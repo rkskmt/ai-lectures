@@ -1,0 +1,629 @@
+---
+title: "機械学習：分類問題"
+_metadata.yml: !expr yaml::read_yaml("_metadata.yml")
+---
+
+## 第一回：分類問題
+
+### 目標
+- 分類問題(Data Classification)：データを分類するタスクを理解する
+    - 2クラス分類
+- データ可視化
+- **決定境界（decision boundary）** の概念を学ぶ
+
+::: {.callout-note title="ここがポイント"}
+- 完全な分類は困難であることを知る
+- 境界決定のトレードオフとコスト
+:::
+
+
+## 今回の問題
+
+
+### サケだけを選別せよ
+
+::: {.columns}
+::: {.column width="60%" .column-center}
+
+- 魚はベルトコンベアで大量に流れてくる
+  - 時間をかけず選別したい
+- サケ以外の魚も混じっている
+  - 一旦、**サケ**（Salmon）か**スズキ**（Sea bass）か
+  - 分類項目を**クラス（class）**という
+:::
+::: {.column width="40%"}
+![](imgs/2026-02-04-12-03-25.png){fig-align="center" width="80%"}
+:::
+:::
+
+
+::: {.callout-note title="ここがポイント"}
+Salmon と Sea bass の**2クラス識別(2-class classification)**問題
+:::
+
+
+## 選別システム
+
+::: {.columns}
+::: {.column width="60%" .column-center}
+```{mermaid}
+%%| fig-width: 90
+%%| fig-height: 320
+flowchart TB
+    A[ベルトコンベアに魚を流す]
+    B[途中で重さを測定]
+    D{何かしらの判定器}
+    E[鮭として加工]
+    F[スズキとして加工]
+
+    A --> B --> D
+    D -->|Salmon| E
+    D -->|Sea bass| F
+
+    classDef bigText font-size:16px,font-weight:400;
+    class A,B,D,E,F bigText;
+
+    style A fill:#e1f5ff
+    style B fill:#fff4e1
+    style D fill:#ff4d4f,color:#ffffff,stroke:#b22222,stroke-width:3px,font-weight:700
+    style E fill:#ffcccb
+    style F fill:#add8e6
+```
+:::
+::: {.column width="40%"}
+![](imgs/2026-02-04-11-46-47.png){fig-align="center"}
+:::
+:::
+
+
+
+## 試行1: 重さだけで分類してみる
+
+### アプローチ
+
+- 重量計をつけられそうなので、まず重さで識別できないかを考えた
+- まずサンプルとして20匹ずつの重さを測定した
+
+
+```{python}
+#| echo: true
+# Salmon（20匹）の重さ (g)
+salmon_weights = [2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,
+                  1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576]
+
+
+# Sea bass（20匹）の重さ (g)
+seabass_weights = [1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,
+                   1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333]
+
+```
+
+
+```{python}
+import altair as alt
+import pandas as pd
+alt.renderers.enable("png")
+
+df = pd.DataFrame({
+    'Weight': salmon_weights + seabass_weights,
+    'Species': ['Salmon'] * 20 + ['Sea bass'] * 20
+})
+
+alt.Chart(df).mark_tick(size=18, thickness=2).encode(
+    x=alt.X('Weight:Q', title='Weight (g)', scale=alt.Scale(zero=False)),
+    y=alt.Y('Species:N', title=None, axis=alt.Axis(labelAngle=0)),
+    color=alt.Color('Species:N', legend=None)
+).properties(height=150, width=480)
+```
+
+
+
+## 準備
+
+pandas, numpy, matplotlib, scikit-learnをインストールします。
+
+```bash
+pip install pandas numpy matplotlib scikit-learn altair[all]
+```
+
+Google Colabの場合は、altair[all]だけインストールすればOKです
+
+```python
+!pip install altair[all]
+```
+
+以下を実行
+
+```{python}
+
+#| echo: true
+#| code-fold: true
+#| code-summary: "全体を表示"
+
+# Setup
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+from sklearn.linear_model import LogisticRegression
+
+# Matplotlib settings
+plt.rcParams['font.size'] = 11
+plt.rcParams['figure.dpi'] = 100
+
+salmon_weights = np.array(salmon_weights)
+seabass_weights = np.array(seabass_weights)
+
+```
+
+
+
+
+## まずはヒストグラム
+
+```{python}
+#| echo: true
+#| fig-align: center
+#| code-fold: true
+#| code-summary: "code"
+plt.figure(figsize=(10, 6))
+bins = range(1000, 2600, 100)
+
+plt.hist(salmon_weights, bins=bins, histtype='step', 
+         edgecolor='black', linewidth=2, label="Salmon")
+plt.hist(seabass_weights, bins=bins, histtype='step', 
+         edgecolor='red', linewidth=2, label="Sea bass")
+
+plt.xlabel("Weight (g)", fontsize=14)
+plt.ylabel("Count", fontsize=14)
+plt.title("Distribution of Fish Weight", fontsize=16, fontweight='bold')
+plt.legend(fontsize=13)
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+## 統計値を見る
+
+```{python}
+#| echo: true
+#| fig-align: center
+#| code-fold: true
+#| code-summary: "code"
+print(f"Salmon   - 最小: {min(salmon_weights)}g, 最大: {max(salmon_weights)}g, 平均: {np.mean(salmon_weights):.0f}g")
+print(f"Sea bass - 最小: {min(seabass_weights)}g, 最大: {max(seabass_weights)}g, 平均: {np.mean(seabass_weights):.0f}g")
+overlap_min = max(min(salmon_weights), min(seabass_weights))
+overlap_max = min(max(salmon_weights), max(seabass_weights))
+if overlap_max >= overlap_min:
+    print(f"\n重なり範囲: {overlap_min}g - {overlap_max}g")
+```
+
+:::{.callout-warning}
+## 発見
+- **双峰型の分布**：2つの山が見える
+  -  **重なっている** がまあ分けれそう？ 
+:::
+
+## 境界線（閾値）を考える
+
+大体でいいので **境界線（threshold）** を設定します。
+
+### 方針
+**1800g以上** → Salmon  
+**1800g未満** → Sea bass
+
+この判定ルールで分類してみましょう。
+
+## 青破線で切ったとしたら
+
+```{python}
+#| echo: false
+#| fig-align: center
+threshold = 1800
+
+plt.figure(figsize=(10, 6))
+bins = range(1000, 2600, 100)
+
+plt.hist(salmon_weights, bins=bins, histtype='step', 
+         edgecolor='black', linewidth=2, label="Salmon")
+plt.hist(seabass_weights, bins=bins, histtype='step', 
+         edgecolor='red', linewidth=2, label="Sea bass")
+
+# Add threshold line
+plt.axvline(x=threshold, color='blue', linestyle='--', linewidth=2.5, 
+           label=f'Threshold = {threshold}g')
+
+plt.xlabel("Weight (g)", fontsize=14)
+plt.ylabel("Count", fontsize=14)
+plt.title("Distribution with Decision Boundary", fontsize=16, fontweight='bold')
+plt.legend(fontsize=13)
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+## 分類結果：4つのパターン
+
+境界線1800gで分類すると、4つのパターンが生まれます：
+
+| 実際の魚 | 判定結果 | 略称 | 説明 |
+|----|----|------|--------|
+| Salmon | Salmon | **TP** (True Positive) | **正しく**Salmonと判定 |
+| Sea bass | Sea bass | **TN** (True Negative) | **正しく**Salmonでは**ない**と判定 |
+| Sea bass | Salmon | **FP** (False Positive) | **誤って**Salmonと判定 |
+| Salmon | Sea bass | **FN** (False Negative) | Salmonを**見逃し** |
+
+
+## TP/FP/TN/FNの覚え方
+
+
+
+### 右から左に読む
+
+1. **右（P/N）** 判定結果 → Positive (シャケ) or Negative (それ以外)
+2. **左（T/F）** その答え合わせ** → True (正解) or False (不正解)
+
+
+つまり、ある魚をみて識別した結果、
+
+- **TP**: Positiveと判定 → True (正しかった！)
+- **FP**: Positiveと判定 → False (間違ってた...)
+- **TN**: Negatigeと判定 → True (正しかった！)
+- **FN**: Negativeと判定 → False (間違ってた...)
+
+
+
+
+## 混同行列（Confusion Matrix）
+
+```{python}
+#| echo: true
+#| fig-align: center
+#| code-fold: true
+#| code-summary: "code"
+threshold = 1800
+
+# Calculate confusion matrix
+TP = sum(1 for weight in salmon_weights if weight >= threshold)
+FN = sum(1 for weight in salmon_weights if weight < threshold)
+TN = sum(1 for weight in seabass_weights if weight < threshold)
+FP = sum(1 for weight in seabass_weights if weight >= threshold)
+
+import matplotlib.patches as mpatches
+
+fig, ax = plt.subplots(figsize=(9, 7))
+
+# Confusion matrix data
+cm_data = np.array([[TP, FP], [FN, TN]])
+
+# Color map: 緑=正解、ピンク=誤り
+colors = np.array([['#90EE90', '#FFB6C6'], ['#FFB6C6', '#90EE90']])
+
+# Draw cells
+for i in range(2):
+    for j in range(2):
+        ax.add_patch(mpatches.Rectangle((j, 1-i), 1, 1, 
+                                        facecolor=colors[i, j], 
+                                        edgecolor='black', linewidth=2.5))
+        ax.text(j + 0.5, 1.5 - i, str(cm_data[i, j]), 
+               ha='center', va='center', fontsize=48, fontweight='bold')
+        
+        # Add label
+        if i == 0 and j == 0:
+            label = 'TP'
+        elif i == 0 and j == 1:
+            label = 'FP'
+        elif i == 1 and j == 0:
+            label = 'FN'
+        else:
+            label = 'TN'
+        ax.text(j + 0.5, 1.15 - i, label, 
+               ha='center', va='center', fontsize=16, style='italic', color='gray')
+
+# Set labels
+ax.set_xlim(0, 2)
+ax.set_ylim(0, 2)
+ax.set_xticks([0.5, 1.5])
+ax.set_yticks([0.5, 1.5])
+ax.set_xticklabels(['Actual: Salmon', 'Actual: Sea bass'], fontsize=13, fontweight='bold')
+ax.set_yticklabels(['Predict: Sea bass', 'Predict: Salmon'], fontsize=13, fontweight='bold')
+ax.set_aspect('equal')
+ax.tick_params(length=0)
+ax.set_title(f'Confusion Matrix (Threshold = {threshold}g)', 
+            fontsize=16, fontweight='bold', pad=20)
+
+plt.tight_layout()
+plt.show()
+```
+
+
+## 判定器の評価
+
+```{python}
+#| echo: true
+#| fig-align: center
+#| code-fold: true
+#| code-summary: "code"
+# Calculate metrics
+accuracy = (TP + TN) / (TP + TN + FP + FN)
+precision = TP / (TP + FP) if (TP + FP) > 0 else 0
+recall = TP / (TP + FN) if (TP + FN) > 0 else 0
+
+metrics = pd.DataFrame({
+    '指標': ['Accuracy', 'Precision', 'Recall'],
+    '値': [f'{accuracy:.3f}', f'{precision:.3f}', f'{recall:.3f}'],
+    '意味': [
+        '全体の正解率',
+        'Salmonと判定した中で実際にSalmonの割合',
+        '実際のSalmonをどれだけ検出できたか',
+    ]
+})
+
+from IPython.display import HTML
+table_html = metrics.to_html(index=False, justify='center')
+display(HTML(f"<div style='font-size:24px'>{table_html}</div>"))
+```
+
+$$\text{Accuracy} = \frac{TP + TN}{\text{全体}} = \frac{\text{正しく分類できた数}}{\text{全データ数}}$$
+
+$$\text{Precision} = \frac{TP}{TP + FP} = \frac{\text{正しいSalmon判定}}{\text{Salmonと判定した全て}}$$
+
+$$\text{Recall} = \frac{TP}{TP + FN} = \frac{\text{検出できたSalmon}}{\text{実際のSalmon全て}}$$
+
+## しきい値を変えると？
+
+```{python}
+#| echo: true
+#| fig-align: center
+#| code-fold: true
+#| code-summary: "code"
+#| output: true
+thresholds = [1600, 1800, 2000]
+results = []
+
+for threshold in thresholds:
+    TP = sum(1 for weight in salmon_weights if weight >= threshold)
+    FN = sum(1 for weight in salmon_weights if weight < threshold)
+    TN = sum(1 for weight in seabass_weights if weight < threshold)
+    FP = sum(1 for weight in seabass_weights if weight >= threshold)
+    
+    accuracy = (TP + TN) / (TP + TN + FP + FN)
+    precision = TP / (TP + FP) if (TP + FP) > 0 else 0
+    recall = TP / (TP + FN) if (TP + FN) > 0 else 0
+    
+    results.append({
+        '境界線': f'{threshold}g',
+        'TP': TP,
+        'FP': FP,
+        'FN': FN,
+        'TN': TN,
+        'Precision': f'{precision:.1%}',
+        'Recall': f'{recall:.1%}',
+        'Accuracy': f'{accuracy:.1%}'
+    })
+
+df = pd.DataFrame(results)
+df
+```
+
+:::{.callout-important}
+- **境界を下げる（1600g）** → Recall ↑、Precision ↓  
+  - Salmonを逃さない（FN減）が、Sea bassの誤判定（FP増）
+  
+- **境界を上げる（2000g）** → Precision ↑、Recall ↓  
+  - Salmon判定の信頼性は高いが、Salmonを見逃す（FN増）
+:::
+
+**Precision と Recall は トレードオフの関係**
+
+
+
+## しきい値の比較（1600g vs 2000g）
+
+:::: {.columns}
+
+::: {.column width="50%"}
+```{python}
+#| echo: false
+#| fig-width: 5.5
+#| fig-height: 4.5
+threshold = 1600
+
+plt.figure(figsize=(5.5, 4.5))
+bins = range(1000, 2600, 100)
+
+plt.hist(salmon_weights, bins=bins, histtype='step', 
+         edgecolor='black', linewidth=2, label="Salmon")
+plt.hist(seabass_weights, bins=bins, histtype='step', 
+         edgecolor='red', linewidth=2, label="Sea bass")
+plt.axvline(x=threshold, color='blue', linestyle='--', linewidth=2.5, 
+           label=f'Threshold={threshold}g')
+
+plt.xlabel("Weight (g)", fontsize=11, fontweight='bold')
+plt.ylabel("Count", fontsize=11, fontweight='bold')
+plt.title(f"Low Threshold ({threshold}g)", fontsize=13, fontweight='bold')
+plt.legend(fontsize=10)
+plt.grid(True, alpha=0.3, linestyle='--')
+plt.tight_layout()
+plt.show()
+
+# Calculate metrics
+TP = sum(1 for weight in salmon_weights if weight >= threshold)
+FN = sum(1 for weight in salmon_weights if weight < threshold)
+TN = sum(1 for weight in seabass_weights if weight < threshold)
+FP = sum(1 for weight in seabass_weights if weight >= threshold)
+precision = TP / (TP + FP) if (TP + FP) > 0 else 0
+recall = TP / (TP + FN) if (TP + FN) > 0 else 0
+```
+
+FP=`{python} FP`, FN=`{python} FN`
+**Precision**: `{python} f'{precision:.1%}'` (低い)  
+**Recall**: `{python} f'{recall:.1%}'` (高い)
+
+:::
+
+::: {.column width="50%"}
+```{python}
+#| echo: false
+#| fig-width: 5.5
+#| fig-height: 4.5
+threshold = 2000
+
+plt.figure(figsize=(5.5, 4.5))
+bins = range(1000, 2600, 100)
+
+plt.hist(salmon_weights, bins=bins, histtype='step', 
+         edgecolor='black', linewidth=2, label="Salmon")
+plt.hist(seabass_weights, bins=bins, histtype='step', 
+         edgecolor='red', linewidth=2, label="Sea bass")
+plt.axvline(x=threshold, color='blue', linestyle='--', linewidth=2.5, 
+           label=f'Threshold={threshold}g')
+
+plt.xlabel("Weight (g)", fontsize=11, fontweight='bold')
+plt.ylabel("Count", fontsize=11, fontweight='bold')
+plt.title(f"High Threshold ({threshold}g)", fontsize=13, fontweight='bold')
+plt.legend(fontsize=10)
+plt.grid(True, alpha=0.3, linestyle='--')
+plt.tight_layout()
+plt.show()
+
+# Calculate metrics
+TP = sum(1 for weight in salmon_weights if weight >= threshold)
+FN = sum(1 for weight in salmon_weights if weight < threshold)
+TN = sum(1 for weight in seabass_weights if weight < threshold)
+FP = sum(1 for weight in seabass_weights if weight >= threshold)
+precision = TP / (TP + FP) if (TP + FP) > 0 else 0
+recall = TP / (TP + FN) if (TP + FN) > 0 else 0
+```
+
+FP=`{python} FP`, FN=`{python} FN`
+**Precision**: `{python} f'{precision:.1%}'` (高い)  
+**Recall**: `{python} f'{recall:.1%}'` (低い)
+
+:::
+
+::::
+
+## どの指標を重視すべきか？
+
+### ケース1: 高級レストラン向け出荷
+- **Precision重視**（FPを避ける）
+- Sea bassの混入を最小化。混入絶対許さないマン
+- → 高めの閾値（2000g）
+
+### ケース2: 缶詰工場（Salmon専用ライン）
+- **Recall重視**（FNを避ける）
+- Salmonの取りこぼしを最小化。シャケ全部入れるマン
+- → 低めの閾値（1600g）
+
+## コストを考慮した最適化
+
+誤分類のコストが異なる場合、総コストを最小化する閾値を選べます。
+$$
+\begin{aligned}
+&\text{argmin}(\text{総コスト}) = N(\text{FP}) \times \text{Cost}(\text{FP}) + N(\text{FN}) \times \text{Cost}(\text{FN})\\
+&\quad \small{N(x): x\text{の個数},\; \text{Cost}(x): x\text{ 1個あたりのコスト}}
+\end{aligned}
+$$
+```{python}
+#| echo: true
+#| fig-align: center
+#| code-fold: true
+#| code-summary: "code"
+#| output: true
+# 例：Sea bass混入のクレーム対応コストが高い場合
+C_FP = 10000  # Sea bass混入のクレーム対応コスト（円/匹）
+C_FN = 500    # Salmon再選別コスト（円/匹）
+
+cost_results = []
+for threshold in [1600, 1800, 2000]:
+    TP = sum(1 for weight in salmon_weights if weight >= threshold)
+    FN = sum(1 for weight in salmon_weights if weight < threshold)
+    TN = sum(1 for weight in seabass_weights if weight < threshold)
+    FP = sum(1 for weight in seabass_weights if weight >= threshold)
+    
+    total_cost = FP * C_FP + FN * C_FN
+    cost_results.append({
+        '境界線': f'{threshold}g',
+        'FP': FP,
+        'FN': FN,
+        '総コスト': f'¥{total_cost:,}'
+    })
+cost_df = pd.DataFrame(cost_results)
+
+min_idx = cost_df.index[cost_df['総コスト'].str.replace('¥', '').str.replace(',', '').astype(int).idxmin()]
+cost_df.loc[min_idx, '境界線'] = '★ ' + cost_df.loc[min_idx, '境界線']
+cost_df.style.hide(axis='index')
+```
+
+**このコスト関数での最適なしきい値**: 2000g（総コスト最小）
+
+## 試行1の結論
+
+:::{.callout-important}
+## 重要なポイント
+
+1. **重さだけでは完全な分類は不可能**
+   - データの分布が重なっている
+   
+2. **境界線は「方針の選択」**
+   - 正解/不正解ではなく、用途に応じた最適化
+   
+3. **評価指標はトレードオフ**
+   - Precision ↑ → Recall ↓
+   - どちらを重視するかは用途次第
+:::
+
+
+## 練習問題
+
+下記のデータ（それぞれ20匹ずつ追加した）について、以下の0-3までのことを実行して分類器をつくれ。
+
+```{python}
+#| echo: true
+salmon_weights = [2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,
+                  1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,
+                  2028, 1903, 2057, 1629, 1884, 1884, 2240, 2081, 1838, 2037,
+                  1839, 1738, 1978, 1754, 1991, 1720, 1731, 1992, 1752, 1652]
+seabass_weights = [1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,
+                   2015, 1528, 1612, 1183, 1436, 1625, 1261, 1701, 1420, 1509,
+                   1387, 1345, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,
+                   1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531]
+
+```
+
+## 以下をレポートで提出
+
+0. まず何をするべきかを考えて実行せよ。
+
+1. 閾値を1800gにした場合の TP, FP, FN, TN を計算せよ
+
+2. 1800gの場合の **Accuracy, Precision, Recall** を求めよ。
+
+3. 1700gの場合の **Accuracy, Precision, Recall** を求めよ。
+
+4. $C_{FP}=5000$円、$C_{FN}=1000$円としたとき、総コストを最小にするしきい値を求めよ
+
+## 問0の答え
+
+```{python}
+#| echo: false
+#| fig-align: center
+threshold = 1800
+
+plt.figure(figsize=(10, 6))
+bins = range(1000, 2600, 100)
+
+plt.hist(salmon_weights, bins=bins, histtype='step', 
+         edgecolor='black', linewidth=2, label="Salmon")
+plt.hist(seabass_weights, bins=bins, histtype='step', 
+         edgecolor='red', linewidth=2, label="Sea bass")
+
+
+plt.xlabel("Weight (g)", fontsize=14)
+plt.ylabel("Count", fontsize=14)
+plt.title("Distribution with Decision Boundary", fontsize=16, fontweight='bold')
+plt.legend(fontsize=13)
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```

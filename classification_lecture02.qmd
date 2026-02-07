@@ -1,0 +1,910 @@
+---
+title: "機械学習：分類問題"
+---
+
+## 第二回：2次元での分類
+
+### 目標
+- **2つの特徴量**を使った分類
+- **手動で直線を引く** → **決定木** → **ロジスティック回帰**の順で理解
+- **決定境界**を可視化する
+
+::: {.callout-note title="ここがポイント"}
+- 1次元（重さのみ）から2次元（重さ+輝度）への拡張
+- まず目で見て、次にアルゴリズムで
+:::
+
+
+## 前回の復習
+
+### 1次元での分類
+
+- **重さ**だけで Salmon vs Sea bass を分類
+- **しきい値（threshold）**を手動で設定
+- TP/FP/TN/FN、Precision/Recall を学習
+
+:::{.callout-note}
+**問題点**: 最適なしきい値は、ケースによって異なる（コスト計算などで決定）
+:::
+
+
+## 今回のアプローチ
+
+### もう1つ特徴量を追加する
+
+- ベルトコンベアに人感センサを搭載して、**輝度（明るさ）**も取れることがわかった
+  - 重さや輝度のことを**特徴量（feature）**といいます
+- 2つの特徴量を使えば、もっと正確に分類できるはず？
+
+| | 前回 | 今回 |
+|--------|---|---|
+| 特徴量 | 重さ（1次元） | 重さ + 輝度（2次元） |
+| 境界 | しきい値 | ？？ |
+
+
+## データの準備
+
+新しく輝度のデータを追加しました（各40匹）。
+
+```{python}
+#| echo: true
+
+# Salmon（40匹）の重さ (g)
+salmon_weights = [2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,
+                  1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,
+                  2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,
+                  1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652]
+
+# Salmon（40匹）の輝度（暗め: 2.1-5.9）
+salmon_brightness = [3.5, 5.8, 4.9, 4.4, 2.6, 2.6, 2.2, 5.5, 4.4, 4.8, 2.1, 
+                     5.9, 5.3, 2.8, 2.7, 2.7, 3.2, 4.1, 3.7, 3.2, 4.4, 2.6, 
+                     3.2, 3.5, 3.8, 5.1, 2.8, 4.1, 4.4, 2.2, 4.4, 2.7, 2.3, 
+                     5.8, 5.9, 5.2, 3.2, 2.4, 4.7, 3.8]
+
+# Sea bass（40匹）の重さ (g)
+seabass_weights = [1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,
+                   1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,
+                   1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,
+                   1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531]
+
+# Sea bass（40匹）の輝度（明るめ: 5.0-9.9）
+seabass_brightness = [5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8, 
+                       8.9, 9.7, 9.5, 8.0, 9.6, 5.4, 6.0, 5.2, 6.6, 6.9, 6.4, 
+                       9.1, 6.8, 6.4, 7.7, 5.7, 9.0, 5.4, 9.9, 8.9, 6.0, 5.0, 
+                       9.1, 8.5, 8.6, 8.9, 5.4, 6.8, 5.6]
+```
+
+
+## 準備
+
+必要なライブラリをインポートします。
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "全体を表示"
+
+# Setup
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix
+
+# Matplotlib settings
+plt.rcParams['font.size'] = 11
+plt.rcParams['figure.dpi'] = 100
+
+# データをnumpy配列に変換
+salmon_weights = np.array(salmon_weights)
+salmon_brightness = np.array(salmon_brightness)
+seabass_weights = np.array(seabass_weights)
+seabass_brightness = np.array(seabass_brightness)
+
+# 特徴量行列とラベルを作成
+X = np.vstack([
+    np.column_stack([salmon_brightness, salmon_weights]),
+    np.column_stack([seabass_brightness, seabass_weights])
+])
+y = np.array([1]*40 + [0]*40)  # 1=Salmon, 0=Sea bass
+```
+
+
+## 目で見て境界線を想像（垂線とする）
+
+```{python}
+#| echo: true
+#| fig-align: center
+#| code-fold: true
+#| code-summary: "code"
+#| classes: fig-medium
+
+plt.figure(figsize=(10, 7))
+
+plt.scatter(salmon_brightness, salmon_weights, 
+           c='black', marker='o', s=100, alpha=0.7, label='Salmon', edgecolors='black')
+plt.scatter(seabass_brightness, seabass_weights, 
+           c='red', marker='s', s=100, alpha=0.7, label='Sea bass', edgecolors='darkred')
+
+plt.xlabel('Lightness', fontsize=14, fontweight='bold')
+plt.ylabel('Weight (g)', fontsize=14, fontweight='bold')
+plt.title('2D Feature Space: Lightness vs Weight', fontsize=16, fontweight='bold')
+plt.legend(fontsize=13, loc='upper left')
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+:::{.callout-note}
+## 観察
+- Salmon（黒丸）は左側（暗い）に集中
+- Sea bass（赤四角）は右側（明るい）に集中
+- でも**5〜6あたりで少し重なっている**
+- **斜めの直線で分けられそう！**
+:::
+
+
+## 試行1: 目で見て直線を引いてみる
+
+### 考え方
+
+グラフを見て、**手動で直線を引いてみましょう**。
+
+- どこに引けば一番うまく分けられそうか？
+- 完璧には分けられない → どのくらい誤分類が出るか？
+
+
+## この辺だとどうか
+
+```{python}
+#| echo: true
+#| fig-align: center
+#| code-fold: true
+#| code-summary: "code"
+#| classes: fig-small
+
+plt.figure(figsize=(10, 7))
+
+plt.scatter(salmon_brightness, salmon_weights, 
+           c='black', marker='o', s=100, alpha=0.7, label='Salmon', edgecolors='black')
+plt.scatter(seabass_brightness, seabass_weights, 
+           c='red', marker='s', s=100, alpha=0.7, label='Sea bass', edgecolors='darkred')
+
+# 手動で引いた直線の例（適当に設定）
+# 例: 輝度=5.5あたりで垂直に分ける
+lightness_threshold = 5.5
+plt.axvline(x=lightness_threshold, color='blue', linestyle='--', linewidth=2.5, 
+           label=f'decision boundary (Lightness = {lightness_threshold})')
+
+plt.xlabel('Lightness', fontsize=14, fontweight='bold')
+plt.ylabel('Weight (g)', fontsize=14, fontweight='bold')
+plt.title('Manual Decision Boundary', fontsize=16, fontweight='bold')
+plt.legend(fontsize=13, loc='upper left')
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+:::{.callout-tip}
+## この直線の性能は？
+輝度5.5を境界にすると、どのくらいの精度になるでしょうか？
+自分で計算してみましょう。
+
+Salmon を陽性 (1) とし、**輝度 < 5.5 → Salmon、>= 5.5 → Sea bass** で判定すると以下の通り。
+
+|            | 予測Salmon | 予測Sea bass |
+|------------|------------|--------------|
+| 実際Salmon | **TP = 35** | FN = 5       |
+| 実際Sea bass | FP = 6     | **TN = 34**  |
+
+- **Accuracy** = (35 + 34) / 80 = **0.86**
+- **Precision (Salmon)** = 35 / (35 + 6) = **0.85**
+- **Recall (Salmon)** = 35 / (35 + 5) = **0.88**
+- **F1** = 2TP / (2TP + FP + FN) = 70 / 81 ≈ **0.86**
+
+Sea bass を陽性にする等、別の定義を使う場合は同じ手順で数え直してみましょう。
+:::
+
+
+## 試行2: 決定木（Decision Tree）
+
+### まず：ジニ不純度とは？
+
+決定木は「**どこで分割すれば一番きれいに分かれるか**」を自動で探します。
+
+その基準が**ジニ不純度（Gini Impurity）**です。
+
+$$\text{Gini} = 1 - (p_{\text{Salmon}}^2 + p_{\text{Sea bass}}^2)$$
+
+- **Gini = 0**: 完全に1クラスだけ（純粋）
+- **Gini = 0.5**: 50:50で混ざってる（不純）
+
+:::{.callout-note}
+## 例
+- データ10個：Salmon 10個、Sea bass 0個 → Gini = 1 - (1² + 0²) = **0**
+- データ10個：Salmon 5個、Sea bass 5個 → Gini = 1 - (0.5² + 0.5²) = **0.5**
+- データ10個：Salmon 8個、Sea bass 2個 → Gini = 1 - (0.8² + 0.2²) = **0.32**
+:::
+
+
+## ジニ不純度を計算してみる
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "code"
+
+def gini_impurity(labels):
+    """ジニ不純度を計算"""
+    if len(labels) == 0:
+        return 0
+    p_salmon = sum(labels) / len(labels)  # 1=Salmon, 0=Sea bass
+    p_seabass = 1 - p_salmon
+    return 1 - (p_salmon**2 + p_seabass**2)
+
+# 全データのジニ不純度
+initial_gini = gini_impurity(y)
+print(f"初期状態（分割前）のジニ不純度: {initial_gini:.3f}")
+print(f"  Salmon: {sum(y)}個, Sea bass: {len(y)-sum(y)}個")
+```
+
+
+## 最良の閾値をどう探す？
+
+### 方法：**総当たり**
+
+**データの値すべて**を候補として試します。
+
+:::{.callout-note title="なぜデータの値？"}
+データとデータの**間**で分けるので、データの値を試せば十分。
+
+例：データが [2.1, 3.5, 5.8] なら
+- 2.1と3.5の間で分ける = 2.1で分割と同じ結果
+- 3.5と5.8の間で分ける = 3.5で分割と同じ結果
+
+→ **データの値だけ試せばOK**
+:::
+
+
+## いくつかの閾値を試してみる
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "code"
+
+# 輝度でいくつかの閾値を試す
+test_thresholds = [3.0, 4.0, 5.0, 6.0, 7.0]
+results = []
+
+for threshold in test_thresholds:
+    # 分割
+    left_mask = X[:, 0] < threshold
+    right_mask = ~left_mask
+    
+    if sum(left_mask) == 0 or sum(right_mask) == 0:
+        continue
+    
+    # 左右のジニ不純度
+    gini_left = gini_impurity(y[left_mask])
+    gini_right = gini_impurity(y[right_mask])
+    
+    # 加重平均
+    n_left = sum(left_mask)
+    n_right = sum(right_mask)
+    weighted_gini = (n_left * gini_left + n_right * gini_right) / len(y)
+    
+    results.append({
+        '閾値': f'{threshold:.1f}',
+        '左側': f'{sum(y[left_mask])}/{n_left}',
+        '右側': f'{sum(y[right_mask])}/{n_right}',
+        'Gini_left': f'{gini_left:.3f}',
+        'Gini_right': f'{gini_right:.3f}',
+        '加重平均': f'{weighted_gini:.3f}'
+    })
+
+results_df = pd.DataFrame(results)
+print("いくつかの閾値でのジニ不純度:")
+display(results_df)
+print("\n→ 加重平均が最小の閾値を選ぶ")
+```
+
+:::{.callout-important}
+**実際は全てのユニーク値**（80個以上）を試して、最小を見つけます。
+:::
+
+
+## 決定木のアルゴリズム（交互版）
+
+### ルール：特徴量を交互に使う
+
+1回目は輝度、2回目は重さ、3回目は輝度...と**交互に使う**ことで、階段状の境界を作ります。
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "code"
+
+def find_best_split_for_feature(X, y, feature_idx):
+    """指定した特徴量で最良の分割点を見つける"""
+    best_gini = float('inf')
+    best_threshold = None
+    best_left_mask = None
+    
+    # この特徴量のユニークな値を試す
+    values = np.unique(X[:, feature_idx])
+    
+    for threshold in values:
+        # 分割
+        left_mask = X[:, feature_idx] < threshold
+        right_mask = ~left_mask
+        
+        # 左右が空でないことを確認
+        if sum(left_mask) == 0 or sum(right_mask) == 0:
+            continue
+        
+        # 左右のジニ不純度
+        gini_left = gini_impurity(y[left_mask])
+        gini_right = gini_impurity(y[right_mask])
+        
+        # 加重平均
+        n_left = sum(left_mask)
+        n_right = sum(right_mask)
+        weighted_gini = (n_left * gini_left + n_right * gini_right) / len(y)
+        
+        if weighted_gini < best_gini:
+            best_gini = weighted_gini
+            best_threshold = threshold
+            best_left_mask = left_mask
+    
+    return best_threshold, best_gini, best_left_mask
+
+# 1回目の分割: 輝度（feature 0）
+feature_names = ['Lightness', 'Weight']
+split1_feature = 0  # Lightness
+split1_threshold, split1_gini, split1_left_mask = find_best_split_for_feature(X, y, split1_feature)
+
+print(f"1回目の分割:")
+print(f"  特徴量: {feature_names[split1_feature]}")
+print(f"  閾値: {split1_threshold:.2f}")
+print(f"  ジニ不純度: {split1_gini:.3f}")
+print(f"  左側: {sum(split1_left_mask)}個, 右側: {sum(~split1_left_mask)}個")
+```
+
+
+## 可視化：1回目の分割
+
+```{python}
+#| echo: false
+#| fig-align: center
+
+plt.figure(figsize=(10, 7))
+
+plt.scatter(salmon_brightness, salmon_weights, 
+           c='black', marker='o', s=100, alpha=0.7, label='Salmon', edgecolors='black')
+plt.scatter(seabass_brightness, seabass_weights, 
+           c='red', marker='s', s=100, alpha=0.7, label='Sea bass', edgecolors='darkred')
+
+# 1回目の分割線（輝度）
+plt.axvline(x=split1_threshold, color='blue', linestyle='-', linewidth=3, 
+           label=f'1st split: Lightness < {split1_threshold:.2f}')
+
+plt.xlabel('Lightness', fontsize=14, fontweight='bold')
+plt.ylabel('Weight (g)', fontsize=14, fontweight='bold')
+plt.title('Decision Tree: First Split (Lightness)', fontsize=16, fontweight='bold')
+plt.legend(fontsize=13, loc='upper left')
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+
+## ステップ2: 2回目の分割（重さで分ける）
+
+左側と右側をそれぞれ**重さで分割**します。
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "code"
+
+split2_feature = 1  # Weight（交互なので重さ）
+
+# 左側を重さで分割
+X_left = X[split1_left_mask]
+y_left = y[split1_left_mask]
+
+split2_left_threshold = None
+if len(X_left) > 1:
+    split2_left_threshold, split2_left_gini, split2_left_left_mask = find_best_split_for_feature(X_left, y_left, split2_feature)
+    print(f"\n2回目の分割（左側）:")
+    print(f"  特徴量: {feature_names[split2_feature]}")
+    print(f"  閾値: {split2_left_threshold:.0f}")
+    print(f"  ジニ不純度: {split2_left_gini:.3f}")
+
+# 右側を重さで分割
+X_right = X[~split1_left_mask]
+y_right = y[~split1_left_mask]
+
+split2_right_threshold = None
+if len(X_right) > 1:
+    split2_right_threshold, split2_right_gini, split2_right_left_mask = find_best_split_for_feature(X_right, y_right, split2_feature)
+    print(f"\n2回目の分割（右側）:")
+    print(f"  特徴量: {feature_names[split2_feature]}")
+    print(f"  閾値: {split2_right_threshold:.0f}")
+    print(f"  ジニ不純度: {split2_right_gini:.3f}")
+```
+
+
+## 可視化：2回目の分割
+
+```{python}
+#| echo: false
+#| fig-align: center
+
+plt.figure(figsize=(10, 7))
+
+plt.scatter(salmon_brightness, salmon_weights, 
+           c='black', marker='o', s=100, alpha=0.7, label='Salmon', edgecolors='black')
+plt.scatter(seabass_brightness, seabass_weights, 
+           c='red', marker='s', s=100, alpha=0.7, label='Sea bass', edgecolors='darkred')
+
+# 1回目の分割線（青・縦線）
+plt.axvline(x=split1_threshold, color='blue', linestyle='-', linewidth=3, 
+           label=f'1st: Lightness < {split1_threshold:.2f}')
+
+# 2回目の分割線（左側・緑・横線）
+if split2_left_threshold is not None:
+    plt.plot([X[:, 0].min(), split1_threshold], [split2_left_threshold, split2_left_threshold], 
+            'green', linestyle='-', linewidth=3, 
+            label=f'2nd left: Weight < {split2_left_threshold:.0f}')
+
+# 2回目の分割線（右側・オレンジ・横線）
+if split2_right_threshold is not None:
+    plt.plot([split1_threshold, X[:, 0].max()], [split2_right_threshold, split2_right_threshold], 
+            'orange', linestyle='-', linewidth=3,
+            label=f'2nd right: Weight < {split2_right_threshold:.0f}')
+
+plt.xlabel('Lightness', fontsize=14, fontweight='bold')
+plt.ylabel('Weight (g)', fontsize=14, fontweight='bold')
+plt.title('Decision Tree: Second Split (Weight) - Alternating Features', fontsize=16, fontweight='bold')
+plt.legend(fontsize=11, loc='upper left')
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+
+## この境界線の性能は？
+
+階段状の境界線で分類した結果を評価します。
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "code"
+
+# 簡易的な予測関数
+def predict_alternating(brightness, weight):
+    """交互分割の決定木で予測"""
+    if brightness < split1_threshold:
+        # 左側（暗い方＝Salmon寄り）
+        if split2_left_threshold is not None:
+            if weight >= split2_left_threshold:
+                return 1  # Salmon（重い）
+            else:
+                return 0  # Sea bass（軽い）
+        else:
+            return 1  # Salmon (分割なし)
+    else:
+        # 右側（明るい方＝Sea bass寄り）
+        if split2_right_threshold is not None:
+            if weight >= split2_right_threshold:
+                return 1  # Salmon（重い）
+            else:
+                return 0  # Sea bass（軽い）
+        else:
+            return 0  # Sea bass (分割なし)
+
+# 全データで予測
+y_pred_alternating = np.array([predict_alternating(X[i, 0], X[i, 1]) for i in range(len(X))])
+
+# 混同行列
+from sklearn.metrics import confusion_matrix
+cm = confusion_matrix(y, y_pred_alternating)
+
+TP = cm[1, 1]
+TN = cm[0, 0]
+FP = cm[0, 1]
+FN = cm[1, 0]
+
+# 評価指標
+accuracy_alt = (TP + TN) / (TP + TN + FP + FN)
+precision_alt = TP / (TP + FP) if (TP + FP) > 0 else 0
+recall_alt = TP / (TP + FN) if (TP + FN) > 0 else 0
+
+print(f"交互分割決定木の性能 (深さ2):")
+print(f"  TP={TP}, FP={FP}, FN={FN}, TN={TN}")
+print(f"  Accuracy:  {accuracy_alt:.3f}")
+print(f"  Precision: {precision_alt:.3f}")
+print(f"  Recall:    {recall_alt:.3f}")
+```
+
+
+## scikit-learnの決定木と比較
+
+自作の決定木（深さ2、交互分割）とライブラリの実装（**深さ3**、最良特徴量を選択）を比較してみましょう。
+
+:::{.callout-note}
+## 違い
+- **自作版**: 深さ2まで、輝度→重さと交互に使う
+- **scikit-learn**: 深さ3まで、毎回最良の特徴量を自動選択
+- → scikit-learnの方が**より細かい階段**になる
+:::
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "code"
+
+# 決定木モデル（深さ3まで）
+tree_model = DecisionTreeClassifier(max_depth=3, random_state=42)
+tree_model.fit(X, y)
+
+# 予測
+y_pred_tree = tree_model.predict(X)
+
+# 評価
+accuracy_tree = accuracy_score(y, y_pred_tree)
+precision_tree = precision_score(y, y_pred_tree)
+recall_tree = recall_score(y, y_pred_tree)
+
+print(f"決定木の性能:")
+print(f"  Accuracy:  {accuracy_tree:.3f}")
+print(f"  Precision: {precision_tree:.3f}")
+print(f"  Recall:    {recall_tree:.3f}")
+```
+
+
+## 決定境界の可視化（決定木）
+
+```{python}
+#| echo: false
+#| fig-align: center
+
+# 決定境界を描画する関数
+def plot_decision_boundary(model, X, y, title, brightness_salmon, weights_salmon, 
+                          brightness_seabass, weights_seabass):
+    h_x = 0.1  # 輝度方向のステップ
+    h_y = 20   # 重さ方向のステップ
+    x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
+    y_min, y_max = X[:, 1].min() - 100, X[:, 1].max() + 100
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, h_x),
+                         np.arange(y_min, y_max, h_y))
+    
+    Z = model.predict(np.c_[xx.ravel(), yy.ravel()])
+    Z = Z.reshape(xx.shape)
+    
+    plt.figure(figsize=(10, 7))
+    plt.contourf(xx, yy, Z, alpha=0.3, levels=1, colors=['lightcoral', 'lightblue'])
+    plt.contour(xx, yy, Z, levels=[0.5], colors='blue', linewidths=3)
+    
+    plt.scatter(brightness_salmon, weights_salmon, 
+               c='black', marker='o', s=100, alpha=0.7, label='Salmon', edgecolors='black')
+    plt.scatter(brightness_seabass, weights_seabass, 
+               c='red', marker='s', s=100, alpha=0.7, label='Sea bass', edgecolors='darkred')
+    
+    plt.xlabel('Lightness', fontsize=14, fontweight='bold')
+    plt.ylabel('Weight (g)', fontsize=14, fontweight='bold')
+    plt.title(title, fontsize=16, fontweight='bold')
+    plt.legend(fontsize=13, loc='upper left')
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.show()
+
+plot_decision_boundary(tree_model, X, y, 
+                      'Decision Tree: Axis-Aligned Decision Boundary',
+                      salmon_brightness, salmon_weights,
+                      seabass_brightness, seabass_weights)
+```
+
+:::{.callout-note}
+- 決定境界が**階段状**（水平・垂直の線の組み合わせ）
+- if-thenルールの結果がこの形になる
+:::
+
+
+## 試行3: ロジスティック回帰（線形分類器）
+
+### 考え方
+
+**数学的に最適な直線**を見つける
+
+- 数式: $w_1 \times \text{輝度} + w_2 \times \text{重さ} + b = 0$
+- この直線で2クラスを最もうまく分ける
+- **斜めの直線**が引ける
+
+::: {.callout-tip title="ロジスティック回帰"}
+**線形分類器**の代表的な手法。確率も計算できる。
+:::
+
+
+## ロジスティック回帰で学習
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "code"
+
+# ロジスティック回帰モデル
+lr_model = LogisticRegression()
+lr_model.fit(X, y)
+
+# 予測
+y_pred_lr = lr_model.predict(X)
+
+# 評価
+accuracy_lr = accuracy_score(y, y_pred_lr)
+precision_lr = precision_score(y, y_pred_lr)
+recall_lr = recall_score(y, y_pred_lr)
+
+print(f"ロジスティック回帰の性能:")
+print(f"  Accuracy:  {accuracy_lr:.3f}")
+print(f"  Precision: {precision_lr:.3f}")
+print(f"  Recall:    {recall_lr:.3f}")
+```
+
+
+## 決定境界の可視化（ロジスティック回帰）
+
+```{python}
+#| echo: false
+#| fig-align: center
+
+plot_decision_boundary(lr_model, X, y, 
+                      'Logistic Regression: Linear Decision Boundary',
+                      salmon_brightness, salmon_weights,
+                      seabass_brightness, seabass_weights)
+```
+
+:::{.callout-note}
+- 青い直線が**決定境界**
+- 背景色: 赤＝Salmon領域、青＝Sea bass領域
+- **斜めの直線1本**でシンプルに分離
+:::
+
+
+## 2つのアルゴリズムの比較
+
+:::: {.columns}
+
+::: {.column width="50%"}
+### 決定木
+
+**メリット:**
+- 解釈しやすい（if-thenルール）
+- 自動で最適化（ジニ不純度）
+- 軸に平行な境界
+
+**デメリット:**
+- 過学習しやすい
+- 階段状の境界のみ
+:::
+
+::: {.column width="50%"}
+### ロジスティック回帰
+
+**メリット:**
+- 数学的に最適
+- シンプル（斜めの直線）
+- 過学習しにくい
+
+**デメリット:**
+- 線形のみ
+- 複雑なパターンに弱い
+:::
+
+::::
+
+
+## 性能比較表
+
+```{python}
+#| echo: false
+
+comparison_df = pd.DataFrame({
+    'モデル': ['決定木', 'ロジスティック回帰'],
+    'Accuracy': [f'{accuracy_tree:.3f}', f'{accuracy_lr:.3f}'],
+    'Precision': [f'{precision_tree:.3f}', f'{precision_lr:.3f}'],
+    'Recall': [f'{recall_tree:.3f}', f'{recall_lr:.3f}']
+})
+
+from IPython.display import HTML
+table_html = comparison_df.to_html(index=False, justify='center')
+display(HTML(f"<div style='font-size:24px'>{table_html}</div>"))
+```
+
+:::{.callout-important}
+どちらが「正解」ではなく、**データと目的に応じて選ぶ**
+:::
+
+
+## 決定木の深さを変えると？
+
+深さを変えることで、複雑さをコントロールできます。
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "code"
+
+depths = [1, 3, 5]
+results = []
+
+for depth in depths:
+    model = DecisionTreeClassifier(max_depth=depth, random_state=42)
+    model.fit(X, y)
+    y_pred = model.predict(X)
+    
+    acc = accuracy_score(y, y_pred)
+    prec = precision_score(y, y_pred)
+    rec = recall_score(y, y_pred)
+    
+    results.append({
+        '深さ': depth,
+        'Accuracy': f'{acc:.3f}',
+        'Precision': f'{prec:.3f}',
+        'Recall': f'{rec:.3f}'
+    })
+
+depth_df = pd.DataFrame(results)
+depth_df
+```
+
+:::{.callout-warning}
+- **深さ1**: シンプルすぎる（underfitting）
+- **深さ3**: バランスが良い
+- **深さ5**: 複雑すぎる可能性（overfitting のリスク）
+:::
+
+
+## 過学習（Overfitting）とは？
+
+:::{.columns}
+:::{.column width="50%"}
+**適切な複雑さ**
+- 訓練データによく適合
+- 新しいデータにも対応
+:::
+:::{.column width="50%"}
+**過学習**
+- 訓練データに**過剰適合**
+- 新しいデータでは性能低下
+:::
+:::
+
+::: {.callout-tip title="対策"}
+- 決定木の深さを制限
+- データを増やす
+- 交差検証で評価
+:::
+
+
+## 混同行列で詳しく見る（決定木）
+
+```{python}
+#| echo: true
+#| fig-align: center
+#| code-fold: true
+#| code-summary: "code"
+
+# 決定木（深さ3）の混同行列
+cm = confusion_matrix(y, y_pred_tree)
+
+TP = cm[1, 1]  # Salmon correctly classified as Salmon
+TN = cm[0, 0]  # Sea bass correctly classified as Sea bass
+FP = cm[0, 1]  # Sea bass incorrectly classified as Salmon
+FN = cm[1, 0]  # Salmon incorrectly classified as Sea bass
+
+import matplotlib.patches as mpatches
+
+fig, ax = plt.subplots(figsize=(9, 7))
+
+# Confusion matrix data
+cm_data = np.array([[TP, FP], [FN, TN]])
+
+# Color map: 緑=正解、ピンク=誤り
+colors = np.array([['#90EE90', '#FFB6C6'], ['#FFB6C6', '#90EE90']])
+
+# Draw cells
+for i in range(2):
+    for j in range(2):
+        ax.add_patch(mpatches.Rectangle((j, 1-i), 1, 1, 
+                                        facecolor=colors[i, j], 
+                                        edgecolor='black', linewidth=2.5))
+        ax.text(j + 0.5, 1.5 - i, str(cm_data[i, j]), 
+               ha='center', va='center', fontsize=48, fontweight='bold')
+        
+        # Add label
+        if i == 0 and j == 0:
+            label = 'TP'
+        elif i == 0 and j == 1:
+            label = 'FP'
+        elif i == 1 and j == 0:
+            label = 'FN'
+        else:
+            label = 'TN'
+        ax.text(j + 0.5, 1.15 - i, label, 
+               ha='center', va='center', fontsize=16, style='italic', color='gray')
+
+# Set labels
+ax.set_xlim(0, 2)
+ax.set_ylim(0, 2)
+ax.set_xticks([0.5, 1.5])
+ax.set_yticks([0.5, 1.5])
+ax.set_xticklabels(['Actual: Salmon', 'Actual: Sea bass'], fontsize=13, fontweight='bold')
+ax.set_yticklabels(['Predict: Sea bass', 'Predict: Salmon'], fontsize=13, fontweight='bold')
+ax.set_aspect('equal')
+ax.tick_params(length=0)
+ax.set_title('Confusion Matrix (Decision Tree)', 
+            fontsize=16, fontweight='bold', pad=20)
+
+plt.tight_layout()
+plt.show()
+
+print(f"\nTP={TP}, FP={FP}, FN={FN}, TN={TN}")
+```
+
+
+## 第二回の結論
+
+:::{.callout-important}
+## 重要なポイント
+
+1. **2次元にすることで分類精度が向上**
+   - 重さ + 輝度の組み合わせで、より正確に分類
+
+2. **まず目で見て、次にアルゴリズム**
+   - 手動の直線 → 決定木 → ロジスティック回帰
+   - 段階的に理解を深める
+
+3. **アルゴリズムによって決定境界が異なる**
+   - 決定木: 階段状（軸に平行）
+   - ロジスティック回帰: 斜めの直線
+
+4. **トレードオフを理解する**
+   - シンプル vs 複雑
+   - 解釈しやすさ vs 性能
+   - 過学習のリスク
+:::
+
+
+## 練習問題
+
+以下を実装して、レポートで提出せよ。
+
+1. **手動で境界線を決める**
+   - グラフを見て、自分で境界線を決める
+   - その境界線でのTP, FP, FN, TNを計算
+
+2. **決定木と ロジスティック回帰を両方実装**
+   - 提供されたデータで学習
+
+3. **決定木の深さを1, 2, 3, 4, 5で試す**
+   - それぞれのAccuracy, Precision, Recallを比較
+   - どの深さが最適か考察
+
+4. **考察**
+   - 手動の境界線 vs 決定木 vs ロジスティック回帰
+   - どれが最も良かったか？その理由は？
+   - 2次元にすることで、1次元と比べてどう改善したか？
+
+
+## 次回予告
+
+### 第三回では...
+
+- **3種類の魚**を扱う（多クラス分類）
+- または**教師なし学習**（クラスタリング）
+- より実践的な機械学習の世界へ！
