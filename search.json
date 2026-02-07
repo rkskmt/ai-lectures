@@ -1,0 +1,359 @@
+[
+  {
+    "objectID": "classification_lecture01.html#第一回分類問題",
+    "href": "classification_lecture01.html#第一回分類問題",
+    "title": "機械学習：分類問題",
+    "section": "第一回：分類問題",
+    "text": "第一回：分類問題\n目標\n\n分類問題(Data Classification)：データを分類するタスクを理解する\n\n2クラス分類\n\nデータ可視化\n決定境界（decision boundary） の概念を学ぶ\n\n\n\n\n\n\n\n\nここがポイント\n\n\n\n完全な分類は困難であることを知る\n境界決定のトレードオフとコスト"
+  },
+  {
+    "objectID": "classification_lecture01.html#今回の問題",
+    "href": "classification_lecture01.html#今回の問題",
+    "title": "機械学習：分類問題",
+    "section": "今回の問題",
+    "text": "今回の問題\nサケだけを選別せよ\n\n\n\n魚はベルトコンベアで大量に流れてくる\n\n時間をかけず選別したい\n\nサケ以外の魚も混じっている\n\n一旦、サケ（Salmon）かスズキ（Sea bass）か\n分類項目をクラス（class）という\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nここがポイント\n\n\nSalmon と Sea bass の2クラス識別(2-class classification)問題"
+  },
+  {
+    "objectID": "classification_lecture01.html#選別システム",
+    "href": "classification_lecture01.html#選別システム",
+    "title": "機械学習：分類問題",
+    "section": "選別システム",
+    "text": "選別システム\n\n\n\n\n\n\n\nflowchart TB\n    A[ベルトコンベアに魚を流す]\n    B[途中で重さを測定]\n    D{何かしらの判定器}\n    E[鮭として加工]\n    F[スズキとして加工]\n\n    A --&gt; B --&gt; D\n    D --&gt;|Salmon| E\n    D --&gt;|Sea bass| F\n\n    classDef bigText font-size:16px,font-weight:400;\n    class A,B,D,E,F bigText;\n\n    style A fill:#e1f5ff\n    style B fill:#fff4e1\n    style D fill:#ff4d4f,color:#ffffff,stroke:#b22222,stroke-width:3px,font-weight:700\n    style E fill:#ffcccb\n    style F fill:#add8e6"
+  },
+  {
+    "objectID": "classification_lecture01.html#試行1-重さだけで分類してみる",
+    "href": "classification_lecture01.html#試行1-重さだけで分類してみる",
+    "title": "機械学習：分類問題",
+    "section": "試行1: 重さだけで分類してみる",
+    "text": "試行1: 重さだけで分類してみる\nアプローチ\n\n重量計をつけられそうなので、まず重さで識別できないかを考えた\nまずサンプルとして20匹ずつの重さを測定した\n\n\n# Salmon（20匹）の重さ (g)\nsalmon_weights = [2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,\n                  1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576]\n\n\n# Sea bass（20匹）の重さ (g)\nseabass_weights = [1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,\n                   1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333]"
+  },
+  {
+    "objectID": "classification_lecture01.html#準備",
+    "href": "classification_lecture01.html#準備",
+    "title": "機械学習：分類問題",
+    "section": "準備",
+    "text": "準備\npandas, numpy, matplotlib, scikit-learnをインストールします。\npip install pandas numpy matplotlib scikit-learn altair[all]\nGoogle Colabの場合は、altair[all]だけインストールすればOKです\n!pip install altair[all]\n以下を実行\n\n\n全体を表示\n# Setup\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport pandas as pd\nfrom sklearn.linear_model import LogisticRegression\n\n# Matplotlib settings\nplt.rcParams['font.size'] = 11\nplt.rcParams['figure.dpi'] = 100\n\nsalmon_weights = np.array(salmon_weights)\nseabass_weights = np.array(seabass_weights)"
+  },
+  {
+    "objectID": "classification_lecture01.html#まずはヒストグラム",
+    "href": "classification_lecture01.html#まずはヒストグラム",
+    "title": "機械学習：分類問題",
+    "section": "まずはヒストグラム",
+    "text": "まずはヒストグラム\n\n\ncode\nplt.figure(figsize=(10, 6))\nbins = range(1000, 2600, 100)\n\nplt.hist(salmon_weights, bins=bins, histtype='step', \n         edgecolor='black', linewidth=2, label=\"Salmon\")\nplt.hist(seabass_weights, bins=bins, histtype='step', \n         edgecolor='red', linewidth=2, label=\"Sea bass\")\n\nplt.xlabel(\"Weight (g)\", fontsize=14)\nplt.ylabel(\"Count\", fontsize=14)\nplt.title(\"Distribution of Fish Weight\", fontsize=16, fontweight='bold')\nplt.legend(fontsize=13)\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()"
+  },
+  {
+    "objectID": "classification_lecture01.html#統計値を見る",
+    "href": "classification_lecture01.html#統計値を見る",
+    "title": "機械学習：分類問題",
+    "section": "統計値を見る",
+    "text": "統計値を見る\n\n\ncode\nprint(f\"Salmon   - 最小: {min(salmon_weights)}g, 最大: {max(salmon_weights)}g, 平均: {np.mean(salmon_weights):.0f}g\")\nprint(f\"Sea bass - 最小: {min(seabass_weights)}g, 最大: {max(seabass_weights)}g, 平均: {np.mean(seabass_weights):.0f}g\")\noverlap_min = max(min(salmon_weights), min(seabass_weights))\noverlap_max = min(max(salmon_weights), max(seabass_weights))\nif overlap_max &gt;= overlap_min:\n    print(f\"\\n重なり範囲: {overlap_min}g - {overlap_max}g\")\n\n\nSalmon   - 最小: 1426g, 最大: 2474g, 平均: 1949g\nSea bass - 最小: 1099g, 最大: 2203g, 平均: 1593g\n\n重なり範囲: 1426g - 2203g\n\n\n\n\n\n\n\n\n発見\n\n\n\n双峰型の分布：2つの山が見える\n\n重なっている がまあ分けれそう？"
+  },
+  {
+    "objectID": "classification_lecture01.html#境界線閾値を考える",
+    "href": "classification_lecture01.html#境界線閾値を考える",
+    "title": "機械学習：分類問題",
+    "section": "境界線（閾値）を考える",
+    "text": "境界線（閾値）を考える\n大体でいいので 境界線（threshold） を設定します。\n方針\n1800g以上 → Salmon\n1800g未満 → Sea bass\nこの判定ルールで分類してみましょう。"
+  },
+  {
+    "objectID": "classification_lecture01.html#青破線で切ったとしたら",
+    "href": "classification_lecture01.html#青破線で切ったとしたら",
+    "title": "機械学習：分類問題",
+    "section": "青破線で切ったとしたら",
+    "text": "青破線で切ったとしたら"
+  },
+  {
+    "objectID": "classification_lecture01.html#分類結果4つのパターン",
+    "href": "classification_lecture01.html#分類結果4つのパターン",
+    "title": "機械学習：分類問題",
+    "section": "分類結果：4つのパターン",
+    "text": "分類結果：4つのパターン\n境界線1800gで分類すると、4つのパターンが生まれます：\n\n\n\n\n\n\n\n\n\n実際の魚\n判定結果\n略称\n説明\n\n\n\n\nSalmon\nSalmon\nTP (True Positive)\n正しくSalmonと判定\n\n\nSea bass\nSea bass\nTN (True Negative)\n正しくSalmonではないと判定\n\n\nSea bass\nSalmon\nFP (False Positive)\n誤ってSalmonと判定\n\n\nSalmon\nSea bass\nFN (False Negative)\nSalmonを見逃し"
+  },
+  {
+    "objectID": "classification_lecture01.html#tpfptnfnの覚え方",
+    "href": "classification_lecture01.html#tpfptnfnの覚え方",
+    "title": "機械学習：分類問題",
+    "section": "TP/FP/TN/FNの覚え方",
+    "text": "TP/FP/TN/FNの覚え方\n右から左に読む\n\n右（P/N） 判定結果 → Positive (シャケ) or Negative (それ以外)\n左（T/F） その答え合わせ** → True (正解) or False (不正解)\n\nつまり、ある魚をみて識別した結果、\n\nTP: Positiveと判定 → True (正しかった！)\nFP: Positiveと判定 → False (間違ってた…)\nTN: Negatigeと判定 → True (正しかった！)\nFN: Negativeと判定 → False (間違ってた…)"
+  },
+  {
+    "objectID": "classification_lecture01.html#混同行列confusion-matrix",
+    "href": "classification_lecture01.html#混同行列confusion-matrix",
+    "title": "機械学習：分類問題",
+    "section": "混同行列（Confusion Matrix）",
+    "text": "混同行列（Confusion Matrix）\n\n\ncode\nthreshold = 1800\n\n# Calculate confusion matrix\nTP = sum(1 for weight in salmon_weights if weight &gt;= threshold)\nFN = sum(1 for weight in salmon_weights if weight &lt; threshold)\nTN = sum(1 for weight in seabass_weights if weight &lt; threshold)\nFP = sum(1 for weight in seabass_weights if weight &gt;= threshold)\n\nimport matplotlib.patches as mpatches\n\nfig, ax = plt.subplots(figsize=(9, 7))\n\n# Confusion matrix data\ncm_data = np.array([[TP, FP], [FN, TN]])\n\n# Color map: 緑=正解、ピンク=誤り\ncolors = np.array([['#90EE90', '#FFB6C6'], ['#FFB6C6', '#90EE90']])\n\n# Draw cells\nfor i in range(2):\n    for j in range(2):\n        ax.add_patch(mpatches.Rectangle((j, 1-i), 1, 1, \n                                        facecolor=colors[i, j], \n                                        edgecolor='black', linewidth=2.5))\n        ax.text(j + 0.5, 1.5 - i, str(cm_data[i, j]), \n               ha='center', va='center', fontsize=48, fontweight='bold')\n        \n        # Add label\n        if i == 0 and j == 0:\n            label = 'TP'\n        elif i == 0 and j == 1:\n            label = 'FP'\n        elif i == 1 and j == 0:\n            label = 'FN'\n        else:\n            label = 'TN'\n        ax.text(j + 0.5, 1.15 - i, label, \n               ha='center', va='center', fontsize=16, style='italic', color='gray')\n\n# Set labels\nax.set_xlim(0, 2)\nax.set_ylim(0, 2)\nax.set_xticks([0.5, 1.5])\nax.set_yticks([0.5, 1.5])\nax.set_xticklabels(['Actual: Salmon', 'Actual: Sea bass'], fontsize=13, fontweight='bold')\nax.set_yticklabels(['Predict: Sea bass', 'Predict: Salmon'], fontsize=13, fontweight='bold')\nax.set_aspect('equal')\nax.tick_params(length=0)\nax.set_title(f'Confusion Matrix (Threshold = {threshold}g)', \n            fontsize=16, fontweight='bold', pad=20)\n\nplt.tight_layout()\nplt.show()"
+  },
+  {
+    "objectID": "classification_lecture01.html#判定器の評価",
+    "href": "classification_lecture01.html#判定器の評価",
+    "title": "機械学習：分類問題",
+    "section": "判定器の評価",
+    "text": "判定器の評価\n\n\ncode\n# Calculate metrics\naccuracy = (TP + TN) / (TP + TN + FP + FN)\nprecision = TP / (TP + FP) if (TP + FP) &gt; 0 else 0\nrecall = TP / (TP + FN) if (TP + FN) &gt; 0 else 0\n\nmetrics = pd.DataFrame({\n    '指標': ['Accuracy', 'Precision', 'Recall'],\n    '値': [f'{accuracy:.3f}', f'{precision:.3f}', f'{recall:.3f}'],\n    '意味': [\n        '全体の正解率',\n        'Salmonと判定した中で実際にSalmonの割合',\n        '実際のSalmonをどれだけ検出できたか',\n    ]\n})\n\nfrom IPython.display import HTML\ntable_html = metrics.to_html(index=False, justify='center')\ndisplay(HTML(f\"&lt;div style='font-size:24px'&gt;{table_html}&lt;/div&gt;\"))\n\n\n\n\n\n\n指標\n値\n意味\n\n\n\n\nAccuracy\n0.775\n全体の正解率\n\n\nPrecision\n0.789\nSalmonと判定した中で実際にSalmonの割合\n\n\nRecall\n0.750\n実際のSalmonをどれだけ検出できたか\n\n\n\n\n\n\n\\[\\text{Accuracy} = \\frac{TP + TN}{\\text{全体}} = \\frac{\\text{正しく分類できた数}}{\\text{全データ数}}\\]\n\\[\\text{Precision} = \\frac{TP}{TP + FP} = \\frac{\\text{正しいSalmon判定}}{\\text{Salmonと判定した全て}}\\]\n\\[\\text{Recall} = \\frac{TP}{TP + FN} = \\frac{\\text{検出できたSalmon}}{\\text{実際のSalmon全て}}\\]"
+  },
+  {
+    "objectID": "classification_lecture01.html#しきい値を変えると",
+    "href": "classification_lecture01.html#しきい値を変えると",
+    "title": "機械学習：分類問題",
+    "section": "しきい値を変えると？",
+    "text": "しきい値を変えると？\n\n\ncode\nthresholds = [1600, 1800, 2000]\nresults = []\n\nfor threshold in thresholds:\n    TP = sum(1 for weight in salmon_weights if weight &gt;= threshold)\n    FN = sum(1 for weight in salmon_weights if weight &lt; threshold)\n    TN = sum(1 for weight in seabass_weights if weight &lt; threshold)\n    FP = sum(1 for weight in seabass_weights if weight &gt;= threshold)\n    \n    accuracy = (TP + TN) / (TP + TN + FP + FN)\n    precision = TP / (TP + FP) if (TP + FP) &gt; 0 else 0\n    recall = TP / (TP + FN) if (TP + FN) &gt; 0 else 0\n    \n    results.append({\n        '境界線': f'{threshold}g',\n        'TP': TP,\n        'FP': FP,\n        'FN': FN,\n        'TN': TN,\n        'Precision': f'{precision:.1%}',\n        'Recall': f'{recall:.1%}',\n        'Accuracy': f'{accuracy:.1%}'\n    })\n\ndf = pd.DataFrame(results)\ndf\n\n\n\n\n\n\n\n\n\n境界線\nTP\nFP\nFN\nTN\nPrecision\nRecall\nAccuracy\n\n\n\n\n0\n1600g\n17\n8\n3\n12\n68.0%\n85.0%\n72.5%\n\n\n1\n1800g\n15\n4\n5\n16\n78.9%\n75.0%\n77.5%\n\n\n2\n2000g\n8\n2\n12\n18\n80.0%\n40.0%\n65.0%\n\n\n\n\n\n\n\n\n\n\n\n\n\n重要\n\n\n\n境界を下げる（1600g） → Recall ↑、Precision ↓\n\nSalmonを逃さない（FN減）が、Sea bassの誤判定（FP増）\n\n境界を上げる（2000g） → Precision ↑、Recall ↓\n\nSalmon判定の信頼性は高いが、Salmonを見逃す（FN増）\n\n\n\n\n\nPrecision と Recall は トレードオフの関係"
+  },
+  {
+    "objectID": "classification_lecture01.html#しきい値の比較1600g-vs-2000g",
+    "href": "classification_lecture01.html#しきい値の比較1600g-vs-2000g",
+    "title": "機械学習：分類問題",
+    "section": "しきい値の比較（1600g vs 2000g）",
+    "text": "しきい値の比較（1600g vs 2000g）\n\n\n\n\n\n\n\n\n\n\n\nFP=8, FN=3 Precision: 68.0% (低い)\nRecall: 85.0% (高い)\n\n\n\n\n\n\n\n\n\n\nFP=2, FN=12 Precision: 80.0% (高い)\nRecall: 40.0% (低い)"
+  },
+  {
+    "objectID": "classification_lecture01.html#どの指標を重視すべきか",
+    "href": "classification_lecture01.html#どの指標を重視すべきか",
+    "title": "機械学習：分類問題",
+    "section": "どの指標を重視すべきか？",
+    "text": "どの指標を重視すべきか？\nケース1: 高級レストラン向け出荷\n\nPrecision重視（FPを避ける）\nSea bassの混入を最小化。混入絶対許さないマン\n→ 高めの閾値（2000g）\n\nケース2: 缶詰工場（Salmon専用ライン）\n\nRecall重視（FNを避ける）\nSalmonの取りこぼしを最小化。シャケ全部入れるマン\n→ 低めの閾値（1600g）"
+  },
+  {
+    "objectID": "classification_lecture01.html#コストを考慮した最適化",
+    "href": "classification_lecture01.html#コストを考慮した最適化",
+    "title": "機械学習：分類問題",
+    "section": "コストを考慮した最適化",
+    "text": "コストを考慮した最適化\n誤分類のコストが異なる場合、総コストを最小化する閾値を選べます。 \\[\n\\begin{aligned}\n&\\text{argmin}(\\text{総コスト}) = N(\\text{FP}) \\times \\text{Cost}(\\text{FP}) + N(\\text{FN}) \\times \\text{Cost}(\\text{FN})\\\\\n&\\quad \\small{N(x): x\\text{の個数},\\; \\text{Cost}(x): x\\text{ 1個あたりのコスト}}\n\\end{aligned}\n\\]\n\n\ncode\n# 例：Sea bass混入のクレーム対応コストが高い場合\nC_FP = 10000  # Sea bass混入のクレーム対応コスト（円/匹）\nC_FN = 500    # Salmon再選別コスト（円/匹）\n\ncost_results = []\nfor threshold in [1600, 1800, 2000]:\n    TP = sum(1 for weight in salmon_weights if weight &gt;= threshold)\n    FN = sum(1 for weight in salmon_weights if weight &lt; threshold)\n    TN = sum(1 for weight in seabass_weights if weight &lt; threshold)\n    FP = sum(1 for weight in seabass_weights if weight &gt;= threshold)\n    \n    total_cost = FP * C_FP + FN * C_FN\n    cost_results.append({\n        '境界線': f'{threshold}g',\n        'FP': FP,\n        'FN': FN,\n        '総コスト': f'¥{total_cost:,}'\n    })\ncost_df = pd.DataFrame(cost_results)\n\nmin_idx = cost_df.index[cost_df['総コスト'].str.replace('¥', '').str.replace(',', '').astype(int).idxmin()]\ncost_df.loc[min_idx, '境界線'] = '★ ' + cost_df.loc[min_idx, '境界線']\ncost_df.style.hide(axis='index')\n\n\n\n\n\n\n\n境界線\nFP\nFN\n総コスト\n\n\n\n\n1600g\n8\n3\n¥81,500\n\n\n1800g\n4\n5\n¥42,500\n\n\n★ 2000g\n2\n12\n¥26,000\n\n\n\n\n\nこのコスト関数での最適なしきい値: 2000g（総コスト最小）"
+  },
+  {
+    "objectID": "classification_lecture01.html#試行1の結論",
+    "href": "classification_lecture01.html#試行1の結論",
+    "title": "機械学習：分類問題",
+    "section": "試行1の結論",
+    "text": "試行1の結論\n\n\n\n\n\n\n重要なポイント\n\n\n\n重さだけでは完全な分類は不可能\n\nデータの分布が重なっている\n\n境界線は「方針の選択」\n\n正解/不正解ではなく、用途に応じた最適化\n\n評価指標はトレードオフ\n\nPrecision ↑ → Recall ↓\nどちらを重視するかは用途次第"
+  },
+  {
+    "objectID": "classification_lecture01.html#練習問題",
+    "href": "classification_lecture01.html#練習問題",
+    "title": "機械学習：分類問題",
+    "section": "練習問題",
+    "text": "練習問題\n下記のデータ（それぞれ20匹ずつ追加した）について、以下の0-3までのことを実行して分類器をつくれ。\n\nsalmon_weights = [2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,\n                  1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,\n                  2028, 1903, 2057, 1629, 1884, 1884, 2240, 2081, 1838, 2037,\n                  1839, 1738, 1978, 1754, 1991, 1720, 1731, 1992, 1752, 1652]\nseabass_weights = [1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,\n                   2015, 1528, 1612, 1183, 1436, 1625, 1261, 1701, 1420, 1509,\n                   1387, 1345, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,\n                   1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531]"
+  },
+  {
+    "objectID": "classification_lecture01.html#以下をレポートで提出",
+    "href": "classification_lecture01.html#以下をレポートで提出",
+    "title": "機械学習：分類問題",
+    "section": "以下をレポートで提出",
+    "text": "以下をレポートで提出\n\nまず何をするべきかを考えて実行せよ。\n閾値を1800gにした場合の TP, FP, FN, TN を計算せよ\n1800gの場合の Accuracy, Precision, Recall を求めよ。\n1700gの場合の Accuracy, Precision, Recall を求めよ。\n\\(C_{FP}=5000\\)円、\\(C_{FN}=1000\\)円としたとき、総コストを最小にするしきい値を求めよ"
+  },
+  {
+    "objectID": "classification_lecture01.html#問0の答え",
+    "href": "classification_lecture01.html#問0の答え",
+    "title": "機械学習：分類問題",
+    "section": "問0の答え",
+    "text": "問0の答え"
+  },
+  {
+    "objectID": "classification_lecture02.html#第二回2次元での分類",
+    "href": "classification_lecture02.html#第二回2次元での分類",
+    "title": "機械学習：分類問題",
+    "section": "第二回：2次元での分類",
+    "text": "第二回：2次元での分類\n目標\n\n2つの特徴量を使った分類\n手動で直線を引く → 決定木 → ロジスティック回帰の順で理解\n決定境界を可視化する\n\n\n\n\n\n\n\n\nここがポイント\n\n\n\n1次元（重さのみ）から2次元（重さ+輝度）への拡張\nまず目で見て、次にアルゴリズムで"
+  },
+  {
+    "objectID": "classification_lecture02.html#前回の復習",
+    "href": "classification_lecture02.html#前回の復習",
+    "title": "機械学習：分類問題",
+    "section": "前回の復習",
+    "text": "前回の復習\n1次元での分類\n\n重さだけで Salmon vs Sea bass を分類\nしきい値（threshold）を手動で設定\nTP/FP/TN/FN、Precision/Recall を学習\n\n\n\n\n\n\n\nノート\n\n\n問題点: 最適なしきい値は、ケースによって異なる（コスト計算などで決定）"
+  },
+  {
+    "objectID": "classification_lecture02.html#今回のアプローチ",
+    "href": "classification_lecture02.html#今回のアプローチ",
+    "title": "機械学習：分類問題",
+    "section": "今回のアプローチ",
+    "text": "今回のアプローチ\nもう1つ特徴量を追加する\n\nベルトコンベアに人感センサを搭載して、輝度（明るさ）も取れることがわかった\n\n重さや輝度のことを特徴量（feature）といいます\n\n2つの特徴量を使えば、もっと正確に分類できるはず？\n\n\n\n\n\n前回\n今回\n\n\n\n\n特徴量\n重さ（1次元）\n重さ + 輝度（2次元）\n\n\n境界\nしきい値\n？？"
+  },
+  {
+    "objectID": "classification_lecture02.html#データの準備",
+    "href": "classification_lecture02.html#データの準備",
+    "title": "機械学習：分類問題",
+    "section": "データの準備",
+    "text": "データの準備\n新しく輝度のデータを追加しました（各40匹）。\n\n# Salmon（40匹）の重さ (g)\nsalmon_weights = [2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,\n                  1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,\n                  2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,\n                  1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652]\n\n# Salmon（40匹）の輝度（暗め: 2.1-5.9）\nsalmon_brightness = [3.5, 5.8, 4.9, 4.4, 2.6, 2.6, 2.2, 5.5, 4.4, 4.8, 2.1, \n                     5.9, 5.3, 2.8, 2.7, 2.7, 3.2, 4.1, 3.7, 3.2, 4.4, 2.6, \n                     3.2, 3.5, 3.8, 5.1, 2.8, 4.1, 4.4, 2.2, 4.4, 2.7, 2.3, \n                     5.8, 5.9, 5.2, 3.2, 2.4, 4.7, 3.8]\n\n# Sea bass（40匹）の重さ (g)\nseabass_weights = [1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,\n                   1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,\n                   1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,\n                   1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531]\n\n# Sea bass（40匹）の輝度（明るめ: 5.0-9.9）\nseabass_brightness = [5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8, \n                       8.9, 9.7, 9.5, 8.0, 9.6, 5.4, 6.0, 5.2, 6.6, 6.9, 6.4, \n                       9.1, 6.8, 6.4, 7.7, 5.7, 9.0, 5.4, 9.9, 8.9, 6.0, 5.0, \n                       9.1, 8.5, 8.6, 8.9, 5.4, 6.8, 5.6]"
+  },
+  {
+    "objectID": "classification_lecture02.html#準備",
+    "href": "classification_lecture02.html#準備",
+    "title": "機械学習：分類問題",
+    "section": "準備",
+    "text": "準備\n必要なライブラリをインポートします。\n\n\n全体を表示\n# Setup\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport pandas as pd\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.tree import DecisionTreeClassifier\nfrom sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix\n\n# Matplotlib settings\nplt.rcParams['font.size'] = 11\nplt.rcParams['figure.dpi'] = 100\n\n# データをnumpy配列に変換\nsalmon_weights = np.array(salmon_weights)\nsalmon_brightness = np.array(salmon_brightness)\nseabass_weights = np.array(seabass_weights)\nseabass_brightness = np.array(seabass_brightness)\n\n# 特徴量行列とラベルを作成\nX = np.vstack([\n    np.column_stack([salmon_brightness, salmon_weights]),\n    np.column_stack([seabass_brightness, seabass_weights])\n])\ny = np.array([1]*40 + [0]*40)  # 1=Salmon, 0=Sea bass"
+  },
+  {
+    "objectID": "classification_lecture02.html#目で見て境界線を想像垂線とする",
+    "href": "classification_lecture02.html#目で見て境界線を想像垂線とする",
+    "title": "機械学習：分類問題",
+    "section": "目で見て境界線を想像（垂線とする）",
+    "text": "目で見て境界線を想像（垂線とする）\n\n\ncode\nplt.figure(figsize=(10, 7))\n\nplt.scatter(salmon_brightness, salmon_weights, \n           c='black', marker='o', s=100, alpha=0.7, label='Salmon', edgecolors='black')\nplt.scatter(seabass_brightness, seabass_weights, \n           c='red', marker='s', s=100, alpha=0.7, label='Sea bass', edgecolors='darkred')\n\nplt.xlabel('Lightness', fontsize=14, fontweight='bold')\nplt.ylabel('Weight (g)', fontsize=14, fontweight='bold')\nplt.title('2D Feature Space: Lightness vs Weight', fontsize=16, fontweight='bold')\nplt.legend(fontsize=13, loc='upper left')\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n観察\n\n\n\nSalmon（黒丸）は左側（暗い）に集中\nSea bass（赤四角）は右側（明るい）に集中\nでも5〜6あたりで少し重なっている\n斜めの直線で分けられそう！"
+  },
+  {
+    "objectID": "classification_lecture02.html#試行1-目で見て直線を引いてみる",
+    "href": "classification_lecture02.html#試行1-目で見て直線を引いてみる",
+    "title": "機械学習：分類問題",
+    "section": "試行1: 目で見て直線を引いてみる",
+    "text": "試行1: 目で見て直線を引いてみる\n考え方\nグラフを見て、手動で直線を引いてみましょう。\n\nどこに引けば一番うまく分けられそうか？\n完璧には分けられない → どのくらい誤分類が出るか？"
+  },
+  {
+    "objectID": "classification_lecture02.html#この辺だとどうか",
+    "href": "classification_lecture02.html#この辺だとどうか",
+    "title": "機械学習：分類問題",
+    "section": "この辺だとどうか",
+    "text": "この辺だとどうか\n\n\ncode\nplt.figure(figsize=(10, 7))\n\nplt.scatter(salmon_brightness, salmon_weights, \n           c='black', marker='o', s=100, alpha=0.7, label='Salmon', edgecolors='black')\nplt.scatter(seabass_brightness, seabass_weights, \n           c='red', marker='s', s=100, alpha=0.7, label='Sea bass', edgecolors='darkred')\n\n# 手動で引いた直線の例（適当に設定）\n# 例: 輝度=5.5あたりで垂直に分ける\nlightness_threshold = 5.5\nplt.axvline(x=lightness_threshold, color='blue', linestyle='--', linewidth=2.5, \n           label=f'decision boundary (Lightness = {lightness_threshold})')\n\nplt.xlabel('Lightness', fontsize=14, fontweight='bold')\nplt.ylabel('Weight (g)', fontsize=14, fontweight='bold')\nplt.title('Manual Decision Boundary', fontsize=16, fontweight='bold')\nplt.legend(fontsize=13, loc='upper left')\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nこの直線の性能は？\n\n\n輝度5.5を境界にすると、どのくらいの精度になるでしょうか？ 自分で計算してみましょう。\nSalmon を陽性 (1) とし、輝度 &lt; 5.5 → Salmon、&gt;= 5.5 → Sea bass で判定すると以下の通り。\n\n\n\n\n予測Salmon\n予測Sea bass\n\n\n\n\n実際Salmon\nTP = 35\nFN = 5\n\n\n実際Sea bass\nFP = 6\nTN = 34\n\n\n\n\nAccuracy = (35 + 34) / 80 = 0.86\nPrecision (Salmon) = 35 / (35 + 6) = 0.85\nRecall (Salmon) = 35 / (35 + 5) = 0.88\nF1 = 2TP / (2TP + FP + FN) = 70 / 81 ≈ 0.86\n\nSea bass を陽性にする等、別の定義を使う場合は同じ手順で数え直してみましょう。"
+  },
+  {
+    "objectID": "classification_lecture02.html#試行2-決定木decision-tree",
+    "href": "classification_lecture02.html#試行2-決定木decision-tree",
+    "title": "機械学習：分類問題",
+    "section": "試行2: 決定木（Decision Tree）",
+    "text": "試行2: 決定木（Decision Tree）\nまず：ジニ不純度とは？\n決定木は「どこで分割すれば一番きれいに分かれるか」を自動で探します。\nその基準がジニ不純度（Gini Impurity）です。\n\\[\\text{Gini} = 1 - (p_{\\text{Salmon}}^2 + p_{\\text{Sea bass}}^2)\\]\n\nGini = 0: 完全に1クラスだけ（純粋）\nGini = 0.5: 50:50で混ざってる（不純）\n\n\n\n\n\n\n\n例\n\n\n\nデータ10個：Salmon 10個、Sea bass 0個 → Gini = 1 - (1² + 0²) = 0\nデータ10個：Salmon 5個、Sea bass 5個 → Gini = 1 - (0.5² + 0.5²) = 0.5\nデータ10個：Salmon 8個、Sea bass 2個 → Gini = 1 - (0.8² + 0.2²) = 0.32"
+  },
+  {
+    "objectID": "classification_lecture02.html#ジニ不純度を計算してみる",
+    "href": "classification_lecture02.html#ジニ不純度を計算してみる",
+    "title": "機械学習：分類問題",
+    "section": "ジニ不純度を計算してみる",
+    "text": "ジニ不純度を計算してみる\n\n\ncode\ndef gini_impurity(labels):\n    \"\"\"ジニ不純度を計算\"\"\"\n    if len(labels) == 0:\n        return 0\n    p_salmon = sum(labels) / len(labels)  # 1=Salmon, 0=Sea bass\n    p_seabass = 1 - p_salmon\n    return 1 - (p_salmon**2 + p_seabass**2)\n\n# 全データのジニ不純度\ninitial_gini = gini_impurity(y)\nprint(f\"初期状態（分割前）のジニ不純度: {initial_gini:.3f}\")\nprint(f\"  Salmon: {sum(y)}個, Sea bass: {len(y)-sum(y)}個\")\n\n\n初期状態（分割前）のジニ不純度: 0.500\n  Salmon: 40個, Sea bass: 40個"
+  },
+  {
+    "objectID": "classification_lecture02.html#最良の閾値をどう探す",
+    "href": "classification_lecture02.html#最良の閾値をどう探す",
+    "title": "機械学習：分類問題",
+    "section": "最良の閾値をどう探す？",
+    "text": "最良の閾値をどう探す？\n方法：総当たり\nデータの値すべてを候補として試します。\n\n\n\n\n\n\n\nなぜデータの値？\n\n\nデータとデータの間で分けるので、データの値を試せば十分。\n例：データが [2.1, 3.5, 5.8] なら - 2.1と3.5の間で分ける = 2.1で分割と同じ結果 - 3.5と5.8の間で分ける = 3.5で分割と同じ結果\n→ データの値だけ試せばOK"
+  },
+  {
+    "objectID": "classification_lecture02.html#いくつかの閾値を試してみる",
+    "href": "classification_lecture02.html#いくつかの閾値を試してみる",
+    "title": "機械学習：分類問題",
+    "section": "いくつかの閾値を試してみる",
+    "text": "いくつかの閾値を試してみる\n\n\ncode\n# 輝度でいくつかの閾値を試す\ntest_thresholds = [3.0, 4.0, 5.0, 6.0, 7.0]\nresults = []\n\nfor threshold in test_thresholds:\n    # 分割\n    left_mask = X[:, 0] &lt; threshold\n    right_mask = ~left_mask\n    \n    if sum(left_mask) == 0 or sum(right_mask) == 0:\n        continue\n    \n    # 左右のジニ不純度\n    gini_left = gini_impurity(y[left_mask])\n    gini_right = gini_impurity(y[right_mask])\n    \n    # 加重平均\n    n_left = sum(left_mask)\n    n_right = sum(right_mask)\n    weighted_gini = (n_left * gini_left + n_right * gini_right) / len(y)\n    \n    results.append({\n        '閾値': f'{threshold:.1f}',\n        '左側': f'{sum(y[left_mask])}/{n_left}',\n        '右側': f'{sum(y[right_mask])}/{n_right}',\n        'Gini_left': f'{gini_left:.3f}',\n        'Gini_right': f'{gini_right:.3f}',\n        '加重平均': f'{weighted_gini:.3f}'\n    })\n\nresults_df = pd.DataFrame(results)\nprint(\"いくつかの閾値でのジニ不純度:\")\ndisplay(results_df)\nprint(\"\\n→ 加重平均が最小の閾値を選ぶ\")\n\n\nいくつかの閾値でのジニ不純度:\n\n\n\n\n\n\n\n\n\n閾値\n左側\n右側\nGini_left\nGini_right\n加重平均\n\n\n\n\n0\n3.0\n13/13\n27/67\n0.000\n0.481\n0.403\n\n\n1\n4.0\n22/22\n18/58\n0.000\n0.428\n0.310\n\n\n2\n5.0\n32/32\n8/48\n0.000\n0.278\n0.167\n\n\n3\n6.0\n40/50\n0/30\n0.320\n0.000\n0.200\n\n\n4\n7.0\n40/60\n0/20\n0.444\n0.000\n0.333\n\n\n\n\n\n\n\n\n→ 加重平均が最小の閾値を選ぶ\n\n\n\n\n\n\n\n\n重要\n\n\n実際は全てのユニーク値（80個以上）を試して、最小を見つけます。"
+  },
+  {
+    "objectID": "classification_lecture02.html#決定木のアルゴリズム交互版",
+    "href": "classification_lecture02.html#決定木のアルゴリズム交互版",
+    "title": "機械学習：分類問題",
+    "section": "決定木のアルゴリズム（交互版）",
+    "text": "決定木のアルゴリズム（交互版）\nルール：特徴量を交互に使う\n1回目は輝度、2回目は重さ、3回目は輝度…と交互に使うことで、階段状の境界を作ります。\n\n\ncode\ndef find_best_split_for_feature(X, y, feature_idx):\n    \"\"\"指定した特徴量で最良の分割点を見つける\"\"\"\n    best_gini = float('inf')\n    best_threshold = None\n    best_left_mask = None\n    \n    # この特徴量のユニークな値を試す\n    values = np.unique(X[:, feature_idx])\n    \n    for threshold in values:\n        # 分割\n        left_mask = X[:, feature_idx] &lt; threshold\n        right_mask = ~left_mask\n        \n        # 左右が空でないことを確認\n        if sum(left_mask) == 0 or sum(right_mask) == 0:\n            continue\n        \n        # 左右のジニ不純度\n        gini_left = gini_impurity(y[left_mask])\n        gini_right = gini_impurity(y[right_mask])\n        \n        # 加重平均\n        n_left = sum(left_mask)\n        n_right = sum(right_mask)\n        weighted_gini = (n_left * gini_left + n_right * gini_right) / len(y)\n        \n        if weighted_gini &lt; best_gini:\n            best_gini = weighted_gini\n            best_threshold = threshold\n            best_left_mask = left_mask\n    \n    return best_threshold, best_gini, best_left_mask\n\n# 1回目の分割: 輝度（feature 0）\nfeature_names = ['Lightness', 'Weight']\nsplit1_feature = 0  # Lightness\nsplit1_threshold, split1_gini, split1_left_mask = find_best_split_for_feature(X, y, split1_feature)\n\nprint(f\"1回目の分割:\")\nprint(f\"  特徴量: {feature_names[split1_feature]}\")\nprint(f\"  閾値: {split1_threshold:.2f}\")\nprint(f\"  ジニ不純度: {split1_gini:.3f}\")\nprint(f\"  左側: {sum(split1_left_mask)}個, 右側: {sum(~split1_left_mask)}個\")\n\n\n1回目の分割:\n  特徴量: Lightness\n  閾値: 5.00\n  ジニ不純度: 0.167\n  左側: 32個, 右側: 48個"
+  },
+  {
+    "objectID": "classification_lecture02.html#可視化1回目の分割",
+    "href": "classification_lecture02.html#可視化1回目の分割",
+    "title": "機械学習：分類問題",
+    "section": "可視化：1回目の分割",
+    "text": "可視化：1回目の分割"
+  },
+  {
+    "objectID": "classification_lecture02.html#ステップ2-2回目の分割重さで分ける",
+    "href": "classification_lecture02.html#ステップ2-2回目の分割重さで分ける",
+    "title": "機械学習：分類問題",
+    "section": "ステップ2: 2回目の分割（重さで分ける）",
+    "text": "ステップ2: 2回目の分割（重さで分ける）\n左側と右側をそれぞれ重さで分割します。\n\n\ncode\nsplit2_feature = 1  # Weight（交互なので重さ）\n\n# 左側を重さで分割\nX_left = X[split1_left_mask]\ny_left = y[split1_left_mask]\n\nsplit2_left_threshold = None\nif len(X_left) &gt; 1:\n    split2_left_threshold, split2_left_gini, split2_left_left_mask = find_best_split_for_feature(X_left, y_left, split2_feature)\n    print(f\"\\n2回目の分割（左側）:\")\n    print(f\"  特徴量: {feature_names[split2_feature]}\")\n    print(f\"  閾値: {split2_left_threshold:.0f}\")\n    print(f\"  ジニ不純度: {split2_left_gini:.3f}\")\n\n# 右側を重さで分割\nX_right = X[~split1_left_mask]\ny_right = y[~split1_left_mask]\n\nsplit2_right_threshold = None\nif len(X_right) &gt; 1:\n    split2_right_threshold, split2_right_gini, split2_right_left_mask = find_best_split_for_feature(X_right, y_right, split2_feature)\n    print(f\"\\n2回目の分割（右側）:\")\n    print(f\"  特徴量: {feature_names[split2_feature]}\")\n    print(f\"  閾値: {split2_right_threshold:.0f}\")\n    print(f\"  ジニ不純度: {split2_right_gini:.3f}\")\n\n\n\n2回目の分割（左側）:\n  特徴量: Weight\n  閾値: 1483\n  ジニ不純度: 0.000\n\n2回目の分割（右側）:\n  特徴量: Weight\n  閾値: 1820\n  ジニ不純度: 0.192"
+  },
+  {
+    "objectID": "classification_lecture02.html#可視化2回目の分割",
+    "href": "classification_lecture02.html#可視化2回目の分割",
+    "title": "機械学習：分類問題",
+    "section": "可視化：2回目の分割",
+    "text": "可視化：2回目の分割"
+  },
+  {
+    "objectID": "classification_lecture02.html#この境界線の性能は",
+    "href": "classification_lecture02.html#この境界線の性能は",
+    "title": "機械学習：分類問題",
+    "section": "この境界線の性能は？",
+    "text": "この境界線の性能は？\n階段状の境界線で分類した結果を評価します。\n\n\ncode\n# 簡易的な予測関数\ndef predict_alternating(brightness, weight):\n    \"\"\"交互分割の決定木で予測\"\"\"\n    if brightness &lt; split1_threshold:\n        # 左側（暗い方＝Salmon寄り）\n        if split2_left_threshold is not None:\n            if weight &gt;= split2_left_threshold:\n                return 1  # Salmon（重い）\n            else:\n                return 0  # Sea bass（軽い）\n        else:\n            return 1  # Salmon (分割なし)\n    else:\n        # 右側（明るい方＝Sea bass寄り）\n        if split2_right_threshold is not None:\n            if weight &gt;= split2_right_threshold:\n                return 1  # Salmon（重い）\n            else:\n                return 0  # Sea bass（軽い）\n        else:\n            return 0  # Sea bass (分割なし)\n\n# 全データで予測\ny_pred_alternating = np.array([predict_alternating(X[i, 0], X[i, 1]) for i in range(len(X))])\n\n# 混同行列\nfrom sklearn.metrics import confusion_matrix\ncm = confusion_matrix(y, y_pred_alternating)\n\nTP = cm[1, 1]\nTN = cm[0, 0]\nFP = cm[0, 1]\nFN = cm[1, 0]\n\n# 評価指標\naccuracy_alt = (TP + TN) / (TP + TN + FP + FN)\nprecision_alt = TP / (TP + FP) if (TP + FP) &gt; 0 else 0\nrecall_alt = TP / (TP + FN) if (TP + FN) &gt; 0 else 0\n\nprint(f\"交互分割決定木の性能 (深さ2):\")\nprint(f\"  TP={TP}, FP={FP}, FN={FN}, TN={TN}\")\nprint(f\"  Accuracy:  {accuracy_alt:.3f}\")\nprint(f\"  Precision: {precision_alt:.3f}\")\nprint(f\"  Recall:    {recall_alt:.3f}\")\n\n\n交互分割決定木の性能 (深さ2):\n  TP=37, FP=5, FN=3, TN=35\n  Accuracy:  0.900\n  Precision: 0.881\n  Recall:    0.925"
+  },
+  {
+    "objectID": "classification_lecture02.html#scikit-learnの決定木と比較",
+    "href": "classification_lecture02.html#scikit-learnの決定木と比較",
+    "title": "機械学習：分類問題",
+    "section": "scikit-learnの決定木と比較",
+    "text": "scikit-learnの決定木と比較\n自作の決定木（深さ2、交互分割）とライブラリの実装（深さ3、最良特徴量を選択）を比較してみましょう。\n\n\n\n\n\n\n違い\n\n\n\n自作版: 深さ2まで、輝度→重さと交互に使う\nscikit-learn: 深さ3まで、毎回最良の特徴量を自動選択\n→ scikit-learnの方がより細かい階段になる\n\n\n\n\n\n\ncode\n# 決定木モデル（深さ3まで）\ntree_model = DecisionTreeClassifier(max_depth=3, random_state=42)\ntree_model.fit(X, y)\n\n# 予測\ny_pred_tree = tree_model.predict(X)\n\n# 評価\naccuracy_tree = accuracy_score(y, y_pred_tree)\nprecision_tree = precision_score(y, y_pred_tree)\nrecall_tree = recall_score(y, y_pred_tree)\n\nprint(f\"決定木の性能:\")\nprint(f\"  Accuracy:  {accuracy_tree:.3f}\")\nprint(f\"  Precision: {precision_tree:.3f}\")\nprint(f\"  Recall:    {recall_tree:.3f}\")\n\n\n決定木の性能:\n  Accuracy:  0.975\n  Precision: 0.952\n  Recall:    1.000"
+  },
+  {
+    "objectID": "classification_lecture02.html#決定境界の可視化決定木",
+    "href": "classification_lecture02.html#決定境界の可視化決定木",
+    "title": "機械学習：分類問題",
+    "section": "決定境界の可視化（決定木）",
+    "text": "決定境界の可視化（決定木）\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nノート\n\n\n\n決定境界が階段状（水平・垂直の線の組み合わせ）\nif-thenルールの結果がこの形になる"
+  },
+  {
+    "objectID": "classification_lecture02.html#試行3-ロジスティック回帰線形分類器",
+    "href": "classification_lecture02.html#試行3-ロジスティック回帰線形分類器",
+    "title": "機械学習：分類問題",
+    "section": "試行3: ロジスティック回帰（線形分類器）",
+    "text": "試行3: ロジスティック回帰（線形分類器）\n考え方\n数学的に最適な直線を見つける\n\n数式: \\(w_1 \\times \\text{輝度} + w_2 \\times \\text{重さ} + b = 0\\)\nこの直線で2クラスを最もうまく分ける\n斜めの直線が引ける\n\n\n\n\n\n\n\n\nロジスティック回帰\n\n\n線形分類器の代表的な手法。確率も計算できる。"
+  },
+  {
+    "objectID": "classification_lecture02.html#ロジスティック回帰で学習",
+    "href": "classification_lecture02.html#ロジスティック回帰で学習",
+    "title": "機械学習：分類問題",
+    "section": "ロジスティック回帰で学習",
+    "text": "ロジスティック回帰で学習\n\n\ncode\n# ロジスティック回帰モデル\nlr_model = LogisticRegression()\nlr_model.fit(X, y)\n\n# 予測\ny_pred_lr = lr_model.predict(X)\n\n# 評価\naccuracy_lr = accuracy_score(y, y_pred_lr)\nprecision_lr = precision_score(y, y_pred_lr)\nrecall_lr = recall_score(y, y_pred_lr)\n\nprint(f\"ロジスティック回帰の性能:\")\nprint(f\"  Accuracy:  {accuracy_lr:.3f}\")\nprint(f\"  Precision: {precision_lr:.3f}\")\nprint(f\"  Recall:    {recall_lr:.3f}\")\n\n\nロジスティック回帰の性能:\n  Accuracy:  0.950\n  Precision: 0.974\n  Recall:    0.925"
+  },
+  {
+    "objectID": "classification_lecture02.html#決定境界の可視化ロジスティック回帰",
+    "href": "classification_lecture02.html#決定境界の可視化ロジスティック回帰",
+    "title": "機械学習：分類問題",
+    "section": "決定境界の可視化（ロジスティック回帰）",
+    "text": "決定境界の可視化（ロジスティック回帰）\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nノート\n\n\n\n青い直線が決定境界\n背景色: 赤＝Salmon領域、青＝Sea bass領域\n斜めの直線1本でシンプルに分離"
+  },
+  {
+    "objectID": "classification_lecture02.html#つのアルゴリズムの比較",
+    "href": "classification_lecture02.html#つのアルゴリズムの比較",
+    "title": "機械学習：分類問題",
+    "section": "2つのアルゴリズムの比較",
+    "text": "2つのアルゴリズムの比較\n\n\n決定木\nメリット: - 解釈しやすい（if-thenルール） - 自動で最適化（ジニ不純度） - 軸に平行な境界\nデメリット: - 過学習しやすい - 階段状の境界のみ\n\nロジスティック回帰\nメリット: - 数学的に最適 - シンプル（斜めの直線） - 過学習しにくい\nデメリット: - 線形のみ - 複雑なパターンに弱い"
+  },
+  {
+    "objectID": "classification_lecture02.html#性能比較表",
+    "href": "classification_lecture02.html#性能比較表",
+    "title": "機械学習：分類問題",
+    "section": "性能比較表",
+    "text": "性能比較表\n\n\n\n\n\n\nモデル\nAccuracy\nPrecision\nRecall\n\n\n\n\n決定木\n0.975\n0.952\n1.000\n\n\nロジスティック回帰\n0.950\n0.974\n0.925\n\n\n\n\n\n\n\n\n\n\n\n\n重要\n\n\nどちらが「正解」ではなく、データと目的に応じて選ぶ"
+  },
+  {
+    "objectID": "classification_lecture02.html#決定木の深さを変えると",
+    "href": "classification_lecture02.html#決定木の深さを変えると",
+    "title": "機械学習：分類問題",
+    "section": "決定木の深さを変えると？",
+    "text": "決定木の深さを変えると？\n深さを変えることで、複雑さをコントロールできます。\n\n\ncode\ndepths = [1, 3, 5]\nresults = []\n\nfor depth in depths:\n    model = DecisionTreeClassifier(max_depth=depth, random_state=42)\n    model.fit(X, y)\n    y_pred = model.predict(X)\n    \n    acc = accuracy_score(y, y_pred)\n    prec = precision_score(y, y_pred)\n    rec = recall_score(y, y_pred)\n    \n    results.append({\n        '深さ': depth,\n        'Accuracy': f'{acc:.3f}',\n        'Precision': f'{prec:.3f}',\n        'Recall': f'{rec:.3f}'\n    })\n\ndepth_df = pd.DataFrame(results)\ndepth_df\n\n\n\n\n\n\n\n\n\n深さ\nAccuracy\nPrecision\nRecall\n\n\n\n\n0\n1\n0.900\n1.000\n0.800\n\n\n1\n3\n0.975\n0.952\n1.000\n\n\n2\n5\n0.988\n1.000\n0.975\n\n\n\n\n\n\n\n\n\n\n\n\n\n警告\n\n\n\n深さ1: シンプルすぎる（underfitting）\n深さ3: バランスが良い\n深さ5: 複雑すぎる可能性（overfitting のリスク）"
+  },
+  {
+    "objectID": "classification_lecture02.html#過学習overfittingとは",
+    "href": "classification_lecture02.html#過学習overfittingとは",
+    "title": "機械学習：分類問題",
+    "section": "過学習（Overfitting）とは？",
+    "text": "過学習（Overfitting）とは？\n\n\n適切な複雑さ - 訓練データによく適合 - 新しいデータにも対応\n\n過学習 - 訓練データに過剰適合 - 新しいデータでは性能低下\n\n\n\n\n\n\n\n\n対策\n\n\n\n決定木の深さを制限\nデータを増やす\n交差検証で評価"
+  },
+  {
+    "objectID": "classification_lecture02.html#混同行列で詳しく見る決定木",
+    "href": "classification_lecture02.html#混同行列で詳しく見る決定木",
+    "title": "機械学習：分類問題",
+    "section": "混同行列で詳しく見る（決定木）",
+    "text": "混同行列で詳しく見る（決定木）\n\n\ncode\n# 決定木（深さ3）の混同行列\ncm = confusion_matrix(y, y_pred_tree)\n\nTP = cm[1, 1]  # Salmon correctly classified as Salmon\nTN = cm[0, 0]  # Sea bass correctly classified as Sea bass\nFP = cm[0, 1]  # Sea bass incorrectly classified as Salmon\nFN = cm[1, 0]  # Salmon incorrectly classified as Sea bass\n\nimport matplotlib.patches as mpatches\n\nfig, ax = plt.subplots(figsize=(9, 7))\n\n# Confusion matrix data\ncm_data = np.array([[TP, FP], [FN, TN]])\n\n# Color map: 緑=正解、ピンク=誤り\ncolors = np.array([['#90EE90', '#FFB6C6'], ['#FFB6C6', '#90EE90']])\n\n# Draw cells\nfor i in range(2):\n    for j in range(2):\n        ax.add_patch(mpatches.Rectangle((j, 1-i), 1, 1, \n                                        facecolor=colors[i, j], \n                                        edgecolor='black', linewidth=2.5))\n        ax.text(j + 0.5, 1.5 - i, str(cm_data[i, j]), \n               ha='center', va='center', fontsize=48, fontweight='bold')\n        \n        # Add label\n        if i == 0 and j == 0:\n            label = 'TP'\n        elif i == 0 and j == 1:\n            label = 'FP'\n        elif i == 1 and j == 0:\n            label = 'FN'\n        else:\n            label = 'TN'\n        ax.text(j + 0.5, 1.15 - i, label, \n               ha='center', va='center', fontsize=16, style='italic', color='gray')\n\n# Set labels\nax.set_xlim(0, 2)\nax.set_ylim(0, 2)\nax.set_xticks([0.5, 1.5])\nax.set_yticks([0.5, 1.5])\nax.set_xticklabels(['Actual: Salmon', 'Actual: Sea bass'], fontsize=13, fontweight='bold')\nax.set_yticklabels(['Predict: Sea bass', 'Predict: Salmon'], fontsize=13, fontweight='bold')\nax.set_aspect('equal')\nax.tick_params(length=0)\nax.set_title('Confusion Matrix (Decision Tree)', \n            fontsize=16, fontweight='bold', pad=20)\n\nplt.tight_layout()\nplt.show()\n\nprint(f\"\\nTP={TP}, FP={FP}, FN={FN}, TN={TN}\")\n\n\n\n\n\n\n\n\n\n\nTP=40, FP=2, FN=0, TN=38"
+  },
+  {
+    "objectID": "classification_lecture02.html#第二回の結論",
+    "href": "classification_lecture02.html#第二回の結論",
+    "title": "機械学習：分類問題",
+    "section": "第二回の結論",
+    "text": "第二回の結論\n\n\n\n\n\n\n重要なポイント\n\n\n\n2次元にすることで分類精度が向上\n\n重さ + 輝度の組み合わせで、より正確に分類\n\nまず目で見て、次にアルゴリズム\n\n手動の直線 → 決定木 → ロジスティック回帰\n段階的に理解を深める\n\nアルゴリズムによって決定境界が異なる\n\n決定木: 階段状（軸に平行）\nロジスティック回帰: 斜めの直線\n\nトレードオフを理解する\n\nシンプル vs 複雑\n解釈しやすさ vs 性能\n過学習のリスク"
+  },
+  {
+    "objectID": "classification_lecture02.html#練習問題",
+    "href": "classification_lecture02.html#練習問題",
+    "title": "機械学習：分類問題",
+    "section": "練習問題",
+    "text": "練習問題\n以下を実装して、レポートで提出せよ。\n\n手動で境界線を決める\n\nグラフを見て、自分で境界線を決める\nその境界線でのTP, FP, FN, TNを計算\n\n決定木と ロジスティック回帰を両方実装\n\n提供されたデータで学習\n\n決定木の深さを1, 2, 3, 4, 5で試す\n\nそれぞれのAccuracy, Precision, Recallを比較\nどの深さが最適か考察\n\n考察\n\n手動の境界線 vs 決定木 vs ロジスティック回帰\nどれが最も良かったか？その理由は？\n2次元にすることで、1次元と比べてどう改善したか？"
+  },
+  {
+    "objectID": "classification_lecture02.html#次回予告",
+    "href": "classification_lecture02.html#次回予告",
+    "title": "機械学習：分類問題",
+    "section": "次回予告",
+    "text": "次回予告\n第三回では…\n\n3種類の魚を扱う（多クラス分類）\nまたは教師なし学習（クラスタリング）\nより実践的な機械学習の世界へ！"
+  }
+]

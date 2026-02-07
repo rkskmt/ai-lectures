@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="ja"><head>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-html/tabby.min.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.8.27">
+
+  <meta name="author" content="rkskmt">
+  <title>AI Lectures – 機械学習：分類問題</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-5ae9c59b2727fcd5357d4f034d95f9e0.css">
+  <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="site_libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+  <meta name="mermaid-theme" content="default">
+  <script src="site_libs/quarto-diagram/mermaid.min.js"></script>
+  <script src="site_libs/quarto-diagram/mermaid-init.js"></script>
+  <link href="site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+  
+  <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+  <style>
+  .callout.callout-note {
+      font-size: 1.5rem;
+      line-height: 1.4;
+  }
+  .callout.callout-note .callout-title {
+      font-size: 2.3rem;
+  }
+  .reveal h2 {
+      font-weight: bold !important;
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #000;
+  }
+  .reveal h3 {
+      font-style: normal !important;
+      font-weight: bold !important;
+      font-size: 2.3rem;
+      background-color: #5dade2;
+      color: white;
+      padding: 20px 25px;
+      margin: 12px;
+      border-radius: 5px;
+  }
+  .reveal p {
+      line-height: 1.6;
+      margin: 30px 0;
+  }
+  .mermaid {
+      max-height: 400px;
+      overflow: auto;
+  }
+  .mermaid svg text {
+      text-anchor: middle !important;
+      dominant-baseline: middle !important;
+  }
+  .mermaid .nodeLabel, .mermaid .edgeLabel {
+      text-align: center !important;
+  }
+  .cell details {
+      margin: 4px 0;
+      font-size: 1.5rem;
+      font-color: #e488f2ff;
+  }
+
+  .cell details summary {
+      margin-bottom: 0px;
+      padding: 4px;
+  }
+  .cell-output pre {
+    font-size: 2.0rem;
+  }
+  .reveal details pre code {
+    font-size: 1.5rem;
+  }
+  .reveal img {
+    max-height: 500px;
+    width: auto;
+    height: auto;
+  }
+  .fig-small img {
+    max-height: 300px !important;
+  }
+  .fig-medium img {
+    max-height: 400px !important;
+  }
+  </style>
+</head>
+<body class="quarto-light">
+<script src="mathjax-config.js"></script>
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">機械学習：分類問題</h1>
+  <p class="subtitle">分類問題 (Classification)</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+rkskmt 
+</div>
+</div>
+</div>
+
+  <p class="date">2026年2月7日</p>
+</section>
+<section id="第一回分類問題" class="slide level2">
+<h2>第一回：分類問題</h2>
+<h3 id="目標">目標</h3>
+<ul>
+<li>分類問題(Data Classification)：データを分類するタスクを理解する
+<ul>
+<li>2クラス分類</li>
+</ul></li>
+<li>データ可視化</li>
+<li><strong>決定境界（decision boundary）</strong> の概念を学ぶ</li>
+</ul>
+<div title="ここがポイント">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ここがポイント</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>完全な分類は困難であることを知る</li>
+<li>境界決定のトレードオフとコスト</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="今回の問題" class="slide level2">
+<h2>今回の問題</h2>
+<h3 id="サケだけを選別せよ">サケだけを選別せよ</h3>
+<div class="columns">
+<div class="column column-center" style="width:60%;">
+<ul>
+<li>魚はベルトコンベアで大量に流れてくる
+<ul>
+<li>時間をかけず選別したい</li>
+</ul></li>
+<li>サケ以外の魚も混じっている
+<ul>
+<li>一旦、<strong>サケ</strong>（Salmon）か<strong>スズキ</strong>（Sea bass）か</li>
+<li>分類項目を<strong>クラス（class）</strong>という</li>
+</ul></li>
+</ul>
+</div><div class="column" style="width:40%;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="imgs/2026-02-04-12-03-25.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img data-src="imgs/2026-02-04-12-03-25.png" class="quarto-figure quarto-figure-center" style="width:80.0%"></a></p>
+</figure>
+</div>
+</div></div>
+<div title="ここがポイント">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ここがポイント</strong></p>
+</div>
+<div class="callout-content">
+<p>Salmon と Sea bass の<strong>2クラス識別(2-class classification)</strong>問題</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="選別システム" class="slide level2">
+<h2>選別システム</h2>
+<div class="columns">
+<div class="column column-center" style="width:60%;">
+<div class="cell" data-reveal="true" data-fig-width="90" data-fig-height="320" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart TB
+    A[ベルトコンベアに魚を流す]
+    B[途中で重さを測定]
+    D{何かしらの判定器}
+    E[鮭として加工]
+    F[スズキとして加工]
+
+    A --&gt; B --&gt; D
+    D --&gt;|Salmon| E
+    D --&gt;|Sea bass| F
+
+    classDef bigText font-size:16px,font-weight:400;
+    class A,B,D,E,F bigText;
+
+    style A fill:#e1f5ff
+    style B fill:#fff4e1
+    style D fill:#ff4d4f,color:#ffffff,stroke:#b22222,stroke-width:3px,font-weight:700
+    style E fill:#ffcccb
+    style F fill:#add8e6
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</div><div class="column" style="width:40%;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="imgs/2026-02-04-11-46-47.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img data-src="imgs/2026-02-04-11-46-47.png" class="quarto-figure quarto-figure-center"></a></p>
+</figure>
+</div>
+</div></div>
+</section>
+<section id="試行1-重さだけで分類してみる" class="slide level2">
+<h2>試行1: 重さだけで分類してみる</h2>
+<h3 id="アプローチ">アプローチ</h3>
+<ul>
+<li>重量計をつけられそうなので、まず重さで識別できないかを考えた</li>
+<li>まずサンプルとして20匹ずつの重さを測定した</li>
+</ul>
+<div id="a739fbc7" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="co"># Salmon（20匹）の重さ (g)</span></span>
+<span id="cb1-2"><a></a>salmon_weights <span class="op">=</span> [<span class="dv">2149</span>, <span class="dv">1959</span>, <span class="dv">2194</span>, <span class="dv">2457</span>, <span class="dv">1930</span>, <span class="dv">1930</span>, <span class="dv">2474</span>, <span class="dv">2230</span>, <span class="dv">1859</span>, <span class="dv">2163</span>,</span>
+<span id="cb1-3"><a></a>                  <span class="dv">1861</span>, <span class="dv">1860</span>, <span class="dv">2073</span>, <span class="dv">1426</span>, <span class="dv">1483</span>, <span class="dv">1831</span>, <span class="dv">1696</span>, <span class="dv">2094</span>, <span class="dv">1728</span>, <span class="dv">1576</span>]</span>
+<span id="cb1-4"><a></a></span>
+<span id="cb1-5"><a></a></span>
+<span id="cb1-6"><a></a><span class="co"># Sea bass（20匹）の重さ (g)</span></span>
+<span id="cb1-7"><a></a>seabass_weights <span class="op">=</span> [<span class="dv">1677</span>, <span class="dv">1327</span>, <span class="dv">1486</span>, <span class="dv">1440</span>, <span class="dv">1857</span>, <span class="dv">1476</span>, <span class="dv">1749</span>, <span class="dv">2203</span>, <span class="dv">1979</span>, <span class="dv">1468</span>,</span>
+<span id="cb1-8"><a></a>                   <span class="dv">1496</span>, <span class="dv">1737</span>, <span class="dv">1099</span>, <span class="dv">1341</span>, <span class="dv">1748</span>, <span class="dv">1563</span>, <span class="dv">2181</span>, <span class="dv">1414</span>, <span class="dv">1286</span>, <span class="dv">1333</span>]</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="f78b8041" class="cell" data-execution_count="2">
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div>
+<figure>
+<p><a href="classification_lecture01_files/figure-revealjs/cell-3-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img data-src="classification_lecture01_files/figure-revealjs/cell-3-output-1.png" width="540" height="192"></a></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="準備" class="slide level2">
+<h2>準備</h2>
+<p>pandas, numpy, matplotlib, scikit-learnをインストールします。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a></a><span class="ex">pip</span> install pandas numpy matplotlib scikit-learn altair<span class="pp">[</span><span class="ss">all</span><span class="pp">]</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Google Colabの場合は、altair[all]だけインストールすればOKです</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a><span class="op">!</span>pip install altair[<span class="bu">all</span>]</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<p>以下を実行</p>
+<div id="5e27f0b8" class="cell" data-execution_count="3">
+<details class="code-fold">
+<summary>全体を表示</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a></a><span class="co"># Setup</span></span>
+<span id="cb4-2"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb4-3"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb4-4"><a></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb4-5"><a></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression</span>
+<span id="cb4-6"><a></a></span>
+<span id="cb4-7"><a></a><span class="co"># Matplotlib settings</span></span>
+<span id="cb4-8"><a></a>plt.rcParams[<span class="st">'font.size'</span>] <span class="op">=</span> <span class="dv">11</span></span>
+<span id="cb4-9"><a></a>plt.rcParams[<span class="st">'figure.dpi'</span>] <span class="op">=</span> <span class="dv">100</span></span>
+<span id="cb4-10"><a></a></span>
+<span id="cb4-11"><a></a>salmon_weights <span class="op">=</span> np.array(salmon_weights)</span>
+<span id="cb4-12"><a></a>seabass_weights <span class="op">=</span> np.array(seabass_weights)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+<section id="まずはヒストグラム" class="slide level2">
+<h2>まずはヒストグラム</h2>
+<div id="201ced21" class="cell" data-execution_count="4">
+<details class="code-fold">
+<summary>code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb5-2"><a></a>bins <span class="op">=</span> <span class="bu">range</span>(<span class="dv">1000</span>, <span class="dv">2600</span>, <span class="dv">100</span>)</span>
+<span id="cb5-3"><a></a></span>
+<span id="cb5-4"><a></a>plt.hist(salmon_weights, bins<span class="op">=</span>bins, histtype<span class="op">=</span><span class="st">'step'</span>, </span>
+<span id="cb5-5"><a></a>         edgecolor<span class="op">=</span><span class="st">'black'</span>, linewidth<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">"Salmon"</span>)</span>
+<span id="cb5-6"><a></a>plt.hist(seabass_weights, bins<span class="op">=</span>bins, histtype<span class="op">=</span><span class="st">'step'</span>, </span>
+<span id="cb5-7"><a></a>         edgecolor<span class="op">=</span><span class="st">'red'</span>, linewidth<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">"Sea bass"</span>)</span>
+<span id="cb5-8"><a></a></span>
+<span id="cb5-9"><a></a>plt.xlabel(<span class="st">"Weight (g)"</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
+<span id="cb5-10"><a></a>plt.ylabel(<span class="st">"Count"</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
+<span id="cb5-11"><a></a>plt.title(<span class="st">"Distribution of Fish Weight"</span>, fontsize<span class="op">=</span><span class="dv">16</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>)</span>
+<span id="cb5-12"><a></a>plt.legend(fontsize<span class="op">=</span><span class="dv">13</span>)</span>
+<span id="cb5-13"><a></a>plt.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb5-14"><a></a>plt.tight_layout()</span>
+<span id="cb5-15"><a></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="classification_lecture01_files/figure-revealjs/cell-5-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img data-src="classification_lecture01_files/figure-revealjs/cell-5-output-1.png" class="quarto-figure quarto-figure-center" width="987" height="587"></a></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="統計値を見る" class="slide level2">
+<h2>統計値を見る</h2>
+<div id="2e36a835" class="cell" data-execution_count="5">
+<details class="code-fold">
+<summary>code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a></a><span class="bu">print</span>(<span class="ss">f"Salmon   - 最小: </span><span class="sc">{</span><span class="bu">min</span>(salmon_weights)<span class="sc">}</span><span class="ss">g, 最大: </span><span class="sc">{</span><span class="bu">max</span>(salmon_weights)<span class="sc">}</span><span class="ss">g, 平均: </span><span class="sc">{</span>np<span class="sc">.</span>mean(salmon_weights)<span class="sc">:.0f}</span><span class="ss">g"</span>)</span>
+<span id="cb6-2"><a></a><span class="bu">print</span>(<span class="ss">f"Sea bass - 最小: </span><span class="sc">{</span><span class="bu">min</span>(seabass_weights)<span class="sc">}</span><span class="ss">g, 最大: </span><span class="sc">{</span><span class="bu">max</span>(seabass_weights)<span class="sc">}</span><span class="ss">g, 平均: </span><span class="sc">{</span>np<span class="sc">.</span>mean(seabass_weights)<span class="sc">:.0f}</span><span class="ss">g"</span>)</span>
+<span id="cb6-3"><a></a>overlap_min <span class="op">=</span> <span class="bu">max</span>(<span class="bu">min</span>(salmon_weights), <span class="bu">min</span>(seabass_weights))</span>
+<span id="cb6-4"><a></a>overlap_max <span class="op">=</span> <span class="bu">min</span>(<span class="bu">max</span>(salmon_weights), <span class="bu">max</span>(seabass_weights))</span>
+<span id="cb6-5"><a></a><span class="cf">if</span> overlap_max <span class="op">&gt;=</span> overlap_min:</span>
+<span id="cb6-6"><a></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">重なり範囲: </span><span class="sc">{</span>overlap_min<span class="sc">}</span><span class="ss">g - </span><span class="sc">{</span>overlap_max<span class="sc">}</span><span class="ss">g"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Salmon   - 最小: 1426g, 最大: 2474g, 平均: 1949g
+Sea bass - 最小: 1099g, 最大: 2203g, 平均: 1593g
+
+重なり範囲: 1426g - 2203g</code></pre>
+</div>
+</div>
+<div class="callout callout-warning callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>発見</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li><strong>双峰型の分布</strong>：2つの山が見える
+<ul>
+<li><strong>重なっている</strong> がまあ分けれそう？</li>
+</ul></li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section id="境界線閾値を考える" class="slide level2">
+<h2>境界線（閾値）を考える</h2>
+<p>大体でいいので <strong>境界線（threshold）</strong> を設定します。</p>
+<h3 id="方針">方針</h3>
+<p><strong>1800g以上</strong> → Salmon<br>
+<strong>1800g未満</strong> → Sea bass</p>
+<p>この判定ルールで分類してみましょう。</p>
+</section>
+<section id="青破線で切ったとしたら" class="slide level2">
+<h2>青破線で切ったとしたら</h2>
+<div id="7817766e" class="cell" data-execution_count="6">
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="classification_lecture01_files/figure-revealjs/cell-7-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img data-src="classification_lecture01_files/figure-revealjs/cell-7-output-1.png" class="quarto-figure quarto-figure-center" width="987" height="587"></a></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="分類結果4つのパターン" class="slide level2">
+<h2>分類結果：4つのパターン</h2>
+<p>境界線1800gで分類すると、4つのパターンが生まれます：</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 18%">
+<col style="width: 18%">
+<col style="width: 27%">
+<col style="width: 36%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>実際の魚</th>
+<th>判定結果</th>
+<th>略称</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Salmon</td>
+<td>Salmon</td>
+<td><strong>TP</strong> (True Positive)</td>
+<td><strong>正しく</strong>Salmonと判定</td>
+</tr>
+<tr class="even">
+<td>Sea bass</td>
+<td>Sea bass</td>
+<td><strong>TN</strong> (True Negative)</td>
+<td><strong>正しく</strong>Salmonでは<strong>ない</strong>と判定</td>
+</tr>
+<tr class="odd">
+<td>Sea bass</td>
+<td>Salmon</td>
+<td><strong>FP</strong> (False Positive)</td>
+<td><strong>誤って</strong>Salmonと判定</td>
+</tr>
+<tr class="even">
+<td>Salmon</td>
+<td>Sea bass</td>
+<td><strong>FN</strong> (False Negative)</td>
+<td>Salmonを<strong>見逃し</strong></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="tpfptnfnの覚え方" class="slide level2 scrollable">
+<h2>TP/FP/TN/FNの覚え方</h2>
+<h3 id="右から左に読む">右から左に読む</h3>
+<ol type="1">
+<li><strong>右（P/N）</strong> 判定結果 → Positive (シャケ) or Negative (それ以外)</li>
+<li><strong>左（T/F）</strong> その答え合わせ** → True (正解) or False (不正解)</li>
+</ol>
+<p>つまり、ある魚をみて識別した結果、</p>
+<ul>
+<li><strong>TP</strong>: Positiveと判定 → True (正しかった！)</li>
+<li><strong>FP</strong>: Positiveと判定 → False (間違ってた…)</li>
+<li><strong>TN</strong>: Negatigeと判定 → True (正しかった！)</li>
+<li><strong>FN</strong>: Negativeと判定 → False (間違ってた…)</li>
+</ul>
+</section>
+<section id="混同行列confusion-matrix" class="slide level2">
+<h2>混同行列（Confusion Matrix）</h2>
+<div id="c3425914" class="cell" data-execution_count="7">
+<details class="code-fold">
+<summary>code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a></a>threshold <span class="op">=</span> <span class="dv">1800</span></span>
+<span id="cb8-2"><a></a></span>
+<span id="cb8-3"><a></a><span class="co"># Calculate confusion matrix</span></span>
+<span id="cb8-4"><a></a>TP <span class="op">=</span> <span class="bu">sum</span>(<span class="dv">1</span> <span class="cf">for</span> weight <span class="kw">in</span> salmon_weights <span class="cf">if</span> weight <span class="op">&gt;=</span> threshold)</span>
+<span id="cb8-5"><a></a>FN <span class="op">=</span> <span class="bu">sum</span>(<span class="dv">1</span> <span class="cf">for</span> weight <span class="kw">in</span> salmon_weights <span class="cf">if</span> weight <span class="op">&lt;</span> threshold)</span>
+<span id="cb8-6"><a></a>TN <span class="op">=</span> <span class="bu">sum</span>(<span class="dv">1</span> <span class="cf">for</span> weight <span class="kw">in</span> seabass_weights <span class="cf">if</span> weight <span class="op">&lt;</span> threshold)</span>
+<span id="cb8-7"><a></a>FP <span class="op">=</span> <span class="bu">sum</span>(<span class="dv">1</span> <span class="cf">for</span> weight <span class="kw">in</span> seabass_weights <span class="cf">if</span> weight <span class="op">&gt;=</span> threshold)</span>
+<span id="cb8-8"><a></a></span>
+<span id="cb8-9"><a></a><span class="im">import</span> matplotlib.patches <span class="im">as</span> mpatches</span>
+<span id="cb8-10"><a></a></span>
+<span id="cb8-11"><a></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">7</span>))</span>
+<span id="cb8-12"><a></a></span>
+<span id="cb8-13"><a></a><span class="co"># Confusion matrix data</span></span>
+<span id="cb8-14"><a></a>cm_data <span class="op">=</span> np.array([[TP, FP], [FN, TN]])</span>
+<span id="cb8-15"><a></a></span>
+<span id="cb8-16"><a></a><span class="co"># Color map: 緑=正解、ピンク=誤り</span></span>
+<span id="cb8-17"><a></a>colors <span class="op">=</span> np.array([[<span class="st">'#90EE90'</span>, <span class="st">'#FFB6C6'</span>], [<span class="st">'#FFB6C6'</span>, <span class="st">'#90EE90'</span>]])</span>
+<span id="cb8-18"><a></a></span>
+<span id="cb8-19"><a></a><span class="co"># Draw cells</span></span>
+<span id="cb8-20"><a></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>):</span>
+<span id="cb8-21"><a></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>):</span>
+<span id="cb8-22"><a></a>        ax.add_patch(mpatches.Rectangle((j, <span class="dv">1</span><span class="op">-</span>i), <span class="dv">1</span>, <span class="dv">1</span>, </span>
+<span id="cb8-23"><a></a>                                        facecolor<span class="op">=</span>colors[i, j], </span>
+<span id="cb8-24"><a></a>                                        edgecolor<span class="op">=</span><span class="st">'black'</span>, linewidth<span class="op">=</span><span class="fl">2.5</span>))</span>
+<span id="cb8-25"><a></a>        ax.text(j <span class="op">+</span> <span class="fl">0.5</span>, <span class="fl">1.5</span> <span class="op">-</span> i, <span class="bu">str</span>(cm_data[i, j]), </span>
+<span id="cb8-26"><a></a>               ha<span class="op">=</span><span class="st">'center'</span>, va<span class="op">=</span><span class="st">'center'</span>, fontsize<span class="op">=</span><span class="dv">48</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>)</span>
+<span id="cb8-27"><a></a>        </span>
+<span id="cb8-28"><a></a>        <span class="co"># Add label</span></span>
+<span id="cb8-29"><a></a>        <span class="cf">if</span> i <span class="op">==</span> <span class="dv">0</span> <span class="kw">and</span> j <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb8-30"><a></a>            label <span class="op">=</span> <span class="st">'TP'</span></span>
+<span id="cb8-31"><a></a>        <span class="cf">elif</span> i <span class="op">==</span> <span class="dv">0</span> <span class="kw">and</span> j <span class="op">==</span> <span class="dv">1</span>:</span>
+<span id="cb8-32"><a></a>            label <span class="op">=</span> <span class="st">'FP'</span></span>
+<span id="cb8-33"><a></a>        <span class="cf">elif</span> i <span class="op">==</span> <span class="dv">1</span> <span class="kw">and</span> j <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb8-34"><a></a>            label <span class="op">=</span> <span class="st">'FN'</span></span>
+<span id="cb8-35"><a></a>        <span class="cf">else</span>:</span>
+<span id="cb8-36"><a></a>            label <span class="op">=</span> <span class="st">'TN'</span></span>
+<span id="cb8-37"><a></a>        ax.text(j <span class="op">+</span> <span class="fl">0.5</span>, <span class="fl">1.15</span> <span class="op">-</span> i, label, </span>
+<span id="cb8-38"><a></a>               ha<span class="op">=</span><span class="st">'center'</span>, va<span class="op">=</span><span class="st">'center'</span>, fontsize<span class="op">=</span><span class="dv">16</span>, style<span class="op">=</span><span class="st">'italic'</span>, color<span class="op">=</span><span class="st">'gray'</span>)</span>
+<span id="cb8-39"><a></a></span>
+<span id="cb8-40"><a></a><span class="co"># Set labels</span></span>
+<span id="cb8-41"><a></a>ax.set_xlim(<span class="dv">0</span>, <span class="dv">2</span>)</span>
+<span id="cb8-42"><a></a>ax.set_ylim(<span class="dv">0</span>, <span class="dv">2</span>)</span>
+<span id="cb8-43"><a></a>ax.set_xticks([<span class="fl">0.5</span>, <span class="fl">1.5</span>])</span>
+<span id="cb8-44"><a></a>ax.set_yticks([<span class="fl">0.5</span>, <span class="fl">1.5</span>])</span>
+<span id="cb8-45"><a></a>ax.set_xticklabels([<span class="st">'Actual: Salmon'</span>, <span class="st">'Actual: Sea bass'</span>], fontsize<span class="op">=</span><span class="dv">13</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>)</span>
+<span id="cb8-46"><a></a>ax.set_yticklabels([<span class="st">'Predict: Sea bass'</span>, <span class="st">'Predict: Salmon'</span>], fontsize<span class="op">=</span><span class="dv">13</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>)</span>
+<span id="cb8-47"><a></a>ax.set_aspect(<span class="st">'equal'</span>)</span>
+<span id="cb8-48"><a></a>ax.tick_params(length<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb8-49"><a></a>ax.set_title(<span class="ss">f'Confusion Matrix (Threshold = </span><span class="sc">{</span>threshold<span class="sc">}</span><span class="ss">g)'</span>, </span>
+<span id="cb8-50"><a></a>            fontsize<span class="op">=</span><span class="dv">16</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>, pad<span class="op">=</span><span class="dv">20</span>)</span>
+<span id="cb8-51"><a></a></span>
+<span id="cb8-52"><a></a>plt.tight_layout()</span>
+<span id="cb8-53"><a></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="classification_lecture01_files/figure-revealjs/cell-8-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img data-src="classification_lecture01_files/figure-revealjs/cell-8-output-1.png" class="quarto-figure quarto-figure-center" width="802" height="687"></a></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="判定器の評価" class="slide level2">
+<h2>判定器の評価</h2>
+<div id="f5392e76" class="cell" data-execution_count="8">
+<details class="code-fold">
+<summary>code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a></a><span class="co"># Calculate metrics</span></span>
+<span id="cb9-2"><a></a>accuracy <span class="op">=</span> (TP <span class="op">+</span> TN) <span class="op">/</span> (TP <span class="op">+</span> TN <span class="op">+</span> FP <span class="op">+</span> FN)</span>
+<span id="cb9-3"><a></a>precision <span class="op">=</span> TP <span class="op">/</span> (TP <span class="op">+</span> FP) <span class="cf">if</span> (TP <span class="op">+</span> FP) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> <span class="dv">0</span></span>
+<span id="cb9-4"><a></a>recall <span class="op">=</span> TP <span class="op">/</span> (TP <span class="op">+</span> FN) <span class="cf">if</span> (TP <span class="op">+</span> FN) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> <span class="dv">0</span></span>
+<span id="cb9-5"><a></a></span>
+<span id="cb9-6"><a></a>metrics <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb9-7"><a></a>    <span class="st">'指標'</span>: [<span class="st">'Accuracy'</span>, <span class="st">'Precision'</span>, <span class="st">'Recall'</span>],</span>
+<span id="cb9-8"><a></a>    <span class="st">'値'</span>: [<span class="ss">f'</span><span class="sc">{</span>accuracy<span class="sc">:.3f}</span><span class="ss">'</span>, <span class="ss">f'</span><span class="sc">{</span>precision<span class="sc">:.3f}</span><span class="ss">'</span>, <span class="ss">f'</span><span class="sc">{</span>recall<span class="sc">:.3f}</span><span class="ss">'</span>],</span>
+<span id="cb9-9"><a></a>    <span class="st">'意味'</span>: [</span>
+<span id="cb9-10"><a></a>        <span class="st">'全体の正解率'</span>,</span>
+<span id="cb9-11"><a></a>        <span class="st">'Salmonと判定した中で実際にSalmonの割合'</span>,</span>
+<span id="cb9-12"><a></a>        <span class="st">'実際のSalmonをどれだけ検出できたか'</span>,</span>
+<span id="cb9-13"><a></a>    ]</span>
+<span id="cb9-14"><a></a>})</span>
+<span id="cb9-15"><a></a></span>
+<span id="cb9-16"><a></a><span class="im">from</span> IPython.display <span class="im">import</span> HTML</span>
+<span id="cb9-17"><a></a>table_html <span class="op">=</span> metrics.to_html(index<span class="op">=</span><span class="va">False</span>, justify<span class="op">=</span><span class="st">'center'</span>)</span>
+<span id="cb9-18"><a></a>display(HTML(<span class="ss">f"&lt;div style='font-size:24px'&gt;</span><span class="sc">{</span>table_html<span class="sc">}</span><span class="ss">&lt;/div&gt;"</span>))</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div style="font-size:24px">
+<table class="dataframe caption-top" data-border="1">
+<thead>
+<tr class="header" style="text-align: center;">
+<th data-quarto-table-cell-role="th">指標</th>
+<th data-quarto-table-cell-role="th">値</th>
+<th data-quarto-table-cell-role="th">意味</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Accuracy</td>
+<td>0.775</td>
+<td>全体の正解率</td>
+</tr>
+<tr class="even">
+<td>Precision</td>
+<td>0.789</td>
+<td>Salmonと判定した中で実際にSalmonの割合</td>
+</tr>
+<tr class="odd">
+<td>Recall</td>
+<td>0.750</td>
+<td>実際のSalmonをどれだけ検出できたか</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p><span class="math display">\[\text{Accuracy} = \frac{TP + TN}{\text{全体}} = \frac{\text{正しく分類できた数}}{\text{全データ数}}\]</span></p>
+<p><span class="math display">\[\text{Precision} = \frac{TP}{TP + FP} = \frac{\text{正しいSalmon判定}}{\text{Salmonと判定した全て}}\]</span></p>
+<p><span class="math display">\[\text{Recall} = \frac{TP}{TP + FN} = \frac{\text{検出できたSalmon}}{\text{実際のSalmon全て}}\]</span></p>
+</section>
+<section id="しきい値を変えると" class="slide level2">
+<h2>しきい値を変えると？</h2>
+<div id="49810ed9" class="cell" data-execution_count="9">
+<details class="code-fold">
+<summary>code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a></a>thresholds <span class="op">=</span> [<span class="dv">1600</span>, <span class="dv">1800</span>, <span class="dv">2000</span>]</span>
+<span id="cb10-2"><a></a>results <span class="op">=</span> []</span>
+<span id="cb10-3"><a></a></span>
+<span id="cb10-4"><a></a><span class="cf">for</span> threshold <span class="kw">in</span> thresholds:</span>
+<span id="cb10-5"><a></a>    TP <span class="op">=</span> <span class="bu">sum</span>(<span class="dv">1</span> <span class="cf">for</span> weight <span class="kw">in</span> salmon_weights <span class="cf">if</span> weight <span class="op">&gt;=</span> threshold)</span>
+<span id="cb10-6"><a></a>    FN <span class="op">=</span> <span class="bu">sum</span>(<span class="dv">1</span> <span class="cf">for</span> weight <span class="kw">in</span> salmon_weights <span class="cf">if</span> weight <span class="op">&lt;</span> threshold)</span>
+<span id="cb10-7"><a></a>    TN <span class="op">=</span> <span class="bu">sum</span>(<span class="dv">1</span> <span class="cf">for</span> weight <span class="kw">in</span> seabass_weights <span class="cf">if</span> weight <span class="op">&lt;</span> threshold)</span>
+<span id="cb10-8"><a></a>    FP <span class="op">=</span> <span class="bu">sum</span>(<span class="dv">1</span> <span class="cf">for</span> weight <span class="kw">in</span> seabass_weights <span class="cf">if</span> weight <span class="op">&gt;=</span> threshold)</span>
+<span id="cb10-9"><a></a>    </span>
+<span id="cb10-10"><a></a>    accuracy <span class="op">=</span> (TP <span class="op">+</span> TN) <span class="op">/</span> (TP <span class="op">+</span> TN <span class="op">+</span> FP <span class="op">+</span> FN)</span>
+<span id="cb10-11"><a></a>    precision <span class="op">=</span> TP <span class="op">/</span> (TP <span class="op">+</span> FP) <span class="cf">if</span> (TP <span class="op">+</span> FP) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> <span class="dv">0</span></span>
+<span id="cb10-12"><a></a>    recall <span class="op">=</span> TP <span class="op">/</span> (TP <span class="op">+</span> FN) <span class="cf">if</span> (TP <span class="op">+</span> FN) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> <span class="dv">0</span></span>
+<span id="cb10-13"><a></a>    </span>
+<span id="cb10-14"><a></a>    results.append({</span>
+<span id="cb10-15"><a></a>        <span class="st">'境界線'</span>: <span class="ss">f'</span><span class="sc">{</span>threshold<span class="sc">}</span><span class="ss">g'</span>,</span>
+<span id="cb10-16"><a></a>        <span class="st">'TP'</span>: TP,</span>
+<span id="cb10-17"><a></a>        <span class="st">'FP'</span>: FP,</span>
+<span id="cb10-18"><a></a>        <span class="st">'FN'</span>: FN,</span>
+<span id="cb10-19"><a></a>        <span class="st">'TN'</span>: TN,</span>
+<span id="cb10-20"><a></a>        <span class="st">'Precision'</span>: <span class="ss">f'</span><span class="sc">{</span>precision<span class="sc">:.1%}</span><span class="ss">'</span>,</span>
+<span id="cb10-21"><a></a>        <span class="st">'Recall'</span>: <span class="ss">f'</span><span class="sc">{</span>recall<span class="sc">:.1%}</span><span class="ss">'</span>,</span>
+<span id="cb10-22"><a></a>        <span class="st">'Accuracy'</span>: <span class="ss">f'</span><span class="sc">{</span>accuracy<span class="sc">:.1%}</span><span class="ss">'</span></span>
+<span id="cb10-23"><a></a>    })</span>
+<span id="cb10-24"><a></a></span>
+<span id="cb10-25"><a></a>df <span class="op">=</span> pd.DataFrame(results)</span>
+<span id="cb10-26"><a></a>df</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+<table class="dataframe caption-top" data-border="1">
+<thead>
+<tr class="header" style="text-align: right;">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">境界線</th>
+<th data-quarto-table-cell-role="th">TP</th>
+<th data-quarto-table-cell-role="th">FP</th>
+<th data-quarto-table-cell-role="th">FN</th>
+<th data-quarto-table-cell-role="th">TN</th>
+<th data-quarto-table-cell-role="th">Precision</th>
+<th data-quarto-table-cell-role="th">Recall</th>
+<th data-quarto-table-cell-role="th">Accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>1600g</td>
+<td>17</td>
+<td>8</td>
+<td>3</td>
+<td>12</td>
+<td>68.0%</td>
+<td>85.0%</td>
+<td>72.5%</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>1800g</td>
+<td>15</td>
+<td>4</td>
+<td>5</td>
+<td>16</td>
+<td>78.9%</td>
+<td>75.0%</td>
+<td>77.5%</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>2000g</td>
+<td>8</td>
+<td>2</td>
+<td>12</td>
+<td>18</td>
+<td>80.0%</td>
+<td>40.0%</td>
+<td>65.0%</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>重要</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li><strong>境界を下げる（1600g）</strong> → Recall ↑、Precision ↓
+<ul>
+<li>Salmonを逃さない（FN減）が、Sea bassの誤判定（FP増）</li>
+</ul></li>
+<li><strong>境界を上げる（2000g）</strong> → Precision ↑、Recall ↓
+<ul>
+<li>Salmon判定の信頼性は高いが、Salmonを見逃す（FN増）</li>
+</ul></li>
+</ul>
+</div>
+</div>
+</div>
+<p><strong>Precision と Recall は トレードオフの関係</strong></p>
+</section>
+<section id="しきい値の比較1600g-vs-2000g" class="slide level2">
+<h2>しきい値の比較（1600g vs 2000g）</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div id="17e2b049" class="cell" data-fig-height="4.5" data-fig-width="5.5" data-execution_count="10">
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><a href="classification_lecture01_files/figure-revealjs/cell-11-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img data-src="classification_lecture01_files/figure-revealjs/cell-11-output-1.png" width="536" height="435"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>FP=8, FN=3 <strong>Precision</strong>: 68.0% (低い)<br>
+<strong>Recall</strong>: 85.0% (高い)</p>
+</div><div class="column" style="width:50%;">
+<div id="f996cb56" class="cell" data-fig-height="4.5" data-fig-width="5.5" data-execution_count="11">
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><a href="classification_lecture01_files/figure-revealjs/cell-12-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img data-src="classification_lecture01_files/figure-revealjs/cell-12-output-1.png" width="536" height="435"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>FP=2, FN=12 <strong>Precision</strong>: 80.0% (高い)<br>
+<strong>Recall</strong>: 40.0% (低い)</p>
+</div></div>
+</section>
+<section id="どの指標を重視すべきか" class="slide level2">
+<h2>どの指標を重視すべきか？</h2>
+<h3 id="ケース1-高級レストラン向け出荷">ケース1: 高級レストラン向け出荷</h3>
+<ul>
+<li><strong>Precision重視</strong>（FPを避ける）</li>
+<li>Sea bassの混入を最小化。混入絶対許さないマン</li>
+<li>→ 高めの閾値（2000g）</li>
+</ul>
+<h3 id="ケース2-缶詰工場salmon専用ライン">ケース2: 缶詰工場（Salmon専用ライン）</h3>
+<ul>
+<li><strong>Recall重視</strong>（FNを避ける）</li>
+<li>Salmonの取りこぼしを最小化。シャケ全部入れるマン</li>
+<li>→ 低めの閾値（1600g）</li>
+</ul>
+</section>
+<section id="コストを考慮した最適化" class="slide level2">
+<h2>コストを考慮した最適化</h2>
+<p>誤分類のコストが異なる場合、総コストを最小化する閾値を選べます。 <span class="math display">\[
+\begin{aligned}
+&amp;\text{argmin}(\text{総コスト}) = N(\text{FP}) \times \text{Cost}(\text{FP}) + N(\text{FN}) \times \text{Cost}(\text{FN})\\
+&amp;\quad \small{N(x): x\text{の個数},\; \text{Cost}(x): x\text{ 1個あたりのコスト}}
+\end{aligned}
+\]</span></p>
+<div id="5d236db0" class="cell" data-execution_count="12">
+<details class="code-fold">
+<summary>code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a></a><span class="co"># 例：Sea bass混入のクレーム対応コストが高い場合</span></span>
+<span id="cb11-2"><a></a>C_FP <span class="op">=</span> <span class="dv">10000</span>  <span class="co"># Sea bass混入のクレーム対応コスト（円/匹）</span></span>
+<span id="cb11-3"><a></a>C_FN <span class="op">=</span> <span class="dv">500</span>    <span class="co"># Salmon再選別コスト（円/匹）</span></span>
+<span id="cb11-4"><a></a></span>
+<span id="cb11-5"><a></a>cost_results <span class="op">=</span> []</span>
+<span id="cb11-6"><a></a><span class="cf">for</span> threshold <span class="kw">in</span> [<span class="dv">1600</span>, <span class="dv">1800</span>, <span class="dv">2000</span>]:</span>
+<span id="cb11-7"><a></a>    TP <span class="op">=</span> <span class="bu">sum</span>(<span class="dv">1</span> <span class="cf">for</span> weight <span class="kw">in</span> salmon_weights <span class="cf">if</span> weight <span class="op">&gt;=</span> threshold)</span>
+<span id="cb11-8"><a></a>    FN <span class="op">=</span> <span class="bu">sum</span>(<span class="dv">1</span> <span class="cf">for</span> weight <span class="kw">in</span> salmon_weights <span class="cf">if</span> weight <span class="op">&lt;</span> threshold)</span>
+<span id="cb11-9"><a></a>    TN <span class="op">=</span> <span class="bu">sum</span>(<span class="dv">1</span> <span class="cf">for</span> weight <span class="kw">in</span> seabass_weights <span class="cf">if</span> weight <span class="op">&lt;</span> threshold)</span>
+<span id="cb11-10"><a></a>    FP <span class="op">=</span> <span class="bu">sum</span>(<span class="dv">1</span> <span class="cf">for</span> weight <span class="kw">in</span> seabass_weights <span class="cf">if</span> weight <span class="op">&gt;=</span> threshold)</span>
+<span id="cb11-11"><a></a>    </span>
+<span id="cb11-12"><a></a>    total_cost <span class="op">=</span> FP <span class="op">*</span> C_FP <span class="op">+</span> FN <span class="op">*</span> C_FN</span>
+<span id="cb11-13"><a></a>    cost_results.append({</span>
+<span id="cb11-14"><a></a>        <span class="st">'境界線'</span>: <span class="ss">f'</span><span class="sc">{</span>threshold<span class="sc">}</span><span class="ss">g'</span>,</span>
+<span id="cb11-15"><a></a>        <span class="st">'FP'</span>: FP,</span>
+<span id="cb11-16"><a></a>        <span class="st">'FN'</span>: FN,</span>
+<span id="cb11-17"><a></a>        <span class="st">'総コスト'</span>: <span class="ss">f'¥</span><span class="sc">{</span>total_cost<span class="sc">:,}</span><span class="ss">'</span></span>
+<span id="cb11-18"><a></a>    })</span>
+<span id="cb11-19"><a></a>cost_df <span class="op">=</span> pd.DataFrame(cost_results)</span>
+<span id="cb11-20"><a></a></span>
+<span id="cb11-21"><a></a>min_idx <span class="op">=</span> cost_df.index[cost_df[<span class="st">'総コスト'</span>].<span class="bu">str</span>.replace(<span class="st">'¥'</span>, <span class="st">''</span>).<span class="bu">str</span>.replace(<span class="st">','</span>, <span class="st">''</span>).astype(<span class="bu">int</span>).idxmin()]</span>
+<span id="cb11-22"><a></a>cost_df.loc[min_idx, <span class="st">'境界線'</span>] <span class="op">=</span> <span class="st">'★ '</span> <span class="op">+</span> cost_df.loc[min_idx, <span class="st">'境界線'</span>]</span>
+<span id="cb11-23"><a></a>cost_df.style.hide(axis<span class="op">=</span><span class="st">'index'</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<style type="text/css">
+</style>
+
+<table id="T_ff6c0" class="caption-top">
+<thead>
+<tr class="header">
+<th id="T_ff6c0_level0_col0" class="col_heading level0 col0" data-quarto-table-cell-role="th">境界線</th>
+<th id="T_ff6c0_level0_col1" class="col_heading level0 col1" data-quarto-table-cell-role="th">FP</th>
+<th id="T_ff6c0_level0_col2" class="col_heading level0 col2" data-quarto-table-cell-role="th">FN</th>
+<th id="T_ff6c0_level0_col3" class="col_heading level0 col3" data-quarto-table-cell-role="th">総コスト</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td id="T_ff6c0_row0_col0" class="data row0 col0">1600g</td>
+<td id="T_ff6c0_row0_col1" class="data row0 col1">8</td>
+<td id="T_ff6c0_row0_col2" class="data row0 col2">3</td>
+<td id="T_ff6c0_row0_col3" class="data row0 col3">¥81,500</td>
+</tr>
+<tr class="even">
+<td id="T_ff6c0_row1_col0" class="data row1 col0">1800g</td>
+<td id="T_ff6c0_row1_col1" class="data row1 col1">4</td>
+<td id="T_ff6c0_row1_col2" class="data row1 col2">5</td>
+<td id="T_ff6c0_row1_col3" class="data row1 col3">¥42,500</td>
+</tr>
+<tr class="odd">
+<td id="T_ff6c0_row2_col0" class="data row2 col0">★ 2000g</td>
+<td id="T_ff6c0_row2_col1" class="data row2 col1">2</td>
+<td id="T_ff6c0_row2_col2" class="data row2 col2">12</td>
+<td id="T_ff6c0_row2_col3" class="data row2 col3">¥26,000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><strong>このコスト関数での最適なしきい値</strong>: 2000g（総コスト最小）</p>
+</section>
+<section id="試行1の結論" class="slide level2 scrollable">
+<h2>試行1の結論</h2>
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>重要なポイント</strong></p>
+</div>
+<div class="callout-content">
+<ol type="1">
+<li><strong>重さだけでは完全な分類は不可能</strong>
+<ul>
+<li>データの分布が重なっている</li>
+</ul></li>
+<li><strong>境界線は「方針の選択」</strong>
+<ul>
+<li>正解/不正解ではなく、用途に応じた最適化</li>
+</ul></li>
+<li><strong>評価指標はトレードオフ</strong>
+<ul>
+<li>Precision ↑ → Recall ↓</li>
+<li>どちらを重視するかは用途次第</li>
+</ul></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="練習問題" class="slide level2">
+<h2>練習問題</h2>
+<p>下記のデータ（それぞれ20匹ずつ追加した）について、以下の0-3までのことを実行して分類器をつくれ。</p>
+<div id="eab6a575" class="cell" data-execution_count="13">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a></a>salmon_weights <span class="op">=</span> [<span class="dv">2149</span>, <span class="dv">1959</span>, <span class="dv">2194</span>, <span class="dv">2457</span>, <span class="dv">1930</span>, <span class="dv">1930</span>, <span class="dv">2474</span>, <span class="dv">2230</span>, <span class="dv">1859</span>, <span class="dv">2163</span>,</span>
+<span id="cb12-2"><a></a>                  <span class="dv">1861</span>, <span class="dv">1860</span>, <span class="dv">2073</span>, <span class="dv">1426</span>, <span class="dv">1483</span>, <span class="dv">1831</span>, <span class="dv">1696</span>, <span class="dv">2094</span>, <span class="dv">1728</span>, <span class="dv">1576</span>,</span>
+<span id="cb12-3"><a></a>                  <span class="dv">2028</span>, <span class="dv">1903</span>, <span class="dv">2057</span>, <span class="dv">1629</span>, <span class="dv">1884</span>, <span class="dv">1884</span>, <span class="dv">2240</span>, <span class="dv">2081</span>, <span class="dv">1838</span>, <span class="dv">2037</span>,</span>
+<span id="cb12-4"><a></a>                  <span class="dv">1839</span>, <span class="dv">1738</span>, <span class="dv">1978</span>, <span class="dv">1754</span>, <span class="dv">1991</span>, <span class="dv">1720</span>, <span class="dv">1731</span>, <span class="dv">1992</span>, <span class="dv">1752</span>, <span class="dv">1652</span>]</span>
+<span id="cb12-5"><a></a>seabass_weights <span class="op">=</span> [<span class="dv">1677</span>, <span class="dv">1327</span>, <span class="dv">1486</span>, <span class="dv">1440</span>, <span class="dv">1857</span>, <span class="dv">1476</span>, <span class="dv">1749</span>, <span class="dv">2203</span>, <span class="dv">1979</span>, <span class="dv">1468</span>,</span>
+<span id="cb12-6"><a></a>                   <span class="dv">2015</span>, <span class="dv">1528</span>, <span class="dv">1612</span>, <span class="dv">1183</span>, <span class="dv">1436</span>, <span class="dv">1625</span>, <span class="dv">1261</span>, <span class="dv">1701</span>, <span class="dv">1420</span>, <span class="dv">1509</span>,</span>
+<span id="cb12-7"><a></a>                   <span class="dv">1387</span>, <span class="dv">1345</span>, <span class="dv">1505</span>, <span class="dv">1204</span>, <span class="dv">1381</span>, <span class="dv">1513</span>, <span class="dv">1259</span>, <span class="dv">1567</span>, <span class="dv">1370</span>, <span class="dv">1432</span>,</span>
+<span id="cb12-8"><a></a>                   <span class="dv">1370</span>, <span class="dv">1864</span>, <span class="dv">1488</span>, <span class="dv">1278</span>, <span class="dv">1657</span>, <span class="dv">1245</span>, <span class="dv">1533</span>, <span class="dv">1096</span>, <span class="dv">1223</span>, <span class="dv">1531</span>]</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="以下をレポートで提出" class="slide level2 scrollable">
+<h2>以下をレポートで提出</h2>
+<ol start="0" type="1">
+<li><p>まず何をするべきかを考えて実行せよ。</p></li>
+<li><p>閾値を1800gにした場合の TP, FP, FN, TN を計算せよ</p></li>
+<li><p>1800gの場合の <strong>Accuracy, Precision, Recall</strong> を求めよ。</p></li>
+<li><p>1700gの場合の <strong>Accuracy, Precision, Recall</strong> を求めよ。</p></li>
+<li><p><span class="math inline">\(C_{FP}=5000\)</span>円、<span class="math inline">\(C_{FN}=1000\)</span>円としたとき、総コストを最小にするしきい値を求めよ</p></li>
+</ol>
+</section>
+<section id="問0の答え" class="slide level2">
+<h2>問0の答え</h2>
+<div id="9627c29c" class="cell" data-execution_count="14">
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="classification_lecture01_files/figure-revealjs/cell-15-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img data-src="classification_lecture01_files/figure-revealjs/cell-15-output-1.png" class="quarto-figure quarto-figure-center" width="987" height="587"></a></p>
+</figure>
+</div>
+</div>
+</div>
+
+
+</section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="site_libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="site_libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="site_libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="site_libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="site_libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="site_libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="site_libs/revealjs/plugin/search/search.js"></script>
+  <script src="site_libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="site_libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "コピーしました");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "コピーしました");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    <script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+    (function() {
+      let previousOnload = window.onload;
+      window.onload = () => {
+        if (previousOnload) {
+          previousOnload();
+        }
+        lightboxQuarto.on('slide_before_load', (data) => {
+          const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+          const href = trigger.getAttribute('href');
+          if (href !== null) {
+            const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+            if (imgEl !== null) {
+              const srcAttr = imgEl.getAttribute("src");
+              if (srcAttr && srcAttr.startsWith("data:")) {
+                slideConfig.href = srcAttr;
+              }
+            }
+          } 
+        });
+      
+        lightboxQuarto.on('slide_after_load', (data) => {
+          const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(slideNode);
+          }
+        });
+      
+      };
+      
+    })();
+              </script>
+    
+
+</body></html>
