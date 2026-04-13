@@ -13,7 +13,7 @@
   <meta name="generator" content="quarto-1.8.27">
 
   <meta name="author" content="rkskmt">
-  <title>AI Lectures – 最適化問題入門：勾配降下法とNewton法</title>
+  <title>AI Lectures – 最適化問題（1）</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -265,8 +265,8 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">最適化問題入門：勾配降下法とNewton法</h1>
-  <p class="subtitle">分類問題 (Classification)</p>
+  <h1 class="title">最適化問題（1）</h1>
+  <p class="subtitle">勾配降下法とNewton法</p>
 
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
@@ -276,7 +276,7 @@ rkskmt
 </div>
 </div>
 
-  <p class="date">2026年2月8日</p>
+  <p class="date">2026年4月13日</p>
 </section>
 <section id="最適化問題とは" class="slide level2 scrollable">
 <h2>最適化問題とは</h2>
@@ -305,7 +305,6 @@ rkskmt
 <h3 id="今回扱う問題">今回扱う問題</h3>
 <p>次の関数の最小値を求めます：</p>
 <p><span class="math display">\[f(x) = x^2 - 4x + 3\]</span></p>
-<p><strong>目標</strong>: <span class="math inline">\(f'(x) = 0\)</span> となる <span class="math inline">\(x\)</span> を見つける</p>
 <p>数学的には簡単ですが、今回は<strong>2つの数値的手法</strong>で解きます。</p>
 <h3 id="今回の目標">今回の目標</h3>
 <ol type="1">
@@ -316,7 +315,7 @@ rkskmt
 </section>
 <section id="準備pythonのセットアップ" class="slide level2">
 <h2>準備：Pythonのセットアップ</h2>
-<div id="1a810db2" class="cell" data-execution_count="1">
+<div id="7052a519" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-3"><a></a></span>
@@ -325,7 +324,7 @@ rkskmt
 <span id="cb1-6"><a></a>plt.rcParams[<span class="st">'figure.dpi'</span>] <span class="op">=</span> <span class="dv">100</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <h3 id="関数の定義">関数の定義</h3>
-<div id="434d5537" class="cell" data-execution_count="2">
+<div id="9768a79c" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a><span class="kw">def</span> f(x):</span>
 <span id="cb2-2"><a></a>    <span class="co">"""目的関数 f(x) = x^2 - 4x + 3"""</span></span>
 <span id="cb2-3"><a></a>    <span class="cf">return</span> x<span class="op">**</span><span class="dv">2</span> <span class="op">-</span> <span class="dv">4</span><span class="op">*</span>x <span class="op">+</span> <span class="dv">3</span></span>
@@ -335,18 +334,20 @@ rkskmt
 <span id="cb2-7"><a></a>    <span class="cf">return</span> <span class="dv">2</span><span class="op">*</span>x <span class="op">-</span> <span class="dv">4</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
-<section class="slide level2">
-
-</section>
 <section>
 <section id="第1部勾配降下法" class="title-slide slide level1 center">
 <h1>第1部：勾配降下法</h1>
 
 </section>
-<section id="勾配降下法とは" class="slide level2">
+<section id="勾配降下法とは" class="slide level2 scrollable">
 <h2>勾配降下法とは</h2>
 <h3 id="基本的な考え方">基本的な考え方</h3>
-<p>山登りの逆バージョン： 1. 現在地点での<strong>傾き（勾配）</strong>を測る 2. 傾きの<strong>逆方向</strong>に少し進む 3. また傾きを測る 4. 繰り返して最小値を探す</p>
+<ol type="1">
+<li>現在地点での<strong>傾き（勾配）</strong>を測る</li>
+<li>傾きの<strong>逆方向</strong>に少し進む</li>
+<li>また傾きを測る</li>
+<li>繰り返して最小値を探す</li>
+</ol>
 <p><strong>キーワード</strong>: 少しずつ、手探りで</p>
 <h3 id="アルゴリズム">アルゴリズム</h3>
 <p><strong>更新式:</strong> <span class="math display">\[x_{\text{new}} = x - \alpha \cdot f'(x)\]</span></p>
@@ -524,7 +525,7 @@ rkskmt
 </section>
 <section id="勾配降下法python実装" class="slide level2">
 <h2>勾配降下法：Python実装</h2>
-<div id="9d2f353a" class="cell" data-execution_count="3">
+<div id="99b9ffa2" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a><span class="co"># 初期設定</span></span>
@@ -652,7 +653,7 @@ f'(x) = -0.0066
 <section id="勾配降下法の問題点" class="slide level2">
 <h2>勾配降下法の問題点</h2>
 <h3 id="学習率の選択が難しい">1. 学習率の選択が難しい</h3>
-<div id="7502afee" class="cell" data-execution_count="4">
+<div id="bc52bbad" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -680,9 +681,6 @@ f'(x) = -0.0066
 </div>
 <h3 id="収束が遅い">2. 収束が遅い</h3>
 <p>10回反復してもまだ誤差がある。複雑な問題では数百〜数千回必要になることも。</p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="第2部newton法" class="title-slide slide level1 center">
@@ -691,7 +689,11 @@ f'(x) = -0.0066
 </section>
 <section id="なぜnewton法が必要か" class="slide level2">
 <h2>なぜNewton法が必要か</h2>
-<p>勾配降下法の問題： - 学習率を手動で調整 - 収束が遅い</p>
+<p>勾配降下法の問題：</p>
+<ul>
+<li>学習率を手動で調整</li>
+<li>収束が遅い</li>
+</ul>
 <p><strong>解決策</strong>: もっと賢く進めないか？</p>
 <div title="Newton法のアイデア">
 <div class="callout callout-note callout-titled callout-style-default">
@@ -854,7 +856,7 @@ f'(x) = -0.0066
 <section id="newton法python実装" class="slide level2">
 <h2>Newton法：Python実装</h2>
 <h3 id="次微分の定義">2次微分の定義</h3>
-<div id="de8e0a82" class="cell" data-execution_count="5">
+<div id="ffd42eb5" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a><span class="kw">def</span> f_double_prime(x):</span>
 <span id="cb5-2"><a></a>    <span class="co">"""2次微分 f''(x) = 2"""</span></span>
 <span id="cb5-3"><a></a>    <span class="cf">return</span> <span class="dv">2</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
@@ -880,7 +882,7 @@ f'(x) = -0.0066
 </div>
 </div>
 <h3 id="newton法の実装">Newton法の実装</h3>
-<div id="cb5c98a5" class="cell" data-execution_count="6">
+<div id="89e146a7" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a></a><span class="co"># 初期値</span></span>
@@ -964,7 +966,7 @@ f''(x) = 2.0000
 </section>
 <section id="可視化で比較" class="slide level2">
 <h2>可視化で比較</h2>
-<div id="b6af5d62" class="cell" data-execution_count="7">
+<div id="a879b266" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1052,7 +1054,7 @@ f''(x) = 2.0000
 <section id="なぜnewton法は速いのか" class="slide level2">
 <h2>なぜNewton法は速いのか</h2>
 <h3 id="視覚的説明">視覚的説明</h3>
-<div id="bf4d50be" class="cell" data-execution_count="8">
+<div id="d62d445a" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>

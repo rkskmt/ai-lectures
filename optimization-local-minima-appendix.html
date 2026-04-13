@@ -13,7 +13,7 @@
   <meta name="generator" content="quarto-1.8.27">
 
   <meta name="author" content="rkskmt">
-  <title>AI Lectures – ローカルミニマムと初期値</title>
+  <title>AI Lectures – 最適化問題（2）</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -265,8 +265,8 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">ローカルミニマムと初期値</h1>
-  <p class="subtitle">分類問題 (Classification)</p>
+  <h1 class="title">最適化問題（2）</h1>
+  <p class="subtitle">ローカルミニマムの罠</p>
 
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
@@ -276,7 +276,7 @@ rkskmt
 </div>
 </div>
 
-  <p class="date">2026年2月8日</p>
+  <p class="date">2026年4月13日</p>
 </section>
 <section>
 <section id="前回の振り返りと今回の問題" class="title-slide slide level1 center">
@@ -332,7 +332,7 @@ rkskmt
 </section>
 <section id="pythonでの定義" class="slide level2">
 <h2>Pythonでの定義</h2>
-<div id="41116ceb" class="cell" data-execution_count="1">
+<div id="34f21f49" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-3"><a></a></span>
@@ -350,7 +350,7 @@ rkskmt
 <section id="まずグラフを描いてみよう" class="slide level2">
 <h2>まずグラフを描いてみよう</h2>
 <p>どんな形の関数なのか、<strong>まず目で見る</strong>ことが大切です。</p>
-<div id="6f79f707" class="cell" data-execution_count="2">
+<div id="77d7908e" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -439,7 +439,7 @@ rkskmt
 </div>
 </div>
 <h3 id="pythonで確認">Pythonで確認</h3>
-<div id="4a982b2c" class="cell" data-execution_count="3">
+<div id="64ccf2fe" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a><span class="co"># 実験1: x0 = 1.5 からスタート</span></span>
@@ -515,7 +515,7 @@ rkskmt
 </div>
 </div>
 <h3 id="pythonで確認-1">Pythonで確認</h3>
-<div id="0d5768b0" class="cell" data-execution_count="4">
+<div id="e9373bf2" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a></a><span class="co"># 実験2: x0 = 5.5 からスタート</span></span>
@@ -565,7 +565,7 @@ rkskmt
 </section>
 <section id="つの実験を並べてみよう" class="slide level2">
 <h2>2つの実験を並べてみよう</h2>
-<div id="60d77cfe" class="cell" data-execution_count="5">
+<div id="42e8e65e" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -627,7 +627,7 @@ rkskmt
 <p>いま体験した現象には、ちゃんと名前がついています。</p>
 <p><strong>ローカルミニマム（局所的最小値）</strong>: 「その周辺では一番低い」けど、関数全体で見ると<strong>もっと低い場所がある</strong>点。 実験1で到達した左の谷がこれです。</p>
 <p><strong>グローバルミニマム（大域的最小値）</strong>: 関数全体で<strong>本当に一番低い</strong>点。 実験2で到達した右の谷がこれです。</p>
-<div id="8faab4f9" class="cell" data-execution_count="6">
+<div id="642b450d" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -676,7 +676,7 @@ rkskmt
 <section id="引力圏basin-of-attractionを可視化しよう" class="slide level2">
 <h2>引力圏（Basin of Attraction）を可視化しよう</h2>
 <p>「どの初期値からスタートすると、どの谷に落ちるか」を全部調べてみましょう。</p>
-<div id="8976dd27" class="cell" data-execution_count="7">
+<div id="db0accb2" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a></a><span class="kw">def</span> newton_optimize(f, fp, fpp, x0, max_iter<span class="op">=</span><span class="dv">50</span>):</span>
@@ -706,7 +706,7 @@ rkskmt
 <span id="cb6-25"><a></a>convergence_values <span class="op">=</span> np.array(convergence_values)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="3b76acc8" class="cell" data-execution_count="8">
+<div id="7ada044e" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -765,7 +765,7 @@ rkskmt
 <p><span class="math display">\[f'(6) = 0.4 \times 216 - 3 \times 36 + 4 \times 6 = 86.4 - 108 + 24 = 2.4\]</span> <span class="math display">\[f''(6) = 1.2 \times 36 - 6 \times 6 + 4 = 43.2 - 36 + 4 = 11.2\]</span> <span class="math display">\[x_{\text{new}} = 6 - \frac{2.4}{11.2} = 6 - 0.214 = 5.786\]</span></p>
 <p>→ 右の谷（グローバルミニマム）の方向に進んでいます。</p>
 <h3 id="つの結果を比較">3つの結果を比較</h3>
-<div id="18c87b06" class="cell" data-execution_count="9">
+<div id="9b07d5a8" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a></a><span class="co"># 3つの初期値から実行して比較</span></span>
 <span id="cb7-2"><a></a>starting_points <span class="op">=</span> [<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">6</span>]</span>
 <span id="cb7-3"><a></a></span>
@@ -811,7 +811,7 @@ rkskmt
 <section id="方法2たくさんの初期値を自動で試すランダムリスタート" class="slide level2">
 <h2>方法2：たくさんの初期値を自動で試す（ランダムリスタート）</h2>
 <p>手で3つ試すのも良いですが、コンピュータなら<strong>20個でも100個でも</strong>試せます。</p>
-<div id="a55cfcd5" class="cell" data-execution_count="10">
+<div id="89d9b591" class="cell" data-execution_count="10">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a></a><span class="co"># 20個のランダムな初期値から試す</span></span>
@@ -855,7 +855,7 @@ rkskmt
 <section id="方法3等間隔に初期値を並べるグリッドサーチ" class="slide level2">
 <h2>方法3：等間隔に初期値を並べる（グリッドサーチ）</h2>
 <p>ランダムではなく、<strong>等間隔に並べる</strong>方法もあります。</p>
-<div id="826da00e" class="cell" data-execution_count="11">
+<div id="78e4c9e2" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a></a><span class="co"># 等間隔に15個の初期値を用意</span></span>
@@ -899,7 +899,7 @@ rkskmt
 ★ 最良: x0=3.57 → x=5.7656, f(x)=-13.6726</code></pre>
 </div>
 </div>
-<div id="c60fe347" class="cell" data-execution_count="12">
+<div id="6fb914f2" class="cell" data-execution_count="12">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1015,7 +1015,7 @@ rkskmt
 <section id="実装テンプレート" class="slide level2">
 <h2>実装テンプレート</h2>
 <p>上の4ステップをまとめたコードです。コピーして使えます。</p>
-<div id="42479583" class="cell" data-execution_count="13">
+<div id="b2e35462" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a></a><span class="kw">def</span> robust_optimization(f, fp, fpp, x0_list, max_iter<span class="op">=</span><span class="dv">100</span>):</span>
 <span id="cb13-2"><a></a>    <span class="co">"""</span></span>
 <span id="cb13-3"><a></a><span class="co">    複数の初期値を使ったロバストな最適化</span></span>
