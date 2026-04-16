@@ -16,6 +16,7 @@
 ::: {.cite}
 出典: <https://example.com>
 :::
+
 :::
 ```
 
@@ -23,13 +24,14 @@
 - `height` — div の高さ（省略時 `60%`）
 - 画像は `background-size: contain` で縦横比を保って収まる
 - `.cite` が右下にオーバーレイ表示される
+- **注意**: `:::` の対応を必ず揃える。最後の `:::` が `.fig-cite` を閉じる
 
 ---
 
 ## 2. 全画面スライド + 引用オーバーレイ
 
 ```markdown
-## {.bg-cover src="imgs/image.png"}
+## スライドタイトル {.bg-cover src="imgs/image.png"}
 
 ::: {.cite}
 出典: <https://example.com>
@@ -39,20 +41,70 @@
 - スライドの `<section>` 要素を背景画像で塗りつぶす（レターボックス外には影響しない）
 - `background-size: cover` で全面を埋める
 - スライドタイトル（h2）は自動的に非表示になる（`.no-header` が付与される）
+- タイトルなしにしたい場合は `## {.bg-cover src="..."}` と空にする
 
 ---
 
-## 3. `.cite` 単体
+## 3. コンテンツボックス（`.content-box`）
 
-`position: absolute` なので、`position: relative` な親要素の右下に表示される。
+背景画像の上にテキストを半透明ボックスで重ねる。`.fig-cite` 内でも `.bg-cover` スライド内でも使える。
+
+### デフォルト（中央）
+
+```markdown
+::: {.content-box}
+内容
+:::
+```
+
+### 右下（`.pos-br`）
+
+```markdown
+::: {.content-box .pos-br}
+内容
+:::
+```
+
+### 中央・左寄せ（`.pos-cl`）
+
+```markdown
+::: {.content-box .pos-cl}
+内容
+:::
+```
+
+### 組み合わせ例（`.fig-cite` + `.content-box` + `.cite`）
+
+```markdown
+::: {.fig-cite src="imgs/image.png" height="90%"}
+
+::: {.content-box .pos-br}
+- ポイント1
+- ポイント2
+:::
+
+::: {.cite}
+出典: <https://example.com>
+:::
+
+:::
+```
+
+- コンテンツ幅は最大 `60%` に制限される
+- `position: absolute` なので親要素（`.fig-cite` or section）を基準に配置される
+
+---
+
+## 4. `.cite` 単体
+
+`position: absolute` なので、親要素（`position: relative`）の右下に表示される。
 
 - `.fig-cite` の中 → 画像右下
 - `.bg-cover` スライド直下 → スライド右下
-- 他の `position: relative` な要素の中でも使える
 
 ---
 
-## 4. その他の CSS クラス
+## 5. その他の CSS クラス
 
 | クラス | 効果 |
 |---|---|
@@ -72,5 +124,5 @@
 └── imgs/               # 画像置き場
 ```
 
-> **注意**: CSS background-image に使う画像は `<img>` タグ経由でないと Quarto が自動コピーしない。
+> **注意**: CSS `background-image` に使う画像は `<img>` タグ経由でないと Quarto が自動コピーしない。
 > `_quarto.yml` の `resources: ["imgs/**"]` で全画像をコピーするよう設定済み。
