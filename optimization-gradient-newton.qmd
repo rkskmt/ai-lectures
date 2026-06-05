@@ -1,0 +1,785 @@
+---
+title: "最適化問題（1）"
+subtitle: "勾配降下法とNewton法"
+_metadata.yml: !expr yaml::read_yaml("_metadata.yml")
+---
+
+## 最適化問題とは
+
+### 機械学習の中心課題
+
+機械学習では、ほぼすべてのアルゴリズムで**最適化問題**を解く必要があります：
+
+- **ロジスティック回帰**: パラメータを調整して分類精度を最大化
+- **ニューラルネットワーク**: 重みを調整して予測誤差を最小化
+- **サポートベクターマシン**: マージンを最大化する境界を見つける
+
+::: {.callout-note title="機械学習 = 最適化"}
+「どうパラメータを調整すれば、最も良い結果が得られるか？」を数値的に解く
+:::
+
+### 今回扱う問題
+
+次の関数の最小値を求めます：
+
+$$f(x) = x^2 - 4x + 3$$
+
+
+
+数学的には簡単ですが、今回は**2つの数値的手法**で解きます。
+
+### 今回の目標
+
+1. **勾配降下法**を完全に理解する（手計算 + 実装）
+2. **Newton法**を完全に理解する（手計算 + 実装）
+3. **2つの手法を比較**して、使い分けを学ぶ
+
+---
+
+## 準備：Pythonのセットアップ
+
+```{python}
+#| echo: true
+import numpy as np
+import matplotlib.pyplot as plt
+
+# 日本語表示設定（必要に応じて）
+plt.rcParams['font.size'] = 11
+plt.rcParams['figure.dpi'] = 100
+```
+
+### 関数の定義
+
+```{python}
+#| echo: true
+def f(x):
+    """目的関数 f(x) = x^2 - 4x + 3"""
+    return x**2 - 4*x + 3
+
+def f_prime(x):
+    """1次微分 f'(x) = 2x - 4"""
+    return 2*x - 4
+```
+
+# 第1部：勾配降下法
+
+## 勾配降下法とは
+
+### 基本的な考え方
+
+ 1. 現在地点での**傾き（勾配）**を測る
+ 2. 傾きの**逆方向**に少し進む
+ 3. また傾きを測る
+ 4. 繰り返して最小値を探す
+
+**キーワード**: 少しずつ、手探りで
+
+### アルゴリズム
+
+**更新式:**
+$$x_{\text{new}} = x - \alpha \cdot f'(x)$$
+
+- $x$: 現在の位置
+- $f'(x)$: 勾配（傾き）
+- $\alpha$: **学習率**（どれくらい進むか）
+- $x_{\text{new}}$: 次の位置
+
+::: {.callout-warning}
+**学習率$\alpha$は自分で決める必要がある**（これが難しい）
+:::
+
+---
+
+## 勾配降下法：手計算で実行
+
+### 設定
+
+- 関数: $f(x) = x^2 - 4x + 3$
+- 1次微分: $f'(x) = 2x - 4$
+- 初期値: $x_0 = 0$
+- **学習率: $\alpha = 0.3$**
+
+---
+
+### 反復1
+
+#### ステップ1：現在の位置
+$$x = 0$$
+
+#### ステップ2：関数値を計算
+$$f(0) = 0^2 - 4 \times 0 + 3 = 3$$
+
+#### ステップ3：勾配を計算
+$$f'(0) = 2 \times 0 - 4 = -4$$
+
+**意味**: 傾きが$-4$（負）なので、右に行くほど値が小さくなる
+
+#### ステップ4：更新
+
+**更新式:**
+$$x_{\text{new}} = x - \alpha \cdot f'(x)$$
+
+**代入:**
+$$x_{\text{new}} = 0 - 0.3 \times (-4)$$
+
+**計算:**
+\begin{align}
+&= 0 - (-1.2) \\
+&= 0 + 1.2 \\
+&= 1.2
+\end{align}
+
+::: {.callout-important}
+**反復1の結果**: $x = 0 \rightarrow x = 1.2$
+:::
+
+---
+
+### 反復2
+
+#### ステップ1：現在の位置
+$$x = 1.2$$
+
+#### ステップ2：関数値
+$$f(1.2) = 1.2^2 - 4 \times 1.2 + 3 = 1.44 - 4.8 + 3 = -0.36$$
+
+#### ステップ3：勾配
+$$f'(1.2) = 2 \times 1.2 - 4 = 2.4 - 4 = -1.6$$
+
+#### ステップ4：更新
+$$x_{\text{new}} = 1.2 - 0.3 \times (-1.6) = 1.2 + 0.48 = 1.68$$
+
+::: {.callout-important}
+**反復2の結果**: $x = 1.2 \rightarrow x = 1.68$
+:::
+
+---
+
+### 反復3
+
+#### 現在の位置
+$$x = 1.68$$
+
+#### 勾配
+$$f'(1.68) = 2 \times 1.68 - 4 = 3.36 - 4 = -0.64$$
+
+#### 更新
+$$x_{\text{new}} = 1.68 - 0.3 \times (-0.64) = 1.68 + 0.192 = 1.872$$
+
+---
+
+### 反復4
+
+#### 現在の位置
+$$x = 1.872$$
+
+#### 勾配
+$$f'(1.872) = 2 \times 1.872 - 4 = 3.744 - 4 = -0.256$$
+
+#### 更新
+$$x_{\text{new}} = 1.872 - 0.3 \times (-0.256) = 1.872 + 0.0768 = 1.9488$$
+
+---
+
+### 進捗まとめ
+
+| 反復 | x | f(x) | f'(x) | 更新幅 |
+|-----|---|------|-------|--------|
+| 0 | 0.000 | 3.000 | -4.000 | - |
+| 1 | 1.200 | -0.360 | -1.600 | +1.200 |
+| 2 | 1.680 | -0.902 | -0.640 | +0.480 |
+| 3 | 1.872 | -0.984 | -0.256 | +0.192 |
+| 4 | 1.949 | -0.997 | -0.102 | +0.077 |
+
+::: {.callout-note}
+徐々に正解（$x=2$）に近づいているが、**まだ到達していない**
+:::
+
+---
+
+## 勾配降下法：Python実装
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "コードを表示"
+# 初期設定
+x = 0.0
+alpha = 0.3  # 学習率
+
+print("勾配降下法で最小値を求める")
+print("=" * 60)
+
+for iteration in range(1, 11):
+    print(f"\n--- 反復 {iteration} ---")
+    print(f"現在の x = {x:.4f}")
+    
+    # 関数値
+    fx = f(x)
+    print(f"f(x) = {fx:.4f}")
+    
+    # 勾配
+    fp = f_prime(x)
+    print(f"f'(x) = {fp:.4f}")
+    
+    # 更新
+    step = alpha * fp
+    x_new = x - step
+    
+    print(f"\n更新:")
+    print(f"  ステップ幅 = α × f'(x) = {alpha} × {fp:.4f} = {step:.4f}")
+    print(f"  x_new = {x:.4f} - {step:.4f} = {x_new:.4f}")
+    
+    x = x_new
+    
+    # 収束チェック
+    if abs(fp) < 0.01:
+        print(f"\n★ ほぼ収束（f'(x) < 0.01）")
+        break
+
+print("\n" + "=" * 60)
+print(f"最終結果: x = {x:.4f}, f(x) = {f(x):.4f}")
+print(f"理論値との誤差: {abs(x - 2.0):.6f}")
+```
+
+---
+
+## 勾配降下法の問題点
+
+### 1. 学習率の選択が難しい
+
+```{python}
+#| echo: false
+#| fig-align: center
+# 学習率による違い
+fig, axes = plt.subplots(1, 3, figsize=(14, 4))
+learning_rates = [0.1, 0.5, 1.1]
+titles = ['Small LR (\u03b1=0.1) Slow', 'Good LR (\u03b1=0.5)', 'Large LR (\u03b1=1.1) Oscillation']
+
+for idx, (alpha, title) in enumerate(zip(learning_rates, titles)):
+    x = 0.0
+    history = [x]
+    
+    for i in range(15):
+        x = x - alpha * f_prime(x)
+        history.append(x)
+    
+    x_range = np.linspace(-1, 4, 100)
+    axes[idx].plot(x_range, f(x_range), 'b-', linewidth=2, alpha=0.3)
+    axes[idx].plot(history, [f(h) for h in history], 'ro-', markersize=6)
+    axes[idx].axvline(x=2, color='g', linestyle='--', alpha=0.5)
+    axes[idx].set_title(title, fontsize=11, fontweight='bold')
+    axes[idx].set_xlabel('x')
+    axes[idx].set_ylabel('f(x)')
+    axes[idx].grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-warning}
+- **$\alpha$が小さすぎる**: 収束が遅い
+- **$\alpha$が大きすぎる**: 振動して収束しない
+- **適切な$\alpha$を探す**のが難しい
+:::
+
+### 2. 収束が遅い
+
+10回反復してもまだ誤差がある。複雑な問題では数百〜数千回必要になることも。
+
+
+# 第2部：Newton法
+
+## なぜNewton法が必要か
+
+勾配降下法の問題：
+
+ - 学習率を手動で調整
+ - 収束が遅い
+
+**解決策**: もっと賢く進めないか？
+
+::: {.callout-note title="Newton法のアイデア"}
+「傾き」だけでなく「曲がり具合」も使えば、**どこまで進めばいいか計算できる**のでは？
+:::
+
+---
+
+## 2次微分の役割
+
+### 2次微分とは
+
+**1次微分**: 傾き（どっちに進むか）
+$$f'(x) = 2x - 4$$
+
+**2次微分**: 曲率（どれくらい曲がっているか）
+$$f''(x) = \frac{d}{dx}(2x - 4) = 2$$
+
+::: {.callout-tip title="2次微分の計算"}
+1次微分をもう一度微分するだけ：
+$$f'(x) = 2x - 4$$
+$$f''(x) = 2 \times 1 - 0 = 2$$
+:::
+
+### ヘッセ行列（Hessian Matrix）とは
+
+**注意**: 1変数の場合、2次微分は単なる数値なので「ヘッセ行列」とは呼びません。
+
+**ヘッセ行列は2変数以上で使う用語**です：
+
+**2変数の場合**（次回学びます）:
+$$H = \begin{bmatrix} 
+\frac{\partial^2 f}{\partial x^2} & \frac{\partial^2 f}{\partial x \partial y} \\
+\frac{\partial^2 f}{\partial y \partial x} & \frac{\partial^2 f}{\partial y^2}
+\end{bmatrix}$$
+
+::: {.callout-note}
+- 1変数: $f''(x)$ = 2次微分（スカラー）
+- 2変数以上: $H$ = ヘッセ行列（行列）
+
+今回は1変数なので「2次微分」と呼びます。
+:::
+
+---
+
+## Newton法のアルゴリズム
+
+### 更新式
+
+$$x_{\text{new}} = x - \frac{f'(x)}{f''(x)}$$
+
+- $f'(x)$: 1次微分（勾配）
+- $f''(x)$: 2次微分（曲率）
+- **学習率不要！**
+
+### なぜこの式？
+
+現在地点で関数を2次関数で近似：
+$$f(x) \approx f(x_0) + f'(x_0)(x-x_0) + \frac{1}{2}f''(x_0)(x-x_0)^2$$
+
+この2次関数の最小値を求めると：
+$$x_{\text{min}} = x_0 - \frac{f'(x_0)}{f''(x_0)}$$
+
+::: {.callout-important}
+**2次関数の最小値は解析的に求められる**
+→ 一気にそこまでジャンプできる！
+:::
+
+---
+
+## Newton法：手計算で実行
+
+### 設定
+
+- 関数: $f(x) = x^2 - 4x + 3$
+- 1次微分: $f'(x) = 2x - 4$
+- **2次微分: $f''(x) = 2$**（重要！）
+- 初期値: $x_0 = 0$
+
+---
+
+### 反復1
+
+#### ステップ1：現在の位置
+$$x = 0$$
+
+#### ステップ2：関数値
+$$f(0) = 0^2 - 4 \times 0 + 3 = 3$$
+
+#### ステップ3：1次微分（勾配）
+$$f'(0) = 2 \times 0 - 4 = -4$$
+
+#### ステップ4：2次微分（曲率）
+$$f''(0) = 2$$
+
+#### ステップ5：Newton法で更新
+
+**更新式:**
+$$x_{\text{new}} = x - \frac{f'(x)}{f''(x)}$$
+
+**代入:**
+$$x_{\text{new}} = 0 - \frac{-4}{2}$$
+
+**計算:**
+\begin{align}
+&= 0 - (-2) \\
+&= 0 + 2 \\
+&= 2
+\end{align}
+
+::: {.callout-important}
+**反復1の結果**: $x = 0 \rightarrow x = 2$
+:::
+
+---
+
+### 反復2：収束確認
+
+#### ステップ1：現在の位置
+$$x = 2$$
+
+#### ステップ2：関数値
+$$f(2) = 2^2 - 4 \times 2 + 3 = 4 - 8 + 3 = -1$$
+
+#### ステップ3：1次微分
+$$f'(2) = 2 \times 2 - 4 = 4 - 4 = 0$$
+
+::: {.callout-note title="収束！"}
+**勾配が0** → 極値に到達 → これ以上更新不要
+:::
+
+### 答え
+
+$$x = 2, \quad f(2) = -1$$
+
+**たった1回の反復で最適解に到達！**
+
+---
+
+## Newton法：Python実装
+
+### 2次微分の定義
+
+```{python}
+#| echo: true
+def f_double_prime(x):
+    """2次微分 f''(x) = 2"""
+    return 2
+```
+
+::: {.callout-tip title="手で微分して関数定義"}
+- $f(x) = x^2 - 4x + 3$
+- $f'(x) = 2x - 4$
+- $f''(x) = 2$
+
+**手で計算した結果を関数として定義**します。
+自動微分は使いません。
+:::
+
+### Newton法の実装
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "コードを表示"
+# 初期値
+x = 0.0
+
+print("Newton法で最小値を求める")
+print("=" * 60)
+
+for iteration in range(1, 6):
+    print(f"\n--- 反復 {iteration} ---")
+    print(f"現在の x = {x:.4f}")
+    
+    # 関数値
+    fx = f(x)
+    print(f"f(x) = {fx:.4f}")
+    
+    # 1次微分（勾配）
+    fp = f_prime(x)
+    print(f"f'(x) = {fp:.4f}")
+    
+    # 2次微分（曲率）
+    fpp = f_double_prime(x)
+    print(f"f''(x) = {fpp:.4f}")
+    
+    # Newton法の更新
+    step = fp / fpp
+    x_new = x - step
+    
+    print(f"\n更新:")
+    print(f"  ステップ幅 = f'(x)/f''(x) = {fp:.4f}/{fpp:.4f} = {step:.4f}")
+    print(f"  x_new = {x:.4f} - {step:.4f} = {x_new:.4f}")
+    
+    x = x_new
+    
+    # 収束チェック
+    if abs(fp) < 0.0001:
+        print(f"\n★ 収束！ f'(x) ≈ 0")
+        break
+
+print("\n" + "=" * 60)
+print(f"最終結果: x = {x:.4f}, f(x) = {f(x):.4f}")
+```
+
+---
+
+# 第3部：2つの手法の比較
+
+## 可視化で比較
+
+```{python}
+#| echo: false
+#| fig-align: center
+# 比較グラフ
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+
+# 左：反復の可視化
+x_range = np.linspace(-0.5, 4, 100)
+y_range = f(x_range)
+
+ax1.plot(x_range, y_range, 'b-', linewidth=2, label='f(x)', alpha=0.5)
+ax1.axvline(x=2, color='gray', linestyle='--', alpha=0.5, label='Minimum x=2')
+
+# 勾配降下法
+x_gd = 0.0
+alpha = 0.3
+gd_history = [x_gd]
+for i in range(10):
+    x_gd = x_gd - alpha * f_prime(x_gd)
+    gd_history.append(x_gd)
+
+ax1.plot(gd_history, [f(h) for h in gd_history], 'mo-', 
+         markersize=6, linewidth=1.5, label='Gradient Descent (10 iter)')
+
+# Newton法
+x_n = 0.0
+newton_history = [x_n]
+x_n = x_n - f_prime(x_n) / f_double_prime(x_n)
+newton_history.append(x_n)
+
+ax1.plot(newton_history, [f(h) for h in newton_history], 'go-', 
+         markersize=10, linewidth=2, label='Newton (1 iter)')
+
+ax1.set_xlabel('x', fontsize=12)
+ax1.set_ylabel('f(x)', fontsize=12)
+ax1.set_title('Iteration Trajectory', fontsize=13, fontweight='bold')
+ax1.legend(fontsize=10)
+ax1.grid(True, alpha=0.3)
+
+# 右：収束速度
+iterations_gd = list(range(len(gd_history)))
+errors_gd = [abs(h - 2) for h in gd_history]
+
+iterations_n = list(range(len(newton_history)))
+errors_n = [abs(h - 2) for h in newton_history]
+
+ax2.semilogy(iterations_gd, errors_gd, 'm^-', linewidth=2, 
+             markersize=6, label='Gradient Descent')
+ax2.semilogy(iterations_n, errors_n, 'go-', linewidth=2, 
+             markersize=10, label='Newton')
+ax2.set_xlabel('Iterations', fontsize=12)
+ax2.set_ylabel('Error |x - 2| (log)', fontsize=12)
+ax2.set_title('Convergence Speed Comparison', fontsize=13, fontweight='bold')
+ax2.legend(fontsize=11)
+ax2.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+```
+
+---
+
+## 比較まとめ
+
+### 数値比較
+
+| 手法 | 反復回数 | 最終結果 | 誤差 |
+|------|---------|---------|------|
+| 勾配降下法（α=0.3） | 10回 | x=1.9926 | 0.0074 |
+| **Newton法** | **1回** | **x=2.0000** | **0.0000** |
+
+### 特徴比較
+
+| 項目 | 勾配降下法 | Newton法 |
+|------|-----------|----------|
+| **使う情報** | 1次微分のみ | 1次微分 + 2次微分 |
+| **学習率** | 必要（α） | 不要 |
+| **収束速度** | 遅い | 非常に速い |
+| **1回の計算量** | 小 | 大 |
+| **パラメータ調整** | 必要 | 不要 |
+| **適用場面** | 大規模問題 | 小〜中規模問題 |
+| **実例** | PyTorch、TensorFlow | scikit-learn |
+
+---
+
+## なぜNewton法は速いのか
+
+### 視覚的説明
+
+```{python}
+#| echo: false
+#| fig-align: center
+# 2次近似の図
+x0 = 0.5
+x_range = np.linspace(-1, 4, 100)
+
+# 元の関数
+y_true = f(x_range)
+
+# x0での2次近似
+y_approx = f(x0) + f_prime(x0)*(x_range - x0) + 0.5*f_double_prime(x0)*(x_range - x0)**2
+
+# Newton法の次の点
+x1 = x0 - f_prime(x0) / f_double_prime(x0)
+
+plt.figure(figsize=(10, 6))
+plt.plot(x_range, y_true, 'b-', linewidth=2.5, label='True function f(x)')
+plt.plot(x_range, y_approx, 'r--', linewidth=2, label=f'Quadratic approx at x={x0}')
+plt.plot(x0, f(x0), 'go', markersize=12, label=f'Current x={x0}')
+plt.plot(x1, f(x1), 'r*', markersize=20, label=f'Next x={x1:.2f}')
+plt.axvline(x=2, color='gray', linestyle=':', alpha=0.5, label='True minimum')
+
+plt.xlabel('x', fontsize=12)
+plt.ylabel('f(x)', fontsize=12)
+plt.title('Newton Method: Optimization via Quadratic Approximation', fontsize=14, fontweight='bold')
+plt.legend(fontsize=11)
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-note title="2次近似の威力"}
+**勾配降下法**: 1次近似（接線）だけ
+→ 「どっちに進むか」はわかるが「どこまで進むか」は手探り
+
+**Newton法**: 2次近似（放物線）
+→ 放物線の最小値を計算 → 一気にジャンプ
+:::
+
+---
+
+## 使い分けの指針
+
+::: {.callout-important}
+## どちらを使うべきか
+
+**勾配降下法を使う場合:**
+- パラメータ数が多い（数万〜数百万）
+- メモリが限られている
+- オンライン学習（データが逐次的に来る）
+- 例：ディープラーニング
+
+**Newton法を使う場合:**
+- パラメータ数が少ない（数個〜数千）
+- 高精度な解が必要
+- バッチ学習
+- 例：ロジスティック回帰、一般化線形モデル
+:::
+
+---
+
+## まとめ
+
+### 勾配降下法
+
+**長所:**
+- シンプルで実装が簡単
+- 大規模問題に対応可能
+- メモリ効率が良い
+
+**短所:**
+- 学習率の調整が必要
+- 収束が遅い
+
+### Newton法
+
+**長所:**
+- 学習率不要（自動計算）
+- 収束が非常に速い
+- 高精度
+
+**短所:**
+- 2次微分（ヘッセ行列）の計算が必要
+- 大規模問題には不向き
+
+::: {.callout-note}
+**どちらも重要！** 問題の性質に応じて使い分けることが大切です。
+:::
+
+---
+
+## 次回予告
+
+次回は**2変数のNewton法**を学びます：
+
+- **ヘッセ行列**（2×2行列）の計算
+- **逆行列**の手計算
+- **ロジスティック回帰**への応用
+- 実際のデータでの分類問題
+
+---
+
+## 練習問題
+
+以下の問題を**手計算**と**Pythonコード**の両方で解け。
+
+### 問題1：勾配降下法
+
+関数 $f(x) = x^2 + 6x + 5$ について：
+
+1. 1次微分を求めよ
+2. 初期値 $x_0 = 0$、学習率 $\alpha = 0.2$ で勾配降下法を実行せよ
+3. 反復1、反復2、反復3を手計算で示せ
+
+### 問題2：Newton法
+
+同じ関数 $f(x) = x^2 + 6x + 5$ について：
+
+1. 2次微分を求めよ
+2. 初期値 $x_0 = 0$ でNewton法を実行せよ
+3. 反復1、反復2を手計算で示せ
+
+### 問題3：比較
+
+1. 問題1と問題2の結果を比較せよ
+2. 何回の反復で収束したか？
+3. どちらが速かったか？
+
+---
+
+## 問題1の解答例
+
+### 準備
+
+$$f(x) = x^2 + 6x + 5$$
+
+**1次微分:**
+$$f'(x) = 2x + 6$$
+
+### 反復1
+
+**現在**: $x = 0$
+
+$$f'(0) = 2(0) + 6 = 6$$
+
+**更新:**
+$$x_{\text{new}} = 0 - 0.2 \times 6 = 0 - 1.2 = -1.2$$
+
+### 反復2
+
+**現在**: $x = -1.2$
+
+$$f'(-1.2) = 2(-1.2) + 6 = -2.4 + 6 = 3.6$$
+
+**更新:**
+$$x_{\text{new}} = -1.2 - 0.2 \times 3.6 = -1.2 - 0.72 = -1.92$$
+
+### 反復3
+
+**現在**: $x = -1.92$
+
+$$f'(-1.92) = 2(-1.92) + 6 = -3.84 + 6 = 2.16$$
+
+**更新:**
+$$x_{\text{new}} = -1.92 - 0.2 \times 2.16 = -1.92 - 0.432 = -2.352$$
+
+まだ収束していない（理論値は$x=-3$）
+
+---
+
+## 参考文献
+
+### 教科書
+- Stephen Boyd & Lieven Vandenberghe, "Convex Optimization" (2004)
+- Jorge Nocedal & Stephen Wright, "Numerical Optimization" (2006)
+
+### 日本語資料
+- 杉山将「イラストで学ぶ機械学習」(2013)
+- 金谷健一「これなら分かる最適化数学」(2005)
+
+### オンライン資料
+- [scipy.optimize documentation](https://docs.scipy.org/doc/scipy/reference/optimize.html)
+- [scikit-learn: Logistic Regression](https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression)
+

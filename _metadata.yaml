@@ -1,22 +1,52 @@
 author: "rkskmt"
-date: today
 lang: ja
-jupyter: python3
 format:
   clean-revealjs:
+    html-math-method:
+      method: mathjax
+      url: "./libs/mathjax/MathJax.js?config=TeX-AMS_HTML-full"
+    highlight-style: github
     scrollable: true
+    footer: " "
     theme:
       - default
-    code-tools: true
     include-in-header:
       text: |
         <style>
+        .reveal {
+          font-family: system-ui, -apple-system, "Hiragino Sans", "Yu Gothic UI", "Segoe UI", "Meiryo", sans-serif;
+        }
+        /* Force scrollbar visibility on macOS/mobile */
+        .reveal .slides section {
+          scrollbar-width: thin;
+        }
+        .reveal .slides section::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+        }
+        .reveal .slides section::-webkit-scrollbar-track {
+          background: rgba(0, 0, 0, 0.1);
+        }
+        .reveal .slides section::-webkit-scrollbar-thumb {
+          background: rgba(0, 0, 0, 0.3);
+          border-radius: 4px;
+        }
         .callout.callout-note {
             font-size: 1.5rem;
             line-height: 1.4;
         }
         .callout.callout-note .callout-title {
             font-size: 2.3rem;
+        }
+        .reveal .callout.callout-tip {
+            font-size: 1.5rem;
+            line-height: 1.4;
+        }
+        .reveal .callout.callout-tip .callout-title {
+            font-size: 2.3rem;
+        }
+        .reveal .callout pre code {
+            font-size: 1.5rem !important;
         }
         .reveal h2 {
             font-weight: bold !important;
@@ -38,29 +68,19 @@ format:
             line-height: 1.6;
             margin: 30px 0;
         }
-        .mermaid {
-            max-height: 400px;
-            overflow: auto;
-        }
-        .mermaid svg text {
-            text-anchor: middle !important;
-            dominant-baseline: middle !important;
-        }
-        .mermaid .nodeLabel, .mermaid .edgeLabel {
-            text-align: center !important;
-        }
         .cell details {
             margin: 4px 0;
             font-size: 1.5rem;
-            font-color: #e488f2ff;
         }
-
         .cell details summary {
             margin-bottom: 0px;
             padding: 4px;
         }
         .cell-output pre {
           font-size: 2.0rem;
+        }
+        .reveal pre code {
+          font-size: 1.8rem !important;
         }
         .reveal details pre code {
           font-size: 1.5rem;
@@ -69,6 +89,15 @@ format:
           max-height: 500px;
           width: auto;
           height: auto;
+        }
+        .reveal p.caption {
+          text-align: center;
+          margin-top: 0;
+          margin-bottom: 0.5em;
+          font-size: 0.8em;
+          color: #444;
+          font-family: inherit;
+          font-weight: lighter;
         }
         .fig-small img {
           max-height: 300px !important;
@@ -100,6 +129,22 @@ format:
           max-height: none !important;
           object-fit: cover;
         }
+        table {
+          width: 100%;
+          border-bottom: none !important;
+        }
+        table tbody {
+          border-bottom: none !important;
+        }
+        table tr:last-child,
+        table tr:last-child td {
+          border-bottom: none !important;
+        }
+        table th:first-child,
+        table td:first-child {
+          font-weight: bold;
+          border-right: 2px solid #aaa;
+        }
         .reveal .cite {
           position: absolute;
           bottom: 6px;
@@ -114,6 +159,9 @@ format:
         .reveal .cite p {
           margin: 0;
           line-height: 1.4;
+        }
+        .reveal .cite a {
+          color: rgba(255,255,255,0.9);
         }
         .reveal .content-box {
           position: absolute;
@@ -132,6 +180,9 @@ format:
           position: absolute;
           bottom: 60px;
           right: 60px;
+          top: auto;
+          left: auto;
+          transform: none;
           text-align: left;
         }
         .reveal .content-box.pos-cl {
@@ -147,14 +198,288 @@ format:
           background-repeat: no-repeat;
           background-position: center;
         }
+        #home-btn {
+          position: fixed;
+          top: 12px;
+          left: 12px;
+          z-index: 100;
+          background: #5dade2;
+          color: white;
+          padding: 4px 14px;
+          border-radius: 4px;
+          text-decoration: none;
+          font-size: 1rem;
+        }
+        .reveal > .footer {
+          display: flex !important;
+          align-items: center;
+          justify-content: center;
+          padding: 0 16px;
+          height: auto !important;
+          overflow: visible !important;
+          box-sizing: border-box;
+        }
+        #slide-nav {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        #slide-nav button {
+          background: transparent;
+          color: #5dade2;
+          border: 1px solid #5dade2;
+          border-radius: 4px;
+          padding: 4px 14px;
+          font-size: 1rem;
+          cursor: pointer;
+          touch-action: manipulation;
+          -webkit-tap-highlight-color: transparent;
+        }
+        #slide-nav button:active {
+          background: rgba(93, 173, 226, 0.2);
+        }
+        #slide-nav button:disabled {
+          opacity: 0.3;
+          cursor: default;
+        }
+        #nav-counter {
+          font-size: 0.9rem;
+          min-width: 56px;
+          text-align: center;
+        }
+        .reveal .slide-number {
+          display: none !important;
+        }
+        pre.shell code > span > a:first-child::before {
+          content: "$" !important;
+          color: #888 !important;
+          user-select: none !important;
+        }
+        .code-copy-outer-scaffold {
+          position: relative !important;
+          margin-top: 0.3em !important;
+        }
+        .code-copy-outer-scaffold:has(pre.python)::before,
+        .code-copy-outer-scaffold:has(pre.shell)::before {
+          position: absolute;
+          top: 2px;
+          right: 30px;
+          font-size: 10px;
+          color: #bbb;
+          pointer-events: none;
+          z-index: 2;
+        }
+        .code-copy-outer-scaffold:has(pre.python)::before {
+          content: "Python";
+        }
+        .code-copy-outer-scaffold:has(pre.shell)::before {
+          content: "Shell";
+        }
+        a[href]::after {
+          content: "";
+          display: inline-block;
+          width: 0.6em;
+          height: 0.6em;
+          margin-left: 0.3em;
+          vertical-align: middle;
+          opacity: 0.5;
+          background: currentColor;
+          -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath d='M290.4 19.8C295.4 7.8 307.1 0 320 0h160c17.7 0 32 14.3 32 32v160c0 12.9-7.8 24.6-19.8 29.6s-25.7 2.2-34.9-6.9L400 157.3 246.6 310.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L354.7 112l-57.3-57.4c-9.2-9.2-11.9-22.9-6.9-34.9zM0 176c0-44.2 35.8-80 80-80h80c17.7 0 32 14.3 32 32s-14.3 32-32 32H80c-8.8 0-16 7.2-16 16v256c0 8.8 7.2 16 16 16h256c8.8 0 16-7.2 16-16v-80c0-17.7 14.3-32 32-32s32 14.3 32 32v80c0 44.2-35.8 80-80 80H80c-44.2 0-80-35.8-80-80V176z'/%3E%3C/svg%3E") no-repeat center / contain;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath d='M290.4 19.8C295.4 7.8 307.1 0 320 0h160c17.7 0 32 14.3 32 32v160c0 12.9-7.8 24.6-19.8 29.6s-25.7 2.2-34.9-6.9L400 157.3 246.6 310.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L354.7 112l-57.3-57.4c-9.2-9.2-11.9-22.9-6.9-34.9zM0 176c0-44.2 35.8-80 80-80h80c17.7 0 32 14.3 32 32s-14.3 32-32 32H80c-8.8 0-16 7.2-16 16v256c0 8.8 7.2 16 16 16h256c8.8 0 16-7.2 16-16v-80c0-17.7 14.3-32 32-32s32 14.3 32 32v80c0 44.2-35.8 80-80 80H80c-44.2 0-80-35.8-80-80V176z'/%3E%3C/svg%3E") no-repeat center / contain;
+        }
+        .reveal .hl {
+          color: rgba(255,255,255,1);
+          font-weight: bold;
+          font-family: monospace;
+          text-shadow:
+            -3px  0   0 #0099cc,
+            -3px -1px 0 #0099cc,
+            -2px -2px 0 #0099cc,
+            -1px -3px 0 #0099cc,
+             0   -3px 0 #0099cc,
+             1px -3px 0 #0099cc,
+             2px -2px 0 #0099cc,
+             3px -1px 0 #0099cc,
+             3px  0   0 #0099cc,
+             3px  1px 0 #0099cc,
+             2px  2px 0 #0099cc,
+             1px  3px 0 #0099cc,
+             0    3px 0 #0099cc,
+            -1px  3px 0 #0099cc,
+            -2px  2px 0 #0099cc,
+            -3px  1px 0 #0099cc;
+        }
+        .break-slide h2 { border: none !important; }
+        .break-slide p { margin: 0 !important; }
+        .break-slide .break-title {
+          font-size: 1.5em;
+          font-weight: bold;
+          color: #333;
+          border-bottom: 0.5px solid #333;
+          padding-bottom: 0.1em;
+        }
+        .reveal ul li::marker {
+          color: #0099cc;
+          font-size: 1.3em;
+        }
+        .reveal ul ul li::before, .reveal ol ul li::before {
+          font-weight: 500;
+          color: #0099cc;
+        }
+        .reveal ul ul ul {
+          list-style: none;
+        }
+        .reveal ul ul ul li::before {
+          content: "‣";
+        }
+        .reveal strong {
+          padding: 0 0.1em;
+        }
+        .reveal .fw-colon {
+          font-weight: 300;
+        }
+        .reveal :not(pre) > code {
+          color: #005cc5;
+          font-weight: bold;
+          font-size: 1.1em;
+          padding: 0 0.15em;
+          font-family: monospace, serif;
+          text-shadow: none;
+        }
         </style>
+        <script>
+        (function() {
+          try {
+            var counterInit = false;
+
+            function createNav() {
+              try {
+                if (document.getElementById('slide-nav')) return;
+                var footer = document.querySelector('.reveal > .footer');
+                if (!footer) return;
+                var nav = document.createElement('span');
+                nav.id = 'slide-nav';
+                nav.innerHTML = '<button id="nav-prev">&#9664;</button><span id="nav-counter">-/-</span><button id="nav-next">&#9654;</button>';
+                footer.appendChild(nav);
+              } catch (e) {}
+            }
+
+            function createHome() {
+              try {
+                if (document.getElementById('home-btn')) return;
+                var home = document.createElement('a');
+                home.id = 'home-btn';
+                home.href = './index.html';
+                home.textContent = 'Home';
+                home.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  goHome();
+                });
+                document.body.appendChild(home);
+              } catch (e) {}
+            }
+
+            function updateCounter() {
+              try {
+                var el = document.getElementById('nav-counter');
+                if (!el || !window.Reveal) return;
+                var slides = Array.from(document.querySelectorAll('.reveal .slides section:not(.stack)'));
+                var idx = slides.findIndex(function(s) { return s.classList.contains('present'); });
+                el.textContent = (idx + 1) + ' / ' + slides.length;
+                var prev = document.getElementById('nav-prev');
+                var next = document.getElementById('nav-next');
+                if (prev) prev.disabled = (idx <= 0);
+                if (next) next.disabled = (idx >= slides.length - 1);
+              } catch (e) {}
+            }
+
+            function initCounter() {
+              try {
+                if (counterInit || !window.Reveal) return;
+                counterInit = true;
+                updateCounter();
+                Reveal.on('slidechanged', updateCounter);
+              } catch (e) {}
+            }
+
+            function isFirstSlide() {
+              return Reveal.getIndices().h === 0 && Reveal.getIndices().v === 0;
+            }
+
+            function goHome() {
+              try { sessionStorage.setItem('lastSlide', window.location.href); } catch (e) {}
+              window.location.href = './index.html';
+            }
+
+            function handleNav(btn) {
+              initCounter();
+              if (btn.id === 'nav-prev') {
+                if (isFirstSlide()) {
+                  goHome();
+                } else {
+                  Reveal.prev();
+                }
+              }
+              if (btn.id === 'nav-next') Reveal.next();
+            }
+
+            document.addEventListener('click', function(e) {
+              try {
+                var btn = e.target.closest('#nav-prev, #nav-next');
+                if (!btn || !window.Reveal) return;
+                handleNav(btn);
+              } catch (e) {}
+            });
+
+            document.addEventListener('touchend', function(e) {
+              try {
+                var btn = e.target.closest('#nav-prev, #nav-next');
+                if (!btn || !window.Reveal) return;
+                e.preventDefault();
+                handleNav(btn);
+              } catch (e) {}
+            }, { passive: false });
+
+            document.addEventListener('keydown', function(e) {
+              try {
+                if (!window.Reveal) return;
+                if (isFirstSlide() && (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp')) {
+                  goHome();
+                }
+              } catch (e) {}
+            });
+
+            function setup() {
+              try {
+                new MutationObserver(function() {
+                  createHome();
+                  if (document.querySelector('.reveal > .footer')) {
+                    createNav();
+                    if (window.Reveal && Reveal.isReady()) initCounter();
+                  }
+                }).observe(document.body, { childList: true, subtree: true });
+                createHome();
+                createNav();
+              } catch (e) {}
+            }
+
+            if (document.body) {
+              setup();
+            } else {
+              document.addEventListener('DOMContentLoaded', setup);
+            }
+          } catch (e) {}
+        })();
+        </script>
 mermaid:
   theme: default
   flowchart:
-#    diagramPadding: 10
     nodeSpacing: 10
     rankSpacing: 15
 filters:
-   - lightbox
-   - cite-image.lua
+  - hl.lua
+  - fw-colon.lua
+  - cite-image.lua
+  - plotly-iframe.lua
+  - lightbox
 lightbox: auto

@@ -1,14 +1,119 @@
-# Quarto スライド 画像・引用 記法
+# AI Lectures
 
-両プロジェクト（`IP3200/`、`ai/`）共通の記法。
+機械学習・AIに関するQuartoスライド。
 
 ## セットアップ
 
-各プロジェクトの `_metadata.yaml` に CSS と Lua フィルター（`cite-image.lua`）が設定済み。
+### 必要なもの
 
----
+- [Quarto](https://quarto.org/docs/get-started/) (>= 1.8)
+- conda (Miniconda / Anaconda)
 
-## 1. 部分画像 + 引用オーバーレイ
+### ワンコマンドセットアップ
+
+```bash
+python setup.py
+conda activate ai
+```
+
+`setup.py` が以下をまとめて行う：
+- conda 環境 `ai` の作成（Python 3.12 + NumPy, Matplotlib, pandas, scipy, scikit-learn, altair 等）
+- `QUARTO_PYTHON` 自動設定の activate フック
+- MathJax 2 のダウンロード（`libs/mathjax/`）
+
+MathJax だけ再取得したい場合：
+
+```bash
+python setup.py --mathjax-only
+```
+
+### ローカルプレビュー
+
+```bash
+quarto preview --port 4321
+```
+
+ブラウザで `http://localhost:4321` が開く。ファイルを保存するとホットリロードされる。
+
+### ビルド・デプロイ
+
+```bash
+quarto render            # _site/ に出力
+quarto publish gh-pages  # GitHub Pages へデプロイ
+```
+
+## ファイル構成
+
+```
+_quarto.yml       サイト設定・ナビゲーション
+_metadata.yaml    スライド共通設定（テーマ・CSS・フィルタ）
+index.qmd         トップページ（リンク一覧）
+*.qmd             各回のスライド
+imgs/             画像ファイル
+hl.lua            ==text== ハイライト用 Lua フィルタ
+fw-colon.lua      全角コロン「：」の表示調整 Lua フィルタ
+cite-image.lua    画像引用表示用 Lua フィルタ
+_extensions/      Quarto 拡張（clean-revealjs テーマ等）
+```
+
+## スライドの書き方
+
+### 基本ルール
+
+- スライド区切りは `##`（`---` は使わない）
+- 本文はバレットポイントで書く（地の文は避ける）
+- 重要概念は Quarto callout（`.callout-note`, `.callout-tip`, `.callout-warning`）を使う
+
+### 新しいスライドを追加する
+
+1. `xxx.qmd` を作成
+2. `index.qmd` にリンクを追加
+3. `_quarto.yml` の `navbar` にも追加
+
+3つ揃えないとナビゲーションがずれるので注意。
+
+### インラインコード（バッククォート）
+
+本文中の `` `code` `` は **太字・青（`#005cc5`）・等幅** で表示される。  
+コードブロックのシンタックスハイライトと同系色。
+
+```markdown
+NumPy では `@` が内積の演算子
+```
+
+### ハイライトマーカー（`==text==`）
+
+`hl.lua` フィルタにより、`==text==` と書くと縁取り付きのハイライト表示になる。  
+バッククォートのインラインコードとは別のスタイル（白文字＋シアン縁取り）。
+
+```markdown
+NumPy では ==@== が内積の演算子
+```
+
+**制約:**
+
+- 中身に空白は含められない（`==` と `==` の間に空白があるとマッチしない）
+- スペースを含む場合は `[a @ b]{.hl}` と書く
+
+### Matplotlib で日本語
+
+```python
+import japanize_matplotlib  # これだけでOK
+```
+
+`rcParams['font.family']` は使わない（動作が不安定）。
+
+### 数式の `\vec{}` の高さ揃え
+
+`\vec{a}` と `\vec{b}` で矢印の高さが揃わない問題の対処：
+
+```latex
+\vec{\vphantom{b}a}   ← b と高さが揃う
+```
+
+## 画像・引用記法
+
+### 部分画像 + 引用オーバーレイ
 
 ```markdown
 ::: {.fig-cite src="imgs/image.png" height="400px"}
@@ -20,15 +125,7 @@
 :::
 ```
 
-- `src` — 画像パス（`imgs/` 相対）
-- `height` — div の高さ（省略時 `60%`）
-- 画像は `background-size: contain` で縦横比を保って収まる
-- `.cite` が右下にオーバーレイ表示される
-- **注意**: `:::` の対応を必ず揃える。最後の `:::` が `.fig-cite` を閉じる
-
----
-
-## 2. 全画面スライド + 引用オーバーレイ
+### 全画面スライド + 引用オーバーレイ
 
 ```markdown
 ## スライドタイトル {.bg-cover src="imgs/image.png"}
@@ -38,91 +135,27 @@
 :::
 ```
 
-- スライドの `<section>` 要素を背景画像で塗りつぶす（レターボックス外には影響しない）
-- `background-size: cover` で全面を埋める
-- スライドタイトル（h2）は自動的に非表示になる（`.no-header` が付与される）
-- タイトルなしにしたい場合は `## {.bg-cover src="..."}` と空にする
-
----
-
-## 3. コンテンツボックス（`.content-box`）
-
-背景画像の上にテキストを半透明ボックスで重ねる。`.fig-cite` 内でも `.bg-cover` スライド内でも使える。
-
-### デフォルト（中央）
+### コンテンツボックス
 
 ```markdown
 ::: {.content-box}
 内容
 :::
-```
 
-### 右下（`.pos-br`）
-
-```markdown
 ::: {.content-box .pos-br}
-内容
+右下に配置
 :::
-```
 
-### 中央・左寄せ（`.pos-cl`）
-
-```markdown
 ::: {.content-box .pos-cl}
-内容
+中央・左寄せ
 :::
 ```
 
-### 組み合わせ例（`.fig-cite` + `.content-box` + `.cite`）
-
-```markdown
-::: {.fig-cite src="imgs/image.png" height="90%"}
-
-::: {.content-box .pos-br}
-- ポイント1
-- ポイント2
-:::
-
-::: {.cite}
-出典: <https://example.com>
-:::
-
-:::
-```
-
-- コンテンツ幅は最大 `60%` に制限される
-- `position: absolute` なので親要素（`.fig-cite` or section）を基準に配置される
-
----
-
-## 4. `.cite` 単体
-
-`position: absolute` なので、親要素（`position: relative`）の右下に表示される。
-
-- `.fig-cite` の中 → 画像右下
-- `.bg-cover` スライド直下 → スライド右下
-
----
-
-## 5. その他の CSS クラス
+### その他の CSS クラス
 
 | クラス | 効果 |
 |---|---|
 | `.fig-small` | 画像の最大高さを 300px に制限 |
 | `.fig-medium` | 画像の最大高さを 400px に制限 |
 | `.no-header` | スライドの h2 を非表示 |
-
----
-
-## ファイル構成
-
-```
-プロジェクト/
-├── cite-image.lua      # Lua フィルター（.fig-cite / .bg-cover → style 展開）
-├── _metadata.yaml      # CSS 定義 + フィルター登録
-├── _quarto.yml         # resources: ["imgs/**"] でimgsを_siteへコピー
-└── imgs/               # 画像置き場
-```
-
-> **注意**: CSS `background-image` に使う画像は `<img>` タグ経由でないと Quarto が自動コピーしない。
-> `_quarto.yml` の `resources: ["imgs/**"]` で全画像をコピーするよう設定済み。
+| `.fig-fullscreen` | 画像を全画面表示 |

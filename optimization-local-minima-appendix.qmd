@@ -1,0 +1,847 @@
+---
+title: "最適化問題（2）"
+subtitle: "ローカルミニマムの罠"
+_metadata.yml: !expr yaml::read_yaml("_metadata.yml")
+---
+
+# 前回の振り返りと今回の問題
+
+## 前回やったこと
+
+前回は $f(x) = x^2 - 4x + 3$ という**2次関数**で、勾配降下法とNewton法を学びました。
+
+この関数は**谷が1つだけ**のシンプルな形でした。
+どこから始めても、必ず同じ最小値 $x = 2$ にたどり着きました。
+
+::: {.callout-note}
+## 前回の結論
+
+- 勾配降下法：何回も反復して少しずつ最小値に近づく
+- Newton法：2次微分も使って、一気に最小値にジャンプ
+- どちらも**同じ答え**にたどり着いた
+:::
+
+## 今回の疑問
+
+でも、こんな疑問が浮かびます：
+
+> **「谷が2つ以上ある関数だったら、どうなるの？」**
+
+実際の機械学習の問題では、谷が1つだけということはほとんどありません。
+パラメータが多くなると、**たくさんの谷**が存在します。
+
+今回は「谷が2つある関数」で、Newton法を使ったときに**何が起こるか**を体験しましょう。
+
+---
+
+# 谷が2つある関数を見てみよう
+
+## 関数の定義
+
+今回使う関数はこれです：
+
+$$f(x) = 0.1x^4 - x^3 + 2x^2 + 1$$
+
+前回と同じように、微分を手で計算しておきます。
+
+**1次微分**（傾き）:
+$$f'(x) = 0.4x^3 - 3x^2 + 4x$$
+
+**2次微分**（曲がり具合）:
+$$f''(x) = 1.2x^2 - 6x + 4$$
+
+## Pythonでの定義
+
+```{python}
+#| echo: true
+import numpy as np
+import matplotlib.pyplot as plt
+
+# 4次関数とその微分
+def f_poly(x):
+    return 0.1*x**4 - x**3 + 2*x**2 + 1
+
+def f_poly_prime(x):
+    return 0.4*x**3 - 3*x**2 + 4*x
+
+def f_poly_double_prime(x):
+    return 1.2*x**2 - 6*x + 4
+```
+
+## まずグラフを描いてみよう
+
+どんな形の関数なのか、**まず目で見る**ことが大切です。
+
+```{python}
+#| echo: false
+#| fig-align: center
+x_range = np.linspace(-2, 8, 300)
+y_range = f_poly(x_range)
+
+plt.figure(figsize=(12, 5))
+plt.plot(x_range, y_range, 'b-', linewidth=2.5)
+plt.axhline(y=0, color='k', linestyle='--', alpha=0.3)
+plt.xlabel('x', fontsize=13)
+plt.ylabel('f(x)', fontsize=13)
+plt.title('Quartic Function: Two Valleys!', fontsize=14, fontweight='bold')
+plt.grid(True, alpha=0.3)
+plt.xlim(-2, 8)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-note}
+## グラフを観察しよう
+
+谷がいくつあるか、数えてみてください。
+
+- **左の谷**（$x \approx 1$ 付近）：浅い谷
+- **右の谷**（$x \approx 6$ 付近）：深い谷
+
+前回の2次関数は谷が1つだけでしたが、今回は**2つ**あります。
+
+さて、Newton法を使ったら、どちらの谷に行くのでしょうか？
+:::
+
+---
+
+# 実験：初期値を変えてNewton法を実行してみよう
+
+前回学んだNewton法の更新式を思い出しましょう：
+
+$$x_{\text{new}} = x - \frac{f'(x)}{f''(x)}$$
+
+同じ式を使って、**スタート地点だけ変えて**2回実験します。
+
+---
+
+
+## その前に：$f'(x) = 0$ は「谷」だけじゃない
+
+実験に入る前に、1つだけ知っておくべきことがあります。
+
+Newton法は $f'(x) = 0$ となる点を探しますが、$f'(x) = 0$ になるのは**谷（最小値）だけではありません**。**山（最大値）**でも $f'(x) = 0$ です。
+
+これは**2次微分で見分けられます**：
+
+$$f''(x) > 0 \Rightarrow \text{谷（最小値）}$$
+$$f''(x) < 0 \Rightarrow \text{山（最大値）}$$
+
+::: {.callout-tip}
+## 覚えておこう
+
+収束したら $f''(x)$ をチェック。正なら谷、負なら山。
+山に止まった結果は捨てましょう。
+:::
+
+
+## 実験1：$x_0 = 1.5$ からスタート（左の谷の近く）
+
+### 手計算で追いかけてみよう
+
+#### 反復1
+
+**現在の位置**: $x = 1.5$
+
+**1次微分（傾き）を計算:**
+$$f'(1.5) = 0.4 \times 1.5^3 - 3 \times 1.5^2 + 4 \times 1.5$$
+$$= 0.4 \times 3.375 - 3 \times 2.25 + 6.0$$
+$$= 1.35 - 6.75 + 6.0 = 0.6$$
+
+**2次微分（曲がり具合）を計算:**
+$$f''(1.5) = 1.2 \times 1.5^2 - 6 \times 1.5 + 4$$
+$$= 1.2 \times 2.25 - 9.0 + 4.0$$
+$$= 2.7 - 9.0 + 4.0 = -2.3$$
+
+**更新:**
+$$x_{\text{new}} = 1.5 - \frac{0.6}{-2.3} = 1.5 - (-0.261) = 1.5 + 0.261 = 1.761$$
+
+#### 反復2
+
+**現在の位置**: $x = 1.761$
+
+**1次微分:**
+$$f'(1.761) = 0.4 \times 1.761^3 - 3 \times 1.761^2 + 4 \times 1.761$$
+$$= 2.184 - 9.302 + 7.044 = -0.074$$
+
+**2次微分:**
+$$f''(1.761) = 1.2 \times 1.761^2 - 6 \times 1.761 + 4$$
+$$= 3.720 - 10.566 + 4.0 = -2.846$$
+
+**更新:**
+$$x_{\text{new}} = 1.761 - \frac{-0.074}{-2.846} = 1.761 - 0.026 = 1.735$$
+
+#### 反復3
+
+$f'(1.735)$ はほぼゼロに近づいています。**収束しました！**
+
+::: {.callout-important}
+## 実験1の結果
+
+$x_0 = 1.5$ からスタート → $x \approx 1.74$ に収束
+
+$f(1.74) \approx 1.93$
+:::
+
+### Pythonで確認
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "コードを表示"
+# 実験1: x0 = 1.5 からスタート
+x0_local = 1.5
+x = x0_local
+history_local = [x]
+
+print("実験1: x0 = 1.5 からスタート")
+print("=" * 65)
+
+for iteration in range(1, 8):
+    fp = f_poly_prime(x)
+    fpp = f_poly_double_prime(x)
+    
+    print(f"反復 {iteration}: x = {x:.4f}, f(x) = {f_poly(x):.4f}, f'(x) = {fp:.4f}, f''(x) = {fpp:.4f}")
+    
+    if abs(fp) < 0.001:
+        print(f"\n★ 収束！ x = {x:.4f}, f(x) = {f_poly(x):.4f}")
+        break
+    
+    if abs(fpp) < 1e-10:
+        print(f"\n2次微分が小さすぎる")
+        break
+    
+    x_new = x - fp / fpp
+    print(f"  更新: x_new = {x:.4f} - ({fp:.4f})/({fpp:.4f}) = {x_new:.4f}")
+    history_local.append(x_new)
+    x = x_new
+
+x_local_final = x
+f_local_final = f_poly(x)
+```
+
+---
+
+## 実験2：$x_0 = 5.5$ からスタート（右の谷の近く）
+
+### 手計算で追いかけてみよう
+
+#### 反復1
+
+**現在の位置**: $x = 5.5$
+
+**1次微分:**
+$$f'(5.5) = 0.4 \times 5.5^3 - 3 \times 5.5^2 + 4 \times 5.5$$
+$$= 0.4 \times 166.375 - 3 \times 30.25 + 22.0$$
+$$= 66.55 - 90.75 + 22.0 = -2.2$$
+
+**2次微分:**
+$$f''(5.5) = 1.2 \times 5.5^2 - 6 \times 5.5 + 4$$
+$$= 1.2 \times 30.25 - 33.0 + 4.0$$
+$$= 36.3 - 33.0 + 4.0 = 7.3$$
+
+**更新:**
+$$x_{\text{new}} = 5.5 - \frac{-2.2}{7.3} = 5.5 + 0.301 = 5.801$$
+
+#### 反復2
+
+**現在の位置**: $x = 5.801$
+
+**1次微分:**
+$$f'(5.801) = 0.4 \times 5.801^3 - 3 \times 5.801^2 + 4 \times 5.801$$
+$$= 78.11 - 100.95 + 23.20 = 0.36$$
+
+**2次微分:**
+$$f''(5.801) = 1.2 \times 5.801^2 - 6 \times 5.801 + 4$$
+$$= 40.37 - 34.81 + 4.0 = 9.56$$
+
+**更新:**
+$$x_{\text{new}} = 5.801 - \frac{0.36}{9.56} = 5.801 - 0.038 = 5.763$$
+
+#### 反復3
+
+$f'(5.763)$ はほぼゼロ。**収束しました！**
+
+::: {.callout-important}
+## 実験2の結果
+
+$x_0 = 5.5$ からスタート → $x \approx 5.76$ に収束
+
+$f(5.76) \approx -3.04$
+:::
+
+### Pythonで確認
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "コードを表示"
+# 実験2: x0 = 5.5 からスタート
+x0_global = 5.5
+x = x0_global
+history_global = [x]
+
+print("実験2: x0 = 5.5 からスタート")
+print("=" * 65)
+
+for iteration in range(1, 8):
+    fp = f_poly_prime(x)
+    fpp = f_poly_double_prime(x)
+    
+    print(f"反復 {iteration}: x = {x:.4f}, f(x) = {f_poly(x):.4f}, f'(x) = {fp:.4f}, f''(x) = {fpp:.4f}")
+    
+    if abs(fp) < 0.001:
+        print(f"\n★ 収束！ x = {x:.4f}, f(x) = {f_poly(x):.4f}")
+        break
+    
+    if abs(fpp) < 1e-10:
+        print(f"\n2次微分が小さすぎる")
+        break
+    
+    x_new = x - fp / fpp
+    print(f"  更新: x_new = {x:.4f} - ({fp:.4f})/({fpp:.4f}) = {x_new:.4f}")
+    history_global.append(x_new)
+    x = x_new
+
+x_global_final = x
+f_global_final = f_poly(x)
+```
+
+---
+
+## 2つの実験を並べてみよう
+
+```{python}
+#| echo: false
+#| fig-align: center
+x_range = np.linspace(-2, 8, 300)
+y_range = f_poly(x_range)
+
+plt.figure(figsize=(12, 6))
+plt.plot(x_range, y_range, 'b-', linewidth=2, alpha=0.5, label='f(x)')
+
+# 実験1
+plt.plot(history_local, [f_poly(h) for h in history_local], 
+         'ro-', markersize=10, linewidth=2, label=f'Exp1: x0={x0_local}')
+
+# 実験2
+plt.plot(history_global, [f_poly(h) for h in history_global], 
+         'go-', markersize=10, linewidth=2, label=f'Exp2: x0={x0_global}')
+
+plt.xlabel('x', fontsize=13)
+plt.ylabel('f(x)', fontsize=13)
+plt.title('Same Newton Method, Different Starting Points, Different Results!', fontsize=14, fontweight='bold')
+plt.legend(fontsize=11)
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-warning}
+## 答えが違う
+
+**まったく同じNewton法を使ったのに、結果が違う：**
+
+| | スタート地点 | 到着地点 | f(x)の値 |
+|---|---|---|---|
+| 実験1 | $x_0 = 1.5$ | $x \approx$ `{python} f'{x_local_final:.2f}'` | `{python} f'{f_local_final:.2f}'` |
+| 実験2 | $x_0 = 5.5$ | $x \approx$ `{python} f'{x_global_final:.2f}'` | `{python} f'{f_global_final:.2f}'` |
+
+実験2のほうが $f(x)$ が小さい = **より良い答え**を見つけている！
+
+**スタート地点（初期値）が違うだけで、たどり着く場所が変わってしまう。**
+:::
+
+---
+
+# この現象に名前をつけよう
+
+## ローカルミニマムとグローバルミニマム
+
+いま体験した現象には、ちゃんと名前がついています。
+
+**ローカルミニマム（局所的最小値）**:
+「その周辺では一番低い」けど、関数全体で見ると**もっと低い場所がある**点。
+実験1で到達した左の谷がこれです。
+
+**グローバルミニマム（大域的最小値）**:
+関数全体で**本当に一番低い**点。
+実験2で到達した右の谷がこれです。
+
+```{python}
+#| echo: false
+#| fig-align: center
+from scipy.optimize import minimize_scalar
+
+# ローカルミニマムとグローバルミニマムを数値的に探す
+result_local = minimize_scalar(f_poly, bounds=(0, 3), method='bounded')
+x_local = result_local.x
+y_local = f_poly(x_local)
+
+result_global = minimize_scalar(f_poly, bounds=(4, 7), method='bounded')
+x_global = result_global.x
+y_global = f_poly(x_global)
+
+# プロット
+x_range = np.linspace(-2, 8, 300)
+y_range = f_poly(x_range)
+
+plt.figure(figsize=(12, 6))
+plt.plot(x_range, y_range, 'b-', linewidth=2.5)
+
+plt.plot(x_local, y_local, 'ro', markersize=15, 
+         label=f'Local Min: x={x_local:.2f}, f(x)={y_local:.2f}', zorder=5)
+plt.plot(x_global, y_global, 'g*', markersize=20, 
+         label=f'Global Min: x={x_global:.2f}, f(x)={y_global:.2f}', zorder=5)
+
+plt.annotate('Local Min\n(shallow valley)', xy=(x_local, y_local), xytext=(x_local-1.5, y_local+2),
+            fontsize=12, ha='center',
+            arrowprops=dict(arrowstyle='->', color='red', lw=2))
+plt.annotate('Global Min\n(deepest valley)', xy=(x_global, y_global), xytext=(x_global+1.5, y_global+2),
+            fontsize=12, ha='center',
+            arrowprops=dict(arrowstyle='->', color='green', lw=2))
+
+plt.xlabel('x', fontsize=13)
+plt.ylabel('f(x)', fontsize=13)
+plt.title('Local Minimum vs Global Minimum', fontsize=14, fontweight='bold')
+plt.legend(fontsize=11, loc='upper right')
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-tip}
+## たとえ話：山の中で一番低い場所を探す
+
+あなたは目隠しをして山の中にいます。足元の傾きだけを頼りに、一番低い場所を探します。
+
+- 近くの谷に降りることはできる → **ローカルミニマム**
+- でも、山の向こうにもっと深い谷があるかもしれない → **グローバルミニマム**
+- 目隠しをしているので、**今いる谷が一番深いかどうかわからない！**
+
+Newton法も勾配降下法も、この「目隠し」と同じ状況です。
+:::
+
+---
+
+# なぜこうなるのか：初期値と「引力圏」
+
+## Newton法は「近くの谷」に落ちる
+
+Newton法は、現在地の近くにある谷を見つけるアルゴリズムです。
+遠くの谷のことは知りません。
+
+だから：
+
+- **左の谷の近くからスタート** → 左の谷（ローカルミニマム）に落ちる
+- **右の谷の近くからスタート** → 右の谷（グローバルミニマム）に落ちる
+
+## 引力圏（Basin of Attraction）を可視化しよう
+
+「どの初期値からスタートすると、どの谷に落ちるか」を全部調べてみましょう。
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "コードを表示"
+def newton_optimize(f, fp, fpp, x0, max_iter=50):
+    """Newton法を実行して結果を返す"""
+    x = x0
+    for i in range(max_iter):
+        grad = fp(x)
+        hess = fpp(x)
+        if abs(grad) < 1e-6:
+            return x, f(x), True
+        if abs(hess) < 1e-10:
+            return x, f(x), False
+        x = x - grad / hess
+    return x, f(x), False
+
+# 初期値を -1.5 から 7.5 まで細かく変えて、全部試す
+x0_dense = np.linspace(-1.5, 7.5, 200)
+convergence_points = []
+convergence_values = []
+
+for x0 in x0_dense:
+    x_final, f_final, _ = newton_optimize(f_poly, f_poly_prime, f_poly_double_prime, x0)
+    convergence_points.append(x_final)
+    convergence_values.append(f_final)
+
+convergence_points = np.array(convergence_points)
+convergence_values = np.array(convergence_values)
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
+# 収束領域を分類
+local_region = np.abs(convergence_points - x_local) < 0.5
+global_region = np.abs(convergence_points - x_global) < 0.5
+
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 10))
+
+# 上：関数の形
+x_range = np.linspace(-2, 8, 300)
+y_range = f_poly(x_range)
+
+ax1.plot(x_range, y_range, 'b-', linewidth=2.5, label='f(x)')
+ax1.plot(x_local, y_local, 'ro', markersize=15, label='Local Min', zorder=5)
+ax1.plot(x_global, y_global, 'g*', markersize=20, label='Global Min', zorder=5)
+ax1.set_xlabel('x', fontsize=13)
+ax1.set_ylabel('f(x)', fontsize=13)
+ax1.set_title('Function Shape', fontsize=14, fontweight='bold')
+ax1.legend(fontsize=11)
+ax1.grid(True, alpha=0.3)
+
+# 下：引力圏
+for i in range(len(x0_dense)-1):
+    if local_region[i]:
+        ax2.axvspan(x0_dense[i], x0_dense[i+1], alpha=0.3, color='red')
+    elif global_region[i]:
+        ax2.axvspan(x0_dense[i], x0_dense[i+1], alpha=0.3, color='green')
+
+ax2.scatter(x0_dense, convergence_points, c=convergence_values, 
+            cmap='RdYlGn_r', s=20, alpha=0.8, zorder=3)
+ax2.axhline(y=x_local, color='r', linestyle='--', linewidth=2, alpha=0.7, 
+            label=f'Local Min (x={x_local:.2f})')
+ax2.axhline(y=x_global, color='g', linestyle='--', linewidth=2, alpha=0.7, 
+            label=f'Global Min (x={x_global:.2f})')
+
+from matplotlib.patches import Patch
+legend_elements = [
+    Patch(facecolor='red', alpha=0.3, label='-> Local Min'),
+    Patch(facecolor='green', alpha=0.3, label='-> Global Min'),
+]
+handles, labels = ax2.get_legend_handles_labels()
+ax2.legend(handles=handles+legend_elements, loc='upper left', fontsize=10)
+
+ax2.set_xlabel('Starting Point (x0)', fontsize=13)
+ax2.set_ylabel('Convergence Point', fontsize=13)
+ax2.set_title('Basin of Attraction', fontsize=14, fontweight='bold')
+ax2.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-note}
+## 引力圏（Basin of Attraction）とは
+
+各谷には「引力圏」があります。**その範囲内からスタートすると、その谷に吸い込まれる**という領域です。
+
+- **赤い領域**からスタート → ローカルミニマム（浅い谷）に落ちる
+- **緑の領域**からスタート → グローバルミニマム（深い谷）に落ちる
+
+初期値が少し変わるだけで、結果がガラッと変わる境界があることに注目してください。
+:::
+
+---
+
+# 対策：どうすればグローバルミニマムを見つけられるか
+
+## 考え方：1回だけでは信用できない
+
+ここまでの実験でわかったこと：
+
+- Newton法は「近くの谷」に落ちるだけ
+- 1回の実行では、それがローカルかグローバルかわからない
+
+**解決策はシンプル：何回もやって、一番良い結果を選ぶ！**
+
+---
+
+## 方法1：手で初期値を変えて比較する
+
+まず、3つの初期値から手計算で比較してみましょう。
+
+### $x_0 = 0$ からスタート
+
+$$f'(0) = 0.4 \times 0 - 3 \times 0 + 4 \times 0 = 0$$
+
+$f'(0) = 0$ なので、$x = 0$ は既に極値です。$f(0) = 1$。
+
+$f''(0) = 1.2 \times 0 - 6 \times 0 + 4 = 4 > 0$ → 最小値（谷）。
+
+### $x_0 = 2$ からスタート
+
+$$f'(2) = 0.4 \times 8 - 3 \times 4 + 4 \times 2 = 3.2 - 12 + 8 = -0.8$$
+$$f''(2) = 1.2 \times 4 - 6 \times 2 + 4 = 4.8 - 12 + 4 = -3.2$$
+$$x_{\text{new}} = 2 - \frac{-0.8}{-3.2} = 2 - 0.25 = 1.75$$
+
+→ 左の谷（ローカルミニマム）の方向に進んでいます。
+
+### $x_0 = 6$ からスタート
+
+$$f'(6) = 0.4 \times 216 - 3 \times 36 + 4 \times 6 = 86.4 - 108 + 24 = 2.4$$
+$$f''(6) = 1.2 \times 36 - 6 \times 6 + 4 = 43.2 - 36 + 4 = 11.2$$
+$$x_{\text{new}} = 6 - \frac{2.4}{11.2} = 6 - 0.214 = 5.786$$
+
+→ 右の谷（グローバルミニマム）の方向に進んでいます。
+
+### 3つの結果を比較
+
+```{python}
+#| echo: true
+# 3つの初期値から実行して比較
+starting_points = [0, 2, 6]
+
+print("初期値を変えて比較")
+print("=" * 55)
+print(f"{'x0':>4}  →  {'到着地点':>8}  →  {'f(x)':>8}  →  判定")
+print("-" * 55)
+
+results_comparison = []
+for x0 in starting_points:
+    x_final, f_final, _ = newton_optimize(f_poly, f_poly_prime, f_poly_double_prime, x0)
+    results_comparison.append((x0, x_final, f_final))
+
+best_f = min(r[2] for r in results_comparison)
+for x0, xf, fx in results_comparison:
+    marker = " ← 最良！" if fx == best_f else ""
+    print(f"{x0:4.1f}  →  {xf:8.4f}  →  {fx:8.4f}  →{marker}")
+```
+
+::: {.callout-important}
+## ポイント
+
+3つの初期値を試すだけで、**一番良い答えを選べる**ようになりました！
+
+手間は3倍になりますが、間違った答えを信じるよりずっと良いです。
+:::
+
+---
+
+## 方法2：たくさんの初期値を自動で試す（ランダムリスタート）
+
+手で3つ試すのも良いですが、コンピュータなら**20個でも100個でも**試せます。
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "コードを表示"
+# 20個のランダムな初期値から試す
+np.random.seed(42)
+n_trials = 20
+results = []
+
+print("ランダムリスタート：20個の初期値から試す")
+print("=" * 60)
+
+for i in range(n_trials):
+    x0 = np.random.uniform(-1, 7)
+    x_final, f_final, success = newton_optimize(f_poly, f_poly_prime, f_poly_double_prime, x0)
+    results.append((x0, x_final, f_final, success))
+    
+    if i < 5:
+        print(f"試行 {i+1:2d}: x0={x0:5.2f} → x={x_final:6.2f}, f(x)={f_final:7.4f}")
+
+print(f"  ... (残り{n_trials-5}個)")
+
+# 最良の結果を見つける
+results.sort(key=lambda r: r[2])
+best_x0, best_x, best_f, _ = results[0]
+
+print(f"\n★ 最良の結果: x0={best_x0:.2f} → x={best_x:.4f}, f(x)={best_f:.4f}")
+```
+
+## 方法3：等間隔に初期値を並べる（グリッドサーチ）
+
+ランダムではなく、**等間隔に並べる**方法もあります。
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "コードを表示"
+# 等間隔に15個の初期値を用意
+x0_candidates = np.linspace(-1, 7, 15)
+grid_results = []
+
+print("グリッドサーチ：等間隔の15個の初期値")
+print("=" * 55)
+print(f"{'x0':>5}  →  {'到着地点':>8}  →  {'f(x)':>8}")
+print("-" * 55)
+
+for x0 in x0_candidates:
+    x_final, f_final, success = newton_optimize(f_poly, f_poly_prime, f_poly_double_prime, x0)
+    grid_results.append((x0, x_final, f_final))
+    print(f"{x0:5.2f}  →  {x_final:8.4f}  →  {f_final:8.4f}")
+
+best_grid = min(grid_results, key=lambda r: r[2])
+print(f"\n★ 最良: x0={best_grid[0]:.2f} → x={best_grid[1]:.4f}, f(x)={best_grid[2]:.4f}")
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
+x0_list = [r[0] for r in grid_results]
+xf_list = [r[1] for r in grid_results]
+f_list = [r[2] for r in grid_results]
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+
+# 左：初期値 vs 収束点
+scatter1 = ax1.scatter(x0_list, xf_list, c=f_list, cmap='RdYlGn_r', s=100, edgecolors='black')
+ax1.axhline(y=x_local, color='r', linestyle='--', linewidth=2, alpha=0.5, label='Local Min')
+ax1.axhline(y=x_global, color='g', linestyle='--', linewidth=2, alpha=0.5, label='Global Min')
+ax1.set_xlabel('Starting Point (x0)', fontsize=12)
+ax1.set_ylabel('Convergence Point', fontsize=12)
+ax1.set_title('Initial Value -> Convergence', fontsize=13, fontweight='bold')
+ax1.legend(fontsize=10)
+ax1.grid(True, alpha=0.3)
+
+# 右：収束時の関数値
+scatter2 = ax2.scatter(x0_list, f_list, c=f_list, cmap='RdYlGn_r', s=100, edgecolors='black')
+ax2.axhline(y=y_local, color='r', linestyle='--', linewidth=2, alpha=0.5, label='Local Min value')
+ax2.axhline(y=y_global, color='g', linestyle='--', linewidth=2, alpha=0.5, label='Global Min value')
+ax2.set_xlabel('Starting Point (x0)', fontsize=12)
+ax2.set_ylabel('f(x) at Convergence', fontsize=12)
+ax2.set_title('Solution Quality', fontsize=13, fontweight='bold')
+ax2.legend(fontsize=10)
+ax2.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-tip}
+## ランダムリスタート vs グリッドサーチ
+
+| 方法 | やり方 | 長所 | 短所 |
+|------|--------|------|------|
+| ランダムリスタート | 初期値をランダムに選ぶ | 簡単、偏りが少ない | 運に左右される |
+| グリッドサーチ | 初期値を等間隔に並べる | 漏れが少ない | 数が多いと大変 |
+
+どちらも**「何回も試して一番良いのを選ぶ」**という同じ考え方です。
+:::
+
+---
+
+# 実践チェックリスト
+
+最適化問題に取り組むときは、以下の手順を守りましょう。
+
+::: {.callout-important}
+## ステップ1：関数を可視化する
+
+まずグラフを描いて、谷がいくつあるか確認する。
+谷が複数ありそうなら、ローカルミニマムに注意！
+:::
+
+::: {.callout-important}
+## ステップ2：複数の初期値を用意する
+
+最低でも3〜5個。余裕があれば10個以上。
+グリッドサーチかランダムリスタートで用意する。
+:::
+
+::: {.callout-important}
+## ステップ3：全部実行して、結果を比較する
+
+すべての初期値からNewton法を実行し、$f(x)$ が**一番小さい**結果を選ぶ。
+:::
+
+::: {.callout-important}
+## ステップ4：2次微分で確認する
+
+収束した点で $f''(x) > 0$ なら谷（最小値）。
+$f''(x) < 0$ なら山（最大値）なので、その結果は捨てる。
+:::
+
+## 実装テンプレート
+
+上の4ステップをまとめたコードです。コピーして使えます。
+
+```{python}
+#| echo: true
+def robust_optimization(f, fp, fpp, x0_list, max_iter=100):
+    """
+    複数の初期値を使ったロバストな最適化
+    
+    Parameters:
+    -----------
+    f, fp, fpp : functions
+        目的関数とその1次微分、2次微分
+    x0_list : list
+        初期値のリスト
+    max_iter : int
+        最大反復数
+    
+    Returns:
+    --------
+    best_x : float
+        見つかった最良解
+    all_results : list
+        比較用のすべての結果
+    """
+    all_results = []
+    
+    for x0 in x0_list:
+        x = x0
+        
+        for i in range(max_iter):
+            grad = fp(x)
+            hess = fpp(x)
+            
+            if abs(grad) < 1e-6:
+                break
+            if abs(hess) < 1e-10:
+                break
+            
+            x = x - grad / hess
+        
+        all_results.append({
+            'x0': x0,
+            'x_final': x,
+            'f_final': f(x),
+            'is_minimum': fpp(x) > 0
+        })
+    
+    # 谷（最小値）だけを残して、一番良いのを選ぶ
+    minima = [r for r in all_results if r['is_minimum']]
+    if minima:
+        best_result = min(minima, key=lambda r: r['f_final'])
+    else:
+        best_result = min(all_results, key=lambda r: r['f_final'])
+    
+    return best_result['x_final'], all_results
+
+# 使用例：5つの初期値から試す
+initial_values = [-1, 0, 2, 4, 6]
+best_x, all_results = robust_optimization(f_poly, f_poly_prime, f_poly_double_prime, 
+                                          initial_values)
+
+print("すべての結果:")
+print(f"{'x0':>4}  →  {'到着地点':>8}  →  {'f(x)':>8}  →  {'谷?':>4}")
+print("-" * 50)
+for r in all_results:
+    valley = "はい" if r['is_minimum'] else "いいえ"
+    marker = " ← 最良！" if r['x_final'] == best_x else ""
+    print(f"{r['x0']:4.1f}  →  {r['x_final']:8.4f}  →  {r['f_final']:8.4f}  →  {valley}{marker}")
+
+print(f"\n★ 最良解: x = {best_x:.4f}, f(x) = {f_poly(best_x):.4f}")
+```
+
+---
+
+# まとめ
+
+::: {.callout-note}
+## 今回学んだこと
+
+1. **谷が複数ある関数では、Newton法の結果が初期値に依存する**
+   - 左の谷の近くからスタート → 左の谷に落ちる
+   - 右の谷の近くからスタート → 右の谷に落ちる
+
+2. **ローカルミニマムとグローバルミニマム**
+   - ローカルミニマム = 周辺では一番低いが、全体では最低ではない
+   - グローバルミニマム = 全体で本当に一番低い点
+
+3. **「収束した」≠「最適解を見つけた」**
+   - アルゴリズムは $f'(x) = 0$ を見つけるだけ
+   - それがローカルかグローバルかは判断できない
+
+4. **対策：複数の初期値から試して、一番良い結果を選ぶ**
+   - ランダムリスタートやグリッドサーチを使う
+   - 2次微分で谷（最小値）かどうかも確認する
+:::
+
