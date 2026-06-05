@@ -2,3 +2,24 @@
 - [Lecture 02: 2次元の決定境界](classification-2d-boundaries.qmd)
 - [Optimization: 勾配降下法とNewton法](optimization-gradient-newton.qmd)
 - [Appendix: ローカルミニマムと初期値](optimization-local-minima-appendix.qmd)
+
+<script>
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    return;
+  }
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown') {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    try {
+      var last = sessionStorage.getItem('lastSlide');
+      if (last) {
+        sessionStorage.removeItem('lastSlide');
+        window.location.href = last;
+      }
+    } catch (e) {}
+  }
+}, true);
+</script>

@@ -29,6 +29,17 @@ Quarto-based AI lecture website ("AI Lectures"). Slide decks for machine learnin
 - Code cells use `jupyter: python3`
 - Image sizing via `.fig-small` (300px) and `.fig-medium` (400px) CSS classes
 
+## JavaScript in .qmd
+
+**Event listener priority:** Inline JS in `.qmd` files loses to Quarto/revealjs event handlers by default. To intercept keyboard events before revealjs, use capture phase and stop propagation:
+```javascript
+document.addEventListener('keydown', function(e) {
+  e.preventDefault();
+  e.stopImmediatePropagation();
+  // ...
+}, true);  // capture phase
+```
+
 ## Build
 
 ```bash
