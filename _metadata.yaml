@@ -17,19 +17,32 @@ format:
           font-family: system-ui, -apple-system, "Hiragino Sans", "Yu Gothic UI", "Segoe UI", "Meiryo", sans-serif;
         }
         /* Force scrollbar visibility on macOS/mobile */
-        .reveal .slides section {
-          scrollbar-width: thin;
+        .reveal .slides section,
+        .reveal .slides section.present {
+          scrollbar-width: thin !important;
+          scrollbar-color: rgba(0,0,0,0.3) rgba(0,0,0,0.1) !important;
         }
-        .reveal .slides section::-webkit-scrollbar {
-          width: 8px;
-          height: 8px;
+        .reveal .slides section::-webkit-scrollbar,
+        .reveal .slides section.present::-webkit-scrollbar {
+          width: 10px !important;
+          height: 10px !important;
+          -webkit-appearance: none !important;
         }
-        .reveal .slides section::-webkit-scrollbar-track {
-          background: rgba(0, 0, 0, 0.1);
+        .reveal .slides section::-webkit-scrollbar-track,
+        .reveal .slides section.present::-webkit-scrollbar-track {
+          background: rgba(0, 0, 0, 0.08) !important;
+          border-radius: 5px !important;
         }
-        .reveal .slides section::-webkit-scrollbar-thumb {
-          background: rgba(0, 0, 0, 0.3);
-          border-radius: 4px;
+        .reveal .slides section::-webkit-scrollbar-thumb,
+        .reveal .slides section.present::-webkit-scrollbar-thumb {
+          background: rgba(0, 0, 0, 0.25) !important;
+          border-radius: 5px !important;
+          border: 2px solid transparent !important;
+          background-clip: content-box !important;
+        }
+        .reveal .slides section::-webkit-scrollbar-thumb:hover,
+        .reveal .slides section.present::-webkit-scrollbar-thumb:hover {
+          background: rgba(0, 0, 0, 0.4) !important;
         }
         .callout.callout-note {
             font-size: 1.5rem;
@@ -104,30 +117,6 @@ format:
         }
         .fig-medium img {
           max-height: 400px !important;
-        }
-        .reveal .no-header h2 {
-          display: none;
-        }
-        .reveal .fig-fullscreen {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          margin: 0;
-          padding: 0;
-          overflow: hidden;
-        }
-        .reveal .fig-fullscreen > p {
-          margin: 0;
-          height: 100%;
-          line-height: 0;
-        }
-        .reveal .fig-fullscreen img {
-          width: 100% !important;
-          height: 100% !important;
-          max-height: none !important;
-          object-fit: cover;
         }
         table {
           width: 100%;
@@ -238,7 +227,7 @@ format:
         #slide-nav button:active {
           background: rgba(93, 173, 226, 0.2);
         }
-        #slide-nav button:disabled {
+        #slide-nav button.nav-disabled {
           opacity: 0.3;
           cursor: default;
         }
@@ -388,8 +377,8 @@ format:
                 el.textContent = (idx + 1) + ' / ' + slides.length;
                 var prev = document.getElementById('nav-prev');
                 var next = document.getElementById('nav-next');
-                if (prev) prev.disabled = (idx <= 0);
-                if (next) next.disabled = (idx >= slides.length - 1);
+                if (prev) prev.classList.toggle('nav-disabled', idx <= 0);
+                if (next) next.classList.toggle('nav-disabled', idx >= slides.length - 1);
               } catch (e) {}
             }
 
@@ -411,6 +400,20 @@ format:
               window.location.href = './index.html';
             }
 
+            function isIndexPage() {
+              return window.location.pathname.endsWith('/index.html') || window.location.pathname.endsWith('/');
+            }
+
+            function goBack() {
+              try {
+                var last = sessionStorage.getItem('lastSlide');
+                if (last) {
+                  sessionStorage.removeItem('lastSlide');
+                  window.location.href = last;
+                }
+              } catch (e) {}
+            }
+
             function handleNav(btn) {
               initCounter();
               if (btn.id === 'nav-prev') {
@@ -420,7 +423,13 @@ format:
                   Reveal.prev();
                 }
               }
-              if (btn.id === 'nav-next') Reveal.next();
+              if (btn.id === 'nav-next') {
+                if (isIndexPage()) {
+                  goBack();
+                } else {
+                  Reveal.next();
+                }
+              }
             }
 
             document.addEventListener('click', function(e) {
@@ -445,6 +454,9 @@ format:
                 if (!window.Reveal) return;
                 if (isFirstSlide() && (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp')) {
                   goHome();
+                }
+                if (isIndexPage() && (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown')) {
+                  goBack();
                 }
               } catch (e) {}
             });
