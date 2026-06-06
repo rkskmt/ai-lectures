@@ -26,6 +26,10 @@ Quarto-based AI lecture website ("AI Lectures"). Slide decks for machine learnin
 - Content is written in **Japanese**
 - Code comments, commit messages, and Claude's reasoning should be in **English**
 
+## Teaching Philosophy
+
+Use Python as the vehicle, but frame concepts as broadly as possible. Where a concept is universal (e.g., iteration, container, method), note that it exists across languages. Prefer language-agnostic expressions alongside Python-specific ones.
+
 ## Matplotlib
 
 - **Whenever using matplotlib, `import japanize_matplotlib`** — even if the current plot has no Japanese text, for consistency.
@@ -34,11 +38,19 @@ Quarto-based AI lecture website ("AI Lectures"). Slide decks for machine learnin
 ## Conventions
 
 - Content is written in **Japanese**
-- `##` がスライドの区切り（`---` は使わない）。`##` は section titles (bold + border-bottom)、`###` は subsection titles (blue background)
+- `##` delimits slides (do not use `---`)
+- `_metadata.yaml` applies `clean-revealjs` to all `.qmd` files
+- **Do not add frontmatter to `index.qmd`.** Quarto **merges** (not overwrites) `format` from `_metadata.yaml` and the file, so adding `format: html` causes it to render in both formats and trigger a `rename` error. Raw HTML (e.g. `<details>/<summary>`) is fine — it needs no frontmatter.
+- **Do not use `listing:` in `index.qmd` either.** Same reason — it requires `format: html`, which conflicts.
+- `render: ["*.qmd"]` in `_quarto.yml` prevents `.md` files (e.g. CLAUDE.md) from being rendered
+- **When adding a new `.qmd`, always update both `index.qmd` and `_quarto.yml`.** `index.qmd` is the link list; `_quarto.yml` is the navbar. Missing either one leaves them out of sync.
+- **Never add numbers to slide section headers or `index.qmd` link text.** Numbered slides (e.g. `## １. ...`) and numbered links (e.g. `第N回`) break on reorder — every insert or swap requires renaming every entry after it. Use plain titles only (e.g. `## 汎化性能を測る`, `[評価と汎化](classification-evaluation.qmd)`). Same rule applies to `_quarto.yml` navbar `text:` labels.
 - Use Quarto callouts (`.callout-note`) for key concepts
+- Slide text should use **bullet points**, not prose sentences
 - Code cells use `jupyter: python3`
 - Image sizing via `.fig-small` (300px) and `.fig-medium` (400px) CSS classes
-- **When adding a new `.qmd`, always update both `index.qmd` and `_quarto.yml`.** `index.qmd` is the link list; `_quarto.yml` is the navbar. Missing either one leaves them out of sync.
+- **Highlight marker (`==text==`):** `hl.lua` filter turns `==text==` into a highlighted span (white text + cyan outline). For text with spaces use `[a b]{.hl}`.
+- **MathJax `\vec{}` height fix:** `\vec{a}` and `\vec{b}` render at different heights because `b` has an ascender. Use `\vec{\vphantom{b}a}` to match the arrow height of shorter letters to `b`.
 
 ## Build
 
@@ -50,6 +62,8 @@ quarto render                # build to _site/
 **Do not run `quarto preview` or `quarto render` yourself.** The user handles previewing and building.
 
 ## Style or functionality changes
+
+Most tasks are content editing — the conventions above are all you need.
 
 When changing CSS, theme, JavaScript, or `_metadata.yaml`: read **[doc/troubleshooting.md](doc/troubleshooting.md)** first. It covers stale preview/cache behavior and Pandoc code-block selectors.
 
@@ -71,3 +85,7 @@ quarto publish gh-pages
 ```
 
 https://rkskmt.github.io/ai-lectures/
+
+## Reference Docs
+
+- **[doc/troubleshooting.md](doc/troubleshooting.md)** — CSS/style changes: stale preview/cache behavior and Pandoc code-block selectors
