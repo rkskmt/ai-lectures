@@ -51,10 +51,10 @@ def setup_conda_env():
         print(f"  Environment '{ENV_NAME}' already exists, skipping creation.")
     else:
         print(f"  Creating environment '{ENV_NAME}'...")
-        run(f"conda create -n {ENV_NAME} python={PYTHON_VERSION} -y")
+        run(f"conda create -n {ENV_NAME} python={PYTHON_VERSION} pip -y")
 
     print(f"  Installing packages: {', '.join(PACKAGES)}")
-    run(f"conda run -n {ENV_NAME} pip install {' '.join(PACKAGES)}")
+    run(f"conda run -n {ENV_NAME} python -m pip install {' '.join(PACKAGES)}")
 
     setup_quarto_hook()
 
