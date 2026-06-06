@@ -15,20 +15,11 @@ import urllib.request
 from pathlib import Path
 
 ENV_NAME = "ai"
-PYTHON_VERSION = "3.12"
-PACKAGES = [
-    "numpy",
-    "matplotlib",
-    "japanize-matplotlib",
-    "pandas",
-    "scipy",
-    "scikit-learn",
-    "altair",
-]
 MATHJAX_VERSION = "2.7.9"
 MATHJAX_URL = f"https://github.com/mathjax/MathJax/archive/refs/tags/{MATHJAX_VERSION}.tar.gz"
 
 ROOT = Path(__file__).parent
+ENV_FILE = ROOT / "environment.yml"
 LIBS_DIR = ROOT / "libs"
 MATHJAX_DIR = LIBS_DIR / "mathjax"
 VSCODE_DIR = ROOT / ".vscode"
@@ -48,13 +39,11 @@ def setup_conda_env():
     print(f"\n=== Conda environment: {ENV_NAME} ===")
 
     if conda_env_exists(ENV_NAME):
-        print(f"  Environment '{ENV_NAME}' already exists, skipping creation.")
+        print(f"  Updating environment '{ENV_NAME}' from {ENV_FILE.name}...")
+        run(f"conda env update -f {ENV_FILE}")
     else:
-        print(f"  Creating environment '{ENV_NAME}'...")
-        run(f"conda create -n {ENV_NAME} python={PYTHON_VERSION} pip -y")
-
-    print(f"  Installing packages: {', '.join(PACKAGES)}")
-    run(f"conda run -n {ENV_NAME} python -m pip install {' '.join(PACKAGES)}")
+        print(f"  Creating environment '{ENV_NAME}' from {ENV_FILE.name}...")
+        run(f"conda env create -f {ENV_FILE}")
 
     setup_quarto_hook()
 

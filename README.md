@@ -17,7 +17,7 @@ conda activate ai
 ```
 
 `setup.py` が以下をまとめて行う：
-- conda 環境 `ai` の作成（Python 3.12 + NumPy, Matplotlib, pandas, scipy, scikit-learn, altair 等）
+- `environment.yml` に基づく conda 環境 `ai` の作成・更新
 - `QUARTO_PYTHON` 自動設定の activate フック
 - MathJax 2 のダウンロード（`libs/mathjax/`）
 
@@ -47,12 +47,14 @@ quarto publish gh-pages  # GitHub Pages へデプロイ
 ```
 _quarto.yml       サイト設定・ナビゲーション
 _metadata.yaml    スライド共通設定（テーマ・CSS・フィルタ）
+environment.yml   conda 環境定義
 index.qmd         トップページ（リンク一覧）
 *.qmd             各回のスライド
 imgs/             画像ファイル
 hl.lua            ==text== ハイライト用 Lua フィルタ
 fw-colon.lua      全角コロン「：」の表示調整 Lua フィルタ
 cite-image.lua    画像引用表示用 Lua フィルタ
+doc/              執筆ガイド・トラブルシュート
 _extensions/      Quarto 拡張（clean-revealjs テーマ等）
 ```
 
@@ -159,3 +161,7 @@ import japanize_matplotlib  # これだけでOK
 | `.fig-medium` | 画像の最大高さを 400px に制限 |
 | `.no-header` | スライドの h2 を非表示 |
 | `.fig-fullscreen` | 画像を全画面表示 |
+
+## 参考ドキュメント
+
+- [doc/troubleshooting.md](doc/troubleshooting.md) — CSS変更時のキャッシュ・コードブロック selector の注意
