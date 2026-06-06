@@ -1,0 +1,279 @@
+---
+title: "評価と汎化"
+subtitle: "モデルの「本当の実力」を測る"
+---
+
+## 前回の振り返り
+
+### ロジスティック回帰で2次元分類
+
+- 重さ + 輝度の **2特徴量** で Salmon / Sea bass を分類
+- `accuracy_score` などで精度を評価した
+- モデルが学習データに対して高い精度を示した
+
+::: {.callout-note title="今回の問い"}
+その精度は **本当に信頼できる** のか？
+:::
+
+
+## テストと汎化
+
+- 勉強には2種類の方法がある
+
+| 方法 | 内容 | 本当の実力？ |
+|---|---|---|
+| **暗記** | 去年の問題を全部覚える | ✗ 今年の問題は解けない |
+| **理解** | 解き方を身に付ける | ✓ 未知の問題にも対応できる |
+
+- 機械学習モデルも全く同じ問題を抱える
+
+::: {.callout-note title="汎化（generalization）"}
+モデルが**学習していないデータ**にも通用する能力のこと
+:::
+
+
+## 訓練データとテストデータ
+
+- データを2つに分けて使う
+
+```{python}
+#| echo: false
+#| fig-align: center
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+import japanize_matplotlib
+
+fig, ax = plt.subplots(figsize=(8, 1.8))
+ax.set_xlim(0, 10)
+ax.set_ylim(0, 1)
+ax.axis("off")
+
+ax.add_patch(mpatches.FancyBboxPatch((0.1, 0.15), 6.6, 0.7,
+    boxstyle="round,pad=0.05", fc="#aed6f1", ec="#2980b9", lw=2))
+ax.text(3.4, 0.5, "訓練データ（Train）  80%\nモデルを学習させる",
+        ha="center", va="center", fontsize=11)
+
+ax.add_patch(mpatches.FancyBboxPatch((7.0, 0.15), 2.8, 0.7,
+    boxstyle="round,pad=0.05", fc="#a9dfbf", ec="#27ae60", lw=2))
+ax.text(8.4, 0.5, "テストデータ\n（Test）  20%",
+        ha="center", va="center", fontsize=10)
+
+plt.tight_layout()
+plt.show()
+```
+
+- **訓練データ**：モデルに見せて学習させる
+- **テストデータ**：学習後に**一度だけ**使い「本当の精度」を測る
+
+::: {.callout-warning}
+## テストデータの鉄則
+テストデータを確認してからモデルを調整してはいけない。
+「見たことのない問題」を模擬するためのもの。
+:::
+
+
+## データの準備
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "魚データの定義（クリックして展開）"
+import numpy as np
+import matplotlib.pyplot as plt
+plt.rcParams['font.size'] = 11
+plt.rcParams['figure.dpi'] = 100
+
+salmon_weights     = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,
+                               1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,
+                               2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,
+                               1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652])
+salmon_brightness  = np.array([3.5, 5.8, 4.9, 4.4, 2.6, 2.6, 2.2, 5.5, 4.4, 4.8, 2.1,
+                               5.9, 5.3, 2.8, 2.7, 2.7, 3.2, 4.1, 3.7, 3.2, 4.4, 2.6,
+                               3.2, 3.5, 3.8, 5.1, 2.8, 4.1, 4.4, 2.2, 4.4, 2.7, 2.3,
+                               5.8, 5.9, 5.2, 3.2, 2.4, 4.7, 3.8])
+seabass_weights    = np.array([1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,
+                               1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,
+                               1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,
+                               1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531])
+seabass_brightness = np.array([5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8,
+                               8.9, 9.7, 9.5, 8.0, 9.6, 5.4, 6.0, 5.2, 6.6, 6.9, 6.4,
+                               9.1, 6.8, 6.4, 7.7, 5.7, 9.0, 5.4, 9.9, 8.9, 6.0, 5.0,
+                               9.1, 8.5, 8.6, 8.9, 5.4, 6.8, 5.6])
+
+X = np.column_stack([
+    np.concatenate([salmon_brightness, seabass_brightness]),
+    np.concatenate([salmon_weights,    seabass_weights])
+])
+y = np.array([1]*40 + [0]*40)   # 1=Salmon, 0=Sea bass
+```
+
+
+## `train_test_split` で分割する
+
+```{python}
+#| echo: true
+from sklearn.model_selection import train_test_split
+
+# 8:2 に分割（test_size=0.2 で20%をテストに）
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+print(f"全データ:       {len(X)} 匹")
+print(f"訓練データ:   {len(X_train)} 匹")
+print(f"テストデータ: {len(X_test)} 匹")
+```
+
+::: {.callout-tip}
+## random_state とは
+分割はランダムなので毎回変わる。
+`random_state=42` のように数値を固定すると再現できる。
+:::
+
+
+## 訓練して評価する
+
+```{python}
+#| echo: true
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+
+model = LogisticRegression(max_iter=1000)
+model.fit(X_train, y_train)         # 訓練データだけで学習
+
+train_acc = accuracy_score(y_train, model.predict(X_train))
+test_acc  = accuracy_score(y_test,  model.predict(X_test))
+
+print(f"訓練データ精度: {train_acc:.3f}  ← 学習済みデータへの精度（楽観的）")
+print(f"テストデータ精度: {test_acc:.3f}  ← 本当の精度")
+```
+
+::: {.callout-tip}
+## 2つの精度を比べる
+- **訓練精度 ≈ テスト精度**：うまく汎化できている
+- **訓練精度 >> テスト精度**：過学習の疑い（暗記している）
+:::
+
+
+## 混同行列（テストデータで評価）
+
+```{python}
+#| echo: true
+#| fig-align: center
+from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
+
+cm = confusion_matrix(y_test, model.predict(X_test))
+disp = ConfusionMatrixDisplay(confusion_matrix=cm,
+                              display_labels=["Sea bass (0)", "Salmon (1)"])
+disp.plot(colorbar=False, cmap="Blues")
+plt.title("Confusion Matrix（テストデータ）")
+plt.tight_layout()
+plt.show()
+```
+
+
+## {background-color="white" .center .break-slide}
+
+::: {.break-title}
+交差検証
+:::
+
+
+## ホールドアウト法の問題点
+
+- `train_test_split` は**ランダムに分割**するため、精度が変わってしまう
+
+```{python}
+#| echo: true
+for seed in range(5):
+    Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=seed)
+    acc = accuracy_score(yte, LogisticRegression(max_iter=1000).fit(Xtr, ytr).predict(Xte))
+    print(f"seed={seed}  テスト精度: {acc:.3f}")
+```
+
+::: {.callout-warning}
+## データが少ないほど揺れが大きい
+テストデータが16匹の場合 → 1匹の誤分類で精度が 6% 変わる
+:::
+
+
+## k-fold 交差検証
+
+- データを **k 個のグループ（fold）**に分割する
+- k 回繰り返す：1つをテスト、残りを訓練に使う
+- k 個の精度の**平均**を最終スコアとする
+
+```{python}
+#| echo: false
+#| fig-align: center
+import matplotlib.patches as mpatches
+
+fig, ax = plt.subplots(figsize=(8, 3.5))
+ax.set_xlim(-0.5, 5.5)
+ax.set_ylim(-0.5, 5.0)
+ax.axis("off")
+
+c_test  = "#e74c3c"
+c_train = "#aed6f1"
+
+for fold in range(5):
+    for block in range(5):
+        color = c_test if block == fold else c_train
+        rect = mpatches.FancyBboxPatch((block, 4 - fold * 0.85), 0.9, 0.75,
+            boxstyle="round,pad=0.04", fc=color, ec="white", lw=1.5)
+        ax.add_patch(rect)
+        if block == fold:
+            ax.text(block + 0.45, 4 - fold * 0.85 + 0.37, "Test",
+                    ha="center", va="center", fontsize=8,
+                    color="white", fontweight="bold")
+    ax.text(5.2, 4 - fold * 0.85 + 0.37, f"Round {fold+1}",
+            va="center", fontsize=10)
+
+ax.legend(handles=[
+    mpatches.Patch(facecolor=c_test,  label="テスト"),
+    mpatches.Patch(facecolor=c_train, label="訓練"),
+], loc="lower right", fontsize=10)
+ax.set_title("5-fold 交差検証（5回テストして平均を取る）", fontsize=11)
+plt.tight_layout()
+plt.show()
+```
+
+
+## `cross_val_score` で交差検証
+
+```{python}
+#| echo: true
+from sklearn.model_selection import cross_val_score
+
+scores = cross_val_score(
+    LogisticRegression(max_iter=1000), X, y, cv=5   # cv=5 で 5-fold
+)
+
+print("各 fold の精度:", scores.round(3))
+print(f"平均精度: {scores.mean():.3f}  ±  {scores.std():.3f}")
+```
+
+::: {.callout-tip}
+## `cross_val_score` の引数
+- 第1引数：モデル（`fit` 前でOK — 内部で k 回 fit してくれる）
+- `cv=k`：k-fold の k を指定（よく使うのは 5 か 10）
+- 返り値は k 個の精度の配列 → `.mean()` / `.std()` で集計
+:::
+
+
+## まとめ
+
+- 訓練データで評価した精度は**楽観的** — 暗記している可能性
+- **汎化**：未知データへの対応能力を測ることが本来の目的
+- **`train_test_split`**：手軽だが分割次第で精度が揺れる
+- **k-fold 交差検証**：k 回の平均で安定した評価が得られる
+
+| 手法 | 特徴 |
+|---|---|
+| ホールドアウト | 手軽。データが多いときに有効 |
+| k-fold 交差検証 | 安定。データが少ないときに特に有効 |
+
+::: {.callout-note}
+## 次回予告
+「分類にはラベルが必要だった。**ラベルがない場合はどうする？**」
+:::

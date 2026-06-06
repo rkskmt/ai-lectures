@@ -1,0 +1,396 @@
+---
+title: "次元の呪いと次元削減"
+subtitle: "特徴量を増やし続けると何が起きるか"
+---
+
+## ここまでの流れ
+
+- **Lecture 01**：重さ（1次元）でサーモンを分類 → ある程度できた
+- **Lecture 02**：輝度を追加（2次元）→ 精度が上がった
+- ならば**特徴量を増やし続ければ**もっと精度が上がる？
+
+::: {.callout-note title="今回の問い"}
+特徴量（次元）を増やし続けると何が起きるか？
+:::
+
+
+## {background-color="white" .center .break-slide}
+
+::: {.break-title}
+次元の呪い
+:::
+
+
+## 次元の呪い（Curse of Dimensionality）
+
+> "データの次元が増えるにつれて、空間が指数的に広くなり、データが希薄になる"
+>
+> ── Richard Bellman（1961）
+
+- 2次元で十分だったサンプル数が、10次元では**全く足りなくなる**
+- 高次元空間は私たちの直感とは全く異なる振る舞いをする
+
+::: {.callout-note}
+1960年代にベルマン（動的計画法の発明者）が提唱した概念。
+現代機械学習でも最重要トピックの一つ。
+:::
+
+
+## 直感的な理解：単位立方体の中の球
+
+- 単位立方体（一辺1の立方体）の中に内接する球を考える
+
+$$V_{球}(d) = \frac{\pi^{d/2}}{\Gamma(d/2+1)} \cdot \left(\frac{1}{2}\right)^d$$
+
+```{python}
+#| echo: true
+#| fig-align: center
+import numpy as np
+import matplotlib.pyplot as plt
+from math import gamma, pi
+plt.rcParams['font.size'] = 11
+plt.rcParams['figure.dpi'] = 100
+
+dims    = list(range(1, 21))
+vol_sphere = [pi**(d/2) / gamma(d/2 + 1) * (0.5**d) for d in dims]
+
+plt.figure(figsize=(7, 3.5))
+plt.plot(dims, vol_sphere, "o-", color="#e74c3c")
+plt.xlabel("次元数 d")
+plt.ylabel("球の体積（立方体の体積=1）")
+plt.title("単位立方体に内接する球の体積")
+plt.grid(True, alpha=0.4)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-warning}
+## 直感との乖離
+2次元（円）ではほぼいっぱいに見えるが、高次元では球は**立方体のほんの一部**しか占めない。
+データのほとんどが「角（隅）」に追いやられる。
+:::
+
+
+## 距離が意味をなさなくなる
+
+- k-NN やロジスティック回帰など、多くの手法は**距離**に依存している
+- 高次元では最近傍と最遠傍の距離差が消えていく
+
+```{python}
+#| echo: true
+#| fig-align: center
+np.random.seed(42)
+dims    = [1, 2, 3, 5, 10, 20, 50, 100]
+cv_list = []   # 変動係数 = std / mean
+
+for d in dims:
+    pts   = np.random.rand(2000, d)
+    query = np.random.rand(d)
+    dists = np.sqrt(((pts - query) ** 2).sum(axis=1))
+    cv_list.append(dists.std() / dists.mean())
+
+plt.figure(figsize=(7, 3.5))
+plt.plot(dims, cv_list, "o-", color="#e74c3c")
+plt.xlabel("次元数 d")
+plt.ylabel("変動係数（std / mean）")
+plt.title("高次元では全点がほぼ等距離になる")
+plt.grid(True, alpha=0.4)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-warning}
+## 変動係数が 0 に近づく
+「最も近い点」と「最も遠い点」の距離がほぼ同じになる。
+**「近い」という概念が意味をなさなくなる。**
+:::
+
+
+## データが疎になる（Sparsity）
+
+- 同じサンプル数でも、次元が増えると空間が広くなりすぎる
+
+```{python}
+#| echo: false
+#| fig-align: center
+np.random.seed(0)
+fig, axes = plt.subplots(1, 2, figsize=(8, 3.5))
+
+pts1d = np.random.rand(20)
+axes[0].scatter(pts1d, np.zeros(20), s=60, alpha=0.8, c="#2980b9", edgecolors="gray")
+axes[0].axhline(y=0, color="gray", lw=0.8)
+axes[0].set_xlim(-0.05, 1.05)
+axes[0].set_ylim(-0.5, 0.5)
+axes[0].set_title("1次元（20点）", fontsize=11)
+axes[0].axis("off")
+
+pts2d = np.random.rand(20, 2)
+axes[1].scatter(pts2d[:, 0], pts2d[:, 1], s=60, alpha=0.8, c="#2980b9", edgecolors="gray")
+axes[1].set_xlim(0, 1); axes[1].set_ylim(0, 1)
+axes[1].set_aspect("equal")
+axes[1].set_title("2次元（20点）", fontsize=11)
+axes[1].axis("off")
+
+plt.suptitle("同じ20点でも次元が増えると空間がスカスカになる", fontsize=10)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-note}
+密度を保つには、次元数に対して**指数的にサンプルを増やす**必要がある。
+10次元で十分な密度を確保するには、1次元の $10^{10}$ 倍のサンプルが必要という計算になる。
+:::
+
+
+## 実用への影響
+
+| 問題 | 原因 |
+|---|---|
+| モデルの精度が上がらない | データが疎でパターンが見えない |
+| 過学習しやすくなる | データに比べてパラメータが多すぎる |
+| 計算コストが増大 | 距離計算などが次元数に比例して重くなる |
+| 可視化できない | 3次元以上は直接見られない |
+
+::: {.callout-tip}
+## 次元の呪いへの対処
+1. **特徴量選択**：重要な特徴量だけを残す
+2. **次元削減**：情報を保ったまま次元を圧縮する（← 今回）
+3. **正則化**：過学習を防ぐ（Part 3 で詳しく）
+:::
+
+
+## {background-color="white" .center .break-slide}
+
+::: {.break-title}
+次元削減と PCA
+:::
+
+
+## PCA の直感
+
+**Principal Component Analysis（主成分分析）**
+
+- データの**分散が最大になる方向**に新しい軸（主成分）を取る
+
+```{python}
+#| echo: false
+#| fig-align: center
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+
+np.random.seed(42)
+mean_pt = np.array([5.0, 1900.0])
+cov_mat = np.array([[3.0, 300.0], [300.0, 60000.0]])
+X_pca   = np.random.multivariate_normal(mean_pt, cov_mat, 80)
+
+X_sc  = StandardScaler().fit_transform(X_pca)
+pca_d = PCA(n_components=2)
+pca_d.fit(X_sc)
+
+fig, ax = plt.subplots(figsize=(6, 4.5))
+ax.scatter(X_pca[:, 0], X_pca[:, 1],
+           alpha=0.6, s=40, c="#5dade2", edgecolors="gray")
+
+# 元スケールに戻した主成分方向を描画
+mean_orig = X_pca.mean(axis=0)
+std_orig  = X_pca.std(axis=0)
+for i, (col, lbl) in enumerate(zip(["#e74c3c", "#f39c12"],
+                                    ["PC1（分散最大）", "PC2（PC1と直交）"])):
+    vec_sc   = pca_d.components_[i] * np.sqrt(pca_d.explained_variance_[i])
+    vec_orig = vec_sc * std_orig * 2
+    ax.annotate("", xy=mean_orig + vec_orig, xytext=mean_orig,
+                arrowprops=dict(arrowstyle="-|>", color=col, lw=2.5, mutation_scale=15))
+    ax.text(*(mean_orig + vec_orig * 1.12), lbl,
+            color=col, fontsize=10, fontweight="bold")
+
+ax.set_xlabel("輝度")
+ax.set_ylabel("重さ (g)")
+ax.set_title("PCA：分散が最大の方向に軸を取る")
+ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+
+## 固有ベクトルとの関係
+
+PCA は共分散行列の**固有ベクトル**を求めることと等価
+
+$$C = \frac{1}{n-1} \tilde{X}^T \tilde{X}, \qquad \tilde{X} = X - \bar{X}$$
+
+$$C \mathbf{v}_i = \lambda_i \mathbf{v}_i$$
+
+- $\mathbf{v}_i$：主成分の**方向**（固有ベクトル）
+- $\lambda_i$：その方向に含まれる**情報量（分散）**（固有値）
+- $\lambda_1 \geq \lambda_2 \geq \cdots$ の順に並べる → PC1, PC2, …
+
+::: {.callout-tip}
+## NumPy で確かめる
+```python
+C = np.cov(X.T)
+eigenvalues, eigenvectors = np.linalg.eig(C)
+# eigenvectors の各列 ≈ pca.components_ の各行
+```
+sklearn の PCA は内部でこれを（SVD で効率的に）計算している
+:::
+
+
+## scikit-learn で PCA
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "魚データの定義"
+salmon_weights     = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,
+                               1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,
+                               2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,
+                               1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652])
+salmon_brightness  = np.array([3.5, 5.8, 4.9, 4.4, 2.6, 2.6, 2.2, 5.5, 4.4, 4.8, 2.1,
+                               5.9, 5.3, 2.8, 2.7, 2.7, 3.2, 4.1, 3.7, 3.2, 4.4, 2.6,
+                               3.2, 3.5, 3.8, 5.1, 2.8, 4.1, 4.4, 2.2, 4.4, 2.7, 2.3,
+                               5.8, 5.9, 5.2, 3.2, 2.4, 4.7, 3.8])
+seabass_weights    = np.array([1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,
+                               1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,
+                               1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,
+                               1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531])
+seabass_brightness = np.array([5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8,
+                               8.9, 9.7, 9.5, 8.0, 9.6, 5.4, 6.0, 5.2, 6.6, 6.9, 6.4,
+                               9.1, 6.8, 6.4, 7.7, 5.7, 9.0, 5.4, 9.9, 8.9, 6.0, 5.0,
+                               9.1, 8.5, 8.6, 8.9, 5.4, 6.8, 5.6])
+X = np.column_stack([
+    np.concatenate([salmon_brightness, seabass_brightness]),
+    np.concatenate([salmon_weights,    seabass_weights])
+])
+y = np.array([1]*40 + [0]*40)
+
+```
+
+```{python}
+#| echo: true
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+
+X_scaled = StandardScaler().fit_transform(X)   # スケールを揃えてから PCA
+
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X_scaled)
+
+print("主成分の方向（固有ベクトル）:")
+print(pca.components_.round(3))
+print("\n各主成分の寄与率（情報量の割合）:")
+for i, r in enumerate(pca.explained_variance_ratio_):
+    print(f"  PC{i+1}: {r:.1%}")
+```
+
+::: {.callout-note}
+## StandardScaler を使う理由
+輝度（1〜10）と重さ（1000〜2500g）はスケールが全く違う。
+正規化しないと重さだけが主成分を支配してしまう。
+:::
+
+
+## 4次元データを2次元に圧縮（Iris）
+
+Fisher の Iris データセット：4特徴量（がく片長さ・幅、花弁長さ・幅）
+
+```{python}
+#| echo: true
+#| fig-align: center
+from sklearn.datasets import load_iris
+
+iris   = load_iris()
+X_iris = StandardScaler().fit_transform(iris.data)   # 4特徴量
+y_iris = iris.target
+
+pca4  = PCA(n_components=2)
+X_2d  = pca4.fit_transform(X_iris)
+
+colors  = ["#e74c3c", "#27ae60", "#2980b9"]
+markers = ["o", "s", "^"]
+
+plt.figure(figsize=(6, 4.5))
+for label, name in enumerate(iris.target_names):
+    mask = y_iris == label
+    plt.scatter(X_2d[mask, 0], X_2d[mask, 1],
+                c=colors[label], marker=markers[label],
+                s=50, alpha=0.8, label=name)
+
+plt.xlabel(f"PC1（寄与率 {pca4.explained_variance_ratio_[0]:.1%}）")
+plt.ylabel(f"PC2（寄与率 {pca4.explained_variance_ratio_[1]:.1%}）")
+plt.title("Iris（4次元）を PCA で2次元に圧縮")
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-note}
+4次元を2次元に圧縮しても全情報の 97% 以上が保たれている。
+setosa（赤丸）が完全に分離できているのも図から見える。
+:::
+
+
+## 寄与率（Explained Variance Ratio）
+
+```{python}
+#| echo: true
+#| fig-align: center
+ratios     = pca4.explained_variance_ratio_
+cumulative = np.cumsum(ratios)
+
+fig, ax = plt.subplots(figsize=(5, 3.5))
+x_pos = ["PC1", "PC2", "PC3", "PC4"]
+
+# 全4成分を改めて計算
+pca_full = PCA(n_components=4).fit(X_iris)
+ratios_full = pca_full.explained_variance_ratio_
+cum_full    = np.cumsum(ratios_full)
+
+ax.bar(x_pos, ratios_full, color=["#e74c3c", "#e67e22", "#bdc3c7", "#bdc3c7"])
+ax.plot(x_pos, cum_full, "o-", color="black", label="累積寄与率")
+for x, y in zip(x_pos, cum_full):
+    ax.text(x, y + 0.02, f"{y:.1%}", ha="center", fontsize=9)
+ax.set_ylabel("寄与率")
+ax.set_ylim(0, 1.15)
+ax.legend(fontsize=9)
+ax.set_title("Iris の主成分別寄与率")
+ax.grid(True, alpha=0.3, axis="y")
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-tip}
+## 何次元に削減するか？
+一般的には**累積寄与率が 80〜95%** を超える次元数を選ぶ。
+Iris は PC1+PC2 だけで 97% 超えるので2次元で十分。
+:::
+
+
+## まとめ
+
+- **次元の呪い**：次元が増えると空間が広くなり、距離が意味をなさなくなる
+- **PCA**：分散が最大の方向（= 共分散行列の固有ベクトル）に軸を取り直す
+
+```python
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+
+X_scaled = StandardScaler().fit_transform(X)   # スケール正規化
+pca = PCA(n_components=2)
+X_2d = pca.fit_transform(X_scaled)             # 2次元に圧縮
+
+pca.explained_variance_ratio_   # 各 PC の寄与率
+```
+
+| 概念 | 意味 |
+|---|---|
+| 主成分（PC） | 分散が最大の方向（固有ベクトル） |
+| 固有値 | その方向の分散の大きさ |
+| 寄与率 | 情報量の割合（累積80〜95%を目安に次元数を決める） |
+
+::: {.callout-note}
+## Part 1 のまとめ
+1D → 2D の分類、評価と汎化、教師なし学習（k-means）、次元の呪いと PCA。
+**機械学習の基本的な問いと道具が揃った。**
+次のパートでは「どうやって最適なパラメータを見つけるか」（最適化）を深める。
+:::
