@@ -1,0 +1,493 @@
+---
+title: "人工知能概論"
+subtitle: "AIとは何か、何ができるのか"
+---
+
+
+
+## {background-color="white" .center .break-slide}
+
+::: {.break-title}
+AIの歩み
+:::
+
+
+## 人工知能とは
+
+### 人間の知的なふるまいを機械で扱う
+
+- **人工知能（Artificial Intelligence）**：知的に見える処理をコンピュータで実現する技術・研究分野
+- 例：
+  - 画像を見て何が写っているか判定する
+  - 文章を読んで要約する
+  - ゲームで次の一手を選ぶ
+  - データから将来の値を予測する
+
+::: {.callout-note title="大事な見方"}
+- AIは「人間そのもの」を作るというより、**知的なタスクを機械で扱う**ための考え方
+:::
+
+
+## AIが扱うタスク
+
+- **分類**：どのグループに属するかを決める
+  - 魚が Salmon か Sea bass か
+  - メールが迷惑メールかどうか
+- **回帰**：数値を予測する
+  - 気温、売上、株価、需要
+- **クラスタリング**：似たもの同士に分ける
+  - ラベルのないデータを自然なグループに分ける
+- **生成**：新しいデータを作る
+  - 文章、画像、音声、コード
+
+## 10分でまとめるAIの歴史（1950s-2000s）
+
+- **知識とルールを与えたかった時代**
+  - 学習ではなく、まず人間が高次の知識を記述して与える前提
+    - 例： 人は哺乳類。哺乳類は●●をもつ。人は二足歩行 
+  - しかし、必要な事象を十分に記述できないことが分かり頓挫
+- **データからパターンを学習する時代**
+  - パターンを機械学習（**数式のパラメータ化**）＝高次知識記述が不要
+  - 推薦システムやスパムフィルターや表情認識などで成果
+  - しかし、**曖昧にしか定義できないものは識別困難**
+    - 例：画像の中に車があるのかどうか判断できない
+
+## 10分でまとめるAIの歴史（2010s-2020s）
+
+- **物量が効くことが分かった時代**
+  - 大量データと大量計算資源で汎化性（曖昧さへの耐性）が劇的に向上
+    - Deep Neural Network
+    - ついに画像の中に犬が写っていることを判断可能に
+- **アテンション機構の時代**
+  - データ間のコンテキストや関係性が学習可能に
+  - ChatGPTのような人に近い認識や応答を実現
+
+## 製品・社会実装で見る流れ
+
+| 時代 | 技術の流れ | 製品・出来事の例 |
+|---|---|---|
+| 1980s | ルールベース、知識処理 | 第五世代コンピュータ、CAPTAINシステム |
+| 1990s | 探索、統計的手法 | Deep Blue |
+| 2000s | Webデータ、検索、広告 | Google検索、機械翻訳 |
+| 2010s前半 | 深層学習、画像認識 | AlexNet、音声認識の改善 |
+| 2010s後半 | RNN、seq2seq、強化学習、Transformer | Google翻訳、AlphaGo、GPT-2 |
+| 2020s | 大規模言語モデル、対話AI | ChatGPT |
+
+::: {.callout-note}
+- 製品は研究成果の「出口」
+- 研究の進歩から社会実装までは時間差がある
+:::
+
+## 古典的AI：知識とルールの集合体
+
+- 初期は、**記号（symbol）**と**ルール**が中心で設計された
+  - 知識を記号で表し、ルールで推論すれば知能のふるまいを模せると考えた
+  - 例：「AならばB」のような推論規則
+    - 「人は死ぬ」「坂本は人」という事実 ⇒ 「坂本は死ぬ」と推論
+- 人間が知識を記述してコンピュータに書き込む発想
+  - 記述できる知識を形式知という（Explicit Knowledge）
+  - 逆に、言葉で語れない知識は暗黙知という（Tacit Knowledge）
+- ゴール：形式知と論理的推論で、専門家の代わりが務まるのでは？
+  - エキスパートシステム
+- やってみると色々な問題が噴出
+  - 知識の記述はどうするのが適当？
+  - ルールは論理的推論だけだと不十分なのだがどうすればいい？
+  - 誰がどこにどうやってすべての知識を入力するの？
+    - 文章化されている法律すら非常に困難であることが判明
+
+
+## 古典的AIの流れ
+
+| 時代 | 技術の中心 | 社会・製品のイメージ |
+|---|---|---|
+| 1950s-60s | 推論、探索、初期の対話システム | ELIZA |
+| 1970s-80s | エキスパートシステム | 医療診断支援、知識ベース |
+| 1980s | 第五世代コンピュータ | CAPTAINシステムなどの情報化構想 |
+
+
+## フレーム問題
+
+### 必要なすべての知識の記述は困難
+
+- ルールベースAIは、世界の状態をできるだけ明示的に書こうとした
+  - しかも、何か行動したら、一部の状態は変わってしまう
+- このとき、何が変わり、何が変わらないかを全部書かないといけない
+  - 全部は明らかに無理
+  - これが狭義の **フレーム問題**
+- 「変更のみ記述。変更がなければ維持する」の原則でいいのでは？？
+  - ダメ。変更が及ぶ範囲を決めなくてはダメなので
+
+## 狭義のフレーム問題
+
+### 何が“変更”なのかを決める必要がある
+
+- 直接変わるものと、間接的に変わるものがある
+  - 机を動かすと、机の位置は変わる
+  - 机の上のコップの位置は？
+  - 机の下の影は？
+  - 机に置かれた紙は？
+  - 机がぶつかった椅子は？
+- 例外条件を全部書く必要が出てくる
+  - 電気のスイッチを押す
+  - スイッチの状態が変わる
+  - 部屋の明るさも変わる
+  - 人の見え方や行動可能性も変わるかもしれない
+  - 「ドアを開ける」と書いても、鍵がかかっていたら開かない
+  - ドアが壊れていても開かない
+  - 押すドアを引いても開かない
+  - 誰かが反対側から押さえていても開かない
+
+## M.ミンスキーのフレーム理論
+
+### 世界全部を見るのではなく、枠で切り取る
+
+- 人間は、世界の全部を同時には考えない
+- よって、窓枠のように、いま必要な範囲だけを切り取って見ればいいのでは？
+- **例：**
+  - レストランなら「席」「注文」「会計」が関係ある
+  - 授業なら「教室」「先生」「学生」「課題」が関係ある
+
+::: {.callout-note title="シンボリックAIへの問い"}
+- 枠を使えば、考える範囲を絞ることはできる
+- しかし、結局、その枠をどう作り、どう選ぶのかは簡単ではない
+:::
+
+## シンボリックAIの限界
+
+### そもそも、定義やルールのきれいな記述が困難
+
+- 例外や曖昧なものはどう線引きする？
+  - 犬の定義って何？犬種により見た目すら大幅に異なる
+  - カモノハシは哺乳類だけど卵生なのはどうすれば...
+- 行動のように時系列と影響を伴うものはもっと困難
+  - ラプラスの悪魔
+
+::: {.callout-note title="古典的AIの限界"}
+- 「知識をたくさん書けばよい」は実は実現困難であった
+- 完全記述・完全予測という発想自体がまずかった
+:::
+
+## フレーム問題は現在も残る
+
+### 完全自動運転はフレーム問題に必ず直面する
+
+- 自動運転では、車の周りのすべてを同時に扱う必要はない
+- しかし、何を見て、何を無視してよいかの判断がとても難しい
+  - 道路標識、歩行者、工事、天気、緊急車両
+  - 落下物、予想外の動き、地域ごとの交通ルール
+  - 「ふつうなら関係ないもの」が急に重要になる場面
+- 限定された場所・条件では、自動運転サービスは実用化が進んでいる
+- でも、どこでも・どんな条件でも任せられる完全自動運転は別の難しさがある
+
+::: {.callout-note title="AI史として見る"}
+- フレーム問題は、昔のシンボリックAIだけの話ではない
+- 現代のAIでも「どこまでの範囲を扱うべきか」は重要な問題
+:::
+
+
+## データからパターンを学習する時代
+
+### 知識を書くのではなく、経験から更新する
+
+- ルールを人間が全部書くのではなく、データからパターンを学ぶ
+- 代表的な学習の形：
+  - **教師あり学習**：入力と正解ラベルから学ぶ
+  - **教師なし学習**：データのまとまりや構造を見つける
+  - **強化学習**：行動して得られる報酬から学ぶ
+- 強化学習では、正解を直接教えるのではなく、試行錯誤で方策を改善する
+  - ゲーム
+  - ロボット制御
+  - 推薦や広告配信
+
+::: {.callout-note title="重要な転換"}
+- 知識を記述するAIから、経験でパラメータを更新するAIへ
+- ただし、この段階では現実世界の曖昧さに対する汎化性はまだ十分ではなかった
+:::
+
+
+## ニューラルネットワーク：現在の最有力アプローチ
+
+### 実は歴史が長い
+- ニューラルネットワークの考え方自体は古い
+- バックプロパゲーションも1980年代に重要性が再認識された
+- 当時は、今ほど大きな成果にはつながりにくかった
+  - データが少ない
+  - 計算機が遅い
+  - 多層ネットワークを安定して学習しにくい
+- そのため、ニューラルネットワークも長い間、決定的な方法にはならなかった
+
+
+
+
+
+## {background-color="white" .center .break-slide}
+
+::: {.break-title}
+ニューラルネットワークの劇的な進歩
+:::
+
+
+## 画像・言語・強化学習の蓄積
+
+### 別々の分野で地道に進んだ
+- **画像認識（CV）**
+  - 手作り特徴量から、CNNによる特徴学習へ
+  - ImageNet、AlexNet などで大きく進展
+- **自然言語処理（NLP）**
+  - 形態素解析、統計的言語モデル、翻訳、単語分散表現
+  - word2vec、RNN、seq2seq などへ
+- **強化学習（RL）**
+  - 試行錯誤で方策を学ぶ
+  - ゲームやロボット制御で進展
+
+
+## DNNで曖昧なパターンを扱いやすくなった
+
+- DNN（Deep Neural Network）は、多層のニューラルネットワーク
+- 人間が特徴量を細かく設計しなくても、データから特徴を学習しやすくなった
+- 特に効果が大きかった分野：
+  - **画像認識**：AlexNet、物体検出、医療画像診断
+  - **音声認識**：スマートフォンの音声入力、音声アシスタント
+  - **ゲーム・強化学習**：DQN（Deep Q-Network）、AlphaGo
+
+::: {.callout-note title="ここでの転換"}
+- 「車とは何か」を人間が完全に定義するのではない
+- 大量の例から、車らしさ・犬らしさ・良い手らしさを学習する
+:::
+
+
+## RNNで系列データが扱いやすくなった
+
+- 言語や音声は、順番に意味があるデータ
+- RNNは、前の情報を次の処理に持ち越す仕組み
+- できるようになったこと：
+  - 文脈を使った文章処理
+  - 機械翻訳：seq2seq、Google翻訳
+  - 音声認識：音声入力、字幕生成
+  - 文章生成：予測変換、チャットボット
+
+::: {.callout-note title="ただし限界もあった"}
+- 長い文脈を扱うのが苦手
+- 並列計算しにくい
+- 遠く離れた単語同士の関係を学びにくい
+:::
+
+
+## DNNブームからLLMへ
+
+```{python}
+#| echo: false
+#| fig-width: 12
+#| fig-height: 5.8
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import japanize_matplotlib
+import matplotlib.image as mpimg
+from matplotlib.offsetbox import AnnotationBbox, HPacker, OffsetImage
+
+sns.set_theme(style="whitegrid")
+japanize_matplotlib.japanize()
+
+logo_images = {
+    "OpenAI": mpimg.imread("imgs/logos/openai-logo.png"),
+    "Meta": mpimg.imread("imgs/logos/meta-logo.png"),
+    "DeepSeek": mpimg.imread("imgs/logos/deepseek-logo.png"),
+}
+
+llm_events = pd.DataFrame({
+    "x": [0, 1, 2, 3, 4, 5, 6, 7],
+    "year_label": [
+        "2012年", "2013年", "2014年", "2017年",
+        "2018年", "2020年", "2022年", "2023-25年",
+    ],
+    "baseline": [0, 0, 0, 0, 0, 0, 0, 0],
+    "position": [1, -1, 1, -1, 1, -1, 1, -1],
+    "label": [
+        "AlexNet",
+        "word2vec",
+        "seq2seq",
+        "Attention Is All You Need",
+        "BERT / GPT-1",
+        "GPT-3",
+        "ChatGPT",
+        "GPT-4 / Llama / o1 / DeepSeek-R1",
+    ],
+    "logos": [
+        [],
+        [],
+        [],
+        [],
+        ["OpenAI"],
+        ["OpenAI"],
+        ["OpenAI"],
+        ["OpenAI", "Meta", "DeepSeek"],
+    ],
+    "detail": [
+        "画像認識で\n深層学習が注目される",
+        "単語の意味を\nベクトルで表す",
+        "翻訳などで\n入力から出力へ変換",
+        "Transformerの登場",
+        "事前学習モデルが広がる",
+        "モデルの巨大化と\n少数例での汎化",
+        "自然な対話が\n日常的な入口になる",
+        "高性能化、マルチモーダル化、\n推論・効率化へ",
+    ],
+})
+
+fig, ax = plt.subplots()
+base_color = "#2f7d59"
+base_edge_color = "#1f4f3a"
+attention_color = "#d95d39"
+attention_edge_color = "#9b1d20"
+
+sns.lineplot(
+    data=llm_events,
+    x="x",
+    y="baseline",
+    color="#4a4a4a",
+    linewidth=2.2,
+    ax=ax,
+    legend=False,
+)
+sns.scatterplot(
+    data=llm_events,
+    x="x",
+    y="baseline",
+    color=base_color,
+    s=180,
+    edgecolor=base_edge_color,
+    linewidth=1.5,
+    ax=ax,
+    legend=False,
+)
+
+for event in llm_events.itertuples():
+    is_attention = event.label == "Attention Is All You Need"
+    event_color = attention_color if is_attention else base_color
+    event_edge_color = attention_edge_color if is_attention else event_color
+    line_width = 3.0 if is_attention else 1.4
+    label_fontsize = 15 if is_attention else 14
+    label_y = event.position * 0.9
+    logo_y = label_y - 0.24
+    detail_y = label_y - 0.45
+    ax.plot(
+        [event.x, event.x],
+        [0, event.position * 0.68],
+        color=event_edge_color,
+        linewidth=line_width,
+    )
+    if is_attention:
+        ax.scatter(
+            event.x,
+            0,
+            s=360,
+            color=attention_color,
+            edgecolor=attention_edge_color,
+            linewidth=2.2,
+            zorder=4,
+        )
+    ax.text(
+        event.x,
+        label_y,
+        event.label,
+        ha="center",
+        va="center",
+        fontsize=label_fontsize,
+        color="white",
+        weight="bold",
+        bbox={
+            "boxstyle": "round,pad=0.35",
+            "facecolor": event_color,
+            "edgecolor": event_edge_color,
+            "linewidth": 2.0 if is_attention else 1.0,
+        },
+    )
+
+    if event.logos:
+        logo_boxes = [
+            OffsetImage(logo_images[logo_name], zoom=0.055)
+            for logo_name in event.logos
+        ]
+        logo_group = HPacker(children=logo_boxes, align="center", pad=0, sep=8)
+        ax.add_artist(AnnotationBbox(
+            logo_group,
+            (event.x, logo_y),
+            frameon=False,
+            box_alignment=(0.5, 0.5),
+        ))
+
+    ax.text(
+        event.x,
+        detail_y,
+        event.detail,
+        ha="center",
+        va="top",
+        fontsize=10.5,
+        color="#333333",
+    )
+    ax.text(event.x, -0.14, event.year_label, ha="center", va="top", fontsize=11)
+
+ax.annotate(
+    "",
+    xy=(7.6, 0),
+    xytext=(-0.4, 0),
+    arrowprops={"arrowstyle": "->", "color": "#4a4a4a", "linewidth": 2.2},
+)
+ax.set_xlim(-0.45, 7.75)
+ax.set_ylim(-1.75, 1.65)
+ax.set_axis_off()
+ax.set_title("DNNブームから現在へ：深層学習、系列モデル、LLM", fontsize=18, pad=18)
+plt.tight_layout()
+plt.show()
+```
+
+
+## Attention と Transformer
+
+- 2017年の論文 **Attention Is All You Need** が大きな転換点になった
+- RNNのように順番に処理するのではなく、単語同士の関係を直接見る
+- 重要な変化：
+  - 長い文脈を扱いやすい
+  - 並列計算しやすい
+  - 大規模データで学習しやすい
+
+| 技術 | 中心アイデア |
+|---|---|
+| RNN | 前から順に情報を渡す |
+| Attention | どの単語を見るべきかを学ぶ |
+| Transformer | Attentionを中心に大規模化しやすくした構造 |
+
+
+## 大規模言語モデルへ
+
+- Transformerを大規模化すると、文章処理の能力が大きく伸びた
+- GPT系モデルでは、次の単語を予測する学習から始める
+- 大量の文章を読むことで、さまざまなタスクに転用できる表現を獲得する
+- ここでいう **GPT-2** は2019年の言語モデルで、**ChatGPT** とは別のもの
+
+| 例 | 何が印象的だったか |
+|---|---|
+| GPT-2 | 文章生成の自然さが注目された |
+| BERT | 文章理解タスクで強い性能を示した |
+| ChatGPT | 対話形式で多くの人が使えるAIになった |
+
+::: {.callout-note}
+- 「汎用AIが完成した」という意味ではない
+- ただし、同じモデルを多くのタスクに使える感覚が一気に広がった
+:::
+
+
+
+
+## まとめ
+
+- AIは、知的なタスクをコンピュータで扱うための技術・研究分野
+- 機械学習は、データからパターンを学ぶAIの代表的な方法
+- モデルは、入力から出力を計算する仕組み
+- 学習は、モデルのパラメータをデータに合わせて調整すること
+- 本当に大事なのは、未知のデータにも通用するかどうか
+
+::: {.callout-note title="次に進む問い"}
+魚を重さだけで分類するには、どんなルールを作ればよいか？
+:::
