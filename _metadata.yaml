@@ -553,23 +553,57 @@ format:
           margin-right: 0 !important;
           padding: 0.12em 0 0.18em;
         }
-        .reveal ul li::marker {
-          color: #0099cc;
-          font-size: 1.3em;
+        .reveal .slide-body ul { /* level 1 */
+          list-style: none;
+          padding-left: 1.45em;
         }
-        .reveal ul ul li::before, .reveal ol ul li::before {
-          color: #0099cc;
+        .reveal .slide-body ul ul { /* level 2 */
+          padding-left: 1.0em;
+        }
+        .reveal .slide-body ul ul ul { /* level 3 */
+          padding-left: 0.0em;
+        }
+        .reveal .slide-body ul > li::before {
+          content: "";
+          display: inline-block;
+          width: 0.58em;
+          height: 0.58em;
+          margin-left: -1.2em;
+          margin-right: 0.62em;
+          vertical-align: 0.1em;
+          background-color: #0099cc;
+          -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='black'/%3E%3C/svg%3E") no-repeat center / contain;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='black'/%3E%3C/svg%3E") no-repeat center / contain;
+        }
+        .reveal .slide-body ul ul > li::before,
+        .reveal .slide-body ol ul > li::before {
+          content: "";
+          display: inline-block;
+          width: 1.1em;
+          height: 0.7em;
+          margin-left: -1.55em;
+          margin-right: 0.45em;
+          vertical-align: 0.02em;
+          background-color: #0099cc;
+          -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 28'%3E%3Cpath d='M2 14h37M29 4l10 10-10 10' fill='none' stroke='black' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center / contain;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 28'%3E%3Cpath d='M2 14h37M29 4l10 10-10 10' fill='none' stroke='black' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center / contain;
         }
         .reveal .slide ul li, .reveal .slide ol li {
             margin-top: 0.1em;
             margin-bottom: 0.1em;
         }
 
-        .reveal ul ul ul {
-          list-style: none;
-        }
-        .reveal ul ul ul li::before {
-          content: "‣";
+        .reveal .slide-body ul ul ul > li::before {
+          content: "";
+          display: inline-block;
+          width: 0.42em;
+          height: 0.62em;
+          margin-left: -0.92em;
+          margin-right: 0.5em;
+          vertical-align: 0.02em;
+          background-color: #6aaec6;
+          -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 32'%3E%3Cpath d='M3 3l18 13L3 29z' fill='black'/%3E%3C/svg%3E") no-repeat center / contain;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 32'%3E%3Cpath d='M3 3l18 13L3 29z' fill='black'/%3E%3C/svg%3E") no-repeat center / contain;
         }
         .reveal strong {
           padding: 0 0.1em;
