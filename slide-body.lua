@@ -7,6 +7,15 @@ local function has_class(el, class_name)
   return false
 end
 
+local function has_top_level_class(blocks, class_name)
+  for _, block in ipairs(blocks) do
+    if block.classes and has_class(block, class_name) then
+      return true
+    end
+  end
+  return false
+end
+
 function Pandoc(doc)
   local blocks = doc.blocks
   local out = {}
@@ -31,7 +40,7 @@ function Pandoc(doc)
       end
 
       if #body > 0 then
-        if is_break_slide then
+        if is_break_slide or has_top_level_class(body, "fig-cite") then
           for _, body_block in ipairs(body) do
             table.insert(out, body_block)
           end
