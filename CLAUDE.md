@@ -52,6 +52,13 @@ Use Python as the vehicle, but frame concepts as broadly as possible. Where a co
 - **Highlight marker (`==text==`):** `hl.lua` filter turns `==text==` into a highlighted span (white text + cyan outline). For text with spaces use `[a b]{.hl}`.
 - **MathJax `\vec{}` height fix:** `\vec{a}` and `\vec{b}` render at different heights because `b` has an ascender. Use `\vec{\vphantom{b}a}` to match the arrow height of shorter letters to `b`.
 
+## Error Handling
+
+- **No `getattr`** — use direct attribute access (`obj.attr`).
+- **Never swallow failures.** Wrong type, missing value, missing package, or unexpected state must raise an error, not be hidden by `try/except`, `continue`, `pass`, a silent fallback/default, or `.get()` when the key must exist.
+- Prefer an immediate crash with a stack trace. It points directly at the source of the problem; a swallowed failure lets corrupted state propagate and usually surfaces later as a harder-to-debug bug.
+- If a lecture needs a dependency, add it to `environment.yml`. Do not add fallback code for a missing dependency.
+
 ## Build
 
 ```bash

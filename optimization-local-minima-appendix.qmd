@@ -4,7 +4,11 @@ subtitle: "ローカルミニマムの罠"
 _metadata.yml: !expr yaml::read_yaml("_metadata.yml")
 ---
 
-# 前回の振り返りと今回の問題
+## {background-color="white" .center .break-slide}
+
+::: {.break-title}
+前回の振り返りと今回の問題
+:::
 
 ## 前回やったこと
 
@@ -32,9 +36,11 @@ _metadata.yml: !expr yaml::read_yaml("_metadata.yml")
 
 今回は「谷が2つある関数」で、Newton法を使ったときに**何が起こるか**を体験しましょう。
 
----
+## {background-color="white" .center .break-slide}
 
-# 谷が2つある関数を見てみよう
+::: {.break-title}
+谷が2つある関数を見てみよう
+:::
 
 ## 関数の定義
 
@@ -56,6 +62,7 @@ $$f''(x) = 1.2x^2 - 6x + 4$$
 #| echo: true
 import numpy as np
 import matplotlib.pyplot as plt
+import japanize_matplotlib
 
 # 4次関数とその微分
 def f_poly(x):
@@ -103,18 +110,17 @@ plt.show()
 さて、Newton法を使ったら、どちらの谷に行くのでしょうか？
 :::
 
----
+## {background-color="white" .center .break-slide}
 
-# 実験：初期値を変えてNewton法を実行してみよう
+::: {.break-title}
+実験：初期値を変えてNewton法を実行してみよう
+:::
 
 前回学んだNewton法の更新式を思い出しましょう：
 
 $$x_{\text{new}} = x - \frac{f'(x)}{f''(x)}$$
 
 同じ式を使って、**スタート地点だけ変えて**2回実験します。
-
----
-
 
 ## その前に：$f'(x) = 0$ は「谷」だけじゃない
 
@@ -220,8 +226,6 @@ x_local_final = x
 f_local_final = f_poly(x)
 ```
 
----
-
 ## 実験2：$x_0 = 5.5$ からスタート（右の谷の近く）
 
 ### 手計算で追いかけてみよう
@@ -307,8 +311,6 @@ x_global_final = x
 f_global_final = f_poly(x)
 ```
 
----
-
 ## 2つの実験を並べてみよう
 
 ```{python}
@@ -352,9 +354,11 @@ plt.show()
 **スタート地点（初期値）が違うだけで、たどり着く場所が変わってしまう。**
 :::
 
----
+## {background-color="white" .center .break-slide}
 
-# この現象に名前をつけよう
+::: {.break-title}
+この現象に名前をつけよう
+:::
 
 ## ローカルミニマムとグローバルミニマム
 
@@ -422,9 +426,11 @@ plt.show()
 Newton法も勾配降下法も、この「目隠し」と同じ状況です。
 :::
 
----
+## {background-color="white" .center .break-slide}
 
-# なぜこうなるのか：初期値と「引力圏」
+::: {.break-title}
+なぜこうなるのか：初期値と「引力圏」
+:::
 
 ## Newton法は「近くの谷」に落ちる
 
@@ -535,9 +541,11 @@ plt.show()
 初期値が少し変わるだけで、結果がガラッと変わる境界があることに注目してください。
 :::
 
----
+## {background-color="white" .center .break-slide}
 
-# 対策：どうすればグローバルミニマムを見つけられるか
+::: {.break-title}
+対策：どうすればグローバルミニマムを見つけられるか
+:::
 
 ## 考え方：1回だけでは信用できない
 
@@ -547,8 +555,6 @@ plt.show()
 - 1回の実行では、それがローカルかグローバルかわからない
 
 **解決策はシンプル：何回もやって、一番良い結果を選ぶ！**
-
----
 
 ## 方法1：手で初期値を変えて比較する
 
@@ -608,8 +614,6 @@ for x0, xf, fx in results_comparison:
 
 手間は3倍になりますが、間違った答えを信じるよりずっと良いです。
 :::
-
----
 
 ## 方法2：たくさんの初期値を自動で試す（ランダムリスタート）
 
@@ -714,9 +718,11 @@ plt.show()
 どちらも**「何回も試して一番良いのを選ぶ」**という同じ考え方です。
 :::
 
----
+## {background-color="white" .center .break-slide}
 
-# 実践チェックリスト
+::: {.break-title}
+実践チェックリスト
+:::
 
 最適化問題に取り組むときは、以下の手順を守りましょう。
 
@@ -821,9 +827,11 @@ for r in all_results:
 print(f"\n★ 最良解: x = {best_x:.4f}, f(x) = {f_poly(best_x):.4f}")
 ```
 
----
+## {background-color="white" .center .break-slide}
 
-# まとめ
+::: {.break-title}
+まとめ
+:::
 
 ::: {.callout-note}
 ## 今回学んだこと
@@ -844,4 +852,3 @@ print(f"\n★ 最良解: x = {best_x:.4f}, f(x) = {f_poly(best_x):.4f}")
    - ランダムリスタートやグリッドサーチを使う
    - 2次微分で谷（最小値）かどうかも確認する
 :::
-
