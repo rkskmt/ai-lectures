@@ -515,7 +515,8 @@ format:
           mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath d='M290.4 19.8C295.4 7.8 307.1 0 320 0h160c17.7 0 32 14.3 32 32v160c0 12.9-7.8 24.6-19.8 29.6s-25.7 2.2-34.9-6.9L400 157.3 246.6 310.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L354.7 112l-57.3-57.4c-9.2-9.2-11.9-22.9-6.9-34.9zM0 176c0-44.2 35.8-80 80-80h80c17.7 0 32 14.3 32 32s-14.3 32-32 32H80c-8.8 0-16 7.2-16 16v256c0 8.8 7.2 16 16 16h256c8.8 0 16-7.2 16-16v-80c0-17.7 14.3-32 32-32s32 14.3 32 32v80c0 44.2-35.8 80-80 80H80c-44.2 0-80-35.8-80-80V176z'/%3E%3C/svg%3E") no-repeat center / contain;
         }
         .reveal .slide-menu-button a[href]::after,
-        .slide-menu-wrapper a[href]::after {
+        .slide-menu-wrapper a[href]::after,
+        a.lightbox[href]::after {
           content: none !important;
           display: none !important;
         }
@@ -613,6 +614,27 @@ format:
         }
         .reveal .fw-colon {
           font-weight: 300;
+        }
+        .cell:has(details.code-fold) {
+          display: flex;
+          flex-direction: column;
+        }
+        .cell:has(details.code-fold) details.code-fold {
+          order: 1;
+        }
+        .cell-output.cell-output-display .quarto-figure {
+          margin-bottom: 0 !important;
+          padding-bottom: 0 !important;
+        }
+        .cell-output.cell-output-display a.lightbox {
+          display: block;
+        }
+        .cell-output.cell-output-display figure p {
+          margin-bottom: 0 !important;
+        }
+        .cell details.code-fold {
+          margin-left: 1.6em;
+          font-size: 1.2rem;
         }
         .reveal :not(pre) > code {
           color: #005cc5;
