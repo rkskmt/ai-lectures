@@ -48,6 +48,9 @@ Use Python as the vehicle, but frame concepts as broadly as possible. Where a co
 - Use Quarto callouts (`.callout-note`) for key concepts
 - Slide text should use **bullet points**, not prose sentences
 - Code cells use `jupyter: python3`
+- **Assume students run Python in VSCode as normal `.py` scripts, not notebooks.** Code examples must be copy-pasteable into a Python file and still show the intended output.
+- **Do not use notebook-only display style** such as a bare `df`, `df.head()`, `df.shape`, `series`, or expression as the final line when the goal is to show output. Use `print(...)` for textual/tabular output (e.g. `print(df.head())`, `print(df.shape)`). Use plotting calls like `plt.show()` when the goal is a figure.
+- For large tables or arrays, show only a small, intentional preview such as `print(df.head())`; do not dump all rows unless the full output is pedagogically necessary.
 - Image sizing via `.fig-small` (300px) and `.fig-medium` (400px) CSS classes
 - **Highlight marker (`==text==`):** `hl.lua` filter turns `==text==` into a highlighted span (white text + cyan outline). For text with spaces use `[a b]{.hl}`.
 - **MathJax `\vec{}` height fix:** `\vec{a}` and `\vec{b}` render at different heights because `b` has an ascender. Use `\vec{\vphantom{b}a}` to match the arrow height of shorter letters to `b`.
@@ -57,7 +60,7 @@ Use Python as the vehicle, but frame concepts as broadly as possible. Where a co
 - **No `getattr`** — use direct attribute access (`obj.attr`).
 - **Never swallow failures.** Wrong type, missing value, missing package, or unexpected state must raise an error, not be hidden by `try/except`, `continue`, `pass`, a silent fallback/default, or `.get()` when the key must exist.
 - Prefer an immediate crash with a stack trace. It points directly at the source of the problem; a swallowed failure lets corrupted state propagate and usually surfaces later as a harder-to-debug bug.
-- If a lecture needs a dependency, add it to `environment.yml`. Do not add fallback code for a missing dependency.
+- If a lecture needs a dependency, add it to this project's `environment.yml` and make sure the actual `ai` Conda environment is updated too. Do not add fallback code for a missing dependency, and do not install packages only into a parent or unrelated environment.
 
 ## Build
 
