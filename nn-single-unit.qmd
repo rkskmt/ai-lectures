@@ -1,0 +1,288 @@
+---
+title: "ニューラルネットワークの最小単位"
+subtitle: "fit() の中で境界が動く"
+---
+
+## ここまでの道具
+
+- **勾配降下法**：傾きの逆方向に少しずつ進んで最小値を探す（最適化の回）
+- **回帰の `fit()` は自作済み**：体長→重さの直線を勾配降下で当て、sklearn と一致した（前回）
+- 残るは**分類**：ロジスティック回帰の `fit()` は、決定境界の回からブラックボックスのまま
+
+::: {.callout-note title="今回の問い"}
+同じ道具で、**分類の** `fit()` も開けられるか？
+— 開けると、そこに**ニューラルネットワークの最小単位**が現れる
+:::
+
+
+## {background-color="white" .center .break-slide}
+
+::: {.break-title}
+最小単位の構造
+:::
+
+
+## 入力から出力まで、たった2ステップ
+
+### Step 1：アフィン変換
+
+$$z = \alpha_1 x_1 + \alpha_2 x_2 + b$$
+
+- $x_1, x_2$：入力（輝度、重さ）
+- $\alpha_1, \alpha_2$：**重み**（どの特徴量をどれだけ重視するか）
+- $b$：**バイアス**（全体のオフセット）
+- $z$：スカラー1個
+
+### 幾何的な意味
+
+- 2次元の点を $\alpha$ 方向に**射影**して1次元に落とす
+- $b$ で位置を調整する
+
+
+## Step 2：シグモイドで「確率」にする
+
+$$p = \sigma(z) = \frac{1}{1 + e^{-z}}$$
+
+```{python}
+#| echo: false
+#| fig-align: center
+import numpy as np
+import matplotlib.pyplot as plt
+import japanize_matplotlib
+plt.rcParams['font.size'] = 11
+plt.rcParams['figure.dpi'] = 100
+
+zz = np.linspace(-6, 6, 200)
+plt.figure(figsize=(5.5, 2.8))
+plt.plot(zz, 1 / (1 + np.exp(-zz)), color="#e74c3c", lw=2.5)
+plt.axhline(0.5, color="gray", ls=":", lw=1)
+plt.axvline(0, color="gray", ls=":", lw=1)
+plt.xlabel("z"); plt.ylabel("p = σ(z)")
+plt.title("シグモイド関数")
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+- 実数全体 $(-\infty, +\infty)$ を **0〜1 の範囲**に押し込む
+- $p \geq 0.5$ → Salmon、$p < 0.5$ → Sea bass と判定
+- $z = 0$（＝決定境界の上）のとき、ちょうど $p = 0.5$
+
+
+## 実はロジスティック回帰
+
+- 「アフィン変換 → シグモイド」 — この2ステップが**ニューラルネットワークの最小単位**（1個のニューロン）
+- そして、これは**ロジスティック回帰そのもの**
+- `sklearn` の `LogisticRegression` が中でやっているのもこの計算
+
+::: {.callout-note title="今回の作戦"}
+- NN は、この最小単位の**組み合わせ**でできている
+- だから、まず**1個だけ**を完全に理解する
+:::
+
+
+## {background-color="white" .center .break-slide}
+
+::: {.break-title}
+学習 ＝ 境界を動かすこと
+:::
+
+
+## 何を最小化するか：損失関数
+
+- 「いまのパラメータがどれだけダメか」を1つの数字にする
+
+$$L = -\frac{1}{N}\sum_{i} \left[ y_i \log p_i + (1 - y_i) \log (1 - p_i) \right]$$
+
+- **交差エントロピー（cross entropy）**と呼ぶ
+- 例：正解 $y=1$（Salmon）なのに $p = 0.4$ しか出せない
+  - $L = -\log(0.4) \approx 0.92$（大きい＝ダメ）
+- 自信を持って正解（$p=0.99$）なら $-\log(0.99) \approx 0.01$（小さい＝良い）
+
+::: {.callout-important title="クイズ"}
+知りたいのは正答率。なぜ**正答率そのもの**を最大化しない？
+:::
+
+::: {.fragment}
+- 正答率はパラメータを少し動かしても**階段状にしか変化しない** → 微分が 0 か未定義
+- 勾配降下法が使えない。**滑らかな代理**として交差エントロピーを最小化する
+:::
+
+
+## 勾配が驚くほど簡単になる
+
+- 損失 $L$ を $z$ で微分すると、連鎖律で
+
+$$\frac{\partial L}{\partial z}
+= \frac{\partial L}{\partial p} \cdot \frac{\partial p}{\partial z}
+= \left(-\frac{1}{p}\right) \cdot p(1-p)
+= p - 1 \quad (\text{正解 } y = 1 \text{ のとき})$$
+
+- 正解が 0 のときは $p - 0$。つまり**常に**
+
+$$\frac{\partial L}{\partial z} = p - y$$
+
+- 各パラメータの更新式（学習率 $\eta$）：
+
+$$\alpha \leftarrow \alpha - \eta\,(p - y)\,x, \qquad b \leftarrow b - \eta\,(p - y)$$
+
+::: {.callout-note}
+シグモイドの微分 $p(1-p)$ と交差エントロピーの微分 $-1/p$ が**打ち消し合う**ようにできている。
+「予測と正解の差 $(p-y)$ を、入力の大きさに応じて配る」だけ。
+:::
+
+
+## 実装：必要な関数は4つだけ
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "魚データの定義（クリックして展開）"
+salmon_weights     = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,
+                               1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,
+                               2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,
+                               1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652])
+salmon_brightness  = np.array([3.5, 5.8, 4.9, 4.4, 2.6, 2.6, 2.2, 5.5, 4.4, 4.8, 2.1,
+                               5.9, 5.3, 2.8, 2.7, 2.7, 3.2, 4.1, 3.7, 3.2, 4.4, 2.6,
+                               3.2, 3.5, 3.8, 5.1, 2.8, 4.1, 4.4, 2.2, 4.4, 2.7, 2.3,
+                               5.8, 5.9, 5.2, 3.2, 2.4, 4.7, 3.8])
+seabass_weights    = np.array([1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,
+                               1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,
+                               1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,
+                               1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531])
+seabass_brightness = np.array([5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8,
+                               8.9, 9.7, 9.5, 8.0, 9.6, 5.4, 6.0, 5.2, 6.6, 6.9, 6.4,
+                               9.1, 6.8, 6.4, 7.7, 5.7, 9.0, 5.4, 9.9, 8.9, 6.0, 5.0,
+                               9.1, 8.5, 8.6, 8.9, 5.4, 6.8, 5.6])
+
+X = np.column_stack([
+    np.concatenate([salmon_brightness, seabass_brightness]),
+    np.concatenate([salmon_weights,    seabass_weights])
+])
+y = np.array([1]*40 + [0]*40)   # 1=Salmon, 0=Sea bass
+
+# スケールを揃える（クラスタリング回の教訓）
+X_norm = (X - X.mean(axis=0)) / X.std(axis=0)
+
+# Salmon, Sea bass, Salmon, ... と交互に並べ替えておく
+order = np.empty(80, dtype=int)
+order[0::2] = np.arange(0, 40)
+order[1::2] = np.arange(40, 80)
+X_norm = X_norm[order]
+y      = y[order]
+```
+
+```{python}
+#| echo: true
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
+
+def forward(X, alpha, b):
+    """アフィン変換 → シグモイド"""
+    return sigmoid(X @ alpha + b)
+
+def loss_fn(y_true, p):
+    """交差エントロピー"""
+    eps = 1e-10
+    p = np.clip(p, eps, 1 - eps)
+    return -np.mean(y_true * np.log(p) + (1 - y_true) * np.log(1 - p))
+
+def accuracy(y_true, p):
+    return np.mean((p >= 0.5) == y_true)
+```
+
+- `forward` が予測、`loss_fn` が採点。勾配は $(p-y)x$ なので関数すら要らない
+
+
+## 魚を1匹ずつ見せて学習する
+
+```{python}
+#| echo: true
+alpha = np.array([0.0, 0.0])   # 重みはゼロからスタート
+b  = 0.0
+lr = 0.5                       # 学習率
+
+for i in range(10):
+    xi, yi = X_norm[i], y[i]
+    p_i   = sigmoid(xi @ alpha + b)   # Forward：1匹だけ予測
+    delta = p_i - yi                  # 予測と正解の差
+    alpha = alpha - lr * delta * xi   # 勾配降下で更新
+    b     = b  - lr * delta
+
+    p_all = forward(X_norm, alpha, b)
+    print(f"{i+1}匹目 | Loss: {loss_fn(y, p_all):.4f} | 正答率: {accuracy(y, p_all):.1%} "
+          f"| α=[{alpha[0]:6.3f}, {alpha[1]:6.3f}] | b={b:6.3f}")
+```
+
+- 1匹見るたびにパラメータが少し動く
+- たった10匹で正答率 90% まで来た
+
+
+## 境界が動く様子を見る
+
+```{python}
+#| echo: false
+#| fig-align: center
+alpha_v = np.array([0.0, 0.0])
+b_v  = 0.0
+hist = [(alpha_v.copy(), b_v, None)]
+for i in range(10):
+    xi, yi = X_norm[i], y[i]
+    p_i     = sigmoid(xi @ alpha_v + b_v)
+    delta   = p_i - yi
+    alpha_v = alpha_v - lr * delta * xi
+    b_v     = b_v - lr * delta
+    hist.append((alpha_v.copy(), b_v, i))
+
+fig, axes = plt.subplots(2, 3, figsize=(11, 6.2))
+for ax, step in zip(axes.flat, [0, 1, 2, 3, 4, 10]):
+    a, bb, used = hist[step]
+    for cls, col in [(1, "salmon"), (0, "#5dade2")]:
+        m = y == cls
+        ax.scatter(X_norm[m, 0], X_norm[m, 1], c=col, s=30, alpha=0.6, edgecolors="gray")
+    if used is not None:
+        ax.scatter(X_norm[used, 0], X_norm[used, 1], s=180, facecolors="none",
+                   edgecolors="black", linewidths=2.5, zorder=10)
+    if abs(a[1]) > 1e-9:
+        xr = np.linspace(-2.5, 2.5, 50)
+        ax.plot(xr, -(a[0] * xr + bb) / a[1], "r--", lw=2)
+    ax.set_xlim(-2.5, 2.5); ax.set_ylim(-2.5, 2.8)
+    ax.set_title("学習前（境界なし）" if step == 0 else f"魚を{step}匹見た後", fontsize=10)
+    ax.grid(True, alpha=0.3)
+fig.supxlabel("輝度（標準化）", fontsize=10)
+fig.supylabel("重さ（標準化）", fontsize=10)
+plt.tight_layout()
+plt.show()
+```
+
+- ◯印＝直前に見せた魚。**間違えるたびに境界がその魚の方へ動く**
+
+
+## 学習されたパラメータを読む
+
+- 最終的な重み：$\alpha \approx [-0.74,\; 1.15]$
+
+| パラメータ | 値 | 意味 |
+|---|---|---|
+| $\alpha_1$（輝度） | 負 | **暗い**ほど Salmon 寄り |
+| $\alpha_2$（重さ） | 正 | **重い**ほど Salmon 寄り |
+
+- 1次元分類・2次元分類の回に**目で見て**発見したことを、機械が数値として再発見した
+
+::: {.callout-note}
+`sklearn` の `fit()` がやっているのは、本質的にこのループ（の高速・安定版）。
+**ブラックボックスが1つ開いた。**
+:::
+
+
+## まとめ
+
+- NN の最小単位 ＝ **アフィン変換 → シグモイド** ＝ ロジスティック回帰
+- 学習 ＝ 交差エントロピーを**勾配降下法**で最小化
+  - 勾配は $(p - y) x$ — シグモイド＋交差エントロピーの組み合わせの妙
+- `fit()` の中身は「予測 → 差を測る → 境界を少し動かす」の繰り返しだった
+
+::: {.callout-note title="次回予告"}
+この最小単位、どれだけ学習しても**直線**しか引けない。
+直線では絶対に分けられないデータが来たらどうする？
+:::

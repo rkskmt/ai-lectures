@@ -1,0 +1,203 @@
+---
+title: "PyTorch入門"
+subtitle: "自分で書けるから、楽をしていい"
+---
+
+## 前回の振り返り
+
+- NumPy だけで多層ネットワークを組み、初回の図を再現した
+- ただし `backward` は**自分で導出して書いた**
+
+::: {.callout-important title="クイズ"}
+層の数や活性化関数を変えるたびに、backward を**書き直す**ことになる。
+100層のネットで、1ヶ所も間違えずに書ける？
+:::
+
+::: {.fragment}
+- 書けるかもしれないが、**人間がやるべき仕事ではない**
+- 連鎖律は機械的な作業 — 機械的な作業は機械にやらせる
+:::
+
+
+## PyTorch とは
+
+- ディープラーニングの**業界標準ライブラリ**のひとつ
+- 勾配降下法の回の比較表で「実例：PyTorch」と書いた、その本人
+- 今日使う機能は実質2つだけ
+  - **autograd**：backward を自動でやってくれる
+  - **nn**：層・損失・最適化の部品セット
+
+::: {.callout-note}
+この講義の環境にはインストール済み（`environment.yml` の pytorch-cpu / torchvision）。
+自分のPCなら `pip install torch` 等で入る。
+:::
+
+
+## tensor：NumPy 配列の親戚
+
+```{python}
+#| echo: true
+import torch
+import numpy as np
+
+t = torch.tensor([1.0, 2.0, 3.0])
+print(t * 2)          # 演算は NumPy とほぼ同じ感覚
+print(t.numpy())      # NumPy 配列との相互変換も簡単
+```
+
+- 違いは2つ：**GPU に載せられる**こと、そして**勾配を覚えられる**こと
+
+```{python}
+#| echo: true
+a = torch.tensor([0.3, -0.2], requires_grad=True)   # 「勾配を追跡せよ」の印
+print(a)
+```
+
+- `requires_grad=True` を付けた tensor は、**自分が関わった計算をすべて記録**する
+
+
+## 山場：autograd が手計算を言い当てる
+
+- バックプロパゲーションの回と**まったく同じ**ネットワーク・同じ数値を流す
+
+```{python}
+#| echo: true
+a = torch.tensor([0.3, -0.2], requires_grad=True)   # α1, α2
+b = torch.tensor(0.1,  requires_grad=True)
+w = torch.tensor(0.5,  requires_grad=True)
+c = torch.tensor(-0.1, requires_grad=True)
+x = torch.tensor([1.0, 0.5])                        # 入力（正解 y=1）
+
+z = a @ x + b          # アフィン変換
+h = torch.relu(z)      # ReLU
+u = w * h + c          # 出力層
+p = torch.sigmoid(u)   # シグモイド
+L = -torch.log(p)      # 交差エントロピー（正解1）
+
+L.backward()           # ← 復路はこの1行
+
+print(f"L = {L.item():.4f}")
+print(f"∂L/∂α = {a.grad.numpy().round(4)}")
+print(f"∂L/∂b = {b.grad.item():.4f}")
+print(f"∂L/∂w = {w.grad.item():.4f}")
+print(f"∂L/∂c = {c.grad.item():.4f}")
+```
+
+::: {.callout-note title="答え合わせ"}
+手計算（とNumPy検算）の答えは α: $(-0.2438, -0.1219)$、b: $-0.2438$、w: $-0.1463$、c: $-0.4875$。
+**全桁一致。** `loss.backward()` の中身は、前回自分の手でやった連鎖律の機械化にすぎない。
+:::
+
+
+## なぜ自動でできるのか
+
+- forward の間、PyTorch は**計算の履歴（計算グラフ）**を記録している
+- `backward()` は、その履歴を**逆順にたどって連鎖律を適用**するだけ
+- やっていることは前回の手計算1往復と同じ：
+  - 往路の途中の値を保存（だからメモリを食う）
+  - $\delta$ を出力側から掛けて貯める
+
+::: {.callout-tip}
+ブラックボックスとして使うのと、中身を知って使うのは別物。
+われわれは**中身を手で再現済み**なので、堂々と楽をしてよい。
+:::
+
+
+## nn：部品には全部、見覚えがある
+
+```{python}
+#| echo: true
+import torch.nn as nn
+
+model = nn.Sequential(
+    nn.Linear(2, 16),   # アフィン変換 X @ W1 + b1（パラメータは自動で用意・初期化）
+    nn.ReLU(),          # 折る
+    nn.Linear(16, 1),   # 出力層 H @ w2 + c2
+)
+print(model)
+```
+
+| PyTorch の名前 | この講義で作った部品 |
+|---|---|
+| `nn.Linear` | アフィン変換（`X @ W1 + b1`） |
+| `nn.ReLU` | $\max(0, z)$ |
+| `nn.BCEWithLogitsLoss` | シグモイド＋交差エントロピー（打ち消しもやってくれる） |
+| `torch.optim.SGD` | 勾配降下法（`θ -= lr * grad`） |
+| `loss.backward()` | バックプロパゲーション |
+
+- **新しい概念はゼロ**。全部、名前が付いただけ
+
+
+## 学習ループ：3拍子
+
+```{python}
+#| echo: true
+from sklearn.datasets import make_moons
+
+X, y = make_moons(n_samples=200, noise=0.1, random_state=42)
+X_t = torch.tensor(X, dtype=torch.float32)
+y_t = torch.tensor(y, dtype=torch.float32).unsqueeze(1)   # (200,) → (200,1)
+
+torch.manual_seed(0)
+model = nn.Sequential(nn.Linear(2, 16), nn.ReLU(), nn.Linear(16, 1))
+loss_fn   = nn.BCEWithLogitsLoss()
+optimizer = torch.optim.SGD(model.parameters(), lr=0.5)
+
+for i in range(1, 4001):
+    optimizer.zero_grad()        # ① 前回の勾配をリセット
+    logits = model(X_t)
+    loss = loss_fn(logits, y_t)
+    loss.backward()              # ② backprop（自動）
+    optimizer.step()             # ③ 勾配降下で1歩
+
+    if i in (1, 100, 500, 2000, 4000):
+        acc = ((torch.sigmoid(logits) >= 0.5).float() == y_t).float().mean()
+        print(f"更新 {i:5d}回 | Loss: {loss.item():.4f} | 正答率: {acc.item():.1%}")
+```
+
+- NumPy 版と同じく **100%**。`zero_grad → backward → step` の3拍子はどんなネットでも同じ
+
+
+## 境界も同じものが出る
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "描画コード"
+import matplotlib.pyplot as plt
+import japanize_matplotlib
+plt.rcParams['font.size'] = 11
+plt.rcParams['figure.dpi'] = 100
+
+xx, yy = np.meshgrid(np.linspace(X[:, 0].min() - 0.4, X[:, 0].max() + 0.4, 300),
+                     np.linspace(X[:, 1].min() - 0.4, X[:, 1].max() + 0.4, 300))
+grid = torch.tensor(np.c_[xx.ravel(), yy.ravel()], dtype=torch.float32)
+
+with torch.no_grad():                       # 推論だけなので履歴の記録は不要
+    Zb = (torch.sigmoid(model(grid)) >= 0.5).numpy().reshape(xx.shape)
+
+plt.figure(figsize=(5.5, 3.8))
+plt.contourf(xx, yy, Zb, alpha=0.25, levels=1, colors=["#5dade2", "#f5b7b1"])
+for cls, col, m in [(0, "#2980b9", "s"), (1, "#e74c3c", "o")]:
+    mask = y == cls
+    plt.scatter(X[mask, 0], X[mask, 1], c=col, marker=m, s=25, edgecolors="gray", lw=0.4)
+plt.xticks([]); plt.yticks([])
+plt.tight_layout()
+plt.show()
+```
+
+- NumPy 版で書いた forward / backward 計60行ほどが、PyTorch では**学習ループ込みで十数行**
+- 浮いた労力は、**モデルとデータを考えること**に使う
+
+
+## まとめ
+
+- **autograd**：`loss.backward()` ＝ 連鎖律の自動化。手計算と全桁一致を確認した
+- **nn の部品**は全部、この講義で自作した部品の別名（対応表）
+- 学習ループは `zero_grad → backward → step` の3拍子
+- 中身を知っているから、安心して楽ができる
+
+::: {.callout-note title="次回予告：最終回"}
+道具は完成した。次回、初回に約束した**手書き数字を読み取る機械**を作る。
+入力は 28×28 ピクセル — **784次元**。次元の話、覚えてる？
+:::

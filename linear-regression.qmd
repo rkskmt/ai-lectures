@@ -1,0 +1,331 @@
+---
+title: "線形回帰と正則化"
+subtitle: "fit() を自分の手で作る"
+---
+
+## ここまでの道具
+
+- **勾配降下法**：傾きの逆方向に少しずつ進んで、損失が最小の場所を探す
+- ただし前回最小化したのは、練習用の数学の関数 $f(x) = x^2 - 4x + 3$ だった
+
+::: {.callout-note title="今回の問い"}
+勾配降下法で、**本物のモデル**を `fit` できるか？ — `fit()` の自作、第1号
+:::
+
+
+## 回帰問題とは
+
+- **分類**：どのグループか答える（Salmon か Sea bass か）
+- **回帰**：**数値そのもの**を予測する（重さは何グラムか）
+- 概論の「AIが扱うタスク」の2番目が、今日ようやく登場
+
+| | 分類 | 回帰 |
+|---|---|---|
+| 出力 | グループ名 | 数値 |
+| 例 | この魚は Salmon | この魚は約 1900g |
+
+
+## 今回の問題：体長から重さを予測する
+
+- 次元削減の回で測った**体長**を使う
+- 体長を測るだけで重さが分かれば、**秤に乗せる手間が省ける**
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "魚データの定義（クリックして展開）"
+import numpy as np
+import matplotlib.pyplot as plt
+import japanize_matplotlib
+plt.rcParams['font.size'] = 11
+plt.rcParams['figure.dpi'] = 100
+
+salmon_weights     = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,
+                               1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,
+                               2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,
+                               1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652])
+seabass_weights    = np.array([1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,
+                               1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,
+                               1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,
+                               1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531])
+
+weights = np.concatenate([salmon_weights, seabass_weights]).astype(float)
+
+# 体長の測定値（cm）— 次元削減の回と同じ
+rng     = np.random.default_rng(42)
+lengths = np.round(np.cbrt(weights) * 4.5 + rng.normal(0, 1.0, len(weights)), 1)
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
+plt.figure(figsize=(5.5, 3.4))
+plt.scatter(lengths, weights, alpha=0.6, s=40, c="#5dade2", edgecolors="gray")
+plt.xlabel("体長 (cm)"); plt.ylabel("重さ (g)")
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+- 直線でいけそう。**直線のパラメータは傾き $a$ と切片 $b$ の2個**
+- ではどの直線が「一番良い」？ — **良さを測る物差し**が要る
+
+
+## 損失関数：二乗誤差（MSE）
+
+- 各魚について「予測と実際のズレ」を測り、二乗して平均する
+
+$$L(a, b) = \frac{1}{N} \sum_{i} \left( \underbrace{a x_i + b}_{\text{予測}} - \underbrace{t_i}_{\text{実際}} \right)^2$$
+
+- **MSE（Mean Squared Error / 平均二乗誤差）**と呼ぶ
+
+::: {.callout-important title="クイズ"}
+ズレの測り方なら**絶対値**でもいいはず。なぜ二乗？
+:::
+
+::: {.fragment}
+- 絶対値は 0 のところで**微分できない**（カクッと折れている）
+- 二乗なら微分がきれい — シグモイド＋交差エントロピーを選んだのと**同じ理由**
+- 勾配降下法を使う前提で、損失は「微分しやすいもの」を選ぶ
+:::
+
+
+## 勾配を手で出す
+
+$L$ を $a$ と $b$ でそれぞれ微分する（合成関数の微分）：
+
+$$\frac{\partial L}{\partial a} = \frac{2}{N} \sum_i (a x_i + b - t_i) \, x_i
+\qquad
+\frac{\partial L}{\partial b} = \frac{2}{N} \sum_i (a x_i + b - t_i)$$
+
+- 構造は分類のときと同じ：**「予測と正解の差」を入力の大きさに応じて配る**
+- あとは勾配降下法に渡すだけ：
+
+$$a \leftarrow a - \eta \frac{\partial L}{\partial a}, \qquad b \leftarrow b - \eta \frac{\partial L}{\partial b}$$
+
+
+## 勾配降下法で fit する
+
+- スケールを揃えてから（クラスタリングの回の教訓。学習率を1つで済ませるため）
+
+```{python}
+#| echo: true
+x = (lengths - lengths.mean()) / lengths.std()   # 標準化した体長
+t = (weights - weights.mean()) / weights.std()   # 標準化した重さ
+
+a, b = 0.0, 0.0   # 直線はゼロからスタート
+lr = 0.1          # 学習率
+
+for i in range(1, 101):
+    pred   = a * x + b
+    grad_a = 2 * np.mean((pred - t) * x)
+    grad_b = 2 * np.mean(pred - t)
+    a -= lr * grad_a
+    b -= lr * grad_b
+    if i in (1, 3, 10, 50, 100):
+        print(f"更新 {i:3d}回 | a={a:.4f} b={b:.4f} | MSE={np.mean((a*x+b - t)**2):.4f}")
+```
+
+- 50回あたりで動かなくなった ＝ **収束**
+
+
+## 直線が合っていく様子
+
+```{python}
+#| echo: false
+#| fig-align: center
+a_v, b_v = 0.0, 0.0
+snaps = {}
+for i in range(1, 101):
+    pred = a_v * x + b_v
+    a_v -= lr * 2 * np.mean((pred - t) * x)
+    b_v -= lr * 2 * np.mean(pred - t)
+    if i in (1, 3, 10, 100):
+        snaps[i] = (a_v, b_v)
+
+fig, axes = plt.subplots(1, 4, figsize=(13, 3.2))
+gx = np.linspace(x.min(), x.max(), 50)
+for ax, (it, (aa, bb)) in zip(axes, snaps.items()):
+    ax.scatter(x, t, s=20, alpha=0.6, c="#5dade2", edgecolors="gray", lw=0.3)
+    ax.plot(gx, aa * gx + bb, "r-", lw=2)
+    ax.set_title(f"{it}回更新後", fontsize=10)
+    ax.set_xticks([]); ax.set_yticks([])
+plt.tight_layout()
+plt.show()
+```
+
+- 寝ていた直線が起き上がり、点の真ん中に吸い付いていく
+- NN最小単位の回で見る「境界が動く」と**同じ現象の回帰版**
+
+
+## 答え合わせ：sklearn と比べる
+
+```{python}
+#| echo: true
+from sklearn.linear_model import LinearRegression
+
+reg = LinearRegression().fit(x.reshape(-1, 1), t)
+print(f"自作の勾配降下: a={a:.4f}, b={b:.4f}")
+print(f"sklearn の fit: a={reg.coef_[0]:.4f}, b={reg.intercept_:.4f}")
+```
+
+- **完全に一致**。`fit()` の中身を、初めて自分の手で再現できた
+- 元の単位に戻すと「体長 1cm あたり約 91g」という意味のある数字になる
+
+::: {.callout-note}
+ブラックボックスがまた1つ開いた。分類モデルの `fit()` も同じ要領で開けられる（次回）。
+:::
+
+
+## {background-color="white" .center .break-slide}
+
+::: {.break-title}
+モデルを複雑にしてみる
+:::
+
+
+## 新しい仕入れ先の魚は15匹しかない
+
+- 別の仕入れ先から来た魚は、まだ**15匹**しか測れていない
+- 直線だけでなく、**曲線**も引ける：多項式回帰
+
+$$\text{予測} = w_1 x + w_2 x^2 + \cdots + w_d x^d + b$$
+
+- $x^2, x^3, \ldots$ を新しい特徴量として作れば、**道具は線形回帰のまま**
+- 次数 $d$ がモデルの複雑さを決める
+
+::: {.callout-important title="クイズ"}
+次数を 1 → 3 → 9 と上げていくと、**訓練誤差**と**テスト誤差**はそれぞれどうなる？
+:::
+
+
+## 次数を上げてみる
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "code"
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import PolynomialFeatures, StandardScaler
+from sklearn.pipeline import make_pipeline
+from sklearn.metrics import mean_squared_error
+
+idx = np.random.default_rng(2).choice(80, 15, replace=False)   # 新しい仕入れ先の15匹
+xs, ts = lengths[idx], weights[idx]
+X_train, X_test, y_train, y_test = train_test_split(
+    xs.reshape(-1, 1), ts, test_size=5, random_state=2
+)
+
+grid = np.linspace(xs.min() - 0.5, xs.max() + 0.5, 300).reshape(-1, 1)
+fig, axes = plt.subplots(1, 3, figsize=(12, 3.6))
+for ax, deg in zip(axes, [1, 3, 9]):
+    model = make_pipeline(PolynomialFeatures(deg), StandardScaler(), LinearRegression())
+    model.fit(X_train, y_train)
+    ax.scatter(X_train, y_train, c="#2980b9", s=45, label="訓練")
+    ax.scatter(X_test, y_test, c="#e74c3c", marker="s", s=45, label="テスト")
+    ax.plot(grid, model.predict(grid), "k-", lw=2)
+    ax.set_ylim(800, 2900)
+    ax.set_title(f"次数 {deg}", fontsize=11)
+    ax.set_xlabel("体長 (cm)")
+axes[0].set_ylabel("重さ (g)"); axes[0].legend(fontsize=8)
+plt.tight_layout()
+plt.show()
+```
+
+- 次数9は訓練の点を**ほぼ完璧に貫く**。代わりに左端で大暴れ —「46.7cm の魚は 2900g 超」と主張している
+
+
+## 数字で見る：また会ったな、過学習
+
+```{python}
+#| echo: true
+#| fig-align: center
+degrees = range(1, 10)
+train_mse, test_mse = [], []
+for deg in degrees:
+    model = make_pipeline(PolynomialFeatures(deg), StandardScaler(), LinearRegression())
+    model.fit(X_train, y_train)
+    train_mse.append(mean_squared_error(y_train, model.predict(X_train)))
+    test_mse.append(mean_squared_error(y_test, model.predict(X_test)))
+
+plt.figure(figsize=(6.5, 3.6))
+plt.semilogy(degrees, train_mse, "o-", color="#2980b9", label="訓練MSE")
+plt.semilogy(degrees, test_mse,  "s-", color="#e74c3c", label="テストMSE")
+plt.xlabel("多項式の次数"); plt.ylabel("MSE（対数目盛）")
+plt.legend(); plt.grid(True, alpha=0.4)
+plt.tight_layout()
+plt.show()
+```
+
+- 訓練誤差は下がり続け、テスト誤差は**桁違いに爆発**（縦軸は対数）
+- 決定木の深さで見た**過学習**が、回帰でもまったく同じ形で現れた
+- 深さを制限したように、複雑さを抑える道具が要る — 回帰では**正則化**
+
+
+## 正則化：大きい係数に罰金を払わせる
+
+- 暴れている曲線の正体は、**巨大な係数**
+
+```{python}
+#| echo: true
+plain = make_pipeline(PolynomialFeatures(9), StandardScaler(), LinearRegression())
+plain.fit(X_train, y_train)
+print("次数9の係数の最大絶対値:", f"{np.abs(plain[-1].coef_).max():,.0f}")
+```
+
+- そこで、損失に「係数の大きさ」への**罰金**を足す：
+
+$$L = \mathrm{MSE} + \alpha \sum_j w_j^2$$
+
+- これが **Ridge 回帰**（L2正則化）
+- 訓練データに合わせたい力と、係数を小さく保ちたい力の**綱引き**。$\alpha$ がその強さ
+
+
+## Ridge で手なずける
+
+```{python}
+#| echo: true
+#| fig-align: center
+from sklearn.linear_model import Ridge
+
+fig, axes = plt.subplots(1, 2, figsize=(9.5, 3.6))
+for ax, (model, name) in zip(axes, [
+        (make_pipeline(PolynomialFeatures(9), StandardScaler(), LinearRegression()),
+         "次数9（正則化なし）"),
+        (make_pipeline(PolynomialFeatures(9), StandardScaler(), Ridge(alpha=1.0)),
+         "次数9 + Ridge")]):
+    model.fit(X_train, y_train)
+    mse = mean_squared_error(y_test, model.predict(X_test))
+    ax.scatter(X_train, y_train, c="#2980b9", s=45)
+    ax.scatter(X_test, y_test, c="#e74c3c", marker="s", s=45)
+    ax.plot(grid, model.predict(grid), "k-", lw=2)
+    ax.set_ylim(800, 2900)
+    ax.set_title(f"{name}　テストMSE {mse:,.0f}", fontsize=10)
+    ax.set_xlabel("体長 (cm)")
+    print(f"{name}: 係数の最大絶対値 = {np.abs(model[-1].coef_).max():,.0f}")
+axes[0].set_ylabel("重さ (g)")
+plt.tight_layout()
+plt.show()
+```
+
+- 同じ次数9なのに、罰金を入れただけで素直な曲線に戻った
+- テストMSEは**3桁以上**改善
+
+::: {.callout-note title="過学習スレッド、完結"}
+引き（決定木のあやしい満点）→ 正体（訓練とテストのギャップ）→ **対抗手段（複雑さの制御と正則化）**。
+NN でも同じ道具（L2正則化＝weight decay）がそのまま使われる。
+:::
+
+
+## まとめ
+
+- **回帰**：数値を予測する。損失は**二乗誤差（MSE）**— 微分しやすさで選ぶ
+- 勾配降下法で fit を自作 → `sklearn` と**完全一致**
+- **多項式回帰**：特徴量に $x^2, x^3, \ldots$ を足せば道具は線形回帰のまま
+- **過学習は回帰でも起きる**：次数を上げると訓練誤差↓・テスト誤差爆発
+- **正則化（Ridge）**：大きい係数に罰金 → 暴れる曲線を手なずける
+
+::: {.callout-note title="次回予告"}
+回帰の `fit()` は開けた。次は**分類**の `fit()` —
+ロジスティック回帰を勾配降下法で開けると、そこに**ニューラルネットワークの最小単位**が現れる。
+:::

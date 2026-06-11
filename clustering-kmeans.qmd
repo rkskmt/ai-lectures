@@ -1,6 +1,6 @@
 ---
 title: "教師なし学習とクラスタリング"
-subtitle: "ラベルがなかったら？"
+subtitle: "ラベルを失った魚たち"
 ---
 
 ## 前回の振り返り
@@ -37,148 +37,17 @@ subtitle: "ラベルがなかったら？"
 ::: {.callout-note}
 どちらが優れているというわけではなく、**使えるデータに応じて選ぶ**
 :::
-あああ
-
-## クラスタリングとは
-
-- データを**似たもの同士のグループ（クラスタ）**にまとめる
-- 正解ラベルがなくても、**データの分布から自然なグループ**を見つける
-
-```{python}
-#| echo: false
-#| fig-align: center
-import numpy as np
-import matplotlib.pyplot as plt
-import japanize_matplotlib
-plt.rcParams['font.size'] = 11
-plt.rcParams['figure.dpi'] = 100
-
-np.random.seed(42)
-centers = np.array([[2.0, 2.0], [7.0, 2.0], [4.5, 7.0]])
-X_demo  = np.vstack([centers[i] + np.random.randn(20, 2) * 0.7 for i in range(3)])
-
-fig, axes = plt.subplots(1, 2, figsize=(9, 3.5))
-
-axes[0].scatter(X_demo[:, 0], X_demo[:, 1], c="gray", s=60, edgecolors="dimgray")
-axes[0].set_title("ラベルなしデータ", fontsize=12)
-axes[0].axis("off")
-
-colors = ["#e74c3c", "#27ae60", "#2980b9"]
-for i, c in enumerate(colors):
-    axes[1].scatter(X_demo[i*20:(i+1)*20, 0], X_demo[i*20:(i+1)*20, 1],
-                    c=c, s=60, edgecolors="dimgray", alpha=0.8)
-axes[1].set_title("クラスタリング後", fontsize=12)
-axes[1].axis("off")
-
-plt.tight_layout()
-plt.show()
-```
 
 
-## {background-color="white" .center .break-slide}
+## ラベルを失った魚たち
 
-::: {.break-title}
-k-means アルゴリズム
-:::
-
-
-## k-means の手順
-
-**入力**：データ点の集合、クラスタ数 $k$
-
-1. $k$ 個の重心（centroid）を**ランダム**に配置
-2. 各データ点を**最も近い重心**のクラスタに割り当てる
-3. 各クラスタの**重心を再計算**（クラスタ内の平均点）
-4. 重心が変化しなくなるまで **2〜3** を繰り返す
-
-::: {.callout-note}
-「assign（割り当て）→ update（更新）→ 繰り返し」
-たったこれだけのシンプルな構造
-:::
-
-
-## k-means の動き（可視化）
-
-```{python}
-#| echo: false
-#| fig-align: center
-import numpy as np
-import matplotlib.pyplot as plt
-import japanize_matplotlib
-
-np.random.seed(42)
-centers_true = np.array([[2.0, 2.0], [7.0, 2.0], [4.5, 7.0]])
-X_demo = np.vstack([centers_true[i] + np.random.randn(20, 2) * 0.7 for i in range(3)])
-colors = ["#e74c3c", "#27ae60", "#2980b9"]
-
-def assign_clusters(X, centroids):
-    dists = np.linalg.norm(X[:, None] - centroids[None, :], axis=2)
-    return dists.argmin(axis=1)
-
-def update_centroids(X, labels, k):
-    return np.array([X[labels == i].mean(axis=0) for i in range(k)])
-
-np.random.seed(3)
-k = 3
-centroids = X_demo[np.random.choice(len(X_demo), k, replace=False)].copy()
-
-fig, axes = plt.subplots(1, 4, figsize=(13, 3.2))
-titles = ["① 初期重心（ランダム）", "② クラスタ割り当て", "③ 重心を更新", "④ 収束"]
-
-# ① 初期重心
-ax = axes[0]
-ax.scatter(X_demo[:, 0], X_demo[:, 1], c="lightgray", s=40, edgecolors="gray")
-for i, c in enumerate(centroids):
-    ax.scatter(*c, c=colors[i], s=220, marker="*", edgecolors="black", zorder=5)
-ax.set_title(titles[0], fontsize=9); ax.axis("off")
-
-# ② 割り当て
-labels = assign_clusters(X_demo, centroids)
-ax = axes[1]
-ax.scatter(X_demo[:, 0], X_demo[:, 1],
-           c=[colors[l] for l in labels], s=40, edgecolors="gray", alpha=0.7)
-for i, c in enumerate(centroids):
-    ax.scatter(*c, c=colors[i], s=220, marker="*", edgecolors="black", zorder=5)
-ax.set_title(titles[1], fontsize=9); ax.axis("off")
-
-# ③ 重心更新
-new_centroids = update_centroids(X_demo, labels, k)
-ax = axes[2]
-ax.scatter(X_demo[:, 0], X_demo[:, 1],
-           c=[colors[l] for l in labels], s=40, edgecolors="gray", alpha=0.7)
-for i in range(k):
-    ax.scatter(*centroids[i], c=colors[i], s=220, marker="*",
-               edgecolors="black", zorder=4, alpha=0.3)
-    ax.scatter(*new_centroids[i], c=colors[i], s=220, marker="*",
-               edgecolors="black", zorder=5)
-    ax.annotate("", xy=new_centroids[i], xytext=centroids[i],
-                arrowprops=dict(arrowstyle="->", color=colors[i], lw=2))
-ax.set_title(titles[2], fontsize=9); ax.axis("off")
-
-# ④ 収束
-c = new_centroids.copy()
-for _ in range(20):
-    l = assign_clusters(X_demo, c)
-    c = update_centroids(X_demo, l, k)
-labels_final = assign_clusters(X_demo, c)
-ax = axes[3]
-ax.scatter(X_demo[:, 0], X_demo[:, 1],
-           c=[colors[l] for l in labels_final], s=40, edgecolors="gray", alpha=0.7)
-for i in range(k):
-    ax.scatter(*c[i], c=colors[i], s=220, marker="*", edgecolors="black", zorder=5)
-ax.set_title(titles[3], fontsize=9); ax.axis("off")
-
-plt.tight_layout()
-plt.show()
-```
-
-
-## scikit-learn で k-means
+- 80匹分の測定データ（輝度・重さ）は手元にある
+- ところが**どれが Salmon でどれが Sea bass か、記録が消えた**
 
 ```{python}
 #| echo: true
 #| code-fold: true
-#| code-summary: "魚データの定義"
+#| code-summary: "魚データの定義（クリックして展開）"
 import numpy as np
 import matplotlib.pyplot as plt
 import japanize_matplotlib
@@ -209,6 +78,61 @@ X = np.column_stack([
 ```
 
 ```{python}
+#| echo: false
+#| fig-align: center
+plt.figure(figsize=(5.5, 3.4))
+plt.scatter(X[:, 0], X[:, 1], c="gray", s=50, alpha=0.7, edgecolors="dimgray")
+plt.xlabel("輝度"); plt.ylabel("重さ (g)")
+plt.title("ラベルを失った80匹")
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-important title="クイズ"}
+ラベルなしのこの図、**何個のグループ**に見える？
+:::
+
+
+## クラスタリングとは
+
+::: {.fragment}
+- 人の目には**2つの塊**が見える — では、それを**機械に**見つけさせられるか？
+:::
+
+- データを**似たもの同士のグループ（クラスタ）**にまとめる
+- 正解ラベルがなくても、**データの分布から自然なグループ**を見つける
+- 用途の例
+  - 顧客をグループに分けて施策を変える
+  - 大量の文書を話題ごとに整理する
+  - 「どのグループにも入らない点」を見つける（異常検知）
+
+
+## {background-color="white" .center .break-slide}
+
+::: {.break-title}
+k-means アルゴリズム
+:::
+
+
+## k-means の手順
+
+**入力**：データ点の集合、クラスタ数 $k$
+
+1. $k$ 個の重心（centroid）を**ランダム**に配置
+2. 各データ点を**最も近い重心**のクラスタに割り当てる
+3. 各クラスタの**重心を再計算**（クラスタ内の平均点）
+4. 重心が変化しなくなるまで **2〜3** を繰り返す
+
+::: {.callout-note}
+「assign（割り当て）→ update（更新）→ 繰り返し」
+たったこれだけのシンプルな構造
+:::
+
+
+## 試行1: そのまま k-means にかける
+
+```{python}
 #| echo: true
 from sklearn.cluster import KMeans
 
@@ -223,8 +147,11 @@ for i, c in enumerate(km.cluster_centers_):
     print(f"  クラスタ {i}: 輝度={c[0]:.2f}, 重さ={c[1]:.0f}g")
 ```
 
+- エラーなく動いた。重心も2つ出た
+- では結果を図で見てみる
 
-## クラスタリング結果を可視化
+
+## 試行1の結果
 
 ```{python}
 #| echo: true
@@ -232,36 +159,180 @@ for i, c in enumerate(km.cluster_centers_):
 colors  = ["#e74c3c", "#2980b9"]
 markers = ["o", "s"]
 
-fig, axes = plt.subplots(1, 2, figsize=(11, 4))
-
-# k-means の結果（ラベルなしで分けた）
-ax = axes[0]
+plt.figure(figsize=(5.8, 3.6))
 for c in range(2):
     mask = cluster_labels == c
-    ax.scatter(X[mask, 0], X[mask, 1],
-               c=colors[c], marker=markers[c], s=60, alpha=0.7, label=f"クラスタ {c}")
+    plt.scatter(X[mask, 0], X[mask, 1],
+                c=colors[c], marker=markers[c], s=50, alpha=0.7, label=f"クラスタ {c}")
 for center in km.cluster_centers_:
-    ax.scatter(*center, c="black", s=200, marker="*", zorder=5)
-ax.set_xlabel("輝度"); ax.set_ylabel("重さ (g)")
-ax.set_title("k-means の結果（k=2）"); ax.legend(); ax.grid(True, alpha=0.3)
+    plt.scatter(*center, c="black", s=200, marker="*", zorder=5)
+plt.xlabel("輝度"); plt.ylabel("重さ (g)")
+plt.legend(); plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
 
-# 正解ラベル（比較用）
-y_true = np.array([1]*40 + [0]*40)
+::: {.callout-important title="クイズ"}
+目に見える塊は「左上」と「右下」。なのに機械の答えは**ほぼ真横の輪切り**。
+輝度を完全に無視しているのはなぜ？
+:::
+
+
+## なぜ輝度が無視されたのか
+
+::: {.fragment}
+- k-means は**距離**だけでグループを決める
+- 重さの差は**数百 g**、輝度の差は**せいぜい数ポイント**
+
+$$\text{距離}^2 = \underbrace{(\Delta \text{輝度})^2}_{\sim 10} + \underbrace{(\Delta \text{重さ})^2}_{\sim 100{,}000}$$
+
+- 距離の計算が**重さに支配され**、輝度はあってもなくても同じだった
+:::
+
+::: {.callout-warning title="スケールの罠"}
+- 単位もケタも違う特徴量をそのまま距離計算に入れてはいけない
+- 距離を使う手法（k-means、k-NN など）共通の落とし穴
+:::
+
+
+## 試行2: スケールを揃えて再挑戦
+
+```{python}
+#| echo: true
+#| fig-align: center
+from sklearn.preprocessing import StandardScaler
+
+X_scaled = StandardScaler().fit_transform(X)   # 各特徴量を平均0・分散1に
+
+km2 = KMeans(n_clusters=2, random_state=42, n_init=10)
+km2.fit(X_scaled)
+cluster_labels2 = km2.labels_
+
+plt.figure(figsize=(5.8, 3.6))
+for c in range(2):
+    mask = cluster_labels2 == c
+    plt.scatter(X[mask, 0], X[mask, 1],
+                c=colors[c], marker=markers[c], s=50, alpha=0.7, label=f"クラスタ {c}")
+plt.xlabel("輝度"); plt.ylabel("重さ (g)")
+plt.legend(); plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+- 今度は**目で見た通りの2つの塊**に分かれた
+
+
+## 答え合わせ：実はラベルを知っていた
+
+- このデータの正体は、これまでの講義で使ってきた Salmon / Sea bass
+
+```{python}
+#| echo: true
+y_true = np.array([1]*40 + [0]*40)   # 1=Salmon, 0=Sea bass（隠していた正解）
+
+agree = np.mean(cluster_labels2 == y_true)
+agree = max(agree, 1 - agree)        # クラスタ番号 0/1 は任意なので向きを合わせる
+print(f"正解ラベルとの一致: {agree:.1%}（{int(round(agree * len(y_true)))}/80匹）")
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
+fig, axes = plt.subplots(1, 2, figsize=(10, 3.4))
+
+ax = axes[0]
+for c in range(2):
+    mask = cluster_labels2 == c
+    ax.scatter(X[mask, 0], X[mask, 1],
+               c=colors[c], marker=markers[c], s=45, alpha=0.7, label=f"クラスタ {c}")
+ax.set_xlabel("輝度"); ax.set_ylabel("重さ (g)")
+ax.set_title("k-means（ラベルなし）"); ax.legend(); ax.grid(True, alpha=0.3)
+
 ax2 = axes[1]
-for label, name, c, m in [(1, "Salmon", "black", "o"), (0, "Sea bass", "red", "s")]:
+for label, name, col, m in [(1, "Salmon", "black", "o"), (0, "Sea bass", "red", "s")]:
     mask = y_true == label
-    ax2.scatter(X[mask, 0], X[mask, 1], c=c, marker=m, s=60, alpha=0.7, label=name)
+    ax2.scatter(X[mask, 0], X[mask, 1], c=col, marker=m, s=45, alpha=0.7, label=name)
 ax2.set_xlabel("輝度"); ax2.set_ylabel("重さ (g)")
-ax2.set_title("正解ラベル（参考）"); ax2.legend(); ax2.grid(True, alpha=0.3)
+ax2.set_title("正解ラベル"); ax2.legend(); ax2.grid(True, alpha=0.3)
 
 plt.tight_layout()
 plt.show()
 ```
 
 ::: {.callout-note}
-クラスタの**番号（0/1）は任意**。大切なのは「同じグループにまとめられているか」。
-輝度でうまく分離できている様子が確認できる。
+ラベルを**1枚も見せていない**のに、80匹中74匹を正しく仕分けた。
+クラスタの**番号（0/1）は任意**で、大切なのは「同じグループにまとまっているか」。
 :::
+
+
+## k-means の動き（中で起きていたこと）
+
+```{python}
+#| echo: false
+#| fig-align: center
+def assign_clusters(Xd, centroids):
+    dists = np.linalg.norm(Xd[:, None] - centroids[None, :], axis=2)
+    return dists.argmin(axis=1)
+
+def update_centroids(Xd, labels, k):
+    return np.array([Xd[labels == i].mean(axis=0) for i in range(k)])
+
+rng = np.random.default_rng(2)
+k = 2
+centroids = X_scaled[rng.choice(len(X_scaled), k, replace=False)].copy()
+
+fig, axes = plt.subplots(1, 4, figsize=(13, 3.2))
+titles = ["① 初期重心（ランダム）", "② クラスタ割り当て", "③ 重心を更新", "④ 収束"]
+
+# ① 初期重心
+ax = axes[0]
+ax.scatter(X_scaled[:, 0], X_scaled[:, 1], c="lightgray", s=40, edgecolors="gray")
+for i, c in enumerate(centroids):
+    ax.scatter(*c, c=colors[i], s=220, marker="*", edgecolors="black", zorder=5)
+ax.set_title(titles[0], fontsize=9); ax.axis("off")
+
+# ② 割り当て
+labels = assign_clusters(X_scaled, centroids)
+ax = axes[1]
+ax.scatter(X_scaled[:, 0], X_scaled[:, 1],
+           c=[colors[l] for l in labels], s=40, edgecolors="gray", alpha=0.7)
+for i, c in enumerate(centroids):
+    ax.scatter(*c, c=colors[i], s=220, marker="*", edgecolors="black", zorder=5)
+ax.set_title(titles[1], fontsize=9); ax.axis("off")
+
+# ③ 重心更新
+new_centroids = update_centroids(X_scaled, labels, k)
+ax = axes[2]
+ax.scatter(X_scaled[:, 0], X_scaled[:, 1],
+           c=[colors[l] for l in labels], s=40, edgecolors="gray", alpha=0.7)
+for i in range(k):
+    ax.scatter(*centroids[i], c=colors[i], s=220, marker="*",
+               edgecolors="black", zorder=4, alpha=0.3)
+    ax.scatter(*new_centroids[i], c=colors[i], s=220, marker="*",
+               edgecolors="black", zorder=5)
+    ax.annotate("", xy=new_centroids[i], xytext=centroids[i],
+                arrowprops=dict(arrowstyle="->", color=colors[i], lw=2))
+ax.set_title(titles[2], fontsize=9); ax.axis("off")
+
+# ④ 収束
+c = new_centroids.copy()
+for _ in range(20):
+    l = assign_clusters(X_scaled, c)
+    c = update_centroids(X_scaled, l, k)
+labels_final = assign_clusters(X_scaled, c)
+ax = axes[3]
+ax.scatter(X_scaled[:, 0], X_scaled[:, 1],
+           c=[colors[l] for l in labels_final], s=40, edgecolors="gray", alpha=0.7)
+for i in range(k):
+    ax.scatter(*c[i], c=colors[i], s=220, marker="*", edgecolors="black", zorder=5)
+ax.set_title(titles[3], fontsize=9); ax.axis("off")
+
+plt.tight_layout()
+plt.show()
+```
+
+- どこに重心を置いても「assign → update」の繰り返しで塊に吸い寄せられていく
+- スケールを揃えた空間（標準化済み）での動き
 
 
 ## {background-color="white" .center .break-slide}
@@ -273,7 +344,8 @@ k の決め方：エルボー法
 
 ## エルボー法
 
-- k-means のポイント：**k を事前に決める必要がある**
+- 今回は「2種類の魚」と知っていたから k=2 にできた
+- 本当のラベルなしデータでは **k 自体を決める必要がある**
 - **エルボー法**：k を変えながら「クラスタ内のまとまり度」を測る
 
 ```{python}
@@ -284,7 +356,7 @@ ks = range(1, 9)
 
 for k in ks:
     km_k = KMeans(n_clusters=k, random_state=42, n_init=10)
-    km_k.fit(X)
+    km_k.fit(X_scaled)
     inertias.append(km_k.inertia_)   # クラスタ内二乗和
 
 plt.figure(figsize=(6, 3.5))
@@ -300,7 +372,7 @@ plt.show()
 ::: {.callout-tip}
 ## エルボー（肘）の見方
 グラフが**急激に折れ曲がる点**（肘のような形）が最適な k の目安。
-それ以上増やしても改善幅が小さい。
+それ以上増やしても改善幅が小さい。魚データでは k=2 で折れている。
 :::
 
 
@@ -341,14 +413,16 @@ plt.show()
 ## まとめ
 
 - **教師なし学習**：ラベルなしでデータの構造を見つける
-- **クラスタリング**：データを自動的にグループ分け
-- **k-means**：「assign → update → 繰り返し」のシンプルなアルゴリズム
+- **k-means**：「assign → update → 繰り返し」だけで、魚80匹中74匹を正しく仕分けた
+- **スケールの罠**：距離を使う手法では、特徴量のスケールを揃えてから
 
 ```python
 from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
 
+X_scaled = StandardScaler().fit_transform(X)   # まずスケールを揃える
 km = KMeans(n_clusters=2, random_state=42, n_init=10)
-km.fit(X)
+km.fit(X_scaled)
 km.labels_          # クラスタ番号（各データ点）
 km.cluster_centers_ # 重心の座標
 km.inertia_         # クラスタ内二乗和（エルボー法に使う）

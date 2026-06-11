@@ -1,0 +1,203 @@
+---
+title: "実装：NumPyだけでニューラルネットワーク"
+subtitle: "初回の図を自分のコードで再現する"
+---
+
+## 部品はすべて揃っている
+
+- アフィン変換・ReLU・シグモイド・交差エントロピー（最小単位／変換を重ねるの回）
+- 勾配降下法（最適化の回）
+- 全パラメータの勾配を出す backprop（前回）
+
+::: {.callout-note title="今日のゴール"}
+講義の初回に見せた「機械が自力で見つけた曲がる境界」を、
+**ライブラリなし（NumPyのみ）の自分のコード**で再現する。
+**今日、新しい概念は1つも出てこない。** 組み立てるだけ。
+:::
+
+
+## データ：あの三日月
+
+```{python}
+#| echo: true
+#| fig-align: center
+import numpy as np
+import matplotlib.pyplot as plt
+import japanize_matplotlib
+from sklearn.datasets import make_moons
+plt.rcParams['font.size'] = 11
+plt.rcParams['figure.dpi'] = 100
+
+X, y = make_moons(n_samples=200, noise=0.1, random_state=42)
+print("X の形:", X.shape, " y の形:", y.shape)
+
+plt.figure(figsize=(5, 3.4))
+for cls, col, m in [(0, "#2980b9", "s"), (1, "#e74c3c", "o")]:
+    mask = y == cls
+    plt.scatter(X[mask, 0], X[mask, 1], c=col, marker=m, s=25, edgecolors="gray", lw=0.4)
+plt.xticks([]); plt.yticks([])
+plt.tight_layout()
+plt.show()
+```
+
+- 直線では分けられない、おなじみのデータ
+- データの形は `(200, 2)` — 200点、2特徴量
+
+
+## 設計：ループを行列に畳む
+
+- 中間の変換を16個並べる。1個ずつ書くと16本の式 — **行列にまとめる**
+
+| 記号 | 形 | 意味 |
+|---|---|---|
+| $W_1$ | $(2, 16)$ | 中間16変換ぶんの重み（列が1変換） |
+| $\mathbf{b}_1$ | $(16,)$ | 中間のバイアス |
+| $\mathbf{w}_2$ | $(16,)$ | 出力層の重み（多数決の票） |
+| $c_2$ | スカラー | 出力層のバイアス |
+
+- 200点まとめて流すのも行列のまま：$Z = X W_1 + \mathbf{b}_1$ は $(200, 16)$
+- 「変換16個 × データ200点」が**たった1回の行列積**
+
+
+## Forward：4行
+
+```{python}
+#| echo: true
+def forward(X, W1, b1, w2, c2):
+    Z = X @ W1 + b1          # アフィン変換（全変換まとめて）
+    H = np.maximum(0, Z)     # ReLU（折る）
+    u = H @ w2 + c2          # 出力層（多数決）
+    p = 1 / (1 + np.exp(-u)) # シグモイド（確率に）
+    return Z, H, u, p
+```
+
+- 最小単位の回の `forward` と見比べると、**スカラーが行列になっただけ**
+- $Z, H$ も返すのは、**復路（backprop）で使うから**（前回の伏線）
+
+
+## Backward：前回の漸化式をそのまま書く
+
+```{python}
+#| echo: true
+def backward(X, y, Z, H, w2, p):
+    N = len(X)
+    delta_out = (p - y) / N                    # 出力層の誤差（p - y）
+    g_w2 = H.T @ delta_out                     # ∂L/∂w2 = δ_out × 入力(H)
+    g_c2 = delta_out.sum()                     # ∂L/∂c2 = δ_out
+    D_mid = np.outer(delta_out, w2) * (Z > 0)  # δ_mid = δ_out・w2・ReLU'(Z)
+    g_W1 = X.T @ D_mid                         # ∂L/∂W1 = δ_mid × 入力(X)
+    g_b1 = D_mid.sum(axis=0)                   # ∂L/∂b1 = δ_mid
+    return g_W1, g_b1, g_w2, g_c2
+```
+
+- 1行ずつ、前回の手計算と**完全に対応**している
+  - `(p - y)`：シグモイド＋交差エントロピーの打ち消し
+  - `* (Z > 0)`：$\mathrm{ReLU}'$ は 1 か 0
+  - 「$\delta$ × その層への入力」が各勾配
+
+
+## 学習ループ：あとは勾配降下法
+
+```{python}
+#| echo: true
+rng = np.random.default_rng(0)
+hidden = 16
+W1 = rng.normal(0, 1.0, (2, hidden))   # ランダム初期化（対称性を破る）
+b1 = np.zeros(hidden)
+w2 = rng.normal(0, 1.0, hidden)
+c2 = 0.0
+lr = 0.5
+
+for i in range(1, 4001):
+    Z, H, u, p = forward(X, W1, b1, w2, c2)
+    g_W1, g_b1, g_w2, g_c2 = backward(X, y, Z, H, w2, p)
+    W1 -= lr * g_W1
+    b1 -= lr * g_b1
+    w2 -= lr * g_w2
+    c2 -= lr * g_c2
+
+    if i in (1, 100, 500, 2000, 4000):
+        eps  = 1e-10
+        loss = -np.mean(y * np.log(np.clip(p, eps, 1)) +
+                        (1 - y) * np.log(np.clip(1 - p, eps, 1)))
+        acc  = np.mean((p >= 0.5) == y)
+        print(f"更新 {i:5d}回 | Loss: {loss:.4f} | 正答率: {acc:.1%}")
+```
+
+- 正答率 **100%**。直線では87%が限界だったデータが、完全に分かれた
+
+
+## コールドオープン回収：初回の図、再現完了
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "描画コード"
+xx, yy = np.meshgrid(np.linspace(X[:, 0].min() - 0.4, X[:, 0].max() + 0.4, 300),
+                     np.linspace(X[:, 1].min() - 0.4, X[:, 1].max() + 0.4, 300))
+grid = np.c_[xx.ravel(), yy.ravel()]
+_, _, _, p_grid = forward(grid, W1, b1, w2, c2)
+Zb = (p_grid >= 0.5).reshape(xx.shape)
+
+plt.figure(figsize=(5.5, 3.8))
+plt.contourf(xx, yy, Zb, alpha=0.25, levels=1, colors=["#5dade2", "#f5b7b1"])
+for cls, col, m in [(0, "#2980b9", "s"), (1, "#e74c3c", "o")]:
+    mask = y == cls
+    plt.scatter(X[mask, 0], X[mask, 1], c=col, marker=m, s=25, edgecolors="gray", lw=0.4)
+plt.xticks([]); plt.yticks([])
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-note title="約束の回収"}
+講義の初回、「数式も規則も誰も教えていないのに機械が見つけた境界」として見せた図。
+いまこの図は、**1行残らず自分が書いたコード**から出ている。中身に未知の部品はもうない。
+:::
+
+
+## 折り目の数で遊ぶ
+
+```{python}
+#| echo: false
+#| fig-align: center
+def train_mlp(hidden, iters=4000, lr=0.5, seed=0):
+    rng = np.random.default_rng(seed)
+    W1 = rng.normal(0, 1.0, (2, hidden)); b1 = np.zeros(hidden)
+    w2 = rng.normal(0, 1.0, hidden); c2 = 0.0
+    for _ in range(iters):
+        Z, H, u, p = forward(X, W1, b1, w2, c2)
+        g_W1, g_b1, g_w2, g_c2 = backward(X, y, Z, H, w2, p)
+        W1 -= lr * g_W1; b1 -= lr * g_b1; w2 -= lr * g_w2; c2 -= lr * g_c2
+    return W1, b1, w2, c2
+
+fig, axes = plt.subplots(1, 2, figsize=(9.5, 3.6))
+for ax, h in zip(axes, [2, 16]):
+    params = train_mlp(h)
+    _, _, _, p_grid = forward(grid, *params)
+    Zb = (p_grid >= 0.5).reshape(xx.shape)
+    _, _, _, p_all = forward(X, *params)
+    acc = np.mean((p_all >= 0.5) == y)
+    ax.contourf(xx, yy, Zb, alpha=0.25, levels=1, colors=["#5dade2", "#f5b7b1"])
+    for cls, col, m in [(0, "#2980b9", "s"), (1, "#e74c3c", "o")]:
+        mask = y == cls
+        ax.scatter(X[mask, 0], X[mask, 1], c=col, marker=m, s=22, edgecolors="gray", lw=0.4)
+    ax.set_title(f"中間の変換 {h} 個　正答率 {acc:.0%}", fontsize=11)
+    ax.set_xticks([]); ax.set_yticks([])
+plt.tight_layout()
+plt.show()
+```
+
+- 中間2個では折り目が足りない。16個なら滑らかに曲がる — 「変換を重ねる」の回の結論を、自作コードで追試できた
+- `hidden` や学習率をいじって遊んでみること。**壊れても全部自分のコードなので、原因も自分で追える**
+
+
+## まとめ
+
+- NumPy の行列演算で、**forward 4行・backward 6行**の多層ネットワークができた
+- 中身は既習の部品のみ：アフィン変換・ReLU・$(p-y)$・$\delta$ の漸化式・勾配降下法
+- 初回のコールドオープンの図を、自分のコードで再現した
+
+::: {.callout-note title="次回予告"}
+全部自分で書けるようになった**からこそ**、次回はライブラリ（PyTorch）で楽をする。
+最大の見せ場：手計算した backprop の勾配を、`loss.backward()` が**一発で言い当てる**。
+:::

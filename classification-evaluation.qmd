@@ -1,18 +1,19 @@
 ---
-title: "評価と汎化"
+title: "過学習と汎化"
 subtitle: "モデルの「本当の実力」を測る"
 ---
 
 ## 前回の振り返り
 
-### ロジスティック回帰で2次元分類
+### 2次元分類と「あやしい満点」
 
 - 重さ + 輝度の **2特徴量** で Salmon / Sea bass を分類
-- 決定境界を学習し、`accuracy_score` などで精度を評価
-- ただし、評価に使ったのは**学習に使った同じデータ**
+- 決定木・ロジスティック回帰で決定境界を学習した
+- **深さ無制限の決定木は正答率 100%** — ただし採点は**学習に使った同じデータ**
+- 境界には、数匹のためだけの**飛び地**ができていた
 
 ::: {.callout-note title="今回の問い"}
-その精度は **本当に信頼できる** のか？
+あの満点は **本当に信頼できる** のか？
 :::
 
 
@@ -210,6 +211,84 @@ plt.show()
 ## {background-color="white" .center .break-slide}
 
 ::: {.break-title}
+満点の正体を暴く
+:::
+
+
+## 深さ無制限の決定木を、新しい魚で採点する
+
+- 前回の「あやしい満点」に、いま手に入れた道具（train/test）を使う
+
+```{python}
+#| echo: true
+from sklearn.tree import DecisionTreeClassifier
+
+deep_tree = DecisionTreeClassifier(max_depth=None, random_state=42)
+deep_tree.fit(X_train, y_train)               # 訓練データだけで学習
+
+deep_train_acc = accuracy_score(y_train, deep_tree.predict(X_train))
+deep_test_acc  = accuracy_score(y_test,  deep_tree.predict(X_test))
+
+print(f"訓練データ精度: {deep_train_acc:.3f}")
+print(f"テストデータ精度: {deep_test_acc:.3f}")
+```
+
+::: {.fragment}
+- 訓練では**満点**。新しい魚では**2割近く間違える**
+- 満点の正体は実力ではなく**暗記**だった
+:::
+
+
+## 深さを変えて、2つの精度を並べる
+
+```{python}
+#| echo: true
+#| fig-align: center
+depths   = list(range(1, 11))
+train_accs, test_accs = [], []
+
+for d in depths:
+    m = DecisionTreeClassifier(max_depth=d, random_state=42).fit(X_train, y_train)
+    train_accs.append(accuracy_score(y_train, m.predict(X_train)))
+    test_accs.append(accuracy_score(y_test,  m.predict(X_test)))
+
+plt.figure(figsize=(6.5, 3.6))
+plt.plot(depths, train_accs, "o-", color="#2980b9", label="訓練データ精度")
+plt.plot(depths, test_accs,  "s-", color="#e74c3c", label="テストデータ精度")
+plt.xlabel("決定木の深さ"); plt.ylabel("正答率")
+plt.ylim(0.5, 1.05)
+plt.legend(); plt.grid(True, alpha=0.4)
+plt.tight_layout()
+plt.show()
+```
+
+- 訓練精度は深くするほど 100% に張り付く
+- テスト精度は**深さ3が最高**。それ以上深くしても上がらないどころか下がる
+- 2本の線の**差（ギャップ）**は開く一方
+
+
+## 過学習（Overfitting）
+
+- 訓練データの細部（たまたまの並び・ノイズ）まで覚え込み、**新しいデータで性能が落ちる**こと
+- 証拠は**訓練精度とテスト精度のギャップ**
+- モデルが複雑なほど（深い木・多すぎるパラメータ）起きやすい
+
+| 状態 | 訓練精度 | テスト精度 |
+|---|---|---|
+| 未学習（underfitting） | 低い | 低い |
+| ちょうど良い | 高い | 高い |
+| **過学習（overfitting）** | **ほぼ満点** | **低い** |
+
+::: {.callout-tip title="対策"}
+- モデルの複雑さを抑える（決定木なら**深さを制限**）
+- データを増やす
+- テスト精度を安定して測る — それが次の**交差検証**
+:::
+
+
+## {background-color="white" .center .break-slide}
+
+::: {.break-title}
 交差検証
 :::
 
@@ -298,7 +377,9 @@ print(f"平均精度: {scores.mean():.3f}  ±  {scores.std():.3f}")
 
 ## まとめ
 
-- 訓練データで評価した精度は**楽観的** — 暗記している可能性
+- 訓練データで評価した精度は**楽観的** — 満点はむしろ疑う
+- **過学習**：訓練データを暗記して、新しいデータで性能が落ちること
+  - 証拠は**訓練精度とテスト精度のギャップ**（深さ無制限の決定木：100% vs 81%）
 - **汎化**：未知データへの対応能力を測ることが本来の目的
 - **`train_test_split`**：手軽だが分割次第で精度が揺れる
 - **k-fold 交差検証**：k 回の平均で安定した評価が得られる

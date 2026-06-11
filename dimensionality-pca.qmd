@@ -167,10 +167,78 @@ plt.show()
 :::
 
 
+## 3つ目の特徴量：体長
+
+- 重さ・輝度で精度が上がった。気を良くして、80匹全部の**体長**も測った
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "魚データの定義（クリックして展開）"
+salmon_weights     = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,
+                               1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,
+                               2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,
+                               1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652])
+salmon_brightness  = np.array([3.5, 5.8, 4.9, 4.4, 2.6, 2.6, 2.2, 5.5, 4.4, 4.8, 2.1,
+                               5.9, 5.3, 2.8, 2.7, 2.7, 3.2, 4.1, 3.7, 3.2, 4.4, 2.6,
+                               3.2, 3.5, 3.8, 5.1, 2.8, 4.1, 4.4, 2.2, 4.4, 2.7, 2.3,
+                               5.8, 5.9, 5.2, 3.2, 2.4, 4.7, 3.8])
+seabass_weights    = np.array([1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,
+                               1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,
+                               1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,
+                               1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531])
+seabass_brightness = np.array([5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8,
+                               8.9, 9.7, 9.5, 8.0, 9.6, 5.4, 6.0, 5.2, 6.6, 6.9, 6.4,
+                               9.1, 6.8, 6.4, 7.7, 5.7, 9.0, 5.4, 9.9, 8.9, 6.0, 5.0,
+                               9.1, 8.5, 8.6, 8.9, 5.4, 6.8, 5.6])
+
+weights    = np.concatenate([salmon_weights, seabass_weights])
+brightness = np.concatenate([salmon_brightness, seabass_brightness])
+y          = np.array([1]*40 + [0]*40)   # 1=Salmon, 0=Sea bass
+
+# 体長の測定値（cm）
+rng     = np.random.default_rng(42)
+lengths = np.round(np.cbrt(weights) * 4.5 + rng.normal(0, 1.0, len(weights)), 1)
+```
+
+```{python}
+#| echo: false
+print("体長（先頭5匹）:", lengths[:5], "cm")
+print(f"体長の範囲: {lengths.min():.1f}〜{lengths.max():.1f} cm")
+```
+
+::: {.callout-important title="クイズ"}
+特徴量が 2 → 3 に増えた。**手に入る情報も 1.5 倍**になったと思う？
+:::
+
+
+## 体長と重さを並べてみる
+
+```{python}
+#| echo: true
+#| fig-align: center
+plt.figure(figsize=(5.5, 3.6))
+plt.scatter(lengths, weights, alpha=0.6, s=40, c="#5dade2", edgecolors="gray")
+plt.xlabel("体長 (cm)"); plt.ylabel("重さ (g)")
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+
+print(f"相関係数: {np.corrcoef(lengths, weights)[0, 1]:.3f}")
+```
+
+::: {.fragment}
+- ほぼ**一直線**。長い魚は重い — あたりまえだった
+- 体長と重さは、**ほぼ同じ情報を2回測っていた**
+- この「実は重複している」を自動で見つけて畳む道具が **PCA**
+:::
+
+
 ## PCA の直感
 
 **Principal Component Analysis（主成分分析）**
 
+- 斜めに細長い雲は、もとの2軸より「**長い方向**と**細い方向**」で見るほうが自然
 - データの**分散が最大になる方向**に新しい軸（主成分）を取る
 
 ```{python}
@@ -179,38 +247,32 @@ plt.show()
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
-np.random.seed(42)
-mean_pt = np.array([5.0, 1900.0])
-cov_mat = np.array([[3.0, 300.0], [300.0, 60000.0]])
-X_pca   = np.random.multivariate_normal(mean_pt, cov_mat, 80)
+X_lw    = np.column_stack([lengths, weights])
+X_lw_sc = StandardScaler().fit_transform(X_lw)
+pca_d   = PCA(n_components=2).fit(X_lw_sc)
 
-X_sc  = StandardScaler().fit_transform(X_pca)
-pca_d = PCA(n_components=2)
-pca_d.fit(X_sc)
-
-fig, ax = plt.subplots(figsize=(6, 4.5))
-ax.scatter(X_pca[:, 0], X_pca[:, 1],
+fig, ax = plt.subplots(figsize=(5.6, 4.2))
+ax.scatter(X_lw_sc[:, 0], X_lw_sc[:, 1],
            alpha=0.6, s=40, c="#5dade2", edgecolors="gray")
 
-# 元スケールに戻した主成分方向を描画
-mean_orig = X_pca.mean(axis=0)
-std_orig  = X_pca.std(axis=0)
 for i, (col, lbl) in enumerate(zip(["#e74c3c", "#f39c12"],
-                                    ["PC1（分散最大）", "PC2（PC1と直交）"])):
-    vec_sc   = pca_d.components_[i] * np.sqrt(pca_d.explained_variance_[i])
-    vec_orig = vec_sc * std_orig * 2
-    ax.annotate("", xy=mean_orig + vec_orig, xytext=mean_orig,
+                                    ["PC1（大きさ）", "PC2（PC1と直交）"])):
+    vec = pca_d.components_[i] * np.sqrt(pca_d.explained_variance_[i]) * 2
+    ax.annotate("", xy=vec, xytext=(0, 0),
                 arrowprops=dict(arrowstyle="-|>", color=col, lw=2.5, mutation_scale=15))
-    ax.text(*(mean_orig + vec_orig * 1.12), lbl,
-            color=col, fontsize=10, fontweight="bold")
+    ax.text(*(vec * 1.18), lbl, color=col, fontsize=10, fontweight="bold",
+            ha="center")
 
-ax.set_xlabel("輝度")
-ax.set_ylabel("重さ (g)")
+ax.set_xlabel("体長（標準化）")
+ax.set_ylabel("重さ（標準化）")
 ax.set_title("PCA：分散が最大の方向に軸を取る")
+ax.set_aspect("equal")
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.show()
 ```
+
+- PC1 は体長と重さを合わせた「**大きさ**」の軸 — この方向だけで分散の約 99% を説明できる
 
 
 ## 固有ベクトルとの関係
@@ -236,57 +298,61 @@ sklearn の PCA は内部でこれを（SVD で効率的に）計算している
 :::
 
 
-## scikit-learn で PCA
+## scikit-learn で PCA（魚は本当は何次元か）
+
+- 輝度・重さ・体長の**3特徴量**を PCA にかけてみる
 
 ```{python}
 #| echo: true
-#| code-fold: true
-#| code-summary: "魚データの定義"
-salmon_weights     = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,
-                               1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,
-                               2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,
-                               1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652])
-salmon_brightness  = np.array([3.5, 5.8, 4.9, 4.4, 2.6, 2.6, 2.2, 5.5, 4.4, 4.8, 2.1,
-                               5.9, 5.3, 2.8, 2.7, 2.7, 3.2, 4.1, 3.7, 3.2, 4.4, 2.6,
-                               3.2, 3.5, 3.8, 5.1, 2.8, 4.1, 4.4, 2.2, 4.4, 2.7, 2.3,
-                               5.8, 5.9, 5.2, 3.2, 2.4, 4.7, 3.8])
-seabass_weights    = np.array([1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,
-                               1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,
-                               1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,
-                               1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531])
-seabass_brightness = np.array([5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8,
-                               8.9, 9.7, 9.5, 8.0, 9.6, 5.4, 6.0, 5.2, 6.6, 6.9, 6.4,
-                               9.1, 6.8, 6.4, 7.7, 5.7, 9.0, 5.4, 9.9, 8.9, 6.0, 5.0,
-                               9.1, 8.5, 8.6, 8.9, 5.4, 6.8, 5.6])
-X = np.column_stack([
-    np.concatenate([salmon_brightness, seabass_brightness]),
-    np.concatenate([salmon_weights,    seabass_weights])
-])
-y = np.array([1]*40 + [0]*40)
+X3 = np.column_stack([brightness, weights, lengths])   # 3特徴量
 
-```
+X3_scaled = StandardScaler().fit_transform(X3)   # スケールを揃えてから PCA
 
-```{python}
-#| echo: true
-from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
+pca = PCA(n_components=3)
+X3_pca = pca.fit_transform(X3_scaled)
 
-X_scaled = StandardScaler().fit_transform(X)   # スケールを揃えてから PCA
-
-pca = PCA(n_components=2)
-X_pca = pca.fit_transform(X_scaled)
-
-print("主成分の方向（固有ベクトル）:")
-print(pca.components_.round(3))
-print("\n各主成分の寄与率（情報量の割合）:")
+print("各主成分の寄与率（情報量の割合）:")
 for i, r in enumerate(pca.explained_variance_ratio_):
     print(f"  PC{i+1}: {r:.1%}")
 ```
 
+::: {.callout-important title="クイズ"}
+PC3 の寄与率は **1% 未満**。これは何を意味している？
+:::
+
+::: {.fragment}
+- 体長と重さがほぼ同じ情報だから、3本目の軸には**情報が残っていない**
+- この魚データは、3次元に見えて**実質2次元**だった
+:::
+
+
+## 2次元に圧縮しても何も失わない
+
+```{python}
+#| echo: true
+#| fig-align: center
+colors  = ["#e74c3c", "#2980b9"]
+
+plt.figure(figsize=(5.8, 3.8))
+for label, name, col, m in [(1, "Salmon", "#e74c3c", "o"), (0, "Sea bass", "#2980b9", "s")]:
+    mask = y == label
+    plt.scatter(X3_pca[mask, 0], X3_pca[mask, 1],
+                c=col, marker=m, s=45, alpha=0.7, label=name)
+plt.xlabel(f"PC1（寄与率 {pca.explained_variance_ratio_[0]:.1%}）")
+plt.ylabel(f"PC2（寄与率 {pca.explained_variance_ratio_[1]:.1%}）")
+plt.title("3特徴量 → 2次元に圧縮")
+plt.legend(); plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+- 次元を1つ捨てたのに、2種類の魚は**今までどおり分離できている**
+- 累積寄与率 99% — 捨てたのは「情報のない軸」だけ
+
 ::: {.callout-note}
 ## StandardScaler を使う理由
-輝度（1〜10）と重さ（1000〜2500g）はスケールが全く違う。
-正規化しないと重さだけが主成分を支配してしまう。
+輝度（1〜10）・重さ（1000〜2500g）・体長（45〜62cm）はスケールが全く違う。
+正規化しないと重さだけが主成分を支配してしまう（クラスタリング回のスケールの罠と同じ）。
 :::
 
 
@@ -370,7 +436,9 @@ Iris は PC1+PC2 だけで 97% 超えるので2次元で十分。
 ## まとめ
 
 - **次元の呪い**：次元が増えると空間が広くなり、距離が意味をなさなくなる
+- **特徴量を増やしても情報が増えるとは限らない**：体長は重さの言い換えだった
 - **PCA**：分散が最大の方向（= 共分散行列の固有ベクトル）に軸を取り直す
+  - 寄与率を見れば「データの**実質的な次元**」がわかる（魚は3次元に見えて実質2次元）
 
 ```python
 from sklearn.decomposition import PCA
@@ -393,5 +461,7 @@ pca.explained_variance_ratio_   # 各 PC の寄与率
 ## 分類問題と特徴量のまとめ
 1D → 2D の分類、評価と汎化、教師なし学習（k-means）、次元の呪いと PCA。
 **機械学習の基本的な問いと道具が揃った。**
-次は「どうやって最適なパラメータを見つけるか」（最適化）を深める。
+
+ここまで `model.fit(X, y)` という1行を何度も呼んだが、**中身は一度も見ていない**。
+次の「最適化」から、この1行を開けにいく。
 :::

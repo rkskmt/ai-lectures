@@ -1,0 +1,259 @@
+---
+title: "変換を重ねる"
+subtitle: "曲がる境界の正体"
+---
+
+## 前回の振り返り
+
+- NN の最小単位 ＝ アフィン変換 → シグモイド（＝ロジスティック回帰）
+- 勾配降下法で境界が動く様子を、自分のコードで見た
+- ただし、この最小単位が引けるのは**直線だけ**
+
+::: {.callout-note title="今回の問い"}
+直線では絶対に分けられないデータが来たら、どうする？
+:::
+
+
+## 直線では絶対に分けられないデータ
+
+```{python}
+#| echo: false
+#| fig-align: center
+import numpy as np
+import matplotlib.pyplot as plt
+import japanize_matplotlib
+from sklearn.datasets import make_moons
+plt.rcParams['font.size'] = 11
+plt.rcParams['figure.dpi'] = 100
+
+X_moon, y_moon = make_moons(n_samples=200, noise=0.1, random_state=42)
+
+plt.figure(figsize=(5.5, 3.8))
+for cls, col, m in [(0, "#2980b9", "s"), (1, "#e74c3c", "o")]:
+    mask = y_moon == cls
+    plt.scatter(X_moon[mask, 0], X_moon[mask, 1], c=col, marker=m, s=25,
+                edgecolors="gray", lw=0.4)
+plt.xticks([]); plt.yticks([])
+plt.tight_layout()
+plt.show()
+```
+
+- 講義の初回に見せた、あの三日月形のデータ
+
+::: {.callout-important title="クイズ"}
+前回の最小単位（直線）にこのデータを学習させたら、正答率は何%くらいになると思う？
+:::
+
+
+## 最小単位の限界
+
+```{python}
+#| echo: false
+#| fig-align: center
+from sklearn.linear_model import LogisticRegression
+from sklearn.neural_network import MLPClassifier
+
+def plot_boundary(ax, model, X, y, title):
+    xx, yy = np.meshgrid(np.linspace(X[:, 0].min() - 0.4, X[:, 0].max() + 0.4, 300),
+                         np.linspace(X[:, 1].min() - 0.4, X[:, 1].max() + 0.4, 300))
+    Z = model.predict(np.c_[xx.ravel(), yy.ravel()]).reshape(xx.shape)
+    ax.contourf(xx, yy, Z, alpha=0.25, levels=1, colors=["#5dade2", "#f5b7b1"])
+    for cls, col, m in [(0, "#2980b9", "s"), (1, "#e74c3c", "o")]:
+        mask = y == cls
+        ax.scatter(X[mask, 0], X[mask, 1], c=col, marker=m, s=22,
+                   edgecolors="gray", lw=0.4)
+    ax.set_title(title, fontsize=10)
+    ax.set_xticks([]); ax.set_yticks([])
+
+logreg = LogisticRegression().fit(X_moon, y_moon)
+
+fig, ax = plt.subplots(figsize=(5.5, 3.8))
+plot_boundary(ax, logreg, X_moon, y_moon,
+              f"最小単位（直線のみ）　正答率 {logreg.score(X_moon, y_moon):.0%}")
+plt.tight_layout()
+plt.show()
+```
+
+- 87% で頭打ち。**どれだけ学習しても直線は直線**
+- パラメータを増やしても、形そのものを変えないと先に進めない
+
+
+## 重ねればいい？ — 落とし穴
+
+::: {.callout-important title="クイズ"}
+アフィン変換を**2回**重ねたら、曲がった境界になる？
+
+$$z_2 = \alpha_2 (\alpha_1 x + b_1) + b_2$$
+:::
+
+::: {.fragment}
+$$z_2 = \underbrace{(\alpha_2 \alpha_1)}_{\text{新しい傾き}} x + \underbrace{(\alpha_2 b_1 + b_2)}_{\text{新しい切片}}$$
+
+- 展開すると**ただのアフィン変換1回分**。何回重ねても同じ
+- 線形（アフィン）変換は、重ねても線形のまま — **境界は直線のまま**
+:::
+
+
+## 間に「非線形」を挟む：ReLU
+
+$$h = \mathrm{ReLU}(z) = \max(0, z)$$
+
+```{python}
+#| echo: false
+#| fig-align: center
+zz = np.linspace(-4, 4, 100)
+plt.figure(figsize=(4.6, 2.6))
+plt.plot(zz, np.maximum(0, zz), color="#e74c3c", lw=2.5)
+plt.axhline(0, color="gray", lw=0.5); plt.axvline(0, color="gray", lw=0.5)
+plt.xlabel("z"); plt.ylabel("ReLU(z)")
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+- 正ならそのまま、負なら 0 に潰す — それだけ
+- 直線をここで**折る**ことができる（折れ曲がり＝非線形）
+- アフィン変換 → ReLU → アフィン変換 と挟めば、重ねた意味が消えない
+
+
+## 中間に変換を1つ挟む
+
+$$x \;\xrightarrow{\;\alpha^{\mathsf T} x + b\;}\; z \;\xrightarrow{\;\mathrm{ReLU}\;}\; h \;\xrightarrow{\;w h + c\;}\; y \;\xrightarrow{\;\sigma\;}\; p$$
+
+- パラメータは5個：$\alpha_1, \alpha_2, b$（中間）＋ $w, c$（出力）
+- 中間の変換が「特徴を作る」、出力の変換が「まとめて判定する」
+- これが**2層**のネットワーク。「層」とは変換の段数のこと
+
+::: {.callout-note}
+最小単位が2個直列につながっただけ。新しい部品は **ReLU だけ**。
+:::
+
+
+## 誤差はどうやって奥まで届くのか
+
+- 出力側の勾配は前回と同じ：$\delta_{\text{out}} = p - y$
+- 中間のパラメータには、**出力の重み $w$ を通して**誤差を配る：
+
+$$\delta_{\text{mid}} = \delta_{\text{out}} \cdot w \cdot \mathrm{ReLU}'(z)$$
+
+- $\mathrm{ReLU}'(z)$ は $z > 0$ なら 1、$z \leq 0$ なら 0（折られた側には誤差が流れない）
+- 各パラメータの更新は前回と同じ形：$\alpha \leftarrow \alpha - \eta\, \delta_{\text{mid}}\, x$
+
+::: {.callout-note title="伏線"}
+誤差が出力から入力へ**逆向きに流れていく**。
+この仕組みの一般形が**バックプロパゲーション**（次回、手計算で1往復する）。
+:::
+
+
+## 中間の変換を2つに増やす
+
+$$
+\begin{aligned}
+z_1 &= \alpha_1^{\mathsf T} x + b_1, \quad h_1 = \mathrm{ReLU}(z_1)\\
+z_2 &= \alpha_2^{\mathsf T} x + b_2, \quad h_2 = \mathrm{ReLU}(z_2)\\
+y &= w_1 h_1 + w_2 h_2 + c, \quad p = \sigma(y)
+\end{aligned}
+$$
+
+- パラメータは9個に増える
+- 各変換は**独立に**自分の直線（超平面）を持ち、自分の場所で空間を折る
+- 出力層は $h_1, h_2$ の**多数決**（線形結合）でまとめる
+
+::: {.callout-note}
+「ノード」「ニューロン」と呼ばれるものの正体は、**独立した変換が複数並んでいる**だけ。
+:::
+
+
+## 折り目が増えると境界が曲がる
+
+```{python}
+#| echo: false
+#| fig-align: center
+models = [
+    (logreg, "直線だけ（最小単位）"),
+    (MLPClassifier(hidden_layer_sizes=(2,), activation="relu", solver="lbfgs",
+                   max_iter=5000, random_state=7).fit(X_moon, y_moon), "中間の変換 2個"),
+    (MLPClassifier(hidden_layer_sizes=(4,), activation="relu", solver="lbfgs",
+                   max_iter=5000, random_state=0).fit(X_moon, y_moon), "中間の変換 4個"),
+    (MLPClassifier(hidden_layer_sizes=(16,), activation="relu", solver="lbfgs",
+                   max_iter=5000, random_state=0).fit(X_moon, y_moon), "中間の変換 16個"),
+]
+
+fig, axes = plt.subplots(1, 4, figsize=(13, 3.3))
+for ax, (model, name) in zip(axes, models):
+    acc = model.score(X_moon, y_moon)
+    plot_boundary(ax, model, X_moon, y_moon, f"{name}\n正答率 {acc:.0%}")
+plt.tight_layout()
+plt.show()
+```
+
+- ReLU 1本につき**折り目が1つ**増える
+- 4本の折れ線で 100%。16本ではほぼ滑らかな曲線に見える
+- 「曲がる境界」の正体は、**たくさんの折り目**だった
+
+::: {.callout-note title="種明かし"}
+講義の初回に見せた「機械が自力で見つけた境界」は、中間の変換16個のネットワーク。
+もうブラックボックスではない。
+:::
+
+
+## 全部の変換が同じになってしまわないか？
+
+::: {.callout-important title="クイズ"}
+パラメータを前回と同じように**全部 0** で初期化したら、何が起きる？
+:::
+
+::: {.fragment}
+- $z_1 = z_2$、$h_1 = h_2$ — 2つの変換が**完全に同じ動き**をする
+- 誤差の配分（$\delta_{\text{mid}} = \delta_{\text{out}} \cdot w \cdot \mathrm{ReLU}'(z)$）も同じ → 更新後も同じ
+- 何個並べても**実質1個**のまま（対称性の罠）
+:::
+
+- 解決策：**ランダム初期化**で最初から全員を別の場所に置く（対称性を破る）
+- 補助策：学習中にランダムに変換を休ませる **Dropout**（依存しすぎを防ぐ）
+
+
+## 出力層は問題に合わせて取り替える
+
+- どんな NN でも、出力層は「線形結合 → 活性化関数」
+
+| 問題 | 出力の活性化関数 | 出力の意味 |
+|---|---|---|
+| 2クラス分類 | シグモイド | クラス1の確率（0〜1） |
+| 多クラス分類 | ソフトマックス | 各クラスの確率分布 |
+| 回帰 | なし（恒等関数） | 実数値そのまま |
+
+- 中間layers は「良い特徴空間」を作ることに専念し、出力層が問題形式に合わせて答えをまとめる
+
+
+## 100層でも原理は同じ
+
+```python
+# Forward：前から順に変換するだけ
+for layer in layers:
+    z = W @ x + b
+    x = relu(z)
+
+# Backward：誤差を後ろから順に配るだけ
+for layer in reversed(layers):
+    grad  = delta * relu_grad(z)
+    W    -= lr * grad @ x.T
+    b    -= lr * grad
+    delta = W.T @ grad   # 1つ前の層へ
+```
+
+- 層が増えても**ループが回るだけ**。各層の処理は今日やった2層と同じ
+- 「ディープ」ラーニングの「ディープ」は、この段数のこと
+
+
+## まとめ
+
+- 線形変換は**重ねても線形** — 間に ReLU を挟んで初めて重ねる意味が生まれる
+- 曲がる境界の正体 ＝ ReLU が作る**折り目の集まり**
+- 変換を並べるときは**ランダム初期化**で対称性を破る
+- 出力層は問題（分類・回帰）に合わせた活性化関数に取り替える
+
+::: {.callout-note title="次回予告"}
+層が深くなると、勾配を**全パラメータに**届ける必要がある。
+今日は2層分を手で書いたが、100層では？ — 連鎖律で機械的に流す**バックプロパゲーション**へ。
+:::

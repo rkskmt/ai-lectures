@@ -733,62 +733,68 @@ display(HTML(f"<div style='font-size:24px'>{table_html}</div>"))
 
 ## 決定木の深さを変えると？
 
-深さを変えることで、複雑さをコントロールできます。
+- 深さ＝ if-then ルールの段数。深いほど複雑な境界が作れる
+- 深さ 1・3・無制限で学習し、同じデータで採点してみる
 
 ```{python}
 #| echo: true
 #| code-fold: true
 #| code-summary: "code"
 
-depths = [1, 3, 5]
-results = []
-
-for depth in depths:
+for depth in [1, 3, None]:
     model = DecisionTreeClassifier(max_depth=depth, random_state=42)
     model.fit(X, y)
-    y_pred = model.predict(X)
-    
-    acc = accuracy_score(y, y_pred)
-    prec = precision_score(y, y_pred)
-    rec = recall_score(y, y_pred)
-    
-    results.append({
-        '深さ': depth,
-        'Accuracy': f'{acc:.3f}',
-        'Precision': f'{prec:.3f}',
-        'Recall': f'{rec:.3f}'
-    })
-
-depth_df = pd.DataFrame(results)
-depth_df
+    acc = accuracy_score(y, model.predict(X))
+    label = "無制限" if depth is None else f"深さ{depth}　"
+    print(f"{label}: Accuracy = {acc:.3f}")
 ```
 
-:::{.callout-warning}
-- **深さ1**: シンプルすぎる（underfitting）
-- **深さ3**: バランスが良い
-- **深さ5**: 複雑すぎる可能性（overfitting のリスク）
+::: {.callout-important title="クイズ"}
+深さ無制限なら、ついに**正答率 100%**。
+これは「最強のモデルが完成した」ということでいい？
 :::
 
 
-## 過学習（Overfitting）とは？
+## 深さ無制限の境界を見てみる
 
-:::{.columns}
-:::{.column width="50%"}
-**適切な複雑さ**
-- 訓練データによく適合
-- 新しいデータにも対応
-:::
-:::{.column width="50%"}
-**過学習**
-- 訓練データに**過剰適合**
-- 新しいデータでは性能低下
-:::
-:::
+```{python}
+#| echo: false
+#| fig-align: center
+xx_g, yy_g = np.meshgrid(np.arange(X[:, 0].min() - 1, X[:, 0].max() + 1, 0.05),
+                         np.arange(X[:, 1].min() - 100, X[:, 1].max() + 100, 10))
 
-::: {.callout-tip title="対策"}
-- 決定木の深さを制限
-- データを増やす
-- 交差検証で評価
+fig, axes = plt.subplots(1, 3, figsize=(13, 4))
+for ax, depth in zip(axes, [1, 3, None]):
+    m = DecisionTreeClassifier(max_depth=depth, random_state=42).fit(X, y)
+    Z = m.predict(np.c_[xx_g.ravel(), yy_g.ravel()]).reshape(xx_g.shape)
+    ax.contourf(xx_g, yy_g, Z, alpha=0.3, levels=1, colors=["lightcoral", "lightblue"])
+    ax.contour(xx_g, yy_g, Z, levels=[0.5], colors="blue", linewidths=2)
+    ax.scatter(salmon_brightness, salmon_weights, c="black", marker="o", s=35,
+               alpha=0.7, edgecolors="black", label="Salmon")
+    ax.scatter(seabass_brightness, seabass_weights, c="red", marker="s", s=35,
+               alpha=0.7, edgecolors="darkred", label="Sea bass")
+    acc = accuracy_score(y, m.predict(X))
+    label = "無制限" if depth is None else f"深さ{depth}"
+    ax.set_title(f"{label}　正答率 {acc:.1%}", fontsize=11)
+    ax.set_xlabel("輝度")
+axes[0].set_ylabel("重さ (g)")
+axes[0].legend(fontsize=8, loc="upper left")
+plt.tight_layout()
+plt.show()
+```
+
+- 無制限の木には、数匹を救うためだけの**細長い回廊（飛び地）**ができている
+- 実際に学習されたルールを読むと「輝度が 5.35〜5.70 でも、重さが **2205g を超えるなら** Salmon」のような**異様に具体的な条項**が入っている
+
+
+## この満点、信用できるのか
+
+- 採点に使ったのは、**学習に使ったのと同じ80匹**
+- 過去問を丸暗記すれば、過去問のテストは満点になる
+- あの飛び地ルールが「**次に来る魚**」にも通用するかは、この採点方法では**確かめようがない**
+
+::: {.callout-warning}
+精度の数字は、**何で採点したか**とセットでないと意味を持たない。
 :::
 
 
@@ -877,7 +883,7 @@ print(f"\nTP={TP}, FP={FP}, FN={FN}, TN={TN}")
 4. **トレードオフを理解する**
    - シンプル vs 複雑
    - 解釈しやすさ vs 性能
-   - 過学習のリスク
+   - 満点に見えても信用できない場合がある（深さ無制限の決定木）
 :::
 
 
@@ -904,8 +910,6 @@ print(f"\nTP={TP}, FP={FP}, FN={FN}, TN={TN}")
 
 ## 次回予告
 
-### 次回は...
-
-- **3種類の魚**を扱う（多クラス分類）
-- または**教師なし学習**（クラスタリング）
-- より実践的な機械学習の世界へ！
+- 深さ無制限の決定木は「同じデータで採点」して満点だった
+- 次回、この**あやしい満点**の正体を、**新しい魚で採点する**ことで暴く
+- 正体には名前がある — **過学習（Overfitting）**

@@ -5,6 +5,92 @@ subtitle: "AIの歴史"
 
 
 
+## このデータ、分けられるか
+
+```{python}
+#| echo: false
+#| fig-align: center
+import numpy as np
+import matplotlib.pyplot as plt
+import japanize_matplotlib
+from sklearn.datasets import make_moons
+plt.rcParams['font.size'] = 11
+plt.rcParams['figure.dpi'] = 100
+
+X_moon, y_moon = make_moons(n_samples=200, noise=0.1, random_state=42)
+
+plt.figure(figsize=(5.5, 3.8))
+for cls, col, m in [(0, "#2980b9", "s"), (1, "#e74c3c", "o")]:
+    mask = y_moon == cls
+    plt.scatter(X_moon[mask, 0], X_moon[mask, 1], c=col, marker=m, s=25,
+                edgecolors="gray", lw=0.4)
+plt.xticks([]); plt.yticks([])
+plt.tight_layout()
+plt.show()
+```
+
+- 青と赤、2種類のデータ。この2つを分ける**境界**を描きたい
+
+::: {.callout-important title="クイズ"}
+定規で直線を1本引いて、分けられる？
+:::
+
+
+## 機械が自力で見つけた境界
+
+```{python}
+#| echo: false
+#| fig-align: center
+from sklearn.neural_network import MLPClassifier
+
+mlp = MLPClassifier(hidden_layer_sizes=(16,), activation="relu", solver="lbfgs",
+                    max_iter=5000, random_state=0).fit(X_moon, y_moon)
+
+xx, yy = np.meshgrid(np.linspace(X_moon[:, 0].min() - 0.4, X_moon[:, 0].max() + 0.4, 300),
+                     np.linspace(X_moon[:, 1].min() - 0.4, X_moon[:, 1].max() + 0.4, 300))
+Z = mlp.predict(np.c_[xx.ravel(), yy.ravel()]).reshape(xx.shape)
+
+plt.figure(figsize=(5.5, 3.8))
+plt.contourf(xx, yy, Z, alpha=0.25, levels=1, colors=["#5dade2", "#f5b7b1"])
+for cls, col, m in [(0, "#2980b9", "s"), (1, "#e74c3c", "o")]:
+    mask = y_moon == cls
+    plt.scatter(X_moon[mask, 0], X_moon[mask, 1], c=col, marker=m, s=25,
+                edgecolors="gray", lw=0.4)
+plt.xticks([]); plt.yticks([])
+plt.tight_layout()
+plt.show()
+```
+
+- 数式も規則も**誰も教えていない**。データを見せただけで、機械がこの境界を自力で見つけた
+
+::: {.callout-note title="この講義の約束"}
+最終回までに、この仕組みを**中身から全部**自分の手で組み立てる。
+ブラックボックスは残さない。
+:::
+
+
+## この講義のゴール
+
+```{python}
+#| echo: false
+#| fig-align: center
+from sklearn.datasets import load_digits
+
+digits = load_digits()
+
+fig, axes = plt.subplots(2, 8, figsize=(10, 2.8))
+for ax, img, label in zip(axes.flat, digits.images, digits.target):
+    ax.imshow(img, cmap="gray_r")
+    ax.set_title(str(label), fontsize=10)
+    ax.axis("off")
+plt.tight_layout()
+plt.show()
+```
+
+- 最終回、こうした**手書き数字を読み取る機械**を自分のコードで作る（PyTorch を使用）
+- そのための部品（境界・損失・勾配・層）を、毎回1つずつ手に入れていく
+
+
 ## {background-color="white" .center .break-slide}
 
 ::: {.break-title}

@@ -69,6 +69,8 @@ quarto preview --port 4321   # local dev server (fixed port)
 quarto render                # build to _site/
 ```
 
+**Heavy render:** `mnist-project.qmd` downloads MNIST (~12MB, cached in gitignored `data/`) and trains an MLP for 3 epochs on CPU — expect a few minutes for that file. `pytorch-intro.qmd` and `nn-numpy.qmd` each train for a few seconds.
+
 **Do not run `quarto preview` or `quarto render` yourself.** The user handles previewing and building.
 
 ## Style or functionality changes
@@ -99,3 +101,5 @@ https://rkskmt.github.io/ai-lectures/
 ## Reference Docs
 
 - **[doc/troubleshooting.md](doc/troubleshooting.md)** — CSS/style changes: stale preview/cache behavior and Pandoc code-block selectors
+- **[doc/engaging-lecture-design.md](doc/engaging-lecture-design.md)** — lecture design playbook (cold open, quiz-then-reveal, one-dataset-per-section). **Read before writing or restructuring any lecture.**
+- **[doc/course-arc.md](doc/course-arc.md)** — the course-wide narrative arc and the spec for each not-yet-written lecture. Keep it updated when lectures are added or reordered.
