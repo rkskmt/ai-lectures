@@ -70,9 +70,8 @@ _extensions/      Quarto 拡張（clean-revealjs テーマ等）
 
 1. `xxx.qmd` を作成
 2. `index.qmd` にリンクを追加
-3. `_quarto.yml` の `navbar` にも追加
 
-3つ揃えないとナビゲーションがずれるので注意。
+ナビゲーションは `index.qmd` のみ（全ページが revealjs スライドのため、`_quarto.yml` の navbar は表示されない。navbar は置かない）。
 
 ### インラインコード（バッククォート）
 
