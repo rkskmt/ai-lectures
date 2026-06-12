@@ -4,39 +4,8 @@
 
 <div id="lecture-search">
   <input id="search-input" type="search" placeholder="全文検索 — どの回に出てきたか探せる（例：MSE、過学習、シグモイド）" autocomplete="off">
-  <div id="search-results"></div>
+  <div id="search-results" class="search-ui-results"></div>
 </div>
-
-<style>
-#lecture-search { margin: 0.5em 0 0.9em; }
-#search-input {
-  width: 100%;
-  font-size: 1.4rem;
-  padding: 8px 14px;
-  border: 2px solid #5dade2;
-  border-radius: 6px;
-  box-sizing: border-box;
-  background: #fff;
-}
-#search-results { margin-top: 6px; max-height: 45vh; overflow-y: auto; }
-#search-results a.search-hit {
-  display: block;
-  padding: 6px 12px;
-  margin: 5px 0;
-  font-size: 1.15rem;
-  line-height: 1.5;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  text-decoration: none;
-  color: #333;
-  background: #fafafa;
-}
-#search-results a.search-hit:hover { background: #eaf4fb; border-color: #5dade2; }
-#search-results .hit-loc { font-weight: bold; color: #2980b9; }
-#search-results mark { background: #fff3a0; padding: 0 2px; }
-#search-results .search-note { font-size: 1.1rem; color: #888; padding: 4px 10px; }
-#lecture-search a[href]::after { content: none !important; display: none !important; }
-</style>
 
 <details open>
 <summary>導入</summary>
@@ -93,76 +62,7 @@ document.addEventListener('keydown', function(e) {
     e.stopImmediatePropagation();
   }
 }, true);
-
-(function() {
-  try {
-    var index = null;
-    var input = document.getElementById('search-input');
-    var resultsEl = document.getElementById('search-results');
-    if (!input || !resultsEl) return;
-
-    function esc(s) {
-      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
-                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
-
-    function loadIndex() {
-      if (index !== null) return Promise.resolve(index);
-      return fetch('search.json')
-        .then(function(r) { return r.json(); })
-        .then(function(d) {
-          index = d.filter(function(e) { return e.href.indexOf('index.html') !== 0; });
-          return index;
-        });
-    }
-
-    function snippet(text, q) {
-      var i = text.toLowerCase().indexOf(q);
-      if (i < 0) return '';
-      var start = Math.max(0, i - 35);
-      var end = Math.min(text.length, i + q.length + 50);
-      return ((start > 0 ? '…' : '') + esc(text.slice(start, i)) +
-              '<mark>' + esc(text.slice(i, i + q.length)) + '</mark>' +
-              esc(text.slice(i + q.length, end)) +
-              (end < text.length ? '…' : '')).replace(/\n+/g, ' ');
-    }
-
-    function run() {
-      var q = input.value.trim().toLowerCase();
-      if (q.length < 2) {
-        resultsEl.innerHTML = q.length === 1
-          ? '<div class="search-note">2文字以上で検索</div>' : '';
-        return;
-      }
-      loadIndex().then(function(idx) {
-        var hits = [];
-        for (var i = 0; i < idx.length && hits.length < 30; i++) {
-          var e = idx[i];
-          var hay = (e.title + '\n' + (e.section || '') + '\n' + (e.text || '')).toLowerCase();
-          if (hay.indexOf(q) >= 0) hits.push(e);
-        }
-        if (hits.length === 0) {
-          resultsEl.innerHTML = '<div class="search-note">ヒットなし</div>';
-          return;
-        }
-        resultsEl.innerHTML = hits.map(function(e) {
-          var href = e.href.replace('#', '#/');
-          var loc = esc(e.title) + (e.section ? ' › ' + esc(e.section) : '');
-          return '<a class="search-hit" href="' + href + '">' +
-                 '<span class="hit-loc">' + loc + '</span><br>' +
-                 snippet(e.text || '', q) + '</a>';
-        }).join('');
-      }).catch(function() {
-        resultsEl.innerHTML =
-          '<div class="search-note">検索インデックスを読み込めませんでした</div>';
-      });
-    }
-
-    var timer = null;
-    input.addEventListener('input', function() {
-      clearTimeout(timer);
-      timer = setTimeout(run, 120);
-    });
-  } catch (e) {}
-})();
 </script>
+
+<!-- 検索ボックスの動作は search-ui.js（全ページ共通、_metadata.yaml で読み込み）が担う -->
+

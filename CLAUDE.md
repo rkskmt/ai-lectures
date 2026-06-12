@@ -44,7 +44,7 @@ Use Python as the vehicle, but frame concepts as broadly as possible. Where a co
 - **Do not use `listing:` in `index.qmd` either.** Same reason — it requires `format: html`, which conflicts.
 - `render: ["*.qmd"]` in `_quarto.yml` prevents `.md` files (e.g. CLAUDE.md) from being rendered
 - **When adding a new `.qmd`, add it to `index.qmd`.** It is the site's only navigation: every page renders as revealjs slides, so the Quarto website navbar is never displayed — do not maintain a `navbar` in `_quarto.yml` (verified 2026-06: no navbar element appears in any built page).
-- **`index.qmd` hosts a client-side full-text search** (inline JS) that reads Quarto's generated `search.json` and deep-links to slides via `#/slide-id`. It needs no per-lecture maintenance — the index regenerates on every render.
+- **`search-ui.js` provides site-wide full-text search**: a 検索 button + modal on every deck (loaded via `_metadata.yaml` include-in-header, listed in `_quarto.yml` resources) and the inline box on `index.qmd` (`#search-input`/`#search-results`). It reads Quarto's generated `search.json` and deep-links to slides via `#/slide-id` — no per-lecture maintenance.
 - **Never add numbers to slide section headers or `index.qmd` link text.** Numbered slides (e.g. `## １. ...`) and numbered links (e.g. `第N回`) break on reorder — every insert or swap requires renaming every entry after it. Use plain titles only (e.g. `## 汎化性能を測る`, `[過学習と汎化](classification-evaluation.qmd)`).
 - Use Quarto callouts (`.callout-note`) for key concepts
 - Slide text should use **bullet points**, not prose sentences
