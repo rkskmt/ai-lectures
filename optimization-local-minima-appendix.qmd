@@ -482,65 +482,86 @@ convergence_values = np.array(convergence_values)
 ```{python}
 #| echo: false
 #| fig-align: center
-# 収束領域を分類
-local_region = np.abs(convergence_points - x_local) < 0.5
-global_region = np.abs(convergence_points - x_global) < 0.5
+# Classify each start by where Newton's method actually converged.
+# Note: Newton seeks f'(x)=0, so the local MAX is a possible destination too.
+x_max = (3 - np.sqrt(2.6)) / 0.8   # local max (root of f_poly_prime)
 
-fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 10))
+to_local  = np.abs(convergence_points - x_local)  < 0.5
+to_global = np.abs(convergence_points - x_global) < 0.5
+to_max    = np.abs(convergence_points - x_max)    < 0.5
 
-# 上：関数の形
-x_range = np.linspace(-2, 8, 300)
-y_range = f_poly(x_range)
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 9), sharex=True)
 
-ax1.plot(x_range, y_range, 'b-', linewidth=2.5, label='f(x)')
-ax1.plot(x_local, y_local, 'ro', markersize=15, label='Local Min', zorder=5)
-ax1.plot(x_global, y_global, 'g*', markersize=20, label='Global Min', zorder=5)
-ax1.set_xlabel('x', fontsize=13)
-ax1.set_ylabel('f(x)', fontsize=13)
-ax1.set_title('Function Shape', fontsize=14, fontweight='bold')
-ax1.legend(fontsize=11)
+def paint_basins(ax):
+    # merge consecutive same-destination starts into one span (avoids striping)
+    labels = np.where(to_local, 0, np.where(to_global, 1, np.where(to_max, 2, 3)))
+    colors = {0: ("red", 0.22), 1: ("green", 0.22), 2: ("orange", 0.3)}
+    start = 0
+    for i in range(1, len(labels) + 1):
+        if i == len(labels) or labels[i] != labels[start]:
+            if labels[start] in colors:
+                c, a = colors[labels[start]]
+                ax.axvspan(x0_dense[start], x0_dense[i - 1], color=c, alpha=a, lw=0)
+            start = i
+
+x_range = np.linspace(-1.5, 7.5, 300)
+paint_basins(ax1)
+ax1.plot(x_range, f_poly(x_range), 'b-', linewidth=2.5)
+ax1.plot(x_local, y_local, 'ro', markersize=13, zorder=5, label='ローカルミニマム')
+ax1.plot(x_global, y_global, 'g*', markersize=20, zorder=5, label='グローバルミニマム')
+ax1.plot(x_max, f_poly(x_max), '^', color='darkorange', markersize=13, zorder=5,
+         label='山頂（極大）')
+ax1.set_ylabel('f(x)', fontsize=12)
+ax1.set_title('関数の形（背景の色＝その x からスタートしたときの行き先）',
+              fontsize=13, fontweight='bold')
+ax1.legend(fontsize=10, loc='upper center')
 ax1.grid(True, alpha=0.3)
 
-# 下：引力圏
-for i in range(len(x0_dense)-1):
-    if local_region[i]:
-        ax2.axvspan(x0_dense[i], x0_dense[i+1], alpha=0.3, color='red')
-    elif global_region[i]:
-        ax2.axvspan(x0_dense[i], x0_dense[i+1], alpha=0.3, color='green')
+paint_basins(ax2)
+for mask, color in [(to_local, 'red'), (to_global, 'green'), (to_max, 'darkorange')]:
+    ax2.scatter(x0_dense[mask], convergence_points[mask], c=color, s=22, zorder=3)
+for yv, color, lbl in [(x_local, 'red', f'x={x_local:.2f}（左の谷）'),
+                       (x_global, 'green', f'x={x_global:.2f}（右の谷）'),
+                       (x_max, 'darkorange', f'x={x_max:.2f}（山頂！）')]:
+    ax2.axhline(y=yv, color=color, linestyle='--', linewidth=1.5, alpha=0.7)
+    ax2.text(7.45, yv + 0.15, lbl, ha='right', fontsize=10, color=color)
 
-ax2.scatter(x0_dense, convergence_points, c=convergence_values, 
-            cmap='RdYlGn_r', s=20, alpha=0.8, zorder=3)
-ax2.axhline(y=x_local, color='r', linestyle='--', linewidth=2, alpha=0.7, 
-            label=f'Local Min (x={x_local:.2f})')
-ax2.axhline(y=x_global, color='g', linestyle='--', linewidth=2, alpha=0.7, 
-            label=f'Global Min (x={x_global:.2f})')
-
-from matplotlib.patches import Patch
-legend_elements = [
-    Patch(facecolor='red', alpha=0.3, label='-> Local Min'),
-    Patch(facecolor='green', alpha=0.3, label='-> Global Min'),
-]
-handles, labels = ax2.get_legend_handles_labels()
-ax2.legend(handles=handles+legend_elements, loc='upper left', fontsize=10)
-
-ax2.set_xlabel('Starting Point (x0)', fontsize=13)
-ax2.set_ylabel('Convergence Point', fontsize=13)
-ax2.set_title('Basin of Attraction', fontsize=14, fontweight='bold')
+ax2.annotate('例：x0 = −1 から出発', xy=(-1.0, x_local), xytext=(-1.2, 2.6),
+             fontsize=10, ha='left',
+             arrowprops={'arrowstyle': '->', 'color': '#333'})
+ax2.annotate('グローバルのすぐ手前なのに\n左の谷へ飛ばされる帯',
+             xy=(3.9, x_local), xytext=(2.6, -2.6), fontsize=10, ha='center',
+             arrowprops={'arrowstyle': '->', 'color': '#333'})
+ax2.set_xlabel('スタート地点 x0', fontsize=12)
+ax2.set_ylabel('たどり着いた場所', fontsize=12)
+ax2.set_title('引力圏：スタート地点（横軸）→ たどり着く先（縦軸）',
+              fontsize=13, fontweight='bold')
+ax2.set_xlim(-1.5, 7.5)
+ax2.set_ylim(-3.2, 7.2)
 ax2.grid(True, alpha=0.3)
 
 plt.tight_layout()
 plt.show()
 ```
 
+**図の見方（下のグラフ）：**
+
+- 横軸＝**スタート地点** x0、縦軸＝そこから Newton法が**最終的にたどり着いた場所**
+- 縦に1本選んで読む：「x0 = −1 から出発 → 点の高さは 0 → 左の谷に着いた」
+- 点は3つの高さのどれかに張り付く — 行き先は **左の谷（赤）・右の谷（緑）・山頂（橙）** の3択
+- 背景の色の帯が**引力圏**：同じ色の帯から出発すると、同じ場所に吸い込まれる
+- 上下のグラフは横軸が揃えてある — 上の山谷と下の帯を見比べられる
+
 ::: {.callout-note}
 ## 引力圏（Basin of Attraction）とは
 
-各谷には「引力圏」があります。**その範囲内からスタートすると、その谷に吸い込まれる**という領域です。
+各収束先には「引力圏」があります。**その範囲からスタートすると、そこに吸い込まれる**領域です。
+この実験では、素朴な予想より意地悪な結果になりました：
 
-- **赤い領域**からスタート → ローカルミニマム（浅い谷）に落ちる
-- **緑の領域**からスタート → グローバルミニマム（深い谷）に落ちる
-
-初期値が少し変わるだけで、結果がガラッと変わる境界があることに注目してください。
+- 赤い帯 → ローカルミニマム、緑の帯 → グローバルミニマム、ここまでは予想どおり
+- **橙の帯 → 山のてっぺん（極大）に到着して止まる**。Newton法が探しているのは「傾きゼロの場所」なので、谷と山頂を**区別できない**
+- 帯はきれいな2分割ではない：**グローバルミニマムのすぐ手前（x0 ≈ 3.6〜4.2）から出発しても、左の谷へ飛ばされる**
+- 初期値が少し変わるだけで行き先がガラッと変わる — 1回の実行を信用してはいけない理由がこれ
 :::
 
 ## {background-color="white" .center .break-slide}
