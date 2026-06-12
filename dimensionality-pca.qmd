@@ -36,11 +36,19 @@ subtitle: "特徴量を増やし続けると何が起きるか"
 :::
 
 
-## 直感的な理解：単位立方体の中の球
+## クイズ：いちばん近い点まで、どれくらい？
 
-- 単位立方体（一辺1の立方体）の中に内接する球を考える
+- 各特徴量は 0〜1 に正規化してあるとする（各軸の長さ＝1）
+- そこに**100個の点**をランダムにばらまく
+- **1次元**なら、いちばん近い点までの距離はだいたい **0.003**（ぎゅうぎゅう）
 
-$$V_{球}(d) = \frac{\pi^{d/2}}{\Gamma(d/2+1)} \cdot \left(\frac{1}{2}\right)^d$$
+::: {.callout-important title="クイズ"}
+特徴量を増やして **10次元** にしたら、いちばん近い点までの距離はいくつになると思う？
+
+（各軸の長さは1のまま。点の数も100個のまま）
+:::
+
+::: {.fragment}
 
 ```{python}
 #| echo: true
@@ -48,28 +56,130 @@ $$V_{球}(d) = \frac{\pi^{d/2}}{\Gamma(d/2+1)} \cdot \left(\frac{1}{2}\right)^d$
 import numpy as np
 import matplotlib.pyplot as plt
 import japanize_matplotlib
-from math import gamma, pi
 plt.rcParams['font.size'] = 11
 plt.rcParams['figure.dpi'] = 100
 
-dims    = list(range(1, 21))
-vol_sphere = [pi**(d/2) / gamma(d/2 + 1) * (0.5**d) for d in dims]
+rng  = np.random.default_rng(0)
+dims = [1, 2, 3, 5, 10, 20]
+nn_median = []
 
-plt.figure(figsize=(7, 3.5))
-plt.plot(dims, vol_sphere, "o-", color="#e74c3c")
+for d in dims:
+    P = rng.random((100, d))                       # 100点を [0,1]^d にばらまく
+    D = np.sqrt(((P[:, None, :] - P[None, :, :]) ** 2).sum(axis=2))
+    np.fill_diagonal(D, np.inf)                    # 自分自身は除外
+    nn_median.append(np.median(D.min(axis=1)))     # 最近傍距離の中央値
+
+for d, m in zip(dims, nn_median):
+    print(f"{d:2d}次元: いちばん近い点まで {m:.3f}")
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
+plt.figure(figsize=(7, 3.2))
+plt.plot(dims, nn_median, "o-", color="#e74c3c")
+plt.axhline(1.0, color="gray", ls="--", lw=1.2)
+plt.text(1.2, 1.03, "各軸の長さ（=1）", fontsize=9.5, color="gray")
+plt.annotate("軸の長さより遠い！", xy=(20, nn_median[-1]),
+             xytext=(13.5, 0.75), fontsize=10.5, color="#c0392b",
+             arrowprops={"arrowstyle": "->", "color": "#c0392b"})
 plt.xlabel("次元数 d")
-plt.ylabel("球の体積（立方体の体積=1）")
-plt.title("単位立方体に内接する球の体積")
+plt.ylabel("最近傍までの距離（中央値）")
+plt.title("「いちばん近い点」が、どんどん遠くなる")
 plt.grid(True, alpha=0.4)
 plt.tight_layout()
 plt.show()
 ```
 
-::: {.callout-warning}
-## 直感との乖離
-2次元（円）ではほぼいっぱいに見えるが、高次元では球は**立方体のほんの一部**しか占めない。
-データのほとんどが「角（隅）」に追いやられる。
+- 10次元で **0.67**、20次元では **1.2** — もはや「お隣さん」は存在しない
+- 同じ100点なのに。なぜこんなことが起きるのか、2つの理由を見ます
+
 :::
+
+
+## なぜ？　その1：真ん中に居続けられない
+
+- ある点が、ある軸で「中央寄り」（その軸の**中央50%**）に入る確率は $\dfrac{1}{2}$
+- $d$ 次元で「**全部の軸**で中央寄り」でいられる確率は：
+
+$$\left(\frac{1}{2}\right)^d \qquad
+\text{1次元: } 50\% \quad \text{3次元: } 12.5\% \quad \text{10次元: } 0.1\% \quad \text{20次元: } 100万分の1$$
+
+```{python}
+#| echo: false
+#| fig-align: center
+fig, axes = plt.subplots(1, 2, figsize=(9.5, 3.4))
+
+ax = axes[0]
+rng2 = np.random.default_rng(7)
+pts = rng2.random((60, 2))
+inside = ((pts > 0.25) & (pts < 0.75)).all(axis=1)
+ax.add_patch(plt.Rectangle((0, 0), 1, 1, fill=False, ec="#555", lw=1.5))
+ax.add_patch(plt.Rectangle((0.25, 0.25), 0.5, 0.5, fc="#fdebd0", ec="#b9770e", lw=1.5))
+ax.scatter(pts[inside, 0], pts[inside, 1], c="#e67e22", s=22, zorder=3)
+ax.scatter(pts[~inside, 0], pts[~inside, 1], c="#85c1e9", s=22, zorder=3)
+ax.text(0.5, 0.5, "両方の軸で\n中央寄り\n（25%）", ha="center", va="center",
+        fontsize=9.5, color="#7d4f0e")
+ax.set_xlim(-0.05, 1.05); ax.set_ylim(-0.05, 1.05)
+ax.set_aspect("equal"); ax.axis("off")
+ax.set_title("2次元：もう4人に1人しか残れない", fontsize=10.5)
+
+ax = axes[1]
+dd = np.arange(1, 21)
+ax.semilogy(dd, 0.5 ** dd, "o-", color="#e74c3c")
+ax.annotate("10次元: 0.1%", xy=(10, 0.5**10), xytext=(11, 3e-2),
+            fontsize=10, arrowprops={"arrowstyle": "->", "color": "#555"})
+ax.annotate("20次元: 100万分の1", xy=(20, 0.5**20), xytext=(11.5, 2e-5),
+            fontsize=10, arrowprops={"arrowstyle": "->", "color": "#555"})
+ax.set_xlabel("次元数 d")
+ax.set_ylabel("全軸で中央寄りの確率（対数）")
+ax.grid(True, alpha=0.4, which="both")
+ax.set_title("「真ん中の住人」は指数的に消える", fontsize=10.5)
+plt.tight_layout()
+plt.show()
+```
+
+- ほぼすべての点が、**どこかの軸では端っこ** — つまり「角のあたり」に住むことになる
+- しかも角の数は $2^d$ 個（20次元で約105万個）。**データは100万個の角に散り散り**になる
+
+::: {.callout-note}
+教科書によく出る言い換え：「単位立方体に内接する球（＝どの軸でも中央寄りの領域）の体積は、
+高次元で 0 に向かう」。いま見たのと同じ現象。
+:::
+
+
+## なぜ？　その2：「ご近所」を集めると世界を覆ってしまう
+
+- k-NN の気持ちになって、周りの**データの1%**を「ご近所」として集めたい
+- 各軸を割合 $r$ だけ切り取った箱は、データの $r^d$ 割を含む → 1% 集めるには：
+
+$$r = 0.01^{1/d}$$
+
+```{python}
+#| echo: false
+#| fig-align: center
+dd = np.arange(1, 21)
+r_need = 0.01 ** (1 / dd)
+
+plt.figure(figsize=(7, 3.4))
+plt.plot(dd, r_need, "o-", color="#2980b9")
+plt.axhline(1.0, color="gray", ls="--", lw=1.2)
+for d_pt, txt, xy_t in [(1, "1次元：辺の1%でOK", (2.5, 0.07)),
+                        (10, "10次元：辺の63%が要る", (6.5, 0.45)),
+                        (20, "20次元：辺の79%", (13.5, 0.9))]:
+    plt.annotate(txt, xy=(d_pt, 0.01 ** (1 / d_pt)), xytext=xy_t,
+                 fontsize=10, arrowprops={"arrowstyle": "->", "color": "#555"})
+plt.xlabel("次元数 d")
+plt.ylabel("データの1%を含む箱の一辺")
+plt.ylim(0, 1.08)
+plt.title("「ご近所」のはずが、空間の大半を覆ってしまう", fontsize=11)
+plt.grid(True, alpha=0.4)
+plt.tight_layout()
+plt.show()
+```
+
+- 10次元では、たった1%の「ご近所」を集めるのに**各軸の63%**を見渡す必要がある
+- それはもう「近所」ではない — **「近い」に頼る手法（k-NN など）が最初に壊れる**
 
 
 ## 距離が意味をなさなくなる
