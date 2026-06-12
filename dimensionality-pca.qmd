@@ -334,17 +334,82 @@ plt.show()
 :::
 
 
-## 固有ベクトルとの関係
+## 「分散が最大の方向」を式にする
 
-PCA は共分散行列の**固有ベクトル**を求めることと等価
+- 探している「方向」を**単位ベクトル** $\mathbf{v}$（$\|\mathbf{v}\| = 1$）で表す
+- 中心化した点 $\tilde{\mathbf{x}}_i$ の $\mathbf{v}$ 方向への**影（射影）**は、内積 $\tilde{\mathbf{x}}_i^{\mathsf T} \mathbf{v}$（ただの数）
+- 知りたいのは**影の分散**。計算してみると：
 
-$$C = \frac{1}{n-1} \tilde{X}^T \tilde{X}, \qquad \tilde{X} = X - \bar{X}$$
+$$\frac{1}{n-1} \sum_i \left( \tilde{\mathbf{x}}_i^{\mathsf T} \mathbf{v} \right)^2
+= \mathbf{v}^{\mathsf T} \underbrace{\left( \frac{1}{n-1} \tilde{X}^{\mathsf T} \tilde{X} \right)}_{C\;（共分散行列）} \mathbf{v}$$
 
-$$C \mathbf{v}_i = \lambda_i \mathbf{v}_i$$
+- **共分散行列 $C$ は、影の分散を計算すると自然に出てくる**（ここが登場理由）
+- つまり PCA の探しものはこう書ける：
 
-- $\mathbf{v}_i$：主成分の**方向**（固有ベクトル）
-- $\lambda_i$：その方向に含まれる**情報量（分散）**（固有値）
-- $\lambda_1 \geq \lambda_2 \geq \cdots$ の順に並べる → PC1, PC2, …
+::: {.callout-note}
+$\|\mathbf{v}\| = 1$ のもとで $\mathbf{v}^{\mathsf T} C \mathbf{v}$（＝ $\mathbf{v}$ 方向の分散）を**最大にする** $\mathbf{v}$ を探せ
+:::
+
+
+## 答えが「固有ベクトル」になる理由
+
+- $\|\mathbf{v}\| = 1$ は「$\mathbf{v}$ の先端は半径1の球面の上」という意味
+- 球面上の**てっぺん**では、球面に沿ってどちらへ動いても $\mathbf{v}^{\mathsf T} C \mathbf{v}$ は増えない
+- 増える向きを表すのは勾配 $2C\mathbf{v}$。これが球面の法線方向（$\mathbf{v}$ 自身）と**平行**になるしかない：
+
+$$C \mathbf{v} = \lambda \mathbf{v} \quad \text{（固有ベクトルの定義式そのもの！）}$$
+
+- しかもそのときの分散は $\mathbf{v}^{\mathsf T} C \mathbf{v} = \lambda \mathbf{v}^{\mathsf T} \mathbf{v} = \lambda$ — **固有値＝その方向の分散**
+
+::: {.callout-tip}
+- **固有ベクトル**＝「球面上でこれ以上増やせない方向」の候補リスト
+- **固有値**＝その候補での分散の値
+- $\lambda_1 \geq \lambda_2 \geq \cdots$ と並べて、一番大きい候補から PC1, PC2, … と呼ぶ
+:::
+
+
+## 総当たりで確かめる：全方向の分散を測る
+
+固有値分解を信じる前に、**力ずく**で確認してみましょう。方向 $\mathbf{v}$ を1度刻みで全部試します。
+
+```{python}
+#| echo: true
+thetas = np.radians(np.arange(0, 181))
+proj_var = np.array([
+    np.var(X_lw_sc @ np.array([np.cos(t), np.sin(t)]), ddof=1)
+    for t in thetas
+])
+
+print(f"分散が最大の角度: {np.degrees(thetas[proj_var.argmax()]):.0f}°"
+      f"（分散 {proj_var.max():.4f}）")
+print(f"分散が最小の角度: {np.degrees(thetas[proj_var.argmin()]):.0f}°"
+      f"（分散 {proj_var.min():.4f}）")
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
+plt.figure(figsize=(7, 3.4))
+plt.plot(np.degrees(thetas), proj_var, color="#2980b9", lw=2)
+for ev, color, lbl in [(pca_d.explained_variance_[0], "#e74c3c", "λ1（PC1の固有値）"),
+                       (pca_d.explained_variance_[1], "#f39c12", "λ2（PC2の固有値）")]:
+    plt.axhline(ev, color=color, ls="--", lw=1.5, alpha=0.8)
+    plt.text(183, ev, lbl, va="center", fontsize=9.5, color=color)
+plt.axvline(45, color="#e74c3c", ls=":", lw=1.2)
+plt.axvline(135, color="#f39c12", ls=":", lw=1.2)
+plt.xlabel("方向の角度（度）")
+plt.ylabel("その方向への影の分散")
+plt.title("山の高さ＝固有値、山の位置＝固有ベクトルの向き", fontsize=11)
+plt.xlim(0, 180)
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+- 総当たりの最大値・最小値が、固有値 $\lambda_1, \lambda_2$ に**ぴったり一致**
+- 山の位置（45°）が PC1 の向き、谷の位置（135°）が PC2 の向き
+- この総当たりを**一発の計算**で済ませるのが固有値分解
+
 
 ## NumPy で確かめる
 
