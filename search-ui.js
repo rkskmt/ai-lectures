@@ -193,6 +193,13 @@
           closeModal();
           return;
         }
+        // Ctrl+F (Cmd+F on Mac) opens the search instead of the browser find
+        if (!open && (e.ctrlKey || e.metaKey) && (e.key === 'f' || e.key === 'F')) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          openModal();
+          return;
+        }
         // "/" opens the search from anywhere (unless typing in a field)
         if (!open && e.key === '/' &&
             !(e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) &&
@@ -209,7 +216,7 @@
       var btn = document.createElement('button');
       btn.id = 'search-btn';
       btn.type = 'button';
-      btn.title = '全文検索（ / キーでも開く）';
+      btn.title = '全文検索（Ctrl+F または / で開く）';
       btn.setAttribute('aria-label', '全文検索');
       btn.innerHTML =
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" ' +
