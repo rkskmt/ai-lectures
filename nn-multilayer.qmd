@@ -91,6 +91,23 @@ $$z_2 = \underbrace{(\alpha_2 \alpha_1)}_{\text{新しい傾き}} x + \underbrac
 
 - 展開すると**ただのアフィン変換1回分**。何回重ねても同じ
 - 線形（アフィン）変換は、重ねても線形のまま — **境界は直線のまま**
+
+```{python}
+#| echo: false
+#| fig-align: center
+# 16 hidden units but identity activation = stacking affine maps only
+stacked_affine = MLPClassifier(hidden_layer_sizes=(16,), activation="identity",
+                               solver="lbfgs", max_iter=5000,
+                               random_state=0).fit(X_moon, y_moon)
+
+fig, ax = plt.subplots(figsize=(5.5, 3.3))
+plot_boundary(ax, stacked_affine, X_moon, y_moon,
+              f"アフィン変換を16個重ねて学習　正答率 {stacked_affine.score(X_moon, y_moon):.0%}")
+plt.tight_layout()
+plt.show()
+```
+
+- 実際に16個重ねて学習させた結果 — **数式の予言どおり、直線のまま**。最小単位とほぼ同じ精度で頭打ち
 :::
 
 
@@ -138,6 +155,43 @@ $$\delta_{\text{mid}} = \delta_{\text{out}} \cdot w \cdot \mathrm{ReLU}'(z)$$
 
 - $\mathrm{ReLU}'(z)$ は $z > 0$ なら 1、$z \leq 0$ なら 0（折られた側には誤差が流れない）
 - 各パラメータの更新は前回と同じ形：$\alpha \leftarrow \alpha - \eta\, \delta_{\text{mid}}\, x$
+
+```{python}
+#| echo: false
+#| fig-align: center
+fig, ax = plt.subplots(figsize=(11, 2.4))
+ax.set_xlim(-0.3, 11.0)
+ax.set_ylim(-0.6, 2.4)
+ax.axis("off")
+
+boxes = [(0.6, "入力 $x$", "#eaf2f8"),
+         (2.7, "アフィン\n（$\\alpha, b$）", "#d6eaf8"),
+         (4.8, "ReLU", "#d6eaf8"),
+         (6.9, "アフィン\n（$w, c$）", "#d6eaf8"),
+         (8.7, "$\\sigma$", "#d6eaf8"),
+         (10.2, "損失 $L$", "#fdebd0")]
+y = 1.5
+for cx, label, fc in boxes:
+    ax.text(cx, y, label, ha="center", va="center", fontsize=10,
+            bbox={"boxstyle": "round,pad=0.4", "fc": fc, "ec": "#2471a3"})
+for i in range(len(boxes) - 1):
+    ax.annotate("", xy=(boxes[i + 1][0] - 0.65, y), xytext=(boxes[i][0] + 0.65, y),
+                arrowprops={"arrowstyle": "->", "color": "#1e8449", "lw": 2})
+
+yb = 0.25
+ax.annotate("", xy=(6.9, yb), xytext=(10.2, yb),
+            arrowprops={"arrowstyle": "->", "color": "#c0392b", "lw": 2.2})
+ax.text(8.55, -0.15, r"$\delta_{\mathrm{out}} = p - y$", ha="center", fontsize=10,
+        color="#c0392b")
+ax.annotate("", xy=(2.7, yb), xytext=(6.9, yb),
+            arrowprops={"arrowstyle": "->", "color": "#c0392b", "lw": 2.2})
+ax.text(4.8, -0.15, r"$\delta_{\mathrm{mid}} = \delta_{\mathrm{out}} \cdot w \cdot \mathrm{ReLU}'(z)$",
+        ha="center", fontsize=10, color="#c0392b")
+ax.text(-0.25, yb + 0.05, "誤差の逆流", fontsize=10, color="#c0392b",
+        fontweight="bold", ha="left")
+plt.tight_layout()
+plt.show()
+```
 
 ::: {.callout-note title="伏線"}
 誤差が出力から入力へ**逆向きに流れていく**。
