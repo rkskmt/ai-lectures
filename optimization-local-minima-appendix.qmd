@@ -143,7 +143,7 @@ $$f''(x) < 0 \Rightarrow \text{山（最大値）}$$
 :::
 
 
-## 実験1：$x_0 = 1.5$ からスタート（左の谷の近く）
+## 実験1：$x_0 = 1.5$ からスタート（真ん中の丘の中腹）
 
 ### 手計算で追いかけてみよう
 
@@ -181,14 +181,16 @@ $$x_{\text{new}} = 1.761 - \frac{-0.074}{-2.846} = 1.761 - 0.026 = 1.735$$
 
 #### 反復3
 
-$f'(1.735)$ はほぼゼロに近づいています。**収束しました！**
+$f'(1.735)$ はほぼゼロに近づいています。**収束しました！** …が、どこに？
 
 ::: {.callout-important}
 ## 実験1の結果
 
-$x_0 = 1.5$ からスタート → $x \approx 1.74$ に収束
+$x_0 = 1.5$ からスタート → $x \approx 1.73$ に収束、$f(1.73) \approx 2.70$
 
-$f(1.74) \approx 1.93$
+ここで前のスライドの教えを実行：$f''(1.73) \approx -2.85 < 0$ — **山だ！**
+
+谷を探していたのに、**丘のてっぺんに登って止まってしまった**。この結果は捨てるしかない。
 :::
 
 ### Pythonで確認
@@ -324,17 +326,26 @@ y_range = f_poly(x_range)
 plt.figure(figsize=(12, 6))
 plt.plot(x_range, y_range, 'b-', linewidth=2, alpha=0.5, label='f(x)')
 
-# 実験1
-plt.plot(history_local, [f_poly(h) for h in history_local], 
-         'ro-', markersize=10, linewidth=2, label=f'Exp1: x0={x0_local}')
+# Experiment 1 (converges to the local MAX)
+plt.plot(history_local, [f_poly(h) for h in history_local],
+         'ro-', markersize=10, linewidth=2, label=f'実験1（x0={x0_local}）')
+plt.annotate('実験1：丘のてっぺんで停止！\n（f″<0 → 谷ではない。捨てる結果）',
+             xy=(x_local_final, f_local_final), xytext=(0.2, 7.5),
+             fontsize=11, ha='center', color='#c0392b',
+             arrowprops={'arrowstyle': '->', 'color': '#c0392b', 'lw': 1.8})
 
-# 実験2
-plt.plot(history_global, [f_poly(h) for h in history_global], 
-         'go-', markersize=10, linewidth=2, label=f'Exp2: x0={x0_global}')
+# Experiment 2 (converges to the global min)
+plt.plot(history_global, [f_poly(h) for h in history_global],
+         'go-', markersize=10, linewidth=2, label=f'実験2（x0={x0_global}）')
+plt.annotate('実験2：谷に到着（f″>0）',
+             xy=(x_global_final, f_global_final), xytext=(6.4, -8.5),
+             fontsize=11, ha='center', color='#1e8449',
+             arrowprops={'arrowstyle': '->', 'color': '#1e8449', 'lw': 1.8})
 
 plt.xlabel('x', fontsize=13)
 plt.ylabel('f(x)', fontsize=13)
-plt.title('Same Newton Method, Different Starting Points, Different Results!', fontsize=14, fontweight='bold')
+plt.title('同じNewton法・同じ式 — スタート地点が違うだけで結末が変わる',
+          fontsize=14, fontweight='bold')
 plt.legend(fontsize=11)
 plt.grid(True, alpha=0.3)
 plt.tight_layout()
@@ -342,18 +353,19 @@ plt.show()
 ```
 
 ::: {.callout-warning}
-## 答えが違う
+## 結末がまったく違う
 
-**まったく同じNewton法を使ったのに、結果が違う：**
+**まったく同じNewton法を使ったのに：**
 
-| | スタート地点 | 到着地点 | f(x)の値 |
-|---|---|---|---|
-| 実験1 | $x_0 = 1.5$ | $x \approx$ `{python} f'{x_local_final:.2f}'` | `{python} f'{f_local_final:.2f}'` |
-| 実験2 | $x_0 = 5.5$ | $x \approx$ `{python} f'{x_global_final:.2f}'` | `{python} f'{f_global_final:.2f}'` |
+| | スタート地点 | 止まった場所 | f(x)の値 | そこは何？ |
+|---|---|---|---|---|
+| 実験1 | $x_0 = 1.5$ | $x \approx$ `{python} f'{x_local_final:.2f}'` | `{python} f'{f_local_final:.2f}'` | **山頂**（$f''<0$）→ 捨てる |
+| 実験2 | $x_0 = 5.5$ | $x \approx$ `{python} f'{x_global_final:.2f}'` | `{python} f'{f_global_final:.2f}'` | 谷（$f''>0$）→ 答え |
 
-実験2のほうが $f(x)$ が小さい = **より良い答え**を見つけている！
+- 実験2は谷（しかもグローバルミニマム）に到着。実験1は**答えにすらなっていない**
+- Newton法が探しているのは「傾きゼロの点」であって「谷」ではない — だから山頂でも平気で止まる
 
-**スタート地点（初期値）が違うだけで、たどり着く場所が変わってしまう。**
+**スタート地点（初期値）が違うだけで、答えが出るかどうかすら変わってしまう。**
 :::
 
 ## {background-color="white" .center .break-slide}
@@ -368,11 +380,13 @@ plt.show()
 
 **ローカルミニマム（局所的最小値）**:
 「その周辺では一番低い」けど、関数全体で見ると**もっと低い場所がある**点。
-実験1で到達した左の谷がこれです。
+この関数では**左の谷（x = 0）**がこれです。
 
 **グローバルミニマム（大域的最小値）**:
 関数全体で**本当に一番低い**点。
-実験2で到達した右の谷がこれです。
+実験2で到達した**右の谷（x ≈ 5.77）**がこれです。
+
+（実験1が止まった丘のてっぺんは**ローカルマキシマム**。最小化では用のない場所です）
 
 ```{python}
 #| echo: false
@@ -434,15 +448,18 @@ Newton法も勾配降下法も、この「目隠し」と同じ状況です。
 なぜこうなるのか：初期値と「引力圏」
 :::
 
-## Newton法は「近くの谷」に落ちる
+## Newton法は「近くの傾きゼロ」に落ちる
 
-Newton法は、現在地の近くにある谷を見つけるアルゴリズムです。
-遠くの谷のことは知りません。
+Newton法は、現在地の近くにある「傾きゼロの点」を見つけるアルゴリズムです。
+遠くのことは知りませんし、そこが谷か山頂かも気にしません。
 
-だから：
+だから、だいたいは：
 
 - **左の谷の近くからスタート** → 左の谷（ローカルミニマム）に落ちる
 - **右の谷の近くからスタート** → 右の谷（グローバルミニマム）に落ちる
+- **丘の上からスタート** → 丘のてっぺんに登って止まる（実験1がこれ）
+
+本当に「だいたい」で済むのか、初期値を200個並べて全部試してみましょう。
 
 ## 引力圏（Basin of Attraction）を可視化しよう
 
@@ -564,6 +581,81 @@ plt.show()
 - 初期値が少し変わるだけで行き先がガラッと変わる — 1回の実行を信用してはいけない理由がこれ
 :::
 
+
+## なぜ「すぐ手前の帯」が左へ飛ぶのか
+
+x0 = 4.0 から始めたときの**最初の1歩**を解剖してみます。
+
+```{python}
+#| echo: false
+#| fig-align: center
+x0_demo = 4.0
+x_next = x0_demo - f_poly_prime(x0_demo) / f_poly_double_prime(x0_demo)   # -4.0
+
+def q_fit(x):
+    """2nd-order Taylor fit at x0_demo = the parabola Newton trusts"""
+    return (f_poly(x0_demo) + f_poly_prime(x0_demo) * (x - x0_demo)
+            + 0.5 * f_poly_double_prime(x0_demo) * (x - x0_demo) ** 2)
+
+fig, ax = plt.subplots(figsize=(11, 5.2))
+xs_f = np.linspace(-1.7, 7.6, 400)
+ax.plot(xs_f, f_poly(xs_f), 'b-', lw=2.5, label='f(x)')
+xs_q = np.linspace(-5.3, 7.3, 400)
+ax.plot(xs_q, q_fit(xs_q), '--', color='#8e44ad', lw=2,
+        label='x0=4 に当てはめた放物線（逆さま！）')
+
+ax.axvspan(0.792, 4.208, color='orange', alpha=0.12)
+ax.text(2.5, 23.5, '上に凸の区間（f″< 0）', ha='center', fontsize=10.5,
+        color='#b9770e')
+ax.axvline(4.208, color='#b9770e', ls=':', lw=1.5)
+ax.text(4.35, 16, '変曲点（f″=0）\n近いほど f′/f″ が爆発', fontsize=9.5,
+        color='#b9770e', ha='left')
+
+ax.plot(x0_demo, f_poly(x0_demo), 'o', color='black', ms=10, zorder=5)
+ax.text(x0_demo + 0.15, f_poly(x0_demo) - 2.8,
+        'スタート x0=4\n（目の前は下り坂なのに…）', fontsize=10, ha='left')
+ax.plot(x_next, q_fit(x_next), 'X', color='#8e44ad', ms=13, zorder=5)
+ax.text(x_next, q_fit(x_next) + 1.6, '放物線の頂点（傾きゼロ）\n→ Newton法はここに飛ぶ',
+        ha='center', fontsize=10, color='#8e44ad')
+
+ax.annotate('', xy=(x_next + 0.3, q_fit(x_next) - 1.2),
+            xytext=(x0_demo - 0.2, f_poly(x0_demo) + 0.8),
+            arrowprops={'arrowstyle': '->', 'color': '#c0392b', 'lw': 2.5,
+                        'connectionstyle': 'arc3,rad=0.25'})
+ax.text(2.0, 9.0, '1歩 = −f′/f″ = −8 の大ジャンプ', fontsize=11, color='#c0392b',
+        fontweight='bold', ha='center')
+
+ax.annotate('着地後は左の谷を素直に降りて x=0 へ\n（−4 → −2.1 → −0.94 → … → 0）',
+            xy=(-0.2, f_poly(0) + 0.4), xytext=(-4.9, -9),
+            fontsize=10, ha='left',
+            arrowprops={'arrowstyle': '->', 'color': '#555'})
+
+ax.plot(0, f_poly(0), 'ro', ms=10, zorder=5)
+ax.plot(x_global, y_global, 'g*', ms=18, zorder=5)
+ax.text(6.75, -15.9, '歩けば目と鼻の先だった\nグローバルミニマム',
+        ha='center', va='top', fontsize=9.5, color='green')
+
+ax.set_xlim(-5.5, 7.8)
+ax.set_ylim(-20, 27)
+ax.set_xlabel('x', fontsize=12)
+ax.set_ylabel('f(x)', fontsize=12)
+ax.legend(fontsize=10, loc='lower left')
+ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+- Newton法の1歩は「いまの場所に**放物線を当てはめて、その頂点へジャンプ**」（$x - f'/f''$ の意味）
+- ところが x0=4 は**上に凸の区間**（2つの変曲点 x≈0.79〜4.21 の間）の右端 — 当てはめた放物線が**逆さま**になり、頂点は左の遠く（x=−4）にある
+- しかも変曲点の近くでは $f'' \approx 0$ なので、割り算 $f'/f''$ が**爆発**して飛距離が伸びる
+- 着地した x=−4 は左の谷の素直な（下に凸の）区間 → あとはおとなしく x=0 に収束
+- 細い緑の帯（x0≈0.85）は同じ現象の**逆向き**：左の変曲点のすぐ内側から +6.3 ジャンプして右の谷へ
+
+::: {.callout-important}
+**大ジャンプできるのがNewton法の強みで、放物線近似が嘘をつく場所では同じ大ジャンプが暴発する。**
+勾配降下法なら「傾きの逆に少しずつ」なので、x0=4 からは素直に右の谷へ降りる。
+:::
+
 ## {background-color="white" .center .break-slide}
 
 ::: {.break-title}
@@ -574,8 +666,8 @@ plt.show()
 
 ここまでの実験でわかったこと：
 
-- Newton法は「近くの谷」に落ちるだけ
-- 1回の実行では、それがローカルかグローバルかわからない
+- Newton法は「近くの傾きゼロの点」に落ちるだけ — 谷とは限らない（山頂もある）
+- 1回の実行では、それが山か谷か、谷だとしてもローカルかグローバルか、わからない
 
 **解決策はシンプル：何回もやって、一番良い結果を選ぶ！**
 
@@ -708,22 +800,26 @@ fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
 
 # 左：初期値 vs 収束点
 scatter1 = ax1.scatter(x0_list, xf_list, c=f_list, cmap='RdYlGn_r', s=100, edgecolors='black')
-ax1.axhline(y=x_local, color='r', linestyle='--', linewidth=2, alpha=0.5, label='Local Min')
-ax1.axhline(y=x_global, color='g', linestyle='--', linewidth=2, alpha=0.5, label='Global Min')
-ax1.set_xlabel('Starting Point (x0)', fontsize=12)
-ax1.set_ylabel('Convergence Point', fontsize=12)
-ax1.set_title('Initial Value -> Convergence', fontsize=13, fontweight='bold')
-ax1.legend(fontsize=10)
+ax1.axhline(y=x_local, color='r', linestyle='--', linewidth=2, alpha=0.5, label='ローカルミニマム')
+ax1.axhline(y=x_global, color='g', linestyle='--', linewidth=2, alpha=0.5, label='グローバルミニマム')
+ax1.axhline(y=x_max, color='darkorange', linestyle=':', linewidth=2, alpha=0.7,
+            label='山頂（極大）→ f″チェックで捨てる')
+ax1.set_xlabel('スタート地点 x0', fontsize=12)
+ax1.set_ylabel('たどり着いた場所', fontsize=12)
+ax1.set_title('初期値 → 収束点', fontsize=13, fontweight='bold')
+ax1.legend(fontsize=9.5)
 ax1.grid(True, alpha=0.3)
 
 # 右：収束時の関数値
 scatter2 = ax2.scatter(x0_list, f_list, c=f_list, cmap='RdYlGn_r', s=100, edgecolors='black')
-ax2.axhline(y=y_local, color='r', linestyle='--', linewidth=2, alpha=0.5, label='Local Min value')
-ax2.axhline(y=y_global, color='g', linestyle='--', linewidth=2, alpha=0.5, label='Global Min value')
-ax2.set_xlabel('Starting Point (x0)', fontsize=12)
-ax2.set_ylabel('f(x) at Convergence', fontsize=12)
-ax2.set_title('Solution Quality', fontsize=13, fontweight='bold')
-ax2.legend(fontsize=10)
+ax2.axhline(y=y_local, color='r', linestyle='--', linewidth=2, alpha=0.5, label='ローカルミニマムの値')
+ax2.axhline(y=y_global, color='g', linestyle='--', linewidth=2, alpha=0.5, label='グローバルミニマムの値')
+ax2.axhline(y=f_poly(x_max), color='darkorange', linestyle=':', linewidth=2, alpha=0.7,
+            label='山頂の値')
+ax2.set_xlabel('スタート地点 x0', fontsize=12)
+ax2.set_ylabel('収束時の f(x)', fontsize=12)
+ax2.set_title('解の良さ（一番下の点を採用する）', fontsize=13, fontweight='bold')
+ax2.legend(fontsize=9.5)
 ax2.grid(True, alpha=0.3)
 
 plt.tight_layout()
