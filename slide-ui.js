@@ -110,13 +110,15 @@
         modal.id = 'code-zoom-modal';
         modal.setAttribute('role', 'dialog');
         modal.setAttribute('aria-modal', 'true');
-        modal.innerHTML = '<div id="code-zoom-panel"><button id="code-zoom-close" type="button" aria-label="閉じる">&times;</button><div id="code-zoom-content"></div></div>';
+        modal.innerHTML = '<div id="code-zoom-panel"><button id="code-zoom-copy" type="button" title="コピー" aria-label="コードをコピー"></button><button id="code-zoom-close" type="button" aria-label="閉じる">&times;</button><div id="code-zoom-content"></div></div>';
         document.body.appendChild(modal);
         modal.addEventListener('click', function(e) {
           if (e.target === modal) closeCodeZoom();
         });
         var close = document.getElementById('code-zoom-close');
         if (close) close.addEventListener('click', closeCodeZoom);
+        var copy = document.getElementById('code-zoom-copy');
+        if (copy) copy.addEventListener('click', copyCodeZoom);
         initCodeZoomPanHandlers();
         return modal;
       } catch (e) {}
@@ -218,6 +220,43 @@
             setCodeZoomFontSize(codeZoomFontSize + delta);
           } catch (e) {}
         }, { passive: false });
+      } catch (e) {}
+    }
+
+    function fallbackCopyText(text, done) {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        done();
+      } catch (e) {}
+    }
+
+    function copyCodeZoom() {
+      try {
+        var content = document.getElementById('code-zoom-content');
+        var btn = document.getElementById('code-zoom-copy');
+        if (!content) return;
+        var code = content.querySelector('pre code') || content.querySelector('pre');
+        if (!code) return;
+        var text = code.innerText;
+        var done = function() {
+          try {
+            if (!btn) return;
+            btn.classList.add('copied');
+            setTimeout(function() { btn.classList.remove('copied'); }, 1000);
+          } catch (e) {}
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(done).catch(function() { fallbackCopyText(text, done); });
+        } else {
+          fallbackCopyText(text, done);
+        }
       } catch (e) {}
     }
 
