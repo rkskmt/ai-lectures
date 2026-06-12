@@ -72,6 +72,77 @@ $$u = 0.5 \times 0.30 + (-0.1) = 0.05$$
 $$p = \sigma(0.05) = 0.5125$$
 $$L = -\log(0.5125) = 0.6685$$
 
+```{python}
+#| echo: false
+#| fig-align: center
+import numpy as np
+import matplotlib.pyplot as plt
+import japanize_matplotlib
+
+def draw_graph(backward=False):
+    fig, ax = plt.subplots(figsize=(12.5, 4.0 if backward else 2.6))
+    ax.set_xlim(-0.4, 12.2)
+    ax.set_ylim(-1.9 if backward else 0.8, 3.1)
+    ax.axis("off")
+
+    nodes = [
+        (0.7,  "入力", r"$x_1=1.0$" + "\n" + r"$x_2=0.5$", "#eaf2f8"),
+        (3.0,  "アフィン", r"$z=\alpha_1 x_1+\alpha_2 x_2+b$", "#d6eaf8"),
+        (5.3,  "ReLU", r"$h=\mathrm{ReLU}(z)$", "#d6eaf8"),
+        (7.4,  "アフィン", r"$u=wh+c$", "#d6eaf8"),
+        (9.3,  "シグモイド", r"$p=\sigma(u)$", "#d6eaf8"),
+        (11.3, "損失", r"$L=-\log p$", "#fdebd0"),
+    ]
+    y = 1.6
+    for cx, name, formula, fc in nodes:
+        ax.text(cx, y, f"{name}\n{formula}", ha="center", va="center", fontsize=10,
+                bbox={"boxstyle": "round,pad=0.4", "fc": fc, "ec": "#2471a3"})
+
+    fwd_vals = [None, "0.30", "0.30", "0.05", "0.5125", "0.6685"]
+    for i in range(len(nodes) - 1):
+        x0, x1 = nodes[i][0], nodes[i + 1][0]
+        ax.annotate("", xy=(x1 - 0.85, y), xytext=(x0 + 0.85, y),
+                    arrowprops={"arrowstyle": "->", "color": "#1e8449", "lw": 2.2})
+    for (cx, _, _, _), v in zip(nodes, fwd_vals):
+        if v is not None:
+            ax.text(cx, 2.75, v, ha="center", fontsize=11, color="#1e8449",
+                    fontweight="bold")
+    ax.text(-0.3, 2.75, "往路の値", fontsize=10, color="#1e8449",
+            fontweight="bold", ha="left")
+
+    if backward:
+        yb = 0.3
+        deltas = [
+            (11.3, 7.4, r"$\delta_{\mathrm{out}}=p-y=-0.4875$"),
+            (7.4, 3.0, r"$\delta_{\mathrm{mid}}=\delta_{\mathrm{out}}\cdot w\cdot \mathrm{ReLU}'(z)=-0.2438$"),
+        ]
+        for x_from, x_to, label in deltas:
+            ax.annotate("", xy=(x_to, yb), xytext=(x_from, yb),
+                        arrowprops={"arrowstyle": "->", "color": "#c0392b", "lw": 2.2})
+            ax.text((x_from + x_to) / 2, yb + 0.22, label, ha="center",
+                    fontsize=9.5, color="#c0392b")
+        ax.text(-0.3, yb + 0.22, "復路（δ）", fontsize=10, color="#c0392b",
+                fontweight="bold", ha="left")
+        ax.text(3.0, -1.15,
+                r"$\partial L/\partial\alpha_1=-0.2438$" + "\n"
+                + r"$\partial L/\partial\alpha_2=-0.1219$" + "\n"
+                + r"$\partial L/\partial b=-0.2438$",
+                ha="center", fontsize=9.5, color="#c0392b",
+                bbox={"boxstyle": "round,pad=0.35", "fc": "#fdedec", "ec": "#c0392b"})
+        ax.text(7.4, -1.15,
+                r"$\partial L/\partial w=-0.1463$" + "\n"
+                + r"$\partial L/\partial c=-0.4875$",
+                ha="center", fontsize=9.5, color="#c0392b",
+                bbox={"boxstyle": "round,pad=0.35", "fc": "#fdedec", "ec": "#c0392b"})
+        for cx in (3.0, 7.4):
+            ax.annotate("", xy=(cx, -0.55), xytext=(cx, yb - 0.05),
+                        arrowprops={"arrowstyle": "->", "color": "#c0392b", "lw": 1.6})
+    plt.tight_layout()
+    plt.show()
+
+draw_graph(backward=False)
+```
+
 - 予測は 0.5125 —「ほぼコイン投げ」。正解は 1 なので、もっと上げたい
 - **途中の値（$z, h, u, p$）は捨てずに取っておく** — 復路で全部使う
 
@@ -100,6 +171,14 @@ $$\frac{\partial L}{\partial \alpha_1} = \delta_{\text{mid}} \cdot x_1 = -0.2438
 \frac{\partial L}{\partial b} = \delta_{\text{mid}} = -0.2438$$
 
 - 5個の勾配が**掛け算と代入だけ**で出揃った。新しい微分は1つもしていない
+
+```{python}
+#| echo: false
+#| fig-align: center
+draw_graph(backward=True)
+```
+
+- 上の緑が**往路**、下の赤が**復路** — 誤差 $\delta$ が右から左へ流れ、通り道のパラメータに勾配を配っていく
 
 
 ## 検算：機械に「微分の定義」でやらせる
@@ -159,6 +238,40 @@ $$\delta^{(\ell)} = \delta^{(\ell+1)} \cdot w^{(\ell+1)} \cdot f'(z^{(\ell)})$$
 - **$\mathrm{ReLU}'(z)$ は 1 か 0** — 掛けても勾配が痩せない（生きている経路はそのまま通す）
   - シグモイドを中間に使うと微分が最大 0.25 — 層を重ねるたびに勾配が薄まる（**勾配消失**）
   - 中間層に ReLU が選ばれる大きな理由
+
+```{python}
+#| echo: false
+#| fig-align: center
+fig, axes = plt.subplots(1, 2, figsize=(11, 3.6))
+zz = np.linspace(-5, 5, 300)
+sig = 1 / (1 + np.exp(-zz))
+axes[0].plot(zz, sig * (1 - sig), color="#8e44ad", lw=2.5,
+             label=r"$\sigma'(z)$（最大 0.25）")
+axes[0].plot(zz, (zz > 0).astype(float), color="#e74c3c", lw=2.5,
+             label=r"$\mathrm{ReLU}'(z)$（1 か 0）")
+axes[0].axhline(0.25, color="#8e44ad", ls=":", lw=1)
+axes[0].set_ylim(-0.1, 1.15)
+axes[0].set_xlabel("z")
+axes[0].set_title("活性化関数の微分", fontsize=11)
+axes[0].legend(fontsize=9.5)
+axes[0].grid(alpha=0.3)
+
+layers = np.arange(1, 11)
+axes[1].semilogy(layers, 0.25**layers, "o-", color="#8e44ad",
+                 label="シグモイド：$0.25^n$")
+axes[1].semilogy(layers, np.ones_like(layers, dtype=float), "o-", color="#e74c3c",
+                 label="ReLU（生きた経路）：$1^n$")
+axes[1].annotate("10層通ると約 100万分の1", xy=(10, 0.25**10),
+                 xytext=(4.6, 3e-5), fontsize=10, color="#8e44ad",
+                 arrowprops={"arrowstyle": "->", "color": "#8e44ad"})
+axes[1].set_xlabel("通過した層の数 n")
+axes[1].set_ylabel("勾配に掛かる倍率")
+axes[1].set_title("層を重ねたとき勾配はどれだけ痩せるか", fontsize=11)
+axes[1].legend(fontsize=9.5)
+axes[1].grid(alpha=0.3, which="both")
+plt.tight_layout()
+plt.show()
+```
 
 ::: {.callout-tip}
 最小単位の回の「$p - y$ のきれいさ」も、ReLU の「1 か 0」も、
