@@ -85,7 +85,10 @@ plt.show()
 :::
 
 
-## データの準備
+## データの準備 — 魚を増やす
+
+- 前回の80匹に、新しく測った**40匹**を加えた**120匹**で考える
+- データが増えると、**どちらとも言いにくい微妙な個体**や計測のばらつきも入ってくる
 
 ```{python}
 #| echo: true
@@ -97,29 +100,60 @@ import japanize_matplotlib
 plt.rcParams['font.size'] = 11
 plt.rcParams['figure.dpi'] = 100
 
-salmon_weights     = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,
-                               1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,
-                               2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,
-                               1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652])
-salmon_brightness  = np.array([3.5, 5.8, 4.9, 4.4, 2.6, 2.6, 2.2, 5.5, 4.4, 4.8, 2.1,
-                               5.9, 5.3, 2.8, 2.7, 2.7, 3.2, 4.1, 3.7, 3.2, 4.4, 2.6,
-                               3.2, 3.5, 3.8, 5.1, 2.8, 4.1, 4.4, 2.2, 4.4, 2.7, 2.3,
-                               5.8, 5.9, 5.2, 3.2, 2.4, 4.7, 3.8])
-seabass_weights    = np.array([1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,
-                               1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,
-                               1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,
-                               1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531])
-seabass_brightness = np.array([5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8,
-                               8.9, 9.7, 9.5, 8.0, 9.6, 5.4, 6.0, 5.2, 6.6, 6.9, 6.4,
-                               9.1, 6.8, 6.4, 7.7, 5.7, 9.0, 5.4, 9.9, 8.9, 6.0, 5.0,
-                               9.1, 8.5, 8.6, 8.9, 5.4, 6.8, 5.6])
+salmon_weights     = np.array([1883, 1903, 1652, 1483, 1825, 2474, 2457, 1503, 2057, 1836,
+                               1825, 2094, 2149, 1930, 2028, 1959, 1859, 1936, 1861, 2240,
+                               2081, 1838, 1728, 1426, 2229, 1838, 1884, 1860, 1930, 1733,
+                               2163, 1831, 1591, 2073, 1706, 1644, 2194, 1828, 1820, 1834,
+                               1554, 1615, 1884, 1979, 1839, 2230, 1986, 1978, 1731, 1796,
+                               1872, 2031, 1458, 1405, 2037, 1576, 1774, 1992, 1696, 1752])
+salmon_brightness  = np.array([7.5, 2.6, 3.8, 2.7, 5.8, 2.2, 4.4, 6.0, 3.2, 4.7, 5.7, 4.1,
+                               3.5, 2.6, 4.4, 5.8, 4.4, 5.4, 2.1, 2.8, 4.1, 2.7, 3.7, 2.8,
+                               3.5, 4.4, 3.8, 5.9, 2.6, 7.2, 4.8, 2.7, 5.9, 5.3, 6.1, 5.4,
+                               4.9, 7.2, 5.2, 5.4, 5.8, 5.1, 5.1, 5.8, 4.4, 5.5, 5.9, 2.3,
+                               3.2, 5.3, 4.8, 4.0, 5.0, 6.6, 2.2, 3.2, 4.4, 2.4, 3.2, 4.7])
+seabass_weights    = np.array([2181, 1749, 1864, 1327, 1819, 1979, 1787, 1488, 1370, 1476,
+                               1472, 1533, 1099, 1368, 1486, 1663, 1992, 1370, 1906, 1480,
+                               1426, 1677, 1286, 1445, 1381, 1333, 1505, 1857, 1767, 1492,
+                               1502, 1468, 1259, 1517, 1278, 1223, 1595, 1531, 1096, 1582,
+                               1513, 1440, 1703, 1490, 1432, 2019, 1397, 1341, 1657, 1414,
+                               1748, 1859, 1820, 1245, 2203, 1204, 1496, 1567, 1563, 1737])
+seabass_brightness = np.array([5.4, 6.6, 6.0, 7.5, 4.9, 7.7, 6.9, 5.0, 8.9, 8.3, 5.7, 8.9,
+                               9.7, 6.9, 5.2, 4.7, 5.3, 5.4, 5.1, 4.8, 3.8, 5.6, 5.2, 6.4,
+                               6.4, 6.6, 9.1, 6.3, 4.9, 5.9, 5.6, 5.9, 5.7, 5.2, 9.1, 6.8,
+                               3.5, 5.6, 5.4, 5.4, 7.7, 9.5, 4.7, 4.7, 9.9, 5.4, 5.3, 9.5,
+                               8.5, 6.0, 8.0, 5.7, 6.0, 8.6, 7.6, 6.8, 9.8, 9.0, 9.6, 8.9])
 
 X = np.column_stack([
     np.concatenate([salmon_brightness, seabass_brightness]),
     np.concatenate([salmon_weights,    seabass_weights])
 ])
-y = np.array([1]*40 + [0]*40)   # 1=Salmon, 0=Sea bass
+y = np.array([1]*60 + [0]*60)   # 1=Salmon, 0=Sea bass
 ```
+
+
+## まずデータを眺める
+
+```{python}
+#| echo: false
+#| fig-align: center
+plt.figure(figsize=(7, 4.2))
+plt.scatter(salmon_brightness, salmon_weights, c="black", marker="o",
+            s=40, alpha=0.7, label="Salmon")
+plt.scatter(seabass_brightness, seabass_weights, c="red", marker="s",
+            s=40, alpha=0.7, label="Sea bass")
+plt.xlabel("輝度"); plt.ylabel("重さ (g)")
+plt.legend(); plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+- 「左上が Salmon・右下が Sea bass」の傾向は前回と同じ
+- ただし真ん中に、2種が**入り混じるゾーン**ができている
+- どんな境界線を引いても、このゾーンの**多少の間違いは避けられない**
+
+::: {.callout-important title="ここで予想"}
+このデータで「正答率 100%」を出すモデルがあったら — それは天才か、それとも？
+:::
 
 
 ## 前回と同じ採点方法
@@ -234,9 +268,75 @@ print(f"テストデータ精度: {deep_test_acc:.3f}")
 ```
 
 ::: {.fragment}
-- 訓練では**満点**。新しい魚では**2割近く間違える**
+- 訓練では**満点**。ところが新しい魚では**4割近く間違える**
 - 満点の正体は実力ではなく**暗記**だった
 :::
+
+
+## 境界線はどう「学習」されていたのか
+
+- 深さを変えた木の**決定境界**を、訓練データと一緒に描いてみる
+
+```{python}
+#| echo: false
+#| fig-align: center
+xx_g, yy_g = np.meshgrid(np.arange(X[:, 0].min() - 1, X[:, 0].max() + 1, 0.05),
+                         np.arange(X[:, 1].min() - 100, X[:, 1].max() + 100, 10))
+
+fig, axes = plt.subplots(1, 3, figsize=(13, 4))
+for ax, depth in zip(axes, [3, 6, None]):
+    m = DecisionTreeClassifier(max_depth=depth, random_state=42).fit(X_train, y_train)
+    Z = m.predict(np.c_[xx_g.ravel(), yy_g.ravel()]).reshape(xx_g.shape)
+    ax.contourf(xx_g, yy_g, Z, alpha=0.3, levels=1, colors=["lightcoral", "lightblue"])
+    ax.contour(xx_g, yy_g, Z, levels=[0.5], colors="blue", linewidths=1.5)
+    ax.scatter(X_train[y_train == 1, 0], X_train[y_train == 1, 1],
+               c="black", marker="o", s=25, alpha=0.7, label="Salmon")
+    ax.scatter(X_train[y_train == 0, 0], X_train[y_train == 0, 1],
+               c="red", marker="s", s=25, alpha=0.7, label="Sea bass")
+    tr_a = accuracy_score(y_train, m.predict(X_train))
+    te_a = accuracy_score(y_test,  m.predict(X_test))
+    label = "無制限" if depth is None else f"深さ{depth}"
+    ax.set_title(f"{label}　訓練 {tr_a:.0%} / テスト {te_a:.0%}", fontsize=11)
+    ax.set_xlabel("輝度")
+axes[0].set_ylabel("重さ (g)")
+axes[0].legend(fontsize=8, loc="upper right")
+plt.tight_layout()
+plt.show()
+```
+
+- 分割を増やすほど、入り混じりゾーンに**細い回廊や飛び地**が増えていく
+- 無制限の木は、微妙な1匹1匹を救うために**境界をめちゃくちゃに曲げて**訓練データ満点を達成している
+
+
+## 暗記の境界に、新しい魚を流し込む
+
+```{python}
+#| echo: false
+#| fig-align: center
+Z = deep_tree.predict(np.c_[xx_g.ravel(), yy_g.ravel()]).reshape(xx_g.shape)
+test_pred = deep_tree.predict(X_test)
+wrong = test_pred != y_test
+
+plt.figure(figsize=(7, 4.2))
+plt.contourf(xx_g, yy_g, Z, alpha=0.3, levels=1, colors=["lightcoral", "lightblue"])
+plt.contour(xx_g, yy_g, Z, levels=[0.5], colors="blue", linewidths=1.5)
+plt.scatter(X_test[y_test == 1, 0], X_test[y_test == 1, 1],
+            c="black", marker="o", s=60, label="Salmon（テスト）")
+plt.scatter(X_test[y_test == 0, 0], X_test[y_test == 0, 1],
+            c="red", marker="s", s=60, label="Sea bass（テスト）")
+plt.scatter(X_test[wrong, 0], X_test[wrong, 1],
+            facecolors="none", edgecolors="orange", s=240, linewidths=2.5,
+            label="誤分類")
+plt.xlabel("輝度"); plt.ylabel("重さ (g)")
+plt.legend(fontsize=9); plt.grid(True, alpha=0.3)
+plt.title("深さ無制限の木の境界 × テストデータ24匹")
+plt.tight_layout()
+plt.show()
+```
+
+- 回廊や飛び地は、**訓練データの特定の数匹**のためのオーダーメイド
+- 新しい魚はその意図どおりには並ばない — 誤分類（オレンジ）は入り混じりゾーンに集中
+- 暗記した細部は、**次に来る魚には通用しない**
 
 
 ## 深さを変えて、2つの精度を並べる
@@ -244,7 +344,7 @@ print(f"テストデータ精度: {deep_test_acc:.3f}")
 ```{python}
 #| echo: true
 #| fig-align: center
-depths   = list(range(1, 11))
+depths   = list(range(1, 13))
 train_accs, test_accs = [], []
 
 for d in depths:
@@ -262,15 +362,16 @@ plt.tight_layout()
 plt.show()
 ```
 
-- 訓練精度は深くするほど 100% に張り付く
-- テスト精度は**深さ3が最高**。それ以上深くしても上がらないどころか下がる
-- 2本の線の**差（ギャップ）**は開く一方
+- 訓練精度は深くするほど上がり続け、やがて 100% に到達する
+- テスト精度は**深さ2〜4がピーク**。それ以上深くすると**むしろ下がる**
+- 深さ5以降、訓練精度だけが伸びて2本の線の**差（ギャップ）**が広がる — 暗記が進んでいるサイン
 
 
 ## 過学習（Overfitting）
 
 - 訓練データの細部（たまたまの並び・ノイズ）まで覚え込み、**新しいデータで性能が落ちる**こと
-- 証拠は**訓練精度とテスト精度のギャップ**
+- 数字での証拠は**訓練精度とテスト精度のギャップ**
+- 図での証拠は**数匹のためだけの回廊・飛び地**だらけの決定境界
 - モデルが複雑なほど（深い木・多すぎるパラメータ）起きやすい
 
 | 状態 | 訓練精度 | テスト精度 |
@@ -307,7 +408,7 @@ for seed in range(5):
 ```
 
 ::: {.callout-warning title="データが少ないほど揺れが大きい"}
-- テストデータが16匹の場合、1匹の誤分類で精度が約 6% 変わる
+- テストデータが24匹の場合、1匹の誤分類で精度が約 4% 変わる
 - 1回だけの分割結果を、強く信じすぎない
 :::
 
@@ -379,7 +480,8 @@ print(f"平均精度: {scores.mean():.3f}  ±  {scores.std():.3f}")
 
 - 訓練データで評価した精度は**楽観的** — 満点はむしろ疑う
 - **過学習**：訓練データを暗記して、新しいデータで性能が落ちること
-  - 証拠は**訓練精度とテスト精度のギャップ**（深さ無制限の決定木：100% vs 81%）
+  - 証拠は**訓練精度とテスト精度のギャップ**（深さ無制限の決定木：100% vs 63%）
+  - 決定境界で見ると、数匹のためだけの**回廊・飛び地**として現れる
 - **汎化**：未知データへの対応能力を測ることが本来の目的
 - **`train_test_split`**：手軽だが分割次第で精度が揺れる
 - **k-fold 交差検証**：k 回の平均で安定した評価が得られる
