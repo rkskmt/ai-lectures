@@ -275,6 +275,65 @@ plt.show()
 - PC1 は体長と重さを合わせた「**大きさ**」の軸 — この方向だけで分散の約 99% を説明できる
 
 
+## 最小二乗法と PCA — 「足」の下ろし方が違う
+
+- 実はどちらも「**足（誤差）の二乗和が最小になる直線**」を探している
+- 違うのは**足の向き**だけ
+
+```{python}
+#| echo: false
+#| fig-align: center
+xs_, ys_ = X_lw_sc[:, 0], X_lw_sc[:, 1]
+a_ls, b_ls = np.polyfit(xs_, ys_, 1)
+u1 = pca_d.components_[0] / np.linalg.norm(pca_d.components_[0])
+proj = np.outer(X_lw_sc @ u1, u1)
+
+# highlight the 3 points with the largest residuals so the foot angle is obvious
+hl = np.argsort(-np.abs(ys_ - (a_ls * xs_ + b_ls)))[:3]
+
+fig, axes = plt.subplots(1, 2, figsize=(10.5, 4.4))
+xr_ = np.array([-2.7, 3.0])
+
+ax = axes[0]
+for i, (x, y0) in enumerate(zip(xs_, ys_)):
+    bold = i in hl
+    ax.plot([x, x], [y0, a_ls * x + b_ls], color="#e74c3c",
+            lw=2.2 if bold else 0.8, alpha=1.0 if bold else 0.45, zorder=1)
+ax.plot(xr_, a_ls * xr_ + b_ls, color="black", lw=2, zorder=3)
+ax.scatter(xs_, ys_, s=28, c="#5dade2", edgecolors="gray", lw=0.4, zorder=2)
+ax.set_title("最小二乗法（回帰）：縦の足の二乗和を最小化", fontsize=11)
+ax.set_xlabel("体長（標準化）"); ax.set_ylabel("重さ（標準化）")
+
+ax = axes[1]
+for i, (p, q) in enumerate(zip(X_lw_sc, proj)):
+    bold = i in hl
+    ax.plot([p[0], q[0]], [p[1], q[1]], color="#e74c3c",
+            lw=2.2 if bold else 0.8, alpha=1.0 if bold else 0.45, zorder=1)
+ax.plot(xr_, (u1[1] / u1[0]) * xr_, color="black", lw=2, zorder=3)
+ax.scatter(xs_, ys_, s=28, c="#5dade2", edgecolors="gray", lw=0.4, zorder=2)
+ax.set_title("PCA（PC1）：垂直の足の二乗和を最小化", fontsize=11)
+ax.set_xlabel("体長（標準化）"); ax.set_ylabel("重さ（標準化）")
+
+for ax in axes:
+    ax.set_aspect("equal")
+    ax.set_xlim(-2.9, 3.2)
+    ax.set_ylim(-2.6, 3.0)
+    ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+- **最小二乗法（[線形回帰の回](linear-regression.qmd)の MSE）**：仕事は「$y$ を当てる」→ 誤差は**縦**に測る
+- **PCA**：仕事は「データの形を要約する」→ 誤差は直線への**最短距離（垂直の足）**で測る
+- 足の向きが違うので、選ばれる直線も**少し違う**（回帰の傾き 0.97、PC1 の傾き 1.00）
+
+::: {.callout-note title="「分散最大」と「垂直の足最小」は同じこと"}
+各点で（中心からの距離）² ＝（軸上の影）² ＋（垂直の足）²（ピタゴラスの定理）。
+左辺の合計はデータで決まっていて動かないので、**影の分散を最大にする軸**と
+**足の二乗和を最小にする直線**は、同じものを選ぶ。
+:::
+
+
 ## 固有ベクトルとの関係
 
 PCA は共分散行列の**固有ベクトル**を求めることと等価
