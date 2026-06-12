@@ -5,13 +5,20 @@
 (function () {
   try {
     var STYLE = [
+      // same visual language as the code-expand button (white circle, gray icon)
       '#search-btn {',
-      '  position: fixed; top: 12px; left: 94px; z-index: 100;',
-      '  display: inline-flex; align-items: center; gap: 6px;',
-      '  background: #5dade2; color: white; border: none; cursor: pointer;',
-      '  padding: 4px 12px; border-radius: 4px; font-size: 1rem;',
+      '  position: fixed; top: 12px; right: 14px; z-index: 100;',
+      '  width: 34px; height: 34px; padding: 0;',
+      '  display: flex; align-items: center; justify-content: center;',
+      '  border: 2px solid rgba(0,0,0,0.25); border-radius: 50%;',
+      '  background: rgba(255,255,255,0.92); color: #666; cursor: pointer;',
+      '  opacity: 0.82; box-shadow: 0 2px 8px rgba(0,0,0,0.22);',
+      '  transition: opacity 0.15s ease, background 0.15s ease, transform 0.15s ease;',
       '}',
-      '#search-btn svg { width: 0.9em; height: 0.9em; display: block; }',
+      '#search-btn:hover, #search-btn:focus {',
+      '  opacity: 1; background: white; transform: scale(1.06); color: #2980b9;',
+      '}',
+      '#search-btn svg { width: 18px; height: 18px; display: block; pointer-events: none; }',
       '#search-modal {',
       '  position: fixed; inset: 0; z-index: 10500; display: none;',
       '  align-items: flex-start; justify-content: center;',
@@ -179,11 +186,20 @@
     document.addEventListener('keydown', function (e) {
       try {
         var modal = document.getElementById('search-modal');
-        if (!modal || !modal.classList.contains('search-open')) return;
-        if (e.key === 'Escape') {
+        var open = modal && modal.classList.contains('search-open');
+        if (open && e.key === 'Escape') {
           e.preventDefault();
           e.stopImmediatePropagation();
           closeModal();
+          return;
+        }
+        // "/" opens the search from anywhere (unless typing in a field)
+        if (!open && e.key === '/' &&
+            !(e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) &&
+            !(e.target && e.target.isContentEditable)) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          openModal();
         }
       } catch (e2) {}
     }, true);
@@ -193,14 +209,13 @@
       var btn = document.createElement('button');
       btn.id = 'search-btn';
       btn.type = 'button';
-      btn.title = '全文検索';
+      btn.title = '全文検索（ / キーでも開く）';
       btn.setAttribute('aria-label', '全文検索');
       btn.innerHTML =
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" ' +
         'stroke-linecap="round" aria-hidden="true">' +
         '<circle cx="10.5" cy="10.5" r="6.5"></circle>' +
-        '<line x1="15.5" y1="15.5" x2="21" y2="21"></line></svg>' +
-        '<span>検索</span>';
+        '<line x1="15.5" y1="15.5" x2="21" y2="21"></line></svg>';
       btn.addEventListener('click', openModal);
       document.body.appendChild(btn);
     }
