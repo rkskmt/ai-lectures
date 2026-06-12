@@ -346,14 +346,43 @@ $$C \mathbf{v}_i = \lambda_i \mathbf{v}_i$$
 - $\lambda_i$：その方向に含まれる**情報量（分散）**（固有値）
 - $\lambda_1 \geq \lambda_2 \geq \cdots$ の順に並べる → PC1, PC2, …
 
-::: {.callout-tip}
 ## NumPy で確かめる
-```python
-C = np.cov(X.T)
-eigenvalues, eigenvectors = np.linalg.eig(C)
-# eigenvectors の各列 ≈ pca.components_ の各行
+
+スライドの式を**そのまま**コードにして、sklearn の答えと突き合わせます。
+
+```{python}
+#| echo: true
+# 1) 式のとおりに共分散行列を作る（専用関数は要らない）
+Xc = X_lw_sc - X_lw_sc.mean(axis=0)     # 中心化 X~
+C  = Xc.T @ Xc / (len(Xc) - 1)          # C = X~^T X~ / (n-1)
+
+# 2) 固有値・固有ベクトル（C のような対称行列には eigh を使う）
+lam, V = np.linalg.eigh(C)
+order  = np.argsort(lam)[::-1]          # 固有値の大きい順に並べ替え → PC1, PC2
+lam, V = lam[order], V[:, order]
+
+print("固有値（自作）        :", lam.round(4))
+print("分散（sklearnのPCA）  :", pca_d.explained_variance_.round(4))
+print("固有ベクトル（自作・列がPC）:")
+print(V.round(4))
+print("components_.T（sklearn）:")
+print(pca_d.components_.T.round(4))
 ```
-sklearn の PCA は内部でこれを（SVD で効率的に）計算している
+
+- 固有値は sklearn の `explained_variance_` と**完全一致**
+- ベクトルは列によって**符号が逆**になることがある — 軸の向きが180°逆なだけで、**同じ軸**
+
+::: {.callout-tip}
+## 実は sklearn の中身は SVD
+
+実務の PCA は、共分散行列を作らずに中心化したデータを **SVD（特異値分解）** に
+かけて同じ答えを出している（大きいデータで速く、数値的にも安定）。
+
+```{python}
+#| echo: true
+U, S, Vt = np.linalg.svd(Xc)
+print("SVD から出した分散:", (S**2 / (len(Xc) - 1)).round(4))   # ↑の固有値と一致
+```
 :::
 
 
