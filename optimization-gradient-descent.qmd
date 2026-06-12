@@ -177,6 +177,28 @@ def f_prime(x):
  3. また傾きを測る
  4. 繰り返して最小値を探す
 
+```{python}
+#| echo: false
+#| fig-align: center
+xr_gd = np.linspace(-1.2, 5.2, 200)
+
+plt.figure(figsize=(6.5, 3.2))
+plt.plot(xr_gd, f(xr_gd), color="#2980b9", lw=2)
+tx = np.linspace(-1.1, 1.1, 10)
+plt.plot(tx, f(0) + f_prime(0) * tx, color="#e67e22", lw=2, label="接線（傾き −4）")
+plt.scatter(0, f(0), c="#e74c3c", s=100, zorder=4)
+plt.annotate("", xy=(1.3, f(0)), xytext=(0.05, f(0)),
+             arrowprops={"arrowstyle": "->", "color": "#c0392b", "lw": 2.5})
+plt.text(2.7, 3.3, "傾きは負（下り坂）\n→ 逆方向＝右へ進む", fontsize=10, color="#c0392b")
+plt.axvline(2, color="green", ls="--", alpha=0.5)
+plt.text(2, 4.8, "ゴール（最小値）", ha="center", fontsize=9, color="green")
+plt.ylim(-1.6, 5.4); plt.xlim(-1.2, 5.2)
+plt.legend(fontsize=9, loc="upper right")
+plt.grid(alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
 **キーワード**: 少しずつ、手探りで
 
 ### アルゴリズム
@@ -202,6 +224,37 @@ $$x_{\text{new}} = x - \alpha \cdot f'(x)$$
 - 1次微分: $f'(x) = 2x - 4$
 - 初期値: $x_0 = 0$
 - **学習率: $\alpha = 0.3$**
+
+```{python}
+#| echo: false
+# Precompute the alpha=0.3 trajectory and a per-iteration plot helper
+xs_03 = [0.0]
+for _ in range(4):
+    xs_03.append(xs_03[-1] - 0.3 * f_prime(xs_03[-1]))
+
+def plot_gd_step(step):
+    x0, x1 = xs_03[step - 1], xs_03[step]
+    plt.figure(figsize=(6.2, 3.0))
+    plt.plot(xr_gd, f(xr_gd), color="#2980b9", lw=2)
+    plt.axvline(2, color="green", ls="--", alpha=0.5)
+    plt.text(2, 3.6, "最小値 x=2", ha="center", fontsize=9, color="green")
+    for p in xs_03[:step - 1]:
+        plt.scatter(p, f(p), c="gray", s=40, zorder=3)
+    tx = np.linspace(x0 - 1.1, x0 + 1.1, 10)
+    plt.plot(tx, f(x0) + f_prime(x0) * (tx - x0), color="#e67e22", lw=1.8,
+             label=f"接線（傾き {f_prime(x0):+.2f}）")
+    plt.scatter(x0, f(x0), c="#e74c3c", s=90, zorder=4,
+                label=f"いまの位置 x={x0:.3f}")
+    plt.annotate("", xy=(x1, f(x1)), xytext=(x0, f(x0)),
+                 arrowprops={"arrowstyle": "->", "color": "#c0392b", "lw": 2.2})
+    plt.scatter(x1, f(x1), facecolors="white", edgecolors="#c0392b", s=90,
+                lw=2, zorder=4, label=f"更新後 x={x1:.3f}")
+    plt.ylim(-1.6, 4.2); plt.xlim(-1.2, 5.2)
+    plt.legend(fontsize=8.5, loc="upper right")
+    plt.grid(alpha=0.3)
+    plt.tight_layout()
+    plt.show()
+```
 
 
 ### 反復1
@@ -236,6 +289,12 @@ $$x_{\text{new}} = 0 - 0.3 \times (-4)$$
 **反復1の結果**: $x = 0 \rightarrow x = 1.2$
 :::
 
+```{python}
+#| echo: false
+#| fig-align: center
+plot_gd_step(1)
+```
+
 
 ### 反復2
 
@@ -255,6 +314,12 @@ $$x_{\text{new}} = 1.2 - 0.3 \times (-1.6) = 1.2 + 0.48 = 1.68$$
 **反復2の結果**: $x = 1.2 \rightarrow x = 1.68$
 :::
 
+```{python}
+#| echo: false
+#| fig-align: center
+plot_gd_step(2)
+```
+
 
 ### 反復3
 
@@ -266,6 +331,12 @@ $$f'(1.68) = 2 \times 1.68 - 4 = 3.36 - 4 = -0.64$$
 
 #### 更新
 $$x_{\text{new}} = 1.68 - 0.3 \times (-0.64) = 1.68 + 0.192 = 1.872$$
+
+```{python}
+#| echo: false
+#| fig-align: center
+plot_gd_step(3)
+```
 
 
 ### 反復4
@@ -279,6 +350,12 @@ $$f'(1.872) = 2 \times 1.872 - 4 = 3.744 - 4 = -0.256$$
 #### 更新
 $$x_{\text{new}} = 1.872 - 0.3 \times (-0.256) = 1.872 + 0.0768 = 1.9488$$
 
+```{python}
+#| echo: false
+#| fig-align: center
+plot_gd_step(4)
+```
+
 
 ### 進捗まとめ
 
@@ -289,6 +366,24 @@ $$x_{\text{new}} = 1.872 - 0.3 \times (-0.256) = 1.872 + 0.0768 = 1.9488$$
 | 2 | 1.680 | -0.902 | -0.640 | +0.480 |
 | 3 | 1.872 | -0.984 | -0.256 | +0.192 |
 | 4 | 1.949 | -0.997 | -0.102 | +0.077 |
+
+```{python}
+#| echo: false
+#| fig-align: center
+plt.figure(figsize=(6.5, 3.2))
+plt.plot(xr_gd, f(xr_gd), color="#2980b9", lw=2, alpha=0.6)
+plt.plot(xs_03, [f(p) for p in xs_03], "o-", c="#e74c3c", ms=7, lw=1.5)
+for i, p in enumerate(xs_03):
+    plt.annotate(f"{i}", (p, f(p)), textcoords="offset points", xytext=(0, 9),
+                 ha="center", fontsize=9, fontweight="bold")
+plt.axvline(2, color="green", ls="--", alpha=0.5)
+plt.text(2, 3.6, "x=2", ha="center", fontsize=9, color="green")
+plt.title("5点の軌跡：谷に近づくほど歩幅（更新幅）が自然に小さくなる", fontsize=11)
+plt.ylim(-1.6, 4.2); plt.xlim(-1.2, 5.2)
+plt.grid(alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
 
 ::: {.callout-note}
 徐々に正解（$x=2$）に近づいているが、**まだ到達していない**
@@ -350,25 +445,27 @@ print(f"理論値との誤差: {abs(x - 2.0):.6f}")
 #| fig-align: center
 # 学習率による違い
 fig, axes = plt.subplots(1, 3, figsize=(14, 4))
-learning_rates = [0.1, 0.5, 1.1]
-titles = ['Small LR (\u03b1=0.1) Slow', 'Good LR (\u03b1=0.5)', 'Large LR (\u03b1=1.1) Oscillation']
+configs = [(0.1, 15, "小さすぎ（α=0.1）：のろのろ"),
+           (0.35, 15, "ちょうど良い（α=0.35）"),
+           (1.1, 7, "大きすぎ（α=1.1）：振動して発散")]
+x_range = np.linspace(-1, 5, 100)
 
-for idx, (alpha, title) in enumerate(zip(learning_rates, titles)):
+for ax, (alpha, n_iter, title) in zip(axes, configs):
     x = 0.0
     history = [x]
-    
-    for i in range(15):
+    for i in range(n_iter):
         x = x - alpha * f_prime(x)
         history.append(x)
-    
-    x_range = np.linspace(-1, 4, 100)
-    axes[idx].plot(x_range, f(x_range), 'b-', linewidth=2, alpha=0.3)
-    axes[idx].plot(history, [f(h) for h in history], 'ro-', markersize=6)
-    axes[idx].axvline(x=2, color='g', linestyle='--', alpha=0.5)
-    axes[idx].set_title(title, fontsize=11, fontweight='bold')
-    axes[idx].set_xlabel('x')
-    axes[idx].set_ylabel('f(x)')
-    axes[idx].grid(True, alpha=0.3)
+
+    ax.plot(x_range, f(x_range), 'b-', linewidth=2, alpha=0.3)
+    ax.plot(history, [f(h) for h in history], 'ro-', markersize=6)
+    ax.axvline(x=2, color='g', linestyle='--', alpha=0.5)
+    ax.set_xlim(-1.5, 5.5)
+    ax.set_ylim(-1.6, 9)
+    ax.set_title(title, fontsize=11, fontweight='bold')
+    ax.set_xlabel('x')
+    ax.set_ylabel('f(x)')
+    ax.grid(True, alpha=0.3)
 
 plt.tight_layout()
 plt.show()
@@ -465,6 +562,30 @@ $$f'(-1.92) = 2(-1.92) + 6 = -3.84 + 6 = 2.16$$
 
 **更新:**
 $$x_{\text{new}} = -1.92 - 0.2 \times 2.16 = -1.92 - 0.432 = -2.352$$
+
+```{python}
+#| echo: false
+#| fig-align: center
+def f_ex(x):
+    return x**2 + 6*x + 5
+
+xs_ex = [0.0]
+for _ in range(3):
+    xs_ex.append(xs_ex[-1] - 0.2 * (2 * xs_ex[-1] + 6))
+
+xr_ex = np.linspace(-7, 1.5, 200)
+plt.figure(figsize=(6.2, 3.0))
+plt.plot(xr_ex, f_ex(xr_ex), color="#2980b9", lw=2, alpha=0.6)
+plt.plot(xs_ex, [f_ex(p) for p in xs_ex], "o-", c="#e74c3c", ms=7, lw=1.5)
+for i, p in enumerate(xs_ex):
+    plt.annotate(f"{i}", (p, f_ex(p)), textcoords="offset points", xytext=(0, 9),
+                 ha="center", fontsize=9, fontweight="bold")
+plt.axvline(-3, color="green", ls="--", alpha=0.5)
+plt.text(-3, 6.5, "x=−3", ha="center", fontsize=9, color="green")
+plt.grid(alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
 
 まだ収束していない（理論値は$x=-3$）
 
