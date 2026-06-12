@@ -98,6 +98,26 @@ AIの歩み
 :::
 
 
+## 1770年、人間を負かし続けたチェス「機械」
+
+::: {.fig-cite src="imgs/history/mechanical-turk.jpg" height="330px"}
+::: {.cite}
+出典: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Tuerkischer_schachspieler_windisch4.jpg)（パブリックドメイン）
+:::
+:::
+
+- 「メカニカル・ターク」— 欧州を巡業し、ナポレオンやフランクリンとも対局した
+
+::: {.callout-important title="クイズ"}
+歯車の時代に、なぜチェスが指せた？
+:::
+
+::: {.fragment}
+**種明かし：中に人間（チェスの達人）が隠れていた。**
+「知的に**見える**ふるまい」とは何か — この問いがAIの出発点になる
+:::
+
+
 ## 人工知能とは
 
 ### 人間の知的なふるまいを機械で扱う
@@ -114,17 +134,125 @@ AIの歩み
 :::
 
 
+## AI・機械学習・深層学習の関係
+
+```{python}
+#| echo: false
+#| fig-align: center
+fig, ax = plt.subplots(figsize=(8, 4.6))
+ax.set_xlim(0, 10); ax.set_ylim(0, 7); ax.set_aspect("equal"); ax.axis("off")
+circles = [(5.0, 3.3, 3.2, "#d6eaf8", "人工知能（AI）", (5.0, 6.1)),
+           (5.6, 2.9, 2.3, "#aed6f1", "機械学習", (5.6, 4.8)),
+           (6.1, 2.5, 1.5, "#85c1e9", "ニューラルネット", (6.1, 3.6)),
+           (6.5, 2.1, 0.8, "#5dade2", "深層学習", (6.5, 2.1))]
+for cx, cy, r, color, label, (tx, ty) in circles:
+    ax.add_patch(plt.Circle((cx, cy), r, fc=color, ec="#2471a3", lw=1.5))
+    ax.text(tx, ty, label, ha="center", va="center", fontsize=12,
+            fontweight="bold", color="#1a5276")
+ax.annotate("ルールベース・探索など", xy=(3.0, 4.3), xytext=(0.9, 5.9),
+            fontsize=10, arrowprops={"arrowstyle": "->", "color": "#555"})
+ax.annotate("決定木・回帰など", xy=(4.2, 3.6), xytext=(0.6, 1.0),
+            fontsize=10, arrowprops={"arrowstyle": "->", "color": "#555"})
+plt.tight_layout()
+plt.show()
+```
+
+- ニュースで聞く言葉は、実は**入れ子の関係**にある
+- この講義は外側（AI全体の歴史）から始めて、内側（深層学習）へ進んでいく
+
+
 ## AIが扱うタスク
 
-- **分類**：どのグループに属するかを決める
-  - 魚が Salmon か Sea bass か
-  - メールが迷惑メールかどうか
-- **回帰**：数値を予測する
-  - 気温、売上、株価、需要
-- **クラスタリング**：似たもの同士に分ける
-  - ラベルのないデータを自然なグループに分ける
-- **生成**：新しいデータを作る
-  - 文章、画像、音声、コード
+```{python}
+#| echo: false
+#| fig-align: center
+from sklearn.datasets import make_blobs
+from sklearn.linear_model import LogisticRegression
+from sklearn.cluster import KMeans
+
+fig, axes = plt.subplots(1, 4, figsize=(13, 3.2))
+
+X_b, y_b = make_blobs(n_samples=80, centers=2, cluster_std=1.1, random_state=7)
+clf = LogisticRegression().fit(X_b, y_b)
+xs = np.linspace(X_b[:, 0].min() - 1, X_b[:, 0].max() + 1, 50)
+w, b = clf.coef_[0], clf.intercept_[0]
+axes[0].scatter(X_b[y_b == 0, 0], X_b[y_b == 0, 1], c="#2980b9", marker="s", s=18)
+axes[0].scatter(X_b[y_b == 1, 0], X_b[y_b == 1, 1], c="#e74c3c", marker="o", s=18)
+axes[0].plot(xs, -(w[0] * xs + b) / w[1], "k--", lw=1.5)
+axes[0].set_ylim(X_b[:, 1].min() - 1.5, X_b[:, 1].max() + 1.5)
+axes[0].set_title("分類：どっちのグループ？", fontsize=11)
+
+rng = np.random.default_rng(0)
+x_r = rng.uniform(0, 10, 50)
+y_r = 2.1 * x_r + 5 + rng.normal(0, 3.5, 50)
+axes[1].scatter(x_r, y_r, c="#7d3c98", s=18)
+axes[1].plot([0, 10], [5, 26], color="black", ls="--", lw=1.5)
+axes[1].set_title("回帰：値はいくつ？", fontsize=11)
+
+X_c, _ = make_blobs(n_samples=120, centers=3, cluster_std=1.0, random_state=3)
+labels = KMeans(n_clusters=3, n_init=10, random_state=0).fit_predict(X_c)
+for k, col in enumerate(["#16a085", "#d68910", "#884ea0"]):
+    axes[2].scatter(X_c[labels == k, 0], X_c[labels == k, 1], c=col, s=18)
+axes[2].set_title("クラスタリング：どんなまとまり？", fontsize=11)
+
+strip = np.hstack([digits.images[i] for i in [0, 1, 2, 3]])
+axes[3].imshow(strip, cmap="gray_r")
+axes[3].set_title("生成：新しく作る", fontsize=11)
+
+for ax in axes:
+    ax.set_xticks([]); ax.set_yticks([])
+plt.tight_layout()
+plt.show()
+```
+
+- **分類**：どのグループに属するかを決める（魚の種類、迷惑メール判定）
+- **回帰**：数値を予測する（気温、売上、株価、需要）
+- **クラスタリング**：ラベルのないデータを、似たもの同士に分ける
+- **生成**：新しいデータを作る（文章、画像、音声、コード）
+
+
+## AIの歴史を1枚で
+
+```{python}
+#| echo: false
+#| fig-align: center
+fig, ax = plt.subplots(figsize=(11, 4.6))
+ax.set_xlim(1948, 2030)
+ax.set_ylim(-2.1, 2.6)
+ax.axis("off")
+
+ax.axvspan(1974, 1980, color="#aab7c4", alpha=0.45)
+ax.axvspan(1987, 1993, color="#aab7c4", alpha=0.45)
+ax.text(1977, 2.25, "冬の時代", ha="center", fontsize=11, color="#34495e")
+ax.text(1990, 2.25, "冬の時代", ha="center", fontsize=11, color="#34495e")
+
+eras = [(1956, 1974, "第1次ブーム\n推論・探索", "#f9e79f"),
+        (1980, 1987, "第2次ブーム\n知識・エキスパートシステム", "#abebc6"),
+        (1993, 2012, "機械学習の時代", "#aed6f1"),
+        (2012, 2030, "第3次ブーム\n深層学習・LLM", "#f5b7b1")]
+for x0, x1, label, color in eras:
+    ax.axvspan(x0, x1, ymin=0.42, ymax=0.58, color=color)
+    ax.text((x0 + x1) / 2, 1.62, label, ha="center", fontsize=10.5)
+
+ax.annotate("", xy=(2030, 0), xytext=(1948, 0),
+            arrowprops={"arrowstyle": "->", "color": "#4a4a4a", "linewidth": 2})
+
+events = [(1956, "ダートマス会議", 1), (1966, "ELIZA", -1), (1972, "シェーキー", 1),
+          (1982, "第五世代\nコンピュータ", -1), (1997, "Deep Blue", 1),
+          (2012, "AlexNet", -1), (2017, "Transformer", 1), (2022, "ChatGPT", -1)]
+for year, label, pos in events:
+    ax.plot([year, year], [0, pos * 0.55], color="#4a4a4a", lw=1.2)
+    ax.scatter(year, 0, s=60, color="#2c3e50", zorder=3)
+    ax.text(year, pos * 0.85, label, ha="center",
+            va="bottom" if pos > 0 else "top", fontsize=10)
+    ax.text(year, -1.75, str(year), ha="center", fontsize=9, color="#555")
+plt.tight_layout()
+plt.show()
+```
+
+- AIは一直線に進歩したのではなく、**ブームと冬を行き来**してきた
+- ここからこの年表を、時代順にたどっていく
+
 
 ## 10分でまとめるAIの歴史（1950s-2000s）
 
@@ -164,6 +292,20 @@ AIの歩み
 - 研究の進歩から社会実装までは時間差がある
 :::
 
+
+## 1997年：機械がチェス世界王者を破る
+
+::: {.fig-cite src="imgs/history/deep-blue.jpg" height="340px"}
+::: {.cite}
+出典: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Deep_Blue.jpg), James the photographer, CC BY 2.0
+:::
+:::
+
+- IBM の **Deep Blue** が世界チャンピオンのカスパロフに勝利
+- 中身は学習ではなく**力まかせの探索**（1秒に約2億局面を評価）
+- ルールが明確で閉じた世界なら、古典的なアプローチでも人間を超えられた — 1770年の「機械」がついに本物になった
+
+
 ## 古典的AI：知識とルールの集合体
 
 - 初期は、**記号（symbol）**と**ルール**が中心で設計された
@@ -191,6 +333,44 @@ AIの歩み
 | 1980s | 第五世代コンピュータ | CAPTAINシステムなどの情報化構想 |
 
 
+## このチャットボット、いつのもの？
+
+::: {.fig-cite src="imgs/history/eliza.png" height="330px"}
+::: {.cite}
+出典: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ELIZA_conversation.png)（パブリックドメイン）
+:::
+:::
+
+::: {.fragment}
+- **1966年**の **ELIZA**（画面は再現実装）。精神科医のまねをする単純なルールの集まり
+- 相手の言葉をパターンで拾ってオウム返しするだけ — それでも当時の人は本気で身の上話を始めた（**イライザ効果**）
+- 「知的に見える」を作るのは、意外と簡単。「本当に分かっている」との差は何か？
+:::
+
+
+## 世界初の「考えて動く」ロボット
+
+:::: {.columns}
+
+::: {.column width="42%"}
+::: {.fig-cite src="imgs/history/shakey.jpg" height="460px"}
+::: {.cite}
+出典: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:SRI_Shakey_with_callouts.jpg), SRI International, CC BY-SA 3.0
+:::
+:::
+:::
+
+::: {.column width="58%"}
+- **シェーキー（Shakey）** 1966-72年、SRI
+- カメラで部屋を観察し、**論理推論で行動計画**を立てて動く
+- 「箱を隣の部屋へ押していけ」→ 手順を自分で考える
+- ただし、一歩動くたびに**世界の記述を全部考え直す**必要があった
+- 計画に時間がかかり、ガタガタ震えながら止まって考え込む様子が名前の由来（shaky = 震える）
+:::
+
+::::
+
+
 ## フレーム問題
 
 ### 必要なすべての知識の記述は困難
@@ -202,6 +382,38 @@ AIの歩み
   - これが狭義の **フレーム問題**
 - 「変更のみ記述。変更がなければ維持する」の原則でいいのでは？？
   - ダメ。変更が及ぶ範囲を決めなくてはダメなので
+
+
+## 「机を動かす」の影響はどこまで？
+
+```{python}
+#| echo: false
+#| fig-align: center
+fig, ax = plt.subplots(figsize=(8.5, 5))
+ax.set_xlim(-5.4, 5.4); ax.set_ylim(-3.4, 3.4); ax.set_aspect("equal"); ax.axis("off")
+for r, style in [(1.7, "-"), (3.0, "--"), (4.3, ":")]:
+    ax.add_patch(plt.Circle((0, 0), r, fill=False, ec="#888", ls=style, lw=1.3))
+ax.text(0, 0, "机を\n動かす", ha="center", va="center", fontsize=12, fontweight="bold",
+        bbox={"boxstyle": "round,pad=0.4", "fc": "#f5b7b1", "ec": "#9b1d20"})
+ring1 = [("机の上のコップ", 90), ("机の下の影", 180), ("机の上の紙", 0), ("ぶつかる椅子", 270)]
+for label, deg in ring1:
+    x, y = 2.35 * np.cos(np.radians(deg)), 2.35 * np.sin(np.radians(deg))
+    ax.text(x, y, label, ha="center", va="center", fontsize=10,
+            bbox={"boxstyle": "round,pad=0.3", "fc": "#fdebd0", "ec": "#b9770e"})
+ring2 = [("コップの中の水は？", 45), ("影で暗くなる本棚は？", 135),
+         ("椅子の上の猫は？", 225), ("紙に挟んだしおりは？", 315)]
+for label, deg in ring2:
+    x, y = 3.65 * np.cos(np.radians(deg)), 3.65 * np.sin(np.radians(deg))
+    ax.text(x, y, label, ha="center", va="center", fontsize=9.5, color="#444",
+            bbox={"boxstyle": "round,pad=0.25", "fc": "white", "ec": "#999"})
+ax.text(0, -3.25, "…どこまで書けば「全部」になる？", ha="center", fontsize=12,
+        color="#9b1d20", fontweight="bold")
+plt.tight_layout()
+plt.show()
+```
+
+- 影響は波紋のように広がり、書くべき「変化」と「不変」が無限に増えていく
+
 
 ## 狭義のフレーム問題
 
@@ -227,11 +439,26 @@ AIの歩み
 
 ### 世界全部を見るのではなく、枠で切り取る
 
+:::: {.columns}
+
+::: {.column width="63%"}
 - 人間は、世界の全部を同時には考えない
 - よって、窓枠のように、いま必要な範囲だけを切り取って見ればいいのでは？
 - **例：**
   - レストランなら「席」「注文」「会計」が関係ある
   - 授業なら「教室」「先生」「学生」「課題」が関係ある
+:::
+
+::: {.column width="37%"}
+::: {.fig-cite src="imgs/history/minsky.jpg" height="300px"}
+::: {.cite}
+出典: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Marvin_Minsky_at_OLPCb.jpg), Sethwoodworth (en.wikipedia), CC BY 3.0
+:::
+:::
+マービン・ミンスキー（1927-2016）
+:::
+
+::::
 
 ::: {.callout-note title="シンボリックAIへの問い"}
 - 枠を使えば、考える範囲を絞ることはできる
@@ -242,11 +469,30 @@ AIの歩み
 
 ### そもそも、定義やルールのきれいな記述が困難
 
-- 例外や曖昧なものはどう線引きする？
-  - 犬の定義って何？犬種により見た目すら大幅に異なる
-  - カモノハシは哺乳類だけど卵生なのはどうすれば...
-- 行動のように時系列と影響を伴うものはもっと困難
-  - ラプラスの悪魔
+:::: {.columns}
+
+::: {.column width="55%"}
+::: {.fig-cite src="imgs/history/dogs.jpg" height="280px"}
+::: {.cite}
+出典: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Collage_of_Nine_Dogs.jpg), 各撮影者（リンク先参照）, CC BY-SA 3.0
+:::
+:::
+これが全部「犬」。では犬の定義は？
+:::
+
+::: {.column width="45%"}
+::: {.fig-cite src="imgs/history/platypus.jpg" height="280px"}
+::: {.cite}
+出典: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Wild_Platypus_4.jpg), Klaus, CC BY-SA 2.0
+:::
+:::
+卵を産む哺乳類、カモノハシ
+:::
+
+::::
+
+- 例外や曖昧なものはどう線引きする？ルールで書ききれない
+- 行動のように時系列と影響を伴うものはもっと困難（ラプラスの悪魔）
 
 ::: {.callout-note title="古典的AIの限界"}
 - 「知識をたくさん書けばよい」は実は実現困難であった
@@ -257,18 +503,63 @@ AIの歩み
 
 ### 完全自動運転はフレーム問題に必ず直面する
 
+:::: {.columns}
+
+::: {.column width="55%"}
 - 自動運転では、車の周りのすべてを同時に扱う必要はない
 - しかし、何を見て、何を無視してよいかの判断がとても難しい
   - 道路標識、歩行者、工事、天気、緊急車両
   - 落下物、予想外の動き、地域ごとの交通ルール
   - 「ふつうなら関係ないもの」が急に重要になる場面
-- 限定された場所・条件では、自動運転サービスは実用化が進んでいる
-- でも、どこでも・どんな条件でも任せられる完全自動運転は別の難しさがある
+- 限定された場所・条件では実用化が進んでいる
+- どこでも・どんな条件でも任せられる完全自動運転は別の難しさがある
+:::
+
+::: {.column width="45%"}
+::: {.fig-cite src="imgs/history/waymo.jpg" height="300px"}
+::: {.cite}
+出典: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Waymo_Jaguar_I-Pace_in_San_Francisco_2023_dllu.jpg), Dllu, CC BY 4.0
+:::
+:::
+サンフランシスコを走る無人タクシー（Waymo）
+:::
+
+::::
 
 ::: {.callout-note title="AI史として見る"}
 - フレーム問題は、昔のシンボリックAIだけの話ではない
 - 現代のAIでも「どこまでの範囲を扱うべきか」は重要な問題
 :::
+
+
+## ルールを書く vs データから学ぶ
+
+```{python}
+#| echo: false
+#| fig-align: center
+rule_pred = (X_moon[:, 0] > 0.5).astype(int)
+rule_acc = (rule_pred == y_moon).mean()
+Z_rule = (xx > 0.5).astype(int)
+mlp_acc = (mlp.predict(X_moon) == y_moon).mean()
+
+fig, axes = plt.subplots(1, 2, figsize=(11, 4))
+for ax, Zi, title in [
+        (axes[0], Z_rule, f"人間が書いたルール「横位置 > 0.5 なら赤」　正答率 {rule_acc:.0%}"),
+        (axes[1], Z, f"データから学習した境界　正答率 {mlp_acc:.0%}")]:
+    ax.contourf(xx, yy, Zi, alpha=0.25, levels=1, colors=["#5dade2", "#f5b7b1"])
+    for cls, col, m in [(0, "#2980b9", "s"), (1, "#e74c3c", "o")]:
+        mask = y_moon == cls
+        ax.scatter(X_moon[mask, 0], X_moon[mask, 1], c=col, marker=m, s=18,
+                   edgecolors="gray", lw=0.4)
+    ax.set_title(title, fontsize=11)
+    ax.set_xticks([]); ax.set_yticks([])
+plt.tight_layout()
+plt.show()
+```
+
+- 左：冒頭のデータに人間がルールを書いてみた場合 — どこに線を引いても**例外だらけ**
+- 右：同じデータから、機械がパターンを**学習**した場合
+- 知識を「書く」時代から、データに「合わせる」時代へ — これが歴史の転換点
 
 
 ## データからパターンを学習する時代
@@ -294,13 +585,29 @@ AIの歩み
 ## ニューラルネットワーク：現在の最有力アプローチ
 
 ### 実は歴史が長い
+
+:::: {.columns}
+
+::: {.column width="55%"}
 - ニューラルネットワークの考え方自体は古い
+  - 右は **1958年**の Perceptron Mark I。部屋サイズの配線で「学習する機械」を実装した
 - バックプロパゲーションも1980年代に重要性が再認識された
 - 当時は、今ほど大きな成果にはつながりにくかった
   - データが少ない
   - 計算機が遅い
   - 多層ネットワークを安定して学習しにくい
-- そのため、ニューラルネットワークも長い間、決定的な方法にはならなかった
+- そのため、長い間、決定的な方法にはならなかった
+:::
+
+::: {.column width="45%"}
+::: {.fig-cite src="imgs/history/perceptron-mark1.png" height="320px"}
+::: {.cite}
+出典: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mark_I_Perceptron,_Figure_2_of_operator%27s_manual.png)（パブリックドメイン）
+:::
+:::
+:::
+
+::::
 
 
 
@@ -357,6 +664,42 @@ AIの歩み
 - 並列計算しにくい
 - 遠く離れた単語同士の関係を学びにくい
 :::
+
+
+## 前から順に渡す vs 全部を直接見る
+
+```{python}
+#| echo: false
+#| fig-align: center
+from matplotlib.patches import FancyArrowPatch
+
+words = ["昨日", "見た", "映画", "は", "面白かった"]
+fig, axes = plt.subplots(1, 2, figsize=(11, 3.2))
+for ax, mode, title in [(axes[0], "rnn", "RNN：前から順に手渡しする"),
+                        (axes[1], "attn", "Attention：どの単語も直接見にいく")]:
+    ax.set_xlim(-0.6, 4.6); ax.set_ylim(-1.0, 1.6); ax.axis("off")
+    for i, w in enumerate(words):
+        ax.text(i, 0, w, ha="center", va="center", fontsize=11,
+                bbox={"boxstyle": "round,pad=0.35", "fc": "#d6eaf8", "ec": "#2471a3"})
+    if mode == "rnn":
+        for i in range(4):
+            ax.annotate("", xy=(i + 0.62, 0), xytext=(i + 0.38, 0),
+                        arrowprops={"arrowstyle": "->", "color": "#2c3e50", "lw": 1.8})
+    else:
+        for i in range(5):
+            for j in range(i + 1, 5):
+                arc = FancyArrowPatch((i, 0.28), (j, 0.28),
+                                      connectionstyle="arc3,rad=-0.5",
+                                      arrowstyle="-", color="#e67e22",
+                                      lw=1.2, alpha=0.75)
+                ax.add_patch(arc)
+    ax.set_title(title, fontsize=12)
+plt.tight_layout()
+plt.show()
+```
+
+- RNN は「昨日」の情報が「面白かった」に届くまでに**バケツリレー**で薄まっていく
+- Attention は離れた単語同士でも**直接**関係を張れる — これが次の主役になる
 
 
 ## DNNブームからLLMへ
