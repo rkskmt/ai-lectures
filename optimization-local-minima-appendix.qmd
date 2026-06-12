@@ -481,6 +481,7 @@ plt.show()
 収束したら $f''(x)$ を確認：**正なら谷、負なら山 — 山なら結果を捨てる**。
 山か谷かの区別は**できる**が、それは止まってからの話。
 走っている最中のNewton法には、登りを避けるブレーキがついていない。
+（実は後付けできる — 引力圏とカタパルトを見たあとで「修理」する）
 :::
 
 ## {background-color="white" .center .break-slide}
@@ -697,18 +698,154 @@ plt.show()
 勾配降下法なら「傾きの逆に少しずつ」なので、x0=4 からは素直に右の谷へ降りる。
 :::
 
+— では、この壊れ方は直せないのか？　**直せます**。次で修理しましょう。
+
+## {background-color="white" .center .break-slide}
+
+::: {.break-title}
+修理する：ワープの前に「検品」を入れる
+:::
+
+## 故障の原因は「無条件ワープ」
+
+ここまでに見た故障は2種類：
+
+- **山頂で止まる**（実験3）— 上に凸の場所では、一歩が**登る向き**になる
+- **反対側へ吹っ飛ぶ**（カタパルト）— 変曲点の近くでは、一歩が**大きすぎる**
+
+原因はどちらも同じ。Newton法が、当てはめた放物線の頂点へ**検査なしでワープ**していることです。
+
+::: {.callout-tip}
+修理方針：提案された一歩を、**2つの検品**に通してから踏む。
+:::
+
+## 検査1：その方向、本当に「下り」？
+
+- Newton法の一歩 $d = -f'/f''$ は**提案**として扱う
+- 踏む前にチェック：$f' \cdot d \geq 0$ なら、提案は**傾きと同じ向き＝登り**なので**却下**
+- 却下したら、確実に下る**最急降下方向** $d = -f'$ に差し替える
+- 登り提案が出るのは、ちょうど $f'' < 0$（上に凸）の場所 — 実験3とカタパルトの現場そのもの
+
+実験3の現場検証：$x = 1.5$ では提案 $d = +0.26$。
+$f' \cdot d = 0.6 \times 0.26 > 0$ → 登りなので却下 → $d = -f' = -0.6$（左の下りへ）
+
+## 検査2：その一歩、実測で下がってる？
+
+- 向きが正しくても、**歩幅が大きすぎる**と谷を飛び越えて高い場所に着くことがある
+- そこで、踏む前に着地点の**本物の $f$ を実測**する：
+  - 十分下がっていれば採用
+  - 下がっていなければ**歩幅を半分**にしてやり直し（バックトラッキング）
+- 放物線の「予言」ではなく、**実測**で確認してからしか進まない
+
+## 修理版Newton法（検査1・2入り）
+
+```{python}
+#| echo: true
+def newton_safe(f, fp, fpp, x0, max_iter=100):
+    """Newton法＋検査1（降下方向）＋検査2（実測バックトラッキング）"""
+    x = x0
+    for _ in range(max_iter):
+        g = fp(x)
+        if abs(g) < 1e-8:                  # 傾きほぼゼロ → 停止
+            break
+        h = fpp(x)
+        d = -g / h if h != 0 else -g       # Newton法の「提案」
+        if g * d >= 0:                     # 検査1：登りなら却下して
+            d = -g                         #   最急降下に差し替え
+        alpha = 1.0
+        while f(x + alpha * d) > f(x) - 1e-4 * alpha * abs(g * d):
+            alpha /= 2                     # 検査2：実測で下がるまで歩幅半分
+        x = x + alpha * d
+    return x, f(x)
+
+# 故障していた2つの初期値で試運転
+for x0 in [1.5, 4.0]:
+    x_fin, f_fin = newton_safe(f_poly, f_poly_prime, f_poly_double_prime, x0)
+    print(f"x0 = {x0} → x = {x_fin:.4f}, f(x) = {f_fin:.4f}")
+```
+
+- 山頂に登っていた $x_0 = 1.5$ は**左の谷**へ降りた
+- カタパルトだった $x_0 = 4$ は、なんと**右の谷（グローバルミニマム）**へ — 暴発も消えた
+
+## 修理後の引力圏
+
+```{python}
+#| echo: false
+#| fig-align: center
+conv_safe = np.array(
+    [newton_safe(f_poly, f_poly_prime, f_poly_double_prime, x)[0] for x in x0_dense])
+safe_local = np.abs(conv_safe - x_local) < 0.5
+safe_global = np.abs(conv_safe - x_global) < 0.5
+
+fig, (axA, axB) = plt.subplots(2, 1, figsize=(12, 8), sharex=True)
+
+def paint_safe(ax):
+    labels = np.where(safe_local, 0, np.where(safe_global, 1, 2))
+    colors = {0: ("red", 0.22), 1: ("green", 0.22)}
+    start = 0
+    for i in range(1, len(labels) + 1):
+        if i == len(labels) or labels[i] != labels[start]:
+            if labels[start] in colors:
+                c, a = colors[labels[start]]
+                ax.axvspan(x0_dense[start], x0_dense[i - 1], color=c, alpha=a, lw=0)
+            start = i
+
+paint_safe(axA)
+axA.plot(np.linspace(-1.5, 7.5, 300), f_poly(np.linspace(-1.5, 7.5, 300)),
+         'b-', linewidth=2.5)
+axA.plot(x_local, y_local, 'ro', markersize=13, zorder=5)
+axA.plot(x_global, y_global, 'g*', markersize=20, zorder=5)
+axA.axvline(x_max, color='#b9770e', ls=':', lw=1.5)
+axA.set_ylabel('f(x)', fontsize=12)
+axA.set_title('修理後：引力圏は「丘のてっぺん」を境にした素直な2分割になる',
+              fontsize=13, fontweight='bold')
+axA.grid(True, alpha=0.3)
+
+paint_safe(axB)
+for mask, color in [(safe_local, 'red'), (safe_global, 'green')]:
+    axB.scatter(x0_dense[mask], conv_safe[mask], c=color, s=22, zorder=3)
+axB.axhline(y=x_local, color='red', linestyle='--', linewidth=1.5, alpha=0.7)
+axB.axhline(y=x_global, color='green', linestyle='--', linewidth=1.5, alpha=0.7)
+axB.axvline(x_max, color='#b9770e', ls=':', lw=1.5)
+axB.text(x_max + 0.1, 3.3, '境界＝丘のてっぺん', fontsize=10, color='#b9770e')
+axB.set_xlabel('スタート地点 x0', fontsize=12)
+axB.set_ylabel('たどり着いた場所', fontsize=12)
+axB.set_xlim(-1.5, 7.5)
+axB.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+- **山頂の帯（橙）も、飛ばされる帯も消えた** — てっぺんより左なら左の谷、右なら右の谷
+- 検査1・2で直るのは、ここまで
+
+## ライブラリは最初から修理済み
+
+- scipy などの実用ソルバーは、この種の検品を**毎歩**組み込み済み：
+  - **BFGS**：常に「下り向きの提案」しか出ないよう作った近似 $f''$ を使う
+  - **Newton-CG**：負の曲率（上に凸）を検出した瞬間に計算を打ち切り、勾配方向へ切り替え
+  - **信頼領域法**：放物線を「信じる半径」の中でだけ使う
+- 実測：$x_0 = 1.5$ から `scipy.optimize.minimize` を呼ぶと、BFGS / Newton-CG / trust-exact のすべてが山頂に登らず $x=0$ の谷に降りる
+- 流儀は違っても思想は同じ：**「$f$ が下がらない一歩は踏まない」**
+
+::: {.callout-note}
+授業で書いた素のNewton法が「欠陥品」なわけではない。教科書のNewton法はもともと「$f'=0$ を解く」方法で、
+**最小化に使うための安全装置**は別売り — ライブラリにはそれが標準装備されている、ということ。
+:::
+
 ## {background-color="white" .center .break-slide}
 
 ::: {.break-title}
 対策：どうすればグローバルミニマムを見つけられるか
 :::
 
-## 考え方：1回だけでは信用できない
+## 修理しても、直らないものがある
 
-ここまでの実験でわかったこと：
+修理後の引力圏図をもう一度思い出すと：
 
-- Newton法は「近くの傾きゼロの点」に落ちるだけ — 谷とは限らない（山頂もある）
-- 1回の実行では、それが山か谷か、谷だとしてもローカルかグローバルか、わからない
+- 「山に登る」「吹っ飛ぶ」は直った
+- でも行き先は相変わらず**2つ**ある — **どっちの谷に落ちるかは初期値しだい**のまま
+- これはNewton法の故障ではなく、**目隠しで坂を下ること自体の限界**（目の前の谷しか見えない）
 
 **解決策はシンプル：何回もやって、一番良い結果を選ぶ！**
 
@@ -728,10 +865,10 @@ $f''(0) = 1.2 \times 0 - 6 \times 0 + 4 = 4 > 0$ → 最小値（谷）。
 
 $$f'(2) = 0.4 \times 8 - 3 \times 4 + 4 \times 2 = 3.2 - 12 + 8 = -0.8$$
 $$f''(2) = 1.2 \times 4 - 6 \times 2 + 4 = 4.8 - 12 + 4 = -3.2$$
-$$x_{\text{new}} = 2 - \frac{-0.8}{-3.2} = 2 - 0.25 = 1.75$$
+Newton法の**提案**は $d = -\dfrac{-0.8}{-3.2} = -0.25$（左へ）。
+でも傾きは右下り（$f' < 0$）なので、左へ進むのは**登り** — **検査1が却下**して $d = -f' = +0.8$（右へ）に差し替えます。
 
-→ 左へ進んでいますが、向かう先は左の谷ではなく**丘のてっぺん（x ≈ 1.73）**。
-実験3の罠をまた踏んでいます（あとで $f''$ チェックで捨てます）。
+→ そのまま右の谷（グローバルミニマム）まで降りていきます。素のNewton法なら丘のてっぺん行きでした。
 
 ### $x_0 = 6$ からスタート
 
@@ -748,36 +885,30 @@ $$x_{\text{new}} = 6 - \frac{2.4}{11.2} = 6 - 0.214 = 5.786$$
 # 3つの初期値から実行して比較
 starting_points = [0, 2, 6]
 
-print("初期値を変えて比較")
+print("初期値を変えて比較（修理版Newton法）")
 print("=" * 60)
-print(f"{'x0':>4}  →  {'到着地点':>8}  →  {'f(x)':>8}  →  判定")
+print(f"{'x0':>4}  →  {'到着地点':>8}  →  {'f(x)':>8}  →  どこの谷？")
 print("-" * 60)
 
 results_comparison = []
 for x0 in starting_points:
-    x_final, f_final, _ = newton_optimize(f_poly, f_poly_prime, f_poly_double_prime, x0)
-    is_valley = f_poly_double_prime(x_final) > 0
-    results_comparison.append((x0, x_final, f_final, is_valley))
+    x_final, f_final = newton_safe(f_poly, f_poly_prime, f_poly_double_prime, x0)
+    results_comparison.append((x0, x_final, f_final))
 
-# pick the best among VALLEYS only (hilltops are discarded)
-best_f = min(r[2] for r in results_comparison if r[3])
-for x0, xf, fx, is_valley in results_comparison:
-    if not is_valley:
-        judge = "山！（f''<0 → 捨てる）"
-    elif fx == best_f:
-        judge = "谷 ← 最良！"
-    else:
-        judge = "谷"
-    print(f"{x0:4.1f}  →  {xf:8.4f}  →  {fx:8.4f}  →  {judge}")
+best_f = min(r[2] for r in results_comparison)
+for x0, xf, fx in results_comparison:
+    where = "左の谷" if xf < 3 else "右の谷"
+    marker = " ← 最良！" if fx == best_f else ""
+    print(f"{x0:4.1f}  →  {xf:8.4f}  →  {fx:8.4f}  →  {where}{marker}")
 ```
 
 ::: {.callout-important}
 ## ポイント
 
-3つ試すと「左の谷・山頂・右の谷」が出揃いました。
-**$f''$ チェックで山を捨て、残った谷から $f(x)$ が最小のものを選ぶ** — これで一番良い答えを選べます。
+修理版でも、3つ試すと**左右両方の谷**が出てきました。
+**$f(x)$ が最小のものを採用する** — これで一番良い答えを選べます。
 
-手間は3倍になりますが、間違った答えを信じるよりずっと良いです。
+手間は3倍になりますが、浅い谷の答えを信じてしまうよりずっと良いです。
 :::
 
 ## 方法2：たくさんの初期値を自動で試す（ランダムリスタート）
@@ -798,9 +929,9 @@ print("=" * 60)
 
 for i in range(n_trials):
     x0 = np.random.uniform(-1, 7)
-    x_final, f_final, success = newton_optimize(f_poly, f_poly_prime, f_poly_double_prime, x0)
-    results.append((x0, x_final, f_final, success))
-    
+    x_final, f_final = newton_safe(f_poly, f_poly_prime, f_poly_double_prime, x0)
+    results.append((x0, x_final, f_final))
+
     if i < 5:
         print(f"試行 {i+1:2d}: x0={x0:5.2f} → x={x_final:6.2f}, f(x)={f_final:7.4f}")
 
@@ -808,7 +939,7 @@ print(f"  ... (残り{n_trials-5}個)")
 
 # 最良の結果を見つける
 results.sort(key=lambda r: r[2])
-best_x0, best_x, best_f, _ = results[0]
+best_x0, best_x, best_f = results[0]
 
 print(f"\n★ 最良の結果: x0={best_x0:.2f} → x={best_x:.4f}, f(x)={best_f:.4f}")
 ```
@@ -831,7 +962,7 @@ print(f"{'x0':>5}  →  {'到着地点':>8}  →  {'f(x)':>8}")
 print("-" * 55)
 
 for x0 in x0_candidates:
-    x_final, f_final, success = newton_optimize(f_poly, f_poly_prime, f_poly_double_prime, x0)
+    x_final, f_final = newton_safe(f_poly, f_poly_prime, f_poly_double_prime, x0)
     grid_results.append((x0, x_final, f_final))
     print(f"{x0:5.2f}  →  {x_final:8.4f}  →  {f_final:8.4f}")
 
@@ -852,8 +983,6 @@ fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
 scatter1 = ax1.scatter(x0_list, xf_list, c=f_list, cmap='RdYlGn_r', s=100, edgecolors='black')
 ax1.axhline(y=x_local, color='r', linestyle='--', linewidth=2, alpha=0.5, label='ローカルミニマム')
 ax1.axhline(y=x_global, color='g', linestyle='--', linewidth=2, alpha=0.5, label='グローバルミニマム')
-ax1.axhline(y=x_max, color='darkorange', linestyle=':', linewidth=2, alpha=0.7,
-            label='山頂（極大）→ f″チェックで捨てる')
 ax1.set_xlabel('スタート地点 x0', fontsize=12)
 ax1.set_ylabel('たどり着いた場所', fontsize=12)
 ax1.set_title('初期値 → 収束点', fontsize=13, fontweight='bold')
@@ -864,8 +993,6 @@ ax1.grid(True, alpha=0.3)
 scatter2 = ax2.scatter(x0_list, f_list, c=f_list, cmap='RdYlGn_r', s=100, edgecolors='black')
 ax2.axhline(y=y_local, color='r', linestyle='--', linewidth=2, alpha=0.5, label='ローカルミニマムの値')
 ax2.axhline(y=y_global, color='g', linestyle='--', linewidth=2, alpha=0.5, label='グローバルミニマムの値')
-ax2.axhline(y=f_poly(x_max), color='darkorange', linestyle=':', linewidth=2, alpha=0.7,
-            label='山頂の値')
 ax2.set_xlabel('スタート地点 x0', fontsize=12)
 ax2.set_ylabel('収束時の f(x)', fontsize=12)
 ax2.set_title('解の良さ（一番下の点を採用する）', fontsize=13, fontweight='bold')
@@ -921,8 +1048,9 @@ plt.show()
 ::: {.callout-important}
 ## ステップ4：2次微分で確認する
 
-収束した点で $f''(x) > 0$ なら谷（最小値）。
-$f''(x) < 0$ なら山（最大値）なので、その結果は捨てる。
+収束した点で $f''(x) > 0$ なら谷（最小値）、$f''(x) < 0$ なら山なので捨てる。
+検査1・2入りの修理版ならまず山には止まらないが、確認は1行 — **保険として常に入れておく**
+（素のNewton法を使ったときは必須）。
 :::
 
 ## 実装テンプレート
@@ -952,35 +1080,37 @@ def robust_optimization(f, fp, fpp, x0_list, max_iter=100):
         比較用のすべての結果
     """
     all_results = []
-    
+
     for x0 in x0_list:
         x = x0
-        
+
         for i in range(max_iter):
             grad = fp(x)
-            hess = fpp(x)
-            
             if abs(grad) < 1e-6:
                 break
-            if abs(hess) < 1e-10:
-                break
-            
-            x = x - grad / hess
-        
+            hess = fpp(x)
+            d = -grad / hess if hess != 0 else -grad   # Newton法の提案
+            if grad * d >= 0:                          # 検査1：登りなら
+                d = -grad                              #   最急降下に差し替え
+            alpha = 1.0
+            while f(x + alpha * d) > f(x) - 1e-4 * alpha * abs(grad * d):
+                alpha /= 2                             # 検査2：実測で確認
+            x = x + alpha * d
+
         all_results.append({
             'x0': x0,
             'x_final': x,
             'f_final': f(x),
-            'is_minimum': fpp(x) > 0
+            'is_minimum': fpp(x) > 0   # 保険の検品（修理版なら通常すべて谷）
         })
-    
+
     # 谷（最小値）だけを残して、一番良いのを選ぶ
     minima = [r for r in all_results if r['is_minimum']]
     if minima:
         best_result = min(minima, key=lambda r: r['f_final'])
     else:
         best_result = min(all_results, key=lambda r: r['f_final'])
-    
+
     return best_result['x_final'], all_results
 
 # 使用例：5つの初期値から試す
@@ -1011,18 +1141,18 @@ print(f"\n★ 最良解: x = {best_x:.4f}, f(x) = {f_poly(best_x):.4f}")
 ::: {.callout-note}
 
 1. **谷が複数ある関数では、Newton法の結果が初期値に依存する**
-   - 左の谷の近くからスタート → 左の谷に落ちる
-   - 右の谷の近くからスタート → 右の谷に落ちる
+   - 左の谷の近く → 左の谷、右の谷の近く → 右の谷
+   - 丘の上からだと**山頂に登って止まる**ことすらある（素のNewton法は $f'=0$ を探しているだけ）
 
 2. **ローカルミニマムとグローバルミニマム**
    - ローカルミニマム = 周辺では一番低いが、全体では最低ではない
    - グローバルミニマム = 全体で本当に一番低い点
 
-3. **「収束した」≠「最適解を見つけた」**
-   - アルゴリズムは $f'(x) = 0$ を見つけるだけ
-   - それがローカルかグローバルかは判断できない
+3. **修理できる故障と、できない故障がある**
+   - 検査1（降下方向か）＋検査2（実測で下がったか）で「山に登る・吹っ飛ぶ」は直る — ライブラリは標準装備
+   - **どの谷に落ちるか**だけは、どんなに修理しても初期値しだい
 
 4. **対策：複数の初期値から試して、一番良い結果を選ぶ**
    - ランダムリスタートやグリッドサーチを使う
-   - 2次微分で谷（最小値）かどうかも確認する
+   - 2次微分の確認（$f''>0$ なら谷）は保険として常に入れる
 :::
