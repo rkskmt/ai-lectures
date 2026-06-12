@@ -336,14 +336,24 @@ plt.show()
 
 ## 「分散が最大の方向」を式にする
 
-- 探している「方向」を**単位ベクトル** $\mathbf{v}$（$\|\mathbf{v}\| = 1$）で表す
-- 中心化した点 $\tilde{\mathbf{x}}_i$ の $\mathbf{v}$ 方向への**影（射影）**は、内積 $\tilde{\mathbf{x}}_i^{\mathsf T} \mathbf{v}$（ただの数）
-- 知りたいのは**影の分散**。計算してみると：
+- 探している**直線の向き**を、**単位ベクトル** $\mathbf{v}$（$\|\mathbf{v}\| = 1$）で表す
+- 中心化した点 $\tilde{\mathbf{x}}_i$ のその直線への**影（射影）**は、内積 $z_i = \tilde{\mathbf{x}}_i^{\mathsf T} \mathbf{v}$（ただの数）
+- 80匹ぶんの影は、行列とベクトルの積で**一度に**出せる：$\mathbf{z} = \tilde{X} \mathbf{v}$
 
-$$\frac{1}{n-1} \sum_i \left( \tilde{\mathbf{x}}_i^{\mathsf T} \mathbf{v} \right)^2
-= \mathbf{v}^{\mathsf T} \underbrace{\left( \frac{1}{n-1} \tilde{X}^{\mathsf T} \tilde{X} \right)}_{C\;（共分散行列）} \mathbf{v}$$
+知りたい「影の分散」を、少しずつ変形します：
 
-- **共分散行列 $C$ は、影の分散を計算すると自然に出てくる**（ここが登場理由）
+$$\text{影の分散} = \frac{1}{n-1} \sum_i z_i^2
+= \frac{1}{n-1} \mathbf{z}^{\mathsf T} \mathbf{z}
+\qquad \text{（2乗和は「自分との内積」）}$$
+
+$$= \frac{1}{n-1} (\tilde{X}\mathbf{v})^{\mathsf T} (\tilde{X}\mathbf{v})
+= \frac{1}{n-1} \mathbf{v}^{\mathsf T} \tilde{X}^{\mathsf T} \tilde{X} \mathbf{v}
+\qquad \text{（転置の規則 } (AB)^{\mathsf T} = B^{\mathsf T} A^{\mathsf T} \text{）}$$
+
+$$= \mathbf{v}^{\mathsf T} \underbrace{\left( \frac{1}{n-1} \tilde{X}^{\mathsf T} \tilde{X} \right)}_{C\;（共分散行列）} \mathbf{v}
+\qquad \text{（真ん中のかたまりに名前をつける）}$$
+
+- **共分散行列 $C$ は、影の分散を変形すると自然に現れる**（ここが登場理由）
 - つまり PCA の探しものはこう書ける：
 
 ::: {.callout-note}
