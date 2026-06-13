@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="ja"><head>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-html/tabby.min.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.8.27">
+
+  <meta name="author" content="rkskmt">
+  <title>AI Lectures – 次元の呪いと次元削減</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #24292e;  }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #24292e; } /* Normal */
+    code span.al { color: #ff5555; font-weight: bold; } /* Alert */
+    code span.an { color: #6a737d; } /* Annotation */
+    code span.at { color: #d73a49; } /* Attribute */
+    code span.bn { color: #005cc5; } /* BaseN */
+    code span.bu { color: #d73a49; } /* BuiltIn */
+    code span.cf { color: #d73a49; } /* ControlFlow */
+    code span.ch { color: #032f62; } /* Char */
+    code span.cn { color: #005cc5; } /* Constant */
+    code span.co { color: #6a737d; } /* Comment */
+    code span.cv { color: #6a737d; } /* CommentVar */
+    code span.do { color: #6a737d; } /* Documentation */
+    code span.dt { color: #d73a49; } /* DataType */
+    code span.dv { color: #005cc5; } /* DecVal */
+    code span.er { color: #ff5555; text-decoration: underline; } /* Error */
+    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
+    code span.fl { color: #005cc5; } /* Float */
+    code span.fu { color: #6f42c1; } /* Function */
+    code span.im { color: #032f62; } /* Import */
+    code span.in { color: #6a737d; } /* Information */
+    code span.kw { color: #d73a49; } /* Keyword */
+    code span.op { color: #24292e; } /* Operator */
+    code span.ot { color: #6f42c1; } /* Other */
+    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.re { color: #6a737d; } /* RegionMarker */
+    code span.sc { color: #005cc5; } /* SpecialChar */
+    code span.ss { color: #032f62; } /* SpecialString */
+    code span.st { color: #032f62; } /* String */
+    code span.va { color: #e36209; } /* Variable */
+    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.wa { color: #ff5555; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-d3a26a7442888a116b43ccec6150e9c5.css">
+  <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="site_libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+  <link rel="stylesheet" href="custom.css">
+  <script src="slide-ui.js" defer=""></script>
+  <script src="search-ui.js" defer=""></script>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">次元の呪いと次元削減</h1>
+  <p class="subtitle">特徴量を増やし続けると何が起きるか</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+rkskmt 
+</div>
+</div>
+</div>
+
+</section>
+<section id="ここまでの流れ" class="slide level2">
+<h2>ここまでの流れ</h2>
+<div class="slide-body">
+<ul>
+<li><strong>重さだけ</strong>でサーモンを分類 → ある程度できた</li>
+<li><strong>輝度も追加</strong>して2次元で分類 → 精度が上がった</li>
+<li>ならば<strong>特徴量を増やし続ければ</strong>もっと精度が上がる？</li>
+</ul>
+<div title="今回の問い">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>今回の問い</strong></p>
+</div>
+<div class="callout-content">
+<p>特徴量（次元）を増やし続けると何が起きるか？</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="section" class="slide level2 center break-slide" data-background-color="white">
+<h2></h2>
+<div class="break-title">
+<p>次元の呪い</p>
+</div>
+</section>
+<section id="次元の呪いcurse-of-dimensionality" class="slide level2">
+<h2>次元の呪い（<span class="en">Curse of Dimensionality</span>）</h2>
+<div class="slide-body">
+<blockquote>
+<p>“データの次元が増えるにつれて、空間が指数的に広くなり、データが希薄になる”</p>
+<p>── Richard Bellman（1961）</p>
+</blockquote>
+<ul>
+<li>2次元で十分だったサンプル数が、10次元では<strong>全く足りなくなる</strong></li>
+<li>高次元空間は私たちの直感とは全く異なる振る舞いをする</li>
+</ul>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<p>1960年代にベルマン（動的計画法の発明者）が提唱した概念。 現代機械学習でも最重要トピックの一つ。</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="クイズいちばん近い点までどれくらい" class="slide level2">
+<h2>クイズ<span class="fw-colon">：</span>いちばん近い点まで、どれくらい？</h2>
+<div class="slide-body">
+<ul>
+<li>各特徴量は 0〜1 に正規化してあるとする（各軸の長さ＝1）</li>
+<li>そこに<strong>100個の点</strong>をランダムにばらまく</li>
+<li><strong>1次元</strong>なら、いちばん近い点までの距離はだいたい <strong>0.003</strong>（ぎゅうぎゅう）</li>
+</ul>
+<div title="クイズ">
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>クイズ</strong></p>
+</div>
+<div class="callout-content">
+<p>特徴量を増やして <strong>10次元</strong> にしたら、いちばん近い点までの距離はいくつになると思う？</p>
+<p>（各軸の長さは1のまま。点の数も100個のまま）</p>
+</div>
+</div>
+</div>
+</div>
+<div class="fragment">
+<div id="fbc8aa95" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a></a><span class="im">import</span> japanize_matplotlib</span>
+<span id="cb1-4"><a></a>plt.rcParams[<span class="st">'font.size'</span>] <span class="op">=</span> <span class="dv">11</span></span>
+<span id="cb1-5"><a></a>plt.rcParams[<span class="st">'figure.dpi'</span>] <span class="op">=</span> <span class="dv">100</span></span>
+<span id="cb1-6"><a></a></span>
+<span id="cb1-7"><a></a>rng  <span class="op">=</span> np.random.default_rng(<span class="dv">0</span>)</span>
+<span id="cb1-8"><a></a>dims <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">20</span>]</span>
+<span id="cb1-9"><a></a>nn_median <span class="op">=</span> []</span>
+<span id="cb1-10"><a></a></span>
+<span id="cb1-11"><a></a><span class="cf">for</span> d <span class="kw">in</span> dims:</span>
+<span id="cb1-12"><a></a>    P <span class="op">=</span> rng.random((<span class="dv">100</span>, d))                       <span class="co"># 100点を [0,1]^d にばらまく</span></span>
+<span id="cb1-13"><a></a>    D <span class="op">=</span> np.sqrt(((P[:, <span class="va">None</span>, :] <span class="op">-</span> P[<span class="va">None</span>, :, :]) <span class="op">**</span> <span class="dv">2</span>).<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">2</span>))</span>
+<span id="cb1-14"><a></a>    np.fill_diagonal(D, np.inf)                    <span class="co"># 自分自身は除外</span></span>
+<span id="cb1-15"><a></a>    nn_median.append(np.median(D.<span class="bu">min</span>(axis<span class="op">=</span><span class="dv">1</span>)))     <span class="co"># 最近傍距離の中央値</span></span>
+<span id="cb1-16"><a></a></span>
+<span id="cb1-17"><a></a><span class="cf">for</span> d, m <span class="kw">in</span> <span class="bu">zip</span>(dims, nn_median):</span>
+<span id="cb1-18"><a></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>d<span class="sc">:2d}</span><span class="ss">次元: いちばん近い点まで </span><span class="sc">{</span>m<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> 1次元: いちばん近い点まで 0.003
+ 2次元: いちばん近い点まで 0.042
+ 3次元: いちばん近い点まで 0.121
+ 5次元: いちばん近い点まで 0.306
+10次元: いちばん近い点まで 0.703
+20次元: いちばん近い点まで 1.195</code></pre>
+</div>
+</div>
+<div id="77f32ab9" class="cell" data-execution_count="2">
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="dimensionality-pca_files/figure-revealjs/cell-3-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img data-src="dimensionality-pca_files/figure-revealjs/cell-3-output-1.png" class="quarto-figure quarto-figure-center" width="687" height="307"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>10次元で <strong>0.67</strong>、20次元では <strong>1.2</strong> — もはや「お隣さん」は存在しない</li>
+<li>同じ100点なのに。なぜこんなことが起きるのか、2つの理由を見ます</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="なぜ-その1真ん中に居続けられない" class="slide level2">
+<h2>なぜ？　その1<span class="fw-colon">：</span>真ん中に居続けられない</h2>
+<div class="slide-body">
+<ul>
+<li>ある点が、ある軸で「中央寄り」（その軸の<strong>中央50%</strong>）に入る確率は <span class="math inline">\(\dfrac{1}{2}\)</span></li>
+<li><span class="math inline">\(d\)</span> 次元で「<strong>全部の軸</strong>で中央寄り」でいられる確率は<span class="fw-colon">：</span></li>
+</ul>
+<p><span class="math display">\[\left(\frac{1}{2}\right)^d \qquad
+\text{1次元: } 50\% \quad \text{3次元: } 12.5\% \quad \text{10次元: } 0.1\% \quad \text{20次元: } 100万分の1\]</span></p>
+<div id="e191ec8c" class="cell" data-execution_count="3">
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="dimensionality-pca_files/figure-revealjs/cell-4-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img data-src="dimensionality-pca_files/figure-revealjs/cell-4-output-1.png" class="quarto-figure quarto-figure-center" width="840" height="327"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>ほぼすべての点が、<strong>どこかの軸では端っこ</strong> — つまり「角のあたり」に住むことになる</li>
+<li>しかも角の数は <span class="math inline">\(2^d\)</span> 個（20次元で約105万個）。<strong>データは100万個の角に散り散り</strong>になる</li>
+</ul>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<p>教科書によく出る言い換え<span class="fw-colon">：</span>「単位立方体に内接する球（＝どの軸でも中央寄りの領域）の体積は、 高次元で 0 に向かう」。いま見たのと同じ現象。</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="なぜ-その2ご近所を集めると世界を覆ってしまう" class="slide level2">
+<h2>なぜ？　その2<span class="fw-colon">：</span>「ご近所」を集めると世界を覆ってしまう</h2>
+<div class="slide-body">
+<ul>
+<li>k-NN の気持ちになって、周りの<strong>データの1%</strong>を「ご近所」として集めたい</li>
+<li>各軸を割合 <span class="math inline">\(r\)</span> だけ切り取った箱は、データの <span class="math inline">\(r^d\)</span> 割を含む → 1% 集めるには<span class="fw-colon">：</span></li>
+</ul>
+<p><span class="math display">\[r = 0.01^{1/d}\]</span></p>
+<div id="ccd34634" class="cell" data-execution_count="4">
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="dimensionality-pca_files/figure-revealjs/cell-5-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img data-src="dimensionality-pca_files/figure-revealjs/cell-5-output-1.png" class="quarto-figure quarto-figure-center" width="686" height="327"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>10次元では、たった1%の「ご近所」を集めるのに<strong>各軸の63%</strong>を見渡す必要がある</li>
+<li>それはもう「近所」ではない — <strong>「近い」に頼る手法（k-NN など）が最初に壊れる</strong></li>
+</ul>
+</div>
+</section>
+<section id="距離が意味をなさなくなる" class="slide level2">
+<h2>距離が意味をなさなくなる</h2>
+<div class="slide-body">
+<ul>
+<li>k-NN やロジスティック回帰など、多くの手法は<strong>距離</strong>に依存している</li>
+<li>高次元では最近傍と最遠傍の距離差が消えていく</li>
+</ul>
+<div id="9f9f7886" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb3-2"><a></a>dims    <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">50</span>, <span class="dv">100</span>]</span>
+<span id="cb3-3"><a></a>cv_list <span class="op">=</span> []   <span class="co"># 変動係数 = std / mean</span></span>
+<span id="cb3-4"><a></a></span>
+<span id="cb3-5"><a></a><span class="cf">for</span> d <span class="kw">in</span> dims:</span>
+<span id="cb3-6"><a></a>    pts   <span class="op">=</span> np.random.rand(<span class="dv">2000</span>, d)</span>
+<span id="cb3-7"><a></a>    query <span class="op">=</span> np.random.rand(d)</span>
+<span id="cb3-8"><a></a>    dists <span class="op">=</span> np.sqrt(((pts <span class="op">-</span> query) <span class="op">**</span> <span class="dv">2</span>).<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>))</span>
+<span id="cb3-9"><a></a>    cv_list.append(dists.std() <span class="op">/</span> dists.mean())</span>
+<span id="cb3-10"><a></a></span>
+<span id="cb3-11"><a></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.5</span>))</span>
+<span id="cb3-12"><a></a>plt.plot(dims, cv_list, <span class="st">"o-"</span>, color<span class="op">=</span><span class="st">"#e74c3c"</span>)</span>
+<span id="cb3-13"><a></a>plt.xlabel(<span class="st">"次元数 d"</span>)</span>
+<span id="cb3-14"><a></a>plt.ylabel(<span class="st">"変動係数（std / mean）"</span>)</span>
+<span id="cb3-15"><a></a>plt.title(<span class="st">"高次元では全点がほぼ等距離になる"</span>)</span>
+<span id="cb3-16"><a></a>plt.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.4</span>)</span>
+<span id="cb3-17"><a></a>plt.tight_layout()</span>
+<span id="cb3-18"><a></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="dimensionality-pca_files/figure-revealjs/cell-6-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img data-src="dimensionality-pca_files/figure-revealjs/cell-6-output-1.png" class="quarto-figure quarto-figure-center" width="686" height="337"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-warning callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>変動係数が 0 に近づく</strong></p>
+</div>
+<div class="callout-content">
+<p>「最も近い点」と「最も遠い点」の距離がほぼ同じになる。 <strong>「近い」という概念が意味をなさなくなる。</strong></p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="データが疎になるsparsity" class="slide level2">
+<h2>データが疎になる（<span class="en">Sparsity</span>）</h2>
+<div class="slide-body">
+<ul>
+<li>同じサンプル数でも、次元が増えると空間が広くなりすぎる</li>
+</ul>
+<div id="ea1fc209" class="cell" data-execution_count="6">
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="dimensionality-pca_files/figure-revealjs/cell-7-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img data-src="dimensionality-pca_files/figure-revealjs/cell-7-output-1.png" class="quarto-figure quarto-figure-center" width="731" height="346"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<p>密度を保つには、次元数に対して<strong>指数的にサンプルを増やす</strong>必要がある。 10次元で十分な密度を確保するには、1次元の <span class="math inline">\(10^{10}\)</span> 倍のサンプルが必要という計算になる。</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="実用への影響" class="slide level2 scrollable">
+<h2>実用への影響</h2>
+<div class="slide-body">
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>問題</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>モデルの精度が上がらない</td>
+<td>データが疎でパターンが見えない</td>
+</tr>
+<tr class="even">
+<td>過学習しやすくなる</td>
+<td>データに比べてパラメータが多すぎる</td>
+</tr>
+<tr class="odd">
+<td>計算コストが増大</td>
+<td>距離計算などが次元数に比例して重くなる</td>
+</tr>
+<tr class="even">
+<td>可視化できない</td>
+<td>3次元以上は直接見られない</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>次元の呪いへの対処</strong></p>
+</div>
+<div class="callout-content">
+<ol type="1">
+<li><strong>特徴量選択</strong><span class="fw-colon">：</span>重要な特徴量だけを残す</li>
+<li><strong>次元削減</strong><span class="fw-colon">：</span>情報を保ったまま次元を圧縮する（← 今回）</li>
+<li><strong>正則化（<span class="en">regularization</span>）</strong><span class="fw-colon">：</span>過学習を防ぐ（回帰問題で詳しく）</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-1" class="slide level2 center break-slide" data-background-color="white">
+<h2></h2>
+<div class="break-title">
+<p>次元削減と PCA</p>
+</div>
+</section>
+<section id="つ目の特徴量体長" class="slide level2">
+<h2>3つ目の特徴量<span class="fw-colon">：</span>体長</h2>
+<div class="slide-body">
+<ul>
+<li>重さ・輝度で精度が上がった。気を良くして、80匹全部の<strong>体長</strong>も測った</li>
+</ul>
+<div id="1500e929" class="cell" data-execution_count="7">
+<details class="code-fold">
+<summary>魚データの定義（クリックして展開）</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a></a>salmon_weights     <span class="op">=</span> np.array([<span class="dv">2149</span>, <span class="dv">1959</span>, <span class="dv">2194</span>, <span class="dv">2457</span>, <span class="dv">1930</span>, <span class="dv">1930</span>, <span class="dv">2474</span>, <span class="dv">2230</span>, <span class="dv">1859</span>, <span class="dv">2163</span>,</span>
+<span id="cb4-2"><a></a>                               <span class="dv">1861</span>, <span class="dv">1860</span>, <span class="dv">2073</span>, <span class="dv">1426</span>, <span class="dv">1483</span>, <span class="dv">1831</span>, <span class="dv">1696</span>, <span class="dv">2094</span>, <span class="dv">1728</span>, <span class="dv">1576</span>,</span>
+<span id="cb4-3"><a></a>                               <span class="dv">2028</span>, <span class="dv">1903</span>, <span class="dv">2057</span>, <span class="dv">2229</span>, <span class="dv">1884</span>, <span class="dv">1884</span>, <span class="dv">2240</span>, <span class="dv">2081</span>, <span class="dv">1838</span>, <span class="dv">2037</span>,</span>
+<span id="cb4-4"><a></a>                               <span class="dv">1839</span>, <span class="dv">1838</span>, <span class="dv">1978</span>, <span class="dv">1554</span>, <span class="dv">1591</span>, <span class="dv">1820</span>, <span class="dv">1731</span>, <span class="dv">1992</span>, <span class="dv">1752</span>, <span class="dv">1652</span>])</span>
+<span id="cb4-5"><a></a>salmon_brightness  <span class="op">=</span> np.array([<span class="fl">3.5</span>, <span class="fl">5.8</span>, <span class="fl">4.9</span>, <span class="fl">4.4</span>, <span class="fl">2.6</span>, <span class="fl">2.6</span>, <span class="fl">2.2</span>, <span class="fl">5.5</span>, <span class="fl">4.4</span>, <span class="fl">4.8</span>, <span class="fl">2.1</span>,</span>
+<span id="cb4-6"><a></a>                               <span class="fl">5.9</span>, <span class="fl">5.3</span>, <span class="fl">2.8</span>, <span class="fl">2.7</span>, <span class="fl">2.7</span>, <span class="fl">3.2</span>, <span class="fl">4.1</span>, <span class="fl">3.7</span>, <span class="fl">3.2</span>, <span class="fl">4.4</span>, <span class="fl">2.6</span>,</span>
+<span id="cb4-7"><a></a>                               <span class="fl">3.2</span>, <span class="fl">3.5</span>, <span class="fl">3.8</span>, <span class="fl">5.1</span>, <span class="fl">2.8</span>, <span class="fl">4.1</span>, <span class="fl">4.4</span>, <span class="fl">2.2</span>, <span class="fl">4.4</span>, <span class="fl">2.7</span>, <span class="fl">2.3</span>,</span>
+<span id="cb4-8"><a></a>                               <span class="fl">5.8</span>, <span class="fl">5.9</span>, <span class="fl">5.2</span>, <span class="fl">3.2</span>, <span class="fl">2.4</span>, <span class="fl">4.7</span>, <span class="fl">3.8</span>])</span>
+<span id="cb4-9"><a></a>seabass_weights    <span class="op">=</span> np.array([<span class="dv">1677</span>, <span class="dv">1327</span>, <span class="dv">1486</span>, <span class="dv">1440</span>, <span class="dv">1857</span>, <span class="dv">1476</span>, <span class="dv">1749</span>, <span class="dv">2203</span>, <span class="dv">1979</span>, <span class="dv">1468</span>,</span>
+<span id="cb4-10"><a></a>                               <span class="dv">1496</span>, <span class="dv">1737</span>, <span class="dv">1099</span>, <span class="dv">1341</span>, <span class="dv">1748</span>, <span class="dv">1563</span>, <span class="dv">2181</span>, <span class="dv">1414</span>, <span class="dv">1286</span>, <span class="dv">1333</span>,</span>
+<span id="cb4-11"><a></a>                               <span class="dv">1787</span>, <span class="dv">1445</span>, <span class="dv">1505</span>, <span class="dv">1204</span>, <span class="dv">1381</span>, <span class="dv">1513</span>, <span class="dv">1259</span>, <span class="dv">1567</span>, <span class="dv">1370</span>, <span class="dv">1432</span>,</span>
+<span id="cb4-12"><a></a>                               <span class="dv">1370</span>, <span class="dv">1864</span>, <span class="dv">1488</span>, <span class="dv">1278</span>, <span class="dv">1657</span>, <span class="dv">1245</span>, <span class="dv">1533</span>, <span class="dv">1096</span>, <span class="dv">1223</span>, <span class="dv">1531</span>])</span>
+<span id="cb4-13"><a></a>seabass_brightness <span class="op">=</span> np.array([<span class="fl">5.6</span>, <span class="fl">7.5</span>, <span class="fl">5.2</span>, <span class="fl">9.5</span>, <span class="fl">6.3</span>, <span class="fl">8.3</span>, <span class="fl">6.6</span>, <span class="fl">7.6</span>, <span class="fl">7.7</span>, <span class="fl">5.9</span>, <span class="fl">9.8</span>,</span>
+<span id="cb4-14"><a></a>                               <span class="fl">8.9</span>, <span class="fl">9.7</span>, <span class="fl">9.5</span>, <span class="fl">8.0</span>, <span class="fl">9.6</span>, <span class="fl">5.4</span>, <span class="fl">6.0</span>, <span class="fl">5.2</span>, <span class="fl">6.6</span>, <span class="fl">6.9</span>, <span class="fl">6.4</span>,</span>
+<span id="cb4-15"><a></a>                               <span class="fl">9.1</span>, <span class="fl">6.8</span>, <span class="fl">6.4</span>, <span class="fl">7.7</span>, <span class="fl">5.7</span>, <span class="fl">9.0</span>, <span class="fl">5.4</span>, <span class="fl">9.9</span>, <span class="fl">8.9</span>, <span class="fl">6.0</span>, <span class="fl">5.0</span>,</span>
+<span id="cb4-16"><a></a>                               <span class="fl">9.1</span>, <span class="fl">8.5</span>, <span class="fl">8.6</span>, <span class="fl">8.9</span>, <span class="fl">5.4</span>, <span class="fl">6.8</span>, <span class="fl">5.6</span>])</span>
+<span id="cb4-17"><a></a></span>
+<span id="cb4-18"><a></a>weights    <span class="op">=</span> np.concatenate([salmon_weights, seabass_weights])</span>
+<span id="cb4-19"><a></a>brightness <span class="op">=</span> np.concatenate([salmon_brightness, seabass_brightness])</span>
+<span id="cb4-20"><a></a>y          <span class="op">=</span> np.array([<span class="dv">1</span>]<span class="op">*</span><span class="dv">40</span> <span class="op">+</span> [<span class="dv">0</span>]<span class="op">*</span><span class="dv">40</span>)   <span class="co"># 1=Salmon, 0=Sea bass</span></span>
+<span id="cb4-21"><a></a></span>
+<span id="cb4-22"><a></a><span class="co"># 体長の測定値（cm）</span></span>
+<span id="cb4-23"><a></a>rng     <span class="op">=</span> np.random.default_rng(<span class="dv">42</span>)</span>
+<span id="cb4-24"><a></a>lengths <span class="op">=</span> np.<span class="bu">round</span>(np.cbrt(weights) <span class="op">*</span> <span class="fl">4.5</span> <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="fl">1.0</span>, <span class="bu">len</span>(weights)), <span class="dv">1</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="b545ce5e" class="cell" data-execution_count="8">
+<div class="cell-output cell-output-stdout">
+<pre><code>体長（先頭5匹）: [58.4 55.3 59.2 61.7 54.1] cm
+体長の範囲: 45.0〜61.7 cm</code></pre>
+</div>
+</div>
+<div title="クイズ">
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>クイズ</strong></p>
+</div>
+<div class="callout-content">
+<p>特徴量が 2 → 3 に増えた。<strong>手に入る情報も 1.5 倍</strong>になったと思う？</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="体長と重さを並べてみる" class="slide level2">
+<h2>体長と重さを並べてみる</h2>
+<div class="slide-body">
+<div id="a562d19b" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">5.5</span>, <span class="fl">3.6</span>))</span>
+<span id="cb6-2"><a></a>plt.scatter(lengths, weights, alpha<span class="op">=</span><span class="fl">0.6</span>, s<span class="op">=</span><span class="dv">40</span>, c<span class="op">=</span><span class="st">"#5dade2"</span>, edgecolors<span class="op">=</span><span class="st">"gray"</span>)</span>
+<span id="cb6-3"><a></a>plt.xlabel(<span class="st">"体長 (cm)"</span>)<span class="op">;</span> plt.ylabel(<span class="st">"重さ (g)"</span>)</span>
+<span id="cb6-4"><a></a>plt.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb6-5"><a></a>plt.tight_layout()</span>
+<span id="cb6-6"><a></a>plt.show()</span>
+<span id="cb6-7"><a></a></span>
+<span id="cb6-8"><a></a><span class="bu">print</span>(<span class="ss">f"相関係数: </span><span class="sc">{</span>np<span class="sc">.</span>corrcoef(lengths, weights)[<span class="dv">0</span>, <span class="dv">1</span>]<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="dimensionality-pca_files/figure-revealjs/cell-10-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img data-src="dimensionality-pca_files/figure-revealjs/cell-10-output-1.png" class="quarto-figure quarto-figure-center" width="536" height="347"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>相関係数: 0.973</code></pre>
+</div>
+</div>
+<div class="fragment">
+<ul>
+<li>ほぼ<strong>一直線</strong>。長い魚は重い — あたりまえだった</li>
+<li>体長と重さは、<strong>ほぼ同じ情報を2回測っていた</strong></li>
+<li>この「実は重複している」を自動で見つけて畳む道具が <strong>PCA</strong></li>
+</ul>
+</div>
+</div>
+</section>
+<section id="pca-の直感" class="slide level2">
+<h2>PCA の直感</h2>
+<div class="slide-body">
+<p><strong>Principal Component Analysis（主成分分析）</strong></p>
+<ul>
+<li>斜めに細長い雲は、もとの2軸より「<strong>長い方向</strong>と<strong>細い方向</strong>」で見るほうが自然</li>
+<li>データの<strong>分散（<span class="en">variance</span>）が最大になる方向</strong>に新しい軸（主成分）を取る</li>
+</ul>
+<div id="d93f7aca" class="cell" data-execution_count="10">
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="dimensionality-pca_files/figure-revealjs/cell-11-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img data-src="dimensionality-pca_files/figure-revealjs/cell-11-output-1.png" class="quarto-figure quarto-figure-center" width="467" height="407"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>PC1 は体長と重さを合わせた「<strong>大きさ</strong>」の軸 — この方向だけで分散の約 99% を説明できる</li>
+</ul>
+</div>
+</section>
+<section id="最小二乗法と-pca-足の下ろし方が違う" class="slide level2">
+<h2>最小二乗法と PCA — 「足」の下ろし方が違う</h2>
+<div class="slide-body">
+<ul>
+<li>実はどちらも「<strong>足（誤差）の二乗和が最小になる直線</strong>」を探している</li>
+<li>違うのは<strong>足の向き</strong>だけ</li>
+</ul>
+<div id="c73d58f1" class="cell" data-execution_count="11">
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="dimensionality-pca_files/figure-revealjs/cell-12-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img data-src="dimensionality-pca_files/figure-revealjs/cell-12-output-1.png" class="quarto-figure quarto-figure-center" width="960" height="427"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li><strong>最小二乗法（<a href="./linear-regression.html">線形回帰の回</a>の MSE）</strong><span class="fw-colon">：</span>仕事は「<span class="math inline">\(y\)</span> を当てる」→ 誤差は<strong>縦</strong>に測る</li>
+<li><strong>PCA</strong><span class="fw-colon">：</span>仕事は「データの形を要約する」→ 誤差は直線への<strong>最短距離（垂直の足）</strong>で測る</li>
+<li>足の向きが違うので、選ばれる直線も<strong>少し違う</strong>（回帰の傾き 0.97、PC1 の傾き 1.00）</li>
+</ul>
+<div title="「分散最大」と「垂直の足最小」は同じこと">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>「分散最大」と「垂直の足最小」は同じこと</strong></p>
+</div>
+<div class="callout-content">
+<p>各点で（中心からの距離）² ＝（軸上の影）² ＋（垂直の足）²（ピタゴラスの定理）。 左辺の合計はデータで決まっていて動かないので、<strong>影の分散を最大にする軸</strong>と <strong>足の二乗和を最小にする直線</strong>は、同じものを選ぶ。</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="分散が最大の方向を式にする" class="slide level2">
+<h2>「分散が最大の方向」を式にする</h2>
+<div class="slide-body">
+<ul>
+<li>探している<strong>直線の向き</strong>を、<strong>単位ベクトル</strong> <span class="math inline">\(\mathbf{v}\)</span>（<span class="math inline">\(\|\mathbf{v}\| = 1\)</span>）で表す</li>
+<li>中心化した点 <span class="math inline">\(\tilde{\mathbf{x}}_i\)</span> のその直線への<strong>影（射影, <span class="en">projection</span>）</strong>は、内積 <span class="math inline">\(z_i = \tilde{\mathbf{x}}_i^{\mathsf T} \mathbf{v}\)</span>（ただの数）</li>
+<li>80匹ぶんの影は、行列とベクトルの積で<strong>一度に</strong>出せる<span class="fw-colon">：</span><span class="math inline">\(\mathbf{z} = \tilde{X} \mathbf{v}\)</span></li>
+</ul>
+<p>知りたい「影の分散」を、少しずつ変形します<span class="fw-colon">：</span></p>
+<p><span class="math display">\[\text{影の分散} = \frac{1}{n-1} \sum_i z_i^2
+= \frac{1}{n-1} \mathbf{z}^{\mathsf T} \mathbf{z}
+\qquad \text{（2乗和は「自分との内積」）}\]</span></p>
+<p><span class="math display">\[= \frac{1}{n-1} (\tilde{X}\mathbf{v})^{\mathsf T} (\tilde{X}\mathbf{v})
+= \frac{1}{n-1} \mathbf{v}^{\mathsf T} \tilde{X}^{\mathsf T} \tilde{X} \mathbf{v}
+\qquad \text{（転置の規則 } (AB)^{\mathsf T} = B^{\mathsf T} A^{\mathsf T} \text{）}\]</span></p>
+<p><span class="math display">\[= \mathbf{v}^{\mathsf T} \underbrace{\left( \frac{1}{n-1} \tilde{X}^{\mathsf T} \tilde{X} \right)}_{C\;（共分散行列）} \mathbf{v}
+\qquad \text{（真ん中のかたまりに名前をつける）}\]</span></p>
+<ul>
+<li><strong>共分散行列（<span class="en">covariance matrix</span>）<span class="math inline">\(C\)</span> は、影の分散を変形すると自然に現れる</strong>（ここが登場理由）</li>
+<li>つまり PCA の探しものはこう書ける<span class="fw-colon">：</span></li>
+</ul>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<p><span class="math inline">\(\|\mathbf{v}\| = 1\)</span> のもとで <span class="math inline">\(\mathbf{v}^{\mathsf T} C \mathbf{v}\)</span>（＝ <span class="math inline">\(\mathbf{v}\)</span> 方向の分散）を<strong>最大にする</strong> <span class="math inline">\(\mathbf{v}\)</span> を探せ</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="ところで固有ベクトルと固有値とは" class="slide level2">
+<h2>ところで「固有ベクトル」と「固有値」とは</h2>
+<div class="slide-body">
+<ul>
+<li>行列 <span class="math inline">\(A\)</span> は、ベクトルを別のベクトルへ移す<strong>変換</strong>（回して・伸ばす機械）。次の <span class="math inline">\(A\)</span> で実験<span class="fw-colon">：</span></li>
+</ul>
+<p><span class="math display">\[A = \begin{pmatrix} 1.75 &amp; 1.25 \\ 1.25 &amp; 1.75 \end{pmatrix}\]</span></p>
+<div id="9f4753d2" class="cell" data-execution_count="12">
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="dimensionality-pca_files/figure-revealjs/cell-13-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img data-src="dimensionality-pca_files/figure-revealjs/cell-13-output-1.png" class="quarto-figure quarto-figure-center" width="1069" height="490"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>同じ変換を、名画にかけてみると<span class="fw-colon">：</span></p>
+<div id="5fab055e" class="cell" data-execution_count="13">
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="dimensionality-pca_files/figure-revealjs/cell-14-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10"><img data-src="dimensionality-pca_files/figure-revealjs/cell-14-output-1.png" class="quarto-figure quarto-figure-center" width="1017" height="489"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>（絵<span class="fw-colon">：</span>レオナルド・ダ・ヴィンチ《モナ・リザ》 — <a href="https://commons.wikimedia.org/wiki/File:Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg">Wikimedia Commons</a>、パブリックドメイン）</p>
+<ul>
+<li>ほとんどの矢印は、変換されると<strong>回ってしまう</strong>（「ふつうの矢印」＝紺色）</li>
+<li>でも<strong>回らない方向が2本だけ</strong>ある（赤と橙）— 向きはそのまま、<strong>伸び縮みするだけ</strong></li>
+<li>その方向が<strong>固有ベクトル（<span class="en">eigenvector</span>）</strong> <span class="math inline">\(\mathbf{v}\)</span>、伸び縮みの倍率が<strong>固有値（<span class="en">eigenvalue</span>）</strong> <span class="math inline">\(\lambda\)</span><span class="fw-colon">：</span></li>
+</ul>
+<p><span class="math display">\[A \mathbf{v} = \lambda \mathbf{v} \qquad \text{（向きはそのまま、長さだけ } \lambda \text{ 倍）}\]</span></p>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<p>共分散行列 <span class="math inline">\(C\)</span> も、これと同じ「対称な変換」のひとつ。 このあと、<strong><span class="math inline">\(C\)</span> の回らない方向</strong>こそが「分散最大の軸」だと分かる。</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="a-の正体回して伸ばして戻す" class="slide level2">
+<h2>A の正体<span class="fw-colon">：</span>回して・伸ばして・戻す</h2>
+<div class="slide-body">
+<p>種明かし<span class="fw-colon">：</span>この <span class="math inline">\(A\)</span> は、おなじみの<strong>回転行列</strong>と<strong>軸ごとの伸縮</strong>だけで組み立ててありました。</p>
+<p><span class="math display">\[A = R\, S\, R^{\mathsf T}, \qquad
+R = \begin{pmatrix} \cos 45^\circ &amp; -\sin 45^\circ \\ \sin 45^\circ &amp; \cos 45^\circ \end{pmatrix}, \qquad
+S = \begin{pmatrix} 3 &amp; 0 \\ 0 &amp; 0.5 \end{pmatrix}\]</span></p>
+<p>読み方は<strong>右から</strong>（ベクトルに近い順）。モナ・リザで1段ずつ<span class="fw-colon">：</span></p>
+<div id="790bfdd3" class="cell" data-execution_count="14">
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="dimensionality-pca_files/figure-revealjs/cell-15-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11"><img data-src="dimensionality-pca_files/figure-revealjs/cell-15-output-1.png" class="quarto-figure quarto-figure-center" width="1236" height="314"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li><strong>① <span class="math inline">\(R^{\mathsf T}\)</span></strong><span class="fw-colon">：</span><span class="math inline">\(-45^\circ\)</span> 回して、「回らない方向」（赤・橙）を<strong>座標軸にそろえる</strong></li>
+<li><strong>② <span class="math inline">\(S\)</span></strong><span class="fw-colon">：</span>軸に沿って伸縮するだけ — ②の絵では赤い矢印が <span class="math inline">\(x\)</span> 軸の上に乗っている</li>
+<li><strong>③ <span class="math inline">\(R\)</span></strong><span class="fw-colon">：</span><span class="math inline">\(45^\circ\)</span> 回して、元の向きに戻す</li>
+<li>つまり「回らない方向」の正体は、<strong><span class="math inline">\(S\)</span> がただ伸縮するだけの軸を、<span class="math inline">\(R\)</span> が <span class="math inline">\(45^\circ\)</span> に向けた先</strong></li>
+<li><strong>固有ベクトル＝ <span class="math inline">\(R\)</span> の列</strong>（軸の向き先）、<strong>固有値＝ <span class="math inline">\(S\)</span> の対角成分</strong>（3 と 0.5）</li>
+</ul>
+<div id="927636f3" class="cell" data-execution_count="15">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a></a><span class="co"># 組み立てて確認：R S R^T がたしかに A になる</span></span>
+<span id="cb8-2"><a></a><span class="bu">print</span>(R_rot <span class="op">@</span> S_str <span class="op">@</span> R_rot.T)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[[1.75 1.25]
+ [1.25 1.75]]</code></pre>
+</div>
+</div>
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ヒント</strong></p>
+</div>
+<div class="callout-content">
+<p>対称行列は<strong>かならず</strong>この「回転・伸縮・逆回転」の形に分解できる — これが<strong>固有値分解</strong>。 <code>np.linalg.eigh</code> が返してくるのは、この <span class="math inline">\(R\)</span>（固有ベクトル）と <span class="math inline">\(S\)</span> の対角成分（固有値）。</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="答えが固有ベクトルになる理由" class="slide level2">
+<h2>答えが「固有ベクトル」になる理由</h2>
+<div class="slide-body">
+<ul>
+<li><span class="math inline">\(\|\mathbf{v}\| = 1\)</span> は「<span class="math inline">\(\mathbf{v}\)</span> の先端は半径1の球面の上」という意味</li>
+<li>球面上の<strong>てっぺん</strong>では、球面に沿ってどちらへ動いても <span class="math inline">\(\mathbf{v}^{\mathsf T} C \mathbf{v}\)</span> は増えない</li>
+<li>増える向きを表すのは勾配 <span class="math inline">\(2C\mathbf{v}\)</span>。これが球面の法線方向（<span class="math inline">\(\mathbf{v}\)</span> 自身）と<strong>平行</strong>になるしかない<span class="fw-colon">：</span></li>
+</ul>
+<p><span class="math display">\[C \mathbf{v} = \lambda \mathbf{v} \quad \text{（固有ベクトルの定義式そのもの！）}\]</span></p>
+<ul>
+<li>しかもそのときの分散は <span class="math inline">\(\mathbf{v}^{\mathsf T} C \mathbf{v} = \lambda \mathbf{v}^{\mathsf T} \mathbf{v} = \lambda\)</span> — <strong>固有値＝その方向の分散</strong></li>
+</ul>
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ヒント</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li><strong>固有ベクトル</strong>＝「球面上でこれ以上増やせない方向」の候補リスト</li>
+<li><strong>固有値</strong>＝その候補での分散の値</li>
+<li><span class="math inline">\(\lambda_1 \geq \lambda_2 \geq \cdots\)</span> と並べて、一番大きい候補から PC1, PC2, … と呼ぶ</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="総当たりで確かめる全方向の分散を測る" class="slide level2">
+<h2>総当たりで確かめる<span class="fw-colon">：</span>全方向の分散を測る</h2>
+<div class="slide-body">
+<p>固有値分解を信じる前に、<strong>力ずく</strong>で確認してみましょう。方向 <span class="math inline">\(\mathbf{v}\)</span> を1度刻みで全部試します。</p>
+<div id="47795922" class="cell" data-execution_count="16">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a></a>thetas <span class="op">=</span> np.radians(np.arange(<span class="dv">0</span>, <span class="dv">181</span>))</span>
+<span id="cb10-2"><a></a>proj_var <span class="op">=</span> np.array([</span>
+<span id="cb10-3"><a></a>    np.var(X_lw_sc <span class="op">@</span> np.array([np.cos(t), np.sin(t)]), ddof<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb10-4"><a></a>    <span class="cf">for</span> t <span class="kw">in</span> thetas</span>
+<span id="cb10-5"><a></a>])</span>
+<span id="cb10-6"><a></a></span>
+<span id="cb10-7"><a></a><span class="bu">print</span>(<span class="ss">f"分散が最大の角度: </span><span class="sc">{</span>np<span class="sc">.</span>degrees(thetas[proj_var.argmax()])<span class="sc">:.0f}</span><span class="ss">°"</span></span>
+<span id="cb10-8"><a></a>      <span class="ss">f"（分散 </span><span class="sc">{</span>proj_var<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.4f}</span><span class="ss">）"</span>)</span>
+<span id="cb10-9"><a></a><span class="bu">print</span>(<span class="ss">f"分散が最小の角度: </span><span class="sc">{</span>np<span class="sc">.</span>degrees(thetas[proj_var.argmin()])<span class="sc">:.0f}</span><span class="ss">°"</span></span>
+<span id="cb10-10"><a></a>      <span class="ss">f"（分散 </span><span class="sc">{</span>proj_var<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.4f}</span><span class="ss">）"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>分散が最大の角度: 45°（分散 1.9978）
+分散が最小の角度: 135°（分散 0.0275）</code></pre>
+</div>
+</div>
+<div id="b46c4877" class="cell" data-execution_count="17">
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="dimensionality-pca_files/figure-revealjs/cell-18-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-12"><img data-src="dimensionality-pca_files/figure-revealjs/cell-18-output-1.png" class="quarto-figure quarto-figure-center" width="685" height="327"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>総当たりの最大値・最小値が、固有値 <span class="math inline">\(\lambda_1, \lambda_2\)</span> に<strong>ぴったり一致</strong></li>
+<li>山の位置（45°）が PC1 の向き、谷の位置（135°）が PC2 の向き</li>
+<li>この総当たりを<strong>一発の計算</strong>で済ませるのが固有値分解</li>
+</ul>
+</div>
+</section>
+<section id="numpy-で確かめる" class="slide level2">
+<h2>NumPy で確かめる</h2>
+<div class="slide-body">
+<p>スライドの式を<strong>そのまま</strong>コードにして、sklearn の答えと突き合わせます。</p>
+<div id="270fb66b" class="cell" data-execution_count="18">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a></a><span class="co"># 1) 式のとおりに共分散行列を作る（専用関数は要らない）</span></span>
+<span id="cb12-2"><a></a>Xc <span class="op">=</span> X_lw_sc <span class="op">-</span> X_lw_sc.mean(axis<span class="op">=</span><span class="dv">0</span>)     <span class="co"># 中心化 X~</span></span>
+<span id="cb12-3"><a></a>C  <span class="op">=</span> Xc.T <span class="op">@</span> Xc <span class="op">/</span> (<span class="bu">len</span>(Xc) <span class="op">-</span> <span class="dv">1</span>)          <span class="co"># C = X~^T X~ / (n-1)</span></span>
+<span id="cb12-4"><a></a></span>
+<span id="cb12-5"><a></a><span class="co"># 2) 固有値・固有ベクトル（C のような対称行列には eigh を使う）</span></span>
+<span id="cb12-6"><a></a>lam, V <span class="op">=</span> np.linalg.eigh(C)</span>
+<span id="cb12-7"><a></a>order  <span class="op">=</span> np.argsort(lam)[::<span class="op">-</span><span class="dv">1</span>]          <span class="co"># 固有値の大きい順に並べ替え → PC1, PC2</span></span>
+<span id="cb12-8"><a></a>lam, V <span class="op">=</span> lam[order], V[:, order]</span>
+<span id="cb12-9"><a></a></span>
+<span id="cb12-10"><a></a><span class="bu">print</span>(<span class="st">"固有値（自作）        :"</span>, lam.<span class="bu">round</span>(<span class="dv">4</span>))</span>
+<span id="cb12-11"><a></a><span class="bu">print</span>(<span class="st">"分散（sklearnのPCA）  :"</span>, pca_d.explained_variance_.<span class="bu">round</span>(<span class="dv">4</span>))</span>
+<span id="cb12-12"><a></a><span class="bu">print</span>(<span class="st">"固有ベクトル（自作・列がPC）:"</span>)</span>
+<span id="cb12-13"><a></a><span class="bu">print</span>(V.<span class="bu">round</span>(<span class="dv">4</span>))</span>
+<span id="cb12-14"><a></a><span class="bu">print</span>(<span class="st">"components_.T（sklearn）:"</span>)</span>
+<span id="cb12-15"><a></a><span class="bu">print</span>(pca_d.components_.T.<span class="bu">round</span>(<span class="dv">4</span>))</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>固有値（自作）        : [1.9978 0.0275]
+分散（sklearnのPCA）  : [1.9978 0.0275]
+固有ベクトル（自作・列がPC）:
+[[ 0.7071 -0.7071]
+ [ 0.7071  0.7071]]
+components_.T（sklearn）:
+[[ 0.7071  0.7071]
+ [ 0.7071 -0.7071]]</code></pre>
+</div>
+</div>
+<ul>
+<li>固有値は sklearn の <code>explained_variance_</code> と<strong>完全一致</strong></li>
+<li>ベクトルは列によって<strong>符号が逆</strong>になることがある — 軸の向きが180°逆なだけで、<strong>同じ軸</strong></li>
+</ul>
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>実は sklearn の中身は SVD</strong></p>
+</div>
+<div class="callout-content">
+<p>実務の PCA は、共分散行列を作らずに中心化したデータを <strong>SVD（特異値分解）</strong> に かけて同じ答えを出している（大きいデータで速く、数値的にも安定）。</p>
+<div id="fb920b51" class="cell" data-execution_count="19">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a></a>U, S, Vt <span class="op">=</span> np.linalg.svd(Xc)</span>
+<span id="cb14-2"><a></a><span class="bu">print</span>(<span class="st">"SVD から出した分散:"</span>, (S<span class="op">**</span><span class="dv">2</span> <span class="op">/</span> (<span class="bu">len</span>(Xc) <span class="op">-</span> <span class="dv">1</span>)).<span class="bu">round</span>(<span class="dv">4</span>))   <span class="co"># ↑の固有値と一致</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>SVD から出した分散: [1.9978 0.0275]</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="scikit-learn-で-pca魚は本当は何次元か" class="slide level2">
+<h2>scikit-learn で PCA（魚は本当は何次元か）</h2>
+<div class="slide-body">
+<ul>
+<li>輝度・重さ・体長の<strong>3特徴量</strong>を PCA にかけてみる</li>
+</ul>
+<div id="f88ea477" class="cell" data-execution_count="20">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a></a>X3 <span class="op">=</span> np.column_stack([brightness, weights, lengths])   <span class="co"># 3特徴量</span></span>
+<span id="cb16-2"><a></a></span>
+<span id="cb16-3"><a></a>X3_scaled <span class="op">=</span> StandardScaler().fit_transform(X3)   <span class="co"># スケールを揃えてから PCA</span></span>
+<span id="cb16-4"><a></a></span>
+<span id="cb16-5"><a></a>pca <span class="op">=</span> PCA(n_components<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb16-6"><a></a>X3_pca <span class="op">=</span> pca.fit_transform(X3_scaled)</span>
+<span id="cb16-7"><a></a></span>
+<span id="cb16-8"><a></a><span class="bu">print</span>(<span class="st">"各主成分の寄与率（情報量の割合）:"</span>)</span>
+<span id="cb16-9"><a></a><span class="cf">for</span> i, r <span class="kw">in</span> <span class="bu">enumerate</span>(pca.explained_variance_ratio_):</span>
+<span id="cb16-10"><a></a>    <span class="bu">print</span>(<span class="ss">f"  PC</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>r<span class="sc">:.1%}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>各主成分の寄与率（情報量の割合）:
+  PC1: 79.2%
+  PC2: 19.9%
+  PC3: 0.9%</code></pre>
+</div>
+</div>
+<div title="クイズ">
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>クイズ</strong></p>
+</div>
+<div class="callout-content">
+<p>PC3 の寄与率は <strong>1% 未満</strong>。これは何を意味している？</p>
+</div>
+</div>
+</div>
+</div>
+<div class="fragment">
+<ul>
+<li>体長と重さがほぼ同じ情報だから、3本目の軸には<strong>情報が残っていない</strong></li>
+<li>この魚データは、3次元に見えて<strong>実質2次元</strong>だった</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="次元に圧縮しても何も失わない" class="slide level2">
+<h2>2次元に圧縮しても何も失わない</h2>
+<div class="slide-body">
+<div id="143a1112" class="cell" data-execution_count="21">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a></a>colors  <span class="op">=</span> [<span class="st">"#e74c3c"</span>, <span class="st">"#2980b9"</span>]</span>
+<span id="cb18-2"><a></a></span>
+<span id="cb18-3"><a></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">5.8</span>, <span class="fl">3.8</span>))</span>
+<span id="cb18-4"><a></a><span class="cf">for</span> label, name, col, m <span class="kw">in</span> [(<span class="dv">1</span>, <span class="st">"Salmon"</span>, <span class="st">"#e74c3c"</span>, <span class="st">"o"</span>), (<span class="dv">0</span>, <span class="st">"Sea bass"</span>, <span class="st">"#2980b9"</span>, <span class="st">"s"</span>)]:</span>
+<span id="cb18-5"><a></a>    mask <span class="op">=</span> y <span class="op">==</span> label</span>
+<span id="cb18-6"><a></a>    plt.scatter(X3_pca[mask, <span class="dv">0</span>], X3_pca[mask, <span class="dv">1</span>],</span>
+<span id="cb18-7"><a></a>                c<span class="op">=</span>col, marker<span class="op">=</span>m, s<span class="op">=</span><span class="dv">45</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, label<span class="op">=</span>name)</span>
+<span id="cb18-8"><a></a>plt.xlabel(<span class="ss">f"PC1（寄与率 </span><span class="sc">{</span>pca<span class="sc">.</span>explained_variance_ratio_[<span class="dv">0</span>]<span class="sc">:.1%}</span><span class="ss">）"</span>)</span>
+<span id="cb18-9"><a></a>plt.ylabel(<span class="ss">f"PC2（寄与率 </span><span class="sc">{</span>pca<span class="sc">.</span>explained_variance_ratio_[<span class="dv">1</span>]<span class="sc">:.1%}</span><span class="ss">）"</span>)</span>
+<span id="cb18-10"><a></a>plt.title(<span class="st">"3特徴量 → 2次元に圧縮"</span>)</span>
+<span id="cb18-11"><a></a>plt.legend()<span class="op">;</span> plt.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb18-12"><a></a>plt.tight_layout()</span>
+<span id="cb18-13"><a></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="dimensionality-pca_files/figure-revealjs/cell-22-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-13"><img data-src="dimensionality-pca_files/figure-revealjs/cell-22-output-1.png" class="quarto-figure quarto-figure-center" width="567" height="367"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>次元を1つ捨てたのに、2種類の魚は<strong>今までどおり分離できている</strong></li>
+<li>累積寄与率 99% — 捨てたのは「情報のない軸」だけ</li>
+</ul>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>StandardScaler を使う理由</strong></p>
+</div>
+<div class="callout-content">
+<p>輝度（1〜10）・重さ（1000〜2500g）・体長（45〜62cm）はスケールが全く違う。 正規化しないと重さだけが主成分を支配してしまう（クラスタリング回のスケールの罠と同じ）。</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="次元データを2次元に圧縮iris" class="slide level2">
+<h2>4次元データを2次元に圧縮（Iris）</h2>
+<div class="slide-body">
+<p>Fisher の Iris データセット<span class="fw-colon">：</span>4特徴量（がく片長さ・幅、花弁長さ・幅）</p>
+<div id="74a95983" class="cell" data-execution_count="22">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> load_iris</span>
+<span id="cb19-2"><a></a></span>
+<span id="cb19-3"><a></a>iris   <span class="op">=</span> load_iris()</span>
+<span id="cb19-4"><a></a>X_iris <span class="op">=</span> StandardScaler().fit_transform(iris.data)   <span class="co"># 4特徴量</span></span>
+<span id="cb19-5"><a></a>y_iris <span class="op">=</span> iris.target</span>
+<span id="cb19-6"><a></a></span>
+<span id="cb19-7"><a></a>pca4  <span class="op">=</span> PCA(n_components<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb19-8"><a></a>X_2d  <span class="op">=</span> pca4.fit_transform(X_iris)</span>
+<span id="cb19-9"><a></a></span>
+<span id="cb19-10"><a></a>colors  <span class="op">=</span> [<span class="st">"#e74c3c"</span>, <span class="st">"#27ae60"</span>, <span class="st">"#2980b9"</span>]</span>
+<span id="cb19-11"><a></a>markers <span class="op">=</span> [<span class="st">"o"</span>, <span class="st">"s"</span>, <span class="st">"^"</span>]</span>
+<span id="cb19-12"><a></a></span>
+<span id="cb19-13"><a></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">6</span>, <span class="fl">4.5</span>))</span>
+<span id="cb19-14"><a></a><span class="cf">for</span> label, name <span class="kw">in</span> <span class="bu">enumerate</span>(iris.target_names):</span>
+<span id="cb19-15"><a></a>    mask <span class="op">=</span> y_iris <span class="op">==</span> label</span>
+<span id="cb19-16"><a></a>    plt.scatter(X_2d[mask, <span class="dv">0</span>], X_2d[mask, <span class="dv">1</span>],</span>
+<span id="cb19-17"><a></a>                c<span class="op">=</span>colors[label], marker<span class="op">=</span>markers[label],</span>
+<span id="cb19-18"><a></a>                s<span class="op">=</span><span class="dv">50</span>, alpha<span class="op">=</span><span class="fl">0.8</span>, label<span class="op">=</span>name)</span>
+<span id="cb19-19"><a></a></span>
+<span id="cb19-20"><a></a>plt.xlabel(<span class="ss">f"PC1（寄与率 </span><span class="sc">{</span>pca4<span class="sc">.</span>explained_variance_ratio_[<span class="dv">0</span>]<span class="sc">:.1%}</span><span class="ss">）"</span>)</span>
+<span id="cb19-21"><a></a>plt.ylabel(<span class="ss">f"PC2（寄与率 </span><span class="sc">{</span>pca4<span class="sc">.</span>explained_variance_ratio_[<span class="dv">1</span>]<span class="sc">:.1%}</span><span class="ss">）"</span>)</span>
+<span id="cb19-22"><a></a>plt.title(<span class="st">"Iris（4次元）を PCA で2次元に圧縮"</span>)</span>
+<span id="cb19-23"><a></a>plt.legend()</span>
+<span id="cb19-24"><a></a>plt.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb19-25"><a></a>plt.tight_layout()</span>
+<span id="cb19-26"><a></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="dimensionality-pca_files/figure-revealjs/cell-23-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-14"><img data-src="dimensionality-pca_files/figure-revealjs/cell-23-output-1.png" class="quarto-figure quarto-figure-center" width="587" height="437"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<p>4次元を2次元に圧縮しても全情報の 97% 以上が保たれている。 setosa（赤丸）が完全に分離できているのも図から見える。</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="寄与率explained-variance-ratio" class="slide level2">
+<h2>寄与率（<span class="en">Explained Variance Ratio</span>）</h2>
+<div class="slide-body">
+<div id="47955f79" class="cell" data-execution_count="23">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a></a>ratios     <span class="op">=</span> pca4.explained_variance_ratio_</span>
+<span id="cb20-2"><a></a>cumulative <span class="op">=</span> np.cumsum(ratios)</span>
+<span id="cb20-3"><a></a></span>
+<span id="cb20-4"><a></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">5</span>, <span class="fl">3.5</span>))</span>
+<span id="cb20-5"><a></a>x_pos <span class="op">=</span> [<span class="st">"PC1"</span>, <span class="st">"PC2"</span>, <span class="st">"PC3"</span>, <span class="st">"PC4"</span>]</span>
+<span id="cb20-6"><a></a></span>
+<span id="cb20-7"><a></a><span class="co"># 全4成分を改めて計算</span></span>
+<span id="cb20-8"><a></a>pca_full <span class="op">=</span> PCA(n_components<span class="op">=</span><span class="dv">4</span>).fit(X_iris)</span>
+<span id="cb20-9"><a></a>ratios_full <span class="op">=</span> pca_full.explained_variance_ratio_</span>
+<span id="cb20-10"><a></a>cum_full    <span class="op">=</span> np.cumsum(ratios_full)</span>
+<span id="cb20-11"><a></a></span>
+<span id="cb20-12"><a></a>ax.bar(x_pos, ratios_full, color<span class="op">=</span>[<span class="st">"#e74c3c"</span>, <span class="st">"#e67e22"</span>, <span class="st">"#bdc3c7"</span>, <span class="st">"#bdc3c7"</span>])</span>
+<span id="cb20-13"><a></a>ax.plot(x_pos, cum_full, <span class="st">"o-"</span>, color<span class="op">=</span><span class="st">"black"</span>, label<span class="op">=</span><span class="st">"累積寄与率"</span>)</span>
+<span id="cb20-14"><a></a><span class="cf">for</span> x, y <span class="kw">in</span> <span class="bu">zip</span>(x_pos, cum_full):</span>
+<span id="cb20-15"><a></a>    ax.text(x, y <span class="op">+</span> <span class="fl">0.02</span>, <span class="ss">f"</span><span class="sc">{</span>y<span class="sc">:.1%}</span><span class="ss">"</span>, ha<span class="op">=</span><span class="st">"center"</span>, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb20-16"><a></a>ax.set_ylabel(<span class="st">"寄与率"</span>)</span>
+<span id="cb20-17"><a></a>ax.set_ylim(<span class="dv">0</span>, <span class="fl">1.15</span>)</span>
+<span id="cb20-18"><a></a>ax.legend(fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb20-19"><a></a>ax.set_title(<span class="st">"Iris の主成分別寄与率"</span>)</span>
+<span id="cb20-20"><a></a>ax.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>, axis<span class="op">=</span><span class="st">"y"</span>)</span>
+<span id="cb20-21"><a></a>plt.tight_layout()</span>
+<span id="cb20-22"><a></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="dimensionality-pca_files/figure-revealjs/cell-24-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-15"><img data-src="dimensionality-pca_files/figure-revealjs/cell-24-output-1.png" class="quarto-figure quarto-figure-center" width="487" height="337"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>何次元に削減するか？</strong></p>
+</div>
+<div class="callout-content">
+<p>一般的には<strong>累積寄与率が 80〜95%</strong> を超える次元数を選ぶ。 Iris は PC1+PC2 だけで 97% 超えるので2次元で十分。</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="まとめ" class="slide level2">
+<h2>まとめ</h2>
+<div class="slide-body">
+<ul>
+<li><strong>次元の呪い</strong><span class="fw-colon">：</span>次元が増えると空間が広くなり、距離が意味をなさなくなる</li>
+<li><strong>特徴量を増やしても情報が増えるとは限らない</strong><span class="fw-colon">：</span>体長は重さの言い換えだった</li>
+<li><strong>PCA</strong><span class="fw-colon">：</span>分散が最大の方向（= 共分散行列の固有ベクトル）に軸を取り直す
+<ul>
+<li>寄与率を見れば「データの<strong>実質的な次元</strong>」がわかる（魚は3次元に見えて実質2次元）</li>
+</ul></li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a></a><span class="im">from</span> sklearn.decomposition <span class="im">import</span> PCA</span>
+<span id="cb21-2"><a></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
+<span id="cb21-3"><a></a></span>
+<span id="cb21-4"><a></a>X_scaled <span class="op">=</span> StandardScaler().fit_transform(X)   <span class="co"># スケール正規化</span></span>
+<span id="cb21-5"><a></a>pca <span class="op">=</span> PCA(n_components<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb21-6"><a></a>X_2d <span class="op">=</span> pca.fit_transform(X_scaled)             <span class="co"># 2次元に圧縮</span></span>
+<span id="cb21-7"><a></a></span>
+<span id="cb21-8"><a></a>pca.explained_variance_ratio_   <span class="co"># 各 PC の寄与率</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>概念</th>
+<th>意味</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>主成分（PC）</td>
+<td>分散が最大の方向（固有ベクトル）</td>
+</tr>
+<tr class="even">
+<td>固有値</td>
+<td>その方向の分散の大きさ</td>
+</tr>
+<tr class="odd">
+<td>寄与率</td>
+<td>情報量の割合（累積80〜95%を目安に次元数を決める）</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>分類問題と特徴量のまとめ</strong></p>
+</div>
+<div class="callout-content">
+<p>1D → 2D の分類、評価と汎化、教師なし学習（k-means）、次元の呪いと PCA。 <strong>機械学習の基本的な問いと道具が揃った。</strong></p>
+<p>ここまで <code>model.fit(X, y)</code> という1行を何度も呼んだが、<strong>中身は一度も見ていない</strong>。 次の「最適化」から、この1行を開けにいく。</p>
+</div>
+</div>
+</div>
+
+
+<div id="3ade8a4a-fb1d-4a6c-8409-ac45482d5fc9" class="hidden">
+
+</div>
+</div>
+</section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="site_libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="site_libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="site_libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="site_libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="site_libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="site_libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="site_libs/revealjs/plugin/search/search.js"></script>
+  <script src="site_libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="site_libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":false},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: false,
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1280,
+
+        height: 720,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 6.0e-2,
+
+        math: {
+          mathjax: './libs/mathjax/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "コピーしました");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "コピーしました");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp("https:\/\/rkskmt\.github\.io\/ai-lectures\/");
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    <script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+    (function() {
+      let previousOnload = window.onload;
+      window.onload = () => {
+        if (previousOnload) {
+          previousOnload();
+        }
+        lightboxQuarto.on('slide_before_load', (data) => {
+          const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+          const href = trigger.getAttribute('href');
+          if (href !== null) {
+            const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+            if (imgEl !== null) {
+              const srcAttr = imgEl.getAttribute("src");
+              if (srcAttr && srcAttr.startsWith("data:")) {
+                slideConfig.href = srcAttr;
+              }
+            }
+          } 
+        });
+      
+        lightboxQuarto.on('slide_after_load', (data) => {
+          const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(slideNode);
+          }
+        });
+      
+      };
+      
+    })();
+              </script>
+    
+
+</body></html>

@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="ja"><head>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-html/tabby.min.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.8.27">
+
+  <meta name="author" content="rkskmt">
+  <title>AI Lectures – ニューラルネットワークの最小単位</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #24292e;  }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #24292e; } /* Normal */
+    code span.al { color: #ff5555; font-weight: bold; } /* Alert */
+    code span.an { color: #6a737d; } /* Annotation */
+    code span.at { color: #d73a49; } /* Attribute */
+    code span.bn { color: #005cc5; } /* BaseN */
+    code span.bu { color: #d73a49; } /* BuiltIn */
+    code span.cf { color: #d73a49; } /* ControlFlow */
+    code span.ch { color: #032f62; } /* Char */
+    code span.cn { color: #005cc5; } /* Constant */
+    code span.co { color: #6a737d; } /* Comment */
+    code span.cv { color: #6a737d; } /* CommentVar */
+    code span.do { color: #6a737d; } /* Documentation */
+    code span.dt { color: #d73a49; } /* DataType */
+    code span.dv { color: #005cc5; } /* DecVal */
+    code span.er { color: #ff5555; text-decoration: underline; } /* Error */
+    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
+    code span.fl { color: #005cc5; } /* Float */
+    code span.fu { color: #6f42c1; } /* Function */
+    code span.im { color: #032f62; } /* Import */
+    code span.in { color: #6a737d; } /* Information */
+    code span.kw { color: #d73a49; } /* Keyword */
+    code span.op { color: #24292e; } /* Operator */
+    code span.ot { color: #6f42c1; } /* Other */
+    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.re { color: #6a737d; } /* RegionMarker */
+    code span.sc { color: #005cc5; } /* SpecialChar */
+    code span.ss { color: #032f62; } /* SpecialString */
+    code span.st { color: #032f62; } /* String */
+    code span.va { color: #e36209; } /* Variable */
+    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.wa { color: #ff5555; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-d3a26a7442888a116b43ccec6150e9c5.css">
+  <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="site_libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+  <link rel="stylesheet" href="custom.css">
+  <script src="slide-ui.js" defer=""></script>
+  <script src="search-ui.js" defer=""></script>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">ニューラルネットワークの最小単位</h1>
+  <p class="subtitle">fit() の中で境界が動く</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+rkskmt 
+</div>
+</div>
+</div>
+
+</section>
+<section id="ここまでの道具" class="slide level2">
+<h2>ここまでの道具</h2>
+<div class="slide-body">
+<ul>
+<li><strong>勾配降下法</strong><span class="fw-colon">：</span>傾きの逆方向に少しずつ進んで最小値を探す（最適化の回）</li>
+<li><strong>回帰の <code>fit()</code> は自作済み</strong><span class="fw-colon">：</span>体長→重さの直線を勾配降下で当て、sklearn と一致した（前回）</li>
+<li>残るは<strong>分類</strong><span class="fw-colon">：</span>ロジスティック回帰の <code>fit()</code> は、決定境界の回からブラックボックスのまま</li>
+</ul>
+<div title="今回の問い">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>今回の問い</strong></p>
+</div>
+<div class="callout-content">
+<p>同じ道具で、<strong>分類の</strong> <code>fit()</code> も開けられるか？ — 開けると、そこに<strong>ニューラルネットワークの最小単位</strong>が現れる</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="section" class="slide level2 center break-slide" data-background-color="white">
+<h2></h2>
+<div class="break-title">
+<p>最小単位の構造</p>
+</div>
+</section>
+<section id="入力から出力までたった2ステップ" class="slide level2">
+<h2>入力から出力まで、たった2ステップ</h2>
+<div class="slide-body">
+<div id="step-1アフィン変換affine-transformation" class="slide-body-heading">
+Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">affine transformation</span>）
+</div>
+<p><span class="math display">\[z = \alpha_1 x_1 + \alpha_2 x_2 + b\]</span></p>
+<ul>
+<li><span class="math inline">\(x_1, x_2\)</span><span class="fw-colon">：</span>入力（輝度、重さ）</li>
+<li><span class="math inline">\(\alpha_1, \alpha_2\)</span><span class="fw-colon">：</span><strong>重み</strong>（どの特徴量をどれだけ重視するか）</li>
+<li><span class="math inline">\(b\)</span><span class="fw-colon">：</span><strong>バイアス</strong>（全体のオフセット）</li>
+<li><span class="math inline">\(z\)</span><span class="fw-colon">：</span>スカラー1個</li>
+</ul>
+<h3 id="幾何的な意味">幾何的な意味</h3>
+<ul>
+<li>2次元の点を <span class="math inline">\(\alpha\)</span> 方向に<strong>射影</strong>して1次元に落とす</li>
+<li><span class="math inline">\(b\)</span> で位置を調整する</li>
+</ul>
+</div>
+</section>
+<section id="step-2シグモイドで確率にする" class="slide level2">
+<h2>Step 2<span class="fw-colon">：</span>シグモイドで「確率」にする</h2>
+<div class="slide-body">
+<p><span class="math display">\[p = \sigma(z) = \frac{1}{1 + e^{-z}}\]</span></p>
+<div id="30508120" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="nn-single-unit_files/figure-revealjs/cell-2-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img data-src="nn-single-unit_files/figure-revealjs/cell-2-output-1.png" class="quarto-figure quarto-figure-center" width="546" height="267"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>実数全体 <span class="math inline">\((-\infty, +\infty)\)</span> を <strong>0〜1 の範囲</strong>に押し込む</li>
+<li><span class="math inline">\(p \geq 0.5\)</span> → Salmon、<span class="math inline">\(p &lt; 0.5\)</span> → Sea bass と判定</li>
+<li><span class="math inline">\(z = 0\)</span>（＝決定境界の上）のとき、ちょうど <span class="math inline">\(p = 0.5\)</span></li>
+</ul>
+</div>
+</section>
+<section id="実はロジスティック回帰" class="slide level2">
+<h2>実はロジスティック回帰</h2>
+<div class="slide-body">
+<ul>
+<li>「アフィン変換 → シグモイド」 — この2ステップが<strong>ニューラルネットワークの最小単位</strong>（1個のニューロン）</li>
+<li>そして、これは<strong>ロジスティック回帰そのもの</strong></li>
+<li><code>sklearn</code> の <code>LogisticRegression</code> が中でやっているのもこの計算</li>
+</ul>
+<div title="今回の作戦">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>今回の作戦</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>NN は、この最小単位の<strong>組み合わせ</strong>でできている</li>
+<li>だから、まず<strong>1個だけ</strong>を完全に理解する</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-1" class="slide level2 center break-slide" data-background-color="white">
+<h2></h2>
+<div class="break-title">
+<p>学習 ＝ 境界を動かすこと</p>
+</div>
+</section>
+<section id="何を最小化するか損失関数" class="slide level2">
+<h2>何を最小化するか<span class="fw-colon">：</span>損失関数</h2>
+<div class="slide-body">
+<ul>
+<li>「いまのパラメータがどれだけダメか」を1つの数字にする</li>
+</ul>
+<p><span class="math display">\[L = -\frac{1}{N}\sum_{i} \left[ y_i \log p_i + (1 - y_i) \log (1 - p_i) \right]\]</span></p>
+<ul>
+<li><strong>交差エントロピー（<span class="en">cross entropy</span>）</strong>と呼ぶ</li>
+<li>例<span class="fw-colon">：</span>正解 <span class="math inline">\(y=1\)</span>（Salmon）なのに <span class="math inline">\(p = 0.4\)</span> しか出せない
+<ul>
+<li><span class="math inline">\(L = -\log(0.4) \approx 0.92\)</span>（大きい＝ダメ）</li>
+</ul></li>
+<li>自信を持って正解（<span class="math inline">\(p=0.99\)</span>）なら <span class="math inline">\(-\log(0.99) \approx 0.01\)</span>（小さい＝良い）</li>
+</ul>
+<div title="クイズ">
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>クイズ</strong></p>
+</div>
+<div class="callout-content">
+<p>知りたいのは正答率。なぜ<strong>正答率そのもの</strong>を最大化しない？</p>
+</div>
+</div>
+</div>
+</div>
+<div class="fragment">
+<ul>
+<li>正答率はパラメータを少し動かしても<strong>階段状にしか変化しない</strong> → 微分が 0 か未定義</li>
+<li>勾配降下法が使えない。<strong>滑らかな代理</strong>として交差エントロピーを最小化する</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="勾配が驚くほど簡単になる" class="slide level2">
+<h2>勾配が驚くほど簡単になる</h2>
+<div class="slide-body">
+<ul>
+<li>損失 <span class="math inline">\(L\)</span> を <span class="math inline">\(z\)</span> で微分すると、連鎖律（<span class="en">chain rule</span>）で</li>
+</ul>
+<p><span class="math display">\[\frac{\partial L}{\partial z}
+= \frac{\partial L}{\partial p} \cdot \frac{\partial p}{\partial z}
+= \left(-\frac{1}{p}\right) \cdot p(1-p)
+= p - 1 \quad (\text{正解 } y = 1 \text{ のとき})\]</span></p>
+<ul>
+<li>正解が 0 のときは <span class="math inline">\(p - 0\)</span>。つまり<strong>常に</strong></li>
+</ul>
+<p><span class="math display">\[\frac{\partial L}{\partial z} = p - y\]</span></p>
+<ul>
+<li>各パラメータの更新式（学習率 <span class="math inline">\(\eta\)</span>）<span class="fw-colon">：</span></li>
+</ul>
+<p><span class="math display">\[\alpha \leftarrow \alpha - \eta\,(p - y)\,x, \qquad b \leftarrow b - \eta\,(p - y)\]</span></p>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<p>シグモイドの微分 <span class="math inline">\(p(1-p)\)</span> と交差エントロピーの微分 <span class="math inline">\(-1/p\)</span> が<strong>打ち消し合う</strong>ようにできている。 「予測と正解の差 <span class="math inline">\((p-y)\)</span> を、入力の大きさに応じて配る」だけ。</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="実装必要な関数は4つだけ" class="slide level2">
+<h2>実装<span class="fw-colon">：</span>必要な関数は4つだけ</h2>
+<div class="slide-body">
+<div id="200106a7" class="cell" data-execution_count="2">
+<details class="code-fold">
+<summary>魚データの定義（クリックして展開）</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a>salmon_weights     <span class="op">=</span> np.array([<span class="dv">2149</span>, <span class="dv">1959</span>, <span class="dv">2194</span>, <span class="dv">2457</span>, <span class="dv">1930</span>, <span class="dv">1930</span>, <span class="dv">2474</span>, <span class="dv">2230</span>, <span class="dv">1859</span>, <span class="dv">2163</span>,</span>
+<span id="cb1-2"><a></a>                               <span class="dv">1861</span>, <span class="dv">1860</span>, <span class="dv">2073</span>, <span class="dv">1426</span>, <span class="dv">1483</span>, <span class="dv">1831</span>, <span class="dv">1696</span>, <span class="dv">2094</span>, <span class="dv">1728</span>, <span class="dv">1576</span>,</span>
+<span id="cb1-3"><a></a>                               <span class="dv">2028</span>, <span class="dv">1903</span>, <span class="dv">2057</span>, <span class="dv">2229</span>, <span class="dv">1884</span>, <span class="dv">1884</span>, <span class="dv">2240</span>, <span class="dv">2081</span>, <span class="dv">1838</span>, <span class="dv">2037</span>,</span>
+<span id="cb1-4"><a></a>                               <span class="dv">1839</span>, <span class="dv">1838</span>, <span class="dv">1978</span>, <span class="dv">1554</span>, <span class="dv">1591</span>, <span class="dv">1820</span>, <span class="dv">1731</span>, <span class="dv">1992</span>, <span class="dv">1752</span>, <span class="dv">1652</span>])</span>
+<span id="cb1-5"><a></a>salmon_brightness  <span class="op">=</span> np.array([<span class="fl">3.5</span>, <span class="fl">5.8</span>, <span class="fl">4.9</span>, <span class="fl">4.4</span>, <span class="fl">2.6</span>, <span class="fl">2.6</span>, <span class="fl">2.2</span>, <span class="fl">5.5</span>, <span class="fl">4.4</span>, <span class="fl">4.8</span>, <span class="fl">2.1</span>,</span>
+<span id="cb1-6"><a></a>                               <span class="fl">5.9</span>, <span class="fl">5.3</span>, <span class="fl">2.8</span>, <span class="fl">2.7</span>, <span class="fl">2.7</span>, <span class="fl">3.2</span>, <span class="fl">4.1</span>, <span class="fl">3.7</span>, <span class="fl">3.2</span>, <span class="fl">4.4</span>, <span class="fl">2.6</span>,</span>
+<span id="cb1-7"><a></a>                               <span class="fl">3.2</span>, <span class="fl">3.5</span>, <span class="fl">3.8</span>, <span class="fl">5.1</span>, <span class="fl">2.8</span>, <span class="fl">4.1</span>, <span class="fl">4.4</span>, <span class="fl">2.2</span>, <span class="fl">4.4</span>, <span class="fl">2.7</span>, <span class="fl">2.3</span>,</span>
+<span id="cb1-8"><a></a>                               <span class="fl">5.8</span>, <span class="fl">5.9</span>, <span class="fl">5.2</span>, <span class="fl">3.2</span>, <span class="fl">2.4</span>, <span class="fl">4.7</span>, <span class="fl">3.8</span>])</span>
+<span id="cb1-9"><a></a>seabass_weights    <span class="op">=</span> np.array([<span class="dv">1677</span>, <span class="dv">1327</span>, <span class="dv">1486</span>, <span class="dv">1440</span>, <span class="dv">1857</span>, <span class="dv">1476</span>, <span class="dv">1749</span>, <span class="dv">2203</span>, <span class="dv">1979</span>, <span class="dv">1468</span>,</span>
+<span id="cb1-10"><a></a>                               <span class="dv">1496</span>, <span class="dv">1737</span>, <span class="dv">1099</span>, <span class="dv">1341</span>, <span class="dv">1748</span>, <span class="dv">1563</span>, <span class="dv">2181</span>, <span class="dv">1414</span>, <span class="dv">1286</span>, <span class="dv">1333</span>,</span>
+<span id="cb1-11"><a></a>                               <span class="dv">1787</span>, <span class="dv">1445</span>, <span class="dv">1505</span>, <span class="dv">1204</span>, <span class="dv">1381</span>, <span class="dv">1513</span>, <span class="dv">1259</span>, <span class="dv">1567</span>, <span class="dv">1370</span>, <span class="dv">1432</span>,</span>
+<span id="cb1-12"><a></a>                               <span class="dv">1370</span>, <span class="dv">1864</span>, <span class="dv">1488</span>, <span class="dv">1278</span>, <span class="dv">1657</span>, <span class="dv">1245</span>, <span class="dv">1533</span>, <span class="dv">1096</span>, <span class="dv">1223</span>, <span class="dv">1531</span>])</span>
+<span id="cb1-13"><a></a>seabass_brightness <span class="op">=</span> np.array([<span class="fl">5.6</span>, <span class="fl">7.5</span>, <span class="fl">5.2</span>, <span class="fl">9.5</span>, <span class="fl">6.3</span>, <span class="fl">8.3</span>, <span class="fl">6.6</span>, <span class="fl">7.6</span>, <span class="fl">7.7</span>, <span class="fl">5.9</span>, <span class="fl">9.8</span>,</span>
+<span id="cb1-14"><a></a>                               <span class="fl">8.9</span>, <span class="fl">9.7</span>, <span class="fl">9.5</span>, <span class="fl">8.0</span>, <span class="fl">9.6</span>, <span class="fl">5.4</span>, <span class="fl">6.0</span>, <span class="fl">5.2</span>, <span class="fl">6.6</span>, <span class="fl">6.9</span>, <span class="fl">6.4</span>,</span>
+<span id="cb1-15"><a></a>                               <span class="fl">9.1</span>, <span class="fl">6.8</span>, <span class="fl">6.4</span>, <span class="fl">7.7</span>, <span class="fl">5.7</span>, <span class="fl">9.0</span>, <span class="fl">5.4</span>, <span class="fl">9.9</span>, <span class="fl">8.9</span>, <span class="fl">6.0</span>, <span class="fl">5.0</span>,</span>
+<span id="cb1-16"><a></a>                               <span class="fl">9.1</span>, <span class="fl">8.5</span>, <span class="fl">8.6</span>, <span class="fl">8.9</span>, <span class="fl">5.4</span>, <span class="fl">6.8</span>, <span class="fl">5.6</span>])</span>
+<span id="cb1-17"><a></a></span>
+<span id="cb1-18"><a></a>X <span class="op">=</span> np.column_stack([</span>
+<span id="cb1-19"><a></a>    np.concatenate([salmon_brightness, seabass_brightness]),</span>
+<span id="cb1-20"><a></a>    np.concatenate([salmon_weights,    seabass_weights])</span>
+<span id="cb1-21"><a></a>])</span>
+<span id="cb1-22"><a></a>y <span class="op">=</span> np.array([<span class="dv">1</span>]<span class="op">*</span><span class="dv">40</span> <span class="op">+</span> [<span class="dv">0</span>]<span class="op">*</span><span class="dv">40</span>)   <span class="co"># 1=Salmon, 0=Sea bass</span></span>
+<span id="cb1-23"><a></a></span>
+<span id="cb1-24"><a></a><span class="co"># スケールを揃える（クラスタリング回の教訓）</span></span>
+<span id="cb1-25"><a></a>X_norm <span class="op">=</span> (X <span class="op">-</span> X.mean(axis<span class="op">=</span><span class="dv">0</span>)) <span class="op">/</span> X.std(axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb1-26"><a></a></span>
+<span id="cb1-27"><a></a><span class="co"># Salmon, Sea bass, Salmon, ... と交互に並べ替えておく</span></span>
+<span id="cb1-28"><a></a>order <span class="op">=</span> np.empty(<span class="dv">80</span>, dtype<span class="op">=</span><span class="bu">int</span>)</span>
+<span id="cb1-29"><a></a>order[<span class="dv">0</span>::<span class="dv">2</span>] <span class="op">=</span> np.arange(<span class="dv">0</span>, <span class="dv">40</span>)</span>
+<span id="cb1-30"><a></a>order[<span class="dv">1</span>::<span class="dv">2</span>] <span class="op">=</span> np.arange(<span class="dv">40</span>, <span class="dv">80</span>)</span>
+<span id="cb1-31"><a></a>X_norm <span class="op">=</span> X_norm[order]</span>
+<span id="cb1-32"><a></a>y      <span class="op">=</span> y[order]</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="f3df8f84" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a><span class="kw">def</span> sigmoid(z):</span>
+<span id="cb2-2"><a></a>    <span class="cf">return</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>z))</span>
+<span id="cb2-3"><a></a></span>
+<span id="cb2-4"><a></a><span class="kw">def</span> forward(X, alpha, b):</span>
+<span id="cb2-5"><a></a>    <span class="co">"""アフィン変換 → シグモイド"""</span></span>
+<span id="cb2-6"><a></a>    <span class="cf">return</span> sigmoid(X <span class="op">@</span> alpha <span class="op">+</span> b)</span>
+<span id="cb2-7"><a></a></span>
+<span id="cb2-8"><a></a><span class="kw">def</span> loss_fn(y_true, p):</span>
+<span id="cb2-9"><a></a>    <span class="co">"""交差エントロピー"""</span></span>
+<span id="cb2-10"><a></a>    eps <span class="op">=</span> <span class="fl">1e-10</span></span>
+<span id="cb2-11"><a></a>    p <span class="op">=</span> np.clip(p, eps, <span class="dv">1</span> <span class="op">-</span> eps)</span>
+<span id="cb2-12"><a></a>    <span class="cf">return</span> <span class="op">-</span>np.mean(y_true <span class="op">*</span> np.log(p) <span class="op">+</span> (<span class="dv">1</span> <span class="op">-</span> y_true) <span class="op">*</span> np.log(<span class="dv">1</span> <span class="op">-</span> p))</span>
+<span id="cb2-13"><a></a></span>
+<span id="cb2-14"><a></a><span class="kw">def</span> accuracy(y_true, p):</span>
+<span id="cb2-15"><a></a>    <span class="cf">return</span> np.mean((p <span class="op">&gt;=</span> <span class="fl">0.5</span>) <span class="op">==</span> y_true)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<ul>
+<li><code>forward</code> が予測、<code>loss_fn</code> が採点。勾配は <span class="math inline">\((p-y)x\)</span> なので関数すら要らない</li>
+</ul>
+</div>
+</section>
+<section id="魚を1匹ずつ見せて学習する" class="slide level2">
+<h2>魚を1匹ずつ見せて学習する</h2>
+<div class="slide-body">
+<div id="a19ad63a" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a>alpha <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">0.0</span>])   <span class="co"># 重みはゼロからスタート</span></span>
+<span id="cb3-2"><a></a>b  <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb3-3"><a></a>lr <span class="op">=</span> <span class="fl">0.5</span>                       <span class="co"># 学習率</span></span>
+<span id="cb3-4"><a></a></span>
+<span id="cb3-5"><a></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>):</span>
+<span id="cb3-6"><a></a>    xi, yi <span class="op">=</span> X_norm[i], y[i]</span>
+<span id="cb3-7"><a></a>    p_i   <span class="op">=</span> sigmoid(xi <span class="op">@</span> alpha <span class="op">+</span> b)   <span class="co"># Forward：1匹だけ予測</span></span>
+<span id="cb3-8"><a></a>    delta <span class="op">=</span> p_i <span class="op">-</span> yi                  <span class="co"># 予測と正解の差</span></span>
+<span id="cb3-9"><a></a>    alpha <span class="op">=</span> alpha <span class="op">-</span> lr <span class="op">*</span> delta <span class="op">*</span> xi   <span class="co"># 勾配降下で更新</span></span>
+<span id="cb3-10"><a></a>    b     <span class="op">=</span> b  <span class="op">-</span> lr <span class="op">*</span> delta</span>
+<span id="cb3-11"><a></a></span>
+<span id="cb3-12"><a></a>    p_all <span class="op">=</span> forward(X_norm, alpha, b)</span>
+<span id="cb3-13"><a></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">匹目 | Loss: </span><span class="sc">{</span>loss_fn(y, p_all)<span class="sc">:.4f}</span><span class="ss"> | 正答率: </span><span class="sc">{</span>accuracy(y, p_all)<span class="sc">:.1%}</span><span class="ss"> "</span></span>
+<span id="cb3-14"><a></a>          <span class="ss">f"| α=[</span><span class="sc">{</span>alpha[<span class="dv">0</span>]<span class="sc">:6.3f}</span><span class="ss">, </span><span class="sc">{</span>alpha[<span class="dv">1</span>]<span class="sc">:6.3f}</span><span class="ss">] | b=</span><span class="sc">{</span>b<span class="sc">:6.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>1匹目 | Loss: 0.5326 | 正答率: 85.0% | α=[-0.233,  0.335] | b= 0.250
+2匹目 | Loss: 0.5179 | 正答率: 90.0% | α=[-0.233,  0.371] | b=-0.026
+3匹目 | Loss: 0.4974 | 正答率: 85.0% | α=[-0.213,  0.537] | b= 0.196
+4匹目 | Loss: 0.4269 | 正答率: 88.8% | α=[-0.359,  0.748] | b= 0.023
+5匹目 | Loss: 0.4044 | 正答率: 85.0% | α=[-0.394,  0.914] | b= 0.135
+6匹目 | Loss: 0.3994 | 正答率: 87.5% | α=[-0.360,  1.054] | b=-0.059
+7匹目 | Loss: 0.3901 | 正答率: 87.5% | α=[-0.379,  1.137] | b=-0.023
+8匹目 | Loss: 0.3617 | 正答率: 87.5% | α=[-0.516,  1.206] | b=-0.102
+9匹目 | Loss: 0.3364 | 正答率: 88.8% | α=[-0.650,  1.272] | b=-0.002
+10匹目 | Loss: 0.3330 | 正答率: 90.0% | α=[-0.741,  1.146] | b=-0.294</code></pre>
+</div>
+</div>
+<ul>
+<li>1匹見るたびにパラメータが少し動く</li>
+<li>たった10匹で正答率 90% まで来た</li>
+</ul>
+</div>
+</section>
+<section id="境界が動く様子を見る" class="slide level2">
+<h2>境界が動く様子を見る</h2>
+<div class="slide-body">
+<div id="20f8577f" class="cell" data-execution_count="5">
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="nn-single-unit_files/figure-revealjs/cell-6-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img data-src="nn-single-unit_files/figure-revealjs/cell-6-output-1.png" class="quarto-figure quarto-figure-center" width="1081" height="617"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>◯印＝直前に見せた魚。<strong>間違えるたびに境界がその魚の方へ動く</strong></li>
+</ul>
+</div>
+</section>
+<section id="学習されたパラメータを読む" class="slide level2">
+<h2>学習されたパラメータを読む</h2>
+<div class="slide-body">
+<ul>
+<li>最終的な重み<span class="fw-colon">：</span><span class="math inline">\(\alpha \approx [-0.74,\; 1.15]\)</span></li>
+</ul>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>パラメータ</th>
+<th>値</th>
+<th>意味</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\alpha_1\)</span>（輝度）</td>
+<td>負</td>
+<td><strong>暗い</strong>ほど Salmon 寄り</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\alpha_2\)</span>（重さ）</td>
+<td>正</td>
+<td><strong>重い</strong>ほど Salmon 寄り</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>1次元分類・2次元分類の回に<strong>目で見て</strong>発見したことを、機械が数値として再発見した</li>
+</ul>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<p><code>sklearn</code> の <code>fit()</code> がやっているのは、本質的にこのループ（の高速・安定版）。 <strong>ブラックボックスが1つ開いた。</strong></p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="まとめ" class="slide level2">
+<h2>まとめ</h2>
+<div class="slide-body">
+<ul>
+<li>NN の最小単位 ＝ <strong>アフィン変換 → シグモイド</strong> ＝ ロジスティック回帰</li>
+<li>学習 ＝ 交差エントロピーを<strong>勾配降下法</strong>で最小化
+<ul>
+<li>勾配は <span class="math inline">\((p - y) x\)</span> — シグモイド＋交差エントロピーの組み合わせの妙</li>
+</ul></li>
+<li><code>fit()</code> の中身は「予測 → 差を測る → 境界を少し動かす」の繰り返しだった</li>
+</ul>
+<div title="次回予告">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>次回予告</strong></p>
+</div>
+<div class="callout-content">
+<p>この最小単位、どれだけ学習しても<strong>直線</strong>しか引けない。 直線では絶対に分けられないデータが来たらどうする？</p>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="3ade8a4a-fb1d-4a6c-8409-ac45482d5fc9" class="hidden">
+
+</div>
+</div>
+</section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="site_libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="site_libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="site_libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="site_libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="site_libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="site_libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="site_libs/revealjs/plugin/search/search.js"></script>
+  <script src="site_libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="site_libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":false},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: false,
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1280,
+
+        height: 720,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 6.0e-2,
+
+        math: {
+          mathjax: './libs/mathjax/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "コピーしました");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "コピーしました");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp("https:\/\/rkskmt\.github\.io\/ai-lectures\/");
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    <script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+    (function() {
+      let previousOnload = window.onload;
+      window.onload = () => {
+        if (previousOnload) {
+          previousOnload();
+        }
+        lightboxQuarto.on('slide_before_load', (data) => {
+          const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+          const href = trigger.getAttribute('href');
+          if (href !== null) {
+            const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+            if (imgEl !== null) {
+              const srcAttr = imgEl.getAttribute("src");
+              if (srcAttr && srcAttr.startsWith("data:")) {
+                slideConfig.href = srcAttr;
+              }
+            }
+          } 
+        });
+      
+        lightboxQuarto.on('slide_after_load', (data) => {
+          const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(slideNode);
+          }
+        });
+      
+      };
+      
+    })();
+              </script>
+    
+
+</body></html>

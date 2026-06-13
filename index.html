@@ -6,7 +6,7 @@
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="site_libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
   <meta name="author" content="rkskmt">
@@ -29,7 +29,7 @@
       vertical-align: middle;
     }
   </style>
-  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-5ae9c59b2727fcd5357d4f034d95f9e0.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-d3a26a7442888a116b43ccec6150e9c5.css">
   <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -122,90 +122,92 @@
       margin-right: 0; 
     }
   </style>
-  <style>
-  .callout.callout-note {
-      font-size: 1.5rem;
-      line-height: 1.4;
-  }
-  .callout.callout-note .callout-title {
-      font-size: 2.3rem;
-  }
-  .reveal h2 {
-      font-weight: bold !important;
-      font-size: 2.5rem;
-      margin-bottom: 10px;
-      border-bottom: 1px solid #000;
-  }
-  .reveal h3 {
-      font-style: normal !important;
-      font-weight: bold !important;
-      font-size: 2.3rem;
-      background-color: #5dade2;
-      color: white;
-      padding: 20px 25px;
-      margin: 12px;
-      border-radius: 5px;
-  }
-  .reveal p {
-      line-height: 1.6;
-      margin: 30px 0;
-  }
-  .mermaid {
-      max-height: 400px;
-      overflow: auto;
-  }
-  .mermaid svg text {
-      text-anchor: middle !important;
-      dominant-baseline: middle !important;
-  }
-  .mermaid .nodeLabel, .mermaid .edgeLabel {
-      text-align: center !important;
-  }
-  .cell details {
-      margin: 4px 0;
-      font-size: 1.5rem;
-      font-color: #e488f2ff;
-  }
-
-  .cell details summary {
-      margin-bottom: 0px;
-      padding: 4px;
-  }
-  .cell-output pre {
-    font-size: 2.0rem;
-  }
-  .reveal details pre code {
-    font-size: 1.5rem;
-  }
-  .reveal img {
-    max-height: 500px;
-    width: auto;
-    height: auto;
-  }
-  .fig-small img {
-    max-height: 300px !important;
-  }
-  .fig-medium img {
-    max-height: 400px !important;
-  }
-  </style>
+  <link rel="stylesheet" href="custom.css">
+  <script src="slide-ui.js" defer=""></script>
+  <script src="search-ui.js" defer=""></script>
 </head>
 <body class="quarto-light">
-<script src="mathjax-config.js"></script>
   <div class="reveal">
     <div class="slides">
 
 
-<section class="slide level2">
+<section id="人工知能" class="slide level2">
+<h2>人工知能</h2>
+<div class="slide-body">
+<p>全14回。最終回は<strong>手書き数字を読み取る機械</strong>を PyTorch で自作する。</p>
+<div id="lecture-search">
+<input id="search-input" type="search" placeholder="全文検索 — どの回に出てきたか探せる（例：MSE、過学習、シグモイド）" autocomplete="off">
+<div id="search-results" class="search-ui-results">
 
+</div>
+</div>
+<details open="">
+<summary>
+導入
+</summary>
 <ul>
-<li><a href="./classification-basics-1d.html">Lecture 01: 1次元分類の基礎</a></li>
-<li><a href="./classification-2d-boundaries.html">Lecture 02: 2次元の決定境界</a></li>
-<li><a href="./optimization-gradient-newton.html">Optimization: 勾配降下法とNewton法</a></li>
-<li><a href="./optimization-local-minima-appendix.html">Appendix: ローカルミニマムと初期値</a></li>
+<li><a href="./ai-introduction.html">人工知能概論</a></li>
 </ul>
+</details>
+<details open="">
+<summary>
+分類問題と特徴量
+</summary>
+<ul>
+<li><a href="./classification-basics-1d.html">1次元分類の基礎</a></li>
+<li><a href="./classification-2d-boundaries.html">2次元の決定境界</a></li>
+<li><a href="./classification-evaluation.html">過学習と汎化</a></li>
+<li><a href="./clustering-kmeans.html">教師なし学習・クラスタリング</a></li>
+<li><a href="./dimensionality-pca.html">次元の呪いと次元削減</a></li>
+</ul>
+</details>
+<details open="">
+<summary>
+fit() の中身を開ける
+</summary>
+<ul>
+<li><a href="./optimization-gradient-descent.html">最適化と勾配降下法</a></li>
+<li><a href="./linear-regression.html">線形回帰と正則化</a></li>
+<li><a href="./nn-single-unit.html">ニューラルネットワークの最小単位</a></li>
+<li><a href="./nn-multilayer.html">変換を重ねる</a></li>
+<li><a href="./nn-backprop.html">バックプロパゲーション</a></li>
+<li><a href="./nn-numpy.html">実装<span class="fw-colon">：</span>NumPyだけでNN</a></li>
+<li><a href="./pytorch-intro.html">PyTorch入門</a></li>
+<li><a href="./mnist-project.html">手書き数字分類プロジェクト</a></li>
+</ul>
+</details>
+<details>
+<summary>
+参考資料（回数外）
+</summary>
+<ul>
+<li><a href="./newton-method-appendix.html">Newton法</a></li>
+<li><a href="./optimization-local-minima-appendix.html">ローカルミニマムの罠</a></li>
+</ul>
+</details>
+<script>
+document.querySelectorAll("details").forEach(d => {
+  const links = d.querySelectorAll("a[href]").length;
+  const total = d.querySelectorAll("li").length;
+  const s = d.querySelector("summary");
+  if (total > 0) s.textContent += `  [${links}/${total}]`;
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.target && /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+  }
+}, true);
+</script>
+<!-- 検索ボックスの動作は search-ui.js（全ページ共通、_metadata.yaml で読み込み）が担う -->
 
 
+<div id="3ade8a4a-fb1d-4a6c-8409-ac45482d5fc9" class="hidden">
+
+</div>
+</div>
 </section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
@@ -242,7 +244,7 @@
 'autoAnimateDuration': 1,
 'autoAnimateUnmatched': true,
 'jumpToSlide': true,
-'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":false},
 'smaller': false,
  
         // Display controls in the bottom right corner
@@ -263,7 +265,7 @@
         progress: true,
 
         // Display the page number of the current slide
-        slideNumber: 'c/t',
+        slideNumber: false,
 
         // 'all', 'print', or 'speaker'
         showSlideNumber: 'all',
@@ -388,15 +390,15 @@
         // The "normal" size of the presentation, aspect ratio will be preserved
         // when the presentation is scaled to fit different resolutions. Can be
         // specified using percentage units.
-        width: 1050,
+        width: 1280,
 
-        height: 700,
+        height: 720,
 
         // Factor of the display size that should remain empty around the content
-        margin: 0.1,
+        margin: 6.0e-2,
 
         math: {
-          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js',
+          mathjax: './libs/mathjax/MathJax.js',
           config: 'TeX-AMS_HTML-full',
           tex2jax: {
             inlineMath: [['\\(','\\)']],
