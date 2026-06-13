@@ -266,7 +266,7 @@ plt.show()
 ## 次元の呪いへの対処
 1. **特徴量選択**：重要な特徴量だけを残す
 2. **次元削減**：情報を保ったまま次元を圧縮する（← 今回）
-3. **正則化**：過学習を防ぐ（回帰問題で詳しく）
+3. **正則化（[regularization]{.en}）**：過学習を防ぐ（回帰問題で詳しく）
 :::
 
 
@@ -349,7 +349,7 @@ print(f"相関係数: {np.corrcoef(lengths, weights)[0, 1]:.3f}")
 **Principal Component Analysis（主成分分析）**
 
 - 斜めに細長い雲は、もとの2軸より「**長い方向**と**細い方向**」で見るほうが自然
-- データの**分散が最大になる方向**に新しい軸（主成分）を取る
+- データの**分散（[variance]{.en}）が最大になる方向**に新しい軸（主成分）を取る
 
 ```{python}
 #| echo: false
@@ -447,7 +447,7 @@ plt.show()
 ## 「分散が最大の方向」を式にする
 
 - 探している**直線の向き**を、**単位ベクトル** $\mathbf{v}$（$\|\mathbf{v}\| = 1$）で表す
-- 中心化した点 $\tilde{\mathbf{x}}_i$ のその直線への**影（射影）**は、内積 $z_i = \tilde{\mathbf{x}}_i^{\mathsf T} \mathbf{v}$（ただの数）
+- 中心化した点 $\tilde{\mathbf{x}}_i$ のその直線への**影（射影, [projection]{.en}）**は、内積 $z_i = \tilde{\mathbf{x}}_i^{\mathsf T} \mathbf{v}$（ただの数）
 - 80匹ぶんの影は、行列とベクトルの積で**一度に**出せる：$\mathbf{z} = \tilde{X} \mathbf{v}$
 
 知りたい「影の分散」を、少しずつ変形します：
@@ -463,7 +463,7 @@ $$= \frac{1}{n-1} (\tilde{X}\mathbf{v})^{\mathsf T} (\tilde{X}\mathbf{v})
 $$= \mathbf{v}^{\mathsf T} \underbrace{\left( \frac{1}{n-1} \tilde{X}^{\mathsf T} \tilde{X} \right)}_{C\;（共分散行列）} \mathbf{v}
 \qquad \text{（真ん中のかたまりに名前をつける）}$$
 
-- **共分散行列 $C$ は、影の分散を変形すると自然に現れる**（ここが登場理由）
+- **共分散行列（[covariance matrix]{.en}）$C$ は、影の分散を変形すると自然に現れる**（ここが登場理由）
 - つまり PCA の探しものはこう書ける：
 
 ::: {.callout-note}
@@ -594,7 +594,7 @@ plt.show()
 
 - ほとんどの矢印は、変換されると**回ってしまう**（「ふつうの矢印」＝紺色）
 - でも**回らない方向が2本だけ**ある（赤と橙）— 向きはそのまま、**伸び縮みするだけ**
-- その方向が**固有ベクトル** $\mathbf{v}$、伸び縮みの倍率が**固有値** $\lambda$：
+- その方向が**固有ベクトル（[eigenvector]{.en}）** $\mathbf{v}$、伸び縮みの倍率が**固有値（[eigenvalue]{.en}）** $\lambda$：
 
 $$A \mathbf{v} = \lambda \mathbf{v} \qquad \text{（向きはそのまま、長さだけ } \lambda \text{ 倍）}$$
 
