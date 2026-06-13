@@ -78,6 +78,13 @@ quarto render                # build to _site/
 
 **Do not run `quarto preview` or `quarto render` yourself.** The user handles previewing and building.
 
+## Self-contained, reproducible builds
+
+Each repo must build from a **fresh clone** on any machine — students build it locally, and the author restores it on a new laptop — with nothing more than `conda env create -f environment.yml` + `quarto render`. Do **not** rely on globally-installed tools or on running `quarto add` after cloning.
+
+- **Commit `_extensions/`** — Quarto extensions are vendored, not regenerated. Never gitignore `_extensions/`, or a fresh clone fails to build. (This bit us: a stray `_extensions/` line in `.gitignore` had been keeping the lightbox and d2 extensions out of git.)
+- **Declare every build-time tool in `environment.yml`** — e.g. the `d2` CLI (used by the quarto-d2 diagram filter) is a `conda-forge` dependency, not a global install.
+
 ## Style or functionality changes
 
 Most tasks are content editing — the conventions above are all you need.

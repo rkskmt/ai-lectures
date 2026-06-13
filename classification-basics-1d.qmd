@@ -46,29 +46,17 @@ Salmon と Sea bass の**2クラス識別(2-class classification)**問題
 ## 選別システム
 
 ::: {.columns .columns-tight}
-::: {.column width="60%" .column-center .mermaid-compact}
-```{mermaid}
-%%| fig-width: 90
-%%| fig-height: 320
-flowchart TB
-    A[ベルトコンベアに魚を流す]
-    B[途中で重さを測定]
-    D{何かしらの判定器}
-    E[鮭として加工]
-    F[スズキとして加工]
-
-    A --> B --> D
-    D -->|Salmon| E
-    D -->|Sea bass| F
-
-    classDef bigText font-size:16px,font-weight:700;
-    class A,B,D,E,F bigText;
-
-    style A fill:#e1f5ff
-    style B fill:#fff4e1
-    style D fill:#ff4d4f,color:#ffffff,stroke:#b22222,stroke-width:3px,font-weight:700
-    style E fill:#ffcccb
-    style F fill:#add8e6
+::: {.column width="60%" .column-center}
+```{.d2 sketch="true" width="100%"}
+direction: right
+A: ベルトコンベアに魚を流す { style.fill: "#e1f5ff" }
+B: 途中で重さを測定 { style.fill: "#fff4e1" }
+D: 何かしらの判定器 { shape: diamond; style.fill: "#ffd9d9" }
+E: 鮭として加工 { style.fill: "#ffcccb" }
+F: スズキとして加工 { style.fill: "#add8e6" }
+A -> B -> D
+D -> E: Salmon
+D -> F: Sea bass
 ```
 :::
 ::: {.column width="40%"}
