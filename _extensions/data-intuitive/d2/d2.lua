@@ -253,7 +253,15 @@ local function render_graph(globalOptions)
           data = outputFile:read('*all')
           outputFile:close()
         end
-        
+
+        -- Local patch: d2 emits preserveAspectRatio="xMinYMin meet", which
+        -- left-aligns the SVG when it is scaled into a box wider than the
+        -- diagram (e.g. a lightbox). Center it. No effect in-slide, where the
+        -- box already matches the diagram's aspect ratio.
+        if data and options.format == "svg" then
+          data = data:gsub('xMinYMin meet', 'xMidYMid meet')
+        end
+
         -- default for png and gif format
         local mimetype = "image/" .. options.format
 
