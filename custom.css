@@ -565,11 +565,24 @@ a.lightbox[href]::after {
 }
 /* English co-notation of a Japanese technical term, e.g. 過学習（[overfitting]{.en}）.
    Serif Latin against the gothic Japanese makes it read as a foreign term and
-   stand out subtly without bold; a muted blue adds a touch of emphasis. */
+   stand out subtly without bold — the serif alone carries the distinction.
+   Color is left to inherit on purpose: it stays readable on colored
+   backgrounds (e.g. the h3 blue banner) and tracks any future theme-color
+   change with zero per-context maintenance. */
 .reveal .en {
   font-family: Georgia, Cambria, "Times New Roman", serif;
-  color: #1a6985;
+  font-weight: normal;
+  /* Georgia only ships 400/700, so 500/600 round to bold. For a true
+     "just a touch heavier" we thicken the regular face with a hairline
+     stroke in the inherited color — font- and theme-independent. */
+  -webkit-text-stroke: 0.02em currentColor;
   letter-spacing: 0.01em;
+}
+/* Spelled-out form of an abbreviation, e.g. DNN（[Deep Neural Network]{.en .abbr}）.
+   Title Case in the source; rendered bold to read as the term's official name. */
+.reveal .en.abbr {
+  font-weight: bold;
+  -webkit-text-stroke: 0;
 }
 .break-slide h2 { border: none !important; }
 .break-slide p { margin: 0 !important; }
