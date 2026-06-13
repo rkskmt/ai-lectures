@@ -25,6 +25,10 @@ Quarto-based AI lecture website ("AI Lectures"). Slide decks for machine learnin
 
 - Content is written in **Japanese**
 - Code comments, commit messages, and Claude's reasoning should be in **English**
+- **English/Japanese mix in slides — intentional, not a defect:**
+  - Explanatory prose, annotations, and callouts: **Japanese**. Japanese data/column names stay Japanese where natural.
+  - **Key technical terms get English alongside Japanese at first appearance** (e.g. 過学習（overfitting）, 固有値（eigenvalue）). This is a feature — students must learn the English. When auditing, **add the English where a term first appears without it** (this is worth a dedicated inspection pass).
+  - **Standard English in matplotlib figures is fine — leave it.** Axis/label/title text that is itself a term a student should know (e.g. `Iteration Trajectory`, `inertia`, `Convergence Point`) is good exposure; do not Japanize it just for uniformity. Use Japanese in figures only when the text is *explanation* aimed at understanding, not a term.
 
 ## Teaching Philosophy
 
