@@ -79,9 +79,36 @@
       '#peek-content .peek-deck .fragment {',
       '  opacity: 1 !important; visibility: visible !important; transform: none !important;',
       '}',
-      // deck chrome that makes no sense lifted out of its deck
+      // deck chrome that makes no sense lifted out of its deck; also hide
+      // Quarto's copy button (its clipboard.js is not bound to the clone) —
+      // we add our own working one below.
       '#peek-content .peek-deck .footer, #peek-content .peek-deck aside.notes,',
-      '#peek-content .peek-deck .notes, #peek-content .peek-deck .code-expand-button { display: none !important; }',
+      '#peek-content .peek-deck .notes, #peek-content .peek-deck .code-expand-button,',
+      '#peek-content .peek-deck .code-copy-button { display: none !important; }',
+      // wrap long code lines so there is no zoom-mangled horizontal scrollbar;
+      // copying still yields the original (unwrapped) source text
+      '#peek-content .peek-deck pre, #peek-content .peek-deck pre code {',
+      '  white-space: pre-wrap !important; overflow-x: hidden !important; word-break: normal; overflow-wrap: anywhere;',
+      '}',
+      // our own copy button, one per code block
+      '#peek-content .peek-copy-button {',
+      '  position: absolute; top: 6px; right: 8px; width: 30px; height: 30px;',
+      '  display: flex; align-items: center; justify-content: center;',
+      '  border: 1px solid rgba(0,0,0,0.14); border-radius: 4px;',
+      '  background: rgba(255,255,255,0.85); padding: 0; cursor: pointer; z-index: 4;',
+      '}',
+      '#peek-content .peek-copy-button:hover { background: #fff; border-color: rgba(0,0,0,0.3); }',
+      '#peek-content .peek-copy-button::before {',
+      '  content: ""; display: inline-block; width: 16px; height: 16px;',
+      '  background-color: rgb(90,99,104);',
+      '  -webkit-mask: url(\'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>\') no-repeat center / 16px 16px;',
+      '  mask: url(\'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>\') no-repeat center / 16px 16px;',
+      '}',
+      '#peek-content .peek-copy-button.copied::before {',
+      '  background-color: rgb(18,128,60);',
+      '  -webkit-mask: url(\'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/></svg>\') no-repeat center / 16px 16px;',
+      '  mask: url(\'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/></svg>\') no-repeat center / 16px 16px;',
+      '}',
       '#peek-hint { margin-top: 14px; font-size: 0.82rem; color: #aaa; text-align: right; }',
       '#peek-loading { color: #888; font-size: 1.1rem; padding: 24px; text-align: center; }'
     ].join('\n');
@@ -181,6 +208,61 @@
       } catch (e) {}
     }
 
+    function copyText(text, btn) {
+      function done() {
+        try {
+          if (!btn) return;
+          btn.classList.add('copied');
+          setTimeout(function () { btn.classList.remove('copied'); }, 1000);
+        } catch (e) {}
+      }
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(done).catch(function () { fallbackCopy(text, done); });
+        } else {
+          fallbackCopy(text, done);
+        }
+      } catch (e) {}
+    }
+
+    function fallbackCopy(text, done) {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        document.execCommand('copy'); document.body.removeChild(ta);
+        done();
+      } catch (e) {}
+    }
+
+    // Quarto's copy button is dead in the clone (clipboard.js isn't bound),
+    // so add a working one to every code block in the peek.
+    function addPeekCopyButtons(content) {
+      try {
+        var pres = content.querySelectorAll('pre');
+        for (var i = 0; i < pres.length; i++) {
+          var pre = pres[i];
+          var code = pre.querySelector('code');
+          if (!code) continue;
+          var host = pre.closest('div.sourceCode') || pre;
+          if (host.querySelector('.peek-copy-button')) continue;
+          if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'peek-copy-button';
+          btn.title = 'コピー';
+          btn.setAttribute('aria-label', 'コードをコピー');
+          btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var c = this.parentNode.querySelector('code');
+            if (c) copyText(c.innerText, this);
+          });
+          host.appendChild(btn);
+        }
+      } catch (e) {}
+    }
+
     function typeset(el) {
       try {
         if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([el]);
@@ -251,6 +333,7 @@
         deck.appendChild(slides);
         content.appendChild(deck);
         fitPeekDeck(deck, avail);
+        addPeekCopyButtons(content);
         typeset(content);
       }).catch(function () {
         content.innerHTML = '<div id="peek-loading">読み込みに失敗しました</div>';
