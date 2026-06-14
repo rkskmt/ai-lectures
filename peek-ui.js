@@ -53,25 +53,35 @@
       '  transition: background 0.15s ease, color 0.15s ease;',
       '}',
       '#peek-close:hover, #peek-close:focus { background: #e74c3c; color: #fff; }',
-      '#peek-content { font-size: 23px; line-height: 1.55; color: #222; }',
-      // a detached revealjs <section> is hidden/absolutely positioned by default;
-      // force it back to normal flow inside the modal
-      '#peek-content section {',
+      '#peek-content { color: #222; }',
+      // The clone is rendered inside a real `.reveal` wrapper (.peek-deck) so
+      // every `.reveal`-scoped deck style applies — without it the slide shows
+      // unstyled (no heading boxes, default bullets, wrong sizes). reveal
+      // normally absolutely-positions `.slides`/`section` and JS-scales them;
+      // none of that runs here, so force static flow and scale the whole deck
+      // with `zoom` (computed in fitPeekDeck so it fills the panel width).
+      '#peek-content .peek-deck {',
+      '  position: static; height: auto; overflow: visible;',
+      '  transform-origin: top left;',
+      '}',
+      '#peek-content .peek-deck .slides {',
+      '  position: static !important; left: auto !important; top: auto !important;',
+      '  width: 100% !important; height: auto !important;',
+      '  transform: none !important; zoom: 1 !important; text-align: left;',
+      '}',
+      '#peek-content .peek-deck .slides > section {',
       '  display: block !important; position: static !important;',
-      '  transform: none !important; height: auto !important;',
-      '  top: auto !important; left: auto !important;',
+      '  top: auto !important; left: auto !important; transform: none !important;',
+      '  width: 100% !important; height: auto !important; min-height: 0 !important;',
       '  opacity: 1 !important; visibility: visible !important;',
       '}',
-      '#peek-content h1, #peek-content h2, #peek-content h3 {',
-      '  font-size: 1.5em; margin: 0 0 0.5em; color: #1a1a1a;',
+      // a peek is a snapshot, not a walkthrough: reveal every fragment
+      '#peek-content .peek-deck .fragment {',
+      '  opacity: 1 !important; visibility: visible !important; transform: none !important;',
       '}',
-      '#peek-content img { max-width: 100%; height: auto; display: block; margin: 0.4em auto; cursor: default; }',
-      '#peek-content ul, #peek-content ol { text-align: left; padding-left: 1.3em; }',
-      '#peek-content table { border-collapse: collapse; margin: 0.5em auto; }',
-      '#peek-content th, #peek-content td { border: 1px solid #ccc; padding: 4px 10px; }',
-      // show fragments fully (this is a recall snapshot, not a walkthrough)
-      '#peek-content .fragment { opacity: 1 !important; visibility: visible !important; }',
-      '#peek-content aside, #peek-content .notes, #peek-content .footer { display: none !important; }',
+      // deck chrome that makes no sense lifted out of its deck
+      '#peek-content .peek-deck .footer, #peek-content .peek-deck aside.notes,',
+      '#peek-content .peek-deck .notes, #peek-content .peek-deck .code-expand-button { display: none !important; }',
       '#peek-hint { margin-top: 14px; font-size: 0.82rem; color: #aaa; text-align: right; }',
       '#peek-loading { color: #888; font-size: 1.1rem; padding: 24px; text-align: center; }'
     ].join('\n');
@@ -149,6 +159,28 @@
       return pageCache[url];
     }
 
+    // The deck's design width (slides are authored at this px width, then the
+    // real deck JS-scales to fit the window). We lay the clone out at this
+    // width and zoom to fit the modal, reproducing the on-screen proportions.
+    function deckWidth() {
+      try {
+        if (window.Reveal && Reveal.getConfig) {
+          var w = Reveal.getConfig().width;
+          if (typeof w === 'number' && w > 0) return w;
+        }
+      } catch (e) {}
+      return 1280;
+    }
+
+    function fitPeekDeck(deck, avail) {
+      try {
+        if (!deck) return;
+        var dw = deckWidth();
+        deck.style.width = dw + 'px';
+        deck.style.zoom = (avail > 0) ? String(avail / dw) : '1';
+      } catch (e) {}
+    }
+
     function typeset(el) {
       try {
         if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([el]);
@@ -208,7 +240,17 @@
           return;
         }
         content.innerHTML = '';
-        content.appendChild(fixupClone(node.cloneNode(true)));
+        // measure the panel's inner width before inserting the (wider) deck
+        var avail = content.clientWidth;
+        // wrap the clone in a real .reveal > .slides so deck CSS applies
+        var deck = document.createElement('div');
+        deck.className = 'reveal peek-deck';
+        var slides = document.createElement('div');
+        slides.className = 'slides';
+        slides.appendChild(fixupClone(node.cloneNode(true)));
+        deck.appendChild(slides);
+        content.appendChild(deck);
+        fitPeekDeck(deck, avail);
         typeset(content);
       }).catch(function () {
         content.innerHTML = '<div id="peek-loading">読み込みに失敗しました</div>';
