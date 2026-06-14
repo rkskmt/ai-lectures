@@ -54,6 +54,7 @@ Use Python as the vehicle, but frame concepts as broadly as possible. Where a co
 - Slide text should use **bullet points**, not prose sentences
 - Code cells use `jupyter: python3`
 - **Assume students run Python in VSCode as normal `.py` scripts, not notebooks.** Code examples must be copy-pasteable into a Python file and still show the intended output.
+- **Any data file a code cell reads must have a download link in the slide body.** Students run the copied code on their own machine, so a bare `pd.read_csv("data/foo.csv")` / `np.loadtxt("data/foo.csv")` fails unless they can obtain `foo.csv`. Put `[foo.csv](data/foo.csv)` in the slide text and tell them to place it in their `data/` folder. Never show runnable student code that reads a data file without a download link for that file.
 - **Do not use notebook-only display style** such as a bare `df`, `df.head()`, `df.shape`, `series`, or expression as the final line when the goal is to show output. Use `print(...)` for textual/tabular output (e.g. `print(df.head())`, `print(df.shape)`). Use plotting calls like `plt.show()` when the goal is a figure.
 - For large tables or arrays, show only a small, intentional preview such as `print(df.head())`; do not dump all rows unless the full output is pedagogically necessary.
 - Image sizing via `.fig-small` (300px) and `.fig-medium` (400px) CSS classes
