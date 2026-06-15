@@ -52,6 +52,7 @@ Use Python as the vehicle, but frame concepts as broadly as possible. Where a co
 - **Never add numbers to slide section headers or `index.qmd` link text.** Numbered slides (e.g. `## １. ...`) and numbered links (e.g. `第N回`) break on reorder — every insert or swap requires renaming every entry after it. Use plain titles only (e.g. `## 汎化性能を測る`, `[過学習と汎化](classification-evaluation.qmd)`).
 - Use Quarto callouts (`.callout-note`) for key concepts
 - Slide text should use **bullet points**, not prose sentences
+- **Do not write the teaching intent or pedagogical effect onto the slide.** Things like "the figure on the right lets students answer ◯◯ on their own" or "this builds intuition for △△" are author/lecturer rationale, not slide content. They belong in conversation, design notes, or `doc/`, never in the deck itself. Put on the slide only the content students see; keep the *why* out of it.
 - Code cells use `jupyter: python3`
 - **Assume students run Python in VSCode as normal `.py` scripts, not notebooks.** Code examples must be copy-pasteable into a Python file and still show the intended output.
 - **Any data file a code cell reads must have a download link in the slide body.** Students run the copied code on their own machine, so a bare `pd.read_csv("data/foo.csv")` / `np.loadtxt("data/foo.csv")` fails unless they can obtain `foo.csv`. Put `[foo.csv](data/foo.csv)` in the slide text and tell them to place it in their `data/` folder. Never show runnable student code that reads a data file without a download link for that file.
