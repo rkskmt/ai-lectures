@@ -119,6 +119,12 @@
   max-height: 500px;
   width: auto;
   height: auto;
+  /* When an image has an explicit width (e.g. {width="50%"}) and its natural
+     height at that width exceeds max-height, the height gets clamped while the
+     width stays fixed — which would distort the aspect ratio (tall images
+     placed wide turn into squashed ellipses). object-fit keeps the bitmap's
+     aspect ratio inside whatever box the width/max-height constraints produce. */
+  object-fit: contain;
 }
 .reveal p.caption {
   text-align: center;
