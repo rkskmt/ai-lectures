@@ -7,7 +7,7 @@
     var STYLE = [
       // same visual language as the code-expand button (white circle, gray icon)
       '#search-btn {',
-      '  position: fixed; top: 12px; right: 14px; z-index: 100;',
+      '  position: fixed; top: 54px; right: 14px; z-index: 100;',
       '  width: 34px; height: 34px; padding: 0;',
       '  display: flex; align-items: center; justify-content: center;',
       '  border: 2px solid rgba(0,0,0,0.25); border-radius: 50%;',
