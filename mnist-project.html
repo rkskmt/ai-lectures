@@ -194,6 +194,7 @@
   <link rel="stylesheet" href="custom.css">
   <script src="slide-ui.js" defer=""></script>
   <script src="search-ui.js" defer=""></script>
+  <script src="peek-ui.js" defer=""></script>
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -215,7 +216,7 @@ rkskmt
 <section id="初回の約束覚えているか" class="slide level2">
 <h2>初回の約束、覚えているか</h2>
 <div class="slide-body">
-<div id="59364bc1" class="cell" data-execution_count="1">
+<div id="7097c1d7" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -239,7 +240,7 @@ rkskmt
 <ul>
 <li>手書き数字の定番データセット。<strong>訓練6万枚・テスト1万枚</strong>、各28×28ピクセル</li>
 </ul>
-<div id="bbc131d5" class="cell" data-execution_count="2">
+<div id="9355093c" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> torch</span>
 <span id="cb1-2"><a></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
 <span id="cb1-3"><a></a><span class="im">from</span> torchvision <span class="im">import</span> datasets, transforms</span>
@@ -256,7 +257,7 @@ rkskmt
 1枚の形: (1, 28, 28)  正解ラベル: 5</code></pre>
 </div>
 </div>
-<div id="ecad5d99" class="cell" data-execution_count="3">
+<div id="9243d194" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -272,7 +273,7 @@ rkskmt
 <div class="slide-body">
 <ul>
 <li>28 × 28 = <strong>784個の数字の並び</strong> — モデルにとって画像は784次元のベクトル</li>
-<li>魚は2次元（輝度・重さ）だった。次元の呪いの回で遊んだ高次元が、<strong>本物の入力</strong>としてやってきた</li>
+<li>魚は2次元（輝度・重さ）だった。<a href="./dimensionality-pca.html#peek-curse" class="peek">次元の呪いの回で遊んだ高次元</a>が、<strong>本物の入力</strong>としてやってきた</li>
 <li><code>nn.Flatten()</code> が「画像 → ベクトル」の変換をやる</li>
 </ul>
 <div class="callout callout-note callout-titled callout-style-default">
@@ -295,7 +296,7 @@ rkskmt
 <div class="slide-body">
 <ul>
 <li>答えは Salmon / Sea bass の2択ではなく、<strong>0〜9 の10択</strong></li>
-<li>「変換を重ねる」の回の表のとおり、<strong>出力層を付け替える</strong>だけ</li>
+<li><a href="./nn-multilayer.html#peek-output-layer" class="peek">「変換を重ねる」の回の表</a>のとおり、<strong>出力層を付け替える</strong>だけ</li>
 </ul>
 <table class="caption-top">
 <thead>
@@ -326,7 +327,7 @@ rkskmt
 <section id="モデル見慣れた3層" class="slide level2">
 <h2>モデル<span class="fw-colon">：</span>見慣れた3層</h2>
 <div class="slide-body">
-<div id="7565ce80" class="cell" data-execution_count="4">
+<div id="391562d9" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a>torch.manual_seed(<span class="dv">0</span>)</span>
 <span id="cb3-2"><a></a></span>
 <span id="cb3-3"><a></a>model <span class="op">=</span> nn.Sequential(</span>
@@ -369,7 +370,7 @@ rkskmt
 <li>6万枚まとめて勾配を計算すると重い → <strong>128枚ずつ</strong>取り出して1歩ずつ進む</li>
 <li>データを一巡することを <strong>1エポック</strong> と呼ぶ</li>
 </ul>
-<div id="720e5e2b" class="cell" data-execution_count="5">
+<div id="5d89be7e" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a>train_loader <span class="op">=</span> torch.utils.data.DataLoader(train_ds, batch_size<span class="op">=</span><span class="dv">128</span>, shuffle<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb5-2"><a></a>test_loader  <span class="op">=</span> torch.utils.data.DataLoader(test_ds,  batch_size<span class="op">=</span><span class="dv">1000</span>)</span>
 <span id="cb5-3"><a></a></span>
@@ -377,14 +378,14 @@ rkskmt
 <span id="cb5-5"><a></a>optimizer <span class="op">=</span> torch.optim.Adam(model.parameters(), lr<span class="op">=</span><span class="fl">1e-3</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <ul>
-<li>NN最小単位の回で「魚を1匹ずつ見せる」とやったのと同じ発想（あちらはバッチサイズ1）</li>
+<li>NN最小単位の回で<a href="./nn-single-unit.html#peek-one-at-a-time" class="peek">「魚を1匹ずつ見せる」</a>とやったのと同じ発想（あちらはバッチサイズ1）</li>
 </ul>
 </div>
 </section>
 <section id="学習する" class="slide level2">
 <h2>学習する</h2>
 <div class="slide-body">
-<div id="a0efdbb1" class="cell" data-execution_count="6">
+<div id="9fb91eab" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">4</span>):</span>
 <span id="cb6-2"><a></a>    <span class="cf">for</span> x_batch, y_batch <span class="kw">in</span> train_loader:</span>
 <span id="cb6-3"><a></a>        optimizer.zero_grad()</span>
@@ -413,7 +414,7 @@ rkskmt
 <section id="読めている様子" class="slide level2">
 <h2>読めている様子</h2>
 <div class="slide-body">
-<div id="2b4b9a8e" class="cell" data-execution_count="7">
+<div id="963daa2e" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -430,7 +431,7 @@ rkskmt
 <section id="間違いを眺める" class="slide level2">
 <h2>間違いを眺める</h2>
 <div class="slide-body">
-<div id="7e915894" class="cell" data-execution_count="8">
+<div id="3f6ec422" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -773,7 +774,7 @@ rkskmt
         margin: 6.0e-2,
 
         math: {
-          mathjax: './libs/mathjax/MathJax.js',
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
           config: 'TeX-AMS_HTML-full',
           tex2jax: {
             inlineMath: [['\\(','\\)']],
@@ -869,7 +870,7 @@ rkskmt
         }
           var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
           var mailtoRegex = new RegExp(/^mailto:/);
-            var filterRegex = new RegExp("https:\/\/rkskmt\.github\.io\/ai-lectures\/");
+            var filterRegex = new RegExp('/' + window.location.host + '/');
           var isInternal = (href) => {
               return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
           }

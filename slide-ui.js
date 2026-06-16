@@ -29,7 +29,14 @@
         var home = document.createElement('a');
         home.id = 'home-btn';
         home.href = './index.html';
-        home.textContent = 'Home';
+        home.title = 'Home（一覧に戻る）';
+        home.setAttribute('aria-label', 'Home');
+        // same visual language as the search button (icon in a translucent circle)
+        home.innerHTML =
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" ' +
+          'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+          '<path d="M4 11.5 12 4l8 7.5"></path>' +
+          '<path d="M6 10.5V20h12v-9.5"></path></svg>';
         home.addEventListener('click', function(e) {
           e.preventDefault();
           goHome();

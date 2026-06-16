@@ -194,6 +194,7 @@
   <link rel="stylesheet" href="custom.css">
   <script src="slide-ui.js" defer=""></script>
   <script src="search-ui.js" defer=""></script>
+  <script src="peek-ui.js" defer=""></script>
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -240,7 +241,7 @@ rkskmt
 <section id="直線では絶対に分けられないデータ" class="slide level2">
 <h2>直線では絶対に分けられないデータ</h2>
 <div class="slide-body">
-<div id="5aa02210" class="cell" data-execution_count="1">
+<div id="12bce6f4" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -272,7 +273,7 @@ rkskmt
 <section id="最小単位の限界" class="slide level2">
 <h2>最小単位の限界</h2>
 <div class="slide-body">
-<div id="0272f4c0" class="cell" data-execution_count="2">
+<div id="b149b018" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -312,7 +313,7 @@ rkskmt
 <li>展開すると<strong>ただのアフィン変換1回分</strong>。何回重ねても同じ</li>
 <li>線形（アフィン）変換は、重ねても線形のまま — <strong>境界は直線のまま</strong></li>
 </ul>
-<div id="05a17f42" class="cell" data-execution_count="3">
+<div id="063023dd" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -331,7 +332,7 @@ rkskmt
 <h2>間に「非線形」を挟む<span class="fw-colon">：</span>ReLU</h2>
 <div class="slide-body">
 <p><span class="math display">\[h = \mathrm{ReLU}(z) = \max(0, z)\]</span></p>
-<div id="66f9c337" class="cell" data-execution_count="4">
+<div id="d623bbd6" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -383,7 +384,7 @@ rkskmt
 <li><span class="math inline">\(\mathrm{ReLU}'(z)\)</span> は <span class="math inline">\(z &gt; 0\)</span> なら 1、<span class="math inline">\(z \leq 0\)</span> なら 0（折られた側には誤差が流れない）</li>
 <li>各パラメータの更新は前回と同じ形<span class="fw-colon">：</span><span class="math inline">\(\alpha \leftarrow \alpha - \eta\, \delta_{\text{mid}}\, x\)</span></li>
 </ul>
-<div id="e57530f8" class="cell" data-execution_count="5">
+<div id="bea86517" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -439,10 +440,10 @@ y &amp;= w_1 h_1 + w_2 h_2 + c, \quad p = \sigma(y)
 </div>
 </div>
 </section>
-<section id="折り目が増えると境界が曲がる" class="slide level2">
+<section id="peek-curved-boundary" class="slide level2">
 <h2>折り目が増えると境界が曲がる</h2>
 <div class="slide-body">
-<div id="3de25b99" class="cell" data-execution_count="6">
+<div id="004a37e0" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -504,7 +505,7 @@ y &amp;= w_1 h_1 + w_2 h_2 + c, \quad p = \sigma(y)
 </ul>
 </div>
 </section>
-<section id="出力層は問題に合わせて取り替える" class="slide level2">
+<section id="peek-output-layer" class="slide level2">
 <h2>出力層は問題に合わせて取り替える</h2>
 <div class="slide-body">
 <ul>
@@ -781,7 +782,7 @@ y &amp;= w_1 h_1 + w_2 h_2 + c, \quad p = \sigma(y)
         margin: 6.0e-2,
 
         math: {
-          mathjax: './libs/mathjax/MathJax.js',
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
           config: 'TeX-AMS_HTML-full',
           tex2jax: {
             inlineMath: [['\\(','\\)']],
@@ -877,7 +878,7 @@ y &amp;= w_1 h_1 + w_2 h_2 + c, \quad p = \sigma(y)
         }
           var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
           var mailtoRegex = new RegExp(/^mailto:/);
-            var filterRegex = new RegExp("https:\/\/rkskmt\.github\.io\/ai-lectures\/");
+            var filterRegex = new RegExp('/' + window.location.host + '/');
           var isInternal = (href) => {
               return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
           }

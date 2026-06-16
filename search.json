@@ -11,7 +11,7 @@
     "href": "pytorch-intro.html#pytorch-とは",
     "title": "PyTorch入門",
     "section": "PyTorch とは",
-    "text": "PyTorch とは\n\n\nディープラーニングの業界標準ライブラリのひとつ\n勾配降下法の回の比較表で「実例：PyTorch」と書いた、その本人\n今日使う機能は実質2つだけ\n\nautograd：backward を自動でやってくれる\nnn：層・損失・最適化の部品セット\n\n\n\n\n\n\n\n\nノート\n\n\nこの講義の環境にはインストール済み（environment.yml の pytorch-cpu / torchvision）。 自分のPCなら pip install torch 等で入る。"
+    "text": "PyTorch とは\n\n\nディープラーニングの業界標準ライブラリのひとつ\n今日使う機能は実質2つだけ\n\nautograd：backward を自動でやってくれる\nnn：層・損失・最適化の部品セット\n\n\n\n\n\n\n\n\nノート\n\n\nこの講義の環境にはインストール済み（environment.yml の pytorch-cpu / torchvision）。 自分のPCなら pip install torch 等で入る。"
   },
   {
     "objectID": "pytorch-intro.html#tensornumpy-配列の親戚",
@@ -273,8 +273,8 @@
     "text": "往路（Forward）：数値を流す\n\n\\[z = 0.3 \\times 1.0 + (-0.2) \\times 0.5 + 0.1 = 0.30\\] \\[h = \\mathrm{ReLU}(0.30) = 0.30\\] \\[u = 0.5 \\times 0.30 + (-0.1) = 0.05\\] \\[p = \\sigma(0.05) = 0.5125\\] \\[L = -\\log(0.5125) = 0.6685\\]\n\n\n\n\n\n\n\n\n\n\n予測は 0.5125 —「ほぼコイン投げ」。正解は 1 なので、もっと上げたい\n途中の値（\\(z, h, u, p\\)）は捨てずに取っておく — 復路で全部使う"
   },
   {
-    "objectID": "nn-backprop.html#復路backward出力側から勾配を貯める",
-    "href": "nn-backprop.html#復路backward出力側から勾配を貯める",
+    "objectID": "nn-backprop.html#peek-handcalc",
+    "href": "nn-backprop.html#peek-handcalc",
     "title": "バックプロパゲーション",
     "section": "復路（Backward）：出力側から勾配を貯める",
     "text": "復路（Backward）：出力側から勾配を貯める\n\n\n出力層\n\n\\[\\delta_{\\text{out}} = \\frac{\\partial L}{\\partial u} = p - y = 0.5125 - 1 = -0.4875\\]\n（シグモイド＋交差エントロピーの「打ち消し合い」— 最小単位の回の道具）\n\\[\\frac{\\partial L}{\\partial w} = \\delta_{\\text{out}} \\cdot h = -0.4875 \\times 0.30 = -0.1463\n\\qquad\n\\frac{\\partial L}{\\partial c} = \\delta_{\\text{out}} = -0.4875\\]\n中間層へ「逆流」\n\\[\\delta_{\\text{mid}} = \\delta_{\\text{out}} \\cdot w \\cdot \\mathrm{ReLU}'(z)\n= -0.4875 \\times 0.5 \\times 1 = -0.2438\\]\n\\[\\frac{\\partial L}{\\partial \\alpha_1} = \\delta_{\\text{mid}} \\cdot x_1 = -0.2438\n\\qquad\n\\frac{\\partial L}{\\partial \\alpha_2} = \\delta_{\\text{mid}} \\cdot x_2 = -0.1219\n\\qquad\n\\frac{\\partial L}{\\partial b} = \\delta_{\\text{mid}} = -0.2438\\]\n\n5個の勾配が掛け算と代入だけで出揃った。新しい微分は1つもしていない\n\n\n\n\n\n\n\n\n\n\n\n上の緑が往路、下の赤が復路 — 誤差 \\(\\delta\\) が右から左へ流れ、通り道のパラメータに勾配を配っていく"
@@ -462,8 +462,8 @@
     "text": "なぜ輝度が無視されたのか\n\n\n\nk-means は距離だけでグループを決める\n重さの差は数百 g、輝度の差はせいぜい数ポイント\n\n\\[\\text{距離}^2 = \\underbrace{(\\Delta \\text{輝度})^2}_{\\sim 10} + \\underbrace{(\\Delta \\text{重さ})^2}_{\\sim 100{,}000}\\]\n\n距離の計算が重さに支配され、輝度はあってもなくても同じだった\n\n\n\n\n\n\n\n\n\nスケールの罠\n\n\n\n単位もケタも違う特徴量をそのまま距離計算に入れてはいけない\n距離を使う手法（k-means、k-NN など）共通の落とし穴"
   },
   {
-    "objectID": "clustering-kmeans.html#試行2-スケールを揃えて再挑戦",
-    "href": "clustering-kmeans.html#試行2-スケールを揃えて再挑戦",
+    "objectID": "clustering-kmeans.html#peek-scale",
+    "href": "clustering-kmeans.html#peek-scale",
     "title": "教師なし学習とクラスタリング",
     "section": "試行2: スケールを揃えて再挑戦",
     "text": "試行2: スケールを揃えて再挑戦\n\n\nfrom sklearn.preprocessing import StandardScaler\n\nX_scaled = StandardScaler().fit_transform(X)   # 各特徴量を平均0・分散1に\n\nkm2 = KMeans(n_clusters=2, random_state=42, n_init=10)\nkm2.fit(X_scaled)\ncluster_labels2 = km2.labels_\n\nplt.figure(figsize=(5.8, 3.6))\nfor c in range(2):\n    mask = cluster_labels2 == c\n    plt.scatter(X[mask, 0], X[mask, 1],\n                c=colors[c], marker=markers[c], s=50, alpha=0.7, label=f\"クラスタ {c}\")\nplt.xlabel(\"輝度\"); plt.ylabel(\"重さ (g)\")\nplt.legend(); plt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n今度は目で見た通りの2つの塊に分かれた"
@@ -536,7 +536,7 @@
     "href": "classification-basics-1d.html#選別システム",
     "title": "機械学習 Classification",
     "section": "選別システム",
-    "text": "選別システム\n\n\n\n\n\n\n\n\nflowchart TB\n    A[ベルトコンベアに魚を流す]\n    B[途中で重さを測定]\n    D{何かしらの判定器}\n    E[鮭として加工]\n    F[スズキとして加工]\n\n    A --&gt; B --&gt; D\n    D --&gt;|Salmon| E\n    D --&gt;|Sea bass| F\n\n    classDef bigText font-size:16px,font-weight:700;\n    class A,B,D,E,F bigText;\n\n    style A fill:#e1f5ff\n    style B fill:#fff4e1\n    style D fill:#ff4d4f,color:#ffffff,stroke:#b22222,stroke-width:3px,font-weight:700\n    style E fill:#ffcccb\n    style F fill:#add8e6"
+    "text": "選別システム"
   },
   {
     "objectID": "classification-basics-1d.html#試行1-重さだけで分類してみる",
@@ -1085,8 +1085,8 @@
     "text": "決定木の深さを変えると？\n\n\n深さ＝ if-then ルールの段数。深いほど複雑な境界が作れる\n深さ 1・3・無制限で学習し、同じデータで採点してみる\n\n\n\ncode\nfor depth in [1, 3, None]:\n    model = DecisionTreeClassifier(max_depth=depth, random_state=42)\n    model.fit(X, y)\n    acc = accuracy_score(y, model.predict(X))\n    label = \"無制限\" if depth is None else f\"深さ{depth}　\"\n    print(f\"{label}: Accuracy = {acc:.3f}\")\n\n\n深さ1　: Accuracy = 0.900\n深さ3　: Accuracy = 0.975\n無制限: Accuracy = 1.000\n\n\n\n\n\n\n\n\n\nクイズ\n\n\n深さ無制限なら、ついに正答率 100%。 これは「最強のモデルが完成した」ということでいい？"
   },
   {
-    "objectID": "classification-2d-boundaries.html#深さ無制限の境界を見てみる",
-    "href": "classification-2d-boundaries.html#深さ無制限の境界を見てみる",
+    "objectID": "classification-2d-boundaries.html#peek-overfit-boundary",
+    "href": "classification-2d-boundaries.html#peek-overfit-boundary",
     "title": "機械学習：分類問題",
     "section": "深さ無制限の境界を見てみる",
     "text": "深さ無制限の境界を見てみる\n\n\n\n\n\n\n\n\n\n\n\n無制限の木には、数匹を救うためだけの細長い回廊（飛び地）ができている\n実際に学習されたルールを読むと「輝度が 5.35〜5.70 でも、重さが 2205g を超えるなら Salmon」のような異様に具体的な条項が入っている"
@@ -1288,8 +1288,8 @@
     "text": "次元の呪い"
   },
   {
-    "objectID": "dimensionality-pca.html#次元の呪いcurse-of-dimensionality",
-    "href": "dimensionality-pca.html#次元の呪いcurse-of-dimensionality",
+    "objectID": "dimensionality-pca.html#peek-curse",
+    "href": "dimensionality-pca.html#peek-curse",
     "title": "次元の呪いと次元削減",
     "section": "次元の呪い（Curse of Dimensionality）",
     "text": "次元の呪い（Curse of Dimensionality）\n\n\n“データの次元が増えるにつれて、空間が指数的に広くなり、データが希薄になる”\n── Richard Bellman（1961）\n\n\n2次元で十分だったサンプル数が、10次元では全く足りなくなる\n高次元空間は私たちの直感とは全く異なる振る舞いをする\n\n\n\n\n\n\n\nノート\n\n\n1960年代にベルマン（動的計画法の発明者）が提唱した概念。 現代機械学習でも最重要トピックの一つ。"
@@ -1701,8 +1701,8 @@
     "text": "中間の変換を2つに増やす\n\n\\[\n\\begin{aligned}\nz_1 &= \\alpha_1^{\\mathsf T} x + b_1, \\quad h_1 = \\mathrm{ReLU}(z_1)\\\\\nz_2 &= \\alpha_2^{\\mathsf T} x + b_2, \\quad h_2 = \\mathrm{ReLU}(z_2)\\\\\ny &= w_1 h_1 + w_2 h_2 + c, \\quad p = \\sigma(y)\n\\end{aligned}\n\\]\n\nパラメータは9個に増える\n各変換は独立に自分の直線（超平面）を持ち、自分の場所で空間を折る\n出力層は \\(h_1, h_2\\) の多数決（線形結合）でまとめる\n\n\n\n\n\n\n\nノート\n\n\n「ノード」「ニューロン」と呼ばれるものの正体は、独立した変換が複数並んでいるだけ。"
   },
   {
-    "objectID": "nn-multilayer.html#折り目が増えると境界が曲がる",
-    "href": "nn-multilayer.html#折り目が増えると境界が曲がる",
+    "objectID": "nn-multilayer.html#peek-curved-boundary",
+    "href": "nn-multilayer.html#peek-curved-boundary",
     "title": "変換を重ねる",
     "section": "折り目が増えると境界が曲がる",
     "text": "折り目が増えると境界が曲がる\n\n\n\n\n\n\n\n\n\n\n\nReLU 1本につき折り目が1つ増える\n4本の折れ線で 100%。16本ではほぼ滑らかな曲線に見える\n「曲がる境界」の正体は、たくさんの折り目だった\n\n\n\n\n\n\n\n\n種明かし\n\n\n講義の初回に見せた「機械が自力で見つけた境界」は、中間の変換16個のネットワーク。 もうブラックボックスではない。"
@@ -1715,8 +1715,8 @@
     "text": "全部の変換が同じになってしまわないか？\n\n\n\n\n\n\n\n\nクイズ\n\n\nパラメータを前回と同じように全部 0 で初期化したら、何が起きる？\n\n\n\n\n\n\n\\(z_1 = z_2\\)、\\(h_1 = h_2\\) — 2つの変換が完全に同じ動きをする\n誤差の配分（\\(\\delta_{\\text{mid}} = \\delta_{\\text{out}} \\cdot w \\cdot \\mathrm{ReLU}'(z)\\)）も同じ → 更新後も同じ\n何個並べても実質1個のまま（対称性の罠）\n\n\n\n解決策：ランダム初期化で最初から全員を別の場所に置く（対称性を破る）\n補助策：学習中にランダムに変換を休ませる Dropout（依存しすぎを防ぐ）"
   },
   {
-    "objectID": "nn-multilayer.html#出力層は問題に合わせて取り替える",
-    "href": "nn-multilayer.html#出力層は問題に合わせて取り替える",
+    "objectID": "nn-multilayer.html#peek-output-layer",
+    "href": "nn-multilayer.html#peek-output-layer",
     "title": "変換を重ねる",
     "section": "出力層は問題に合わせて取り替える",
     "text": "出力層は問題に合わせて取り替える\n\n\nどんな NN でも、出力層は「線形結合 → 活性化関数（activation function）」\n\n\n\n\n問題\n出力の活性化関数\n出力の意味\n\n\n\n\n2クラス分類\nシグモイド\nクラス1の確率（0〜1）\n\n\n多クラス分類\nソフトマックス\n各クラスの確率分布\n\n\n回帰\nなし（恒等関数）\n実数値そのまま\n\n\n\n\n中間layers は「良い特徴空間」を作ることに専念し、出力層が問題形式に合わせて答えをまとめる"
@@ -1792,15 +1792,15 @@
     "text": "勾配が驚くほど簡単になる\n\n\n損失 \\(L\\) を \\(z\\) で微分すると、連鎖律（chain rule）で\n\n\\[\\frac{\\partial L}{\\partial z}\n= \\frac{\\partial L}{\\partial p} \\cdot \\frac{\\partial p}{\\partial z}\n= \\left(-\\frac{1}{p}\\right) \\cdot p(1-p)\n= p - 1 \\quad (\\text{正解 } y = 1 \\text{ のとき})\\]\n\n正解が 0 のときは \\(p - 0\\)。つまり常に\n\n\\[\\frac{\\partial L}{\\partial z} = p - y\\]\n\n各パラメータの更新式（学習率 \\(\\eta\\)）：\n\n\\[\\alpha \\leftarrow \\alpha - \\eta\\,(p - y)\\,x, \\qquad b \\leftarrow b - \\eta\\,(p - y)\\]\n\n\n\n\n\n\nノート\n\n\nシグモイドの微分 \\(p(1-p)\\) と交差エントロピーの微分 \\(-1/p\\) が打ち消し合うようにできている。 「予測と正解の差 \\((p-y)\\) を、入力の大きさに応じて配る」だけ。"
   },
   {
-    "objectID": "nn-single-unit.html#実装必要な関数は4つだけ",
-    "href": "nn-single-unit.html#実装必要な関数は4つだけ",
+    "objectID": "nn-single-unit.html#peek-forward",
+    "href": "nn-single-unit.html#peek-forward",
     "title": "ニューラルネットワークの最小単位",
     "section": "実装：必要な関数は4つだけ",
     "text": "実装：必要な関数は4つだけ\n\n\n\n魚データの定義（クリックして展開）\nsalmon_weights     = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,\n                               1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,\n                               2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,\n                               1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652])\nsalmon_brightness  = np.array([3.5, 5.8, 4.9, 4.4, 2.6, 2.6, 2.2, 5.5, 4.4, 4.8, 2.1,\n                               5.9, 5.3, 2.8, 2.7, 2.7, 3.2, 4.1, 3.7, 3.2, 4.4, 2.6,\n                               3.2, 3.5, 3.8, 5.1, 2.8, 4.1, 4.4, 2.2, 4.4, 2.7, 2.3,\n                               5.8, 5.9, 5.2, 3.2, 2.4, 4.7, 3.8])\nseabass_weights    = np.array([1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,\n                               1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,\n                               1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,\n                               1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531])\nseabass_brightness = np.array([5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8,\n                               8.9, 9.7, 9.5, 8.0, 9.6, 5.4, 6.0, 5.2, 6.6, 6.9, 6.4,\n                               9.1, 6.8, 6.4, 7.7, 5.7, 9.0, 5.4, 9.9, 8.9, 6.0, 5.0,\n                               9.1, 8.5, 8.6, 8.9, 5.4, 6.8, 5.6])\n\nX = np.column_stack([\n    np.concatenate([salmon_brightness, seabass_brightness]),\n    np.concatenate([salmon_weights,    seabass_weights])\n])\ny = np.array([1]*40 + [0]*40)   # 1=Salmon, 0=Sea bass\n\n# スケールを揃える（クラスタリング回の教訓）\nX_norm = (X - X.mean(axis=0)) / X.std(axis=0)\n\n# Salmon, Sea bass, Salmon, ... と交互に並べ替えておく\norder = np.empty(80, dtype=int)\norder[0::2] = np.arange(0, 40)\norder[1::2] = np.arange(40, 80)\nX_norm = X_norm[order]\ny      = y[order]\n\n\n\ndef sigmoid(z):\n    return 1 / (1 + np.exp(-z))\n\ndef forward(X, alpha, b):\n    \"\"\"アフィン変換 → シグモイド\"\"\"\n    return sigmoid(X @ alpha + b)\n\ndef loss_fn(y_true, p):\n    \"\"\"交差エントロピー\"\"\"\n    eps = 1e-10\n    p = np.clip(p, eps, 1 - eps)\n    return -np.mean(y_true * np.log(p) + (1 - y_true) * np.log(1 - p))\n\ndef accuracy(y_true, p):\n    return np.mean((p &gt;= 0.5) == y_true)\n\n\nforward が予測、loss_fn が採点。勾配は \\((p-y)x\\) なので関数すら要らない"
   },
   {
-    "objectID": "nn-single-unit.html#魚を1匹ずつ見せて学習する",
-    "href": "nn-single-unit.html#魚を1匹ずつ見せて学習する",
+    "objectID": "nn-single-unit.html#peek-one-at-a-time",
+    "href": "nn-single-unit.html#peek-one-at-a-time",
     "title": "ニューラルネットワークの最小単位",
     "section": "魚を1匹ずつ見せて学習する",
     "text": "魚を1匹ずつ見せて学習する\n\n\nalpha = np.array([0.0, 0.0])   # 重みはゼロからスタート\nb  = 0.0\nlr = 0.5                       # 学習率\n\nfor i in range(10):\n    xi, yi = X_norm[i], y[i]\n    p_i   = sigmoid(xi @ alpha + b)   # Forward：1匹だけ予測\n    delta = p_i - yi                  # 予測と正解の差\n    alpha = alpha - lr * delta * xi   # 勾配降下で更新\n    b     = b  - lr * delta\n\n    p_all = forward(X_norm, alpha, b)\n    print(f\"{i+1}匹目 | Loss: {loss_fn(y, p_all):.4f} | 正答率: {accuracy(y, p_all):.1%} \"\n          f\"| α=[{alpha[0]:6.3f}, {alpha[1]:6.3f}] | b={b:6.3f}\")\n\n1匹目 | Loss: 0.5326 | 正答率: 85.0% | α=[-0.233,  0.335] | b= 0.250\n2匹目 | Loss: 0.5179 | 正答率: 90.0% | α=[-0.233,  0.371] | b=-0.026\n3匹目 | Loss: 0.4974 | 正答率: 85.0% | α=[-0.213,  0.537] | b= 0.196\n4匹目 | Loss: 0.4269 | 正答率: 88.8% | α=[-0.359,  0.748] | b= 0.023\n5匹目 | Loss: 0.4044 | 正答率: 85.0% | α=[-0.394,  0.914] | b= 0.135\n6匹目 | Loss: 0.3994 | 正答率: 87.5% | α=[-0.360,  1.054] | b=-0.059\n7匹目 | Loss: 0.3901 | 正答率: 87.5% | α=[-0.379,  1.137] | b=-0.023\n8匹目 | Loss: 0.3617 | 正答率: 87.5% | α=[-0.516,  1.206] | b=-0.102\n9匹目 | Loss: 0.3364 | 正答率: 88.8% | α=[-0.650,  1.272] | b=-0.002\n10匹目 | Loss: 0.3330 | 正答率: 90.0% | α=[-0.741,  1.146] | b=-0.294\n\n\n\n1匹見るたびにパラメータが少し動く\nたった10匹で正答率 90% まで来た"

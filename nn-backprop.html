@@ -194,6 +194,7 @@
   <link rel="stylesheet" href="custom.css">
   <script src="slide-ui.js" defer=""></script>
   <script src="search-ui.js" defer=""></script>
+  <script src="peek-ui.js" defer=""></script>
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -326,7 +327,7 @@ rkskmt
 <h2>往路（<span class="en">Forward</span>）<span class="fw-colon">：</span>数値を流す</h2>
 <div class="slide-body">
 <p><span class="math display">\[z = 0.3 \times 1.0 + (-0.2) \times 0.5 + 0.1 = 0.30\]</span> <span class="math display">\[h = \mathrm{ReLU}(0.30) = 0.30\]</span> <span class="math display">\[u = 0.5 \times 0.30 + (-0.1) = 0.05\]</span> <span class="math display">\[p = \sigma(0.05) = 0.5125\]</span> <span class="math display">\[L = -\log(0.5125) = 0.6685\]</span></p>
-<div id="df8ac8e6" class="cell" data-execution_count="1">
+<div id="f3a99121" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -341,7 +342,7 @@ rkskmt
 </ul>
 </div>
 </section>
-<section id="復路backward出力側から勾配を貯める" class="slide level2">
+<section id="peek-handcalc" class="slide level2">
 <h2>復路（<span class="en">Backward</span>）<span class="fw-colon">：</span>出力側から勾配を貯める</h2>
 <div class="slide-body">
 <div id="出力層" class="slide-body-heading">
@@ -363,7 +364,7 @@ rkskmt
 <ul>
 <li>5個の勾配が<strong>掛け算と代入だけ</strong>で出揃った。新しい微分は1つもしていない</li>
 </ul>
-<div id="cb16831e" class="cell" data-execution_count="2">
+<div id="645682ed" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -383,7 +384,7 @@ rkskmt
 <ul>
 <li>微分の定義 <span class="math inline">\(\dfrac{L(\theta + \varepsilon) - L(\theta)}{\varepsilon}\)</span> で、手計算を検算できる（<strong>数値微分</strong>）</li>
 </ul>
-<div id="977a4853" class="cell" data-execution_count="3">
+<div id="324df19e" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a></a></span>
 <span id="cb1-3"><a></a>x1, x2, y <span class="op">=</span> <span class="fl">1.0</span>, <span class="fl">0.5</span>, <span class="fl">1.0</span></span>
@@ -464,7 +465,7 @@ rkskmt
 <li>中間層に ReLU が選ばれる大きな理由</li>
 </ul></li>
 </ul>
-<div id="b4660f8f" class="cell" data-execution_count="4">
+<div id="6e9fdbfc" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -708,7 +709,7 @@ rkskmt
         margin: 6.0e-2,
 
         math: {
-          mathjax: './libs/mathjax/MathJax.js',
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
           config: 'TeX-AMS_HTML-full',
           tex2jax: {
             inlineMath: [['\\(','\\)']],
@@ -804,7 +805,7 @@ rkskmt
         }
           var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
           var mailtoRegex = new RegExp(/^mailto:/);
-            var filterRegex = new RegExp("https:\/\/rkskmt\.github\.io\/ai-lectures\/");
+            var filterRegex = new RegExp('/' + window.location.host + '/');
           var isInternal = (href) => {
               return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
           }

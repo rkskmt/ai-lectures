@@ -194,6 +194,7 @@
   <link rel="stylesheet" href="custom.css">
   <script src="slide-ui.js" defer=""></script>
   <script src="search-ui.js" defer=""></script>
+  <script src="peek-ui.js" defer=""></script>
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -240,7 +241,7 @@ rkskmt
 <section id="データあの三日月" class="slide level2">
 <h2>データ<span class="fw-colon">：</span>あの三日月</h2>
 <div class="slide-body">
-<div id="73f8cd6b" class="cell" data-execution_count="1">
+<div id="90eaa833" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-3"><a></a><span class="im">import</span> japanize_matplotlib</span>
@@ -321,7 +322,7 @@ rkskmt
 <section id="forward4行" class="slide level2">
 <h2>Forward<span class="fw-colon">：</span>4行</h2>
 <div class="slide-body">
-<div id="844a2434" class="cell" data-execution_count="2">
+<div id="1557c6a6" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a><span class="kw">def</span> forward(X, W1, b1, w2, c2):</span>
 <span id="cb3-2"><a></a>    Z <span class="op">=</span> X <span class="op">@</span> W1 <span class="op">+</span> b1          <span class="co"># アフィン変換（全変換まとめて）</span></span>
 <span id="cb3-3"><a></a>    H <span class="op">=</span> np.maximum(<span class="dv">0</span>, Z)     <span class="co"># ReLU（折る）</span></span>
@@ -330,7 +331,7 @@ rkskmt
 <span id="cb3-6"><a></a>    <span class="cf">return</span> Z, H, u, p</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <ul>
-<li>最小単位の回の <code>forward</code> と見比べると、<strong>スカラーが行列になっただけ</strong></li>
+<li><a href="./nn-single-unit.html#peek-forward" class="peek">最小単位の回の <code>forward</code></a> と見比べると、<strong>スカラーが行列になっただけ</strong></li>
 <li><span class="math inline">\(Z, H\)</span> も返すのは、<strong>復路（<span class="en">backprop</span>）で使うから</strong>（前回の伏線）</li>
 </ul>
 </div>
@@ -338,7 +339,7 @@ rkskmt
 <section id="backward前回の漸化式をそのまま書く" class="slide level2">
 <h2>Backward<span class="fw-colon">：</span>前回の漸化式をそのまま書く</h2>
 <div class="slide-body">
-<div id="3f4165b3" class="cell" data-execution_count="3">
+<div id="528c48f6" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a></a><span class="kw">def</span> backward(X, y, Z, H, w2, p):</span>
 <span id="cb4-2"><a></a>    N <span class="op">=</span> <span class="bu">len</span>(X)</span>
 <span id="cb4-3"><a></a>    delta_out <span class="op">=</span> (p <span class="op">-</span> y) <span class="op">/</span> N                    <span class="co"># 出力層の誤差（p - y）</span></span>
@@ -362,7 +363,7 @@ rkskmt
 <section id="学習ループあとは勾配降下法" class="slide level2">
 <h2>学習ループ<span class="fw-colon">：</span>あとは勾配降下法</h2>
 <div class="slide-body">
-<div id="2d864412" class="cell" data-execution_count="4">
+<div id="90844489" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">0</span>)</span>
 <span id="cb5-2"><a></a>hidden <span class="op">=</span> <span class="dv">16</span></span>
 <span id="cb5-3"><a></a>W1 <span class="op">=</span> rng.normal(<span class="dv">0</span>, <span class="fl">1.0</span>, (<span class="dv">2</span>, hidden))   <span class="co"># ランダム初期化（対称性を破る）</span></span>
@@ -401,7 +402,7 @@ rkskmt
 <section id="コールドオープン回収初回の図再現完了" class="slide level2">
 <h2>コールドオープン回収<span class="fw-colon">：</span>初回の図、再現完了</h2>
 <div class="slide-body">
-<div id="1e2f1748" class="cell" data-execution_count="5">
+<div id="b47d6ac7" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>描画コード</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a></a>xx, yy <span class="op">=</span> np.meshgrid(np.linspace(X[:, <span class="dv">0</span>].<span class="bu">min</span>() <span class="op">-</span> <span class="fl">0.4</span>, X[:, <span class="dv">0</span>].<span class="bu">max</span>() <span class="op">+</span> <span class="fl">0.4</span>, <span class="dv">300</span>),</span>
@@ -447,7 +448,7 @@ rkskmt
 <section id="折り目の数で遊ぶ" class="slide level2">
 <h2>折り目の数で遊ぶ</h2>
 <div class="slide-body">
-<div id="03c22166" class="cell" data-execution_count="6">
+<div id="9b407aae" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -457,7 +458,7 @@ rkskmt
 </div>
 </div>
 <ul>
-<li>中間2個では折り目が足りない。16個なら滑らかに曲がる — 「変換を重ねる」の回の結論を、自作コードで追試できた</li>
+<li>中間2個では折り目が足りない。16個なら滑らかに曲がる — <a href="./nn-multilayer.html#peek-curved-boundary" class="peek">「変換を重ねる」の回の結論</a>を、自作コードで追試できた</li>
 <li><code>hidden</code> や学習率をいじって遊んでみること。<strong>壊れても全部自分のコードなので、原因も自分で追える</strong></li>
 </ul>
 </div>
@@ -681,7 +682,7 @@ rkskmt
         margin: 6.0e-2,
 
         math: {
-          mathjax: './libs/mathjax/MathJax.js',
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
           config: 'TeX-AMS_HTML-full',
           tex2jax: {
             inlineMath: [['\\(','\\)']],
@@ -777,7 +778,7 @@ rkskmt
         }
           var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
           var mailtoRegex = new RegExp(/^mailto:/);
-            var filterRegex = new RegExp("https:\/\/rkskmt\.github\.io\/ai-lectures\/");
+            var filterRegex = new RegExp('/' + window.location.host + '/');
           var isInternal = (href) => {
               return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
           }

@@ -194,6 +194,7 @@
   <link rel="stylesheet" href="custom.css">
   <script src="slide-ui.js" defer=""></script>
   <script src="search-ui.js" defer=""></script>
+  <script src="peek-ui.js" defer=""></script>
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -220,7 +221,7 @@ rkskmt
 <li>勾配降下法の弱点（学習率の手動調整・収束の遅さ）を、<strong>2次微分</strong>で解決する手法</li>
 <li>ディープラーニングでは使われないが、<code>scikit-learn</code> のロジスティック回帰などの中で現役</li>
 </ul>
-<div id="2b36c9c7" class="cell" data-execution_count="1">
+<div id="ca30f83a" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-3"><a></a><span class="im">import</span> japanize_matplotlib</span>
@@ -419,7 +420,7 @@ rkskmt
 <section id="newton法python実装" class="slide level2">
 <h2>Newton法<span class="fw-colon">：</span>Python実装</h2>
 <div class="slide-body">
-<div id="4ddcf693" class="cell" data-execution_count="2">
+<div id="f3c191e9" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a><span class="co"># 初期値</span></span>
@@ -523,7 +524,7 @@ f''(x) = 2.0000
 <section id="可視化で比較" class="slide level2">
 <h2>可視化で比較</h2>
 <div class="slide-body">
-<div id="6f26bda6" class="cell" data-execution_count="3">
+<div id="b7d52faa" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -619,7 +620,7 @@ f''(x) = 2.0000
 <div id="視覚的説明" class="slide-body-heading">
 視覚的説明
 </div>
-<div id="c9ea3087" class="cell" data-execution_count="4">
+<div id="30c82dc7" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -895,7 +896,7 @@ f''(x) = 2.0000
         margin: 6.0e-2,
 
         math: {
-          mathjax: './libs/mathjax/MathJax.js',
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
           config: 'TeX-AMS_HTML-full',
           tex2jax: {
             inlineMath: [['\\(','\\)']],
@@ -991,7 +992,7 @@ f''(x) = 2.0000
         }
           var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
           var mailtoRegex = new RegExp(/^mailto:/);
-            var filterRegex = new RegExp("https:\/\/rkskmt\.github\.io\/ai-lectures\/");
+            var filterRegex = new RegExp('/' + window.location.host + '/');
           var isInternal = (href) => {
               return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
           }

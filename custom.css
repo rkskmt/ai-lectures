@@ -119,7 +119,18 @@
   max-height: 500px;
   width: auto;
   height: auto;
+  /* When an image has an explicit width (e.g. {width="50%"}) and its natural
+     height at that width exceeds max-height, the height gets clamped while the
+     width stays fixed — which would distort the aspect ratio (tall images
+     placed wide turn into squashed ellipses). object-fit keeps the bitmap's
+     aspect ratio inside whatever box the width/max-height constraints produce. */
+  object-fit: contain;
 }
+/* A .fig wrapper (see figscale.lua) centers its figure — pairs with
+   ::: {.fig width="50%"} so sizing and centering are one mechanism.
+   margin:auto (not text-align) so it survives the left text-align that
+   Quarto sets on the output <p>. */
+.reveal .fig img { display: block; margin-left: auto; margin-right: auto; }
 .reveal p.caption {
   text-align: center;
   margin-top: 0;
@@ -215,18 +226,36 @@ table td:first-child {
   background-repeat: no-repeat;
   background-position: center;
 }
+/* Home button: same translucent-circle style as the search button,
+   stacked directly above it in the top-right corner. */
 #home-btn {
   position: fixed;
   top: 12px;
-  left: 12px;
+  right: 14px;
   z-index: 100;
-  background: #5dade2;
-  color: white;
-  padding: 4px 14px;
-  border-radius: 4px;
+  width: 34px;
+  height: 34px;
+  box-sizing: border-box;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(0,0,0,0.25);
+  border-radius: 50%;
+  background: rgba(255,255,255,0.92);
+  color: #666;
   text-decoration: none;
-  font-size: 1rem;
+  opacity: 0.82;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.22);
+  transition: opacity 0.15s ease, background 0.15s ease, transform 0.15s ease;
 }
+#home-btn:hover, #home-btn:focus {
+  opacity: 1;
+  background: white;
+  transform: scale(1.06);
+  color: #2980b9;
+}
+#home-btn svg { width: 18px; height: 18px; display: block; pointer-events: none; }
 .reveal > .footer {
   display: flex !important;
   align-items: center;
@@ -578,10 +607,12 @@ a.lightbox[href]::after {
   -webkit-text-stroke: 0.02em currentColor;
   letter-spacing: 0.01em;
 }
-/* Spelled-out form of an abbreviation, e.g. DNN（[Deep Neural Network]{.en .abbr}）.
-   Title Case in the source; rendered bold to read as the term's official name. */
-.reveal .en.abbr {
-  font-weight: bold;
+/* Spelled-out form of an abbreviation is just bold: write it as Markdown
+   **…** inside .en, e.g. DNN（[**Deep Neural Network**]{.en}）. The <strong>
+   child would otherwise inherit .en's hairline text-stroke and look
+   double-weighted, so zero the stroke on it. (No .abbr class: Pandoc rewrites
+   {.abbr} to <abbr> and drops the .en class along with it.) */
+.reveal .en strong {
   -webkit-text-stroke: 0;
 }
 .break-slide h2 { border: none !important; }

@@ -194,6 +194,7 @@
   <link rel="stylesheet" href="custom.css">
   <script src="slide-ui.js" defer=""></script>
   <script src="search-ui.js" defer=""></script>
+  <script src="peek-ui.js" defer=""></script>
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -274,7 +275,7 @@ rkskmt
 <li>次元削減の回で測った<strong>体長</strong>を使う</li>
 <li>体長を測るだけで重さが分かれば、<strong>秤に乗せる手間が省ける</strong></li>
 </ul>
-<div id="dfe9c05c" class="cell" data-execution_count="1">
+<div id="19dfd438" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>魚データの定義（クリックして展開）</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -299,7 +300,7 @@ rkskmt
 <span id="cb1-20"><a></a>lengths <span class="op">=</span> np.<span class="bu">round</span>(np.cbrt(weights) <span class="op">*</span> <span class="fl">4.5</span> <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="fl">1.0</span>, <span class="bu">len</span>(weights)), <span class="dv">1</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="930af531" class="cell" data-execution_count="2">
+<div id="85b5af9e" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -322,7 +323,7 @@ rkskmt
 </ul>
 <p><span class="math display">\[L(a, b) = \frac{1}{N} \sum_{i} \left( \underbrace{a x_i + b}_{\text{予測}} - \underbrace{t_i}_{\text{実際}} \right)^2\]</span></p>
 <ul>
-<li><strong>MSE（<abbr>Mean Squared Error</abbr> / 平均二乗誤差）</strong>と呼ぶ</li>
+<li><strong>MSE（<span class="en"><strong>Mean Squared Error</strong></span> / 平均二乗誤差）</strong>と呼ぶ</li>
 </ul>
 <div title="クイズ">
 <div class="callout callout-important callout-titled callout-style-default">
@@ -366,9 +367,9 @@ rkskmt
 <h2>勾配降下法で fit する</h2>
 <div class="slide-body">
 <ul>
-<li>スケールを揃えてから（クラスタリングの回の教訓。学習率を1つで済ませるため）</li>
+<li>スケールを揃えてから（<a href="./clustering-kmeans.html#peek-scale" class="peek">クラスタリングの回の教訓</a>。学習率を1つで済ませるため）</li>
 </ul>
-<div id="6a381700" class="cell" data-execution_count="3">
+<div id="7d8a036c" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a>x <span class="op">=</span> (lengths <span class="op">-</span> lengths.mean()) <span class="op">/</span> lengths.std()   <span class="co"># 標準化した体長</span></span>
 <span id="cb2-2"><a></a>t <span class="op">=</span> (weights <span class="op">-</span> weights.mean()) <span class="op">/</span> weights.std()   <span class="co"># 標準化した重さ</span></span>
 <span id="cb2-3"><a></a></span>
@@ -399,7 +400,7 @@ rkskmt
 <section id="直線が合っていく様子" class="slide level2">
 <h2>直線が合っていく様子</h2>
 <div class="slide-body">
-<div id="6e7a2bdf" class="cell" data-execution_count="4">
+<div id="a4f2d6e4" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -417,7 +418,7 @@ rkskmt
 <section id="答え合わせsklearn-と比べる" class="slide level2">
 <h2>答え合わせ<span class="fw-colon">：</span>sklearn と比べる</h2>
 <div class="slide-body">
-<div id="ddb0f77c" class="cell" data-execution_count="5">
+<div id="7babe089" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
 <span id="cb4-2"><a></a></span>
 <span id="cb4-3"><a></a>reg <span class="op">=</span> LinearRegression().fit(x.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), t)</span>
@@ -485,7 +486,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <section id="次数を上げてみる" class="slide level2">
 <h2>次数を上げてみる</h2>
 <div class="slide-body">
-<div id="89cc95f4" class="cell" data-execution_count="6">
+<div id="4ff03274" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
@@ -530,7 +531,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <section id="数字で見るまた会ったな過学習" class="slide level2">
 <h2>数字で見る<span class="fw-colon">：</span>また会ったな、過学習</h2>
 <div class="slide-body">
-<div id="ed9f2f1b" class="cell" data-execution_count="7">
+<div id="175dd53a" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a></a>degrees <span class="op">=</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">10</span>)</span>
 <span id="cb7-2"><a></a>train_mse, test_mse <span class="op">=</span> [], []</span>
 <span id="cb7-3"><a></a><span class="cf">for</span> deg <span class="kw">in</span> degrees:</span>
@@ -556,7 +557,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 </div>
 <ul>
 <li>訓練誤差は下がり続け、テスト誤差は<strong>桁違いに爆発</strong>（縦軸は対数）</li>
-<li>決定木の深さで見た<strong>過学習</strong>が、回帰でもまったく同じ形で現れた</li>
+<li><a href="./classification-2d-boundaries.html#peek-overfit-boundary" class="peek">決定木の深さで見た<strong>過学習</strong></a>が、回帰でもまったく同じ形で現れた</li>
 <li>深さを制限したように、複雑さを抑える道具が要る — 回帰では<strong>正則化</strong></li>
 </ul>
 </div>
@@ -567,7 +568,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <ul>
 <li>暴れている曲線の正体は、<strong>巨大な係数</strong></li>
 </ul>
-<div id="8673c4cd" class="cell" data-execution_count="8">
+<div id="97626cb8" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a></a>plain <span class="op">=</span> make_pipeline(PolynomialFeatures(<span class="dv">9</span>), StandardScaler(), LinearRegression())</span>
 <span id="cb8-2"><a></a>plain.fit(X_train, y_train)</span>
 <span id="cb8-3"><a></a><span class="bu">print</span>(<span class="st">"次数9の係数の最大絶対値:"</span>, <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">abs</span>(plain[<span class="op">-</span><span class="dv">1</span>].coef_)<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
@@ -588,7 +589,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <section id="ridge-で手なずける" class="slide level2">
 <h2>Ridge で手なずける</h2>
 <div class="slide-body">
-<div id="2ea825f2" class="cell" data-execution_count="9">
+<div id="afcabbdf" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> Ridge</span>
 <span id="cb10-2"><a></a></span>
 <span id="cb10-3"><a></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="fl">9.5</span>, <span class="fl">3.6</span>))</span>
@@ -863,7 +864,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
         margin: 6.0e-2,
 
         math: {
-          mathjax: './libs/mathjax/MathJax.js',
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
           config: 'TeX-AMS_HTML-full',
           tex2jax: {
             inlineMath: [['\\(','\\)']],
@@ -959,7 +960,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
         }
           var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
           var mailtoRegex = new RegExp(/^mailto:/);
-            var filterRegex = new RegExp("https:\/\/rkskmt\.github\.io\/ai-lectures\/");
+            var filterRegex = new RegExp('/' + window.location.host + '/');
           var isInternal = (href) => {
               return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
           }

@@ -194,6 +194,7 @@
   <link rel="stylesheet" href="custom.css">
   <script src="slide-ui.js" defer=""></script>
   <script src="search-ui.js" defer=""></script>
+  <script src="peek-ui.js" defer=""></script>
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -325,7 +326,7 @@ rkskmt
 <ul>
 <li>データを2つに分けて使う</li>
 </ul>
-<div id="05318a92" class="cell" data-execution_count="1">
+<div id="a6f7e1f4" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -365,7 +366,7 @@ rkskmt
 <li>前回の80匹に、新しく測った<strong>40匹</strong>を加えた<strong>120匹</strong>で考える</li>
 <li>データが増えると、<strong>どちらとも言いにくい微妙な個体</strong>や計測のばらつきも入ってくる</li>
 </ul>
-<div id="423a495c" class="cell" data-execution_count="2">
+<div id="98286cbd" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>魚データの定義（クリックして展開）</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -409,7 +410,7 @@ rkskmt
 <section id="まずデータを眺める" class="slide level2">
 <h2>まずデータを眺める</h2>
 <div class="slide-body">
-<div id="93cd5d3e" class="cell" data-execution_count="3">
+<div id="40f5a037" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -447,7 +448,7 @@ rkskmt
 <li>まずは全データで学習し、同じ全データで評価する</li>
 <li>これは「学習済みデータへの精度」を測っている</li>
 </ul>
-<div id="ceea43fb" class="cell" data-execution_count="4">
+<div id="9f0c9e8d" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression</span>
 <span id="cb2-2"><a></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> accuracy_score</span>
 <span id="cb2-3"><a></a></span>
@@ -485,7 +486,7 @@ rkskmt
 <li>データの一部を、最初から評価用に取り分ける</li>
 <li>手軽なので、最初に試す評価方法としてよく使う</li>
 </ul>
-<div id="7cc368cb" class="cell" data-execution_count="5">
+<div id="a007710f" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
 <span id="cb4-2"><a></a></span>
 <span id="cb4-3"><a></a><span class="co"># 8:2 に分割（test_size=0.2 で20%をテストに）</span></span>
@@ -525,7 +526,7 @@ rkskmt
 <section id="見ていないデータで評価する" class="slide level2">
 <h2>見ていないデータで評価する</h2>
 <div class="slide-body">
-<div id="60e048a4" class="cell" data-execution_count="6">
+<div id="7cd319bc" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a></a>model <span class="op">=</span> LogisticRegression(max_iter<span class="op">=</span><span class="dv">1000</span>)</span>
 <span id="cb6-2"><a></a>model.fit(X_train, y_train)         <span class="co"># 訓練データだけで学習</span></span>
 <span id="cb6-3"><a></a></span>
@@ -562,7 +563,7 @@ rkskmt
 <section id="混同行列テストデータで評価" class="slide level2">
 <h2>混同行列（テストデータで評価）</h2>
 <div class="slide-body">
-<div id="4d4b07bd" class="cell" data-execution_count="7">
+<div id="1a3d7cfe" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> ConfusionMatrixDisplay, confusion_matrix</span>
 <span id="cb8-2"><a></a></span>
 <span id="cb8-3"><a></a>cm <span class="op">=</span> confusion_matrix(y_test, model.predict(X_test))</span>
@@ -592,9 +593,9 @@ rkskmt
 <h2>深さ無制限の決定木を、新しい魚で採点する</h2>
 <div class="slide-body">
 <ul>
-<li>前回の「あやしい満点」に、いま手に入れた道具（train/test）を使う</li>
+<li>前回の「<a href="./classification-2d-boundaries.html#peek-overfit-boundary" class="peek">あやしい満点</a>」に、いま手に入れた道具（train/test）を使う</li>
 </ul>
-<div id="1463baf4" class="cell" data-execution_count="8">
+<div id="6f44c5c7" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a></a><span class="im">from</span> sklearn.tree <span class="im">import</span> DecisionTreeClassifier</span>
 <span id="cb9-2"><a></a></span>
 <span id="cb9-3"><a></a>deep_tree <span class="op">=</span> DecisionTreeClassifier(max_depth<span class="op">=</span><span class="va">None</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
@@ -624,7 +625,7 @@ rkskmt
 <ul>
 <li>深さを変えた木の<strong>決定境界</strong>を、訓練データと一緒に描いてみる</li>
 </ul>
-<div id="fcbfbddc" class="cell" data-execution_count="9">
+<div id="8da34df5" class="cell" data-execution_count="9">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -642,7 +643,7 @@ rkskmt
 <section id="暗記の境界に新しい魚を流し込む" class="slide level2">
 <h2>暗記の境界に、新しい魚を流し込む</h2>
 <div class="slide-body">
-<div id="7b5aaf37" class="cell" data-execution_count="10">
+<div id="16c0cbbb" class="cell" data-execution_count="10">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -661,7 +662,7 @@ rkskmt
 <section id="深さを変えて2つの精度を並べる" class="slide level2">
 <h2>深さを変えて、2つの精度を並べる</h2>
 <div class="slide-body">
-<div id="08e44d3d" class="cell" data-execution_count="11">
+<div id="1564813a" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a></a>depths   <span class="op">=</span> <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">13</span>))</span>
 <span id="cb11-2"><a></a>train_accs, test_accs <span class="op">=</span> [], []</span>
 <span id="cb11-3"><a></a></span>
@@ -762,7 +763,7 @@ rkskmt
 <li><code>train_test_split</code> は<strong>ランダムに分割</strong>する</li>
 <li>どのデータがテスト側に入るかで、精度が変わる</li>
 </ul>
-<div id="e92482e3" class="cell" data-execution_count="12">
+<div id="5ed975e8" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a></a><span class="cf">for</span> seed <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">5</span>):</span>
 <span id="cb12-2"><a></a>    Xtr, Xte, ytr, yte <span class="op">=</span> train_test_split(X, y, test_size<span class="op">=</span><span class="fl">0.2</span>, random_state<span class="op">=</span>seed)</span>
 <span id="cb12-3"><a></a>    acc <span class="op">=</span> accuracy_score(yte, LogisticRegression(max_iter<span class="op">=</span><span class="dv">1000</span>).fit(Xtr, ytr).predict(Xte))</span>
@@ -803,7 +804,7 @@ seed=4  テスト精度: 0.917</code></pre>
 <li>k 回繰り返す<span class="fw-colon">：</span>1つをテスト、残りを訓練に使う</li>
 <li>k 個の精度の<strong>平均</strong>を最終スコアとする</li>
 </ul>
-<div id="c7c04ccd" class="cell" data-execution_count="13">
+<div id="1e72574b" class="cell" data-execution_count="13">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -817,7 +818,7 @@ seed=4  テスト精度: 0.917</code></pre>
 <section id="cross_val_score-で交差検証" class="slide level2">
 <h2><code>cross_val_score</code> で交差検証</h2>
 <div class="slide-body">
-<div id="4de54622" class="cell" data-execution_count="14">
+<div id="96422141" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> cross_val_score</span>
 <span id="cb14-2"><a></a></span>
 <span id="cb14-3"><a></a>scores <span class="op">=</span> cross_val_score(</span>
@@ -1095,7 +1096,7 @@ seed=4  テスト精度: 0.917</code></pre>
         margin: 6.0e-2,
 
         math: {
-          mathjax: './libs/mathjax/MathJax.js',
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
           config: 'TeX-AMS_HTML-full',
           tex2jax: {
             inlineMath: [['\\(','\\)']],
@@ -1191,7 +1192,7 @@ seed=4  テスト精度: 0.917</code></pre>
         }
           var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
           var mailtoRegex = new RegExp(/^mailto:/);
-            var filterRegex = new RegExp("https:\/\/rkskmt\.github\.io\/ai-lectures\/");
+            var filterRegex = new RegExp('/' + window.location.host + '/');
           var isInternal = (href) => {
               return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
           }
