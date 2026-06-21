@@ -230,7 +230,7 @@ table td:first-child {
    stacked directly above it in the top-right corner. */
 #home-btn {
   position: fixed;
-  top: 12px;
+  bottom: 56px;          /* moved to bottom-right: top-right is badge-only */
   right: 14px;
   z-index: 100;
   width: 34px;
@@ -256,6 +256,9 @@ table td:first-child {
   color: #2980b9;
 }
 #home-btn svg { width: 18px; height: 18px; display: block; pointer-events: none; }
+/* Search button (created by search-ui.js at top:54px) moved to the bottom-right
+   so the top-right corner is reserved for the badge. */
+#search-btn { top: auto !important; bottom: 14px !important; }
 .reveal > .footer {
   display: flex !important;
   align-items: center;
@@ -272,8 +275,8 @@ table td:first-child {
 }
 #slide-nav button {
   background: transparent;
-  color: #5dade2;
-  border: 1px solid #5dade2;
+  color: #f6b394;             /* badge peach (was theme blue) */
+  border: 1px solid #f6b394;
   border-radius: 4px;
   padding: 4px 14px;
   font-size: 1rem;
@@ -282,7 +285,7 @@ table td:first-child {
   -webkit-tap-highlight-color: transparent;
 }
 #slide-nav button:active {
-  background: rgba(93, 173, 226, 0.2);
+  background: rgba(246, 179, 148, 0.25);
 }
 #slide-nav button.nav-disabled {
   opacity: 0.3;
@@ -292,6 +295,7 @@ table td:first-child {
   font-size: 0.9rem;
   min-width: 56px;
   text-align: center;
+  color: #a8a8a8;             /* muted, so the page number doesn't read as body text */
 }
 .reveal .slide-number {
   display: none !important;
@@ -722,3 +726,47 @@ a.lightbox[href]::after {
   font-family: monospace, serif;
   text-shadow: none;
 }
+/* Rosette preset badges (injected by badge-ui.js). The top-right corner is
+   reserved for badges (home/search buttons live at the bottom-right). Absolutely
+   positioned within the section so it tracks the title's right shoulder, not the
+   viewport corner. Title gets right-padding (set inline by the script) so a long
+   heading wraps before the badge zone. */
+.reveal .slides section > .slide-badge-group {
+  position: absolute;
+  top: 2px;              /* high in the corner, head fully visible (no top bleed) */
+  right: 22px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  z-index: 6;
+  pointer-events: none;
+}
+.reveal .slides section > .slide-badge-group svg {
+  display: block;
+  transform: rotate(-8deg);    /* tilt each badge about ITS OWN center */
+  transform-origin: 50% 39%;   /* 39% of the 256-tall viewBox = rosette center (y=100) */
+}
+.reveal .slides section > .slide-badge-group text {
+  font-family: system-ui, -apple-system, "Hiragino Sans", "Yu Gothic UI", "Segoe UI", "Meiryo", sans-serif;
+}
+/* ---- Callouts: unified "solid colored header bar + white text + white icon" ----
+   The title row is a solid block in each type's color; the body stays plain.
+   Icons are whitened with a filter so we keep Quarto's per-type glyphs.
+   Colours are chosen so white text stays legible AND the five types stay
+   distinct: important is violet (no longer red), so warning shifts to a deep
+   orange and caution to red (amber + white text is unreadable). */
+.reveal .callout .callout-title { color: #fff !important; }
+.reveal .callout .callout-title p,
+.reveal .callout .callout-title strong { color: #fff !important; }
+.reveal .callout .callout-icon::before { filter: brightness(0) invert(1) !important; }
+
+.reveal .callout-note      .callout-title { background: #1c7ed6 !important; }
+.reveal .callout-note      { border-left-color: #1864ab !important; }
+.reveal .callout-tip       .callout-title { background: #2f9e44 !important; }
+.reveal .callout-tip       { border-left-color: #2b8a3e !important; }
+.reveal .callout-important .callout-title { background: #7c3aed !important; }
+.reveal .callout-important { border-left-color: #5f3dc4 !important; }
+.reveal .callout-warning   .callout-title { background: #e8590c !important; }
+.reveal .callout-warning   { border-left-color: #d9480f !important; }
+.reveal .callout-caution   .callout-title { background: #e03131 !important; }
+.reveal .callout-caution   { border-left-color: #c92a2a !important; }
