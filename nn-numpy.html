@@ -195,6 +195,7 @@
   <script src="slide-ui.js" defer=""></script>
   <script src="search-ui.js" defer=""></script>
   <script src="peek-ui.js" defer=""></script>
+  <script src="badge-ui.js" defer=""></script>
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -241,7 +242,7 @@ rkskmt
 <section id="データあの三日月" class="slide level2">
 <h2>データ<span class="fw-colon">：</span>あの三日月</h2>
 <div class="slide-body">
-<div id="4e88dfc6" class="cell" data-execution_count="1">
+<div id="138a5fa6" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-3"><a></a><span class="im">import</span> japanize_matplotlib</span>
@@ -322,7 +323,7 @@ rkskmt
 <section id="forward4行" class="slide level2">
 <h2>Forward<span class="fw-colon">：</span>4行</h2>
 <div class="slide-body">
-<div id="6ca65ee2" class="cell" data-execution_count="2">
+<div id="f66920b0" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a><span class="kw">def</span> forward(X, W1, b1, w2, c2):</span>
 <span id="cb3-2"><a></a>    Z <span class="op">=</span> X <span class="op">@</span> W1 <span class="op">+</span> b1          <span class="co"># アフィン変換（全変換まとめて）</span></span>
 <span id="cb3-3"><a></a>    H <span class="op">=</span> np.maximum(<span class="dv">0</span>, Z)     <span class="co"># ReLU（折る）</span></span>
@@ -339,7 +340,7 @@ rkskmt
 <section id="backward前回の漸化式をそのまま書く" class="slide level2">
 <h2>Backward<span class="fw-colon">：</span>前回の漸化式をそのまま書く</h2>
 <div class="slide-body">
-<div id="7f98a3d2" class="cell" data-execution_count="3">
+<div id="3ba8698f" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a></a><span class="kw">def</span> backward(X, y, Z, H, w2, p):</span>
 <span id="cb4-2"><a></a>    N <span class="op">=</span> <span class="bu">len</span>(X)</span>
 <span id="cb4-3"><a></a>    delta_out <span class="op">=</span> (p <span class="op">-</span> y) <span class="op">/</span> N                    <span class="co"># 出力層の誤差（p - y）</span></span>
@@ -363,7 +364,7 @@ rkskmt
 <section id="学習ループあとは勾配降下法" class="slide level2">
 <h2>学習ループ<span class="fw-colon">：</span>あとは勾配降下法</h2>
 <div class="slide-body">
-<div id="9ba0a38d" class="cell" data-execution_count="4">
+<div id="b1a16c23" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">0</span>)</span>
 <span id="cb5-2"><a></a>hidden <span class="op">=</span> <span class="dv">16</span></span>
 <span id="cb5-3"><a></a>W1 <span class="op">=</span> rng.normal(<span class="dv">0</span>, <span class="fl">1.0</span>, (<span class="dv">2</span>, hidden))   <span class="co"># ランダム初期化（対称性を破る）</span></span>
@@ -402,7 +403,7 @@ rkskmt
 <section id="コールドオープン回収初回の図再現完了" class="slide level2">
 <h2>コールドオープン回収<span class="fw-colon">：</span>初回の図、再現完了</h2>
 <div class="slide-body">
-<div id="541ca413" class="cell" data-execution_count="5">
+<div id="488317c4" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>描画コード</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a></a>xx, yy <span class="op">=</span> np.meshgrid(np.linspace(X[:, <span class="dv">0</span>].<span class="bu">min</span>() <span class="op">-</span> <span class="fl">0.4</span>, X[:, <span class="dv">0</span>].<span class="bu">max</span>() <span class="op">+</span> <span class="fl">0.4</span>, <span class="dv">300</span>),</span>
@@ -448,7 +449,7 @@ rkskmt
 <section id="折り目の数で遊ぶ" class="slide level2">
 <h2>折り目の数で遊ぶ</h2>
 <div class="slide-body">
-<div id="74650db0" class="cell" data-execution_count="6">
+<div id="b89567ad" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>

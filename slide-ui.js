@@ -10,6 +10,8 @@
     var codeZoomScrollStartLeft = 0;
     var codeZoomScrollStartTop = 0;
     var codeZoomPreviousKeyboard = null;
+    var lastTouchNavAt = 0;  // when a tap (touchend) drove navigation — used to drop the ghost click
+    var lastNavAt = 0;       // when ANY route last navigated — coalesces simultaneous double fires
 
     function createNav() {
       try {
@@ -92,6 +94,12 @@
     }
 
     function handleNav(btn) {
+      // Coalesce near-simultaneous double fires for one physical interaction
+      // (e.g. a button tap that reveal.js also reads as a swipe, or a stray
+      // second event) into a single navigation step.
+      var now = Date.now();
+      if (now - lastNavAt < 250) return;
+      lastNavAt = now;
       initCounter();
       if (btn.id === 'nav-prev') {
         if (isFirstSlide()) {
@@ -375,6 +383,11 @@
       try {
         var btn = e.target.closest('#nav-prev, #nav-next');
         if (!btn || !window.Reveal) return;
+        // Drop the synthetic click that follows a touch tap (ghost click):
+        // touchend already navigated for this gesture. preventDefault() on a
+        // delegated document touchend does not reliably suppress this click on
+        // iPad/tablet Safari, so guard it explicitly by timestamp.
+        if (Date.now() - lastTouchNavAt < 700) return;
         handleNav(btn);
       } catch (e) {}
     });
@@ -384,6 +397,7 @@
         var btn = e.target.closest('#nav-prev, #nav-next');
         if (!btn || !window.Reveal) return;
         e.preventDefault();
+        lastTouchNavAt = Date.now();
         handleNav(btn);
       } catch (e) {}
     }, { passive: false });

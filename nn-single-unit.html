@@ -195,6 +195,7 @@
   <script src="slide-ui.js" defer=""></script>
   <script src="search-ui.js" defer=""></script>
   <script src="peek-ui.js" defer=""></script>
+  <script src="badge-ui.js" defer=""></script>
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -268,7 +269,7 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">aff
 <h2>Step 2<span class="fw-colon">：</span>シグモイドで「確率」にする</h2>
 <div class="slide-body">
 <p><span class="math display">\[p = \sigma(z) = \frac{1}{1 + e^{-z}}\]</span></p>
-<div id="4ae7ab8b" class="cell" data-execution_count="1">
+<div id="5c843b8c" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -392,7 +393,7 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">aff
 <section id="peek-forward" class="slide level2">
 <h2>実装<span class="fw-colon">：</span>必要な関数は4つだけ</h2>
 <div class="slide-body">
-<div id="5f7ec1a2" class="cell" data-execution_count="2">
+<div id="7f2ca76a" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>魚データの定義（クリックして展開）</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a>salmon_weights     <span class="op">=</span> np.array([<span class="dv">2149</span>, <span class="dv">1959</span>, <span class="dv">2194</span>, <span class="dv">2457</span>, <span class="dv">1930</span>, <span class="dv">1930</span>, <span class="dv">2474</span>, <span class="dv">2230</span>, <span class="dv">1859</span>, <span class="dv">2163</span>,</span>
@@ -429,7 +430,7 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">aff
 <span id="cb1-32"><a></a>y      <span class="op">=</span> y[order]</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="309489bd" class="cell" data-execution_count="3">
+<div id="84656939" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a><span class="kw">def</span> sigmoid(z):</span>
 <span id="cb2-2"><a></a>    <span class="cf">return</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>z))</span>
 <span id="cb2-3"><a></a></span>
@@ -454,7 +455,7 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">aff
 <section id="peek-one-at-a-time" class="slide level2">
 <h2>魚を1匹ずつ見せて学習する</h2>
 <div class="slide-body">
-<div id="90ecefed" class="cell" data-execution_count="4">
+<div id="4c80e611" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a>alpha <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">0.0</span>])   <span class="co"># 重みはゼロからスタート</span></span>
 <span id="cb3-2"><a></a>b  <span class="op">=</span> <span class="fl">0.0</span></span>
 <span id="cb3-3"><a></a>lr <span class="op">=</span> <span class="fl">0.5</span>                       <span class="co"># 学習率</span></span>
@@ -491,7 +492,7 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">aff
 <section id="境界が動く様子を見る" class="slide level2">
 <h2>境界が動く様子を見る</h2>
 <div class="slide-body">
-<div id="7a22763c" class="cell" data-execution_count="5">
+<div id="995d62de" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
