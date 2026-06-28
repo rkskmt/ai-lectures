@@ -1,69 +1,53 @@
 ## 人工知能
 
+[PDF](handouts.qmd){.pdf-gate title="配布資料（PDF）"}
+
+::: {.idx-lead}
 全14回。最終回は**手書き数字を読み取る機械**を PyTorch で自作する。
+:::
 
 <div id="lecture-search">
   <input id="search-input" type="search" placeholder="全文検索 — どの回に出てきたか探せる（例：MSE、過学習、シグモイド）" autocomplete="off">
   <div id="search-results" class="search-ui-results"></div>
 </div>
 
-<details open>
-<summary>導入</summary>
+:::: {.lectures}
 
-- [人工知能概論](ai-introduction.qmd)[PDF](pdf/ai-introduction.pdf){.pdf-dl target="_blank"}
+### 導入 {.sec .cat1}
+::: {.grid .cat1}
+- [人工知能概論](ai-introduction.qmd)
+:::
 
-</details>
+### 分類問題と特徴量 {.sec .cat2}
+::: {.grid .cat2}
+- [1次元分類の基礎](classification-basics-1d.qmd)
+- [2次元の決定境界](classification-2d-boundaries.qmd)
+- [過学習と汎化](classification-evaluation.qmd)
+- [教師なし学習・クラスタリング](clustering-kmeans.qmd)
+- [次元の呪いと次元削減](dimensionality-pca.qmd)
+:::
 
-<details open>
-<summary>分類問題と特徴量</summary>
+### fit() の中身を開ける {.sec .cat3}
+::: {.grid .cat3}
+- [最適化と勾配降下法](optimization-gradient-descent.qmd)
+- [線形回帰と正則化](linear-regression.qmd)
+- [ニューラルネットワークの最小単位](nn-single-unit.qmd)
+- [変換を重ねる](nn-multilayer.qmd)
+- [バックプロパゲーション](nn-backprop.qmd)
+- [実装：NumPyだけでNN](nn-numpy.qmd)
+- [PyTorch入門](pytorch-intro.qmd)
+- [手書き数字分類プロジェクト](mnist-project.qmd)
+:::
 
-- [1次元分類の基礎](classification-basics-1d.qmd)[PDF](pdf/classification-basics-1d.pdf){.pdf-dl target="_blank"}
-- [2次元の決定境界](classification-2d-boundaries.qmd)[PDF](pdf/classification-2d-boundaries.pdf){.pdf-dl target="_blank"}
-- [過学習と汎化](classification-evaluation.qmd)[PDF](pdf/classification-evaluation.pdf){.pdf-dl target="_blank"}
-- [教師なし学習・クラスタリング](clustering-kmeans.qmd)[PDF](pdf/clustering-kmeans.pdf){.pdf-dl target="_blank"}
-- [次元の呪いと次元削減](dimensionality-pca.qmd)[PDF](pdf/dimensionality-pca.pdf){.pdf-dl target="_blank"}
+### 参考資料 [回数外]{.sub} {.sec}
+::: {.grid .app}
+- [Newton法](newton-method-appendix.qmd)
+- [ローカルミニマムの罠](optimization-local-minima-appendix.qmd)
+:::
 
-</details>
-
-<details open>
-<summary>fit() の中身を開ける</summary>
-
-- [最適化と勾配降下法](optimization-gradient-descent.qmd)[PDF](pdf/optimization-gradient-descent.pdf){.pdf-dl target="_blank"}
-- [線形回帰と正則化](linear-regression.qmd)[PDF](pdf/linear-regression.pdf){.pdf-dl target="_blank"}
-- [ニューラルネットワークの最小単位](nn-single-unit.qmd)[PDF](pdf/nn-single-unit.pdf){.pdf-dl target="_blank"}
-- [変換を重ねる](nn-multilayer.qmd)[PDF](pdf/nn-multilayer.pdf){.pdf-dl target="_blank"}
-- [バックプロパゲーション](nn-backprop.qmd)[PDF](pdf/nn-backprop.pdf){.pdf-dl target="_blank"}
-- [実装：NumPyだけでNN](nn-numpy.qmd)[PDF](pdf/nn-numpy.pdf){.pdf-dl target="_blank"}
-- [PyTorch入門](pytorch-intro.qmd)[PDF](pdf/pytorch-intro.pdf){.pdf-dl target="_blank"}
-- [手書き数字分類プロジェクト](mnist-project.qmd)[PDF](pdf/mnist-project.pdf){.pdf-dl target="_blank"}
-
-</details>
-
-<details>
-<summary>参考資料（回数外）</summary>
-
-- [Newton法](newton-method-appendix.qmd)[PDF](pdf/newton-method-appendix.pdf){.pdf-dl target="_blank"}
-- [ローカルミニマムの罠](optimization-local-minima-appendix.qmd)[PDF](pdf/optimization-local-minima-appendix.pdf){.pdf-dl target="_blank"}
-
-</details>
-
-<style>
-/* PDF ダウンロードバッジ：小さなドキュメントアイコン付きタグ（控えめ） */
-.reveal a.pdf-dl{display:inline-block;font-size:0.34em;font-weight:700;letter-spacing:0.05em;
-  vertical-align:0.36em;margin-left:0.55em;color:#bb4a3f;text-decoration:none;
-  border:1px solid #e6c4bf;border-radius:4px;padding:0.3em 0.55em 0.3em 1.7em;opacity:0.82;
-  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23bb4a3f' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpath d='M14 2v6h6'/%3E%3C/svg%3E") no-repeat 0.5em center / 0.82em}
-.reveal a.pdf-dl:hover{opacity:1;background-color:#fbf1ef;border-color:#dca99f}
-</style>
+::::
 
 <script>
-document.querySelectorAll("details").forEach(d => {
-  const links = d.querySelectorAll('a[href$=".qmd"]').length;  // 講義リンクのみ（PDFリンクは数えない）
-  const total = d.querySelectorAll("li").length;
-  const s = d.querySelector("summary");
-  if (total > 0) s.textContent += `  [${links}/${total}]`;
-});
-
 document.addEventListener('keydown', function(e) {
   if (e.target && /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
   if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
@@ -74,4 +58,3 @@ document.addEventListener('keydown', function(e) {
 </script>
 
 <!-- 検索ボックスの動作は search-ui.js（全ページ共通、_metadata.yaml で読み込み）が担う -->
-
