@@ -136,25 +136,25 @@
 <section id="人工知能" class="slide level2">
 <h2>人工知能</h2>
 <div class="slide-body">
+<p><a href="./handouts.html" class="pdf-gate" title="配布資料（PDF）">PDF</a></p>
+<div class="idx-lead">
 <p>全14回。最終回は<strong>手書き数字を読み取る機械</strong>を PyTorch で自作する。</p>
+</div>
 <div id="lecture-search">
 <input id="search-input" type="search" placeholder="全文検索 — どの回に出てきたか探せる（例：MSE、過学習、シグモイド）" autocomplete="off">
 <div id="search-results" class="search-ui-results">
 
 </div>
 </div>
-<details open="">
-<summary>
-導入
-</summary>
+<div class="lectures">
+<h3 class="sec cat1" id="導入">導入</h3>
+<div class="grid cat1">
 <ul>
 <li><a href="./ai-introduction.html">人工知能概論</a></li>
 </ul>
-</details>
-<details open="">
-<summary>
-分類問題と特徴量
-</summary>
+</div>
+<h3 class="sec cat2" id="分類問題と特徴量">分類問題と特徴量</h3>
+<div class="grid cat2">
 <ul>
 <li><a href="./classification-basics-1d.html">1次元分類の基礎</a></li>
 <li><a href="./classification-2d-boundaries.html">2次元の決定境界</a></li>
@@ -162,11 +162,9 @@
 <li><a href="./clustering-kmeans.html">教師なし学習・クラスタリング</a></li>
 <li><a href="./dimensionality-pca.html">次元の呪いと次元削減</a></li>
 </ul>
-</details>
-<details open="">
-<summary>
-fit() の中身を開ける
-</summary>
+</div>
+<h3 class="sec cat3" id="fit-の中身を開ける">fit() の中身を開ける</h3>
+<div class="grid cat3">
 <ul>
 <li><a href="./optimization-gradient-descent.html">最適化と勾配降下法</a></li>
 <li><a href="./linear-regression.html">線形回帰と正則化</a></li>
@@ -177,24 +175,16 @@ fit() の中身を開ける
 <li><a href="./pytorch-intro.html">PyTorch入門</a></li>
 <li><a href="./mnist-project.html">手書き数字分類プロジェクト</a></li>
 </ul>
-</details>
-<details>
-<summary>
-参考資料（回数外）
-</summary>
+</div>
+<h3 class="sec" id="参考資料-回数外">参考資料 <span class="sub">回数外</span></h3>
+<div class="grid app">
 <ul>
 <li><a href="./newton-method-appendix.html">Newton法</a></li>
 <li><a href="./optimization-local-minima-appendix.html">ローカルミニマムの罠</a></li>
 </ul>
-</details>
+</div>
+</div>
 <script>
-document.querySelectorAll("details").forEach(d => {
-  const links = d.querySelectorAll("a[href]").length;
-  const total = d.querySelectorAll("li").length;
-  const s = d.querySelector("summary");
-  if (total > 0) s.textContent += `  [${links}/${total}]`;
-});
-
 document.addEventListener('keydown', function(e) {
   if (e.target && /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
   if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {

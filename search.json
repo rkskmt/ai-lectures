@@ -396,273 +396,546 @@
     "href": "index.html#人工知能",
     "title": "AI Lectures",
     "section": "人工知能",
-    "text": "人工知能\n\n全14回。最終回は手書き数字を読み取る機械を PyTorch で自作する。\n\n\n\n\n\n\n\n\n導入\n\n\n人工知能概論\n\n\n\n\n分類問題と特徴量\n\n\n1次元分類の基礎\n2次元の決定境界\n過学習と汎化\n教師なし学習・クラスタリング\n次元の呪いと次元削減\n\n\n\n\nfit() の中身を開ける\n\n\n最適化と勾配降下法\n線形回帰と正則化\nニューラルネットワークの最小単位\n変換を重ねる\nバックプロパゲーション\n実装：NumPyだけでNN\nPyTorch入門\n手書き数字分類プロジェクト\n\n\n\n\n参考資料（回数外）\n\n\nNewton法\nローカルミニマムの罠"
+    "text": "人工知能\n\nPDF\n\n全14回。最終回は手書き数字を読み取る機械を PyTorch で自作する。\n\n\n\n\n\n\n\n\n導入\n\n\n人工知能概論\n\n\n分類問題と特徴量\n\n\n1次元分類の基礎\n2次元の決定境界\n過学習と汎化\n教師なし学習・クラスタリング\n次元の呪いと次元削減\n\n\nfit() の中身を開ける\n\n\n最適化と勾配降下法\n線形回帰と正則化\nニューラルネットワークの最小単位\n変換を重ねる\nバックプロパゲーション\n実装：NumPyだけでNN\nPyTorch入門\n手書き数字分類プロジェクト\n\n\n参考資料 回数外\n\n\nNewton法\nローカルミニマムの罠"
   },
   {
-    "objectID": "clustering-kmeans.html#前回の振り返り",
-    "href": "clustering-kmeans.html#前回の振り返り",
-    "title": "教師なし学習とクラスタリング",
-    "section": "前回の振り返り",
-    "text": "前回の振り返り\n\n\n分類問題ではラベルが必要だった\n\n\n訓練データに「これはサーモン、これはスズキ」という正解ラベルが必要\nロジスティック回帰はラベル付きデータを使って決定境界を学習した\n\n\n\n\n\n\n\n\n今回の問い\n\n\n魚にラベルを付ける余裕がない場合、何もできないのか？"
+    "objectID": "dimensionality-pca.html#ここまでの流れ",
+    "href": "dimensionality-pca.html#ここまでの流れ",
+    "title": "次元の呪いと次元削減",
+    "section": "ここまでの流れ",
+    "text": "ここまでの流れ\n\n\n重さだけでサーモンを分類 → ある程度できた\n輝度も追加して2次元で分類 → 精度が上がった\nならば特徴量を増やし続ければもっと精度が上がる？\n\n\n\n\n\n\n\n\n今回の問い\n\n\n特徴量（次元）を増やし続けると何が起きるか？"
   },
   {
-    "objectID": "clustering-kmeans.html#教師あり学習-vs-教師なし学習",
-    "href": "clustering-kmeans.html#教師あり学習-vs-教師なし学習",
-    "title": "教師なし学習とクラスタリング",
-    "section": "教師あり学習 vs 教師なし学習",
-    "text": "教師あり学習 vs 教師なし学習\n\n\n\n教師あり学習（Supervised）\n\n正解ラベルつきデータを使う\n「これはサーモン」と教えながら学習\n例：分類、回帰\n\n\n教師なし学習（Unsupervised）\n\nラベルなしデータを使う\nデータの構造・パターンを自分で見つける\n例：クラスタリング、次元削減\n\n\n\n\n\n\n\n\nノート\n\n\nどちらが優れているというわけではなく、使えるデータに応じて選ぶ"
-  },
-  {
-    "objectID": "clustering-kmeans.html#ラベルを失った魚たち",
-    "href": "clustering-kmeans.html#ラベルを失った魚たち",
-    "title": "教師なし学習とクラスタリング",
-    "section": "ラベルを失った魚たち",
-    "text": "ラベルを失った魚たち\n\n\n80匹分の測定データ（輝度・重さ）は手元にある\nところがどれが Salmon でどれが Sea bass か、記録が消えた\n\n\n\n魚データの定義（クリックして展開）\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\nplt.rcParams['font.size'] = 11\nplt.rcParams['figure.dpi'] = 100\n\nsalmon_weights     = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,\n                               1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,\n                               2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,\n                               1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652])\nsalmon_brightness  = np.array([3.5, 5.8, 4.9, 4.4, 2.6, 2.6, 2.2, 5.5, 4.4, 4.8, 2.1,\n                               5.9, 5.3, 2.8, 2.7, 2.7, 3.2, 4.1, 3.7, 3.2, 4.4, 2.6,\n                               3.2, 3.5, 3.8, 5.1, 2.8, 4.1, 4.4, 2.2, 4.4, 2.7, 2.3,\n                               5.8, 5.9, 5.2, 3.2, 2.4, 4.7, 3.8])\nseabass_weights    = np.array([1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,\n                               1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,\n                               1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,\n                               1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531])\nseabass_brightness = np.array([5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8,\n                               8.9, 9.7, 9.5, 8.0, 9.6, 5.4, 6.0, 5.2, 6.6, 6.9, 6.4,\n                               9.1, 6.8, 6.4, 7.7, 5.7, 9.0, 5.4, 9.9, 8.9, 6.0, 5.0,\n                               9.1, 8.5, 8.6, 8.9, 5.4, 6.8, 5.6])\n\nX = np.column_stack([\n    np.concatenate([salmon_brightness, seabass_brightness]),\n    np.concatenate([salmon_weights,    seabass_weights])\n])\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nクイズ\n\n\nラベルなしのこの図、何個のグループに見える？"
-  },
-  {
-    "objectID": "clustering-kmeans.html#クラスタリングとは",
-    "href": "clustering-kmeans.html#クラスタリングとは",
-    "title": "教師なし学習とクラスタリング",
-    "section": "クラスタリングとは",
-    "text": "クラスタリングとは\n\n\n\n人の目には2つの塊が見える — では、それを機械に見つけさせられるか？\n\n\n\nデータを似たもの同士のグループ（クラスタ）にまとめる\n正解ラベルがなくても、データの分布から自然なグループを見つける\n用途の例\n\n顧客をグループに分けて施策を変える\n大量の文書を話題ごとに整理する\n「どのグループにも入らない点」を見つける（異常検知）"
-  },
-  {
-    "objectID": "clustering-kmeans.html#section",
-    "href": "clustering-kmeans.html#section",
-    "title": "教師なし学習とクラスタリング",
+    "objectID": "dimensionality-pca.html#section",
+    "href": "dimensionality-pca.html#section",
+    "title": "次元の呪いと次元削減",
     "section": "",
-    "text": "k-means アルゴリズム"
+    "text": "次元の呪い"
   },
   {
-    "objectID": "clustering-kmeans.html#k-means-の手順",
-    "href": "clustering-kmeans.html#k-means-の手順",
-    "title": "教師なし学習とクラスタリング",
-    "section": "k-means の手順",
-    "text": "k-means の手順\n\n入力：データ点の集合、クラスタ数 \\(k\\)\n\n\\(k\\) 個の重心（centroid）をランダムに配置\n各データ点を最も近い重心のクラスタに割り当てる\n各クラスタの重心を再計算（クラスタ内の平均点）\n重心が変化しなくなるまで 2〜3 を繰り返す\n\n\n\n\n\n\n\nノート\n\n\n「assign（割り当て）→ update（更新）→ 繰り返し」 たったこれだけのシンプルな構造"
+    "objectID": "dimensionality-pca.html#peek-curse",
+    "href": "dimensionality-pca.html#peek-curse",
+    "title": "次元の呪いと次元削減",
+    "section": "次元の呪い（Curse of Dimensionality）",
+    "text": "次元の呪い（Curse of Dimensionality）\n\n\n“データの次元が増えるにつれて、空間が指数的に広くなり、データが希薄になる”\n── Richard Bellman（1961）\n\n\n2次元で十分だったサンプル数が、10次元では全く足りなくなる\n高次元空間は私たちの直感とは全く異なる振る舞いをする\n\n\n\n\n\n\n\nノート\n\n\n1960年代にベルマン（動的計画法の発明者）が提唱した概念。 現代機械学習でも最重要トピックの一つ。"
   },
   {
-    "objectID": "clustering-kmeans.html#試行1-そのまま-k-means-にかける",
-    "href": "clustering-kmeans.html#試行1-そのまま-k-means-にかける",
-    "title": "教師なし学習とクラスタリング",
-    "section": "試行1: そのまま k-means にかける",
-    "text": "試行1: そのまま k-means にかける\n\n\nfrom sklearn.cluster import KMeans\n\n# ラベルを使わずに k=2 でクラスタリング\nkm = KMeans(n_clusters=2, random_state=42, n_init=10)\nkm.fit(X)\ncluster_labels = km.labels_\n\nprint(\"クラスタ割り当て（先頭10件）:\", cluster_labels[:10])\nprint(\"重心の座標（輝度, 重さ）:\")\nfor i, c in enumerate(km.cluster_centers_):\n    print(f\"  クラスタ {i}: 輝度={c[0]:.2f}, 重さ={c[1]:.0f}g\")\n\nクラスタ割り当て（先頭10件）: [0 0 0 0 0 0 0 0 0 0]\n重心の座標（輝度, 重さ）:\n  クラスタ 0: 輝度=4.50, 重さ=1977g\n  クラスタ 1: 輝度=6.82, 重さ=1434g\n\n\n\nエラーなく動いた。重心も2つ出た\nでは結果を図で見てみる"
+    "objectID": "dimensionality-pca.html#クイズいちばん近い点までどれくらい",
+    "href": "dimensionality-pca.html#クイズいちばん近い点までどれくらい",
+    "title": "次元の呪いと次元削減",
+    "section": "クイズ：いちばん近い点まで、どれくらい？",
+    "text": "クイズ：いちばん近い点まで、どれくらい？\n\n\n各特徴量は 0〜1 に正規化してあるとする（各軸の長さ＝1）\nそこに100個の点をランダムにばらまく\n1次元なら、いちばん近い点までの距離はだいたい 0.003（ぎゅうぎゅう）\n\n\n\n\n\n\n\n\nクイズ\n\n\n特徴量を増やして 10次元 にしたら、いちばん近い点までの距離はいくつになると思う？\n（各軸の長さは1のまま。点の数も100個のまま）\n\n\n\n\n\n\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\nplt.rcParams['font.size'] = 11\nplt.rcParams['figure.dpi'] = 100\n\nrng  = np.random.default_rng(0)\ndims = [1, 2, 3, 5, 10, 20]\nnn_median = []\n\nfor d in dims:\n    P = rng.random((100, d))                       # 100点を [0,1]^d にばらまく\n    D = np.sqrt(((P[:, None, :] - P[None, :, :]) ** 2).sum(axis=2))\n    np.fill_diagonal(D, np.inf)                    # 自分自身は除外\n    nn_median.append(np.median(D.min(axis=1)))     # 最近傍距離の中央値\n\nfor d, m in zip(dims, nn_median):\n    print(f\"{d:2d}次元: いちばん近い点まで {m:.3f}\")\n\n 1次元: いちばん近い点まで 0.003\n 2次元: いちばん近い点まで 0.042\n 3次元: いちばん近い点まで 0.121\n 5次元: いちばん近い点まで 0.306\n10次元: いちばん近い点まで 0.703\n20次元: いちばん近い点まで 1.195\n\n\n\n\n\n\n\n\n\n\n\n\n10次元で 0.67、20次元では 1.2 — もはや「お隣さん」は存在しない\n同じ100点なのに。なぜこんなことが起きるのか、2つの理由を見ます"
   },
   {
-    "objectID": "clustering-kmeans.html#試行1の結果",
-    "href": "clustering-kmeans.html#試行1の結果",
-    "title": "教師なし学習とクラスタリング",
-    "section": "試行1の結果",
-    "text": "試行1の結果\n\n\ncolors  = [\"#e74c3c\", \"#2980b9\"]\nmarkers = [\"o\", \"s\"]\n\nplt.figure(figsize=(5.8, 3.6))\nfor c in range(2):\n    mask = cluster_labels == c\n    plt.scatter(X[mask, 0], X[mask, 1],\n                c=colors[c], marker=markers[c], s=50, alpha=0.7, label=f\"クラスタ {c}\")\nfor center in km.cluster_centers_:\n    plt.scatter(*center, c=\"black\", s=200, marker=\"*\", zorder=5)\nplt.xlabel(\"輝度\"); plt.ylabel(\"重さ (g)\")\nplt.legend(); plt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nクイズ\n\n\n目に見える塊は「左上」と「右下」。なのに機械の答えはほぼ真横の輪切り。 輝度を完全に無視しているのはなぜ？"
+    "objectID": "dimensionality-pca.html#なぜ-その1真ん中に居続けられない",
+    "href": "dimensionality-pca.html#なぜ-その1真ん中に居続けられない",
+    "title": "次元の呪いと次元削減",
+    "section": "なぜ？　その1：真ん中に居続けられない",
+    "text": "なぜ？　その1：真ん中に居続けられない\n\n\nある点が、ある軸で「中央寄り」（その軸の中央50%）に入る確率は \\(\\dfrac{1}{2}\\)\n\\(d\\) 次元で「全部の軸で中央寄り」でいられる確率は：\n\n\\[\\left(\\frac{1}{2}\\right)^d \\qquad\n\\text{1次元: } 50\\% \\quad \\text{3次元: } 12.5\\% \\quad \\text{10次元: } 0.1\\% \\quad \\text{20次元: } 100万分の1\\]\n\n\n\n\n\n\n\n\n\n\nほぼすべての点が、どこかの軸では端っこ — つまり「角のあたり」に住むことになる\nしかも角の数は \\(2^d\\) 個（20次元で約105万個）。データは100万個の角に散り散りになる\n\n\n\n\n\n\n\nノート\n\n\n教科書によく出る言い換え：「単位立方体に内接する球（＝どの軸でも中央寄りの領域）の体積は、 高次元で 0 に向かう」。いま見たのと同じ現象。"
   },
   {
-    "objectID": "clustering-kmeans.html#なぜ輝度が無視されたのか",
-    "href": "clustering-kmeans.html#なぜ輝度が無視されたのか",
-    "title": "教師なし学習とクラスタリング",
-    "section": "なぜ輝度が無視されたのか",
-    "text": "なぜ輝度が無視されたのか\n\n\n\nk-means は距離だけでグループを決める\n重さの差は数百 g、輝度の差はせいぜい数ポイント\n\n\\[\\text{距離}^2 = \\underbrace{(\\Delta \\text{輝度})^2}_{\\sim 10} + \\underbrace{(\\Delta \\text{重さ})^2}_{\\sim 100{,}000}\\]\n\n距離の計算が重さに支配され、輝度はあってもなくても同じだった\n\n\n\n\n\n\n\n\n\nスケールの罠\n\n\n\n単位もケタも違う特徴量をそのまま距離計算に入れてはいけない\n距離を使う手法（k-means、k-NN など）共通の落とし穴"
+    "objectID": "dimensionality-pca.html#なぜ-その2ご近所を集めると世界を覆ってしまう",
+    "href": "dimensionality-pca.html#なぜ-その2ご近所を集めると世界を覆ってしまう",
+    "title": "次元の呪いと次元削減",
+    "section": "なぜ？　その2：「ご近所」を集めると世界を覆ってしまう",
+    "text": "なぜ？　その2：「ご近所」を集めると世界を覆ってしまう\n\n\nk-NN の気持ちになって、周りのデータの1%を「ご近所」として集めたい\n各軸を割合 \\(r\\) だけ切り取った箱は、データの \\(r^d\\) 割を含む → 1% 集めるには：\n\n\\[r = 0.01^{1/d}\\]\n\n\n\n\n\n\n\n\n\n\n10次元では、たった1%の「ご近所」を集めるのに各軸の63%を見渡す必要がある\nそれはもう「近所」ではない — 「近い」に頼る手法（k-NN など）が最初に壊れる"
   },
   {
-    "objectID": "clustering-kmeans.html#peek-scale",
-    "href": "clustering-kmeans.html#peek-scale",
-    "title": "教師なし学習とクラスタリング",
-    "section": "試行2: スケールを揃えて再挑戦",
-    "text": "試行2: スケールを揃えて再挑戦\n\n\nfrom sklearn.preprocessing import StandardScaler\n\nX_scaled = StandardScaler().fit_transform(X)   # 各特徴量を平均0・分散1に\n\nkm2 = KMeans(n_clusters=2, random_state=42, n_init=10)\nkm2.fit(X_scaled)\ncluster_labels2 = km2.labels_\n\nplt.figure(figsize=(5.8, 3.6))\nfor c in range(2):\n    mask = cluster_labels2 == c\n    plt.scatter(X[mask, 0], X[mask, 1],\n                c=colors[c], marker=markers[c], s=50, alpha=0.7, label=f\"クラスタ {c}\")\nplt.xlabel(\"輝度\"); plt.ylabel(\"重さ (g)\")\nplt.legend(); plt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n今度は目で見た通りの2つの塊に分かれた"
+    "objectID": "dimensionality-pca.html#距離が意味をなさなくなる",
+    "href": "dimensionality-pca.html#距離が意味をなさなくなる",
+    "title": "次元の呪いと次元削減",
+    "section": "距離が意味をなさなくなる",
+    "text": "距離が意味をなさなくなる\n\n\nk-NN やロジスティック回帰など、多くの手法は距離に依存している\n高次元では最近傍と最遠傍の距離差が消えていく\n\n\nnp.random.seed(42)\ndims    = [1, 2, 3, 5, 10, 20, 50, 100]\ncv_list = []   # 変動係数 = std / mean\n\nfor d in dims:\n    pts   = np.random.rand(2000, d)\n    query = np.random.rand(d)\n    dists = np.sqrt(((pts - query) ** 2).sum(axis=1))\n    cv_list.append(dists.std() / dists.mean())\n\nplt.figure(figsize=(7, 3.5))\nplt.plot(dims, cv_list, \"o-\", color=\"#e74c3c\")\nplt.xlabel(\"次元数 d\")\nplt.ylabel(\"変動係数（std / mean）\")\nplt.title(\"高次元では全点がほぼ等距離になる\")\nplt.grid(True, alpha=0.4)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n変動係数が 0 に近づく\n\n\n「最も近い点」と「最も遠い点」の距離がほぼ同じになる。 「近い」という概念が意味をなさなくなる。"
   },
   {
-    "objectID": "clustering-kmeans.html#答え合わせ実はラベルを知っていた",
-    "href": "clustering-kmeans.html#答え合わせ実はラベルを知っていた",
-    "title": "教師なし学習とクラスタリング",
-    "section": "答え合わせ：実はラベルを知っていた",
-    "text": "答え合わせ：実はラベルを知っていた\n\n\nこのデータの正体は、これまでの講義で使ってきた Salmon / Sea bass\n\n\ny_true = np.array([1]*40 + [0]*40)   # 1=Salmon, 0=Sea bass（隠していた正解）\n\nagree = np.mean(cluster_labels2 == y_true)\nagree = max(agree, 1 - agree)        # クラスタ番号 0/1 は任意なので向きを合わせる\nprint(f\"正解ラベルとの一致: {agree:.1%}（{int(round(agree * len(y_true)))}/80匹）\")\n\n正解ラベルとの一致: 92.5%（74/80匹）\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nノート\n\n\nラベルを1枚も見せていないのに、80匹中74匹を正しく仕分けた。 クラスタの番号（0/1）は任意で、大切なのは「同じグループにまとまっているか」。"
+    "objectID": "dimensionality-pca.html#データが疎になるsparsity",
+    "href": "dimensionality-pca.html#データが疎になるsparsity",
+    "title": "次元の呪いと次元削減",
+    "section": "データが疎になる（Sparsity）",
+    "text": "データが疎になる（Sparsity）\n\n\n同じサンプル数でも、次元が増えると空間が広くなりすぎる\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nノート\n\n\n密度を保つには、次元数に対して指数的にサンプルを増やす必要がある。 10次元で十分な密度を確保するには、1次元の \\(10^{10}\\) 倍のサンプルが必要という計算になる。"
   },
   {
-    "objectID": "clustering-kmeans.html#k-means-の動き中で起きていたこと",
-    "href": "clustering-kmeans.html#k-means-の動き中で起きていたこと",
-    "title": "教師なし学習とクラスタリング",
-    "section": "k-means の動き（中で起きていたこと）",
-    "text": "k-means の動き（中で起きていたこと）\n\n\n\n\n\n\n\n\n\n\n\nどこに重心を置いても「assign → update」の繰り返しで塊に吸い寄せられていく\nスケールを揃えた空間（標準化済み, standardization）での動き"
+    "objectID": "dimensionality-pca.html#実用への影響",
+    "href": "dimensionality-pca.html#実用への影響",
+    "title": "次元の呪いと次元削減",
+    "section": "実用への影響",
+    "text": "実用への影響\n\n\n\n\n問題\n原因\n\n\n\n\nモデルの精度が上がらない\nデータが疎でパターンが見えない\n\n\n過学習しやすくなる\nデータに比べてパラメータが多すぎる\n\n\n計算コストが増大\n距離計算などが次元数に比例して重くなる\n\n\n可視化できない\n3次元以上は直接見られない\n\n\n\n\n\n\n\n\n\n次元の呪いへの対処\n\n\n\n特徴量選択：重要な特徴量だけを残す\n次元削減：情報を保ったまま次元を圧縮する（← 今回）\n正則化（regularization）：過学習を防ぐ（回帰問題で詳しく）"
   },
   {
-    "objectID": "clustering-kmeans.html#ところで最初の重心はどこに置く",
-    "href": "clustering-kmeans.html#ところで最初の重心はどこに置く",
-    "title": "教師なし学習とクラスタリング",
-    "section": "ところで、最初の重心はどこに置く？",
-    "text": "ところで、最初の重心はどこに置く？\n\n\n「assign → update」は最初の重心の位置から始まる — そこはランダムに選ばれる\n運の悪い初期値だと、おかしな所で落ち着く（下の左：青が2つの塊を飲み込んだ）\n\n\n\n\n\n\n\n\n\n\n\nk-means は「クラスタ内二乗和（inertia）を小さくする」最適化 — でも初期値しだいで悪い谷にハマる\n対策は「何度も別の初期値で試して、一番 inertia が小さいものを採る」\n\n\n\n\n\n\n\n\nこれ、どこかで見た\n\n\n初期値しだいで結果が変わる → 何回も試して最良を選ぶ。これは ローカルミニマムの罠 でやったマルチスタートそのもの。 KMeans(..., n_init=10) の n_init が「10回試す」の正体（既定でこうなっている）。"
-  },
-  {
-    "objectID": "clustering-kmeans.html#section-1",
-    "href": "clustering-kmeans.html#section-1",
-    "title": "教師なし学習とクラスタリング",
+    "objectID": "dimensionality-pca.html#section-1",
+    "href": "dimensionality-pca.html#section-1",
+    "title": "次元の呪いと次元削減",
     "section": "",
-    "text": "k の決め方：エルボー法"
+    "text": "次元削減と PCA"
   },
   {
-    "objectID": "clustering-kmeans.html#エルボー法",
-    "href": "clustering-kmeans.html#エルボー法",
-    "title": "教師なし学習とクラスタリング",
-    "section": "エルボー法",
-    "text": "エルボー法\n\n\n今回は「2種類の魚」と知っていたから k=2 にできた\n本当のラベルなしデータでは k 自体を決める必要がある\nエルボー法：k を変えながら「クラスタ内のまとまり度」を測る\n\n\ninertias = []\nks = range(1, 9)\n\nfor k in ks:\n    km_k = KMeans(n_clusters=k, random_state=42, n_init=10)\n    km_k.fit(X_scaled)\n    inertias.append(km_k.inertia_)   # クラスタ内二乗和\n\nplt.figure(figsize=(6, 3.5))\nplt.plot(list(ks), inertias, \"o-\", color=\"#2980b9\")\nplt.xlabel(\"クラスタ数 k\")\nplt.ylabel(\"Inertia（クラスタ内二乗和）\")\nplt.title(\"エルボー法\")\nplt.grid(True, alpha=0.4)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nエルボー（肘）の見方\n\n\nグラフが急激に折れ曲がる点（肘のような形）が最適な k の目安。 それ以上増やしても改善幅が小さい。魚データでは k=2 で折れている。"
+    "objectID": "dimensionality-pca.html#つ目の特徴量体長",
+    "href": "dimensionality-pca.html#つ目の特徴量体長",
+    "title": "次元の呪いと次元削減",
+    "section": "3つ目の特徴量：体長",
+    "text": "3つ目の特徴量：体長\n\n\n重さ・輝度で精度が上がった。気を良くして、80匹全部の体長も測った\n\n\n\n魚データの定義（クリックして展開）\nsalmon_weights     = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,\n                               1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,\n                               2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,\n                               1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652])\nsalmon_brightness  = np.array([3.5, 5.8, 4.9, 4.4, 2.6, 2.6, 2.2, 5.5, 4.4, 4.8, 2.1,\n                               5.9, 5.3, 2.8, 2.7, 2.7, 3.2, 4.1, 3.7, 3.2, 4.4, 2.6,\n                               3.2, 3.5, 3.8, 5.1, 2.8, 4.1, 4.4, 2.2, 4.4, 2.7, 2.3,\n                               5.8, 5.9, 5.2, 3.2, 2.4, 4.7, 3.8])\nseabass_weights    = np.array([1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,\n                               1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,\n                               1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,\n                               1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531])\nseabass_brightness = np.array([5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8,\n                               8.9, 9.7, 9.5, 8.0, 9.6, 5.4, 6.0, 5.2, 6.6, 6.9, 6.4,\n                               9.1, 6.8, 6.4, 7.7, 5.7, 9.0, 5.4, 9.9, 8.9, 6.0, 5.0,\n                               9.1, 8.5, 8.6, 8.9, 5.4, 6.8, 5.6])\n\nweights    = np.concatenate([salmon_weights, seabass_weights])\nbrightness = np.concatenate([salmon_brightness, seabass_brightness])\ny          = np.array([1]*40 + [0]*40)   # 1=Salmon, 0=Sea bass\n\n# 体長の測定値（cm）\nrng     = np.random.default_rng(42)\nlengths = np.round(np.cbrt(weights) * 4.5 + rng.normal(0, 1.0, len(weights)), 1)\n\n\n\n\n体長（先頭5匹）: [58.4 55.3 59.2 61.7 54.1] cm\n体長の範囲: 45.0〜61.7 cm\n\n\n\n\n\n\n\n\n\nクイズ\n\n\n特徴量が 2 → 3 に増えた。手に入る情報も 1.5 倍になったと思う？"
   },
   {
-    "objectID": "clustering-kmeans.html#k-means-の限界",
-    "href": "clustering-kmeans.html#k-means-の限界",
-    "title": "教師なし学習とクラスタリング",
-    "section": "k-means の限界",
-    "text": "k-means の限界\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nk-means が苦手なケース\n\n\n\n非球状のクラスタ（同心円、三日月形など）\nクラスタのサイズが大きく異なる場合\n初期値によって結果が変わる → n_init（マルチスタート）で回避（前述）"
+    "objectID": "dimensionality-pca.html#体長と重さを並べてみる",
+    "href": "dimensionality-pca.html#体長と重さを並べてみる",
+    "title": "次元の呪いと次元削減",
+    "section": "体長と重さを並べてみる",
+    "text": "体長と重さを並べてみる\n\n\nplt.figure(figsize=(5.5, 3.6))\nplt.scatter(lengths, weights, alpha=0.6, s=40, c=\"#5dade2\", edgecolors=\"gray\")\nplt.xlabel(\"体長 (cm)\"); plt.ylabel(\"重さ (g)\")\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\nprint(f\"相関係数: {np.corrcoef(lengths, weights)[0, 1]:.3f}\")\n\n\n\n\n\n\n\n\n相関係数: 0.973\n\n\n\n\nほぼ一直線。長い魚は重い — あたりまえだった\n体長と重さは、ほぼ同じ情報を2回測っていた\nこの「実は重複している」を自動で見つけて畳む道具が PCA"
   },
   {
-    "objectID": "clustering-kmeans.html#まとめ",
-    "href": "clustering-kmeans.html#まとめ",
-    "title": "教師なし学習とクラスタリング",
+    "objectID": "dimensionality-pca.html#pca-の直感",
+    "href": "dimensionality-pca.html#pca-の直感",
+    "title": "次元の呪いと次元削減",
+    "section": "PCA の直感",
+    "text": "PCA の直感\n\nPrincipal Component Analysis（主成分分析）\n\n斜めに細長い雲は、もとの2軸より「長い方向と細い方向」で見るほうが自然\nデータの分散（variance）が最大になる方向に新しい軸（主成分）を取る\n\n\n\n\n\n\n\n\n\n\n\nPC1 は体長と重さを合わせた「大きさ」の軸 — この方向だけで分散の約 99% を説明できる"
+  },
+  {
+    "objectID": "dimensionality-pca.html#最小二乗法と-pca-足の下ろし方が違う",
+    "href": "dimensionality-pca.html#最小二乗法と-pca-足の下ろし方が違う",
+    "title": "次元の呪いと次元削減",
+    "section": "最小二乗法と PCA — 「足」の下ろし方が違う",
+    "text": "最小二乗法と PCA — 「足」の下ろし方が違う\n\n\n実はどちらも「足（誤差）の二乗和が最小になる直線」を探している\n違うのは足の向きだけ\n\n\n\n\n\n\n\n\n\n\n\n最小二乗法（線形回帰の回の MSE）：仕事は「\\(y\\) を当てる」→ 誤差は縦に測る\nPCA：仕事は「データの形を要約する」→ 誤差は直線への最短距離（垂直の足）で測る\n足の向きが違うので、選ばれる直線も少し違う（回帰の傾き 0.97、PC1 の傾き 1.00）\n\n\n\n\n\n\n\n\n「分散最大」と「垂直の足最小」は同じこと\n\n\n各点で（中心からの距離）² ＝（軸上の影）² ＋（垂直の足）²（ピタゴラスの定理）。 左辺の合計はデータで決まっていて動かないので、影の分散を最大にする軸と 足の二乗和を最小にする直線は、同じものを選ぶ。"
+  },
+  {
+    "objectID": "dimensionality-pca.html#分散が最大の方向を式にする",
+    "href": "dimensionality-pca.html#分散が最大の方向を式にする",
+    "title": "次元の呪いと次元削減",
+    "section": "「分散が最大の方向」を式にする",
+    "text": "「分散が最大の方向」を式にする\n\n\n探している直線の向きを、単位ベクトル \\(\\mathbf{v}\\)（\\(\\|\\mathbf{v}\\| = 1\\)）で表す\n中心化した点 \\(\\tilde{\\mathbf{x}}_i\\) のその直線への影（射影, projection）は、内積 \\(z_i = \\tilde{\\mathbf{x}}_i^{\\mathsf T} \\mathbf{v}\\)（ただの数）\n80匹ぶんの影は、行列とベクトルの積で一度に出せる：\\(\\mathbf{z} = \\tilde{X} \\mathbf{v}\\)\n\n知りたい「影の分散」を、少しずつ変形します：\n\\[\\text{影の分散} = \\frac{1}{n-1} \\sum_i z_i^2\n= \\frac{1}{n-1} \\mathbf{z}^{\\mathsf T} \\mathbf{z}\n\\qquad \\text{（2乗和は「自分との内積」）}\\]\n\\[= \\frac{1}{n-1} (\\tilde{X}\\mathbf{v})^{\\mathsf T} (\\tilde{X}\\mathbf{v})\n= \\frac{1}{n-1} \\mathbf{v}^{\\mathsf T} \\tilde{X}^{\\mathsf T} \\tilde{X} \\mathbf{v}\n\\qquad \\text{（転置の規則 } (AB)^{\\mathsf T} = B^{\\mathsf T} A^{\\mathsf T} \\text{）}\\]\n\\[= \\mathbf{v}^{\\mathsf T} \\underbrace{\\left( \\frac{1}{n-1} \\tilde{X}^{\\mathsf T} \\tilde{X} \\right)}_{C\\;（共分散行列）} \\mathbf{v}\n\\qquad \\text{（真ん中のかたまりに名前をつける）}\\]\n\n共分散行列（covariance matrix）\\(C\\) は、影の分散を変形すると自然に現れる（ここが登場理由）\nつまり PCA の探しものはこう書ける：\n\n\n\n\n\n\n\nノート\n\n\n\\(\\|\\mathbf{v}\\| = 1\\) のもとで \\(\\mathbf{v}^{\\mathsf T} C \\mathbf{v}\\)（＝ \\(\\mathbf{v}\\) 方向の分散）を最大にする \\(\\mathbf{v}\\) を探せ"
+  },
+  {
+    "objectID": "dimensionality-pca.html#ところで固有ベクトルと固有値とは",
+    "href": "dimensionality-pca.html#ところで固有ベクトルと固有値とは",
+    "title": "次元の呪いと次元削減",
+    "section": "ところで「固有ベクトル」と「固有値」とは",
+    "text": "ところで「固有ベクトル」と「固有値」とは\n\n\n行列 \\(A\\) は、ベクトルを別のベクトルへ移す変換（回して・伸ばす機械）。次の \\(A\\) で実験：\n\n\\[A = \\begin{pmatrix} 1.75 & 1.25 \\\\ 1.25 & 1.75 \\end{pmatrix}\\]\n\n\n\n\n\n\n\n\n\n同じ変換を、名画にかけてみると：\n\n\n\n\n\n\n\n\n\n（絵：レオナルド・ダ・ヴィンチ《モナ・リザ》 — Wikimedia Commons、パブリックドメイン）\n\nほとんどの矢印は、変換されると回ってしまう（「ふつうの矢印」＝紺色）\nでも回らない方向が2本だけある（赤と橙）— 向きはそのまま、伸び縮みするだけ\nその方向が固有ベクトル（eigenvector） \\(\\mathbf{v}\\)、伸び縮みの倍率が固有値（eigenvalue） \\(\\lambda\\)：\n\n\\[A \\mathbf{v} = \\lambda \\mathbf{v} \\qquad \\text{（向きはそのまま、長さだけ } \\lambda \\text{ 倍）}\\]\n\n\n\n\n\n\nノート\n\n\n共分散行列 \\(C\\) も、これと同じ「対称な変換」のひとつ。 このあと、\\(C\\) の回らない方向こそが「分散最大の軸」だと分かる。"
+  },
+  {
+    "objectID": "dimensionality-pca.html#a-の正体回して伸ばして戻す",
+    "href": "dimensionality-pca.html#a-の正体回して伸ばして戻す",
+    "title": "次元の呪いと次元削減",
+    "section": "A の正体：回して・伸ばして・戻す",
+    "text": "A の正体：回して・伸ばして・戻す\n\n種明かし：この \\(A\\) は、おなじみの回転行列と軸ごとの伸縮だけで組み立ててありました。\n\\[A = R\\, S\\, R^{\\mathsf T}, \\qquad\nR = \\begin{pmatrix} \\cos 45^\\circ & -\\sin 45^\\circ \\\\ \\sin 45^\\circ & \\cos 45^\\circ \\end{pmatrix}, \\qquad\nS = \\begin{pmatrix} 3 & 0 \\\\ 0 & 0.5 \\end{pmatrix}\\]\n読み方は右から（ベクトルに近い順）。モナ・リザで1段ずつ：\n\n\n\n\n\n\n\n\n\n\n① \\(R^{\\mathsf T}\\)：\\(-45^\\circ\\) 回して、「回らない方向」（赤・橙）を座標軸にそろえる\n② \\(S\\)：軸に沿って伸縮するだけ — ②の絵では赤い矢印が \\(x\\) 軸の上に乗っている\n③ \\(R\\)：\\(45^\\circ\\) 回して、元の向きに戻す\nつまり「回らない方向」の正体は、\\(S\\) がただ伸縮するだけの軸を、\\(R\\) が \\(45^\\circ\\) に向けた先\n固有ベクトル＝ \\(R\\) の列（軸の向き先）、固有値＝ \\(S\\) の対角成分（3 と 0.5）\n\n\n# 組み立てて確認：R S R^T がたしかに A になる\nprint(R_rot @ S_str @ R_rot.T)\n\n[[1.75 1.25]\n [1.25 1.75]]\n\n\n\n\n\n\n\n\nヒント\n\n\n対称行列はかならずこの「回転・伸縮・逆回転」の形に分解できる — これが固有値分解。 np.linalg.eigh が返してくるのは、この \\(R\\)（固有ベクトル）と \\(S\\) の対角成分（固有値）。"
+  },
+  {
+    "objectID": "dimensionality-pca.html#答えが固有ベクトルになる理由",
+    "href": "dimensionality-pca.html#答えが固有ベクトルになる理由",
+    "title": "次元の呪いと次元削減",
+    "section": "答えが「固有ベクトル」になる理由",
+    "text": "答えが「固有ベクトル」になる理由\n\n\n\\(\\|\\mathbf{v}\\| = 1\\) は「\\(\\mathbf{v}\\) の先端は半径1の球面の上」という意味\n球面上のてっぺんでは、球面に沿ってどちらへ動いても \\(\\mathbf{v}^{\\mathsf T} C \\mathbf{v}\\) は増えない\n増える向きを表すのは勾配 \\(2C\\mathbf{v}\\)。これが球面の法線方向（\\(\\mathbf{v}\\) 自身）と平行になるしかない：\n\n\\[C \\mathbf{v} = \\lambda \\mathbf{v} \\quad \\text{（固有ベクトルの定義式そのもの！）}\\]\n\nしかもそのときの分散は \\(\\mathbf{v}^{\\mathsf T} C \\mathbf{v} = \\lambda \\mathbf{v}^{\\mathsf T} \\mathbf{v} = \\lambda\\) — 固有値＝その方向の分散\n\n\n\n\n\n\n\nヒント\n\n\n\n固有ベクトル＝「球面上でこれ以上増やせない方向」の候補リスト\n固有値＝その候補での分散の値\n\\(\\lambda_1 \\geq \\lambda_2 \\geq \\cdots\\) と並べて、一番大きい候補から PC1, PC2, … と呼ぶ"
+  },
+  {
+    "objectID": "dimensionality-pca.html#総当たりで確かめる全方向の分散を測る",
+    "href": "dimensionality-pca.html#総当たりで確かめる全方向の分散を測る",
+    "title": "次元の呪いと次元削減",
+    "section": "総当たりで確かめる：全方向の分散を測る",
+    "text": "総当たりで確かめる：全方向の分散を測る\n\n固有値分解を信じる前に、力ずくで確認してみましょう。方向 \\(\\mathbf{v}\\) を1度刻みで全部試します。\n\nthetas = np.radians(np.arange(0, 181))\nproj_var = np.array([\n    np.var(X_lw_sc @ np.array([np.cos(t), np.sin(t)]), ddof=1)\n    for t in thetas\n])\n\nprint(f\"分散が最大の角度: {np.degrees(thetas[proj_var.argmax()]):.0f}°\"\n      f\"（分散 {proj_var.max():.4f}）\")\nprint(f\"分散が最小の角度: {np.degrees(thetas[proj_var.argmin()]):.0f}°\"\n      f\"（分散 {proj_var.min():.4f}）\")\n\n分散が最大の角度: 45°（分散 1.9978）\n分散が最小の角度: 135°（分散 0.0275）\n\n\n\n\n\n\n\n\n\n\n\n\n総当たりの最大値・最小値が、固有値 \\(\\lambda_1, \\lambda_2\\) にぴったり一致\n山の位置（45°）が PC1 の向き、谷の位置（135°）が PC2 の向き\nこの総当たりを一発の計算で済ませるのが固有値分解"
+  },
+  {
+    "objectID": "dimensionality-pca.html#numpy-で確かめる",
+    "href": "dimensionality-pca.html#numpy-で確かめる",
+    "title": "次元の呪いと次元削減",
+    "section": "NumPy で確かめる",
+    "text": "NumPy で確かめる\n\nスライドの式をそのままコードにして、sklearn の答えと突き合わせます。\n\n# 1) 式のとおりに共分散行列を作る（専用関数は要らない）\nXc = X_lw_sc - X_lw_sc.mean(axis=0)     # 中心化 X~\nC  = Xc.T @ Xc / (len(Xc) - 1)          # C = X~^T X~ / (n-1)\n\n# 2) 固有値・固有ベクトル（C のような対称行列には eigh を使う）\nlam, V = np.linalg.eigh(C)\norder  = np.argsort(lam)[::-1]          # 固有値の大きい順に並べ替え → PC1, PC2\nlam, V = lam[order], V[:, order]\n\nprint(\"固有値（自作）        :\", lam.round(4))\nprint(\"分散（sklearnのPCA）  :\", pca_d.explained_variance_.round(4))\nprint(\"固有ベクトル（自作・列がPC）:\")\nprint(V.round(4))\nprint(\"components_.T（sklearn）:\")\nprint(pca_d.components_.T.round(4))\n\n固有値（自作）        : [1.9978 0.0275]\n分散（sklearnのPCA）  : [1.9978 0.0275]\n固有ベクトル（自作・列がPC）:\n[[ 0.7071 -0.7071]\n [ 0.7071  0.7071]]\ncomponents_.T（sklearn）:\n[[ 0.7071  0.7071]\n [ 0.7071 -0.7071]]\n\n\n\n固有値は sklearn の explained_variance_ と完全一致\nベクトルは列によって符号が逆になることがある — 軸の向きが180°逆なだけで、同じ軸\n\n\n\n\n\n\n\n実は sklearn の中身は SVD\n\n\n実務の PCA は、共分散行列を作らずに中心化したデータを SVD（特異値分解） に かけて同じ答えを出している（大きいデータで速く、数値的にも安定）。\n\nU, S, Vt = np.linalg.svd(Xc)\nprint(\"SVD から出した分散:\", (S**2 / (len(Xc) - 1)).round(4))   # ↑の固有値と一致\n\nSVD から出した分散: [1.9978 0.0275]"
+  },
+  {
+    "objectID": "dimensionality-pca.html#scikit-learn-で-pca魚は本当は何次元か",
+    "href": "dimensionality-pca.html#scikit-learn-で-pca魚は本当は何次元か",
+    "title": "次元の呪いと次元削減",
+    "section": "scikit-learn で PCA（魚は本当は何次元か）",
+    "text": "scikit-learn で PCA（魚は本当は何次元か）\n\n\n輝度・重さ・体長の3特徴量を PCA にかけてみる\n\n\nX3 = np.column_stack([brightness, weights, lengths])   # 3特徴量\n\nX3_scaled = StandardScaler().fit_transform(X3)   # スケールを揃えてから PCA\n\npca = PCA(n_components=3)\nX3_pca = pca.fit_transform(X3_scaled)\n\nprint(\"各主成分の寄与率（情報量の割合）:\")\nfor i, r in enumerate(pca.explained_variance_ratio_):\n    print(f\"  PC{i+1}: {r:.1%}\")\n\n各主成分の寄与率（情報量の割合）:\n  PC1: 79.2%\n  PC2: 19.9%\n  PC3: 0.9%\n\n\n\n\n\n\n\n\n\nクイズ\n\n\nPC3 の寄与率は 1% 未満。これは何を意味している？\n\n\n\n\n\n\n体長と重さがほぼ同じ情報だから、3本目の軸には情報が残っていない\nこの魚データは、3次元に見えて実質2次元だった"
+  },
+  {
+    "objectID": "dimensionality-pca.html#次元に圧縮しても何も失わない",
+    "href": "dimensionality-pca.html#次元に圧縮しても何も失わない",
+    "title": "次元の呪いと次元削減",
+    "section": "2次元に圧縮しても何も失わない",
+    "text": "2次元に圧縮しても何も失わない\n\n\ncolors  = [\"#e74c3c\", \"#2980b9\"]\n\nplt.figure(figsize=(5.8, 3.8))\nfor label, name, col, m in [(1, \"Salmon\", \"#e74c3c\", \"o\"), (0, \"Sea bass\", \"#2980b9\", \"s\")]:\n    mask = y == label\n    plt.scatter(X3_pca[mask, 0], X3_pca[mask, 1],\n                c=col, marker=m, s=45, alpha=0.7, label=name)\nplt.xlabel(f\"PC1（寄与率 {pca.explained_variance_ratio_[0]:.1%}）\")\nplt.ylabel(f\"PC2（寄与率 {pca.explained_variance_ratio_[1]:.1%}）\")\nplt.title(\"3特徴量 → 2次元に圧縮\")\nplt.legend(); plt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n次元を1つ捨てたのに、2種類の魚は今までどおり分離できている\n累積寄与率 99% — 捨てたのは「情報のない軸」だけ\n\n\n\n\n\n\n\nStandardScaler を使う理由\n\n\n輝度（1〜10）・重さ（1000〜2500g）・体長（45〜62cm）はスケールが全く違う。 正規化しないと重さだけが主成分を支配してしまう（クラスタリング回のスケールの罠と同じ）。"
+  },
+  {
+    "objectID": "dimensionality-pca.html#次元データを2次元に圧縮iris",
+    "href": "dimensionality-pca.html#次元データを2次元に圧縮iris",
+    "title": "次元の呪いと次元削減",
+    "section": "4次元データを2次元に圧縮（Iris）",
+    "text": "4次元データを2次元に圧縮（Iris）\n\nFisher の Iris データセット：4特徴量（がく片長さ・幅、花弁長さ・幅）\n\nfrom sklearn.datasets import load_iris\n\niris   = load_iris()\nX_iris = StandardScaler().fit_transform(iris.data)   # 4特徴量\ny_iris = iris.target\n\npca4  = PCA(n_components=2)\nX_2d  = pca4.fit_transform(X_iris)\n\ncolors  = [\"#e74c3c\", \"#27ae60\", \"#2980b9\"]\nmarkers = [\"o\", \"s\", \"^\"]\n\nplt.figure(figsize=(6, 4.5))\nfor label, name in enumerate(iris.target_names):\n    mask = y_iris == label\n    plt.scatter(X_2d[mask, 0], X_2d[mask, 1],\n                c=colors[label], marker=markers[label],\n                s=50, alpha=0.8, label=name)\n\nplt.xlabel(f\"PC1（寄与率 {pca4.explained_variance_ratio_[0]:.1%}）\")\nplt.ylabel(f\"PC2（寄与率 {pca4.explained_variance_ratio_[1]:.1%}）\")\nplt.title(\"Iris（4次元）を PCA で2次元に圧縮\")\nplt.legend()\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nノート\n\n\n4次元を2次元に圧縮しても全情報の 97% 以上が保たれている。 setosa（赤丸）が完全に分離できているのも図から見える。"
+  },
+  {
+    "objectID": "dimensionality-pca.html#寄与率explained-variance-ratio",
+    "href": "dimensionality-pca.html#寄与率explained-variance-ratio",
+    "title": "次元の呪いと次元削減",
+    "section": "寄与率（Explained Variance Ratio）",
+    "text": "寄与率（Explained Variance Ratio）\n\n\nratios     = pca4.explained_variance_ratio_\ncumulative = np.cumsum(ratios)\n\nfig, ax = plt.subplots(figsize=(5, 3.5))\nx_pos = [\"PC1\", \"PC2\", \"PC3\", \"PC4\"]\n\n# 全4成分を改めて計算\npca_full = PCA(n_components=4).fit(X_iris)\nratios_full = pca_full.explained_variance_ratio_\ncum_full    = np.cumsum(ratios_full)\n\nax.bar(x_pos, ratios_full, color=[\"#e74c3c\", \"#e67e22\", \"#bdc3c7\", \"#bdc3c7\"])\nax.plot(x_pos, cum_full, \"o-\", color=\"black\", label=\"累積寄与率\")\nfor x, y in zip(x_pos, cum_full):\n    ax.text(x, y + 0.02, f\"{y:.1%}\", ha=\"center\", fontsize=9)\nax.set_ylabel(\"寄与率\")\nax.set_ylim(0, 1.15)\nax.legend(fontsize=9)\nax.set_title(\"Iris の主成分別寄与率\")\nax.grid(True, alpha=0.3, axis=\"y\")\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n何次元に削減するか？\n\n\n一般的には累積寄与率が 80〜95% を超える次元数を選ぶ。 Iris は PC1+PC2 だけで 97% 超えるので2次元で十分。"
+  },
+  {
+    "objectID": "dimensionality-pca.html#まとめ",
+    "href": "dimensionality-pca.html#まとめ",
+    "title": "次元の呪いと次元削減",
     "section": "まとめ",
-    "text": "まとめ\n\n\n教師なし学習：ラベルなしでデータの構造を見つける\nk-means：「assign → update → 繰り返し」だけで、魚80匹中74匹を正しく仕分けた\nスケールの罠：距離を使う手法では、特徴量のスケールを揃えてから\n\nfrom sklearn.cluster import KMeans\nfrom sklearn.preprocessing import StandardScaler\n\nX_scaled = StandardScaler().fit_transform(X)   # まずスケールを揃える\nkm = KMeans(n_clusters=2, random_state=42, n_init=10)\nkm.fit(X_scaled)\nkm.labels_          # クラスタ番号（各データ点）\nkm.cluster_centers_ # 重心の座標\nkm.inertia_         # クラスタ内二乗和（エルボー法に使う）\n\n\n\n長所\n短所\n\n\n\n\nシンプルで高速\nk を事前に決める必要がある\n\n\n結果が直感的\n球状クラスタしか見つけられない\n\n\n\n\n\n\n\n\n\n次回予告\n\n\n「特徴量を増やせば精度が上がった。では増やし続けたらどうなる？」"
+    "text": "まとめ\n\n\n次元の呪い：次元が増えると空間が広くなり、距離が意味をなさなくなる\n特徴量を増やしても情報が増えるとは限らない：体長は重さの言い換えだった\nPCA：分散が最大の方向（= 共分散行列の固有ベクトル）に軸を取り直す\n\n寄与率を見れば「データの実質的な次元」がわかる（魚は3次元に見えて実質2次元）\n\n\nfrom sklearn.decomposition import PCA\nfrom sklearn.preprocessing import StandardScaler\n\nX_scaled = StandardScaler().fit_transform(X)   # スケール正規化\npca = PCA(n_components=2)\nX_2d = pca.fit_transform(X_scaled)             # 2次元に圧縮\n\npca.explained_variance_ratio_   # 各 PC の寄与率\n\n\n\n概念\n意味\n\n\n\n\n主成分（PC）\n分散が最大の方向（固有ベクトル）\n\n\n固有値\nその方向の分散の大きさ\n\n\n寄与率\n情報量の割合（累積80〜95%を目安に次元数を決める）\n\n\n\n\n\n\n\n\n\n分類問題と特徴量のまとめ\n\n\n1D → 2D の分類、評価と汎化、教師なし学習（k-means）、次元の呪いと PCA。 機械学習の基本的な問いと道具が揃った。\nここまで model.fit(X, y) という1行を何度も呼んだが、中身は一度も見ていない。 次の「最適化」から、この1行を開けにいく。"
   },
   {
-    "objectID": "classification-basics-1d.html#分類問題",
-    "href": "classification-basics-1d.html#分類問題",
-    "title": "機械学習 Classification",
-    "section": "分類問題",
-    "text": "分類問題\n\n\n目標\n\n\n分類問題(Data Classification)：データを分類するタスクを理解する\n\n2クラス分類\n\nデータ可視化\n決定境界（decision boundary） の概念を学ぶ\n\n\n\n\n\n\n\n\nここがポイント\n\n\n\n完全な分類は困難であることを知る\n境界決定のトレードオフとコスト"
+    "objectID": "classification-evaluation.html#前回の振り返り",
+    "href": "classification-evaluation.html#前回の振り返り",
+    "title": "過学習と汎化",
+    "section": "前回の振り返り",
+    "text": "前回の振り返り\n\n\n2次元分類と「あやしい満点」\n\n\n重さ + 輝度の 2特徴量 で Salmon / Sea bass を分類\n決定木・ロジスティック回帰で決定境界を学習した\n深さ無制限の決定木は正答率 100% — ただし採点は学習に使った同じデータ\n境界には、数匹のためだけの飛び地ができていた\n\n\n\n\n\n\n\n\n今回の問い\n\n\nあの満点は 本当に信頼できる のか？"
   },
   {
-    "objectID": "classification-basics-1d.html#今回の問題",
-    "href": "classification-basics-1d.html#今回の問題",
-    "title": "機械学習 Classification",
-    "section": "今回の問題",
-    "text": "今回の問題\n\n\nサケだけを選別せよ\n\n\n\n\n魚はベルトコンベアで大量に流れてくる\n\n時間をかけず選別したい\n\nサケ以外の魚も混じっている\n\n一旦、サケ（Salmon）かスズキ（Sea bass）か\n分類項目をクラス（class）という\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nここがポイント\n\n\nSalmon と Sea bass の2クラス識別(2-class classification)問題"
+    "objectID": "classification-evaluation.html#何が問題か",
+    "href": "classification-evaluation.html#何が問題か",
+    "title": "過学習と汎化",
+    "section": "何が問題か",
+    "text": "何が問題か\n\n\nモデルは、学習データの特徴を見てパラメータを調整する\nその同じデータで採点すると、精度は高めに出やすい\n知りたいのは「覚えたデータへの強さ」ではない\n知りたいのは「次に来る魚にも通用するか」\n\n\n\n\n\n\n\n\n学習データで採点する危険\n\n\n\n学習に使ったデータでの精度は、モデルの実力を楽観的に見積もる可能性がある\nまずは、前回と同じ採点方法をもう一度確認する"
   },
   {
-    "objectID": "classification-basics-1d.html#選別システム",
-    "href": "classification-basics-1d.html#選別システム",
-    "title": "機械学習 Classification",
-    "section": "選別システム",
-    "text": "選別システム"
+    "objectID": "classification-evaluation.html#汎化という考え方",
+    "href": "classification-evaluation.html#汎化という考え方",
+    "title": "過学習と汎化",
+    "section": "汎化という考え方",
+    "text": "汎化という考え方\n\n\n勉強には2種類のうまく見える状態がある\n\n\n\n\n方法\n内容\n本当の実力？\n\n\n\n\n暗記\n去年の問題を全部覚える\n✗ 今年の問題は解けない\n\n\n理解\n解き方を身に付ける\n✓ 未知の問題にも対応できる\n\n\n\n\n機械学習モデルでも、同じ区別が必要\n\n\n\n\n\n\n\n\n汎化（generalization）\n\n\n\nモデルが学習していないデータにも通用する能力のこと"
   },
   {
-    "objectID": "classification-basics-1d.html#試行1-重さだけで分類してみる",
-    "href": "classification-basics-1d.html#試行1-重さだけで分類してみる",
-    "title": "機械学習 Classification",
-    "section": "試行1: 重さだけで分類してみる",
-    "text": "試行1: 重さだけで分類してみる\n\n\nアプローチ\n\n\n重量計をつけられそうなので、まず重さで識別できないかを考えた\nまずサンプルとして20匹ずつの重さを測定した\n\n\n# Salmon（20匹）の重さ (g)\nsalmon_weights = [2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,\n                  1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576]\n\n\n# Sea bass（20匹）の重さ (g)\nseabass_weights = [1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,\n                   1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333]"
+    "objectID": "classification-evaluation.html#訓練データとテストデータ",
+    "href": "classification-evaluation.html#訓練データとテストデータ",
+    "title": "過学習と汎化",
+    "section": "訓練データとテストデータ",
+    "text": "訓練データとテストデータ\n\n\nデータを2つに分けて使う\n\n\n\n\n\n\n\n\n\n\n\n訓練データ：モデルに見せて学習させる\nテストデータ：学習後に一度だけ使い「本当の精度」を測る\n\n\n\n\n\n\n\n\nテストデータの鉄則\n\n\n\nテストデータを確認してからモデルを調整しない\n「見たことのない問題」を模擬するために残しておく"
   },
   {
-    "objectID": "classification-basics-1d.html#準備",
-    "href": "classification-basics-1d.html#準備",
-    "title": "機械学習 Classification",
+    "objectID": "classification-evaluation.html#データの準備-魚を増やす",
+    "href": "classification-evaluation.html#データの準備-魚を増やす",
+    "title": "過学習と汎化",
+    "section": "データの準備 — 魚を増やす",
+    "text": "データの準備 — 魚を増やす\n\n\n前回の80匹に、新しく測った40匹を加えた120匹で考える\nデータが増えると、どちらとも言いにくい微妙な個体や計測のばらつきも入ってくる\n\n\n\n魚データの定義（クリックして展開）\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\nplt.rcParams['font.size'] = 11\nplt.rcParams['figure.dpi'] = 100\n\nsalmon_weights     = np.array([1883, 1903, 1652, 1483, 1825, 2474, 2457, 1503, 2057, 1836,\n                               1825, 2094, 2149, 1930, 2028, 1959, 1859, 1936, 1861, 2240,\n                               2081, 1838, 1728, 1426, 2229, 1838, 1884, 1860, 1930, 1733,\n                               2163, 1831, 1591, 2073, 1706, 1644, 2194, 1828, 1820, 1834,\n                               1554, 1615, 1884, 1979, 1839, 2230, 1986, 1978, 1731, 1796,\n                               1872, 2031, 1458, 1405, 2037, 1576, 1774, 1992, 1696, 1752])\nsalmon_brightness  = np.array([7.5, 2.6, 3.8, 2.7, 5.8, 2.2, 4.4, 6.0, 3.2, 4.7, 5.7, 4.1,\n                               3.5, 2.6, 4.4, 5.8, 4.4, 5.4, 2.1, 2.8, 4.1, 2.7, 3.7, 2.8,\n                               3.5, 4.4, 3.8, 5.9, 2.6, 7.2, 4.8, 2.7, 5.9, 5.3, 6.1, 5.4,\n                               4.9, 7.2, 5.2, 5.4, 5.8, 5.1, 5.1, 5.8, 4.4, 5.5, 5.9, 2.3,\n                               3.2, 5.3, 4.8, 4.0, 5.0, 6.6, 2.2, 3.2, 4.4, 2.4, 3.2, 4.7])\nseabass_weights    = np.array([2181, 1749, 1864, 1327, 1819, 1979, 1787, 1488, 1370, 1476,\n                               1472, 1533, 1099, 1368, 1486, 1663, 1992, 1370, 1906, 1480,\n                               1426, 1677, 1286, 1445, 1381, 1333, 1505, 1857, 1767, 1492,\n                               1502, 1468, 1259, 1517, 1278, 1223, 1595, 1531, 1096, 1582,\n                               1513, 1440, 1703, 1490, 1432, 2019, 1397, 1341, 1657, 1414,\n                               1748, 1859, 1820, 1245, 2203, 1204, 1496, 1567, 1563, 1737])\nseabass_brightness = np.array([5.4, 6.6, 6.0, 7.5, 4.9, 7.7, 6.9, 5.0, 8.9, 8.3, 5.7, 8.9,\n                               9.7, 6.9, 5.2, 4.7, 5.3, 5.4, 5.1, 4.8, 3.8, 5.6, 5.2, 6.4,\n                               6.4, 6.6, 9.1, 6.3, 4.9, 5.9, 5.6, 5.9, 5.7, 5.2, 9.1, 6.8,\n                               3.5, 5.6, 5.4, 5.4, 7.7, 9.5, 4.7, 4.7, 9.9, 5.4, 5.3, 9.5,\n                               8.5, 6.0, 8.0, 5.7, 6.0, 8.6, 7.6, 6.8, 9.8, 9.0, 9.6, 8.9])\n\nX = np.column_stack([\n    np.concatenate([salmon_brightness, seabass_brightness]),\n    np.concatenate([salmon_weights,    seabass_weights])\n])\ny = np.array([1]*60 + [0]*60)   # 1=Salmon, 0=Sea bass"
+  },
+  {
+    "objectID": "classification-evaluation.html#まずデータを眺める",
+    "href": "classification-evaluation.html#まずデータを眺める",
+    "title": "過学習と汎化",
+    "section": "まずデータを眺める",
+    "text": "まずデータを眺める\n\n\n\n\n\n\n\n\n\n\n\n「左上が Salmon・右下が Sea bass」の傾向は前回と同じ\nただし真ん中に、2種が入り混じるゾーンができている\nどんな境界線を引いても、このゾーンの多少の間違いは避けられない\n\n\n\n\n\n\n\n\nここで予想\n\n\nこのデータで「正答率 100%」を出すモデルがあったら — それは天才か、それとも？"
+  },
+  {
+    "objectID": "classification-evaluation.html#前回と同じ採点方法",
+    "href": "classification-evaluation.html#前回と同じ採点方法",
+    "title": "過学習と汎化",
+    "section": "前回と同じ採点方法",
+    "text": "前回と同じ採点方法\n\n\nまずは全データで学習し、同じ全データで評価する\nこれは「学習済みデータへの精度」を測っている\n\n\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.metrics import accuracy_score\n\nsame_data_model = LogisticRegression(max_iter=1000)\nsame_data_model.fit(X, y)\n\nsame_data_acc = accuracy_score(y, same_data_model.predict(X))\nprint(f\"全データで学習 → 同じ全データで評価: {same_data_acc:.3f}\")\n\n全データで学習 → 同じ全データで評価: 0.800\n\n\n\n\n\n\n\n\nノート\n\n\n\nこの値だけでは、新しい魚にも通用するかは分からない\n次に、データを「学習用」と「評価用」に分ける"
+  },
+  {
+    "objectID": "classification-evaluation.html#ホールドアウト法",
+    "href": "classification-evaluation.html#ホールドアウト法",
+    "title": "過学習と汎化",
+    "section": "ホールドアウト法",
+    "text": "ホールドアウト法\n\n\nデータの一部を、最初から評価用に取り分ける\n手軽なので、最初に試す評価方法としてよく使う\n\n\nfrom sklearn.model_selection import train_test_split\n\n# 8:2 に分割（test_size=0.2 で20%をテストに）\nX_train, X_test, y_train, y_test = train_test_split(\n    X, y, test_size=0.2, random_state=42\n)\n\nprint(f\"全データ:       {len(X)} 匹\")\nprint(f\"訓練データ:   {len(X_train)} 匹\")\nprint(f\"テストデータ: {len(X_test)} 匹\")\n\n全データ:       120 匹\n訓練データ:   96 匹\nテストデータ: 24 匹\n\n\n\n\n\n\n\n\n\nrandom_state とは\n\n\n\n分割はランダムなので毎回変わる\nrandom_state=42 のように数値を固定すると再現できる"
+  },
+  {
+    "objectID": "classification-evaluation.html#見ていないデータで評価する",
+    "href": "classification-evaluation.html#見ていないデータで評価する",
+    "title": "過学習と汎化",
+    "section": "見ていないデータで評価する",
+    "text": "見ていないデータで評価する\n\n\nmodel = LogisticRegression(max_iter=1000)\nmodel.fit(X_train, y_train)         # 訓練データだけで学習\n\ntrain_acc = accuracy_score(y_train, model.predict(X_train))\ntest_acc  = accuracy_score(y_test,  model.predict(X_test))\n\nprint(f\"訓練データ精度: {train_acc:.3f}  ← 学習済みデータへの精度（楽観的）\")\nprint(f\"テストデータ精度: {test_acc:.3f}  ← 本当の精度\")\n\n訓練データ精度: 0.802  ← 学習済みデータへの精度（楽観的）\nテストデータ精度: 0.792  ← 本当の精度\n\n\n\n\n\n\n\n\n\n2つの精度を比べる\n\n\n\n訓練精度 ≈ テスト精度：うまく汎化できている\n訓練精度 &gt;&gt; テスト精度：過学習の疑い（暗記している）"
+  },
+  {
+    "objectID": "classification-evaluation.html#混同行列テストデータで評価",
+    "href": "classification-evaluation.html#混同行列テストデータで評価",
+    "title": "過学習と汎化",
+    "section": "混同行列（テストデータで評価）",
+    "text": "混同行列（テストデータで評価）\n\n\nfrom sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix\n\ncm = confusion_matrix(y_test, model.predict(X_test))\ndisp = ConfusionMatrixDisplay(confusion_matrix=cm,\n                              display_labels=[\"Sea bass (0)\", \"Salmon (1)\"])\ndisp.plot(colorbar=False, cmap=\"Blues\")\nplt.title(\"Confusion Matrix（テストデータ）\")\nplt.tight_layout()\nplt.show()"
+  },
+  {
+    "objectID": "classification-evaluation.html#section",
+    "href": "classification-evaluation.html#section",
+    "title": "過学習と汎化",
+    "section": "",
+    "text": "満点の正体を暴く"
+  },
+  {
+    "objectID": "classification-evaluation.html#深さ無制限の決定木を新しい魚で採点する",
+    "href": "classification-evaluation.html#深さ無制限の決定木を新しい魚で採点する",
+    "title": "過学習と汎化",
+    "section": "深さ無制限の決定木を、新しい魚で採点する",
+    "text": "深さ無制限の決定木を、新しい魚で採点する\n\n\n前回の「あやしい満点」に、いま手に入れた道具（train/test）を使う\n\n\nfrom sklearn.tree import DecisionTreeClassifier\n\ndeep_tree = DecisionTreeClassifier(max_depth=None, random_state=42)\ndeep_tree.fit(X_train, y_train)               # 訓練データだけで学習\n\ndeep_train_acc = accuracy_score(y_train, deep_tree.predict(X_train))\ndeep_test_acc  = accuracy_score(y_test,  deep_tree.predict(X_test))\n\nprint(f\"訓練データ精度: {deep_train_acc:.3f}\")\nprint(f\"テストデータ精度: {deep_test_acc:.3f}\")\n\n訓練データ精度: 1.000\nテストデータ精度: 0.625\n\n\n\n\n訓練では満点。ところが新しい魚では4割近く間違える\n満点の正体は実力ではなく暗記だった"
+  },
+  {
+    "objectID": "classification-evaluation.html#境界線はどう学習されていたのか",
+    "href": "classification-evaluation.html#境界線はどう学習されていたのか",
+    "title": "過学習と汎化",
+    "section": "境界線はどう「学習」されていたのか",
+    "text": "境界線はどう「学習」されていたのか\n\n\n深さを変えた木の決定境界を、訓練データと一緒に描いてみる\n\n\n\n\n\n\n\n\n\n\n\n分割を増やすほど、入り混じりゾーンに細い回廊や飛び地が増えていく\n無制限の木は、微妙な1匹1匹を救うために境界をめちゃくちゃに曲げて訓練データ満点を達成している"
+  },
+  {
+    "objectID": "classification-evaluation.html#暗記の境界に新しい魚を流し込む",
+    "href": "classification-evaluation.html#暗記の境界に新しい魚を流し込む",
+    "title": "過学習と汎化",
+    "section": "暗記の境界に、新しい魚を流し込む",
+    "text": "暗記の境界に、新しい魚を流し込む\n\n\n\n\n\n\n\n\n\n\n\n回廊や飛び地は、訓練データの特定の数匹のためのオーダーメイド\n新しい魚はその意図どおりには並ばない — 誤分類（オレンジ）は入り混じりゾーンに集中\n暗記した細部は、次に来る魚には通用しない"
+  },
+  {
+    "objectID": "classification-evaluation.html#深さを変えて2つの精度を並べる",
+    "href": "classification-evaluation.html#深さを変えて2つの精度を並べる",
+    "title": "過学習と汎化",
+    "section": "深さを変えて、2つの精度を並べる",
+    "text": "深さを変えて、2つの精度を並べる\n\n\ndepths   = list(range(1, 13))\ntrain_accs, test_accs = [], []\n\nfor d in depths:\n    m = DecisionTreeClassifier(max_depth=d, random_state=42).fit(X_train, y_train)\n    train_accs.append(accuracy_score(y_train, m.predict(X_train)))\n    test_accs.append(accuracy_score(y_test,  m.predict(X_test)))\n\nplt.figure(figsize=(6.5, 3.6))\nplt.plot(depths, train_accs, \"o-\", color=\"#2980b9\", label=\"訓練データ精度\")\nplt.plot(depths, test_accs,  \"s-\", color=\"#e74c3c\", label=\"テストデータ精度\")\nplt.xlabel(\"決定木の深さ\"); plt.ylabel(\"正答率\")\nplt.ylim(0.5, 1.05)\nplt.legend(); plt.grid(True, alpha=0.4)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n訓練精度は深くするほど上がり続け、やがて 100% に到達する\nテスト精度は深さ2〜4がピーク。それ以上深くするとむしろ下がる\n深さ5以降、訓練精度だけが伸びて2本の線の差（ギャップ）が広がる — 暗記が進んでいるサイン"
+  },
+  {
+    "objectID": "classification-evaluation.html#過学習overfitting",
+    "href": "classification-evaluation.html#過学習overfitting",
+    "title": "過学習と汎化",
+    "section": "過学習（Overfitting）",
+    "text": "過学習（Overfitting）\n\n\n訓練データの細部（たまたまの並び・ノイズ）まで覚え込み、新しいデータで性能が落ちること\n数字での証拠は訓練精度とテスト精度のギャップ\n図での証拠は数匹のためだけの回廊・飛び地だらけの決定境界\nモデルが複雑なほど（深い木・多すぎるパラメータ）起きやすい\n\n\n\n\n状態\n訓練精度\nテスト精度\n\n\n\n\n未学習（underfitting）\n低い\n低い\n\n\nちょうど良い\n高い\n高い\n\n\n過学習（overfitting）\nほぼ満点\n低い\n\n\n\n\n\n\n\n\n\n\n対策\n\n\n\nモデルの複雑さを抑える（決定木なら深さを制限）\nデータを増やす\nテスト精度を安定して測る — それが次の交差検証（cross-validation）"
+  },
+  {
+    "objectID": "classification-evaluation.html#section-1",
+    "href": "classification-evaluation.html#section-1",
+    "title": "過学習と汎化",
+    "section": "",
+    "text": "交差検証"
+  },
+  {
+    "objectID": "classification-evaluation.html#ホールドアウト法の問題点",
+    "href": "classification-evaluation.html#ホールドアウト法の問題点",
+    "title": "過学習と汎化",
+    "section": "ホールドアウト法の問題点",
+    "text": "ホールドアウト法の問題点\n\n\ntrain_test_split はランダムに分割する\nどのデータがテスト側に入るかで、精度が変わる\n\n\nfor seed in range(5):\n    Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=seed)\n    acc = accuracy_score(yte, LogisticRegression(max_iter=1000).fit(Xtr, ytr).predict(Xte))\n    print(f\"seed={seed}  テスト精度: {acc:.3f}\")\n\nseed=0  テスト精度: 0.833\nseed=1  テスト精度: 0.917\nseed=2  テスト精度: 0.792\nseed=3  テスト精度: 0.833\nseed=4  テスト精度: 0.917\n\n\n\n\n\n\n\n\n\nデータが少ないほど揺れが大きい\n\n\n\nテストデータが24匹の場合、1匹の誤分類で精度が約 4% 変わる\n1回だけの分割結果を、強く信じすぎない"
+  },
+  {
+    "objectID": "classification-evaluation.html#k-fold-交差検証",
+    "href": "classification-evaluation.html#k-fold-交差検証",
+    "title": "過学習と汎化",
+    "section": "k-fold 交差検証",
+    "text": "k-fold 交差検証\n\n\nデータを k 個のグループ（fold）に分割する\nk 回繰り返す：1つをテスト、残りを訓練に使う\nk 個の精度の平均を最終スコアとする"
+  },
+  {
+    "objectID": "classification-evaluation.html#cross_val_score-で交差検証",
+    "href": "classification-evaluation.html#cross_val_score-で交差検証",
+    "title": "過学習と汎化",
+    "section": "cross_val_score で交差検証",
+    "text": "cross_val_score で交差検証\n\n\nfrom sklearn.model_selection import cross_val_score\n\nscores = cross_val_score(\n    LogisticRegression(max_iter=1000), X, y, cv=5   # cv=5 で 5-fold\n)\n\nprint(\"各 fold の精度:\", scores.round(3))\nprint(f\"平均精度: {scores.mean():.3f}  ±  {scores.std():.3f}\")\n\n各 fold の精度: [0.792 0.833 0.792 0.75  0.792]\n平均精度: 0.792  ±  0.026\n\n\n\n\n\n\n\n\n\ncross_val_score の引数\n\n\n\n第1引数：モデル（fit 前でOK。内部で k 回 fit してくれる）\ncv=k：k-fold の k を指定（よく使うのは 5 か 10）\n返り値は k 個の精度の配列 → .mean() / .std() で集計"
+  },
+  {
+    "objectID": "classification-evaluation.html#まとめ",
+    "href": "classification-evaluation.html#まとめ",
+    "title": "過学習と汎化",
+    "section": "まとめ",
+    "text": "まとめ\n\n\n訓練データで評価した精度は楽観的 — 満点はむしろ疑う\n過学習：訓練データを暗記して、新しいデータで性能が落ちること\n\n証拠は訓練精度とテスト精度のギャップ（深さ無制限の決定木：100% vs 63%）\n決定境界で見ると、数匹のためだけの回廊・飛び地として現れる\n\n汎化：未知データへの対応能力を測ることが本来の目的\ntrain_test_split：手軽だが分割次第で精度が揺れる\nk-fold 交差検証：k 回の平均で安定した評価が得られる\n\n\n\n\n手法\n特徴\n\n\n\n\nホールドアウト\n手軽。データが多いときに有効\n\n\nk-fold 交差検証\n安定。データが少ないときに特に有効\n\n\n\n\n\n\n\n\n\n\n次回予告\n\n\n「分類にはラベルが必要だった。ラベルがない場合はどうする？」"
+  },
+  {
+    "objectID": "classification-2d-boundaries.html#次元での分類",
+    "href": "classification-2d-boundaries.html#次元での分類",
+    "title": "機械学習：分類問題",
+    "section": "2次元での分類",
+    "text": "2次元での分類\n\n\n目標\n\n\n2つの特徴量（feature）を使った分類\n手動で直線を引く → 決定木 → ロジスティック回帰の順で理解\n決定境界を可視化する\n\n\n\n\n\n\n\n\nここがポイント\n\n\n\n1次元（重さのみ）から2次元（重さ+輝度）への拡張\nまず目で見て、次にアルゴリズムで"
+  },
+  {
+    "objectID": "classification-2d-boundaries.html#前回の復習",
+    "href": "classification-2d-boundaries.html#前回の復習",
+    "title": "機械学習：分類問題",
+    "section": "前回の復習",
+    "text": "前回の復習\n\n\n1次元での分類\n\n\n重さだけで Salmon vs Sea bass を分類\nしきい値（threshold）を手動で設定\nTP/FP/TN/FN、Precision/Recall を学習\n\n\n\n\n\n\n\nノート\n\n\n問題点: 最適なしきい値は、ケースによって異なる（コスト計算などで決定）"
+  },
+  {
+    "objectID": "classification-2d-boundaries.html#今回のアプローチ",
+    "href": "classification-2d-boundaries.html#今回のアプローチ",
+    "title": "機械学習：分類問題",
+    "section": "今回のアプローチ",
+    "text": "今回のアプローチ\n\n\nもう1つ特徴量を追加する\n\n\nベルトコンベアに人感センサを搭載して、輝度（明るさ）も取れることがわかった\n\n重さや輝度のことを特徴量（feature）といいます\n\n2つの特徴量を使えば、もっと正確に分類できるはず？\n\n\n\n\n\n前回\n今回\n\n\n\n\n特徴量\n重さ（1次元）\n重さ + 輝度（2次元）\n\n\n境界\nしきい値\n？？"
+  },
+  {
+    "objectID": "classification-2d-boundaries.html#データの準備",
+    "href": "classification-2d-boundaries.html#データの準備",
+    "title": "機械学習：分類問題",
+    "section": "データの準備",
+    "text": "データの準備\n\n新しく輝度のデータを追加しました（各40匹）。\n\n# Salmon（40匹）の重さ (g)\nsalmon_weights = [2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,\n                  1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,\n                  2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,\n                  1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652]\n\n# Salmon（40匹）の輝度（暗め: 2.1-5.9）\nsalmon_brightness = [3.5, 5.8, 4.9, 4.4, 2.6, 2.6, 2.2, 5.5, 4.4, 4.8, 2.1, \n                     5.9, 5.3, 2.8, 2.7, 2.7, 3.2, 4.1, 3.7, 3.2, 4.4, 2.6, \n                     3.2, 3.5, 3.8, 5.1, 2.8, 4.1, 4.4, 2.2, 4.4, 2.7, 2.3, \n                     5.8, 5.9, 5.2, 3.2, 2.4, 4.7, 3.8]\n\n# Sea bass（40匹）の重さ (g)\nseabass_weights = [1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,\n                   1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,\n                   1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,\n                   1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531]\n\n# Sea bass（40匹）の輝度（明るめ: 5.0-9.9）\nseabass_brightness = [5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8, \n                       8.9, 9.7, 9.5, 8.0, 9.6, 5.4, 6.0, 5.2, 6.6, 6.9, 6.4, \n                       9.1, 6.8, 6.4, 7.7, 5.7, 9.0, 5.4, 9.9, 8.9, 6.0, 5.0, \n                       9.1, 8.5, 8.6, 8.9, 5.4, 6.8, 5.6]"
+  },
+  {
+    "objectID": "classification-2d-boundaries.html#準備",
+    "href": "classification-2d-boundaries.html#準備",
+    "title": "機械学習：分類問題",
     "section": "準備",
-    "text": "準備\n\npandas, numpy, matplotlib, scikit-learnをインストールします。\npip install pandas numpy matplotlib scikit-learn altair[all]\nGoogle Colabの場合は、altair[all]だけインストールすればOKです\n!pip install altair[all]\n以下を実行\n\n\n全体を表示\n# Setup\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\nimport pandas as pd\nfrom sklearn.linear_model import LogisticRegression\n\n# Matplotlib settings\nplt.rcParams['font.size'] = 11\nplt.rcParams['figure.dpi'] = 100\n\nsalmon_weights = np.array(salmon_weights)\nseabass_weights = np.array(seabass_weights)"
+    "text": "準備\n\n必要なライブラリをインポートします。\n\n\n全体を表示\n# Setup\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\nimport pandas as pd\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.tree import DecisionTreeClassifier\nfrom sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix\n\n# Matplotlib settings\nplt.rcParams['font.size'] = 11\nplt.rcParams['figure.dpi'] = 100\n\n# データをnumpy配列に変換\nsalmon_weights = np.array(salmon_weights)\nsalmon_brightness = np.array(salmon_brightness)\nseabass_weights = np.array(seabass_weights)\nseabass_brightness = np.array(seabass_brightness)\n\n# 特徴量行列とラベルを作成\nX = np.vstack([\n    np.column_stack([salmon_brightness, salmon_weights]),\n    np.column_stack([seabass_brightness, seabass_weights])\n])\ny = np.array([1]*40 + [0]*40)  # 1=Salmon, 0=Sea bass"
   },
   {
-    "objectID": "classification-basics-1d.html#まずはヒストグラム",
-    "href": "classification-basics-1d.html#まずはヒストグラム",
-    "title": "機械学習 Classification",
-    "section": "まずはヒストグラム",
-    "text": "まずはヒストグラム\n\n\n\ncode\nplt.figure(figsize=(10, 6))\nbins = range(1000, 2600, 100)\n\nplt.hist(salmon_weights, bins=bins, histtype='step', \n         edgecolor='black', linewidth=2, label=\"Salmon\")\nplt.hist(seabass_weights, bins=bins, histtype='step', \n         edgecolor='red', linewidth=2, label=\"Sea bass\")\n\nplt.xlabel(\"Weight (g)\", fontsize=14)\nplt.ylabel(\"Count\", fontsize=14)\nplt.title(\"Distribution of Fish Weight\", fontsize=16, fontweight='bold')\nplt.legend(fontsize=13)\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()"
+    "objectID": "classification-2d-boundaries.html#目で見て境界線を想像垂線とする",
+    "href": "classification-2d-boundaries.html#目で見て境界線を想像垂線とする",
+    "title": "機械学習：分類問題",
+    "section": "目で見て境界線を想像（垂線とする）",
+    "text": "目で見て境界線を想像（垂線とする）\n\n\n\ncode\nplt.figure(figsize=(10, 7))\n\nplt.scatter(salmon_brightness, salmon_weights, \n           c='black', marker='o', s=100, alpha=0.7, label='Salmon', edgecolors='black')\nplt.scatter(seabass_brightness, seabass_weights, \n           c='red', marker='s', s=100, alpha=0.7, label='Sea bass', edgecolors='darkred')\n\nplt.xlabel('Lightness', fontsize=14, fontweight='bold')\nplt.ylabel('Weight (g)', fontsize=14, fontweight='bold')\nplt.title('2D Feature Space: Lightness vs Weight', fontsize=16, fontweight='bold')\nplt.legend(fontsize=13, loc='upper left')\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n観察\n\n\n\nSalmon（黒丸）は左側（暗い）に集中\nSea bass（赤四角）は右側（明るい）に集中\nでも5〜6あたりで少し重なっている\n斜めの直線で分けられそう！"
   },
   {
-    "objectID": "classification-basics-1d.html#統計値を見る",
-    "href": "classification-basics-1d.html#統計値を見る",
-    "title": "機械学習 Classification",
-    "section": "統計値を見る",
-    "text": "統計値を見る\n\n\n\ncode\nprint(f\"Salmon   - 最小: {min(salmon_weights)}g, 最大: {max(salmon_weights)}g, 平均: {np.mean(salmon_weights):.0f}g\")\nprint(f\"Sea bass - 最小: {min(seabass_weights)}g, 最大: {max(seabass_weights)}g, 平均: {np.mean(seabass_weights):.0f}g\")\noverlap_min = max(min(salmon_weights), min(seabass_weights))\noverlap_max = min(max(salmon_weights), max(seabass_weights))\nif overlap_max &gt;= overlap_min:\n    print(f\"\\n重なり範囲: {overlap_min}g - {overlap_max}g\")\n\n\nSalmon   - 最小: 1426g, 最大: 2474g, 平均: 1949g\nSea bass - 最小: 1099g, 最大: 2203g, 平均: 1593g\n\n重なり範囲: 1426g - 2203g\n\n\n\n\n\n\n\n\n発見\n\n\n\n双峰型の分布：2つの山が見える\n\n重なっている がまあ分けれそう？"
+    "objectID": "classification-2d-boundaries.html#試行1-目で見て直線を引いてみる",
+    "href": "classification-2d-boundaries.html#試行1-目で見て直線を引いてみる",
+    "title": "機械学習：分類問題",
+    "section": "試行1: 目で見て直線を引いてみる",
+    "text": "試行1: 目で見て直線を引いてみる\n\n\n考え方\n\nグラフを見て、手動で直線を引いてみましょう。\n\nどこに引けば一番うまく分けられそうか？\n完璧には分けられない → どのくらい誤分類が出るか？"
   },
   {
-    "objectID": "classification-basics-1d.html#境界線閾値を考える",
-    "href": "classification-basics-1d.html#境界線閾値を考える",
-    "title": "機械学習 Classification",
-    "section": "境界線（閾値）を考える",
-    "text": "境界線（閾値）を考える\n\n大体でいいので 境界線（threshold） を設定します。\n方針\n1800g以上 → Salmon\n1800g未満 → Sea bass\nこの判定ルールで分類してみましょう。"
+    "objectID": "classification-2d-boundaries.html#この辺だとどうか",
+    "href": "classification-2d-boundaries.html#この辺だとどうか",
+    "title": "機械学習：分類問題",
+    "section": "この辺だとどうか",
+    "text": "この辺だとどうか\n\n\n\ncode\nplt.figure(figsize=(10, 7))\n\nplt.scatter(salmon_brightness, salmon_weights, \n           c='black', marker='o', s=100, alpha=0.7, label='Salmon', edgecolors='black')\nplt.scatter(seabass_brightness, seabass_weights, \n           c='red', marker='s', s=100, alpha=0.7, label='Sea bass', edgecolors='darkred')\n\n# 手動で引いた直線の例（適当に設定）\n# 例: 輝度=5.5あたりで垂直に分ける\nlightness_threshold = 5.5\nplt.axvline(x=lightness_threshold, color='blue', linestyle='--', linewidth=2.5, \n           label=f'decision boundary (Lightness = {lightness_threshold})')\n\nplt.xlabel('Lightness', fontsize=14, fontweight='bold')\nplt.ylabel('Weight (g)', fontsize=14, fontweight='bold')\nplt.title('Manual Decision Boundary', fontsize=16, fontweight='bold')\nplt.legend(fontsize=13, loc='upper left')\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nこの直線の性能は？\n\n\n輝度5.5を境界にすると、どのくらいの精度になるでしょうか？ 自分で計算してみましょう。\nSalmon を陽性 (1) とし、輝度 &lt; 5.5 → Salmon、&gt;= 5.5 → Sea bass で判定すると以下の通り。\n\n\n\n\n予測Salmon\n予測Sea bass\n\n\n\n\n実際Salmon\nTP = 35\nFN = 5\n\n\n実際Sea bass\nFP = 6\nTN = 34\n\n\n\n\nAccuracy = (35 + 34) / 80 = 0.86\nPrecision (Salmon) = 35 / (35 + 6) = 0.85\nRecall (Salmon) = 35 / (35 + 5) = 0.88\nF1 = 2TP / (2TP + FP + FN) = 70 / 81 ≈ 0.86\n\nSea bass を陽性にする等、別の定義を使う場合は同じ手順で数え直してみましょう。"
   },
   {
-    "objectID": "classification-basics-1d.html#青破線で切ったとしたら",
-    "href": "classification-basics-1d.html#青破線で切ったとしたら",
-    "title": "機械学習 Classification",
-    "section": "青破線で切ったとしたら",
-    "text": "青破線で切ったとしたら"
+    "objectID": "classification-2d-boundaries.html#試行2-決定木decision-tree",
+    "href": "classification-2d-boundaries.html#試行2-決定木decision-tree",
+    "title": "機械学習：分類問題",
+    "section": "試行2: 決定木（Decision Tree）",
+    "text": "試行2: 決定木（Decision Tree）\n\n\nまず：ジニ不純度とは？\n\n決定木は「どこで分割すれば一番きれいに分かれるか」を自動で探します。\nその基準がジニ不純度（Gini impurity）です。\n\\[\\text{Gini} = 1 - (p_{\\text{Salmon}}^2 + p_{\\text{Sea bass}}^2)\\]\n\nGini = 0: 完全に1クラスだけ（純粋）\nGini = 0.5: 50:50で混ざってる（不純）\n\n\n\n\n\n\n\n例\n\n\n\nデータ10個：Salmon 10個、Sea bass 0個 → Gini = 1 - (1² + 0²) = 0\nデータ10個：Salmon 5個、Sea bass 5個 → Gini = 1 - (0.5² + 0.5²) = 0.5\nデータ10個：Salmon 8個、Sea bass 2個 → Gini = 1 - (0.8² + 0.2²) = 0.32"
   },
   {
-    "objectID": "classification-basics-1d.html#分類結果4つのパターン",
-    "href": "classification-basics-1d.html#分類結果4つのパターン",
-    "title": "機械学習 Classification",
-    "section": "分類結果：4つのパターン",
-    "text": "分類結果：4つのパターン\n\n境界線1800gで分類すると、4つのパターンが生まれます：\n\n\n\n\n\n\n\n\n\n実際の魚\n判定結果\n略称\n説明\n\n\n\n\nSalmon\nSalmon\nTP (True Positive)\n正しくSalmonと判定\n\n\nSea bass\nSea bass\nTN (True Negative)\n正しくSalmonではないと判定\n\n\nSea bass\nSalmon\nFP (False Positive)\n誤ってSalmonと判定\n\n\nSalmon\nSea bass\nFN (False Negative)\nSalmonを見逃し"
+    "objectID": "classification-2d-boundaries.html#ジニ不純度を計算してみる",
+    "href": "classification-2d-boundaries.html#ジニ不純度を計算してみる",
+    "title": "機械学習：分類問題",
+    "section": "ジニ不純度を計算してみる",
+    "text": "ジニ不純度を計算してみる\n\n\n\ncode\ndef gini_impurity(labels):\n    \"\"\"ジニ不純度を計算\"\"\"\n    if len(labels) == 0:\n        return 0\n    p_salmon = sum(labels) / len(labels)  # 1=Salmon, 0=Sea bass\n    p_seabass = 1 - p_salmon\n    return 1 - (p_salmon**2 + p_seabass**2)\n\n# 全データのジニ不純度\ninitial_gini = gini_impurity(y)\nprint(f\"初期状態（分割前）のジニ不純度: {initial_gini:.3f}\")\nprint(f\"  Salmon: {sum(y)}個, Sea bass: {len(y)-sum(y)}個\")\n\n\n初期状態（分割前）のジニ不純度: 0.500\n  Salmon: 40個, Sea bass: 40個"
   },
   {
-    "objectID": "classification-basics-1d.html#tpfptnfnの覚え方",
-    "href": "classification-basics-1d.html#tpfptnfnの覚え方",
-    "title": "機械学習 Classification",
-    "section": "TP/FP/TN/FNの覚え方",
-    "text": "TP/FP/TN/FNの覚え方\n\n\n右から左に読む\n\n\n右（P/N） 判定結果 → Positive (シャケ) or Negative (それ以外)\n左（T/F） その答え合わせ** → True (正解) or False (不正解)\n\nつまり、ある魚をみて識別した結果、\n\nTP: Positiveと判定 → True (正しかった！)\nFP: Positiveと判定 → False (間違ってた…)\nTN: Negatigeと判定 → True (正しかった！)\nFN: Negativeと判定 → False (間違ってた…)"
+    "objectID": "classification-2d-boundaries.html#最良の閾値をどう探す",
+    "href": "classification-2d-boundaries.html#最良の閾値をどう探す",
+    "title": "機械学習：分類問題",
+    "section": "最良の閾値をどう探す？",
+    "text": "最良の閾値をどう探す？\n\n\n方法：総当たり\n\nデータの値すべてを候補として試します。\n\n\n\n\n\n\n\nなぜデータの値？\n\n\nデータとデータの間で分けるので、データの値を試せば十分。\n例：データが [2.1, 3.5, 5.8] なら - 2.1と3.5の間で分ける = 2.1で分割と同じ結果 - 3.5と5.8の間で分ける = 3.5で分割と同じ結果\n→ データの値だけ試せばOK"
   },
   {
-    "objectID": "classification-basics-1d.html#混同行列confusion-matrix",
-    "href": "classification-basics-1d.html#混同行列confusion-matrix",
-    "title": "機械学習 Classification",
-    "section": "混同行列（Confusion Matrix）",
-    "text": "混同行列（Confusion Matrix）\n\n\n\ncode\nthreshold = 1800\n\n# Calculate confusion matrix\nTP = sum(1 for weight in salmon_weights if weight &gt;= threshold)\nFN = sum(1 for weight in salmon_weights if weight &lt; threshold)\nTN = sum(1 for weight in seabass_weights if weight &lt; threshold)\nFP = sum(1 for weight in seabass_weights if weight &gt;= threshold)\n\nimport matplotlib.patches as mpatches\n\nfig, ax = plt.subplots(figsize=(9, 7))\n\n# Confusion matrix data\ncm_data = np.array([[TP, FP], [FN, TN]])\n\n# Color map: 緑=正解、ピンク=誤り\ncolors = np.array([['#90EE90', '#FFB6C6'], ['#FFB6C6', '#90EE90']])\n\n# Draw cells\nfor i in range(2):\n    for j in range(2):\n        ax.add_patch(mpatches.Rectangle((j, 1-i), 1, 1, \n                                        facecolor=colors[i, j], \n                                        edgecolor='black', linewidth=2.5))\n        ax.text(j + 0.5, 1.5 - i, str(cm_data[i, j]), \n               ha='center', va='center', fontsize=48, fontweight='bold')\n        \n        # Add label\n        if i == 0 and j == 0:\n            label = 'TP'\n        elif i == 0 and j == 1:\n            label = 'FP'\n        elif i == 1 and j == 0:\n            label = 'FN'\n        else:\n            label = 'TN'\n        ax.text(j + 0.5, 1.15 - i, label, \n               ha='center', va='center', fontsize=16, style='italic', color='gray')\n\n# Set labels\nax.set_xlim(0, 2)\nax.set_ylim(0, 2)\nax.set_xticks([0.5, 1.5])\nax.set_yticks([0.5, 1.5])\nax.set_xticklabels(['Actual: Salmon', 'Actual: Sea bass'], fontsize=13, fontweight='bold')\nax.set_yticklabels(['Predict: Sea bass', 'Predict: Salmon'], fontsize=13, fontweight='bold')\nax.set_aspect('equal')\nax.tick_params(length=0)\nax.set_title(f'Confusion Matrix (Threshold = {threshold}g)', \n            fontsize=16, fontweight='bold', pad=20)\n\nplt.tight_layout()\nplt.show()"
+    "objectID": "classification-2d-boundaries.html#いくつかの閾値を試してみる",
+    "href": "classification-2d-boundaries.html#いくつかの閾値を試してみる",
+    "title": "機械学習：分類問題",
+    "section": "いくつかの閾値を試してみる",
+    "text": "いくつかの閾値を試してみる\n\n\n\ncode\n# 輝度でいくつかの閾値を試す\ntest_thresholds = [3.0, 4.0, 5.0, 6.0, 7.0]\nresults = []\n\nfor threshold in test_thresholds:\n    # 分割\n    left_mask = X[:, 0] &lt; threshold\n    right_mask = ~left_mask\n    \n    if sum(left_mask) == 0 or sum(right_mask) == 0:\n        continue\n    \n    # 左右のジニ不純度\n    gini_left = gini_impurity(y[left_mask])\n    gini_right = gini_impurity(y[right_mask])\n    \n    # 加重平均\n    n_left = sum(left_mask)\n    n_right = sum(right_mask)\n    weighted_gini = (n_left * gini_left + n_right * gini_right) / len(y)\n    \n    results.append({\n        '閾値': f'{threshold:.1f}',\n        '左側': f'{sum(y[left_mask])}/{n_left}',\n        '右側': f'{sum(y[right_mask])}/{n_right}',\n        'Gini_left': f'{gini_left:.3f}',\n        'Gini_right': f'{gini_right:.3f}',\n        '加重平均': f'{weighted_gini:.3f}'\n    })\n\nresults_df = pd.DataFrame(results)\nprint(\"いくつかの閾値でのジニ不純度:\")\ndisplay(results_df)\nprint(\"\\n→ 加重平均が最小の閾値を選ぶ\")\n\n\nいくつかの閾値でのジニ不純度:\n\n\n\n\n\n\n\n\n\n閾値\n左側\n右側\nGini_left\nGini_right\n加重平均\n\n\n\n\n0\n3.0\n13/13\n27/67\n0.000\n0.481\n0.403\n\n\n1\n4.0\n22/22\n18/58\n0.000\n0.428\n0.310\n\n\n2\n5.0\n32/32\n8/48\n0.000\n0.278\n0.167\n\n\n3\n6.0\n40/50\n0/30\n0.320\n0.000\n0.200\n\n\n4\n7.0\n40/60\n0/20\n0.444\n0.000\n0.333\n\n\n\n\n\n\n\n\n→ 加重平均が最小の閾値を選ぶ\n\n\n\n\n\n\n\n\n重要\n\n\n実際は全てのユニーク値（80個以上）を試して、最小を見つけます。"
   },
   {
-    "objectID": "classification-basics-1d.html#判定器の評価",
-    "href": "classification-basics-1d.html#判定器の評価",
-    "title": "機械学習 Classification",
-    "section": "判定器の評価",
-    "text": "判定器の評価\n\n\n\ncode\n# Calculate metrics\naccuracy = (TP + TN) / (TP + TN + FP + FN)\nprecision = TP / (TP + FP) if (TP + FP) &gt; 0 else 0\nrecall = TP / (TP + FN) if (TP + FN) &gt; 0 else 0\n\nmetrics = pd.DataFrame({\n    '指標': ['Accuracy', 'Precision', 'Recall'],\n    '値': [f'{accuracy:.3f}', f'{precision:.3f}', f'{recall:.3f}'],\n    '意味': [\n        '全体の正解率',\n        'Salmonと判定した中で実際にSalmonの割合',\n        '実際のSalmonをどれだけ検出できたか',\n    ]\n})\n\nfrom IPython.display import HTML\ntable_html = metrics.to_html(index=False, justify='center')\ndisplay(HTML(f\"&lt;div style='font-size:24px'&gt;{table_html}&lt;/div&gt;\"))\n\n\n\n\n\n\n指標\n値\n意味\n\n\n\n\nAccuracy\n0.775\n全体の正解率\n\n\nPrecision\n0.789\nSalmonと判定した中で実際にSalmonの割合\n\n\nRecall\n0.750\n実際のSalmonをどれだけ検出できたか\n\n\n\n\n\n\n\\[\\text{Accuracy} = \\frac{TP + TN}{\\text{全体}} = \\frac{\\text{正しく分類できた数}}{\\text{全データ数}}\\]\n\\[\\text{Precision} = \\frac{TP}{TP + FP} = \\frac{\\text{正しいSalmon判定}}{\\text{Salmonと判定した全て}}\\]\n\\[\\text{Recall} = \\frac{TP}{TP + FN} = \\frac{\\text{検出できたSalmon}}{\\text{実際のSalmon全て}}\\]"
+    "objectID": "classification-2d-boundaries.html#決定木のアルゴリズム交互版",
+    "href": "classification-2d-boundaries.html#決定木のアルゴリズム交互版",
+    "title": "機械学習：分類問題",
+    "section": "決定木のアルゴリズム（交互版）",
+    "text": "決定木のアルゴリズム（交互版）\n\n\nルール：特徴量を交互に使う\n\n1回目は輝度、2回目は重さ、3回目は輝度…と交互に使うことで、階段状の境界を作ります。\n\n\ncode\ndef find_best_split_for_feature(X, y, feature_idx):\n    \"\"\"指定した特徴量で最良の分割点を見つける\"\"\"\n    best_gini = float('inf')\n    best_threshold = None\n    best_left_mask = None\n    \n    # この特徴量のユニークな値を試す\n    values = np.unique(X[:, feature_idx])\n    \n    for threshold in values:\n        # 分割\n        left_mask = X[:, feature_idx] &lt; threshold\n        right_mask = ~left_mask\n        \n        # 左右が空でないことを確認\n        if sum(left_mask) == 0 or sum(right_mask) == 0:\n            continue\n        \n        # 左右のジニ不純度\n        gini_left = gini_impurity(y[left_mask])\n        gini_right = gini_impurity(y[right_mask])\n        \n        # 加重平均\n        n_left = sum(left_mask)\n        n_right = sum(right_mask)\n        weighted_gini = (n_left * gini_left + n_right * gini_right) / len(y)\n        \n        if weighted_gini &lt; best_gini:\n            best_gini = weighted_gini\n            best_threshold = threshold\n            best_left_mask = left_mask\n    \n    return best_threshold, best_gini, best_left_mask\n\n# 1回目の分割: 輝度（feature 0）\nfeature_names = ['Lightness', 'Weight']\nsplit1_feature = 0  # Lightness\nsplit1_threshold, split1_gini, split1_left_mask = find_best_split_for_feature(X, y, split1_feature)\n\nprint(f\"1回目の分割:\")\nprint(f\"  特徴量: {feature_names[split1_feature]}\")\nprint(f\"  閾値: {split1_threshold:.2f}\")\nprint(f\"  ジニ不純度: {split1_gini:.3f}\")\nprint(f\"  左側: {sum(split1_left_mask)}個, 右側: {sum(~split1_left_mask)}個\")\n\n\n1回目の分割:\n  特徴量: Lightness\n  閾値: 5.00\n  ジニ不純度: 0.167\n  左側: 32個, 右側: 48個"
   },
   {
-    "objectID": "classification-basics-1d.html#しきい値を変えると",
-    "href": "classification-basics-1d.html#しきい値を変えると",
-    "title": "機械学習 Classification",
-    "section": "しきい値を変えると？",
-    "text": "しきい値を変えると？\n\n\n\ncode\nthresholds = [1600, 1800, 2000]\nresults = []\n\nfor threshold in thresholds:\n    TP = sum(1 for weight in salmon_weights if weight &gt;= threshold)\n    FN = sum(1 for weight in salmon_weights if weight &lt; threshold)\n    TN = sum(1 for weight in seabass_weights if weight &lt; threshold)\n    FP = sum(1 for weight in seabass_weights if weight &gt;= threshold)\n    \n    accuracy = (TP + TN) / (TP + TN + FP + FN)\n    precision = TP / (TP + FP) if (TP + FP) &gt; 0 else 0\n    recall = TP / (TP + FN) if (TP + FN) &gt; 0 else 0\n    \n    results.append({\n        '境界線': f'{threshold}g',\n        'TP': TP,\n        'FP': FP,\n        'FN': FN,\n        'TN': TN,\n        'Precision': f'{precision:.1%}',\n        'Recall': f'{recall:.1%}',\n        'Accuracy': f'{accuracy:.1%}'\n    })\n\ndf = pd.DataFrame(results)\ndf\n\n\n\n\n\n\n\n\n\n境界線\nTP\nFP\nFN\nTN\nPrecision\nRecall\nAccuracy\n\n\n\n\n0\n1600g\n17\n8\n3\n12\n68.0%\n85.0%\n72.5%\n\n\n1\n1800g\n15\n4\n5\n16\n78.9%\n75.0%\n77.5%\n\n\n2\n2000g\n8\n2\n12\n18\n80.0%\n40.0%\n65.0%\n\n\n\n\n\n\n\n\n\n\n\n\n\n重要\n\n\n\n境界を下げる（1600g） → Recall ↑、Precision ↓\n\nSalmonを逃さない（FN減）が、Sea bassの誤判定（FP増）\n\n境界を上げる（2000g） → Precision ↑、Recall ↓\n\nSalmon判定の信頼性は高いが、Salmonを見逃す（FN増）\n\n\n\n\n\nPrecision と Recall は トレードオフの関係"
+    "objectID": "classification-2d-boundaries.html#可視化1回目の分割",
+    "href": "classification-2d-boundaries.html#可視化1回目の分割",
+    "title": "機械学習：分類問題",
+    "section": "可視化：1回目の分割",
+    "text": "可視化：1回目の分割"
   },
   {
-    "objectID": "classification-basics-1d.html#しきい値の比較1600g-vs-2000g",
-    "href": "classification-basics-1d.html#しきい値の比較1600g-vs-2000g",
-    "title": "機械学習 Classification",
-    "section": "しきい値の比較（1600g vs 2000g）",
-    "text": "しきい値の比較（1600g vs 2000g）\n\n\n\n\n\n\n\n\n\n\n\n\n\nFP=8\nFN=3\nPrecision: 68.0% (低い)\n\nRecall: 85.0% (高い)\n\n\n\n\n\n\n\n\n\n\n\nFP=2, FN=12 Precision: 80.0% (高い)\nRecall: 40.0% (低い)"
+    "objectID": "classification-2d-boundaries.html#ステップ2-2回目の分割重さで分ける",
+    "href": "classification-2d-boundaries.html#ステップ2-2回目の分割重さで分ける",
+    "title": "機械学習：分類問題",
+    "section": "ステップ2: 2回目の分割（重さで分ける）",
+    "text": "ステップ2: 2回目の分割（重さで分ける）\n\n左側と右側をそれぞれ重さで分割します。\n\n\ncode\nsplit2_feature = 1  # Weight（交互なので重さ）\n\n# 左側を重さで分割\nX_left = X[split1_left_mask]\ny_left = y[split1_left_mask]\n\nsplit2_left_threshold = None\nif len(X_left) &gt; 1:\n    split2_left_threshold, split2_left_gini, split2_left_left_mask = find_best_split_for_feature(X_left, y_left, split2_feature)\n    print(f\"\\n2回目の分割（左側）:\")\n    print(f\"  特徴量: {feature_names[split2_feature]}\")\n    print(f\"  閾値: {split2_left_threshold:.0f}\")\n    print(f\"  ジニ不純度: {split2_left_gini:.3f}\")\n\n# 右側を重さで分割\nX_right = X[~split1_left_mask]\ny_right = y[~split1_left_mask]\n\nsplit2_right_threshold = None\nif len(X_right) &gt; 1:\n    split2_right_threshold, split2_right_gini, split2_right_left_mask = find_best_split_for_feature(X_right, y_right, split2_feature)\n    print(f\"\\n2回目の分割（右側）:\")\n    print(f\"  特徴量: {feature_names[split2_feature]}\")\n    print(f\"  閾値: {split2_right_threshold:.0f}\")\n    print(f\"  ジニ不純度: {split2_right_gini:.3f}\")\n\n\n\n2回目の分割（左側）:\n  特徴量: Weight\n  閾値: 1483\n  ジニ不純度: 0.000\n\n2回目の分割（右側）:\n  特徴量: Weight\n  閾値: 1820\n  ジニ不純度: 0.192"
   },
   {
-    "objectID": "classification-basics-1d.html#どの指標を重視すべきか",
-    "href": "classification-basics-1d.html#どの指標を重視すべきか",
-    "title": "機械学習 Classification",
-    "section": "どの指標を重視すべきか？",
-    "text": "どの指標を重視すべきか？\n\n\nケース1: 高級レストラン向け出荷\n\n\nPrecision重視（FPを避ける）\nSea bassの混入を最小化。混入絶対許さないマン\n→ 高めの閾値（2000g）\n\nケース2: 缶詰工場（Salmon専用ライン）\n\nRecall重視（FNを避ける）\nSalmonの取りこぼしを最小化。シャケ全部入れるマン\n→ 低めの閾値（1600g）"
+    "objectID": "classification-2d-boundaries.html#可視化2回目の分割",
+    "href": "classification-2d-boundaries.html#可視化2回目の分割",
+    "title": "機械学習：分類問題",
+    "section": "可視化：2回目の分割",
+    "text": "可視化：2回目の分割"
   },
   {
-    "objectID": "classification-basics-1d.html#コストを考慮した最適化",
-    "href": "classification-basics-1d.html#コストを考慮した最適化",
-    "title": "機械学習 Classification",
-    "section": "コストを考慮した最適化",
-    "text": "コストを考慮した最適化\n\n誤分類のコストが異なる場合、総コストを最小化する閾値を選べます。 \\[\n\\begin{aligned}\n&\\text{argmin}(\\text{総コスト}) = N(\\text{FP}) \\times \\text{Cost}(\\text{FP}) + N(\\text{FN}) \\times \\text{Cost}(\\text{FN})\\\\\n&\\quad \\small{N(x): x\\text{の個数},\\; \\text{Cost}(x): x\\text{ 1個あたりのコスト}}\n\\end{aligned}\n\\]\n\n\ncode\n# 例：Sea bass混入のクレーム対応コストが高い場合\nC_FP = 10000  # Sea bass混入のクレーム対応コスト（円/匹）\nC_FN = 500    # Salmon再選別コスト（円/匹）\n\ncost_results = []\nfor threshold in [1600, 1800, 2000]:\n    TP = sum(1 for weight in salmon_weights if weight &gt;= threshold)\n    FN = sum(1 for weight in salmon_weights if weight &lt; threshold)\n    TN = sum(1 for weight in seabass_weights if weight &lt; threshold)\n    FP = sum(1 for weight in seabass_weights if weight &gt;= threshold)\n    \n    total_cost = FP * C_FP + FN * C_FN\n    cost_results.append({\n        '境界線': f'{threshold}g',\n        'FP': FP,\n        'FN': FN,\n        '総コスト': f'¥{total_cost:,}'\n    })\ncost_df = pd.DataFrame(cost_results)\n\nmin_idx = cost_df.index[cost_df['総コスト'].str.replace('¥', '').str.replace(',', '').astype(int).idxmin()]\ncost_df.loc[min_idx, '境界線'] = '★ ' + cost_df.loc[min_idx, '境界線']\ncost_df.style.hide(axis='index')\n\n\n\n\n\n\n\n境界線\nFP\nFN\n総コスト\n\n\n\n\n1600g\n8\n3\n¥81,500\n\n\n1800g\n4\n5\n¥42,500\n\n\n★ 2000g\n2\n12\n¥26,000\n\n\n\n\n\nこのコスト関数での最適なしきい値: 2000g（総コスト最小）"
+    "objectID": "classification-2d-boundaries.html#この境界線の性能は",
+    "href": "classification-2d-boundaries.html#この境界線の性能は",
+    "title": "機械学習：分類問題",
+    "section": "この境界線の性能は？",
+    "text": "この境界線の性能は？\n\n階段状の境界線で分類した結果を評価します。\n\n\ncode\n# 簡易的な予測関数\ndef predict_alternating(brightness, weight):\n    \"\"\"交互分割の決定木で予測\"\"\"\n    if brightness &lt; split1_threshold:\n        # 左側（暗い方＝Salmon寄り）\n        if split2_left_threshold is not None:\n            if weight &gt;= split2_left_threshold:\n                return 1  # Salmon（重い）\n            else:\n                return 0  # Sea bass（軽い）\n        else:\n            return 1  # Salmon (分割なし)\n    else:\n        # 右側（明るい方＝Sea bass寄り）\n        if split2_right_threshold is not None:\n            if weight &gt;= split2_right_threshold:\n                return 1  # Salmon（重い）\n            else:\n                return 0  # Sea bass（軽い）\n        else:\n            return 0  # Sea bass (分割なし)\n\n# 全データで予測\ny_pred_alternating = np.array([predict_alternating(X[i, 0], X[i, 1]) for i in range(len(X))])\n\n# 混同行列\nfrom sklearn.metrics import confusion_matrix\ncm = confusion_matrix(y, y_pred_alternating)\n\nTP = cm[1, 1]\nTN = cm[0, 0]\nFP = cm[0, 1]\nFN = cm[1, 0]\n\n# 評価指標\naccuracy_alt = (TP + TN) / (TP + TN + FP + FN)\nprecision_alt = TP / (TP + FP) if (TP + FP) &gt; 0 else 0\nrecall_alt = TP / (TP + FN) if (TP + FN) &gt; 0 else 0\n\nprint(f\"交互分割決定木の性能 (深さ2):\")\nprint(f\"  TP={TP}, FP={FP}, FN={FN}, TN={TN}\")\nprint(f\"  Accuracy:  {accuracy_alt:.3f}\")\nprint(f\"  Precision: {precision_alt:.3f}\")\nprint(f\"  Recall:    {recall_alt:.3f}\")\n\n\n交互分割決定木の性能 (深さ2):\n  TP=37, FP=5, FN=3, TN=35\n  Accuracy:  0.900\n  Precision: 0.881\n  Recall:    0.925"
   },
   {
-    "objectID": "classification-basics-1d.html#試行1の結論",
-    "href": "classification-basics-1d.html#試行1の結論",
-    "title": "機械学習 Classification",
-    "section": "試行1の結論",
-    "text": "試行1の結論\n\n\n\n\n\n\n\n重要なポイント\n\n\n\n重さだけでは完全な分類は不可能\n\nデータの分布が重なっている\n\n境界線は「方針の選択」\n\n正解/不正解ではなく、用途に応じた最適化（optimization）\n\n評価指標はトレードオフ\n\nPrecision ↑ → Recall ↓\nどちらを重視するかは用途次第"
+    "objectID": "classification-2d-boundaries.html#scikit-learnの決定木と比較",
+    "href": "classification-2d-boundaries.html#scikit-learnの決定木と比較",
+    "title": "機械学習：分類問題",
+    "section": "scikit-learnの決定木と比較",
+    "text": "scikit-learnの決定木と比較\n\n自作の決定木（深さ2、交互分割）とライブラリの実装（深さ3、最良特徴量を選択）を比較してみましょう。\n\n\n\n\n\n\n違い\n\n\n\n自作版: 深さ2まで、輝度→重さと交互に使う\nscikit-learn: 深さ3まで、毎回最良の特徴量を自動選択\n→ scikit-learnの方がより細かい階段になる\n\n\n\n\n\n\ncode\n# 決定木モデル（深さ3まで）\ntree_model = DecisionTreeClassifier(max_depth=3, random_state=42)\ntree_model.fit(X, y)\n\n# 予測\ny_pred_tree = tree_model.predict(X)\n\n# 評価\naccuracy_tree = accuracy_score(y, y_pred_tree)\nprecision_tree = precision_score(y, y_pred_tree)\nrecall_tree = recall_score(y, y_pred_tree)\n\nprint(f\"決定木の性能:\")\nprint(f\"  Accuracy:  {accuracy_tree:.3f}\")\nprint(f\"  Precision: {precision_tree:.3f}\")\nprint(f\"  Recall:    {recall_tree:.3f}\")\n\n\n決定木の性能:\n  Accuracy:  0.975\n  Precision: 0.952\n  Recall:    1.000"
   },
   {
-    "objectID": "classification-basics-1d.html#練習問題",
-    "href": "classification-basics-1d.html#練習問題",
-    "title": "機械学習 Classification",
+    "objectID": "classification-2d-boundaries.html#決定境界の可視化決定木",
+    "href": "classification-2d-boundaries.html#決定境界の可視化決定木",
+    "title": "機械学習：分類問題",
+    "section": "決定境界の可視化（決定木）",
+    "text": "決定境界の可視化（決定木）\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nノート\n\n\n\n決定境界が階段状（水平・垂直の線の組み合わせ）\nif-thenルールの結果がこの形になる"
+  },
+  {
+    "objectID": "classification-2d-boundaries.html#試行3-ロジスティック回帰線形分類器",
+    "href": "classification-2d-boundaries.html#試行3-ロジスティック回帰線形分類器",
+    "title": "機械学習：分類問題",
+    "section": "試行3: ロジスティック回帰（線形分類器）",
+    "text": "試行3: ロジスティック回帰（線形分類器）\n\n\n考え方\n\n数学的に最適な直線を見つける\n\n数式: \\(w_1 \\times \\text{輝度} + w_2 \\times \\text{重さ} + b = 0\\)\nこの直線で2クラスを最もうまく分ける\n斜めの直線が引ける\n\n\n\n\n\n\n\n\nロジスティック回帰\n\n\n線形分類器の代表的な手法。確率も計算できる。"
+  },
+  {
+    "objectID": "classification-2d-boundaries.html#ロジスティック回帰で学習",
+    "href": "classification-2d-boundaries.html#ロジスティック回帰で学習",
+    "title": "機械学習：分類問題",
+    "section": "ロジスティック回帰で学習",
+    "text": "ロジスティック回帰で学習\n\n\n\ncode\n# ロジスティック回帰モデル\nlr_model = LogisticRegression()\nlr_model.fit(X, y)\n\n# 予測\ny_pred_lr = lr_model.predict(X)\n\n# 評価\naccuracy_lr = accuracy_score(y, y_pred_lr)\nprecision_lr = precision_score(y, y_pred_lr)\nrecall_lr = recall_score(y, y_pred_lr)\n\nprint(f\"ロジスティック回帰の性能:\")\nprint(f\"  Accuracy:  {accuracy_lr:.3f}\")\nprint(f\"  Precision: {precision_lr:.3f}\")\nprint(f\"  Recall:    {recall_lr:.3f}\")\n\n\nロジスティック回帰の性能:\n  Accuracy:  0.950\n  Precision: 0.974\n  Recall:    0.925"
+  },
+  {
+    "objectID": "classification-2d-boundaries.html#決定境界の可視化ロジスティック回帰",
+    "href": "classification-2d-boundaries.html#決定境界の可視化ロジスティック回帰",
+    "title": "機械学習：分類問題",
+    "section": "決定境界の可視化（ロジスティック回帰）",
+    "text": "決定境界の可視化（ロジスティック回帰）\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nノート\n\n\n\n青い直線が決定境界\n背景色: 赤＝Salmon領域、青＝Sea bass領域\n斜めの直線1本でシンプルに分離"
+  },
+  {
+    "objectID": "classification-2d-boundaries.html#つのアルゴリズムの比較",
+    "href": "classification-2d-boundaries.html#つのアルゴリズムの比較",
+    "title": "機械学習：分類問題",
+    "section": "2つのアルゴリズムの比較",
+    "text": "2つのアルゴリズムの比較\n\n\n\n決定木\nメリット: - 解釈しやすい（if-thenルール） - 自動で最適化（ジニ不純度） - 軸に平行な境界\nデメリット: - 過学習（overfitting）しやすい - 階段状の境界のみ\n\nロジスティック回帰\nメリット: - 数学的に最適 - シンプル（斜めの直線） - 過学習しにくい\nデメリット: - 線形のみ - 複雑なパターンに弱い"
+  },
+  {
+    "objectID": "classification-2d-boundaries.html#性能比較表",
+    "href": "classification-2d-boundaries.html#性能比較表",
+    "title": "機械学習：分類問題",
+    "section": "性能比較表",
+    "text": "性能比較表\n\n\n\n\n\n\n\nモデル\nAccuracy\nPrecision\nRecall\n\n\n\n\n決定木\n0.975\n0.952\n1.000\n\n\nロジスティック回帰\n0.950\n0.974\n0.925\n\n\n\n\n\n\n\n\n\n\n\n\n重要\n\n\nどちらが「正解」ではなく、データと目的に応じて選ぶ"
+  },
+  {
+    "objectID": "classification-2d-boundaries.html#決定木の深さを変えると",
+    "href": "classification-2d-boundaries.html#決定木の深さを変えると",
+    "title": "機械学習：分類問題",
+    "section": "決定木の深さを変えると？",
+    "text": "決定木の深さを変えると？\n\n\n深さ＝ if-then ルールの段数。深いほど複雑な境界が作れる\n深さ 1・3・無制限で学習し、同じデータで採点してみる\n\n\n\ncode\nfor depth in [1, 3, None]:\n    model = DecisionTreeClassifier(max_depth=depth, random_state=42)\n    model.fit(X, y)\n    acc = accuracy_score(y, model.predict(X))\n    label = \"無制限\" if depth is None else f\"深さ{depth}　\"\n    print(f\"{label}: Accuracy = {acc:.3f}\")\n\n\n深さ1　: Accuracy = 0.900\n深さ3　: Accuracy = 0.975\n無制限: Accuracy = 1.000\n\n\n\n\n\n\n\n\n\nクイズ\n\n\n深さ無制限なら、ついに正答率 100%。 これは「最強のモデルが完成した」ということでいい？"
+  },
+  {
+    "objectID": "classification-2d-boundaries.html#peek-overfit-boundary",
+    "href": "classification-2d-boundaries.html#peek-overfit-boundary",
+    "title": "機械学習：分類問題",
+    "section": "深さ無制限の境界を見てみる",
+    "text": "深さ無制限の境界を見てみる\n\n\n\n\n\n\n\n\n\n\n\n無制限の木には、数匹を救うためだけの細長い回廊（飛び地）ができている\n実際に学習されたルールを読むと「輝度が 5.35〜5.70 でも、重さが 2205g を超えるなら Salmon」のような異様に具体的な条項が入っている"
+  },
+  {
+    "objectID": "classification-2d-boundaries.html#この満点信用できるのか",
+    "href": "classification-2d-boundaries.html#この満点信用できるのか",
+    "title": "機械学習：分類問題",
+    "section": "この満点、信用できるのか",
+    "text": "この満点、信用できるのか\n\n\n採点に使ったのは、学習に使ったのと同じ80匹\n過去問を丸暗記すれば、過去問のテストは満点になる\nあの飛び地ルールが「次に来る魚」にも通用するかは、この採点方法では確かめようがない\n\n\n\n\n\n\n\n警告\n\n\n精度の数字は、何で採点したかとセットでないと意味を持たない。"
+  },
+  {
+    "objectID": "classification-2d-boundaries.html#混同行列で詳しく見る決定木",
+    "href": "classification-2d-boundaries.html#混同行列で詳しく見る決定木",
+    "title": "機械学習：分類問題",
+    "section": "混同行列で詳しく見る（決定木）",
+    "text": "混同行列で詳しく見る（決定木）\n\n\n\ncode\n# 決定木（深さ3）の混同行列\ncm = confusion_matrix(y, y_pred_tree)\n\nTP = cm[1, 1]  # Salmon correctly classified as Salmon\nTN = cm[0, 0]  # Sea bass correctly classified as Sea bass\nFP = cm[0, 1]  # Sea bass incorrectly classified as Salmon\nFN = cm[1, 0]  # Salmon incorrectly classified as Sea bass\n\nimport matplotlib.patches as mpatches\n\nfig, ax = plt.subplots(figsize=(9, 7))\n\n# Confusion matrix data\ncm_data = np.array([[TP, FP], [FN, TN]])\n\n# Color map: 緑=正解、ピンク=誤り\ncolors = np.array([['#90EE90', '#FFB6C6'], ['#FFB6C6', '#90EE90']])\n\n# Draw cells\nfor i in range(2):\n    for j in range(2):\n        ax.add_patch(mpatches.Rectangle((j, 1-i), 1, 1, \n                                        facecolor=colors[i, j], \n                                        edgecolor='black', linewidth=2.5))\n        ax.text(j + 0.5, 1.5 - i, str(cm_data[i, j]), \n               ha='center', va='center', fontsize=48, fontweight='bold')\n        \n        # Add label\n        if i == 0 and j == 0:\n            label = 'TP'\n        elif i == 0 and j == 1:\n            label = 'FP'\n        elif i == 1 and j == 0:\n            label = 'FN'\n        else:\n            label = 'TN'\n        ax.text(j + 0.5, 1.15 - i, label, \n               ha='center', va='center', fontsize=16, style='italic', color='gray')\n\n# Set labels\nax.set_xlim(0, 2)\nax.set_ylim(0, 2)\nax.set_xticks([0.5, 1.5])\nax.set_yticks([0.5, 1.5])\nax.set_xticklabels(['Actual: Salmon', 'Actual: Sea bass'], fontsize=13, fontweight='bold')\nax.set_yticklabels(['Predict: Sea bass', 'Predict: Salmon'], fontsize=13, fontweight='bold')\nax.set_aspect('equal')\nax.tick_params(length=0)\nax.set_title('Confusion Matrix (Decision Tree)', \n            fontsize=16, fontweight='bold', pad=20)\n\nplt.tight_layout()\nplt.show()\n\nprint(f\"\\nTP={TP}, FP={FP}, FN={FN}, TN={TN}\")\n\n\n\n\n\n\n\n\n\n\nTP=40, FP=2, FN=0, TN=38"
+  },
+  {
+    "objectID": "classification-2d-boundaries.html#まとめ",
+    "href": "classification-2d-boundaries.html#まとめ",
+    "title": "機械学習：分類問題",
+    "section": "まとめ",
+    "text": "まとめ\n\n\n\n\n\n\n\n重要なポイント\n\n\n\n2次元にすることで分類精度が向上\n\n重さ + 輝度の組み合わせで、より正確に分類\n\nまず目で見て、次にアルゴリズム\n\n手動の直線 → 決定木 → ロジスティック回帰\n段階的に理解を深める\n\nアルゴリズムによって決定境界が異なる\n\n決定木: 階段状（軸に平行）\nロジスティック回帰: 斜めの直線\n\nトレードオフを理解する\n\nシンプル vs 複雑\n解釈しやすさ vs 性能\n満点に見えても信用できない場合がある（深さ無制限の決定木）"
+  },
+  {
+    "objectID": "classification-2d-boundaries.html#練習問題",
+    "href": "classification-2d-boundaries.html#練習問題",
+    "title": "機械学習：分類問題",
     "section": "練習問題",
-    "text": "練習問題\n\n下記のデータ（それぞれ20匹ずつ追加した）について、以下の0-3までのことを実行して分類器をつくれ。\n\nsalmon_weights = [2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,\n                  1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,\n                  2028, 1903, 2057, 1629, 1884, 1884, 2240, 2081, 1838, 2037,\n                  1839, 1738, 1978, 1754, 1991, 1720, 1731, 1992, 1752, 1652]\nseabass_weights = [1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,\n                   2015, 1528, 1612, 1183, 1436, 1625, 1261, 1701, 1420, 1509,\n                   1387, 1345, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,\n                   1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531]"
+    "text": "練習問題\n\n以下を実装して、レポートで提出せよ。\n\n手動で境界線を決める\n\nグラフを見て、自分で境界線を決める\nその境界線でのTP, FP, FN, TNを計算\n\n決定木と ロジスティック回帰を両方実装\n\n提供されたデータで学習\n\n決定木の深さを1, 2, 3, 4, 5で試す\n\nそれぞれのAccuracy, Precision, Recallを比較\nどの深さが最適か考察\n\n考察\n\n手動の境界線 vs 決定木 vs ロジスティック回帰\nどれが最も良かったか？その理由は？\n2次元にすることで、1次元と比べてどう改善したか？"
   },
   {
-    "objectID": "classification-basics-1d.html#以下をレポートで提出",
-    "href": "classification-basics-1d.html#以下をレポートで提出",
-    "title": "機械学習 Classification",
-    "section": "以下をレポートで提出",
-    "text": "以下をレポートで提出\n\n\nまず何をするべきかを考えて実行せよ。\n閾値を1800gにした場合の TP, FP, FN, TN を計算せよ\n1800gの場合の Accuracy, Precision, Recall を求めよ。\n1700gの場合の Accuracy, Precision, Recall を求めよ。\n\\(C_{FP}=5000\\)円、\\(C_{FN}=1000\\)円としたとき、総コストを最小にするしきい値を求めよ"
-  },
-  {
-    "objectID": "classification-basics-1d.html#問0の答え",
-    "href": "classification-basics-1d.html#問0の答え",
-    "title": "機械学習 Classification",
-    "section": "問0の答え",
-    "text": "問0の答え"
+    "objectID": "classification-2d-boundaries.html#次回予告",
+    "href": "classification-2d-boundaries.html#次回予告",
+    "title": "機械学習：分類問題",
+    "section": "次回予告",
+    "text": "次回予告\n\n\n深さ無制限の決定木は「同じデータで採点」して満点だった\n次回、このあやしい満点の正体を、新しい魚で採点することで暴く\n正体には名前がある — 過学習（Overfitting）"
   },
   {
     "objectID": "ai-introduction.html#このデータ分けられるか",
@@ -910,543 +1183,277 @@
     "text": "まとめ\n\n\nAIは、知的なタスクをコンピュータで扱うための技術・研究分野\n機械学習は、データからパターンを学ぶAIの代表的な方法\nモデルは、入力から出力を計算する仕組み\n学習は、モデルのパラメータをデータに合わせて調整すること\n本当に大事なのは、未知のデータにも通用するかどうか\n\n\n\n\n\n\n\n\n次に進む問い\n\n\n魚を重さだけで分類するには、どんなルールを作ればよいか？"
   },
   {
-    "objectID": "classification-2d-boundaries.html#次元での分類",
-    "href": "classification-2d-boundaries.html#次元での分類",
-    "title": "機械学習：分類問題",
-    "section": "2次元での分類",
-    "text": "2次元での分類\n\n\n目標\n\n\n2つの特徴量（feature）を使った分類\n手動で直線を引く → 決定木 → ロジスティック回帰の順で理解\n決定境界を可視化する\n\n\n\n\n\n\n\n\nここがポイント\n\n\n\n1次元（重さのみ）から2次元（重さ+輝度）への拡張\nまず目で見て、次にアルゴリズムで"
+    "objectID": "classification-basics-1d.html#分類問題",
+    "href": "classification-basics-1d.html#分類問題",
+    "title": "機械学習 Classification",
+    "section": "分類問題",
+    "text": "分類問題\n\n\n目標\n\n\n分類問題(Data Classification)：データを分類するタスクを理解する\n\n2クラス分類\n\nデータ可視化\n決定境界（decision boundary） の概念を学ぶ\n\n\n\n\n\n\n\n\nここがポイント\n\n\n\n完全な分類は困難であることを知る\n境界決定のトレードオフとコスト"
   },
   {
-    "objectID": "classification-2d-boundaries.html#前回の復習",
-    "href": "classification-2d-boundaries.html#前回の復習",
-    "title": "機械学習：分類問題",
-    "section": "前回の復習",
-    "text": "前回の復習\n\n\n1次元での分類\n\n\n重さだけで Salmon vs Sea bass を分類\nしきい値（threshold）を手動で設定\nTP/FP/TN/FN、Precision/Recall を学習\n\n\n\n\n\n\n\nノート\n\n\n問題点: 最適なしきい値は、ケースによって異なる（コスト計算などで決定）"
+    "objectID": "classification-basics-1d.html#今回の問題",
+    "href": "classification-basics-1d.html#今回の問題",
+    "title": "機械学習 Classification",
+    "section": "今回の問題",
+    "text": "今回の問題\n\n\nサケだけを選別せよ\n\n\n\n\n魚はベルトコンベアで大量に流れてくる\n\n時間をかけず選別したい\n\nサケ以外の魚も混じっている\n\n一旦、サケ（Salmon）かスズキ（Sea bass）か\n分類項目をクラス（class）という\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nここがポイント\n\n\nSalmon と Sea bass の2クラス識別(2-class classification)問題"
   },
   {
-    "objectID": "classification-2d-boundaries.html#今回のアプローチ",
-    "href": "classification-2d-boundaries.html#今回のアプローチ",
-    "title": "機械学習：分類問題",
-    "section": "今回のアプローチ",
-    "text": "今回のアプローチ\n\n\nもう1つ特徴量を追加する\n\n\nベルトコンベアに人感センサを搭載して、輝度（明るさ）も取れることがわかった\n\n重さや輝度のことを特徴量（feature）といいます\n\n2つの特徴量を使えば、もっと正確に分類できるはず？\n\n\n\n\n\n前回\n今回\n\n\n\n\n特徴量\n重さ（1次元）\n重さ + 輝度（2次元）\n\n\n境界\nしきい値\n？？"
+    "objectID": "classification-basics-1d.html#選別システム",
+    "href": "classification-basics-1d.html#選別システム",
+    "title": "機械学習 Classification",
+    "section": "選別システム",
+    "text": "選別システム"
   },
   {
-    "objectID": "classification-2d-boundaries.html#データの準備",
-    "href": "classification-2d-boundaries.html#データの準備",
-    "title": "機械学習：分類問題",
-    "section": "データの準備",
-    "text": "データの準備\n\n新しく輝度のデータを追加しました（各40匹）。\n\n# Salmon（40匹）の重さ (g)\nsalmon_weights = [2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,\n                  1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,\n                  2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,\n                  1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652]\n\n# Salmon（40匹）の輝度（暗め: 2.1-5.9）\nsalmon_brightness = [3.5, 5.8, 4.9, 4.4, 2.6, 2.6, 2.2, 5.5, 4.4, 4.8, 2.1, \n                     5.9, 5.3, 2.8, 2.7, 2.7, 3.2, 4.1, 3.7, 3.2, 4.4, 2.6, \n                     3.2, 3.5, 3.8, 5.1, 2.8, 4.1, 4.4, 2.2, 4.4, 2.7, 2.3, \n                     5.8, 5.9, 5.2, 3.2, 2.4, 4.7, 3.8]\n\n# Sea bass（40匹）の重さ (g)\nseabass_weights = [1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,\n                   1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,\n                   1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,\n                   1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531]\n\n# Sea bass（40匹）の輝度（明るめ: 5.0-9.9）\nseabass_brightness = [5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8, \n                       8.9, 9.7, 9.5, 8.0, 9.6, 5.4, 6.0, 5.2, 6.6, 6.9, 6.4, \n                       9.1, 6.8, 6.4, 7.7, 5.7, 9.0, 5.4, 9.9, 8.9, 6.0, 5.0, \n                       9.1, 8.5, 8.6, 8.9, 5.4, 6.8, 5.6]"
+    "objectID": "classification-basics-1d.html#試行1-重さだけで分類してみる",
+    "href": "classification-basics-1d.html#試行1-重さだけで分類してみる",
+    "title": "機械学習 Classification",
+    "section": "試行1: 重さだけで分類してみる",
+    "text": "試行1: 重さだけで分類してみる\n\n\nアプローチ\n\n\n重量計をつけられそうなので、まず重さで識別できないかを考えた\nまずサンプルとして20匹ずつの重さを測定した\n\n\n# Salmon（20匹）の重さ (g)\nsalmon_weights = [2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,\n                  1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576]\n\n\n# Sea bass（20匹）の重さ (g)\nseabass_weights = [1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,\n                   1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333]"
   },
   {
-    "objectID": "classification-2d-boundaries.html#準備",
-    "href": "classification-2d-boundaries.html#準備",
-    "title": "機械学習：分類問題",
+    "objectID": "classification-basics-1d.html#準備",
+    "href": "classification-basics-1d.html#準備",
+    "title": "機械学習 Classification",
     "section": "準備",
-    "text": "準備\n\n必要なライブラリをインポートします。\n\n\n全体を表示\n# Setup\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\nimport pandas as pd\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.tree import DecisionTreeClassifier\nfrom sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix\n\n# Matplotlib settings\nplt.rcParams['font.size'] = 11\nplt.rcParams['figure.dpi'] = 100\n\n# データをnumpy配列に変換\nsalmon_weights = np.array(salmon_weights)\nsalmon_brightness = np.array(salmon_brightness)\nseabass_weights = np.array(seabass_weights)\nseabass_brightness = np.array(seabass_brightness)\n\n# 特徴量行列とラベルを作成\nX = np.vstack([\n    np.column_stack([salmon_brightness, salmon_weights]),\n    np.column_stack([seabass_brightness, seabass_weights])\n])\ny = np.array([1]*40 + [0]*40)  # 1=Salmon, 0=Sea bass"
+    "text": "準備\n\npandas, numpy, matplotlib, scikit-learnをインストールします。\npip install pandas numpy matplotlib scikit-learn altair[all]\nGoogle Colabの場合は、altair[all]だけインストールすればOKです\n!pip install altair[all]\n以下を実行\n\n\n全体を表示\n# Setup\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\nimport pandas as pd\nfrom sklearn.linear_model import LogisticRegression\n\n# Matplotlib settings\nplt.rcParams['font.size'] = 11\nplt.rcParams['figure.dpi'] = 100\n\nsalmon_weights = np.array(salmon_weights)\nseabass_weights = np.array(seabass_weights)"
   },
   {
-    "objectID": "classification-2d-boundaries.html#目で見て境界線を想像垂線とする",
-    "href": "classification-2d-boundaries.html#目で見て境界線を想像垂線とする",
-    "title": "機械学習：分類問題",
-    "section": "目で見て境界線を想像（垂線とする）",
-    "text": "目で見て境界線を想像（垂線とする）\n\n\n\ncode\nplt.figure(figsize=(10, 7))\n\nplt.scatter(salmon_brightness, salmon_weights, \n           c='black', marker='o', s=100, alpha=0.7, label='Salmon', edgecolors='black')\nplt.scatter(seabass_brightness, seabass_weights, \n           c='red', marker='s', s=100, alpha=0.7, label='Sea bass', edgecolors='darkred')\n\nplt.xlabel('Lightness', fontsize=14, fontweight='bold')\nplt.ylabel('Weight (g)', fontsize=14, fontweight='bold')\nplt.title('2D Feature Space: Lightness vs Weight', fontsize=16, fontweight='bold')\nplt.legend(fontsize=13, loc='upper left')\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n観察\n\n\n\nSalmon（黒丸）は左側（暗い）に集中\nSea bass（赤四角）は右側（明るい）に集中\nでも5〜6あたりで少し重なっている\n斜めの直線で分けられそう！"
+    "objectID": "classification-basics-1d.html#まずはヒストグラム",
+    "href": "classification-basics-1d.html#まずはヒストグラム",
+    "title": "機械学習 Classification",
+    "section": "まずはヒストグラム",
+    "text": "まずはヒストグラム\n\n\n\ncode\nplt.figure(figsize=(10, 6))\nbins = range(1000, 2600, 100)\n\nplt.hist(salmon_weights, bins=bins, histtype='step', \n         edgecolor='black', linewidth=2, label=\"Salmon\")\nplt.hist(seabass_weights, bins=bins, histtype='step', \n         edgecolor='red', linewidth=2, label=\"Sea bass\")\n\nplt.xlabel(\"Weight (g)\", fontsize=14)\nplt.ylabel(\"Count\", fontsize=14)\nplt.title(\"Distribution of Fish Weight\", fontsize=16, fontweight='bold')\nplt.legend(fontsize=13)\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()"
   },
   {
-    "objectID": "classification-2d-boundaries.html#試行1-目で見て直線を引いてみる",
-    "href": "classification-2d-boundaries.html#試行1-目で見て直線を引いてみる",
-    "title": "機械学習：分類問題",
-    "section": "試行1: 目で見て直線を引いてみる",
-    "text": "試行1: 目で見て直線を引いてみる\n\n\n考え方\n\nグラフを見て、手動で直線を引いてみましょう。\n\nどこに引けば一番うまく分けられそうか？\n完璧には分けられない → どのくらい誤分類が出るか？"
+    "objectID": "classification-basics-1d.html#統計値を見る",
+    "href": "classification-basics-1d.html#統計値を見る",
+    "title": "機械学習 Classification",
+    "section": "統計値を見る",
+    "text": "統計値を見る\n\n\n\ncode\nprint(f\"Salmon   - 最小: {min(salmon_weights)}g, 最大: {max(salmon_weights)}g, 平均: {np.mean(salmon_weights):.0f}g\")\nprint(f\"Sea bass - 最小: {min(seabass_weights)}g, 最大: {max(seabass_weights)}g, 平均: {np.mean(seabass_weights):.0f}g\")\noverlap_min = max(min(salmon_weights), min(seabass_weights))\noverlap_max = min(max(salmon_weights), max(seabass_weights))\nif overlap_max &gt;= overlap_min:\n    print(f\"\\n重なり範囲: {overlap_min}g - {overlap_max}g\")\n\n\nSalmon   - 最小: 1426g, 最大: 2474g, 平均: 1949g\nSea bass - 最小: 1099g, 最大: 2203g, 平均: 1593g\n\n重なり範囲: 1426g - 2203g\n\n\n\n\n\n\n\n\n発見\n\n\n\n双峰型の分布：2つの山が見える\n\n重なっている がまあ分けれそう？"
   },
   {
-    "objectID": "classification-2d-boundaries.html#この辺だとどうか",
-    "href": "classification-2d-boundaries.html#この辺だとどうか",
-    "title": "機械学習：分類問題",
-    "section": "この辺だとどうか",
-    "text": "この辺だとどうか\n\n\n\ncode\nplt.figure(figsize=(10, 7))\n\nplt.scatter(salmon_brightness, salmon_weights, \n           c='black', marker='o', s=100, alpha=0.7, label='Salmon', edgecolors='black')\nplt.scatter(seabass_brightness, seabass_weights, \n           c='red', marker='s', s=100, alpha=0.7, label='Sea bass', edgecolors='darkred')\n\n# 手動で引いた直線の例（適当に設定）\n# 例: 輝度=5.5あたりで垂直に分ける\nlightness_threshold = 5.5\nplt.axvline(x=lightness_threshold, color='blue', linestyle='--', linewidth=2.5, \n           label=f'decision boundary (Lightness = {lightness_threshold})')\n\nplt.xlabel('Lightness', fontsize=14, fontweight='bold')\nplt.ylabel('Weight (g)', fontsize=14, fontweight='bold')\nplt.title('Manual Decision Boundary', fontsize=16, fontweight='bold')\nplt.legend(fontsize=13, loc='upper left')\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nこの直線の性能は？\n\n\n輝度5.5を境界にすると、どのくらいの精度になるでしょうか？ 自分で計算してみましょう。\nSalmon を陽性 (1) とし、輝度 &lt; 5.5 → Salmon、&gt;= 5.5 → Sea bass で判定すると以下の通り。\n\n\n\n\n予測Salmon\n予測Sea bass\n\n\n\n\n実際Salmon\nTP = 35\nFN = 5\n\n\n実際Sea bass\nFP = 6\nTN = 34\n\n\n\n\nAccuracy = (35 + 34) / 80 = 0.86\nPrecision (Salmon) = 35 / (35 + 6) = 0.85\nRecall (Salmon) = 35 / (35 + 5) = 0.88\nF1 = 2TP / (2TP + FP + FN) = 70 / 81 ≈ 0.86\n\nSea bass を陽性にする等、別の定義を使う場合は同じ手順で数え直してみましょう。"
+    "objectID": "classification-basics-1d.html#境界線閾値を考える",
+    "href": "classification-basics-1d.html#境界線閾値を考える",
+    "title": "機械学習 Classification",
+    "section": "境界線（閾値）を考える",
+    "text": "境界線（閾値）を考える\n\n大体でいいので 境界線（threshold） を設定します。\n方針\n1800g以上 → Salmon\n1800g未満 → Sea bass\nこの判定ルールで分類してみましょう。"
   },
   {
-    "objectID": "classification-2d-boundaries.html#試行2-決定木decision-tree",
-    "href": "classification-2d-boundaries.html#試行2-決定木decision-tree",
-    "title": "機械学習：分類問題",
-    "section": "試行2: 決定木（Decision Tree）",
-    "text": "試行2: 決定木（Decision Tree）\n\n\nまず：ジニ不純度とは？\n\n決定木は「どこで分割すれば一番きれいに分かれるか」を自動で探します。\nその基準がジニ不純度（Gini impurity）です。\n\\[\\text{Gini} = 1 - (p_{\\text{Salmon}}^2 + p_{\\text{Sea bass}}^2)\\]\n\nGini = 0: 完全に1クラスだけ（純粋）\nGini = 0.5: 50:50で混ざってる（不純）\n\n\n\n\n\n\n\n例\n\n\n\nデータ10個：Salmon 10個、Sea bass 0個 → Gini = 1 - (1² + 0²) = 0\nデータ10個：Salmon 5個、Sea bass 5個 → Gini = 1 - (0.5² + 0.5²) = 0.5\nデータ10個：Salmon 8個、Sea bass 2個 → Gini = 1 - (0.8² + 0.2²) = 0.32"
+    "objectID": "classification-basics-1d.html#青破線で切ったとしたら",
+    "href": "classification-basics-1d.html#青破線で切ったとしたら",
+    "title": "機械学習 Classification",
+    "section": "青破線で切ったとしたら",
+    "text": "青破線で切ったとしたら"
   },
   {
-    "objectID": "classification-2d-boundaries.html#ジニ不純度を計算してみる",
-    "href": "classification-2d-boundaries.html#ジニ不純度を計算してみる",
-    "title": "機械学習：分類問題",
-    "section": "ジニ不純度を計算してみる",
-    "text": "ジニ不純度を計算してみる\n\n\n\ncode\ndef gini_impurity(labels):\n    \"\"\"ジニ不純度を計算\"\"\"\n    if len(labels) == 0:\n        return 0\n    p_salmon = sum(labels) / len(labels)  # 1=Salmon, 0=Sea bass\n    p_seabass = 1 - p_salmon\n    return 1 - (p_salmon**2 + p_seabass**2)\n\n# 全データのジニ不純度\ninitial_gini = gini_impurity(y)\nprint(f\"初期状態（分割前）のジニ不純度: {initial_gini:.3f}\")\nprint(f\"  Salmon: {sum(y)}個, Sea bass: {len(y)-sum(y)}個\")\n\n\n初期状態（分割前）のジニ不純度: 0.500\n  Salmon: 40個, Sea bass: 40個"
+    "objectID": "classification-basics-1d.html#分類結果4つのパターン",
+    "href": "classification-basics-1d.html#分類結果4つのパターン",
+    "title": "機械学習 Classification",
+    "section": "分類結果：4つのパターン",
+    "text": "分類結果：4つのパターン\n\n境界線1800gで分類すると、4つのパターンが生まれます：\n\n\n\n\n\n\n\n\n\n実際の魚\n判定結果\n略称\n説明\n\n\n\n\nSalmon\nSalmon\nTP (True Positive)\n正しくSalmonと判定\n\n\nSea bass\nSea bass\nTN (True Negative)\n正しくSalmonではないと判定\n\n\nSea bass\nSalmon\nFP (False Positive)\n誤ってSalmonと判定\n\n\nSalmon\nSea bass\nFN (False Negative)\nSalmonを見逃し"
   },
   {
-    "objectID": "classification-2d-boundaries.html#最良の閾値をどう探す",
-    "href": "classification-2d-boundaries.html#最良の閾値をどう探す",
-    "title": "機械学習：分類問題",
-    "section": "最良の閾値をどう探す？",
-    "text": "最良の閾値をどう探す？\n\n\n方法：総当たり\n\nデータの値すべてを候補として試します。\n\n\n\n\n\n\n\nなぜデータの値？\n\n\nデータとデータの間で分けるので、データの値を試せば十分。\n例：データが [2.1, 3.5, 5.8] なら - 2.1と3.5の間で分ける = 2.1で分割と同じ結果 - 3.5と5.8の間で分ける = 3.5で分割と同じ結果\n→ データの値だけ試せばOK"
+    "objectID": "classification-basics-1d.html#tpfptnfnの覚え方",
+    "href": "classification-basics-1d.html#tpfptnfnの覚え方",
+    "title": "機械学習 Classification",
+    "section": "TP/FP/TN/FNの覚え方",
+    "text": "TP/FP/TN/FNの覚え方\n\n\n右から左に読む\n\n\n右（P/N） 判定結果 → Positive (シャケ) or Negative (それ以外)\n左（T/F） その答え合わせ** → True (正解) or False (不正解)\n\nつまり、ある魚をみて識別した結果、\n\nTP: Positiveと判定 → True (正しかった！)\nFP: Positiveと判定 → False (間違ってた…)\nTN: Negatigeと判定 → True (正しかった！)\nFN: Negativeと判定 → False (間違ってた…)"
   },
   {
-    "objectID": "classification-2d-boundaries.html#いくつかの閾値を試してみる",
-    "href": "classification-2d-boundaries.html#いくつかの閾値を試してみる",
-    "title": "機械学習：分類問題",
-    "section": "いくつかの閾値を試してみる",
-    "text": "いくつかの閾値を試してみる\n\n\n\ncode\n# 輝度でいくつかの閾値を試す\ntest_thresholds = [3.0, 4.0, 5.0, 6.0, 7.0]\nresults = []\n\nfor threshold in test_thresholds:\n    # 分割\n    left_mask = X[:, 0] &lt; threshold\n    right_mask = ~left_mask\n    \n    if sum(left_mask) == 0 or sum(right_mask) == 0:\n        continue\n    \n    # 左右のジニ不純度\n    gini_left = gini_impurity(y[left_mask])\n    gini_right = gini_impurity(y[right_mask])\n    \n    # 加重平均\n    n_left = sum(left_mask)\n    n_right = sum(right_mask)\n    weighted_gini = (n_left * gini_left + n_right * gini_right) / len(y)\n    \n    results.append({\n        '閾値': f'{threshold:.1f}',\n        '左側': f'{sum(y[left_mask])}/{n_left}',\n        '右側': f'{sum(y[right_mask])}/{n_right}',\n        'Gini_left': f'{gini_left:.3f}',\n        'Gini_right': f'{gini_right:.3f}',\n        '加重平均': f'{weighted_gini:.3f}'\n    })\n\nresults_df = pd.DataFrame(results)\nprint(\"いくつかの閾値でのジニ不純度:\")\ndisplay(results_df)\nprint(\"\\n→ 加重平均が最小の閾値を選ぶ\")\n\n\nいくつかの閾値でのジニ不純度:\n\n\n\n\n\n\n\n\n\n閾値\n左側\n右側\nGini_left\nGini_right\n加重平均\n\n\n\n\n0\n3.0\n13/13\n27/67\n0.000\n0.481\n0.403\n\n\n1\n4.0\n22/22\n18/58\n0.000\n0.428\n0.310\n\n\n2\n5.0\n32/32\n8/48\n0.000\n0.278\n0.167\n\n\n3\n6.0\n40/50\n0/30\n0.320\n0.000\n0.200\n\n\n4\n7.0\n40/60\n0/20\n0.444\n0.000\n0.333\n\n\n\n\n\n\n\n\n→ 加重平均が最小の閾値を選ぶ\n\n\n\n\n\n\n\n\n重要\n\n\n実際は全てのユニーク値（80個以上）を試して、最小を見つけます。"
+    "objectID": "classification-basics-1d.html#混同行列confusion-matrix",
+    "href": "classification-basics-1d.html#混同行列confusion-matrix",
+    "title": "機械学習 Classification",
+    "section": "混同行列（Confusion Matrix）",
+    "text": "混同行列（Confusion Matrix）\n\n\n\ncode\nthreshold = 1800\n\n# Calculate confusion matrix\nTP = sum(1 for weight in salmon_weights if weight &gt;= threshold)\nFN = sum(1 for weight in salmon_weights if weight &lt; threshold)\nTN = sum(1 for weight in seabass_weights if weight &lt; threshold)\nFP = sum(1 for weight in seabass_weights if weight &gt;= threshold)\n\nimport matplotlib.patches as mpatches\n\nfig, ax = plt.subplots(figsize=(9, 7))\n\n# Confusion matrix data\ncm_data = np.array([[TP, FP], [FN, TN]])\n\n# Color map: 緑=正解、ピンク=誤り\ncolors = np.array([['#90EE90', '#FFB6C6'], ['#FFB6C6', '#90EE90']])\n\n# Draw cells\nfor i in range(2):\n    for j in range(2):\n        ax.add_patch(mpatches.Rectangle((j, 1-i), 1, 1, \n                                        facecolor=colors[i, j], \n                                        edgecolor='black', linewidth=2.5))\n        ax.text(j + 0.5, 1.5 - i, str(cm_data[i, j]), \n               ha='center', va='center', fontsize=48, fontweight='bold')\n        \n        # Add label\n        if i == 0 and j == 0:\n            label = 'TP'\n        elif i == 0 and j == 1:\n            label = 'FP'\n        elif i == 1 and j == 0:\n            label = 'FN'\n        else:\n            label = 'TN'\n        ax.text(j + 0.5, 1.15 - i, label, \n               ha='center', va='center', fontsize=16, style='italic', color='gray')\n\n# Set labels\nax.set_xlim(0, 2)\nax.set_ylim(0, 2)\nax.set_xticks([0.5, 1.5])\nax.set_yticks([0.5, 1.5])\nax.set_xticklabels(['Actual: Salmon', 'Actual: Sea bass'], fontsize=13, fontweight='bold')\nax.set_yticklabels(['Predict: Sea bass', 'Predict: Salmon'], fontsize=13, fontweight='bold')\nax.set_aspect('equal')\nax.tick_params(length=0)\nax.set_title(f'Confusion Matrix (Threshold = {threshold}g)', \n            fontsize=16, fontweight='bold', pad=20)\n\nplt.tight_layout()\nplt.show()"
   },
   {
-    "objectID": "classification-2d-boundaries.html#決定木のアルゴリズム交互版",
-    "href": "classification-2d-boundaries.html#決定木のアルゴリズム交互版",
-    "title": "機械学習：分類問題",
-    "section": "決定木のアルゴリズム（交互版）",
-    "text": "決定木のアルゴリズム（交互版）\n\n\nルール：特徴量を交互に使う\n\n1回目は輝度、2回目は重さ、3回目は輝度…と交互に使うことで、階段状の境界を作ります。\n\n\ncode\ndef find_best_split_for_feature(X, y, feature_idx):\n    \"\"\"指定した特徴量で最良の分割点を見つける\"\"\"\n    best_gini = float('inf')\n    best_threshold = None\n    best_left_mask = None\n    \n    # この特徴量のユニークな値を試す\n    values = np.unique(X[:, feature_idx])\n    \n    for threshold in values:\n        # 分割\n        left_mask = X[:, feature_idx] &lt; threshold\n        right_mask = ~left_mask\n        \n        # 左右が空でないことを確認\n        if sum(left_mask) == 0 or sum(right_mask) == 0:\n            continue\n        \n        # 左右のジニ不純度\n        gini_left = gini_impurity(y[left_mask])\n        gini_right = gini_impurity(y[right_mask])\n        \n        # 加重平均\n        n_left = sum(left_mask)\n        n_right = sum(right_mask)\n        weighted_gini = (n_left * gini_left + n_right * gini_right) / len(y)\n        \n        if weighted_gini &lt; best_gini:\n            best_gini = weighted_gini\n            best_threshold = threshold\n            best_left_mask = left_mask\n    \n    return best_threshold, best_gini, best_left_mask\n\n# 1回目の分割: 輝度（feature 0）\nfeature_names = ['Lightness', 'Weight']\nsplit1_feature = 0  # Lightness\nsplit1_threshold, split1_gini, split1_left_mask = find_best_split_for_feature(X, y, split1_feature)\n\nprint(f\"1回目の分割:\")\nprint(f\"  特徴量: {feature_names[split1_feature]}\")\nprint(f\"  閾値: {split1_threshold:.2f}\")\nprint(f\"  ジニ不純度: {split1_gini:.3f}\")\nprint(f\"  左側: {sum(split1_left_mask)}個, 右側: {sum(~split1_left_mask)}個\")\n\n\n1回目の分割:\n  特徴量: Lightness\n  閾値: 5.00\n  ジニ不純度: 0.167\n  左側: 32個, 右側: 48個"
+    "objectID": "classification-basics-1d.html#判定器の評価",
+    "href": "classification-basics-1d.html#判定器の評価",
+    "title": "機械学習 Classification",
+    "section": "判定器の評価",
+    "text": "判定器の評価\n\n\n\ncode\n# Calculate metrics\naccuracy = (TP + TN) / (TP + TN + FP + FN)\nprecision = TP / (TP + FP) if (TP + FP) &gt; 0 else 0\nrecall = TP / (TP + FN) if (TP + FN) &gt; 0 else 0\n\nmetrics = pd.DataFrame({\n    '指標': ['Accuracy', 'Precision', 'Recall'],\n    '値': [f'{accuracy:.3f}', f'{precision:.3f}', f'{recall:.3f}'],\n    '意味': [\n        '全体の正解率',\n        'Salmonと判定した中で実際にSalmonの割合',\n        '実際のSalmonをどれだけ検出できたか',\n    ]\n})\n\nfrom IPython.display import HTML\ntable_html = metrics.to_html(index=False, justify='center')\ndisplay(HTML(f\"&lt;div style='font-size:24px'&gt;{table_html}&lt;/div&gt;\"))\n\n\n\n\n\n\n指標\n値\n意味\n\n\n\n\nAccuracy\n0.775\n全体の正解率\n\n\nPrecision\n0.789\nSalmonと判定した中で実際にSalmonの割合\n\n\nRecall\n0.750\n実際のSalmonをどれだけ検出できたか\n\n\n\n\n\n\n\\[\\text{Accuracy} = \\frac{TP + TN}{\\text{全体}} = \\frac{\\text{正しく分類できた数}}{\\text{全データ数}}\\]\n\\[\\text{Precision} = \\frac{TP}{TP + FP} = \\frac{\\text{正しいSalmon判定}}{\\text{Salmonと判定した全て}}\\]\n\\[\\text{Recall} = \\frac{TP}{TP + FN} = \\frac{\\text{検出できたSalmon}}{\\text{実際のSalmon全て}}\\]"
   },
   {
-    "objectID": "classification-2d-boundaries.html#可視化1回目の分割",
-    "href": "classification-2d-boundaries.html#可視化1回目の分割",
-    "title": "機械学習：分類問題",
-    "section": "可視化：1回目の分割",
-    "text": "可視化：1回目の分割"
+    "objectID": "classification-basics-1d.html#しきい値を変えると",
+    "href": "classification-basics-1d.html#しきい値を変えると",
+    "title": "機械学習 Classification",
+    "section": "しきい値を変えると？",
+    "text": "しきい値を変えると？\n\n\n\ncode\nthresholds = [1600, 1800, 2000]\nresults = []\n\nfor threshold in thresholds:\n    TP = sum(1 for weight in salmon_weights if weight &gt;= threshold)\n    FN = sum(1 for weight in salmon_weights if weight &lt; threshold)\n    TN = sum(1 for weight in seabass_weights if weight &lt; threshold)\n    FP = sum(1 for weight in seabass_weights if weight &gt;= threshold)\n    \n    accuracy = (TP + TN) / (TP + TN + FP + FN)\n    precision = TP / (TP + FP) if (TP + FP) &gt; 0 else 0\n    recall = TP / (TP + FN) if (TP + FN) &gt; 0 else 0\n    \n    results.append({\n        '境界線': f'{threshold}g',\n        'TP': TP,\n        'FP': FP,\n        'FN': FN,\n        'TN': TN,\n        'Precision': f'{precision:.1%}',\n        'Recall': f'{recall:.1%}',\n        'Accuracy': f'{accuracy:.1%}'\n    })\n\ndf = pd.DataFrame(results)\ndf\n\n\n\n\n\n\n\n\n\n境界線\nTP\nFP\nFN\nTN\nPrecision\nRecall\nAccuracy\n\n\n\n\n0\n1600g\n17\n8\n3\n12\n68.0%\n85.0%\n72.5%\n\n\n1\n1800g\n15\n4\n5\n16\n78.9%\n75.0%\n77.5%\n\n\n2\n2000g\n8\n2\n12\n18\n80.0%\n40.0%\n65.0%\n\n\n\n\n\n\n\n\n\n\n\n\n\n重要\n\n\n\n境界を下げる（1600g） → Recall ↑、Precision ↓\n\nSalmonを逃さない（FN減）が、Sea bassの誤判定（FP増）\n\n境界を上げる（2000g） → Precision ↑、Recall ↓\n\nSalmon判定の信頼性は高いが、Salmonを見逃す（FN増）\n\n\n\n\n\nPrecision と Recall は トレードオフの関係"
   },
   {
-    "objectID": "classification-2d-boundaries.html#ステップ2-2回目の分割重さで分ける",
-    "href": "classification-2d-boundaries.html#ステップ2-2回目の分割重さで分ける",
-    "title": "機械学習：分類問題",
-    "section": "ステップ2: 2回目の分割（重さで分ける）",
-    "text": "ステップ2: 2回目の分割（重さで分ける）\n\n左側と右側をそれぞれ重さで分割します。\n\n\ncode\nsplit2_feature = 1  # Weight（交互なので重さ）\n\n# 左側を重さで分割\nX_left = X[split1_left_mask]\ny_left = y[split1_left_mask]\n\nsplit2_left_threshold = None\nif len(X_left) &gt; 1:\n    split2_left_threshold, split2_left_gini, split2_left_left_mask = find_best_split_for_feature(X_left, y_left, split2_feature)\n    print(f\"\\n2回目の分割（左側）:\")\n    print(f\"  特徴量: {feature_names[split2_feature]}\")\n    print(f\"  閾値: {split2_left_threshold:.0f}\")\n    print(f\"  ジニ不純度: {split2_left_gini:.3f}\")\n\n# 右側を重さで分割\nX_right = X[~split1_left_mask]\ny_right = y[~split1_left_mask]\n\nsplit2_right_threshold = None\nif len(X_right) &gt; 1:\n    split2_right_threshold, split2_right_gini, split2_right_left_mask = find_best_split_for_feature(X_right, y_right, split2_feature)\n    print(f\"\\n2回目の分割（右側）:\")\n    print(f\"  特徴量: {feature_names[split2_feature]}\")\n    print(f\"  閾値: {split2_right_threshold:.0f}\")\n    print(f\"  ジニ不純度: {split2_right_gini:.3f}\")\n\n\n\n2回目の分割（左側）:\n  特徴量: Weight\n  閾値: 1483\n  ジニ不純度: 0.000\n\n2回目の分割（右側）:\n  特徴量: Weight\n  閾値: 1820\n  ジニ不純度: 0.192"
+    "objectID": "classification-basics-1d.html#しきい値の比較1600g-vs-2000g",
+    "href": "classification-basics-1d.html#しきい値の比較1600g-vs-2000g",
+    "title": "機械学習 Classification",
+    "section": "しきい値の比較（1600g vs 2000g）",
+    "text": "しきい値の比較（1600g vs 2000g）\n\n\n\n\n\n\n\n\n\n\n\n\n\nFP=8\nFN=3\nPrecision: 68.0% (低い)\n\nRecall: 85.0% (高い)\n\n\n\n\n\n\n\n\n\n\n\nFP=2, FN=12 Precision: 80.0% (高い)\nRecall: 40.0% (低い)"
   },
   {
-    "objectID": "classification-2d-boundaries.html#可視化2回目の分割",
-    "href": "classification-2d-boundaries.html#可視化2回目の分割",
-    "title": "機械学習：分類問題",
-    "section": "可視化：2回目の分割",
-    "text": "可視化：2回目の分割"
+    "objectID": "classification-basics-1d.html#どの指標を重視すべきか",
+    "href": "classification-basics-1d.html#どの指標を重視すべきか",
+    "title": "機械学習 Classification",
+    "section": "どの指標を重視すべきか？",
+    "text": "どの指標を重視すべきか？\n\n\nケース1: 高級レストラン向け出荷\n\n\nPrecision重視（FPを避ける）\nSea bassの混入を最小化。混入絶対許さないマン\n→ 高めの閾値（2000g）\n\nケース2: 缶詰工場（Salmon専用ライン）\n\nRecall重視（FNを避ける）\nSalmonの取りこぼしを最小化。シャケ全部入れるマン\n→ 低めの閾値（1600g）"
   },
   {
-    "objectID": "classification-2d-boundaries.html#この境界線の性能は",
-    "href": "classification-2d-boundaries.html#この境界線の性能は",
-    "title": "機械学習：分類問題",
-    "section": "この境界線の性能は？",
-    "text": "この境界線の性能は？\n\n階段状の境界線で分類した結果を評価します。\n\n\ncode\n# 簡易的な予測関数\ndef predict_alternating(brightness, weight):\n    \"\"\"交互分割の決定木で予測\"\"\"\n    if brightness &lt; split1_threshold:\n        # 左側（暗い方＝Salmon寄り）\n        if split2_left_threshold is not None:\n            if weight &gt;= split2_left_threshold:\n                return 1  # Salmon（重い）\n            else:\n                return 0  # Sea bass（軽い）\n        else:\n            return 1  # Salmon (分割なし)\n    else:\n        # 右側（明るい方＝Sea bass寄り）\n        if split2_right_threshold is not None:\n            if weight &gt;= split2_right_threshold:\n                return 1  # Salmon（重い）\n            else:\n                return 0  # Sea bass（軽い）\n        else:\n            return 0  # Sea bass (分割なし)\n\n# 全データで予測\ny_pred_alternating = np.array([predict_alternating(X[i, 0], X[i, 1]) for i in range(len(X))])\n\n# 混同行列\nfrom sklearn.metrics import confusion_matrix\ncm = confusion_matrix(y, y_pred_alternating)\n\nTP = cm[1, 1]\nTN = cm[0, 0]\nFP = cm[0, 1]\nFN = cm[1, 0]\n\n# 評価指標\naccuracy_alt = (TP + TN) / (TP + TN + FP + FN)\nprecision_alt = TP / (TP + FP) if (TP + FP) &gt; 0 else 0\nrecall_alt = TP / (TP + FN) if (TP + FN) &gt; 0 else 0\n\nprint(f\"交互分割決定木の性能 (深さ2):\")\nprint(f\"  TP={TP}, FP={FP}, FN={FN}, TN={TN}\")\nprint(f\"  Accuracy:  {accuracy_alt:.3f}\")\nprint(f\"  Precision: {precision_alt:.3f}\")\nprint(f\"  Recall:    {recall_alt:.3f}\")\n\n\n交互分割決定木の性能 (深さ2):\n  TP=37, FP=5, FN=3, TN=35\n  Accuracy:  0.900\n  Precision: 0.881\n  Recall:    0.925"
+    "objectID": "classification-basics-1d.html#コストを考慮した最適化",
+    "href": "classification-basics-1d.html#コストを考慮した最適化",
+    "title": "機械学習 Classification",
+    "section": "コストを考慮した最適化",
+    "text": "コストを考慮した最適化\n\n誤分類のコストが異なる場合、総コストを最小化する閾値を選べます。 \\[\n\\begin{aligned}\n&\\text{argmin}(\\text{総コスト}) = N(\\text{FP}) \\times \\text{Cost}(\\text{FP}) + N(\\text{FN}) \\times \\text{Cost}(\\text{FN})\\\\\n&\\quad \\small{N(x): x\\text{の個数},\\; \\text{Cost}(x): x\\text{ 1個あたりのコスト}}\n\\end{aligned}\n\\]\n\n\ncode\n# 例：Sea bass混入のクレーム対応コストが高い場合\nC_FP = 10000  # Sea bass混入のクレーム対応コスト（円/匹）\nC_FN = 500    # Salmon再選別コスト（円/匹）\n\ncost_results = []\nfor threshold in [1600, 1800, 2000]:\n    TP = sum(1 for weight in salmon_weights if weight &gt;= threshold)\n    FN = sum(1 for weight in salmon_weights if weight &lt; threshold)\n    TN = sum(1 for weight in seabass_weights if weight &lt; threshold)\n    FP = sum(1 for weight in seabass_weights if weight &gt;= threshold)\n    \n    total_cost = FP * C_FP + FN * C_FN\n    cost_results.append({\n        '境界線': f'{threshold}g',\n        'FP': FP,\n        'FN': FN,\n        '総コスト': f'¥{total_cost:,}'\n    })\ncost_df = pd.DataFrame(cost_results)\n\nmin_idx = cost_df.index[cost_df['総コスト'].str.replace('¥', '').str.replace(',', '').astype(int).idxmin()]\ncost_df.loc[min_idx, '境界線'] = '★ ' + cost_df.loc[min_idx, '境界線']\ncost_df.style.hide(axis='index')\n\n\n\n\n\n\n\n境界線\nFP\nFN\n総コスト\n\n\n\n\n1600g\n8\n3\n¥81,500\n\n\n1800g\n4\n5\n¥42,500\n\n\n★ 2000g\n2\n12\n¥26,000\n\n\n\n\n\nこのコスト関数での最適なしきい値: 2000g（総コスト最小）"
   },
   {
-    "objectID": "classification-2d-boundaries.html#scikit-learnの決定木と比較",
-    "href": "classification-2d-boundaries.html#scikit-learnの決定木と比較",
-    "title": "機械学習：分類問題",
-    "section": "scikit-learnの決定木と比較",
-    "text": "scikit-learnの決定木と比較\n\n自作の決定木（深さ2、交互分割）とライブラリの実装（深さ3、最良特徴量を選択）を比較してみましょう。\n\n\n\n\n\n\n違い\n\n\n\n自作版: 深さ2まで、輝度→重さと交互に使う\nscikit-learn: 深さ3まで、毎回最良の特徴量を自動選択\n→ scikit-learnの方がより細かい階段になる\n\n\n\n\n\n\ncode\n# 決定木モデル（深さ3まで）\ntree_model = DecisionTreeClassifier(max_depth=3, random_state=42)\ntree_model.fit(X, y)\n\n# 予測\ny_pred_tree = tree_model.predict(X)\n\n# 評価\naccuracy_tree = accuracy_score(y, y_pred_tree)\nprecision_tree = precision_score(y, y_pred_tree)\nrecall_tree = recall_score(y, y_pred_tree)\n\nprint(f\"決定木の性能:\")\nprint(f\"  Accuracy:  {accuracy_tree:.3f}\")\nprint(f\"  Precision: {precision_tree:.3f}\")\nprint(f\"  Recall:    {recall_tree:.3f}\")\n\n\n決定木の性能:\n  Accuracy:  0.975\n  Precision: 0.952\n  Recall:    1.000"
+    "objectID": "classification-basics-1d.html#試行1の結論",
+    "href": "classification-basics-1d.html#試行1の結論",
+    "title": "機械学習 Classification",
+    "section": "試行1の結論",
+    "text": "試行1の結論\n\n\n\n\n\n\n\n重要なポイント\n\n\n\n重さだけでは完全な分類は不可能\n\nデータの分布が重なっている\n\n境界線は「方針の選択」\n\n正解/不正解ではなく、用途に応じた最適化（optimization）\n\n評価指標はトレードオフ\n\nPrecision ↑ → Recall ↓\nどちらを重視するかは用途次第"
   },
   {
-    "objectID": "classification-2d-boundaries.html#決定境界の可視化決定木",
-    "href": "classification-2d-boundaries.html#決定境界の可視化決定木",
-    "title": "機械学習：分類問題",
-    "section": "決定境界の可視化（決定木）",
-    "text": "決定境界の可視化（決定木）\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nノート\n\n\n\n決定境界が階段状（水平・垂直の線の組み合わせ）\nif-thenルールの結果がこの形になる"
-  },
-  {
-    "objectID": "classification-2d-boundaries.html#試行3-ロジスティック回帰線形分類器",
-    "href": "classification-2d-boundaries.html#試行3-ロジスティック回帰線形分類器",
-    "title": "機械学習：分類問題",
-    "section": "試行3: ロジスティック回帰（線形分類器）",
-    "text": "試行3: ロジスティック回帰（線形分類器）\n\n\n考え方\n\n数学的に最適な直線を見つける\n\n数式: \\(w_1 \\times \\text{輝度} + w_2 \\times \\text{重さ} + b = 0\\)\nこの直線で2クラスを最もうまく分ける\n斜めの直線が引ける\n\n\n\n\n\n\n\n\nロジスティック回帰\n\n\n線形分類器の代表的な手法。確率も計算できる。"
-  },
-  {
-    "objectID": "classification-2d-boundaries.html#ロジスティック回帰で学習",
-    "href": "classification-2d-boundaries.html#ロジスティック回帰で学習",
-    "title": "機械学習：分類問題",
-    "section": "ロジスティック回帰で学習",
-    "text": "ロジスティック回帰で学習\n\n\n\ncode\n# ロジスティック回帰モデル\nlr_model = LogisticRegression()\nlr_model.fit(X, y)\n\n# 予測\ny_pred_lr = lr_model.predict(X)\n\n# 評価\naccuracy_lr = accuracy_score(y, y_pred_lr)\nprecision_lr = precision_score(y, y_pred_lr)\nrecall_lr = recall_score(y, y_pred_lr)\n\nprint(f\"ロジスティック回帰の性能:\")\nprint(f\"  Accuracy:  {accuracy_lr:.3f}\")\nprint(f\"  Precision: {precision_lr:.3f}\")\nprint(f\"  Recall:    {recall_lr:.3f}\")\n\n\nロジスティック回帰の性能:\n  Accuracy:  0.950\n  Precision: 0.974\n  Recall:    0.925"
-  },
-  {
-    "objectID": "classification-2d-boundaries.html#決定境界の可視化ロジスティック回帰",
-    "href": "classification-2d-boundaries.html#決定境界の可視化ロジスティック回帰",
-    "title": "機械学習：分類問題",
-    "section": "決定境界の可視化（ロジスティック回帰）",
-    "text": "決定境界の可視化（ロジスティック回帰）\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nノート\n\n\n\n青い直線が決定境界\n背景色: 赤＝Salmon領域、青＝Sea bass領域\n斜めの直線1本でシンプルに分離"
-  },
-  {
-    "objectID": "classification-2d-boundaries.html#つのアルゴリズムの比較",
-    "href": "classification-2d-boundaries.html#つのアルゴリズムの比較",
-    "title": "機械学習：分類問題",
-    "section": "2つのアルゴリズムの比較",
-    "text": "2つのアルゴリズムの比較\n\n\n\n決定木\nメリット: - 解釈しやすい（if-thenルール） - 自動で最適化（ジニ不純度） - 軸に平行な境界\nデメリット: - 過学習（overfitting）しやすい - 階段状の境界のみ\n\nロジスティック回帰\nメリット: - 数学的に最適 - シンプル（斜めの直線） - 過学習しにくい\nデメリット: - 線形のみ - 複雑なパターンに弱い"
-  },
-  {
-    "objectID": "classification-2d-boundaries.html#性能比較表",
-    "href": "classification-2d-boundaries.html#性能比較表",
-    "title": "機械学習：分類問題",
-    "section": "性能比較表",
-    "text": "性能比較表\n\n\n\n\n\n\n\nモデル\nAccuracy\nPrecision\nRecall\n\n\n\n\n決定木\n0.975\n0.952\n1.000\n\n\nロジスティック回帰\n0.950\n0.974\n0.925\n\n\n\n\n\n\n\n\n\n\n\n\n重要\n\n\nどちらが「正解」ではなく、データと目的に応じて選ぶ"
-  },
-  {
-    "objectID": "classification-2d-boundaries.html#決定木の深さを変えると",
-    "href": "classification-2d-boundaries.html#決定木の深さを変えると",
-    "title": "機械学習：分類問題",
-    "section": "決定木の深さを変えると？",
-    "text": "決定木の深さを変えると？\n\n\n深さ＝ if-then ルールの段数。深いほど複雑な境界が作れる\n深さ 1・3・無制限で学習し、同じデータで採点してみる\n\n\n\ncode\nfor depth in [1, 3, None]:\n    model = DecisionTreeClassifier(max_depth=depth, random_state=42)\n    model.fit(X, y)\n    acc = accuracy_score(y, model.predict(X))\n    label = \"無制限\" if depth is None else f\"深さ{depth}　\"\n    print(f\"{label}: Accuracy = {acc:.3f}\")\n\n\n深さ1　: Accuracy = 0.900\n深さ3　: Accuracy = 0.975\n無制限: Accuracy = 1.000\n\n\n\n\n\n\n\n\n\nクイズ\n\n\n深さ無制限なら、ついに正答率 100%。 これは「最強のモデルが完成した」ということでいい？"
-  },
-  {
-    "objectID": "classification-2d-boundaries.html#peek-overfit-boundary",
-    "href": "classification-2d-boundaries.html#peek-overfit-boundary",
-    "title": "機械学習：分類問題",
-    "section": "深さ無制限の境界を見てみる",
-    "text": "深さ無制限の境界を見てみる\n\n\n\n\n\n\n\n\n\n\n\n無制限の木には、数匹を救うためだけの細長い回廊（飛び地）ができている\n実際に学習されたルールを読むと「輝度が 5.35〜5.70 でも、重さが 2205g を超えるなら Salmon」のような異様に具体的な条項が入っている"
-  },
-  {
-    "objectID": "classification-2d-boundaries.html#この満点信用できるのか",
-    "href": "classification-2d-boundaries.html#この満点信用できるのか",
-    "title": "機械学習：分類問題",
-    "section": "この満点、信用できるのか",
-    "text": "この満点、信用できるのか\n\n\n採点に使ったのは、学習に使ったのと同じ80匹\n過去問を丸暗記すれば、過去問のテストは満点になる\nあの飛び地ルールが「次に来る魚」にも通用するかは、この採点方法では確かめようがない\n\n\n\n\n\n\n\n警告\n\n\n精度の数字は、何で採点したかとセットでないと意味を持たない。"
-  },
-  {
-    "objectID": "classification-2d-boundaries.html#混同行列で詳しく見る決定木",
-    "href": "classification-2d-boundaries.html#混同行列で詳しく見る決定木",
-    "title": "機械学習：分類問題",
-    "section": "混同行列で詳しく見る（決定木）",
-    "text": "混同行列で詳しく見る（決定木）\n\n\n\ncode\n# 決定木（深さ3）の混同行列\ncm = confusion_matrix(y, y_pred_tree)\n\nTP = cm[1, 1]  # Salmon correctly classified as Salmon\nTN = cm[0, 0]  # Sea bass correctly classified as Sea bass\nFP = cm[0, 1]  # Sea bass incorrectly classified as Salmon\nFN = cm[1, 0]  # Salmon incorrectly classified as Sea bass\n\nimport matplotlib.patches as mpatches\n\nfig, ax = plt.subplots(figsize=(9, 7))\n\n# Confusion matrix data\ncm_data = np.array([[TP, FP], [FN, TN]])\n\n# Color map: 緑=正解、ピンク=誤り\ncolors = np.array([['#90EE90', '#FFB6C6'], ['#FFB6C6', '#90EE90']])\n\n# Draw cells\nfor i in range(2):\n    for j in range(2):\n        ax.add_patch(mpatches.Rectangle((j, 1-i), 1, 1, \n                                        facecolor=colors[i, j], \n                                        edgecolor='black', linewidth=2.5))\n        ax.text(j + 0.5, 1.5 - i, str(cm_data[i, j]), \n               ha='center', va='center', fontsize=48, fontweight='bold')\n        \n        # Add label\n        if i == 0 and j == 0:\n            label = 'TP'\n        elif i == 0 and j == 1:\n            label = 'FP'\n        elif i == 1 and j == 0:\n            label = 'FN'\n        else:\n            label = 'TN'\n        ax.text(j + 0.5, 1.15 - i, label, \n               ha='center', va='center', fontsize=16, style='italic', color='gray')\n\n# Set labels\nax.set_xlim(0, 2)\nax.set_ylim(0, 2)\nax.set_xticks([0.5, 1.5])\nax.set_yticks([0.5, 1.5])\nax.set_xticklabels(['Actual: Salmon', 'Actual: Sea bass'], fontsize=13, fontweight='bold')\nax.set_yticklabels(['Predict: Sea bass', 'Predict: Salmon'], fontsize=13, fontweight='bold')\nax.set_aspect('equal')\nax.tick_params(length=0)\nax.set_title('Confusion Matrix (Decision Tree)', \n            fontsize=16, fontweight='bold', pad=20)\n\nplt.tight_layout()\nplt.show()\n\nprint(f\"\\nTP={TP}, FP={FP}, FN={FN}, TN={TN}\")\n\n\n\n\n\n\n\n\n\n\nTP=40, FP=2, FN=0, TN=38"
-  },
-  {
-    "objectID": "classification-2d-boundaries.html#まとめ",
-    "href": "classification-2d-boundaries.html#まとめ",
-    "title": "機械学習：分類問題",
-    "section": "まとめ",
-    "text": "まとめ\n\n\n\n\n\n\n\n重要なポイント\n\n\n\n2次元にすることで分類精度が向上\n\n重さ + 輝度の組み合わせで、より正確に分類\n\nまず目で見て、次にアルゴリズム\n\n手動の直線 → 決定木 → ロジスティック回帰\n段階的に理解を深める\n\nアルゴリズムによって決定境界が異なる\n\n決定木: 階段状（軸に平行）\nロジスティック回帰: 斜めの直線\n\nトレードオフを理解する\n\nシンプル vs 複雑\n解釈しやすさ vs 性能\n満点に見えても信用できない場合がある（深さ無制限の決定木）"
-  },
-  {
-    "objectID": "classification-2d-boundaries.html#練習問題",
-    "href": "classification-2d-boundaries.html#練習問題",
-    "title": "機械学習：分類問題",
+    "objectID": "classification-basics-1d.html#練習問題",
+    "href": "classification-basics-1d.html#練習問題",
+    "title": "機械学習 Classification",
     "section": "練習問題",
-    "text": "練習問題\n\n以下を実装して、レポートで提出せよ。\n\n手動で境界線を決める\n\nグラフを見て、自分で境界線を決める\nその境界線でのTP, FP, FN, TNを計算\n\n決定木と ロジスティック回帰を両方実装\n\n提供されたデータで学習\n\n決定木の深さを1, 2, 3, 4, 5で試す\n\nそれぞれのAccuracy, Precision, Recallを比較\nどの深さが最適か考察\n\n考察\n\n手動の境界線 vs 決定木 vs ロジスティック回帰\nどれが最も良かったか？その理由は？\n2次元にすることで、1次元と比べてどう改善したか？"
+    "text": "練習問題\n\n下記のデータ（それぞれ20匹ずつ追加した）について、以下の0-3までのことを実行して分類器をつくれ。\n\nsalmon_weights = [2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,\n                  1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,\n                  2028, 1903, 2057, 1629, 1884, 1884, 2240, 2081, 1838, 2037,\n                  1839, 1738, 1978, 1754, 1991, 1720, 1731, 1992, 1752, 1652]\nseabass_weights = [1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,\n                   2015, 1528, 1612, 1183, 1436, 1625, 1261, 1701, 1420, 1509,\n                   1387, 1345, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,\n                   1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531]"
   },
   {
-    "objectID": "classification-2d-boundaries.html#次回予告",
-    "href": "classification-2d-boundaries.html#次回予告",
-    "title": "機械学習：分類問題",
-    "section": "次回予告",
-    "text": "次回予告\n\n\n深さ無制限の決定木は「同じデータで採点」して満点だった\n次回、このあやしい満点の正体を、新しい魚で採点することで暴く\n正体には名前がある — 過学習（Overfitting）"
+    "objectID": "classification-basics-1d.html#以下をレポートで提出",
+    "href": "classification-basics-1d.html#以下をレポートで提出",
+    "title": "機械学習 Classification",
+    "section": "以下をレポートで提出",
+    "text": "以下をレポートで提出\n\n\nまず何をするべきかを考えて実行せよ。\n閾値を1800gにした場合の TP, FP, FN, TN を計算せよ\n1800gの場合の Accuracy, Precision, Recall を求めよ。\n1700gの場合の Accuracy, Precision, Recall を求めよ。\n\\(C_{FP}=5000\\)円、\\(C_{FN}=1000\\)円としたとき、総コストを最小にするしきい値を求めよ"
   },
   {
-    "objectID": "classification-evaluation.html#前回の振り返り",
-    "href": "classification-evaluation.html#前回の振り返り",
-    "title": "過学習と汎化",
+    "objectID": "classification-basics-1d.html#問0の答え",
+    "href": "classification-basics-1d.html#問0の答え",
+    "title": "機械学習 Classification",
+    "section": "問0の答え",
+    "text": "問0の答え"
+  },
+  {
+    "objectID": "clustering-kmeans.html#前回の振り返り",
+    "href": "clustering-kmeans.html#前回の振り返り",
+    "title": "教師なし学習とクラスタリング",
     "section": "前回の振り返り",
-    "text": "前回の振り返り\n\n\n2次元分類と「あやしい満点」\n\n\n重さ + 輝度の 2特徴量 で Salmon / Sea bass を分類\n決定木・ロジスティック回帰で決定境界を学習した\n深さ無制限の決定木は正答率 100% — ただし採点は学習に使った同じデータ\n境界には、数匹のためだけの飛び地ができていた\n\n\n\n\n\n\n\n\n今回の問い\n\n\nあの満点は 本当に信頼できる のか？"
+    "text": "前回の振り返り\n\n\n分類問題ではラベルが必要だった\n\n\n訓練データに「これはサーモン、これはスズキ」という正解ラベルが必要\nロジスティック回帰はラベル付きデータを使って決定境界を学習した\n\n\n\n\n\n\n\n\n今回の問い\n\n\n魚にラベルを付ける余裕がない場合、何もできないのか？"
   },
   {
-    "objectID": "classification-evaluation.html#何が問題か",
-    "href": "classification-evaluation.html#何が問題か",
-    "title": "過学習と汎化",
-    "section": "何が問題か",
-    "text": "何が問題か\n\n\nモデルは、学習データの特徴を見てパラメータを調整する\nその同じデータで採点すると、精度は高めに出やすい\n知りたいのは「覚えたデータへの強さ」ではない\n知りたいのは「次に来る魚にも通用するか」\n\n\n\n\n\n\n\n\n学習データで採点する危険\n\n\n\n学習に使ったデータでの精度は、モデルの実力を楽観的に見積もる可能性がある\nまずは、前回と同じ採点方法をもう一度確認する"
+    "objectID": "clustering-kmeans.html#教師あり学習-vs-教師なし学習",
+    "href": "clustering-kmeans.html#教師あり学習-vs-教師なし学習",
+    "title": "教師なし学習とクラスタリング",
+    "section": "教師あり学習 vs 教師なし学習",
+    "text": "教師あり学習 vs 教師なし学習\n\n\n\n教師あり学習（Supervised）\n\n正解ラベルつきデータを使う\n「これはサーモン」と教えながら学習\n例：分類、回帰\n\n\n教師なし学習（Unsupervised）\n\nラベルなしデータを使う\nデータの構造・パターンを自分で見つける\n例：クラスタリング、次元削減\n\n\n\n\n\n\n\n\nノート\n\n\nどちらが優れているというわけではなく、使えるデータに応じて選ぶ"
   },
   {
-    "objectID": "classification-evaluation.html#汎化という考え方",
-    "href": "classification-evaluation.html#汎化という考え方",
-    "title": "過学習と汎化",
-    "section": "汎化という考え方",
-    "text": "汎化という考え方\n\n\n勉強には2種類のうまく見える状態がある\n\n\n\n\n方法\n内容\n本当の実力？\n\n\n\n\n暗記\n去年の問題を全部覚える\n✗ 今年の問題は解けない\n\n\n理解\n解き方を身に付ける\n✓ 未知の問題にも対応できる\n\n\n\n\n機械学習モデルでも、同じ区別が必要\n\n\n\n\n\n\n\n\n汎化（generalization）\n\n\n\nモデルが学習していないデータにも通用する能力のこと"
+    "objectID": "clustering-kmeans.html#ラベルを失った魚たち",
+    "href": "clustering-kmeans.html#ラベルを失った魚たち",
+    "title": "教師なし学習とクラスタリング",
+    "section": "ラベルを失った魚たち",
+    "text": "ラベルを失った魚たち\n\n\n80匹分の測定データ（輝度・重さ）は手元にある\nところがどれが Salmon でどれが Sea bass か、記録が消えた\n\n\n\n魚データの定義（クリックして展開）\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\nplt.rcParams['font.size'] = 11\nplt.rcParams['figure.dpi'] = 100\n\nsalmon_weights     = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,\n                               1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,\n                               2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,\n                               1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652])\nsalmon_brightness  = np.array([3.5, 5.8, 4.9, 4.4, 2.6, 2.6, 2.2, 5.5, 4.4, 4.8, 2.1,\n                               5.9, 5.3, 2.8, 2.7, 2.7, 3.2, 4.1, 3.7, 3.2, 4.4, 2.6,\n                               3.2, 3.5, 3.8, 5.1, 2.8, 4.1, 4.4, 2.2, 4.4, 2.7, 2.3,\n                               5.8, 5.9, 5.2, 3.2, 2.4, 4.7, 3.8])\nseabass_weights    = np.array([1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,\n                               1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,\n                               1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,\n                               1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531])\nseabass_brightness = np.array([5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8,\n                               8.9, 9.7, 9.5, 8.0, 9.6, 5.4, 6.0, 5.2, 6.6, 6.9, 6.4,\n                               9.1, 6.8, 6.4, 7.7, 5.7, 9.0, 5.4, 9.9, 8.9, 6.0, 5.0,\n                               9.1, 8.5, 8.6, 8.9, 5.4, 6.8, 5.6])\n\nX = np.column_stack([\n    np.concatenate([salmon_brightness, seabass_brightness]),\n    np.concatenate([salmon_weights,    seabass_weights])\n])\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nクイズ\n\n\nラベルなしのこの図、何個のグループに見える？"
   },
   {
-    "objectID": "classification-evaluation.html#訓練データとテストデータ",
-    "href": "classification-evaluation.html#訓練データとテストデータ",
-    "title": "過学習と汎化",
-    "section": "訓練データとテストデータ",
-    "text": "訓練データとテストデータ\n\n\nデータを2つに分けて使う\n\n\n\n\n\n\n\n\n\n\n\n訓練データ：モデルに見せて学習させる\nテストデータ：学習後に一度だけ使い「本当の精度」を測る\n\n\n\n\n\n\n\n\nテストデータの鉄則\n\n\n\nテストデータを確認してからモデルを調整しない\n「見たことのない問題」を模擬するために残しておく"
+    "objectID": "clustering-kmeans.html#クラスタリングとは",
+    "href": "clustering-kmeans.html#クラスタリングとは",
+    "title": "教師なし学習とクラスタリング",
+    "section": "クラスタリングとは",
+    "text": "クラスタリングとは\n\n\n\n人の目には2つの塊が見える — では、それを機械に見つけさせられるか？\n\n\n\nデータを似たもの同士のグループ（クラスタ）にまとめる\n正解ラベルがなくても、データの分布から自然なグループを見つける\n用途の例\n\n顧客をグループに分けて施策を変える\n大量の文書を話題ごとに整理する\n「どのグループにも入らない点」を見つける（異常検知）"
   },
   {
-    "objectID": "classification-evaluation.html#データの準備-魚を増やす",
-    "href": "classification-evaluation.html#データの準備-魚を増やす",
-    "title": "過学習と汎化",
-    "section": "データの準備 — 魚を増やす",
-    "text": "データの準備 — 魚を増やす\n\n\n前回の80匹に、新しく測った40匹を加えた120匹で考える\nデータが増えると、どちらとも言いにくい微妙な個体や計測のばらつきも入ってくる\n\n\n\n魚データの定義（クリックして展開）\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\nplt.rcParams['font.size'] = 11\nplt.rcParams['figure.dpi'] = 100\n\nsalmon_weights     = np.array([1883, 1903, 1652, 1483, 1825, 2474, 2457, 1503, 2057, 1836,\n                               1825, 2094, 2149, 1930, 2028, 1959, 1859, 1936, 1861, 2240,\n                               2081, 1838, 1728, 1426, 2229, 1838, 1884, 1860, 1930, 1733,\n                               2163, 1831, 1591, 2073, 1706, 1644, 2194, 1828, 1820, 1834,\n                               1554, 1615, 1884, 1979, 1839, 2230, 1986, 1978, 1731, 1796,\n                               1872, 2031, 1458, 1405, 2037, 1576, 1774, 1992, 1696, 1752])\nsalmon_brightness  = np.array([7.5, 2.6, 3.8, 2.7, 5.8, 2.2, 4.4, 6.0, 3.2, 4.7, 5.7, 4.1,\n                               3.5, 2.6, 4.4, 5.8, 4.4, 5.4, 2.1, 2.8, 4.1, 2.7, 3.7, 2.8,\n                               3.5, 4.4, 3.8, 5.9, 2.6, 7.2, 4.8, 2.7, 5.9, 5.3, 6.1, 5.4,\n                               4.9, 7.2, 5.2, 5.4, 5.8, 5.1, 5.1, 5.8, 4.4, 5.5, 5.9, 2.3,\n                               3.2, 5.3, 4.8, 4.0, 5.0, 6.6, 2.2, 3.2, 4.4, 2.4, 3.2, 4.7])\nseabass_weights    = np.array([2181, 1749, 1864, 1327, 1819, 1979, 1787, 1488, 1370, 1476,\n                               1472, 1533, 1099, 1368, 1486, 1663, 1992, 1370, 1906, 1480,\n                               1426, 1677, 1286, 1445, 1381, 1333, 1505, 1857, 1767, 1492,\n                               1502, 1468, 1259, 1517, 1278, 1223, 1595, 1531, 1096, 1582,\n                               1513, 1440, 1703, 1490, 1432, 2019, 1397, 1341, 1657, 1414,\n                               1748, 1859, 1820, 1245, 2203, 1204, 1496, 1567, 1563, 1737])\nseabass_brightness = np.array([5.4, 6.6, 6.0, 7.5, 4.9, 7.7, 6.9, 5.0, 8.9, 8.3, 5.7, 8.9,\n                               9.7, 6.9, 5.2, 4.7, 5.3, 5.4, 5.1, 4.8, 3.8, 5.6, 5.2, 6.4,\n                               6.4, 6.6, 9.1, 6.3, 4.9, 5.9, 5.6, 5.9, 5.7, 5.2, 9.1, 6.8,\n                               3.5, 5.6, 5.4, 5.4, 7.7, 9.5, 4.7, 4.7, 9.9, 5.4, 5.3, 9.5,\n                               8.5, 6.0, 8.0, 5.7, 6.0, 8.6, 7.6, 6.8, 9.8, 9.0, 9.6, 8.9])\n\nX = np.column_stack([\n    np.concatenate([salmon_brightness, seabass_brightness]),\n    np.concatenate([salmon_weights,    seabass_weights])\n])\ny = np.array([1]*60 + [0]*60)   # 1=Salmon, 0=Sea bass"
-  },
-  {
-    "objectID": "classification-evaluation.html#まずデータを眺める",
-    "href": "classification-evaluation.html#まずデータを眺める",
-    "title": "過学習と汎化",
-    "section": "まずデータを眺める",
-    "text": "まずデータを眺める\n\n\n\n\n\n\n\n\n\n\n\n「左上が Salmon・右下が Sea bass」の傾向は前回と同じ\nただし真ん中に、2種が入り混じるゾーンができている\nどんな境界線を引いても、このゾーンの多少の間違いは避けられない\n\n\n\n\n\n\n\n\nここで予想\n\n\nこのデータで「正答率 100%」を出すモデルがあったら — それは天才か、それとも？"
-  },
-  {
-    "objectID": "classification-evaluation.html#前回と同じ採点方法",
-    "href": "classification-evaluation.html#前回と同じ採点方法",
-    "title": "過学習と汎化",
-    "section": "前回と同じ採点方法",
-    "text": "前回と同じ採点方法\n\n\nまずは全データで学習し、同じ全データで評価する\nこれは「学習済みデータへの精度」を測っている\n\n\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.metrics import accuracy_score\n\nsame_data_model = LogisticRegression(max_iter=1000)\nsame_data_model.fit(X, y)\n\nsame_data_acc = accuracy_score(y, same_data_model.predict(X))\nprint(f\"全データで学習 → 同じ全データで評価: {same_data_acc:.3f}\")\n\n全データで学習 → 同じ全データで評価: 0.800\n\n\n\n\n\n\n\n\nノート\n\n\n\nこの値だけでは、新しい魚にも通用するかは分からない\n次に、データを「学習用」と「評価用」に分ける"
-  },
-  {
-    "objectID": "classification-evaluation.html#ホールドアウト法",
-    "href": "classification-evaluation.html#ホールドアウト法",
-    "title": "過学習と汎化",
-    "section": "ホールドアウト法",
-    "text": "ホールドアウト法\n\n\nデータの一部を、最初から評価用に取り分ける\n手軽なので、最初に試す評価方法としてよく使う\n\n\nfrom sklearn.model_selection import train_test_split\n\n# 8:2 に分割（test_size=0.2 で20%をテストに）\nX_train, X_test, y_train, y_test = train_test_split(\n    X, y, test_size=0.2, random_state=42\n)\n\nprint(f\"全データ:       {len(X)} 匹\")\nprint(f\"訓練データ:   {len(X_train)} 匹\")\nprint(f\"テストデータ: {len(X_test)} 匹\")\n\n全データ:       120 匹\n訓練データ:   96 匹\nテストデータ: 24 匹\n\n\n\n\n\n\n\n\n\nrandom_state とは\n\n\n\n分割はランダムなので毎回変わる\nrandom_state=42 のように数値を固定すると再現できる"
-  },
-  {
-    "objectID": "classification-evaluation.html#見ていないデータで評価する",
-    "href": "classification-evaluation.html#見ていないデータで評価する",
-    "title": "過学習と汎化",
-    "section": "見ていないデータで評価する",
-    "text": "見ていないデータで評価する\n\n\nmodel = LogisticRegression(max_iter=1000)\nmodel.fit(X_train, y_train)         # 訓練データだけで学習\n\ntrain_acc = accuracy_score(y_train, model.predict(X_train))\ntest_acc  = accuracy_score(y_test,  model.predict(X_test))\n\nprint(f\"訓練データ精度: {train_acc:.3f}  ← 学習済みデータへの精度（楽観的）\")\nprint(f\"テストデータ精度: {test_acc:.3f}  ← 本当の精度\")\n\n訓練データ精度: 0.802  ← 学習済みデータへの精度（楽観的）\nテストデータ精度: 0.792  ← 本当の精度\n\n\n\n\n\n\n\n\n\n2つの精度を比べる\n\n\n\n訓練精度 ≈ テスト精度：うまく汎化できている\n訓練精度 &gt;&gt; テスト精度：過学習の疑い（暗記している）"
-  },
-  {
-    "objectID": "classification-evaluation.html#混同行列テストデータで評価",
-    "href": "classification-evaluation.html#混同行列テストデータで評価",
-    "title": "過学習と汎化",
-    "section": "混同行列（テストデータで評価）",
-    "text": "混同行列（テストデータで評価）\n\n\nfrom sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix\n\ncm = confusion_matrix(y_test, model.predict(X_test))\ndisp = ConfusionMatrixDisplay(confusion_matrix=cm,\n                              display_labels=[\"Sea bass (0)\", \"Salmon (1)\"])\ndisp.plot(colorbar=False, cmap=\"Blues\")\nplt.title(\"Confusion Matrix（テストデータ）\")\nplt.tight_layout()\nplt.show()"
-  },
-  {
-    "objectID": "classification-evaluation.html#section",
-    "href": "classification-evaluation.html#section",
-    "title": "過学習と汎化",
+    "objectID": "clustering-kmeans.html#section",
+    "href": "clustering-kmeans.html#section",
+    "title": "教師なし学習とクラスタリング",
     "section": "",
-    "text": "満点の正体を暴く"
+    "text": "k-means アルゴリズム"
   },
   {
-    "objectID": "classification-evaluation.html#深さ無制限の決定木を新しい魚で採点する",
-    "href": "classification-evaluation.html#深さ無制限の決定木を新しい魚で採点する",
-    "title": "過学習と汎化",
-    "section": "深さ無制限の決定木を、新しい魚で採点する",
-    "text": "深さ無制限の決定木を、新しい魚で採点する\n\n\n前回の「あやしい満点」に、いま手に入れた道具（train/test）を使う\n\n\nfrom sklearn.tree import DecisionTreeClassifier\n\ndeep_tree = DecisionTreeClassifier(max_depth=None, random_state=42)\ndeep_tree.fit(X_train, y_train)               # 訓練データだけで学習\n\ndeep_train_acc = accuracy_score(y_train, deep_tree.predict(X_train))\ndeep_test_acc  = accuracy_score(y_test,  deep_tree.predict(X_test))\n\nprint(f\"訓練データ精度: {deep_train_acc:.3f}\")\nprint(f\"テストデータ精度: {deep_test_acc:.3f}\")\n\n訓練データ精度: 1.000\nテストデータ精度: 0.625\n\n\n\n\n訓練では満点。ところが新しい魚では4割近く間違える\n満点の正体は実力ではなく暗記だった"
+    "objectID": "clustering-kmeans.html#k-means-の手順",
+    "href": "clustering-kmeans.html#k-means-の手順",
+    "title": "教師なし学習とクラスタリング",
+    "section": "k-means の手順",
+    "text": "k-means の手順\n\n入力：データ点の集合、クラスタ数 \\(k\\)\n\n\\(k\\) 個の重心（centroid）をランダムに配置\n各データ点を最も近い重心のクラスタに割り当てる\n各クラスタの重心を再計算（クラスタ内の平均点）\n重心が変化しなくなるまで 2〜3 を繰り返す\n\n\n\n\n\n\n\nノート\n\n\n「assign（割り当て）→ update（更新）→ 繰り返し」 たったこれだけのシンプルな構造"
   },
   {
-    "objectID": "classification-evaluation.html#境界線はどう学習されていたのか",
-    "href": "classification-evaluation.html#境界線はどう学習されていたのか",
-    "title": "過学習と汎化",
-    "section": "境界線はどう「学習」されていたのか",
-    "text": "境界線はどう「学習」されていたのか\n\n\n深さを変えた木の決定境界を、訓練データと一緒に描いてみる\n\n\n\n\n\n\n\n\n\n\n\n分割を増やすほど、入り混じりゾーンに細い回廊や飛び地が増えていく\n無制限の木は、微妙な1匹1匹を救うために境界をめちゃくちゃに曲げて訓練データ満点を達成している"
+    "objectID": "clustering-kmeans.html#試行1-そのまま-k-means-にかける",
+    "href": "clustering-kmeans.html#試行1-そのまま-k-means-にかける",
+    "title": "教師なし学習とクラスタリング",
+    "section": "試行1: そのまま k-means にかける",
+    "text": "試行1: そのまま k-means にかける\n\n\nfrom sklearn.cluster import KMeans\n\n# ラベルを使わずに k=2 でクラスタリング\nkm = KMeans(n_clusters=2, random_state=42, n_init=10)\nkm.fit(X)\ncluster_labels = km.labels_\n\nprint(\"クラスタ割り当て（先頭10件）:\", cluster_labels[:10])\nprint(\"重心の座標（輝度, 重さ）:\")\nfor i, c in enumerate(km.cluster_centers_):\n    print(f\"  クラスタ {i}: 輝度={c[0]:.2f}, 重さ={c[1]:.0f}g\")\n\nクラスタ割り当て（先頭10件）: [0 0 0 0 0 0 0 0 0 0]\n重心の座標（輝度, 重さ）:\n  クラスタ 0: 輝度=4.50, 重さ=1977g\n  クラスタ 1: 輝度=6.82, 重さ=1434g\n\n\n\nエラーなく動いた。重心も2つ出た\nでは結果を図で見てみる"
   },
   {
-    "objectID": "classification-evaluation.html#暗記の境界に新しい魚を流し込む",
-    "href": "classification-evaluation.html#暗記の境界に新しい魚を流し込む",
-    "title": "過学習と汎化",
-    "section": "暗記の境界に、新しい魚を流し込む",
-    "text": "暗記の境界に、新しい魚を流し込む\n\n\n\n\n\n\n\n\n\n\n\n回廊や飛び地は、訓練データの特定の数匹のためのオーダーメイド\n新しい魚はその意図どおりには並ばない — 誤分類（オレンジ）は入り混じりゾーンに集中\n暗記した細部は、次に来る魚には通用しない"
+    "objectID": "clustering-kmeans.html#試行1の結果",
+    "href": "clustering-kmeans.html#試行1の結果",
+    "title": "教師なし学習とクラスタリング",
+    "section": "試行1の結果",
+    "text": "試行1の結果\n\n\ncolors  = [\"#e74c3c\", \"#2980b9\"]\nmarkers = [\"o\", \"s\"]\n\nplt.figure(figsize=(5.8, 3.6))\nfor c in range(2):\n    mask = cluster_labels == c\n    plt.scatter(X[mask, 0], X[mask, 1],\n                c=colors[c], marker=markers[c], s=50, alpha=0.7, label=f\"クラスタ {c}\")\nfor center in km.cluster_centers_:\n    plt.scatter(*center, c=\"black\", s=200, marker=\"*\", zorder=5)\nplt.xlabel(\"輝度\"); plt.ylabel(\"重さ (g)\")\nplt.legend(); plt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nクイズ\n\n\n目に見える塊は「左上」と「右下」。なのに機械の答えはほぼ真横の輪切り。 輝度を完全に無視しているのはなぜ？"
   },
   {
-    "objectID": "classification-evaluation.html#深さを変えて2つの精度を並べる",
-    "href": "classification-evaluation.html#深さを変えて2つの精度を並べる",
-    "title": "過学習と汎化",
-    "section": "深さを変えて、2つの精度を並べる",
-    "text": "深さを変えて、2つの精度を並べる\n\n\ndepths   = list(range(1, 13))\ntrain_accs, test_accs = [], []\n\nfor d in depths:\n    m = DecisionTreeClassifier(max_depth=d, random_state=42).fit(X_train, y_train)\n    train_accs.append(accuracy_score(y_train, m.predict(X_train)))\n    test_accs.append(accuracy_score(y_test,  m.predict(X_test)))\n\nplt.figure(figsize=(6.5, 3.6))\nplt.plot(depths, train_accs, \"o-\", color=\"#2980b9\", label=\"訓練データ精度\")\nplt.plot(depths, test_accs,  \"s-\", color=\"#e74c3c\", label=\"テストデータ精度\")\nplt.xlabel(\"決定木の深さ\"); plt.ylabel(\"正答率\")\nplt.ylim(0.5, 1.05)\nplt.legend(); plt.grid(True, alpha=0.4)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n訓練精度は深くするほど上がり続け、やがて 100% に到達する\nテスト精度は深さ2〜4がピーク。それ以上深くするとむしろ下がる\n深さ5以降、訓練精度だけが伸びて2本の線の差（ギャップ）が広がる — 暗記が進んでいるサイン"
+    "objectID": "clustering-kmeans.html#なぜ輝度が無視されたのか",
+    "href": "clustering-kmeans.html#なぜ輝度が無視されたのか",
+    "title": "教師なし学習とクラスタリング",
+    "section": "なぜ輝度が無視されたのか",
+    "text": "なぜ輝度が無視されたのか\n\n\n\nk-means は距離だけでグループを決める\n重さの差は数百 g、輝度の差はせいぜい数ポイント\n\n\\[\\text{距離}^2 = \\underbrace{(\\Delta \\text{輝度})^2}_{\\sim 10} + \\underbrace{(\\Delta \\text{重さ})^2}_{\\sim 100{,}000}\\]\n\n距離の計算が重さに支配され、輝度はあってもなくても同じだった\n\n\n\n\n\n\n\n\n\nスケールの罠\n\n\n\n単位もケタも違う特徴量をそのまま距離計算に入れてはいけない\n距離を使う手法（k-means、k-NN など）共通の落とし穴"
   },
   {
-    "objectID": "classification-evaluation.html#過学習overfitting",
-    "href": "classification-evaluation.html#過学習overfitting",
-    "title": "過学習と汎化",
-    "section": "過学習（Overfitting）",
-    "text": "過学習（Overfitting）\n\n\n訓練データの細部（たまたまの並び・ノイズ）まで覚え込み、新しいデータで性能が落ちること\n数字での証拠は訓練精度とテスト精度のギャップ\n図での証拠は数匹のためだけの回廊・飛び地だらけの決定境界\nモデルが複雑なほど（深い木・多すぎるパラメータ）起きやすい\n\n\n\n\n状態\n訓練精度\nテスト精度\n\n\n\n\n未学習（underfitting）\n低い\n低い\n\n\nちょうど良い\n高い\n高い\n\n\n過学習（overfitting）\nほぼ満点\n低い\n\n\n\n\n\n\n\n\n\n\n対策\n\n\n\nモデルの複雑さを抑える（決定木なら深さを制限）\nデータを増やす\nテスト精度を安定して測る — それが次の交差検証（cross-validation）"
+    "objectID": "clustering-kmeans.html#peek-scale",
+    "href": "clustering-kmeans.html#peek-scale",
+    "title": "教師なし学習とクラスタリング",
+    "section": "試行2: スケールを揃えて再挑戦",
+    "text": "試行2: スケールを揃えて再挑戦\n\n\nfrom sklearn.preprocessing import StandardScaler\n\nX_scaled = StandardScaler().fit_transform(X)   # 各特徴量を平均0・分散1に\n\nkm2 = KMeans(n_clusters=2, random_state=42, n_init=10)\nkm2.fit(X_scaled)\ncluster_labels2 = km2.labels_\n\nplt.figure(figsize=(5.8, 3.6))\nfor c in range(2):\n    mask = cluster_labels2 == c\n    plt.scatter(X[mask, 0], X[mask, 1],\n                c=colors[c], marker=markers[c], s=50, alpha=0.7, label=f\"クラスタ {c}\")\nplt.xlabel(\"輝度\"); plt.ylabel(\"重さ (g)\")\nplt.legend(); plt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n今度は目で見た通りの2つの塊に分かれた"
   },
   {
-    "objectID": "classification-evaluation.html#section-1",
-    "href": "classification-evaluation.html#section-1",
-    "title": "過学習と汎化",
+    "objectID": "clustering-kmeans.html#答え合わせ実はラベルを知っていた",
+    "href": "clustering-kmeans.html#答え合わせ実はラベルを知っていた",
+    "title": "教師なし学習とクラスタリング",
+    "section": "答え合わせ：実はラベルを知っていた",
+    "text": "答え合わせ：実はラベルを知っていた\n\n\nこのデータの正体は、これまでの講義で使ってきた Salmon / Sea bass\n\n\ny_true = np.array([1]*40 + [0]*40)   # 1=Salmon, 0=Sea bass（隠していた正解）\n\nagree = np.mean(cluster_labels2 == y_true)\nagree = max(agree, 1 - agree)        # クラスタ番号 0/1 は任意なので向きを合わせる\nprint(f\"正解ラベルとの一致: {agree:.1%}（{int(round(agree * len(y_true)))}/80匹）\")\n\n正解ラベルとの一致: 92.5%（74/80匹）\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nノート\n\n\nラベルを1枚も見せていないのに、80匹中74匹を正しく仕分けた。 クラスタの番号（0/1）は任意で、大切なのは「同じグループにまとまっているか」。"
+  },
+  {
+    "objectID": "clustering-kmeans.html#k-means-の動き中で起きていたこと",
+    "href": "clustering-kmeans.html#k-means-の動き中で起きていたこと",
+    "title": "教師なし学習とクラスタリング",
+    "section": "k-means の動き（中で起きていたこと）",
+    "text": "k-means の動き（中で起きていたこと）\n\n\n\n\n\n\n\n\n\n\n\nどこに重心を置いても「assign → update」の繰り返しで塊に吸い寄せられていく\nスケールを揃えた空間（標準化済み, standardization）での動き"
+  },
+  {
+    "objectID": "clustering-kmeans.html#ところで最初の重心はどこに置く",
+    "href": "clustering-kmeans.html#ところで最初の重心はどこに置く",
+    "title": "教師なし学習とクラスタリング",
+    "section": "ところで、最初の重心はどこに置く？",
+    "text": "ところで、最初の重心はどこに置く？\n\n\n「assign → update」は最初の重心の位置から始まる — そこはランダムに選ばれる\n運の悪い初期値だと、おかしな所で落ち着く（下の左：青が2つの塊を飲み込んだ）\n\n\n\n\n\n\n\n\n\n\n\nk-means は「クラスタ内二乗和（inertia）を小さくする」最適化 — でも初期値しだいで悪い谷にハマる\n対策は「何度も別の初期値で試して、一番 inertia が小さいものを採る」\n\n\n\n\n\n\n\n\nこれ、どこかで見た\n\n\n初期値しだいで結果が変わる → 何回も試して最良を選ぶ。これは ローカルミニマムの罠 でやったマルチスタートそのもの。 KMeans(..., n_init=10) の n_init が「10回試す」の正体（既定でこうなっている）。"
+  },
+  {
+    "objectID": "clustering-kmeans.html#section-1",
+    "href": "clustering-kmeans.html#section-1",
+    "title": "教師なし学習とクラスタリング",
     "section": "",
-    "text": "交差検証"
+    "text": "k の決め方：エルボー法"
   },
   {
-    "objectID": "classification-evaluation.html#ホールドアウト法の問題点",
-    "href": "classification-evaluation.html#ホールドアウト法の問題点",
-    "title": "過学習と汎化",
-    "section": "ホールドアウト法の問題点",
-    "text": "ホールドアウト法の問題点\n\n\ntrain_test_split はランダムに分割する\nどのデータがテスト側に入るかで、精度が変わる\n\n\nfor seed in range(5):\n    Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=seed)\n    acc = accuracy_score(yte, LogisticRegression(max_iter=1000).fit(Xtr, ytr).predict(Xte))\n    print(f\"seed={seed}  テスト精度: {acc:.3f}\")\n\nseed=0  テスト精度: 0.833\nseed=1  テスト精度: 0.917\nseed=2  テスト精度: 0.792\nseed=3  テスト精度: 0.833\nseed=4  テスト精度: 0.917\n\n\n\n\n\n\n\n\n\nデータが少ないほど揺れが大きい\n\n\n\nテストデータが24匹の場合、1匹の誤分類で精度が約 4% 変わる\n1回だけの分割結果を、強く信じすぎない"
+    "objectID": "clustering-kmeans.html#エルボー法",
+    "href": "clustering-kmeans.html#エルボー法",
+    "title": "教師なし学習とクラスタリング",
+    "section": "エルボー法",
+    "text": "エルボー法\n\n\n今回は「2種類の魚」と知っていたから k=2 にできた\n本当のラベルなしデータでは k 自体を決める必要がある\nエルボー法：k を変えながら「クラスタ内のまとまり度」を測る\n\n\ninertias = []\nks = range(1, 9)\n\nfor k in ks:\n    km_k = KMeans(n_clusters=k, random_state=42, n_init=10)\n    km_k.fit(X_scaled)\n    inertias.append(km_k.inertia_)   # クラスタ内二乗和\n\nplt.figure(figsize=(6, 3.5))\nplt.plot(list(ks), inertias, \"o-\", color=\"#2980b9\")\nplt.xlabel(\"クラスタ数 k\")\nplt.ylabel(\"Inertia（クラスタ内二乗和）\")\nplt.title(\"エルボー法\")\nplt.grid(True, alpha=0.4)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nエルボー（肘）の見方\n\n\nグラフが急激に折れ曲がる点（肘のような形）が最適な k の目安。 それ以上増やしても改善幅が小さい。魚データでは k=2 で折れている。"
   },
   {
-    "objectID": "classification-evaluation.html#k-fold-交差検証",
-    "href": "classification-evaluation.html#k-fold-交差検証",
-    "title": "過学習と汎化",
-    "section": "k-fold 交差検証",
-    "text": "k-fold 交差検証\n\n\nデータを k 個のグループ（fold）に分割する\nk 回繰り返す：1つをテスト、残りを訓練に使う\nk 個の精度の平均を最終スコアとする"
+    "objectID": "clustering-kmeans.html#k-means-の限界",
+    "href": "clustering-kmeans.html#k-means-の限界",
+    "title": "教師なし学習とクラスタリング",
+    "section": "k-means の限界",
+    "text": "k-means の限界\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nk-means が苦手なケース\n\n\n\n非球状のクラスタ（同心円、三日月形など）\nクラスタのサイズが大きく異なる場合\n初期値によって結果が変わる → n_init（マルチスタート）で回避（前述）"
   },
   {
-    "objectID": "classification-evaluation.html#cross_val_score-で交差検証",
-    "href": "classification-evaluation.html#cross_val_score-で交差検証",
-    "title": "過学習と汎化",
-    "section": "cross_val_score で交差検証",
-    "text": "cross_val_score で交差検証\n\n\nfrom sklearn.model_selection import cross_val_score\n\nscores = cross_val_score(\n    LogisticRegression(max_iter=1000), X, y, cv=5   # cv=5 で 5-fold\n)\n\nprint(\"各 fold の精度:\", scores.round(3))\nprint(f\"平均精度: {scores.mean():.3f}  ±  {scores.std():.3f}\")\n\n各 fold の精度: [0.792 0.833 0.792 0.75  0.792]\n平均精度: 0.792  ±  0.026\n\n\n\n\n\n\n\n\n\ncross_val_score の引数\n\n\n\n第1引数：モデル（fit 前でOK。内部で k 回 fit してくれる）\ncv=k：k-fold の k を指定（よく使うのは 5 か 10）\n返り値は k 個の精度の配列 → .mean() / .std() で集計"
-  },
-  {
-    "objectID": "classification-evaluation.html#まとめ",
-    "href": "classification-evaluation.html#まとめ",
-    "title": "過学習と汎化",
+    "objectID": "clustering-kmeans.html#まとめ",
+    "href": "clustering-kmeans.html#まとめ",
+    "title": "教師なし学習とクラスタリング",
     "section": "まとめ",
-    "text": "まとめ\n\n\n訓練データで評価した精度は楽観的 — 満点はむしろ疑う\n過学習：訓練データを暗記して、新しいデータで性能が落ちること\n\n証拠は訓練精度とテスト精度のギャップ（深さ無制限の決定木：100% vs 63%）\n決定境界で見ると、数匹のためだけの回廊・飛び地として現れる\n\n汎化：未知データへの対応能力を測ることが本来の目的\ntrain_test_split：手軽だが分割次第で精度が揺れる\nk-fold 交差検証：k 回の平均で安定した評価が得られる\n\n\n\n\n手法\n特徴\n\n\n\n\nホールドアウト\n手軽。データが多いときに有効\n\n\nk-fold 交差検証\n安定。データが少ないときに特に有効\n\n\n\n\n\n\n\n\n\n\n次回予告\n\n\n「分類にはラベルが必要だった。ラベルがない場合はどうする？」"
+    "text": "まとめ\n\n\n教師なし学習：ラベルなしでデータの構造を見つける\nk-means：「assign → update → 繰り返し」だけで、魚80匹中74匹を正しく仕分けた\nスケールの罠：距離を使う手法では、特徴量のスケールを揃えてから\n\nfrom sklearn.cluster import KMeans\nfrom sklearn.preprocessing import StandardScaler\n\nX_scaled = StandardScaler().fit_transform(X)   # まずスケールを揃える\nkm = KMeans(n_clusters=2, random_state=42, n_init=10)\nkm.fit(X_scaled)\nkm.labels_          # クラスタ番号（各データ点）\nkm.cluster_centers_ # 重心の座標\nkm.inertia_         # クラスタ内二乗和（エルボー法に使う）\n\n\n\n長所\n短所\n\n\n\n\nシンプルで高速\nk を事前に決める必要がある\n\n\n結果が直感的\n球状クラスタしか見つけられない\n\n\n\n\n\n\n\n\n\n次回予告\n\n\n「特徴量を増やせば精度が上がった。では増やし続けたらどうなる？」"
   },
   {
-    "objectID": "dimensionality-pca.html#ここまでの流れ",
-    "href": "dimensionality-pca.html#ここまでの流れ",
-    "title": "次元の呪いと次元削減",
-    "section": "ここまでの流れ",
-    "text": "ここまでの流れ\n\n\n重さだけでサーモンを分類 → ある程度できた\n輝度も追加して2次元で分類 → 精度が上がった\nならば特徴量を増やし続ければもっと精度が上がる？\n\n\n\n\n\n\n\n\n今回の問い\n\n\n特徴量（次元）を増やし続けると何が起きるか？"
-  },
-  {
-    "objectID": "dimensionality-pca.html#section",
-    "href": "dimensionality-pca.html#section",
-    "title": "次元の呪いと次元削減",
-    "section": "",
-    "text": "次元の呪い"
-  },
-  {
-    "objectID": "dimensionality-pca.html#peek-curse",
-    "href": "dimensionality-pca.html#peek-curse",
-    "title": "次元の呪いと次元削減",
-    "section": "次元の呪い（Curse of Dimensionality）",
-    "text": "次元の呪い（Curse of Dimensionality）\n\n\n“データの次元が増えるにつれて、空間が指数的に広くなり、データが希薄になる”\n── Richard Bellman（1961）\n\n\n2次元で十分だったサンプル数が、10次元では全く足りなくなる\n高次元空間は私たちの直感とは全く異なる振る舞いをする\n\n\n\n\n\n\n\nノート\n\n\n1960年代にベルマン（動的計画法の発明者）が提唱した概念。 現代機械学習でも最重要トピックの一つ。"
-  },
-  {
-    "objectID": "dimensionality-pca.html#クイズいちばん近い点までどれくらい",
-    "href": "dimensionality-pca.html#クイズいちばん近い点までどれくらい",
-    "title": "次元の呪いと次元削減",
-    "section": "クイズ：いちばん近い点まで、どれくらい？",
-    "text": "クイズ：いちばん近い点まで、どれくらい？\n\n\n各特徴量は 0〜1 に正規化してあるとする（各軸の長さ＝1）\nそこに100個の点をランダムにばらまく\n1次元なら、いちばん近い点までの距離はだいたい 0.003（ぎゅうぎゅう）\n\n\n\n\n\n\n\n\nクイズ\n\n\n特徴量を増やして 10次元 にしたら、いちばん近い点までの距離はいくつになると思う？\n（各軸の長さは1のまま。点の数も100個のまま）\n\n\n\n\n\n\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\nplt.rcParams['font.size'] = 11\nplt.rcParams['figure.dpi'] = 100\n\nrng  = np.random.default_rng(0)\ndims = [1, 2, 3, 5, 10, 20]\nnn_median = []\n\nfor d in dims:\n    P = rng.random((100, d))                       # 100点を [0,1]^d にばらまく\n    D = np.sqrt(((P[:, None, :] - P[None, :, :]) ** 2).sum(axis=2))\n    np.fill_diagonal(D, np.inf)                    # 自分自身は除外\n    nn_median.append(np.median(D.min(axis=1)))     # 最近傍距離の中央値\n\nfor d, m in zip(dims, nn_median):\n    print(f\"{d:2d}次元: いちばん近い点まで {m:.3f}\")\n\n 1次元: いちばん近い点まで 0.003\n 2次元: いちばん近い点まで 0.042\n 3次元: いちばん近い点まで 0.121\n 5次元: いちばん近い点まで 0.306\n10次元: いちばん近い点まで 0.703\n20次元: いちばん近い点まで 1.195\n\n\n\n\n\n\n\n\n\n\n\n\n10次元で 0.67、20次元では 1.2 — もはや「お隣さん」は存在しない\n同じ100点なのに。なぜこんなことが起きるのか、2つの理由を見ます"
-  },
-  {
-    "objectID": "dimensionality-pca.html#なぜ-その1真ん中に居続けられない",
-    "href": "dimensionality-pca.html#なぜ-その1真ん中に居続けられない",
-    "title": "次元の呪いと次元削減",
-    "section": "なぜ？　その1：真ん中に居続けられない",
-    "text": "なぜ？　その1：真ん中に居続けられない\n\n\nある点が、ある軸で「中央寄り」（その軸の中央50%）に入る確率は \\(\\dfrac{1}{2}\\)\n\\(d\\) 次元で「全部の軸で中央寄り」でいられる確率は：\n\n\\[\\left(\\frac{1}{2}\\right)^d \\qquad\n\\text{1次元: } 50\\% \\quad \\text{3次元: } 12.5\\% \\quad \\text{10次元: } 0.1\\% \\quad \\text{20次元: } 100万分の1\\]\n\n\n\n\n\n\n\n\n\n\nほぼすべての点が、どこかの軸では端っこ — つまり「角のあたり」に住むことになる\nしかも角の数は \\(2^d\\) 個（20次元で約105万個）。データは100万個の角に散り散りになる\n\n\n\n\n\n\n\nノート\n\n\n教科書によく出る言い換え：「単位立方体に内接する球（＝どの軸でも中央寄りの領域）の体積は、 高次元で 0 に向かう」。いま見たのと同じ現象。"
-  },
-  {
-    "objectID": "dimensionality-pca.html#なぜ-その2ご近所を集めると世界を覆ってしまう",
-    "href": "dimensionality-pca.html#なぜ-その2ご近所を集めると世界を覆ってしまう",
-    "title": "次元の呪いと次元削減",
-    "section": "なぜ？　その2：「ご近所」を集めると世界を覆ってしまう",
-    "text": "なぜ？　その2：「ご近所」を集めると世界を覆ってしまう\n\n\nk-NN の気持ちになって、周りのデータの1%を「ご近所」として集めたい\n各軸を割合 \\(r\\) だけ切り取った箱は、データの \\(r^d\\) 割を含む → 1% 集めるには：\n\n\\[r = 0.01^{1/d}\\]\n\n\n\n\n\n\n\n\n\n\n10次元では、たった1%の「ご近所」を集めるのに各軸の63%を見渡す必要がある\nそれはもう「近所」ではない — 「近い」に頼る手法（k-NN など）が最初に壊れる"
-  },
-  {
-    "objectID": "dimensionality-pca.html#距離が意味をなさなくなる",
-    "href": "dimensionality-pca.html#距離が意味をなさなくなる",
-    "title": "次元の呪いと次元削減",
-    "section": "距離が意味をなさなくなる",
-    "text": "距離が意味をなさなくなる\n\n\nk-NN やロジスティック回帰など、多くの手法は距離に依存している\n高次元では最近傍と最遠傍の距離差が消えていく\n\n\nnp.random.seed(42)\ndims    = [1, 2, 3, 5, 10, 20, 50, 100]\ncv_list = []   # 変動係数 = std / mean\n\nfor d in dims:\n    pts   = np.random.rand(2000, d)\n    query = np.random.rand(d)\n    dists = np.sqrt(((pts - query) ** 2).sum(axis=1))\n    cv_list.append(dists.std() / dists.mean())\n\nplt.figure(figsize=(7, 3.5))\nplt.plot(dims, cv_list, \"o-\", color=\"#e74c3c\")\nplt.xlabel(\"次元数 d\")\nplt.ylabel(\"変動係数（std / mean）\")\nplt.title(\"高次元では全点がほぼ等距離になる\")\nplt.grid(True, alpha=0.4)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n変動係数が 0 に近づく\n\n\n「最も近い点」と「最も遠い点」の距離がほぼ同じになる。 「近い」という概念が意味をなさなくなる。"
-  },
-  {
-    "objectID": "dimensionality-pca.html#データが疎になるsparsity",
-    "href": "dimensionality-pca.html#データが疎になるsparsity",
-    "title": "次元の呪いと次元削減",
-    "section": "データが疎になる（Sparsity）",
-    "text": "データが疎になる（Sparsity）\n\n\n同じサンプル数でも、次元が増えると空間が広くなりすぎる\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nノート\n\n\n密度を保つには、次元数に対して指数的にサンプルを増やす必要がある。 10次元で十分な密度を確保するには、1次元の \\(10^{10}\\) 倍のサンプルが必要という計算になる。"
-  },
-  {
-    "objectID": "dimensionality-pca.html#実用への影響",
-    "href": "dimensionality-pca.html#実用への影響",
-    "title": "次元の呪いと次元削減",
-    "section": "実用への影響",
-    "text": "実用への影響\n\n\n\n\n問題\n原因\n\n\n\n\nモデルの精度が上がらない\nデータが疎でパターンが見えない\n\n\n過学習しやすくなる\nデータに比べてパラメータが多すぎる\n\n\n計算コストが増大\n距離計算などが次元数に比例して重くなる\n\n\n可視化できない\n3次元以上は直接見られない\n\n\n\n\n\n\n\n\n\n次元の呪いへの対処\n\n\n\n特徴量選択：重要な特徴量だけを残す\n次元削減：情報を保ったまま次元を圧縮する（← 今回）\n正則化（regularization）：過学習を防ぐ（回帰問題で詳しく）"
-  },
-  {
-    "objectID": "dimensionality-pca.html#section-1",
-    "href": "dimensionality-pca.html#section-1",
-    "title": "次元の呪いと次元削減",
-    "section": "",
-    "text": "次元削減と PCA"
-  },
-  {
-    "objectID": "dimensionality-pca.html#つ目の特徴量体長",
-    "href": "dimensionality-pca.html#つ目の特徴量体長",
-    "title": "次元の呪いと次元削減",
-    "section": "3つ目の特徴量：体長",
-    "text": "3つ目の特徴量：体長\n\n\n重さ・輝度で精度が上がった。気を良くして、80匹全部の体長も測った\n\n\n\n魚データの定義（クリックして展開）\nsalmon_weights     = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,\n                               1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,\n                               2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,\n                               1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652])\nsalmon_brightness  = np.array([3.5, 5.8, 4.9, 4.4, 2.6, 2.6, 2.2, 5.5, 4.4, 4.8, 2.1,\n                               5.9, 5.3, 2.8, 2.7, 2.7, 3.2, 4.1, 3.7, 3.2, 4.4, 2.6,\n                               3.2, 3.5, 3.8, 5.1, 2.8, 4.1, 4.4, 2.2, 4.4, 2.7, 2.3,\n                               5.8, 5.9, 5.2, 3.2, 2.4, 4.7, 3.8])\nseabass_weights    = np.array([1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,\n                               1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,\n                               1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,\n                               1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531])\nseabass_brightness = np.array([5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8,\n                               8.9, 9.7, 9.5, 8.0, 9.6, 5.4, 6.0, 5.2, 6.6, 6.9, 6.4,\n                               9.1, 6.8, 6.4, 7.7, 5.7, 9.0, 5.4, 9.9, 8.9, 6.0, 5.0,\n                               9.1, 8.5, 8.6, 8.9, 5.4, 6.8, 5.6])\n\nweights    = np.concatenate([salmon_weights, seabass_weights])\nbrightness = np.concatenate([salmon_brightness, seabass_brightness])\ny          = np.array([1]*40 + [0]*40)   # 1=Salmon, 0=Sea bass\n\n# 体長の測定値（cm）\nrng     = np.random.default_rng(42)\nlengths = np.round(np.cbrt(weights) * 4.5 + rng.normal(0, 1.0, len(weights)), 1)\n\n\n\n\n体長（先頭5匹）: [58.4 55.3 59.2 61.7 54.1] cm\n体長の範囲: 45.0〜61.7 cm\n\n\n\n\n\n\n\n\n\nクイズ\n\n\n特徴量が 2 → 3 に増えた。手に入る情報も 1.5 倍になったと思う？"
-  },
-  {
-    "objectID": "dimensionality-pca.html#体長と重さを並べてみる",
-    "href": "dimensionality-pca.html#体長と重さを並べてみる",
-    "title": "次元の呪いと次元削減",
-    "section": "体長と重さを並べてみる",
-    "text": "体長と重さを並べてみる\n\n\nplt.figure(figsize=(5.5, 3.6))\nplt.scatter(lengths, weights, alpha=0.6, s=40, c=\"#5dade2\", edgecolors=\"gray\")\nplt.xlabel(\"体長 (cm)\"); plt.ylabel(\"重さ (g)\")\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\nprint(f\"相関係数: {np.corrcoef(lengths, weights)[0, 1]:.3f}\")\n\n\n\n\n\n\n\n\n相関係数: 0.973\n\n\n\n\nほぼ一直線。長い魚は重い — あたりまえだった\n体長と重さは、ほぼ同じ情報を2回測っていた\nこの「実は重複している」を自動で見つけて畳む道具が PCA"
-  },
-  {
-    "objectID": "dimensionality-pca.html#pca-の直感",
-    "href": "dimensionality-pca.html#pca-の直感",
-    "title": "次元の呪いと次元削減",
-    "section": "PCA の直感",
-    "text": "PCA の直感\n\nPrincipal Component Analysis（主成分分析）\n\n斜めに細長い雲は、もとの2軸より「長い方向と細い方向」で見るほうが自然\nデータの分散（variance）が最大になる方向に新しい軸（主成分）を取る\n\n\n\n\n\n\n\n\n\n\n\nPC1 は体長と重さを合わせた「大きさ」の軸 — この方向だけで分散の約 99% を説明できる"
-  },
-  {
-    "objectID": "dimensionality-pca.html#最小二乗法と-pca-足の下ろし方が違う",
-    "href": "dimensionality-pca.html#最小二乗法と-pca-足の下ろし方が違う",
-    "title": "次元の呪いと次元削減",
-    "section": "最小二乗法と PCA — 「足」の下ろし方が違う",
-    "text": "最小二乗法と PCA — 「足」の下ろし方が違う\n\n\n実はどちらも「足（誤差）の二乗和が最小になる直線」を探している\n違うのは足の向きだけ\n\n\n\n\n\n\n\n\n\n\n\n最小二乗法（線形回帰の回の MSE）：仕事は「\\(y\\) を当てる」→ 誤差は縦に測る\nPCA：仕事は「データの形を要約する」→ 誤差は直線への最短距離（垂直の足）で測る\n足の向きが違うので、選ばれる直線も少し違う（回帰の傾き 0.97、PC1 の傾き 1.00）\n\n\n\n\n\n\n\n\n「分散最大」と「垂直の足最小」は同じこと\n\n\n各点で（中心からの距離）² ＝（軸上の影）² ＋（垂直の足）²（ピタゴラスの定理）。 左辺の合計はデータで決まっていて動かないので、影の分散を最大にする軸と 足の二乗和を最小にする直線は、同じものを選ぶ。"
-  },
-  {
-    "objectID": "dimensionality-pca.html#分散が最大の方向を式にする",
-    "href": "dimensionality-pca.html#分散が最大の方向を式にする",
-    "title": "次元の呪いと次元削減",
-    "section": "「分散が最大の方向」を式にする",
-    "text": "「分散が最大の方向」を式にする\n\n\n探している直線の向きを、単位ベクトル \\(\\mathbf{v}\\)（\\(\\|\\mathbf{v}\\| = 1\\)）で表す\n中心化した点 \\(\\tilde{\\mathbf{x}}_i\\) のその直線への影（射影, projection）は、内積 \\(z_i = \\tilde{\\mathbf{x}}_i^{\\mathsf T} \\mathbf{v}\\)（ただの数）\n80匹ぶんの影は、行列とベクトルの積で一度に出せる：\\(\\mathbf{z} = \\tilde{X} \\mathbf{v}\\)\n\n知りたい「影の分散」を、少しずつ変形します：\n\\[\\text{影の分散} = \\frac{1}{n-1} \\sum_i z_i^2\n= \\frac{1}{n-1} \\mathbf{z}^{\\mathsf T} \\mathbf{z}\n\\qquad \\text{（2乗和は「自分との内積」）}\\]\n\\[= \\frac{1}{n-1} (\\tilde{X}\\mathbf{v})^{\\mathsf T} (\\tilde{X}\\mathbf{v})\n= \\frac{1}{n-1} \\mathbf{v}^{\\mathsf T} \\tilde{X}^{\\mathsf T} \\tilde{X} \\mathbf{v}\n\\qquad \\text{（転置の規則 } (AB)^{\\mathsf T} = B^{\\mathsf T} A^{\\mathsf T} \\text{）}\\]\n\\[= \\mathbf{v}^{\\mathsf T} \\underbrace{\\left( \\frac{1}{n-1} \\tilde{X}^{\\mathsf T} \\tilde{X} \\right)}_{C\\;（共分散行列）} \\mathbf{v}\n\\qquad \\text{（真ん中のかたまりに名前をつける）}\\]\n\n共分散行列（covariance matrix）\\(C\\) は、影の分散を変形すると自然に現れる（ここが登場理由）\nつまり PCA の探しものはこう書ける：\n\n\n\n\n\n\n\nノート\n\n\n\\(\\|\\mathbf{v}\\| = 1\\) のもとで \\(\\mathbf{v}^{\\mathsf T} C \\mathbf{v}\\)（＝ \\(\\mathbf{v}\\) 方向の分散）を最大にする \\(\\mathbf{v}\\) を探せ"
-  },
-  {
-    "objectID": "dimensionality-pca.html#ところで固有ベクトルと固有値とは",
-    "href": "dimensionality-pca.html#ところで固有ベクトルと固有値とは",
-    "title": "次元の呪いと次元削減",
-    "section": "ところで「固有ベクトル」と「固有値」とは",
-    "text": "ところで「固有ベクトル」と「固有値」とは\n\n\n行列 \\(A\\) は、ベクトルを別のベクトルへ移す変換（回して・伸ばす機械）。次の \\(A\\) で実験：\n\n\\[A = \\begin{pmatrix} 1.75 & 1.25 \\\\ 1.25 & 1.75 \\end{pmatrix}\\]\n\n\n\n\n\n\n\n\n\n同じ変換を、名画にかけてみると：\n\n\n\n\n\n\n\n\n\n（絵：レオナルド・ダ・ヴィンチ《モナ・リザ》 — Wikimedia Commons、パブリックドメイン）\n\nほとんどの矢印は、変換されると回ってしまう（「ふつうの矢印」＝紺色）\nでも回らない方向が2本だけある（赤と橙）— 向きはそのまま、伸び縮みするだけ\nその方向が固有ベクトル（eigenvector） \\(\\mathbf{v}\\)、伸び縮みの倍率が固有値（eigenvalue） \\(\\lambda\\)：\n\n\\[A \\mathbf{v} = \\lambda \\mathbf{v} \\qquad \\text{（向きはそのまま、長さだけ } \\lambda \\text{ 倍）}\\]\n\n\n\n\n\n\nノート\n\n\n共分散行列 \\(C\\) も、これと同じ「対称な変換」のひとつ。 このあと、\\(C\\) の回らない方向こそが「分散最大の軸」だと分かる。"
-  },
-  {
-    "objectID": "dimensionality-pca.html#a-の正体回して伸ばして戻す",
-    "href": "dimensionality-pca.html#a-の正体回して伸ばして戻す",
-    "title": "次元の呪いと次元削減",
-    "section": "A の正体：回して・伸ばして・戻す",
-    "text": "A の正体：回して・伸ばして・戻す\n\n種明かし：この \\(A\\) は、おなじみの回転行列と軸ごとの伸縮だけで組み立ててありました。\n\\[A = R\\, S\\, R^{\\mathsf T}, \\qquad\nR = \\begin{pmatrix} \\cos 45^\\circ & -\\sin 45^\\circ \\\\ \\sin 45^\\circ & \\cos 45^\\circ \\end{pmatrix}, \\qquad\nS = \\begin{pmatrix} 3 & 0 \\\\ 0 & 0.5 \\end{pmatrix}\\]\n読み方は右から（ベクトルに近い順）。モナ・リザで1段ずつ：\n\n\n\n\n\n\n\n\n\n\n① \\(R^{\\mathsf T}\\)：\\(-45^\\circ\\) 回して、「回らない方向」（赤・橙）を座標軸にそろえる\n② \\(S\\)：軸に沿って伸縮するだけ — ②の絵では赤い矢印が \\(x\\) 軸の上に乗っている\n③ \\(R\\)：\\(45^\\circ\\) 回して、元の向きに戻す\nつまり「回らない方向」の正体は、\\(S\\) がただ伸縮するだけの軸を、\\(R\\) が \\(45^\\circ\\) に向けた先\n固有ベクトル＝ \\(R\\) の列（軸の向き先）、固有値＝ \\(S\\) の対角成分（3 と 0.5）\n\n\n# 組み立てて確認：R S R^T がたしかに A になる\nprint(R_rot @ S_str @ R_rot.T)\n\n[[1.75 1.25]\n [1.25 1.75]]\n\n\n\n\n\n\n\n\nヒント\n\n\n対称行列はかならずこの「回転・伸縮・逆回転」の形に分解できる — これが固有値分解。 np.linalg.eigh が返してくるのは、この \\(R\\)（固有ベクトル）と \\(S\\) の対角成分（固有値）。"
-  },
-  {
-    "objectID": "dimensionality-pca.html#答えが固有ベクトルになる理由",
-    "href": "dimensionality-pca.html#答えが固有ベクトルになる理由",
-    "title": "次元の呪いと次元削減",
-    "section": "答えが「固有ベクトル」になる理由",
-    "text": "答えが「固有ベクトル」になる理由\n\n\n\\(\\|\\mathbf{v}\\| = 1\\) は「\\(\\mathbf{v}\\) の先端は半径1の球面の上」という意味\n球面上のてっぺんでは、球面に沿ってどちらへ動いても \\(\\mathbf{v}^{\\mathsf T} C \\mathbf{v}\\) は増えない\n増える向きを表すのは勾配 \\(2C\\mathbf{v}\\)。これが球面の法線方向（\\(\\mathbf{v}\\) 自身）と平行になるしかない：\n\n\\[C \\mathbf{v} = \\lambda \\mathbf{v} \\quad \\text{（固有ベクトルの定義式そのもの！）}\\]\n\nしかもそのときの分散は \\(\\mathbf{v}^{\\mathsf T} C \\mathbf{v} = \\lambda \\mathbf{v}^{\\mathsf T} \\mathbf{v} = \\lambda\\) — 固有値＝その方向の分散\n\n\n\n\n\n\n\nヒント\n\n\n\n固有ベクトル＝「球面上でこれ以上増やせない方向」の候補リスト\n固有値＝その候補での分散の値\n\\(\\lambda_1 \\geq \\lambda_2 \\geq \\cdots\\) と並べて、一番大きい候補から PC1, PC2, … と呼ぶ"
-  },
-  {
-    "objectID": "dimensionality-pca.html#総当たりで確かめる全方向の分散を測る",
-    "href": "dimensionality-pca.html#総当たりで確かめる全方向の分散を測る",
-    "title": "次元の呪いと次元削減",
-    "section": "総当たりで確かめる：全方向の分散を測る",
-    "text": "総当たりで確かめる：全方向の分散を測る\n\n固有値分解を信じる前に、力ずくで確認してみましょう。方向 \\(\\mathbf{v}\\) を1度刻みで全部試します。\n\nthetas = np.radians(np.arange(0, 181))\nproj_var = np.array([\n    np.var(X_lw_sc @ np.array([np.cos(t), np.sin(t)]), ddof=1)\n    for t in thetas\n])\n\nprint(f\"分散が最大の角度: {np.degrees(thetas[proj_var.argmax()]):.0f}°\"\n      f\"（分散 {proj_var.max():.4f}）\")\nprint(f\"分散が最小の角度: {np.degrees(thetas[proj_var.argmin()]):.0f}°\"\n      f\"（分散 {proj_var.min():.4f}）\")\n\n分散が最大の角度: 45°（分散 1.9978）\n分散が最小の角度: 135°（分散 0.0275）\n\n\n\n\n\n\n\n\n\n\n\n\n総当たりの最大値・最小値が、固有値 \\(\\lambda_1, \\lambda_2\\) にぴったり一致\n山の位置（45°）が PC1 の向き、谷の位置（135°）が PC2 の向き\nこの総当たりを一発の計算で済ませるのが固有値分解"
-  },
-  {
-    "objectID": "dimensionality-pca.html#numpy-で確かめる",
-    "href": "dimensionality-pca.html#numpy-で確かめる",
-    "title": "次元の呪いと次元削減",
-    "section": "NumPy で確かめる",
-    "text": "NumPy で確かめる\n\nスライドの式をそのままコードにして、sklearn の答えと突き合わせます。\n\n# 1) 式のとおりに共分散行列を作る（専用関数は要らない）\nXc = X_lw_sc - X_lw_sc.mean(axis=0)     # 中心化 X~\nC  = Xc.T @ Xc / (len(Xc) - 1)          # C = X~^T X~ / (n-1)\n\n# 2) 固有値・固有ベクトル（C のような対称行列には eigh を使う）\nlam, V = np.linalg.eigh(C)\norder  = np.argsort(lam)[::-1]          # 固有値の大きい順に並べ替え → PC1, PC2\nlam, V = lam[order], V[:, order]\n\nprint(\"固有値（自作）        :\", lam.round(4))\nprint(\"分散（sklearnのPCA）  :\", pca_d.explained_variance_.round(4))\nprint(\"固有ベクトル（自作・列がPC）:\")\nprint(V.round(4))\nprint(\"components_.T（sklearn）:\")\nprint(pca_d.components_.T.round(4))\n\n固有値（自作）        : [1.9978 0.0275]\n分散（sklearnのPCA）  : [1.9978 0.0275]\n固有ベクトル（自作・列がPC）:\n[[ 0.7071 -0.7071]\n [ 0.7071  0.7071]]\ncomponents_.T（sklearn）:\n[[ 0.7071  0.7071]\n [ 0.7071 -0.7071]]\n\n\n\n固有値は sklearn の explained_variance_ と完全一致\nベクトルは列によって符号が逆になることがある — 軸の向きが180°逆なだけで、同じ軸\n\n\n\n\n\n\n\n実は sklearn の中身は SVD\n\n\n実務の PCA は、共分散行列を作らずに中心化したデータを SVD（特異値分解） に かけて同じ答えを出している（大きいデータで速く、数値的にも安定）。\n\nU, S, Vt = np.linalg.svd(Xc)\nprint(\"SVD から出した分散:\", (S**2 / (len(Xc) - 1)).round(4))   # ↑の固有値と一致\n\nSVD から出した分散: [1.9978 0.0275]"
-  },
-  {
-    "objectID": "dimensionality-pca.html#scikit-learn-で-pca魚は本当は何次元か",
-    "href": "dimensionality-pca.html#scikit-learn-で-pca魚は本当は何次元か",
-    "title": "次元の呪いと次元削減",
-    "section": "scikit-learn で PCA（魚は本当は何次元か）",
-    "text": "scikit-learn で PCA（魚は本当は何次元か）\n\n\n輝度・重さ・体長の3特徴量を PCA にかけてみる\n\n\nX3 = np.column_stack([brightness, weights, lengths])   # 3特徴量\n\nX3_scaled = StandardScaler().fit_transform(X3)   # スケールを揃えてから PCA\n\npca = PCA(n_components=3)\nX3_pca = pca.fit_transform(X3_scaled)\n\nprint(\"各主成分の寄与率（情報量の割合）:\")\nfor i, r in enumerate(pca.explained_variance_ratio_):\n    print(f\"  PC{i+1}: {r:.1%}\")\n\n各主成分の寄与率（情報量の割合）:\n  PC1: 79.2%\n  PC2: 19.9%\n  PC3: 0.9%\n\n\n\n\n\n\n\n\n\nクイズ\n\n\nPC3 の寄与率は 1% 未満。これは何を意味している？\n\n\n\n\n\n\n体長と重さがほぼ同じ情報だから、3本目の軸には情報が残っていない\nこの魚データは、3次元に見えて実質2次元だった"
-  },
-  {
-    "objectID": "dimensionality-pca.html#次元に圧縮しても何も失わない",
-    "href": "dimensionality-pca.html#次元に圧縮しても何も失わない",
-    "title": "次元の呪いと次元削減",
-    "section": "2次元に圧縮しても何も失わない",
-    "text": "2次元に圧縮しても何も失わない\n\n\ncolors  = [\"#e74c3c\", \"#2980b9\"]\n\nplt.figure(figsize=(5.8, 3.8))\nfor label, name, col, m in [(1, \"Salmon\", \"#e74c3c\", \"o\"), (0, \"Sea bass\", \"#2980b9\", \"s\")]:\n    mask = y == label\n    plt.scatter(X3_pca[mask, 0], X3_pca[mask, 1],\n                c=col, marker=m, s=45, alpha=0.7, label=name)\nplt.xlabel(f\"PC1（寄与率 {pca.explained_variance_ratio_[0]:.1%}）\")\nplt.ylabel(f\"PC2（寄与率 {pca.explained_variance_ratio_[1]:.1%}）\")\nplt.title(\"3特徴量 → 2次元に圧縮\")\nplt.legend(); plt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n次元を1つ捨てたのに、2種類の魚は今までどおり分離できている\n累積寄与率 99% — 捨てたのは「情報のない軸」だけ\n\n\n\n\n\n\n\nStandardScaler を使う理由\n\n\n輝度（1〜10）・重さ（1000〜2500g）・体長（45〜62cm）はスケールが全く違う。 正規化しないと重さだけが主成分を支配してしまう（クラスタリング回のスケールの罠と同じ）。"
-  },
-  {
-    "objectID": "dimensionality-pca.html#次元データを2次元に圧縮iris",
-    "href": "dimensionality-pca.html#次元データを2次元に圧縮iris",
-    "title": "次元の呪いと次元削減",
-    "section": "4次元データを2次元に圧縮（Iris）",
-    "text": "4次元データを2次元に圧縮（Iris）\n\nFisher の Iris データセット：4特徴量（がく片長さ・幅、花弁長さ・幅）\n\nfrom sklearn.datasets import load_iris\n\niris   = load_iris()\nX_iris = StandardScaler().fit_transform(iris.data)   # 4特徴量\ny_iris = iris.target\n\npca4  = PCA(n_components=2)\nX_2d  = pca4.fit_transform(X_iris)\n\ncolors  = [\"#e74c3c\", \"#27ae60\", \"#2980b9\"]\nmarkers = [\"o\", \"s\", \"^\"]\n\nplt.figure(figsize=(6, 4.5))\nfor label, name in enumerate(iris.target_names):\n    mask = y_iris == label\n    plt.scatter(X_2d[mask, 0], X_2d[mask, 1],\n                c=colors[label], marker=markers[label],\n                s=50, alpha=0.8, label=name)\n\nplt.xlabel(f\"PC1（寄与率 {pca4.explained_variance_ratio_[0]:.1%}）\")\nplt.ylabel(f\"PC2（寄与率 {pca4.explained_variance_ratio_[1]:.1%}）\")\nplt.title(\"Iris（4次元）を PCA で2次元に圧縮\")\nplt.legend()\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nノート\n\n\n4次元を2次元に圧縮しても全情報の 97% 以上が保たれている。 setosa（赤丸）が完全に分離できているのも図から見える。"
-  },
-  {
-    "objectID": "dimensionality-pca.html#寄与率explained-variance-ratio",
-    "href": "dimensionality-pca.html#寄与率explained-variance-ratio",
-    "title": "次元の呪いと次元削減",
-    "section": "寄与率（Explained Variance Ratio）",
-    "text": "寄与率（Explained Variance Ratio）\n\n\nratios     = pca4.explained_variance_ratio_\ncumulative = np.cumsum(ratios)\n\nfig, ax = plt.subplots(figsize=(5, 3.5))\nx_pos = [\"PC1\", \"PC2\", \"PC3\", \"PC4\"]\n\n# 全4成分を改めて計算\npca_full = PCA(n_components=4).fit(X_iris)\nratios_full = pca_full.explained_variance_ratio_\ncum_full    = np.cumsum(ratios_full)\n\nax.bar(x_pos, ratios_full, color=[\"#e74c3c\", \"#e67e22\", \"#bdc3c7\", \"#bdc3c7\"])\nax.plot(x_pos, cum_full, \"o-\", color=\"black\", label=\"累積寄与率\")\nfor x, y in zip(x_pos, cum_full):\n    ax.text(x, y + 0.02, f\"{y:.1%}\", ha=\"center\", fontsize=9)\nax.set_ylabel(\"寄与率\")\nax.set_ylim(0, 1.15)\nax.legend(fontsize=9)\nax.set_title(\"Iris の主成分別寄与率\")\nax.grid(True, alpha=0.3, axis=\"y\")\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n何次元に削減するか？\n\n\n一般的には累積寄与率が 80〜95% を超える次元数を選ぶ。 Iris は PC1+PC2 だけで 97% 超えるので2次元で十分。"
-  },
-  {
-    "objectID": "dimensionality-pca.html#まとめ",
-    "href": "dimensionality-pca.html#まとめ",
-    "title": "次元の呪いと次元削減",
-    "section": "まとめ",
-    "text": "まとめ\n\n\n次元の呪い：次元が増えると空間が広くなり、距離が意味をなさなくなる\n特徴量を増やしても情報が増えるとは限らない：体長は重さの言い換えだった\nPCA：分散が最大の方向（= 共分散行列の固有ベクトル）に軸を取り直す\n\n寄与率を見れば「データの実質的な次元」がわかる（魚は3次元に見えて実質2次元）\n\n\nfrom sklearn.decomposition import PCA\nfrom sklearn.preprocessing import StandardScaler\n\nX_scaled = StandardScaler().fit_transform(X)   # スケール正規化\npca = PCA(n_components=2)\nX_2d = pca.fit_transform(X_scaled)             # 2次元に圧縮\n\npca.explained_variance_ratio_   # 各 PC の寄与率\n\n\n\n概念\n意味\n\n\n\n\n主成分（PC）\n分散が最大の方向（固有ベクトル）\n\n\n固有値\nその方向の分散の大きさ\n\n\n寄与率\n情報量の割合（累積80〜95%を目安に次元数を決める）\n\n\n\n\n\n\n\n\n\n分類問題と特徴量のまとめ\n\n\n1D → 2D の分類、評価と汎化、教師なし学習（k-means）、次元の呪いと PCA。 機械学習の基本的な問いと道具が揃った。\nここまで model.fit(X, y) という1行を何度も呼んだが、中身は一度も見ていない。 次の「最適化」から、この1行を開けにいく。"
+    "objectID": "handouts.html#handouts",
+    "href": "handouts.html#handouts",
+    "title": "AI Lectures",
+    "section": "Handouts",
+    "text": "Handouts\n\n← Lectures\n\n各回スライドの配布用 PDF。クリックで開く。番号は講義一覧と対応。\n\n\n導入\n\n\n人工知能概論\n\n\n分類問題と特徴量\n\n\n1次元分類の基礎\n2次元の決定境界\n過学習と汎化\n教師なし学習・クラスタリング\n次元の呪いと次元削減\n\n\nfit() の中身を開ける\n\n\n最適化と勾配降下法\n線形回帰と正則化\nニューラルネットワークの最小単位\n変換を重ねる\nバックプロパゲーション\n実装：NumPyだけでNN\nPyTorch入門\n手書き数字分類プロジェクト\n\n\n参考資料 回数外\n\n\nNewton法\nローカルミニマムの罠"
   },
   {
     "objectID": "linear-regression.html#ここまでの道具",
