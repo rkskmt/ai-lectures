@@ -10,46 +10,46 @@
 <details open>
 <summary>導入</summary>
 
-- [人工知能概論](ai-introduction.qmd)
+- [人工知能概論](ai-introduction.qmd) · [PDF](pdf/ai-introduction.pdf){target="_blank"}
 
 </details>
 
 <details open>
 <summary>分類問題と特徴量</summary>
 
-- [1次元分類の基礎](classification-basics-1d.qmd)
-- [2次元の決定境界](classification-2d-boundaries.qmd)
-- [過学習と汎化](classification-evaluation.qmd)
-- [教師なし学習・クラスタリング](clustering-kmeans.qmd)
-- [次元の呪いと次元削減](dimensionality-pca.qmd)
+- [1次元分類の基礎](classification-basics-1d.qmd) · [PDF](pdf/classification-basics-1d.pdf){target="_blank"}
+- [2次元の決定境界](classification-2d-boundaries.qmd) · [PDF](pdf/classification-2d-boundaries.pdf){target="_blank"}
+- [過学習と汎化](classification-evaluation.qmd) · [PDF](pdf/classification-evaluation.pdf){target="_blank"}
+- [教師なし学習・クラスタリング](clustering-kmeans.qmd) · [PDF](pdf/clustering-kmeans.pdf){target="_blank"}
+- [次元の呪いと次元削減](dimensionality-pca.qmd) · [PDF](pdf/dimensionality-pca.pdf){target="_blank"}
 
 </details>
 
 <details open>
 <summary>fit() の中身を開ける</summary>
 
-- [最適化と勾配降下法](optimization-gradient-descent.qmd)
-- [線形回帰と正則化](linear-regression.qmd)
-- [ニューラルネットワークの最小単位](nn-single-unit.qmd)
-- [変換を重ねる](nn-multilayer.qmd)
-- [バックプロパゲーション](nn-backprop.qmd)
-- [実装：NumPyだけでNN](nn-numpy.qmd)
-- [PyTorch入門](pytorch-intro.qmd)
-- [手書き数字分類プロジェクト](mnist-project.qmd)
+- [最適化と勾配降下法](optimization-gradient-descent.qmd) · [PDF](pdf/optimization-gradient-descent.pdf){target="_blank"}
+- [線形回帰と正則化](linear-regression.qmd) · [PDF](pdf/linear-regression.pdf){target="_blank"}
+- [ニューラルネットワークの最小単位](nn-single-unit.qmd) · [PDF](pdf/nn-single-unit.pdf){target="_blank"}
+- [変換を重ねる](nn-multilayer.qmd) · [PDF](pdf/nn-multilayer.pdf){target="_blank"}
+- [バックプロパゲーション](nn-backprop.qmd) · [PDF](pdf/nn-backprop.pdf){target="_blank"}
+- [実装：NumPyだけでNN](nn-numpy.qmd) · [PDF](pdf/nn-numpy.pdf){target="_blank"}
+- [PyTorch入門](pytorch-intro.qmd) · [PDF](pdf/pytorch-intro.pdf){target="_blank"}
+- [手書き数字分類プロジェクト](mnist-project.qmd) · [PDF](pdf/mnist-project.pdf){target="_blank"}
 
 </details>
 
 <details>
 <summary>参考資料（回数外）</summary>
 
-- [Newton法](newton-method-appendix.qmd)
-- [ローカルミニマムの罠](optimization-local-minima-appendix.qmd)
+- [Newton法](newton-method-appendix.qmd) · [PDF](pdf/newton-method-appendix.pdf){target="_blank"}
+- [ローカルミニマムの罠](optimization-local-minima-appendix.qmd) · [PDF](pdf/optimization-local-minima-appendix.pdf){target="_blank"}
 
 </details>
 
 <script>
 document.querySelectorAll("details").forEach(d => {
-  const links = d.querySelectorAll("a[href]").length;
+  const links = d.querySelectorAll('a[href$=".qmd"]').length;  // 講義リンクのみ（PDFリンクは数えない）
   const total = d.querySelectorAll("li").length;
   const s = d.querySelector("summary");
   if (total > 0) s.textContent += `  [${links}/${total}]`;
