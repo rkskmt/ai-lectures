@@ -73,19 +73,18 @@ done
 ## ファイル構成
 
 ```
-_quarto.yml       サイト設定・ナビゲーション
-_metadata.yaml    スライド共通設定（テーマ・CSS・フィルタ）
+_quarto.yml       サイト設定・resources
+_metadata.yaml    スライド共通設定（cleanslidekit-revealjs 形式・d2/lightbox フィルタ）
 environment.yml   conda 環境定義
 index.qmd         トップページ（リンク一覧）
 *.qmd             各回のスライド
 imgs/             画像ファイル
 pdf/              配布用ハンドアウトPDF（生成物・gitignore、上記参照）
-hl.lua            ==text== ハイライト用 Lua フィルタ
-fw-colon.lua      全角コロン「：」の表示調整 Lua フィルタ
-cite-image.lua    画像引用表示用 Lua フィルタ
 doc/              執筆ガイド・トラブルシュート
-_extensions/      Quarto 拡張（clean-revealjs テーマ等）
+_extensions/      Quarto 拡張（cleanslidekit テーマ＝CSS/UI JS/Lua フィルタ同梱、d2、lightbox）
 ```
+
+Lua フィルタ（`hl.lua`・`fw-colon.lua`・`cite-image.lua` 等）は cleanslidekit 拡張に同梱されている（ルート直下には置かない）。
 
 ## スライドの書き方
 
@@ -132,6 +131,18 @@ import japanize_matplotlib  # これだけでOK
 ```
 
 `rcParams['font.family']` は使わない（動作が不安定）。
+
+### D2 図（ダイアグラム）
+
+コードブロックで `.d2` を指定すると図が描画される（quarto-d2 拡張。`d2` バイナリは `environment.yml` で導入済み）。
+
+````markdown
+```{.d2 sketch="true" width="80%"}
+A -> B: ラベル
+```
+````
+
+Mermaid は使わない（D2 に移行済み）。
 
 ### 数式の `\vec{}` の高さ揃え
 
@@ -192,4 +203,6 @@ import japanize_matplotlib  # これだけでOK
 
 ## 参考ドキュメント
 
-- [doc/troubleshooting.md](doc/troubleshooting.md) — CSS変更時のキャッシュ・コードブロック selector の注意
+- [doc/course-arc.md](doc/course-arc.md) — 講義全体のアーク設計・各回の仕様
+- [doc/engaging-lecture-design.md](doc/engaging-lecture-design.md) — 講義設計の装置（コールドオープン、クイズ→めくり等）
+- [doc/troubleshooting.md](doc/troubleshooting.md) — CSS変更時の注意点（編集すべき custom.css の場所、キャッシュ）
