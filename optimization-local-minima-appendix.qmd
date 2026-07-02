@@ -85,11 +85,11 @@ x_range = np.linspace(-2, 8, 300)
 y_range = f_poly(x_range)
 
 plt.figure(figsize=(12, 5))
-plt.plot(x_range, y_range, 'b-', linewidth=2.5)
-plt.axhline(y=0, color='k', linestyle='--', alpha=0.3)
-plt.xlabel('x', fontsize=13)
-plt.ylabel('f(x)', fontsize=13)
-plt.title('Quartic Function: Two Valleys!', fontsize=14, fontweight='bold')
+plt.plot(x_range, y_range, "b-", linewidth=2.5)
+plt.axhline(y=0, color="k", linestyle="--", alpha=0.3)
+plt.xlabel("x", fontsize=13)
+plt.ylabel("f(x)", fontsize=13)
+plt.title("Quartic Function: Two Valleys!", fontsize=14, fontweight="bold")
 plt.grid(True, alpha=0.3)
 plt.xlim(-2, 8)
 plt.tight_layout()
@@ -307,28 +307,28 @@ x_range = np.linspace(-2, 8, 300)
 y_range = f_poly(x_range)
 
 plt.figure(figsize=(12, 6))
-plt.plot(x_range, y_range, 'b-', linewidth=2, alpha=0.5, label='f(x)')
+plt.plot(x_range, y_range, "b-", linewidth=2, alpha=0.5, label="f(x)")
 
 # Experiment 1 (converges to the local min)
 plt.plot(history_local, [f_poly(h) for h in history_local],
-         'ro-', markersize=10, linewidth=2, label=f'実験1（x0={x0_local}）')
-plt.annotate('実験1：左の谷に到着\n（ローカルミニマム）',
+         'ro-', markersize=10, linewidth=2, label=f"実験1（x0={x0_local}）")
+plt.annotate("実験1：左の谷に到着\n（ローカルミニマム）",
              xy=(x_local_final, f_local_final), xytext=(-0.6, 7.5),
-             fontsize=11, ha='center', color='#c0392b',
-             arrowprops={'arrowstyle': '->', 'color': '#c0392b', 'lw': 1.8})
+             fontsize=11, ha="center", color="#c0392b",
+             arrowprops={"arrowstyle": "->", "color": "#c0392b", "lw": 1.8})
 
 # Experiment 2 (converges to the global min)
 plt.plot(history_global, [f_poly(h) for h in history_global],
-         'go-', markersize=10, linewidth=2, label=f'実験2（x0={x0_global}）')
-plt.annotate('実験2：右の谷に到着\n（グローバルミニマム）',
+         'go-', markersize=10, linewidth=2, label=f"実験2（x0={x0_global}）")
+plt.annotate("実験2：右の谷に到着\n（グローバルミニマム）",
              xy=(x_global_final, f_global_final), xytext=(6.4, -7.5),
-             fontsize=11, ha='center', color='#1e8449',
-             arrowprops={'arrowstyle': '->', 'color': '#1e8449', 'lw': 1.8})
+             fontsize=11, ha="center", color="#1e8449",
+             arrowprops={"arrowstyle": "->", "color": "#1e8449", "lw": 1.8})
 
-plt.xlabel('x', fontsize=13)
-plt.ylabel('f(x)', fontsize=13)
-plt.title('同じNewton法・同じ式 — スタート地点が違うだけで結末が変わる',
-          fontsize=14, fontweight='bold')
+plt.xlabel("x", fontsize=13)
+plt.ylabel("f(x)", fontsize=13)
+plt.title("同じNewton法・同じ式 — スタート地点が違うだけで結末が変わる",
+          fontsize=14, fontweight="bold")
 plt.legend(fontsize=11)
 plt.grid(True, alpha=0.3)
 plt.tight_layout()
@@ -342,8 +342,8 @@ plt.show()
 
 | | スタート地点 | 到着地点 | f(x)の値 | そこは何？ |
 |---|---|---|---|---|
-| 実験1 | $x_0 = 0.5$ | $x \approx$ `{python} f'{x_local_final:.2f}'` | `{python} f'{f_local_final:.2f}'` | 谷（左） |
-| 実験2 | $x_0 = 5.5$ | $x \approx$ `{python} f'{x_global_final:.2f}'` | `{python} f'{f_global_final:.2f}'` | 谷（右・もっと深い） |
+| 実験1 | $x_0 = 0.5$ | $x \approx$ `{python} f"{x_local_final:.2f}"` | `{python} f"{f_local_final:.2f}"` | 谷（左） |
+| 実験2 | $x_0 = 5.5$ | $x \approx$ `{python} f"{x_global_final:.2f}"` | `{python} f"{f_global_final:.2f}"` | 谷（右・もっと深い） |
 
 - どちらも正真正銘の谷（$f''>0$）。でも**深さがまったく違う**
 - 実験1の答えは「その周辺では最適、全体では2番手」— そして使った本人は、**もっと深い谷の存在に気づけない**
@@ -375,11 +375,11 @@ plt.show()
 from scipy.optimize import minimize_scalar
 
 # ローカルミニマムとグローバルミニマムを数値的に探す
-result_local = minimize_scalar(f_poly, bounds=(0, 3), method='bounded')
+result_local = minimize_scalar(f_poly, bounds=(0, 3), method="bounded")
 x_local = result_local.x
 y_local = f_poly(x_local)
 
-result_global = minimize_scalar(f_poly, bounds=(4, 7), method='bounded')
+result_global = minimize_scalar(f_poly, bounds=(4, 7), method="bounded")
 x_global = result_global.x
 y_global = f_poly(x_global)
 
@@ -388,24 +388,24 @@ x_range = np.linspace(-2, 8, 300)
 y_range = f_poly(x_range)
 
 plt.figure(figsize=(12, 6))
-plt.plot(x_range, y_range, 'b-', linewidth=2.5)
+plt.plot(x_range, y_range, "b-", linewidth=2.5)
 
-plt.plot(x_local, y_local, 'ro', markersize=15, 
-         label=f'Local Min: x={x_local:.2f}, f(x)={y_local:.2f}', zorder=5)
-plt.plot(x_global, y_global, 'g*', markersize=20, 
-         label=f'Global Min: x={x_global:.2f}, f(x)={y_global:.2f}', zorder=5)
+plt.plot(x_local, y_local, "ro", markersize=15, 
+         label=f"Local Min: x={x_local:.2f}, f(x)={y_local:.2f}", zorder=5)
+plt.plot(x_global, y_global, "g*", markersize=20, 
+         label=f"Global Min: x={x_global:.2f}, f(x)={y_global:.2f}", zorder=5)
 
-plt.annotate('Local Min\n(shallow valley)', xy=(x_local, y_local), xytext=(x_local-1.5, y_local+2),
-            fontsize=12, ha='center',
-            arrowprops=dict(arrowstyle='->', color='red', lw=2))
-plt.annotate('Global Min\n(deepest valley)', xy=(x_global, y_global), xytext=(x_global+1.5, y_global+2),
-            fontsize=12, ha='center',
-            arrowprops=dict(arrowstyle='->', color='green', lw=2))
+plt.annotate("Local Min\n(shallow valley)", xy=(x_local, y_local), xytext=(x_local-1.5, y_local+2),
+            fontsize=12, ha="center",
+            arrowprops=dict(arrowstyle="->", color="red", lw=2))
+plt.annotate("Global Min\n(deepest valley)", xy=(x_global, y_global), xytext=(x_global+1.5, y_global+2),
+            fontsize=12, ha="center",
+            arrowprops=dict(arrowstyle="->", color="green", lw=2))
 
-plt.xlabel('x', fontsize=13)
-plt.ylabel('f(x)', fontsize=13)
-plt.title('Local Minimum vs Global Minimum', fontsize=14, fontweight='bold')
-plt.legend(fontsize=11, loc='upper right')
+plt.xlabel("x", fontsize=13)
+plt.ylabel("f(x)", fontsize=13)
+plt.title("Local Minimum vs Global Minimum", fontsize=14, fontweight="bold")
+plt.legend(fontsize=11, loc="upper right")
 plt.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.show()
@@ -441,28 +441,28 @@ for _ in range(6):
 
 fig, (axL, axR) = plt.subplots(1, 2, figsize=(11, 3.6))
 xs_w = np.linspace(-1.7, 7.6, 400)
-axL.plot(xs_w, f_poly(xs_w), 'b-', lw=2)
-axL.plot(hist3, [f_poly(h) for h in hist3], 'o-', color='#c0392b', ms=7)
-axL.add_patch(plt.Rectangle((1.3, 2.45), 0.7, 0.4, fill=False, ec='#555', lw=1.2))
-axL.set_title('全体図（四角の中で起きていること）', fontsize=11)
+axL.plot(xs_w, f_poly(xs_w), "b-", lw=2)
+axL.plot(hist3, [f_poly(h) for h in hist3], "o-", color="#c0392b", ms=7)
+axL.add_patch(plt.Rectangle((1.3, 2.45), 0.7, 0.4, fill=False, ec="#555", lw=1.2))
+axL.set_title("全体図（四角の中で起きていること）", fontsize=11)
 axL.grid(True, alpha=0.3)
 
 xs_z = np.linspace(1.3, 2.0, 300)
-axR.plot(xs_z, f_poly(xs_z), 'b-', lw=2.5)
-axR.plot(x_max_demo, f_poly(x_max_demo), '^', color='darkorange', ms=14,
-         zorder=5, label='丘のてっぺん（極大）')
-axR.plot(hist3, [f_poly(h) for h in hist3], 'o', color='#c0392b', ms=9, zorder=4)
+axR.plot(xs_z, f_poly(xs_z), "b-", lw=2.5)
+axR.plot(x_max_demo, f_poly(x_max_demo), "^", color="darkorange", ms=14,
+         zorder=5, label="丘のてっぺん（極大）")
+axR.plot(hist3, [f_poly(h) for h in hist3], "o", color="#c0392b", ms=9, zorder=4)
 for i in range(len(hist3) - 1):
-    axR.annotate('', xy=(hist3[i + 1], f_poly(hist3[i + 1])),
+    axR.annotate("", xy=(hist3[i + 1], f_poly(hist3[i + 1])),
                  xytext=(hist3[i], f_poly(hist3[i])),
-                 arrowprops={'arrowstyle': '->', 'color': '#c0392b', 'lw': 1.8})
+                 arrowprops={"arrowstyle": "->", "color": "#c0392b", "lw": 1.8})
 for i, h in enumerate(hist3):
-    axR.annotate(f'{i}', (h, f_poly(h)), textcoords='offset points',
-                 xytext=(0, -16), ha='center', fontsize=10, fontweight='bold')
+    axR.annotate(f"{i}", (h, f_poly(h)), textcoords='offset points',
+                 xytext=(0, -16), ha="center", fontsize=10, fontweight="bold")
 axR.set_xlim(1.3, 2.0)
 axR.set_ylim(2.55, 2.75)
-axR.set_title('拡大：坂を登って山頂で停止', fontsize=11)
-axR.legend(fontsize=9.5, loc='lower right')
+axR.set_title("拡大：坂を登って山頂で停止", fontsize=11)
+axR.legend(fontsize=9.5, loc="lower right")
 axR.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.show()
@@ -565,36 +565,36 @@ def paint_basins(ax):
 
 x_range = np.linspace(-1.5, 7.5, 300)
 paint_basins(ax1)
-ax1.plot(x_range, f_poly(x_range), 'b-', linewidth=2.5)
-ax1.plot(x_local, y_local, 'ro', markersize=13, zorder=5, label='ローカルミニマム')
-ax1.plot(x_global, y_global, 'g*', markersize=20, zorder=5, label='グローバルミニマム')
-ax1.plot(x_max, f_poly(x_max), '^', color='darkorange', markersize=13, zorder=5,
-         label='山頂（極大）')
-ax1.set_ylabel('f(x)', fontsize=12)
-ax1.set_title('関数の形（背景の色＝その x からスタートしたときの行き先）',
-              fontsize=13, fontweight='bold')
-ax1.legend(fontsize=10, loc='upper center')
+ax1.plot(x_range, f_poly(x_range), "b-", linewidth=2.5)
+ax1.plot(x_local, y_local, "ro", markersize=13, zorder=5, label="ローカルミニマム")
+ax1.plot(x_global, y_global, "g*", markersize=20, zorder=5, label="グローバルミニマム")
+ax1.plot(x_max, f_poly(x_max), "^", color="darkorange", markersize=13, zorder=5,
+         label="山頂（極大）")
+ax1.set_ylabel("f(x)", fontsize=12)
+ax1.set_title("関数の形（背景の色＝その x からスタートしたときの行き先）",
+              fontsize=13, fontweight="bold")
+ax1.legend(fontsize=10, loc="upper center")
 ax1.grid(True, alpha=0.3)
 
 paint_basins(ax2)
-for mask, color in [(to_local, 'red'), (to_global, 'green'), (to_max, 'darkorange')]:
+for mask, color in [(to_local, "red"), (to_global, "green"), (to_max, "darkorange")]:
     ax2.scatter(x0_dense[mask], convergence_points[mask], c=color, s=22, zorder=3)
-for yv, color, lbl in [(x_local, 'red', f'x={x_local:.2f}（左の谷）'),
-                       (x_global, 'green', f'x={x_global:.2f}（右の谷）'),
-                       (x_max, 'darkorange', f'x={x_max:.2f}（山頂！）')]:
-    ax2.axhline(y=yv, color=color, linestyle='--', linewidth=1.5, alpha=0.7)
-    ax2.text(7.45, yv + 0.15, lbl, ha='right', fontsize=10, color=color)
+for yv, color, lbl in [(x_local, 'red', f"x={x_local:.2f}（左の谷）"),
+                       (x_global, 'green', f"x={x_global:.2f}（右の谷）"),
+                       (x_max, 'darkorange', f"x={x_max:.2f}（山頂！）")]:
+    ax2.axhline(y=yv, color=color, linestyle="--", linewidth=1.5, alpha=0.7)
+    ax2.text(7.45, yv + 0.15, lbl, ha="right", fontsize=10, color=color)
 
-ax2.annotate('例：x0 = −1 から出発', xy=(-1.0, x_local), xytext=(-1.2, 2.6),
-             fontsize=10, ha='left',
-             arrowprops={'arrowstyle': '->', 'color': '#333'})
-ax2.annotate('グローバルのすぐ手前なのに\n左の谷へ飛ばされる帯',
-             xy=(3.9, x_local), xytext=(2.6, -2.6), fontsize=10, ha='center',
-             arrowprops={'arrowstyle': '->', 'color': '#333'})
-ax2.set_xlabel('スタート地点 x0', fontsize=12)
-ax2.set_ylabel('たどり着いた場所', fontsize=12)
-ax2.set_title('引力圏：スタート地点（横軸）→ たどり着く先（縦軸）',
-              fontsize=13, fontweight='bold')
+ax2.annotate("例：x0 = −1 から出発", xy=(-1.0, x_local), xytext=(-1.2, 2.6),
+             fontsize=10, ha="left",
+             arrowprops={"arrowstyle": "->", "color": "#333"})
+ax2.annotate("グローバルのすぐ手前なのに\n左の谷へ飛ばされる帯",
+             xy=(3.9, x_local), xytext=(2.6, -2.6), fontsize=10, ha="center",
+             arrowprops={"arrowstyle": "->", "color": "#333"})
+ax2.set_xlabel("スタート地点 x0", fontsize=12)
+ax2.set_ylabel("たどり着いた場所", fontsize=12)
+ax2.set_title("引力圏：スタート地点（横軸）→ たどり着く先（縦軸）",
+              fontsize=13, fontweight="bold")
 ax2.set_xlim(-1.5, 7.5)
 ax2.set_ylim(-3.2, 7.2)
 ax2.grid(True, alpha=0.3)
@@ -641,47 +641,47 @@ def q_fit(x):
 
 fig, ax = plt.subplots(figsize=(11, 5.2))
 xs_f = np.linspace(-1.7, 7.6, 400)
-ax.plot(xs_f, f_poly(xs_f), 'b-', lw=2.5, label='f(x)')
+ax.plot(xs_f, f_poly(xs_f), "b-", lw=2.5, label="f(x)")
 xs_q = np.linspace(-5.3, 7.3, 400)
-ax.plot(xs_q, q_fit(xs_q), '--', color='#8e44ad', lw=2,
-        label='x0=4 に当てはめた放物線（逆さま！）')
+ax.plot(xs_q, q_fit(xs_q), "--", color="#8e44ad", lw=2,
+        label="x0=4 に当てはめた放物線（逆さま！）")
 
-ax.axvspan(0.792, 4.208, color='orange', alpha=0.12)
-ax.text(2.5, 23.5, '上に凸の区間（f″< 0）', ha='center', fontsize=10.5,
-        color='#b9770e')
-ax.axvline(4.208, color='#b9770e', ls=':', lw=1.5)
-ax.text(4.35, 16, '変曲点（f″=0）\n近いほど f′/f″ が爆発', fontsize=9.5,
-        color='#b9770e', ha='left')
+ax.axvspan(0.792, 4.208, color="orange", alpha=0.12)
+ax.text(2.5, 23.5, "上に凸の区間（f″< 0）", ha="center", fontsize=10.5,
+        color="#b9770e")
+ax.axvline(4.208, color="#b9770e", ls=":", lw=1.5)
+ax.text(4.35, 16, "変曲点（f″=0）\n近いほど f′/f″ が爆発", fontsize=9.5,
+        color="#b9770e", ha="left")
 
-ax.plot(x0_demo, f_poly(x0_demo), 'o', color='black', ms=10, zorder=5)
+ax.plot(x0_demo, f_poly(x0_demo), "o", color="black", ms=10, zorder=5)
 ax.text(x0_demo + 0.15, f_poly(x0_demo) - 2.8,
-        'スタート x0=4\n（目の前は下り坂なのに…）', fontsize=10, ha='left')
-ax.plot(x_next, q_fit(x_next), 'X', color='#8e44ad', ms=13, zorder=5)
-ax.text(x_next, q_fit(x_next) + 1.6, '放物線の頂点（傾きゼロ）\n→ Newton法はここに飛ぶ',
-        ha='center', fontsize=10, color='#8e44ad')
+        "スタート x0=4\n（目の前は下り坂なのに…）", fontsize=10, ha="left")
+ax.plot(x_next, q_fit(x_next), "X", color="#8e44ad", ms=13, zorder=5)
+ax.text(x_next, q_fit(x_next) + 1.6, "放物線の頂点（傾きゼロ）\n→ Newton法はここに飛ぶ",
+        ha="center", fontsize=10, color="#8e44ad")
 
-ax.annotate('', xy=(x_next + 0.3, q_fit(x_next) - 1.2),
+ax.annotate("", xy=(x_next + 0.3, q_fit(x_next) - 1.2),
             xytext=(x0_demo - 0.2, f_poly(x0_demo) + 0.8),
-            arrowprops={'arrowstyle': '->', 'color': '#c0392b', 'lw': 2.5,
-                        'connectionstyle': 'arc3,rad=0.25'})
-ax.text(2.0, 9.0, '1歩 = −f′/f″ = −8 の大ジャンプ', fontsize=11, color='#c0392b',
-        fontweight='bold', ha='center')
+            arrowprops={"arrowstyle": "->", "color": "#c0392b", "lw": 2.5,
+                        "connectionstyle": "arc3,rad=0.25"})
+ax.text(2.0, 9.0, "1歩 = −f′/f″ = −8 の大ジャンプ", fontsize=11, color="#c0392b",
+        fontweight="bold", ha="center")
 
-ax.annotate('着地後は左の谷を素直に降りて x=0 へ\n（−4 → −2.1 → −0.94 → … → 0）',
+ax.annotate("着地後は左の谷を素直に降りて x=0 へ\n（−4 → −2.1 → −0.94 → … → 0）",
             xy=(-0.2, f_poly(0) + 0.4), xytext=(-4.9, -9),
-            fontsize=10, ha='left',
-            arrowprops={'arrowstyle': '->', 'color': '#555'})
+            fontsize=10, ha="left",
+            arrowprops={"arrowstyle": "->", "color": "#555"})
 
-ax.plot(0, f_poly(0), 'ro', ms=10, zorder=5)
-ax.plot(x_global, y_global, 'g*', ms=18, zorder=5)
-ax.text(6.75, -15.9, '歩けば目と鼻の先だった\nグローバルミニマム',
-        ha='center', va='top', fontsize=9.5, color='green')
+ax.plot(0, f_poly(0), "ro", ms=10, zorder=5)
+ax.plot(x_global, y_global, "g*", ms=18, zorder=5)
+ax.text(6.75, -15.9, "歩けば目と鼻の先だった\nグローバルミニマム",
+        ha="center", va="top", fontsize=9.5, color="green")
 
 ax.set_xlim(-5.5, 7.8)
 ax.set_ylim(-20, 27)
-ax.set_xlabel('x', fontsize=12)
-ax.set_ylabel('f(x)', fontsize=12)
-ax.legend(fontsize=10, loc='lower left')
+ax.set_xlabel("x", fontsize=12)
+ax.set_ylabel("f(x)", fontsize=12)
+ax.legend(fontsize=10, loc="lower left")
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.show()
@@ -727,7 +727,7 @@ plt.show()
 - 登り提案が出るのは、ちょうど $f'' < 0$（上に凸）の場所 — 実験3とカタパルトの現場そのもの
 
 実験3の現場検証：$x = 1.5$ では提案 $d = +0.26$。
-$f' \cdot d = 0.6 \times 0.26 > 0$ → 登りなので却下 → $d = -f' = -0.6$（左の下りへ）
+$f" \cdot d = 0.6 \times 0.26 > 0$ → 登りなので却下 → $d = -f" = -0.6$（左の下りへ）
 
 ## 検査2：その一歩、実測で下がってる？
 
@@ -792,24 +792,24 @@ def paint_safe(ax):
 
 paint_safe(axA)
 axA.plot(np.linspace(-1.5, 7.5, 300), f_poly(np.linspace(-1.5, 7.5, 300)),
-         'b-', linewidth=2.5)
-axA.plot(x_local, y_local, 'ro', markersize=13, zorder=5)
-axA.plot(x_global, y_global, 'g*', markersize=20, zorder=5)
-axA.axvline(x_max, color='#b9770e', ls=':', lw=1.5)
-axA.set_ylabel('f(x)', fontsize=12)
-axA.set_title('修理後：引力圏は「丘のてっぺん」を境にした素直な2分割になる',
-              fontsize=13, fontweight='bold')
+         "b-", linewidth=2.5)
+axA.plot(x_local, y_local, "ro", markersize=13, zorder=5)
+axA.plot(x_global, y_global, "g*", markersize=20, zorder=5)
+axA.axvline(x_max, color="#b9770e", ls=":", lw=1.5)
+axA.set_ylabel("f(x)", fontsize=12)
+axA.set_title("修理後：引力圏は「丘のてっぺん」を境にした素直な2分割になる",
+              fontsize=13, fontweight="bold")
 axA.grid(True, alpha=0.3)
 
 paint_safe(axB)
-for mask, color in [(safe_local, 'red'), (safe_global, 'green')]:
+for mask, color in [(safe_local, "red"), (safe_global, "green")]:
     axB.scatter(x0_dense[mask], conv_safe[mask], c=color, s=22, zorder=3)
-axB.axhline(y=x_local, color='red', linestyle='--', linewidth=1.5, alpha=0.7)
-axB.axhline(y=x_global, color='green', linestyle='--', linewidth=1.5, alpha=0.7)
-axB.axvline(x_max, color='#b9770e', ls=':', lw=1.5)
-axB.text(x_max + 0.1, 3.3, '境界＝丘のてっぺん', fontsize=10, color='#b9770e')
-axB.set_xlabel('スタート地点 x0', fontsize=12)
-axB.set_ylabel('たどり着いた場所', fontsize=12)
+axB.axhline(y=x_local, color="red", linestyle="--", linewidth=1.5, alpha=0.7)
+axB.axhline(y=x_global, color="green", linestyle="--", linewidth=1.5, alpha=0.7)
+axB.axvline(x_max, color="#b9770e", ls=":", lw=1.5)
+axB.text(x_max + 0.1, 3.3, "境界＝丘のてっぺん", fontsize=10, color="#b9770e")
+axB.set_xlabel("スタート地点 x0", fontsize=12)
+axB.set_ylabel("たどり着いた場所", fontsize=12)
 axB.set_xlim(-1.5, 7.5)
 axB.grid(True, alpha=0.3)
 plt.tight_layout()
@@ -866,7 +866,7 @@ $f''(0) = 1.2 \times 0 - 6 \times 0 + 4 = 4 > 0$ → 最小値（谷）。
 $$f'(2) = 0.4 \times 8 - 3 \times 4 + 4 \times 2 = 3.2 - 12 + 8 = -0.8$$
 $$f''(2) = 1.2 \times 4 - 6 \times 2 + 4 = 4.8 - 12 + 4 = -3.2$$
 Newton法の**提案**は $d = -\dfrac{-0.8}{-3.2} = -0.25$（左へ）。
-でも傾きは右下り（$f' < 0$）なので、左へ進むのは**登り** — **検査1が却下**して $d = -f' = +0.8$（右へ）に差し替えます。
+でも傾きは右下り（$f" < 0$）なので、左へ進むのは**登り** — **検査1が却下**して $d = -f" = +0.8$（右へ）に差し替えます。
 
 → そのまま右の谷（グローバルミニマム）まで降りていきます。素のNewton法なら丘のてっぺん行きでした。
 
@@ -980,22 +980,22 @@ f_list = [r[2] for r in grid_results]
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
 
 # 左：初期値 vs 収束点
-scatter1 = ax1.scatter(x0_list, xf_list, c=f_list, cmap='RdYlGn_r', s=100, edgecolors='black')
-ax1.axhline(y=x_local, color='r', linestyle='--', linewidth=2, alpha=0.5, label='ローカルミニマム')
-ax1.axhline(y=x_global, color='g', linestyle='--', linewidth=2, alpha=0.5, label='グローバルミニマム')
-ax1.set_xlabel('スタート地点 x0', fontsize=12)
-ax1.set_ylabel('たどり着いた場所', fontsize=12)
-ax1.set_title('初期値 → 収束点', fontsize=13, fontweight='bold')
+scatter1 = ax1.scatter(x0_list, xf_list, c=f_list, cmap="RdYlGn_r", s=100, edgecolors="black")
+ax1.axhline(y=x_local, color="r", linestyle="--", linewidth=2, alpha=0.5, label="ローカルミニマム")
+ax1.axhline(y=x_global, color="g", linestyle="--", linewidth=2, alpha=0.5, label="グローバルミニマム")
+ax1.set_xlabel("スタート地点 x0", fontsize=12)
+ax1.set_ylabel("たどり着いた場所", fontsize=12)
+ax1.set_title("初期値 → 収束点", fontsize=13, fontweight="bold")
 ax1.legend(fontsize=9.5)
 ax1.grid(True, alpha=0.3)
 
 # 右：収束時の関数値
-scatter2 = ax2.scatter(x0_list, f_list, c=f_list, cmap='RdYlGn_r', s=100, edgecolors='black')
-ax2.axhline(y=y_local, color='r', linestyle='--', linewidth=2, alpha=0.5, label='ローカルミニマムの値')
-ax2.axhline(y=y_global, color='g', linestyle='--', linewidth=2, alpha=0.5, label='グローバルミニマムの値')
-ax2.set_xlabel('スタート地点 x0', fontsize=12)
-ax2.set_ylabel('収束時の f(x)', fontsize=12)
-ax2.set_title('解の良さ（一番下の点を採用する）', fontsize=13, fontweight='bold')
+scatter2 = ax2.scatter(x0_list, f_list, c=f_list, cmap="RdYlGn_r", s=100, edgecolors="black")
+ax2.axhline(y=y_local, color="r", linestyle="--", linewidth=2, alpha=0.5, label="ローカルミニマムの値")
+ax2.axhline(y=y_global, color="g", linestyle="--", linewidth=2, alpha=0.5, label="グローバルミニマムの値")
+ax2.set_xlabel("スタート地点 x0", fontsize=12)
+ax2.set_ylabel("収束時の f(x)", fontsize=12)
+ax2.set_title("解の良さ（一番下の点を採用する）", fontsize=13, fontweight="bold")
 ax2.legend(fontsize=9.5)
 ax2.grid(True, alpha=0.3)
 
@@ -1098,20 +1098,20 @@ def robust_optimization(f, fp, fpp, x0_list, max_iter=100):
             x = x + alpha * d
 
         all_results.append({
-            'x0': x0,
-            'x_final': x,
-            'f_final': f(x),
-            'is_minimum': fpp(x) > 0   # 保険の検品（修理版なら通常すべて谷）
+            "x0": x0,
+            "x_final": x,
+            "f_final": f(x),
+            "is_minimum": fpp(x) > 0   # 保険の検品（修理版なら通常すべて谷）
         })
 
     # 谷（最小値）だけを残して、一番良いのを選ぶ
-    minima = [r for r in all_results if r['is_minimum']]
+    minima = [r for r in all_results if r["is_minimum"]]
     if minima:
-        best_result = min(minima, key=lambda r: r['f_final'])
+        best_result = min(minima, key=lambda r: r["f_final"])
     else:
-        best_result = min(all_results, key=lambda r: r['f_final'])
+        best_result = min(all_results, key=lambda r: r["f_final"])
 
-    return best_result['x_final'], all_results
+    return best_result["x_final"], all_results
 
 # 使用例：5つの初期値から試す
 initial_values = [-1, 0, 2, 4, 6]
@@ -1122,8 +1122,8 @@ print("すべての結果:")
 print(f"{'x0':>4}  →  {'到着地点':>8}  →  {'f(x)':>8}  →  {'谷?':>4}")
 print("-" * 50)
 for r in all_results:
-    valley = "はい" if r['is_minimum'] else "いいえ"
-    marker = " ← 最良！" if r['x_final'] == best_x else ""
+    valley = "はい" if r["is_minimum"] else "いいえ"
+    marker = " ← 最良！" if r["x_final"] == best_x else ""
     print(f"{r['x0']:4.1f}  →  {r['x_final']:8.4f}  →  {r['f_final']:8.4f}  →  {valley}{marker}")
 
 print(f"\n★ 最良解: x = {best_x:.4f}, f(x) = {f_poly(best_x):.4f}")

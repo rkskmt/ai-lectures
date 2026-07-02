@@ -1,7 +1,6 @@
 ---
 title: "機械学習 Classification"
 subtitle: "最も単純な２クラス分類"
-_metadata.yml: !expr yaml::read_yaml("_metadata.yml")
 ---
 
 ## 分類問題
@@ -89,19 +88,20 @@ seabass_weights = [1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,
 
 
 ```{python}
+#| echo: false
 import altair as alt
 import pandas as pd
 alt.renderers.enable("png")
 
 df = pd.DataFrame({
-    'Weight': salmon_weights + seabass_weights,
-    'Species': ['Salmon'] * 20 + ['Sea bass'] * 20
+    "Weight": salmon_weights + seabass_weights,
+    "Species": ["Salmon"] * 20 + ["Sea bass"] * 20
 })
 
 alt.Chart(df).mark_tick(size=18, thickness=2).encode(
-    x=alt.X('Weight:Q', title='Weight (g)', scale=alt.Scale(zero=False)),
-    y=alt.Y('Species:N', title=None, axis=alt.Axis(labelAngle=0)),
-    color=alt.Color('Species:N', legend=None)
+    x=alt.X("Weight:Q", title="Weight (g)", scale=alt.Scale(zero=False)),
+    y=alt.Y("Species:N", title=None, axis=alt.Axis(labelAngle=0)),
+    color=alt.Color("Species:N", legend=None)
 ).properties(height=150, width=480)
 ```
 
@@ -109,19 +109,13 @@ alt.Chart(df).mark_tick(size=18, thickness=2).encode(
 
 ## 準備
 
-pandas, numpy, matplotlib, scikit-learnをインストールします。
+pandas, numpy, matplotlib, scikit-learn をインストールする。
 
 ```bash
-pip install pandas numpy matplotlib scikit-learn altair[all]
+pip install pandas numpy matplotlib scikit-learn
 ```
 
-Google Colabの場合は、altair[all]だけインストールすればOKです
-
-```python
-!pip install altair[all]
-```
-
-以下を実行
+続けて、以下を実行
 
 ```{python}
 
@@ -137,8 +131,8 @@ import pandas as pd
 from sklearn.linear_model import LogisticRegression
 
 # Matplotlib settings
-plt.rcParams['font.size'] = 11
-plt.rcParams['figure.dpi'] = 100
+plt.rcParams["font.size"] = 11
+plt.rcParams["figure.dpi"] = 100
 
 salmon_weights = np.array(salmon_weights)
 seabass_weights = np.array(seabass_weights)
@@ -158,14 +152,14 @@ seabass_weights = np.array(seabass_weights)
 plt.figure(figsize=(10, 6))
 bins = range(1000, 2600, 100)
 
-plt.hist(salmon_weights, bins=bins, histtype='step', 
-         edgecolor='black', linewidth=2, label="Salmon")
-plt.hist(seabass_weights, bins=bins, histtype='step', 
-         edgecolor='red', linewidth=2, label="Sea bass")
+plt.hist(salmon_weights, bins=bins, histtype="step", 
+         edgecolor="black", linewidth=2, label="Salmon")
+plt.hist(seabass_weights, bins=bins, histtype="step", 
+         edgecolor="red", linewidth=2, label="Sea bass")
 
 plt.xlabel("Weight (g)", fontsize=14)
 plt.ylabel("Count", fontsize=14)
-plt.title("Distribution of Fish Weight", fontsize=16, fontweight='bold')
+plt.title("Distribution of Fish Weight", fontsize=16, fontweight="bold")
 plt.legend(fontsize=13)
 plt.grid(True, alpha=0.3)
 plt.tight_layout()
@@ -190,18 +184,18 @@ if overlap_max >= overlap_min:
 :::{.callout-warning}
 ## 発見
 - **双峰型の分布**：2つの山が見える
-  -  **重なっている** がまあ分けれそう？ 
+  -  **重なっている** が、まあ分けられそう？
 :::
 
 ## 境界線（閾値）を考える
 
-大体でいいので **境界線（[threshold]{.en}）** を設定します。
+大体でいいので **しきい値（[threshold]{.en}）** を設定する。
 
 ### 方針
-**1800g以上** → Salmon  
+**1800g以上** → Salmon
 **1800g未満** → Sea bass
 
-この判定ルールで分類してみましょう。
+この判定ルールで分類してみる。
 
 ## 青破線で切ったとしたら
 
@@ -213,18 +207,18 @@ threshold = 1800
 plt.figure(figsize=(10, 6))
 bins = range(1000, 2600, 100)
 
-plt.hist(salmon_weights, bins=bins, histtype='step', 
-         edgecolor='black', linewidth=2, label="Salmon")
-plt.hist(seabass_weights, bins=bins, histtype='step', 
-         edgecolor='red', linewidth=2, label="Sea bass")
+plt.hist(salmon_weights, bins=bins, histtype="step", 
+         edgecolor="black", linewidth=2, label="Salmon")
+plt.hist(seabass_weights, bins=bins, histtype="step", 
+         edgecolor="red", linewidth=2, label="Sea bass")
 
 # Add threshold line
-plt.axvline(x=threshold, color='blue', linestyle='--', linewidth=2.5, 
-           label=f'Threshold = {threshold}g')
+plt.axvline(x=threshold, color="blue", linestyle="--", linewidth=2.5, 
+           label=f"Threshold = {threshold}g")
 
 plt.xlabel("Weight (g)", fontsize=14)
 plt.ylabel("Count", fontsize=14)
-plt.title("Distribution with Decision Boundary", fontsize=16, fontweight='bold')
+plt.title("Distribution with Decision Boundary", fontsize=16, fontweight="bold")
 plt.legend(fontsize=13)
 plt.grid(True, alpha=0.3)
 plt.tight_layout()
@@ -233,7 +227,7 @@ plt.show()
 
 ## 分類結果：4つのパターン
 
-境界線1800gで分類すると、4つのパターンが生まれます：
+境界線1800gで分類すると、4つのパターンが生まれる：
 
 | 実際の魚 | 判定結果 | 略称 | 説明 |
 |----|----|------|--------|
@@ -249,15 +243,15 @@ plt.show()
 
 ### 右から左に読む
 
-1. **右（P/N）** 判定結果 → Positive (シャケ) or Negative (それ以外)
-2. **左（T/F）** その答え合わせ** → True (正解) or False (不正解)
+1. **右（P/N）** 判定結果 → Positive（サケ）or Negative（それ以外）
+2. **左（T/F）** その答え合わせ → True（正解）or False（不正解）
 
 
 つまり、ある魚をみて識別した結果、
 
 - **TP**: Positiveと判定 → True (正しかった！)
 - **FP**: Positiveと判定 → False (間違ってた...)
-- **TN**: Negatigeと判定 → True (正しかった！)
+- **TN**: Negativeと判定 → True (正しかった！)
 - **FN**: Negativeと判定 → False (間違ってた...)
 
 
@@ -286,40 +280,40 @@ fig, ax = plt.subplots(figsize=(9, 7))
 cm_data = np.array([[TP, FP], [FN, TN]])
 
 # Color map: 緑=正解、ピンク=誤り
-colors = np.array([['#90EE90', '#FFB6C6'], ['#FFB6C6', '#90EE90']])
+colors = np.array([["#90EE90", "#FFB6C6"], ["#FFB6C6", "#90EE90"]])
 
 # Draw cells
 for i in range(2):
     for j in range(2):
         ax.add_patch(mpatches.Rectangle((j, 1-i), 1, 1, 
                                         facecolor=colors[i, j], 
-                                        edgecolor='black', linewidth=2.5))
+                                        edgecolor="black", linewidth=2.5))
         ax.text(j + 0.5, 1.5 - i, str(cm_data[i, j]), 
-               ha='center', va='center', fontsize=48, fontweight='bold')
+               ha="center", va="center", fontsize=48, fontweight="bold")
         
         # Add label
         if i == 0 and j == 0:
-            label = 'TP'
+            label = "TP"
         elif i == 0 and j == 1:
-            label = 'FP'
+            label = "FP"
         elif i == 1 and j == 0:
-            label = 'FN'
+            label = "FN"
         else:
-            label = 'TN'
+            label = "TN"
         ax.text(j + 0.5, 1.15 - i, label, 
-               ha='center', va='center', fontsize=16, style='italic', color='gray')
+               ha="center", va="center", fontsize=16, style="italic", color="gray")
 
 # Set labels
 ax.set_xlim(0, 2)
 ax.set_ylim(0, 2)
 ax.set_xticks([0.5, 1.5])
 ax.set_yticks([0.5, 1.5])
-ax.set_xticklabels(['Actual: Salmon', 'Actual: Sea bass'], fontsize=13, fontweight='bold')
-ax.set_yticklabels(['Predict: Sea bass', 'Predict: Salmon'], fontsize=13, fontweight='bold')
-ax.set_aspect('equal')
+ax.set_xticklabels(["Actual: Salmon", "Actual: Sea bass"], fontsize=13, fontweight="bold")
+ax.set_yticklabels(["Predict: Sea bass", "Predict: Salmon"], fontsize=13, fontweight="bold")
+ax.set_aspect("equal")
 ax.tick_params(length=0)
-ax.set_title(f'Confusion Matrix (Threshold = {threshold}g)', 
-            fontsize=16, fontweight='bold', pad=20)
+ax.set_title(f"Confusion Matrix (Threshold = {threshold}g)", 
+            fontsize=16, fontweight="bold", pad=20)
 
 plt.tight_layout()
 plt.show()
@@ -339,18 +333,16 @@ precision = TP / (TP + FP) if (TP + FP) > 0 else 0
 recall = TP / (TP + FN) if (TP + FN) > 0 else 0
 
 metrics = pd.DataFrame({
-    '指標': ['Accuracy', 'Precision', 'Recall'],
-    '値': [f'{accuracy:.3f}', f'{precision:.3f}', f'{recall:.3f}'],
-    '意味': [
-        '全体の正解率',
-        'Salmonと判定した中で実際にSalmonの割合',
-        '実際のSalmonをどれだけ検出できたか',
+    "指標": ["Accuracy", "Precision", "Recall"],
+    '値': [f"{accuracy:.3f}", f"{precision:.3f}", f"{recall:.3f}"],
+    "意味": [
+        "全体の正解率",
+        "Salmonと判定した中で実際にSalmonの割合",
+        "実際のSalmonをどれだけ検出できたか",
     ]
 })
 
-from IPython.display import HTML
-table_html = metrics.to_html(index=False, justify='center')
-display(HTML(f"<div style='font-size:24px'>{table_html}</div>"))
+print(metrics.to_string(index=False))
 ```
 
 $$\text{Accuracy} = \frac{TP + TN}{\text{全体}} = \frac{\text{正しく分類できた数}}{\text{全データ数}}$$
@@ -381,18 +373,18 @@ for threshold in thresholds:
     recall = TP / (TP + FN) if (TP + FN) > 0 else 0
     
     results.append({
-        '境界線': f'{threshold}g',
-        'TP': TP,
-        'FP': FP,
-        'FN': FN,
-        'TN': TN,
-        'Precision': f'{precision:.1%}',
-        'Recall': f'{recall:.1%}',
-        'Accuracy': f'{accuracy:.1%}'
+        '境界線': f"{threshold}g",
+        "TP": TP,
+        "FP": FP,
+        "FN": FN,
+        "TN": TN,
+        'Precision': f"{precision:.1%}",
+        'Recall': f"{recall:.1%}",
+        'Accuracy': f"{accuracy:.1%}"
     })
 
 df = pd.DataFrame(results)
-df
+print(df.to_string(index=False))
 ```
 
 :::{.callout-important}
@@ -419,18 +411,18 @@ threshold = 1600
 plt.figure(figsize=(5.5, 4.5))
 bins = range(1000, 2600, 100)
 
-plt.hist(salmon_weights, bins=bins, histtype='step', 
-         edgecolor='black', linewidth=2, label="Salmon")
-plt.hist(seabass_weights, bins=bins, histtype='step', 
-         edgecolor='red', linewidth=2, label="Sea bass")
-plt.axvline(x=threshold, color='blue', linestyle='--', linewidth=2.5, 
-           label=f'Threshold={threshold}g')
+plt.hist(salmon_weights, bins=bins, histtype="step", 
+         edgecolor="black", linewidth=2, label="Salmon")
+plt.hist(seabass_weights, bins=bins, histtype="step", 
+         edgecolor="red", linewidth=2, label="Sea bass")
+plt.axvline(x=threshold, color="blue", linestyle="--", linewidth=2.5, 
+           label=f"Threshold={threshold}g")
 
-plt.xlabel("Weight (g)", fontsize=11, fontweight='bold')
-plt.ylabel("Count", fontsize=11, fontweight='bold')
+plt.xlabel("Weight (g)", fontsize=11, fontweight="bold")
+plt.ylabel("Count", fontsize=11, fontweight="bold")
 plt.title(f"Low Threshold ({threshold}g)", fontsize=13, fontweight='bold')
 plt.legend(fontsize=10)
-plt.grid(True, alpha=0.3, linestyle='--')
+plt.grid(True, alpha=0.3, linestyle="--")
 plt.tight_layout()
 plt.show()
 
@@ -445,8 +437,8 @@ recall = TP / (TP + FN) if (TP + FN) > 0 else 0
 
 - FP=`{python} FP`
 - FN=`{python} FN`
-- **Precision**: `{python} f'{precision:.1%}'` (低い)  
-- **Recall**: `{python} f'{recall:.1%}'` (高い)
+- **Precision**: `{python} f"{precision:.1%}"` (低い)  
+- **Recall**: `{python} f"{recall:.1%}"` (高い)
 
 :::
 
@@ -458,18 +450,18 @@ threshold = 2000
 plt.figure(figsize=(5.5, 4.5))
 bins = range(1000, 2600, 100)
 
-plt.hist(salmon_weights, bins=bins, histtype='step', 
-         edgecolor='black', linewidth=2, label="Salmon")
-plt.hist(seabass_weights, bins=bins, histtype='step', 
-         edgecolor='red', linewidth=2, label="Sea bass")
-plt.axvline(x=threshold, color='blue', linestyle='--', linewidth=2.5, 
-           label=f'Threshold={threshold}g')
+plt.hist(salmon_weights, bins=bins, histtype="step", 
+         edgecolor="black", linewidth=2, label="Salmon")
+plt.hist(seabass_weights, bins=bins, histtype="step", 
+         edgecolor="red", linewidth=2, label="Sea bass")
+plt.axvline(x=threshold, color="blue", linestyle="--", linewidth=2.5, 
+           label=f"Threshold={threshold}g")
 
-plt.xlabel("Weight (g)", fontsize=11, fontweight='bold')
-plt.ylabel("Count", fontsize=11, fontweight='bold')
+plt.xlabel("Weight (g)", fontsize=11, fontweight="bold")
+plt.ylabel("Count", fontsize=11, fontweight="bold")
 plt.title(f"High Threshold ({threshold}g)", fontsize=13, fontweight='bold')
 plt.legend(fontsize=10)
-plt.grid(True, alpha=0.3, linestyle='--')
+plt.grid(True, alpha=0.3, linestyle="--")
 plt.tight_layout()
 plt.show()
 
@@ -483,8 +475,8 @@ recall = TP / (TP + FN) if (TP + FN) > 0 else 0
 ```
 
 FP=`{python} FP`, FN=`{python} FN`
-**Precision**: `{python} f'{precision:.1%}'` (高い)  
-**Recall**: `{python} f'{recall:.1%}'` (低い)
+**Precision**: `{python} f"{precision:.1%}"` (高い)  
+**Recall**: `{python} f"{recall:.1%}"` (低い)
 
 :::
 
@@ -504,7 +496,7 @@ FP=`{python} FP`, FN=`{python} FN`
 
 ## コストを考慮した最適化
 
-誤分類のコストが異なる場合、総コストを最小化する閾値を選べます。
+誤分類のコストが異なる場合、総コストを最小化するしきい値を選べる。
 $$
 \begin{aligned}
 &\text{argmin}(\text{総コスト}) = N(\text{FP}) \times \text{Cost}(\text{FP}) + N(\text{FN}) \times \text{Cost}(\text{FN})\\
@@ -530,16 +522,16 @@ for threshold in [1600, 1800, 2000]:
     
     total_cost = FP * C_FP + FN * C_FN
     cost_results.append({
-        '境界線': f'{threshold}g',
-        'FP': FP,
-        'FN': FN,
-        '総コスト': f'¥{total_cost:,}'
+        '境界線': f"{threshold}g",
+        "FP": FP,
+        "FN": FN,
+        '総コスト': f"¥{total_cost:,}"
     })
 cost_df = pd.DataFrame(cost_results)
 
-min_idx = cost_df.index[cost_df['総コスト'].str.replace('¥', '').str.replace(',', '').astype(int).idxmin()]
-cost_df.loc[min_idx, '境界線'] = '★ ' + cost_df.loc[min_idx, '境界線']
-cost_df.style.hide(axis='index')
+min_idx = cost_df.index[cost_df["総コスト"].str.replace("¥", "").str.replace(",", "").astype(int).idxmin()]
+cost_df.loc[min_idx, "境界線"] = "★ " + cost_df.loc[min_idx, "境界線"]
+print(cost_df.to_string(index=False))
 ```
 
 **このコスト関数での最適なしきい値**: 2000g（総コスト最小）
@@ -563,7 +555,7 @@ cost_df.style.hide(axis='index')
 
 ## 練習問題
 
-下記のデータ（それぞれ20匹ずつ追加した）について、以下の0-3までのことを実行して分類器をつくれ。
+下記のデータ（それぞれ20匹ずつ追加した）について、以下の0〜4を実行して分類器をつくれ。
 
 ```{python}
 #| echo: true
@@ -600,15 +592,15 @@ threshold = 1800
 plt.figure(figsize=(10, 6))
 bins = range(1000, 2600, 100)
 
-plt.hist(salmon_weights, bins=bins, histtype='step', 
-         edgecolor='black', linewidth=2, label="Salmon")
-plt.hist(seabass_weights, bins=bins, histtype='step', 
-         edgecolor='red', linewidth=2, label="Sea bass")
+plt.hist(salmon_weights, bins=bins, histtype="step", 
+         edgecolor="black", linewidth=2, label="Salmon")
+plt.hist(seabass_weights, bins=bins, histtype="step", 
+         edgecolor="red", linewidth=2, label="Sea bass")
 
 
 plt.xlabel("Weight (g)", fontsize=14)
 plt.ylabel("Count", fontsize=14)
-plt.title("Distribution with Decision Boundary", fontsize=16, fontweight='bold')
+plt.title("Distribution with Decision Boundary", fontsize=16, fontweight="bold")
 plt.legend(fontsize=13)
 plt.grid(True, alpha=0.3)
 plt.tight_layout()

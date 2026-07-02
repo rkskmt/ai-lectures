@@ -39,8 +39,8 @@ model.fit(X, y)   # ← この中で何が起きている？
 import numpy as np
 import matplotlib.pyplot as plt
 import japanize_matplotlib
-plt.rcParams['font.size'] = 11
-plt.rcParams['figure.dpi'] = 100
+plt.rcParams["font.size"] = 11
+plt.rcParams["figure.dpi"] = 100
 
 salmon_weights     = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,
                                1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,
@@ -128,7 +128,7 @@ $$f(x) = x^2 - 4x + 3$$
 
 
 
-数学的には簡単ですが、今回は**数値的に**（機械のやり方で）解きます。
+数学的には簡単だが、今回は**数値的に**（機械のやり方で）解く。
 
 ### 今回の目標
 
@@ -145,8 +145,8 @@ import matplotlib.pyplot as plt
 import japanize_matplotlib
 
 # 日本語表示設定（必要に応じて）
-plt.rcParams['font.size'] = 11
-plt.rcParams['figure.dpi'] = 100
+plt.rcParams["font.size"] = 11
+plt.rcParams["figure.dpi"] = 100
 ```
 
 ### 関数の定義
@@ -457,14 +457,14 @@ for ax, (alpha, n_iter, title) in zip(axes, configs):
         x = x - alpha * f_prime(x)
         history.append(x)
 
-    ax.plot(x_range, f(x_range), 'b-', linewidth=2, alpha=0.3)
-    ax.plot(history, [f(h) for h in history], 'ro-', markersize=6)
-    ax.axvline(x=2, color='g', linestyle='--', alpha=0.5)
+    ax.plot(x_range, f(x_range), "b-", linewidth=2, alpha=0.3)
+    ax.plot(history, [f(h) for h in history], "ro-", markersize=6)
+    ax.axvline(x=2, color="g", linestyle="--", alpha=0.5)
     ax.set_xlim(-1.5, 5.5)
     ax.set_ylim(-1.6, 9)
-    ax.set_title(title, fontsize=11, fontweight='bold')
-    ax.set_xlabel('x')
-    ax.set_ylabel('f(x)')
+    ax.set_title(title, fontsize=11, fontweight="bold")
+    ax.set_xlabel("x")
+    ax.set_ylabel("f(x)")
     ax.grid(True, alpha=0.3)
 
 plt.tight_layout()

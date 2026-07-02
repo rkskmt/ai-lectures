@@ -51,8 +51,8 @@ subtitle: "ラベルを失った魚たち"
 import numpy as np
 import matplotlib.pyplot as plt
 import japanize_matplotlib
-plt.rcParams['font.size'] = 11
-plt.rcParams['figure.dpi'] = 100
+plt.rcParams["font.size"] = 11
+plt.rcParams["figure.dpi"] = 100
 
 salmon_weights     = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,
                                1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,
@@ -378,8 +378,8 @@ plt.show()
 - 対策は「**何度も別の初期値で試して、一番 inertia が小さいものを採る**」
 
 ::: {.callout-tip title="これ、どこかで見た"}
-初期値しだいで結果が変わる → 何回も試して最良を選ぶ。これは
-**[ローカルミニマムの罠](optimization-local-minima-appendix.qmd)** でやった**マルチスタート**そのもの。
+初期値しだいで結果が変わる → 何回も試して最良を選ぶ。この作戦は**マルチスタート**と呼ばれ、
+参考資料 **[ローカルミニマムの罠](optimization-local-minima-appendix.qmd)** で詳しく扱っている。
 `KMeans(..., n_init=10)` の `n_init` が「10回試す」の正体（既定でこうなっている）。
 :::
 
