@@ -249,13 +249,13 @@ rkskmt
 <h2>入力から出力まで、たった2ステップ</h2>
 <div class="slide-body">
 <div id="step-1アフィン変換affine-transformation" class="slide-body-heading">
-Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">affine transformation</span>）
+Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">Affine Transformation</span>）
 </div>
 <p><span class="math display">\[z = \alpha_1 x_1 + \alpha_2 x_2 + b\]</span></p>
 <ul>
 <li><span class="math inline">\(x_1, x_2\)</span><span class="fw-colon">：</span>入力（輝度、重さ）</li>
-<li><span class="math inline">\(\alpha_1, \alpha_2\)</span><span class="fw-colon">：</span><strong>重み</strong>（どの特徴量をどれだけ重視するか）</li>
-<li><span class="math inline">\(b\)</span><span class="fw-colon">：</span><strong>バイアス</strong>（全体のオフセット）</li>
+<li><span class="math inline">\(\alpha_1, \alpha_2\)</span><span class="fw-colon">：</span><strong>重み（<span class="en">weight</span>）</strong>（どの特徴量をどれだけ重視するか）</li>
+<li><span class="math inline">\(b\)</span><span class="fw-colon">：</span><strong>バイアス（<span class="en">bias</span>）</strong>（全体のオフセット）</li>
 <li><span class="math inline">\(z\)</span><span class="fw-colon">：</span>スカラー1個</li>
 </ul>
 <h3 id="幾何的な意味">幾何的な意味</h3>
@@ -265,11 +265,11 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">aff
 </ul>
 </div>
 </section>
-<section id="step-2シグモイドで確率にする" class="slide level2">
-<h2>Step 2<span class="fw-colon">：</span>シグモイドで「確率」にする</h2>
+<section id="step-2シグモイドsigmoidで確率にする" class="slide level2">
+<h2>Step 2<span class="fw-colon">：</span>シグモイド（<span class="en">Sigmoid</span>）で「確率」にする</h2>
 <div class="slide-body">
 <p><span class="math display">\[p = \sigma(z) = \frac{1}{1 + e^{-z}}\]</span></p>
-<div id="1572c0c3" class="cell" data-execution_count="1">
+<div id="064763f3" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -289,7 +289,7 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">aff
 <h2>実はロジスティック回帰</h2>
 <div class="slide-body">
 <ul>
-<li>「アフィン変換 → シグモイド」 — この2ステップが<strong>ニューラルネットワークの最小単位</strong>（1個のニューロン）</li>
+<li>「アフィン変換 → シグモイド」 — この2ステップが<strong>ニューラルネットワークの最小単位</strong> ＝ 1個の<strong>ニューロン（<span class="en">neuron</span>）</strong></li>
 <li>そして、これは<strong>ロジスティック回帰そのもの</strong></li>
 <li><code>sklearn</code> の <code>LogisticRegression</code> が中でやっているのもこの計算</li>
 </ul>
@@ -393,44 +393,46 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">aff
 <section id="peek-forward" class="slide level2">
 <h2>実装<span class="fw-colon">：</span>必要な関数は4つだけ</h2>
 <div class="slide-body">
-<div id="676b0f01" class="cell" data-execution_count="2">
+<div id="1288ff0a" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>魚データの定義（クリックして展開）</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a>salmon_weights     <span class="op">=</span> np.array([<span class="dv">2149</span>, <span class="dv">1959</span>, <span class="dv">2194</span>, <span class="dv">2457</span>, <span class="dv">1930</span>, <span class="dv">1930</span>, <span class="dv">2474</span>, <span class="dv">2230</span>, <span class="dv">1859</span>, <span class="dv">2163</span>,</span>
-<span id="cb1-2"><a></a>                               <span class="dv">1861</span>, <span class="dv">1860</span>, <span class="dv">2073</span>, <span class="dv">1426</span>, <span class="dv">1483</span>, <span class="dv">1831</span>, <span class="dv">1696</span>, <span class="dv">2094</span>, <span class="dv">1728</span>, <span class="dv">1576</span>,</span>
-<span id="cb1-3"><a></a>                               <span class="dv">2028</span>, <span class="dv">1903</span>, <span class="dv">2057</span>, <span class="dv">2229</span>, <span class="dv">1884</span>, <span class="dv">1884</span>, <span class="dv">2240</span>, <span class="dv">2081</span>, <span class="dv">1838</span>, <span class="dv">2037</span>,</span>
-<span id="cb1-4"><a></a>                               <span class="dv">1839</span>, <span class="dv">1838</span>, <span class="dv">1978</span>, <span class="dv">1554</span>, <span class="dv">1591</span>, <span class="dv">1820</span>, <span class="dv">1731</span>, <span class="dv">1992</span>, <span class="dv">1752</span>, <span class="dv">1652</span>])</span>
-<span id="cb1-5"><a></a>salmon_brightness  <span class="op">=</span> np.array([<span class="fl">3.5</span>, <span class="fl">5.8</span>, <span class="fl">4.9</span>, <span class="fl">4.4</span>, <span class="fl">2.6</span>, <span class="fl">2.6</span>, <span class="fl">2.2</span>, <span class="fl">5.5</span>, <span class="fl">4.4</span>, <span class="fl">4.8</span>, <span class="fl">2.1</span>,</span>
-<span id="cb1-6"><a></a>                               <span class="fl">5.9</span>, <span class="fl">5.3</span>, <span class="fl">2.8</span>, <span class="fl">2.7</span>, <span class="fl">2.7</span>, <span class="fl">3.2</span>, <span class="fl">4.1</span>, <span class="fl">3.7</span>, <span class="fl">3.2</span>, <span class="fl">4.4</span>, <span class="fl">2.6</span>,</span>
-<span id="cb1-7"><a></a>                               <span class="fl">3.2</span>, <span class="fl">3.5</span>, <span class="fl">3.8</span>, <span class="fl">5.1</span>, <span class="fl">2.8</span>, <span class="fl">4.1</span>, <span class="fl">4.4</span>, <span class="fl">2.2</span>, <span class="fl">4.4</span>, <span class="fl">2.7</span>, <span class="fl">2.3</span>,</span>
-<span id="cb1-8"><a></a>                               <span class="fl">5.8</span>, <span class="fl">5.9</span>, <span class="fl">5.2</span>, <span class="fl">3.2</span>, <span class="fl">2.4</span>, <span class="fl">4.7</span>, <span class="fl">3.8</span>])</span>
-<span id="cb1-9"><a></a>seabass_weights    <span class="op">=</span> np.array([<span class="dv">1677</span>, <span class="dv">1327</span>, <span class="dv">1486</span>, <span class="dv">1440</span>, <span class="dv">1857</span>, <span class="dv">1476</span>, <span class="dv">1749</span>, <span class="dv">2203</span>, <span class="dv">1979</span>, <span class="dv">1468</span>,</span>
-<span id="cb1-10"><a></a>                               <span class="dv">1496</span>, <span class="dv">1737</span>, <span class="dv">1099</span>, <span class="dv">1341</span>, <span class="dv">1748</span>, <span class="dv">1563</span>, <span class="dv">2181</span>, <span class="dv">1414</span>, <span class="dv">1286</span>, <span class="dv">1333</span>,</span>
-<span id="cb1-11"><a></a>                               <span class="dv">1787</span>, <span class="dv">1445</span>, <span class="dv">1505</span>, <span class="dv">1204</span>, <span class="dv">1381</span>, <span class="dv">1513</span>, <span class="dv">1259</span>, <span class="dv">1567</span>, <span class="dv">1370</span>, <span class="dv">1432</span>,</span>
-<span id="cb1-12"><a></a>                               <span class="dv">1370</span>, <span class="dv">1864</span>, <span class="dv">1488</span>, <span class="dv">1278</span>, <span class="dv">1657</span>, <span class="dv">1245</span>, <span class="dv">1533</span>, <span class="dv">1096</span>, <span class="dv">1223</span>, <span class="dv">1531</span>])</span>
-<span id="cb1-13"><a></a>seabass_brightness <span class="op">=</span> np.array([<span class="fl">5.6</span>, <span class="fl">7.5</span>, <span class="fl">5.2</span>, <span class="fl">9.5</span>, <span class="fl">6.3</span>, <span class="fl">8.3</span>, <span class="fl">6.6</span>, <span class="fl">7.6</span>, <span class="fl">7.7</span>, <span class="fl">5.9</span>, <span class="fl">9.8</span>,</span>
-<span id="cb1-14"><a></a>                               <span class="fl">8.9</span>, <span class="fl">9.7</span>, <span class="fl">9.5</span>, <span class="fl">8.0</span>, <span class="fl">9.6</span>, <span class="fl">5.4</span>, <span class="fl">6.0</span>, <span class="fl">5.2</span>, <span class="fl">6.6</span>, <span class="fl">6.9</span>, <span class="fl">6.4</span>,</span>
-<span id="cb1-15"><a></a>                               <span class="fl">9.1</span>, <span class="fl">6.8</span>, <span class="fl">6.4</span>, <span class="fl">7.7</span>, <span class="fl">5.7</span>, <span class="fl">9.0</span>, <span class="fl">5.4</span>, <span class="fl">9.9</span>, <span class="fl">8.9</span>, <span class="fl">6.0</span>, <span class="fl">5.0</span>,</span>
-<span id="cb1-16"><a></a>                               <span class="fl">9.1</span>, <span class="fl">8.5</span>, <span class="fl">8.6</span>, <span class="fl">8.9</span>, <span class="fl">5.4</span>, <span class="fl">6.8</span>, <span class="fl">5.6</span>])</span>
-<span id="cb1-17"><a></a></span>
-<span id="cb1-18"><a></a>X <span class="op">=</span> np.column_stack([</span>
-<span id="cb1-19"><a></a>    np.concatenate([salmon_brightness, seabass_brightness]),</span>
-<span id="cb1-20"><a></a>    np.concatenate([salmon_weights,    seabass_weights])</span>
-<span id="cb1-21"><a></a>])</span>
-<span id="cb1-22"><a></a>y <span class="op">=</span> np.array([<span class="dv">1</span>]<span class="op">*</span><span class="dv">40</span> <span class="op">+</span> [<span class="dv">0</span>]<span class="op">*</span><span class="dv">40</span>)   <span class="co"># 1=Salmon, 0=Sea bass</span></span>
-<span id="cb1-23"><a></a></span>
-<span id="cb1-24"><a></a><span class="co"># スケールを揃える（クラスタリング回の教訓）</span></span>
-<span id="cb1-25"><a></a>X_norm <span class="op">=</span> (X <span class="op">-</span> X.mean(axis<span class="op">=</span><span class="dv">0</span>)) <span class="op">/</span> X.std(axis<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb1-26"><a></a></span>
-<span id="cb1-27"><a></a><span class="co"># Salmon, Sea bass, Salmon, ... と交互に並べ替えておく</span></span>
-<span id="cb1-28"><a></a>order <span class="op">=</span> np.empty(<span class="dv">80</span>, dtype<span class="op">=</span><span class="bu">int</span>)</span>
-<span id="cb1-29"><a></a>order[<span class="dv">0</span>::<span class="dv">2</span>] <span class="op">=</span> np.arange(<span class="dv">0</span>, <span class="dv">40</span>)</span>
-<span id="cb1-30"><a></a>order[<span class="dv">1</span>::<span class="dv">2</span>] <span class="op">=</span> np.arange(<span class="dv">40</span>, <span class="dv">80</span>)</span>
-<span id="cb1-31"><a></a>X_norm <span class="op">=</span> X_norm[order]</span>
-<span id="cb1-32"><a></a>y      <span class="op">=</span> y[order]</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a></a></span>
+<span id="cb1-3"><a></a>salmon_weights     <span class="op">=</span> np.array([<span class="dv">2149</span>, <span class="dv">1959</span>, <span class="dv">2194</span>, <span class="dv">2457</span>, <span class="dv">1930</span>, <span class="dv">1930</span>, <span class="dv">2474</span>, <span class="dv">2230</span>, <span class="dv">1859</span>, <span class="dv">2163</span>,</span>
+<span id="cb1-4"><a></a>                               <span class="dv">1861</span>, <span class="dv">1860</span>, <span class="dv">2073</span>, <span class="dv">1426</span>, <span class="dv">1483</span>, <span class="dv">1831</span>, <span class="dv">1696</span>, <span class="dv">2094</span>, <span class="dv">1728</span>, <span class="dv">1576</span>,</span>
+<span id="cb1-5"><a></a>                               <span class="dv">2028</span>, <span class="dv">1903</span>, <span class="dv">2057</span>, <span class="dv">2229</span>, <span class="dv">1884</span>, <span class="dv">1884</span>, <span class="dv">2240</span>, <span class="dv">2081</span>, <span class="dv">1838</span>, <span class="dv">2037</span>,</span>
+<span id="cb1-6"><a></a>                               <span class="dv">1839</span>, <span class="dv">1838</span>, <span class="dv">1978</span>, <span class="dv">1554</span>, <span class="dv">1591</span>, <span class="dv">1820</span>, <span class="dv">1731</span>, <span class="dv">1992</span>, <span class="dv">1752</span>, <span class="dv">1652</span>])</span>
+<span id="cb1-7"><a></a>salmon_brightness  <span class="op">=</span> np.array([<span class="fl">3.5</span>, <span class="fl">5.8</span>, <span class="fl">4.9</span>, <span class="fl">4.4</span>, <span class="fl">2.6</span>, <span class="fl">2.6</span>, <span class="fl">2.2</span>, <span class="fl">5.5</span>, <span class="fl">4.4</span>, <span class="fl">4.8</span>, <span class="fl">2.1</span>,</span>
+<span id="cb1-8"><a></a>                               <span class="fl">5.9</span>, <span class="fl">5.3</span>, <span class="fl">2.8</span>, <span class="fl">2.7</span>, <span class="fl">2.7</span>, <span class="fl">3.2</span>, <span class="fl">4.1</span>, <span class="fl">3.7</span>, <span class="fl">3.2</span>, <span class="fl">4.4</span>, <span class="fl">2.6</span>,</span>
+<span id="cb1-9"><a></a>                               <span class="fl">3.2</span>, <span class="fl">3.5</span>, <span class="fl">3.8</span>, <span class="fl">5.1</span>, <span class="fl">2.8</span>, <span class="fl">4.1</span>, <span class="fl">4.4</span>, <span class="fl">2.2</span>, <span class="fl">4.4</span>, <span class="fl">2.7</span>, <span class="fl">2.3</span>,</span>
+<span id="cb1-10"><a></a>                               <span class="fl">5.8</span>, <span class="fl">5.9</span>, <span class="fl">5.2</span>, <span class="fl">3.2</span>, <span class="fl">2.4</span>, <span class="fl">4.7</span>, <span class="fl">3.8</span>])</span>
+<span id="cb1-11"><a></a>seabass_weights    <span class="op">=</span> np.array([<span class="dv">1677</span>, <span class="dv">1327</span>, <span class="dv">1486</span>, <span class="dv">1440</span>, <span class="dv">1857</span>, <span class="dv">1476</span>, <span class="dv">1749</span>, <span class="dv">2203</span>, <span class="dv">1979</span>, <span class="dv">1468</span>,</span>
+<span id="cb1-12"><a></a>                               <span class="dv">1496</span>, <span class="dv">1737</span>, <span class="dv">1099</span>, <span class="dv">1341</span>, <span class="dv">1748</span>, <span class="dv">1563</span>, <span class="dv">2181</span>, <span class="dv">1414</span>, <span class="dv">1286</span>, <span class="dv">1333</span>,</span>
+<span id="cb1-13"><a></a>                               <span class="dv">1787</span>, <span class="dv">1445</span>, <span class="dv">1505</span>, <span class="dv">1204</span>, <span class="dv">1381</span>, <span class="dv">1513</span>, <span class="dv">1259</span>, <span class="dv">1567</span>, <span class="dv">1370</span>, <span class="dv">1432</span>,</span>
+<span id="cb1-14"><a></a>                               <span class="dv">1370</span>, <span class="dv">1864</span>, <span class="dv">1488</span>, <span class="dv">1278</span>, <span class="dv">1657</span>, <span class="dv">1245</span>, <span class="dv">1533</span>, <span class="dv">1096</span>, <span class="dv">1223</span>, <span class="dv">1531</span>])</span>
+<span id="cb1-15"><a></a>seabass_brightness <span class="op">=</span> np.array([<span class="fl">5.6</span>, <span class="fl">7.5</span>, <span class="fl">5.2</span>, <span class="fl">9.5</span>, <span class="fl">6.3</span>, <span class="fl">8.3</span>, <span class="fl">6.6</span>, <span class="fl">7.6</span>, <span class="fl">7.7</span>, <span class="fl">5.9</span>, <span class="fl">9.8</span>,</span>
+<span id="cb1-16"><a></a>                               <span class="fl">8.9</span>, <span class="fl">9.7</span>, <span class="fl">9.5</span>, <span class="fl">8.0</span>, <span class="fl">9.6</span>, <span class="fl">5.4</span>, <span class="fl">6.0</span>, <span class="fl">5.2</span>, <span class="fl">6.6</span>, <span class="fl">6.9</span>, <span class="fl">6.4</span>,</span>
+<span id="cb1-17"><a></a>                               <span class="fl">9.1</span>, <span class="fl">6.8</span>, <span class="fl">6.4</span>, <span class="fl">7.7</span>, <span class="fl">5.7</span>, <span class="fl">9.0</span>, <span class="fl">5.4</span>, <span class="fl">9.9</span>, <span class="fl">8.9</span>, <span class="fl">6.0</span>, <span class="fl">5.0</span>,</span>
+<span id="cb1-18"><a></a>                               <span class="fl">9.1</span>, <span class="fl">8.5</span>, <span class="fl">8.6</span>, <span class="fl">8.9</span>, <span class="fl">5.4</span>, <span class="fl">6.8</span>, <span class="fl">5.6</span>])</span>
+<span id="cb1-19"><a></a></span>
+<span id="cb1-20"><a></a>X <span class="op">=</span> np.column_stack([</span>
+<span id="cb1-21"><a></a>    np.concatenate([salmon_brightness, seabass_brightness]),</span>
+<span id="cb1-22"><a></a>    np.concatenate([salmon_weights,    seabass_weights])</span>
+<span id="cb1-23"><a></a>])</span>
+<span id="cb1-24"><a></a>y <span class="op">=</span> np.array([<span class="dv">1</span>]<span class="op">*</span><span class="dv">40</span> <span class="op">+</span> [<span class="dv">0</span>]<span class="op">*</span><span class="dv">40</span>)   <span class="co"># 1=Salmon, 0=Sea bass</span></span>
+<span id="cb1-25"><a></a></span>
+<span id="cb1-26"><a></a><span class="co"># スケールを揃える（クラスタリング回の教訓）</span></span>
+<span id="cb1-27"><a></a>X_norm <span class="op">=</span> (X <span class="op">-</span> X.mean(axis<span class="op">=</span><span class="dv">0</span>)) <span class="op">/</span> X.std(axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb1-28"><a></a></span>
+<span id="cb1-29"><a></a><span class="co"># Salmon, Sea bass, Salmon, ... と交互に並べ替えておく</span></span>
+<span id="cb1-30"><a></a>order <span class="op">=</span> np.empty(<span class="dv">80</span>, dtype<span class="op">=</span><span class="bu">int</span>)</span>
+<span id="cb1-31"><a></a>order[<span class="dv">0</span>::<span class="dv">2</span>] <span class="op">=</span> np.arange(<span class="dv">0</span>, <span class="dv">40</span>)</span>
+<span id="cb1-32"><a></a>order[<span class="dv">1</span>::<span class="dv">2</span>] <span class="op">=</span> np.arange(<span class="dv">40</span>, <span class="dv">80</span>)</span>
+<span id="cb1-33"><a></a>X_norm <span class="op">=</span> X_norm[order]</span>
+<span id="cb1-34"><a></a>y      <span class="op">=</span> y[order]</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="b56716c1" class="cell" data-execution_count="3">
+<div id="489cfaa6" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a><span class="kw">def</span> sigmoid(z):</span>
 <span id="cb2-2"><a></a>    <span class="cf">return</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>z))</span>
 <span id="cb2-3"><a></a></span>
@@ -455,7 +457,10 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">aff
 <section id="peek-one-at-a-time" class="slide level2">
 <h2>魚を1匹ずつ見せて学習する</h2>
 <div class="slide-body">
-<div id="592d7d41" class="cell" data-execution_count="4">
+<ul>
+<li>1匹見るたびにパラメータが少し動く</li>
+</ul>
+<div id="d3ca0cf3" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a>alpha <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">0.0</span>])   <span class="co"># 重みはゼロからスタート</span></span>
 <span id="cb3-2"><a></a>b  <span class="op">=</span> <span class="fl">0.0</span></span>
 <span id="cb3-3"><a></a>lr <span class="op">=</span> <span class="fl">0.5</span>                       <span class="co"># 学習率</span></span>
@@ -484,7 +489,6 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">aff
 </div>
 </div>
 <ul>
-<li>1匹見るたびにパラメータが少し動く</li>
 <li>たった10匹で正答率 90% まで来た</li>
 </ul>
 </div>
@@ -492,7 +496,7 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">aff
 <section id="境界が動く様子を見る" class="slide level2">
 <h2>境界が動く様子を見る</h2>
 <div class="slide-body">
-<div id="eb3e537b" class="cell" data-execution_count="5">
+<div id="138e1fca" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>

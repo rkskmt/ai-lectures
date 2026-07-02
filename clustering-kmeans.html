@@ -282,14 +282,14 @@ rkskmt
 <li>80匹分の測定データ（輝度・重さ）は手元にある</li>
 <li>ところが<strong>どれが Salmon でどれが Sea bass か、記録が消えた</strong></li>
 </ul>
-<div id="d6093e5d" class="cell" data-execution_count="1">
+<div id="79b19a13" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>魚データの定義（クリックして展開）</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-3"><a></a><span class="im">import</span> japanize_matplotlib</span>
-<span id="cb1-4"><a></a>plt.rcParams[<span class="st">'font.size'</span>] <span class="op">=</span> <span class="dv">11</span></span>
-<span id="cb1-5"><a></a>plt.rcParams[<span class="st">'figure.dpi'</span>] <span class="op">=</span> <span class="dv">100</span></span>
+<span id="cb1-4"><a></a>plt.rcParams[<span class="st">"font.size"</span>] <span class="op">=</span> <span class="dv">11</span></span>
+<span id="cb1-5"><a></a>plt.rcParams[<span class="st">"figure.dpi"</span>] <span class="op">=</span> <span class="dv">100</span></span>
 <span id="cb1-6"><a></a></span>
 <span id="cb1-7"><a></a>salmon_weights     <span class="op">=</span> np.array([<span class="dv">2149</span>, <span class="dv">1959</span>, <span class="dv">2194</span>, <span class="dv">2457</span>, <span class="dv">1930</span>, <span class="dv">1930</span>, <span class="dv">2474</span>, <span class="dv">2230</span>, <span class="dv">1859</span>, <span class="dv">2163</span>,</span>
 <span id="cb1-8"><a></a>                               <span class="dv">1861</span>, <span class="dv">1860</span>, <span class="dv">2073</span>, <span class="dv">1426</span>, <span class="dv">1483</span>, <span class="dv">1831</span>, <span class="dv">1696</span>, <span class="dv">2094</span>, <span class="dv">1728</span>, <span class="dv">1576</span>,</span>
@@ -314,7 +314,7 @@ rkskmt
 <span id="cb1-27"><a></a>])</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="c00b7612" class="cell" data-execution_count="2">
+<div id="d72bb749" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -394,7 +394,7 @@ rkskmt
 <section id="試行1-そのまま-k-means-にかける" class="slide level2">
 <h2>試行1: そのまま k-means にかける</h2>
 <div class="slide-body">
-<div id="9cec7ebe" class="cell" data-execution_count="3">
+<div id="d44c256f" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> KMeans</span>
 <span id="cb2-2"><a></a></span>
 <span id="cb2-3"><a></a><span class="co"># ラベルを使わずに k=2 でクラスタリング</span></span>
@@ -422,7 +422,7 @@ rkskmt
 <section id="試行1の結果" class="slide level2">
 <h2>試行1の結果</h2>
 <div class="slide-body">
-<div id="107d60d3" class="cell" data-execution_count="4">
+<div id="48a12910" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a></a>colors  <span class="op">=</span> [<span class="st">"#e74c3c"</span>, <span class="st">"#2980b9"</span>]</span>
 <span id="cb4-2"><a></a>markers <span class="op">=</span> [<span class="st">"o"</span>, <span class="st">"s"</span>]</span>
 <span id="cb4-3"><a></a></span>
@@ -498,7 +498,7 @@ rkskmt
 <section id="peek-scale" class="slide level2">
 <h2>試行2: スケールを揃えて再挑戦</h2>
 <div class="slide-body">
-<div id="2baf4d82" class="cell" data-execution_count="5">
+<div id="8e003fb6" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
 <span id="cb5-2"><a></a></span>
 <span id="cb5-3"><a></a>X_scaled <span class="op">=</span> StandardScaler().fit_transform(X)   <span class="co"># 各特徴量を平均0・分散1に</span></span>
@@ -535,7 +535,7 @@ rkskmt
 <ul>
 <li>このデータの正体は、これまでの講義で使ってきた Salmon / Sea bass</li>
 </ul>
-<div id="db2ed3cd" class="cell" data-execution_count="6">
+<div id="cc420722" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a></a>y_true <span class="op">=</span> np.array([<span class="dv">1</span>]<span class="op">*</span><span class="dv">40</span> <span class="op">+</span> [<span class="dv">0</span>]<span class="op">*</span><span class="dv">40</span>)   <span class="co"># 1=Salmon, 0=Sea bass（隠していた正解）</span></span>
 <span id="cb6-2"><a></a></span>
 <span id="cb6-3"><a></a>agree <span class="op">=</span> np.mean(cluster_labels2 <span class="op">==</span> y_true)</span>
@@ -545,7 +545,7 @@ rkskmt
 <pre><code>正解ラベルとの一致: 92.5%（74/80匹）</code></pre>
 </div>
 </div>
-<div id="1b1f2bec" class="cell" data-execution_count="7">
+<div id="1b23697e" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -572,7 +572,7 @@ rkskmt
 <section id="k-means-の動き中で起きていたこと" class="slide level2">
 <h2>k-means の動き（中で起きていたこと）</h2>
 <div class="slide-body">
-<div id="487058d4" class="cell" data-execution_count="8">
+<div id="83092dfb" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -594,7 +594,7 @@ rkskmt
 <li>「assign → update」は<strong>最初の重心の位置</strong>から始まる — そこは<strong>ランダム</strong>に選ばれる</li>
 <li>運の悪い初期値だと、おかしな所で落ち着く（下の左<span class="fw-colon">：</span>青が2つの塊を飲み込んだ）</li>
 </ul>
-<div id="cbc8dd65" class="cell" data-execution_count="9">
+<div id="fd2bdda6" class="cell" data-execution_count="9">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -617,7 +617,7 @@ rkskmt
 <p><strong>これ、どこかで見た</strong></p>
 </div>
 <div class="callout-content">
-<p>初期値しだいで結果が変わる → 何回も試して最良を選ぶ。これは <strong><a href="./optimization-local-minima-appendix.html">ローカルミニマムの罠</a></strong> でやった<strong>マルチスタート</strong>そのもの。 <code>KMeans(..., n_init=10)</code> の <code>n_init</code> が「10回試す」の正体（既定でこうなっている）。</p>
+<p>初期値しだいで結果が変わる → 何回も試して最良を選ぶ。この作戦は<strong>マルチスタート</strong>と呼ばれ、 参考資料 <strong><a href="./optimization-local-minima-appendix.html">ローカルミニマムの罠</a></strong> で詳しく扱っている。 <code>KMeans(..., n_init=10)</code> の <code>n_init</code> が「10回試す」の正体（既定でこうなっている）。</p>
 </div>
 </div>
 </div>
@@ -638,7 +638,7 @@ rkskmt
 <li>本当のラベルなしデータでは <strong>k 自体を決める必要がある</strong></li>
 <li><strong>エルボー法</strong><span class="fw-colon">：</span>k を変えながら「クラスタ内のまとまり度」を測る</li>
 </ul>
-<div id="8d578ad3" class="cell" data-execution_count="10">
+<div id="ca960fd1" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a></a>inertias <span class="op">=</span> []</span>
 <span id="cb8-2"><a></a>ks <span class="op">=</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">9</span>)</span>
 <span id="cb8-3"><a></a></span>
@@ -681,7 +681,7 @@ rkskmt
 <section id="k-means-の限界" class="slide level2">
 <h2>k-means の限界</h2>
 <div class="slide-body">
-<div id="59bff3a2" class="cell" data-execution_count="11">
+<div id="a811b74e" class="cell" data-execution_count="11">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
