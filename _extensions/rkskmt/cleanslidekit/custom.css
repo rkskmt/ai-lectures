@@ -67,6 +67,43 @@
     margin-bottom: 10px;
     border-bottom: 1px solid #000;
 }
+/* A **bold** word placed directly in a slide title renders as a solid label
+   chip — white text on the title's own near-black (#131516 = the text color),
+   like a textbook section label. Deliberately NOT a content color: blue/teal/
+   coral all belong to body content (code, links, table numbers), so a colored
+   chip competes with the content; near-black reads as title *structure*.
+   Weight 600 (not 700) keeps the small white-on-dark type from bloating.
+   Generic — it keys off position (direct child of h2), not any specific word —
+   so `## **Tweak**：…`, `## **重要**：…`, `## **例**：…` all get the chip,
+   showing whatever word was bolded. Bold is otherwise meaningless in an
+   already-bold title, so nothing is displaced. Kept inline (not inline-block)
+   and smaller than the title's line box, so a title on the slide's first row
+   is not clipped at the top by the slide's overflow.
+   `> ` (direct child) is deliberate: <strong> nested in .en (the abbreviation
+   spell-out, e.g. `## LUT（[**Look-Up Table**]{.en}）`) is a grandchild and
+   stays untouched. */
+.reveal h2 > strong {
+    font-size: 0.55em;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    white-space: nowrap;        /* a label never line-breaks inside its chip */
+    color: #fff;
+    background: #131516;
+    border-radius: 4px;
+    padding: 0.3em 0.75em;
+    margin-right: 0.55em;
+    vertical-align: 0.28em;     /* optical center against the 2.5rem title glyphs */
+    -webkit-text-stroke: 0;     /* same guard as .en strong: no double-weighting */
+}
+/* Sources keep the readable `**Tweak**：…` notation, but after the chip the
+   full-width colon is a leftover text separator — the chip's own margin
+   already separates. fw-colon.lua wraps every ： in span.fw-colon, so the one
+   directly following the chip can be hidden without touching the source.
+   Display-only: slide ids and search text keep the colon; colons elsewhere in
+   the title (and in chip-less titles like `## 演習：…`) are untouched. */
+.reveal h2 > strong + .fw-colon {
+    display: none;
+}
 .reveal h3 {
     font-style: normal !important;
     font-weight: bold !important;
@@ -101,6 +138,33 @@
 }
 .cell-output pre {
   font-size: 2.0rem;
+}
+/* Execution results: a light dashed outline (no fill) with a small "Result" tag, top-left */
+.cell-output-stdout pre {              /* descendant: also matches pre wrapped by the zoom scaffold */
+  position: relative;
+  background-color: transparent !important;
+  /* widely-spaced dashed outline drawn per edge (CSS `dashed` can't set dash length) */
+  background-image:
+    repeating-linear-gradient(to right,  #9aa1ab 0 14px, transparent 14px 26px),
+    repeating-linear-gradient(to right,  #9aa1ab 0 14px, transparent 14px 26px),
+    repeating-linear-gradient(to bottom, #9aa1ab 0 14px, transparent 14px 26px),
+    repeating-linear-gradient(to bottom, #9aa1ab 0 14px, transparent 14px 26px);
+  background-position: left top, left bottom, left top, right top;
+  background-size: 100% 1px, 100% 1px, 1px 100%, 1px 100%;
+  background-repeat: no-repeat;
+  border: none;
+  padding: 0.7em 0.95em 0.5em !important;
+  margin-top: 0.4em;
+  margin-bottom: 0.9em;
+}
+.cell-output-stdout pre::before {
+  content: "Result";
+  position: absolute;
+  top: 0.2em;
+  left: 0.7em;
+  font-size: 0.72rem;
+  color: #9aa1ab;
+  letter-spacing: 0.04em;
 }
 .reveal pre,
 .reveal div.sourceCode {
@@ -149,6 +213,28 @@
   font-family: inherit;
   font-weight: lighter;
 }
+/* Caption that annotates whatever sits directly above it — a table, a figure,
+   or a code cell's output. A bordered serif "legend" chip, deliberately unlike
+   the sans-serif body bullets, so trailing explanation never reads as another
+   main point. System fonts only, NO web-font download: Latin → Georgia,
+   Japanese → an installed mincho if present else the generic serif fallback. */
+.reveal .caption-note {
+  text-align: center;
+  margin-top: 0.3em;             /* small, element-agnostic gap (table OR code output above) */
+  margin-bottom: 0.6em;
+}
+.reveal .caption-note p {
+  display: inline-block;
+  margin: 0 !important;
+  padding: 0.3em 1.2em;
+  border: 1px solid #c7ccd4;
+  border-radius: 8px;
+  background: #f7f8fa;
+  font-family: Georgia, Cambria, "Times New Roman", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif CJK JP", serif !important;
+  font-size: 0.72em !important;
+  color: #555 !important;
+  font-weight: normal !important;
+}
 .fig-small img {
   max-height: 300px !important;
 }
@@ -157,6 +243,8 @@
 }
 table {
   width: 100%;
+  margin-top: 1.1em !important;     /* vertical breathing room — reveal sets table{margin:auto} → 0 top/bottom */
+  margin-bottom: 1.1em !important;
   border-bottom: none !important;
 }
 .reveal table.dataframe {
@@ -181,6 +269,122 @@ table th:first-child,
 table td:first-child {
   font-weight: bold;
   border-right: 2px solid #aaa;
+}
+/* Tweak slides: hands-on "change one line & see" practice.
+   Each action is its OWN numbered row-band:  [#] | intent → key.  The left number
+   is auto-generated (CSS counter) so steps are countable; the coral arrow links the
+   intent to the exact code to type. Header hidden (kept for screen readers); the
+   slide intro gives the context. Palette = the practice badge: coral accents,
+   neutral bands. Value tweaks → 2-col table (intent | `code`). Task → bullet list. */
+/* Exercise prompt (問題文) — a plain rounded frame around the task statement
+   on 演習 slides. Deliberately neutral: typed callouts carry colored-header
+   emphasis and .caption-note annotates the element above it — this frame just
+   marks "this paragraph is the problem". Usage: ::: {.prompt} 問題文 ::: */
+.reveal .prompt {
+  border: 1.5px solid #b9c2cf;
+  border-radius: 10px;
+  background: #fafbfd;
+  padding: 0.5em 0.9em;
+  margin: 0.35em 0 0.75em;
+}
+.reveal .prompt p {
+  margin: 0;
+}
+.reveal .prompt p + p {
+  margin-top: 0.4em;
+}
+.tweak {
+  width: fit-content;
+  max-width: 96%;
+  margin: 0.45em auto 0;
+}
+.tweak table {
+  width: auto;
+  margin: 0 auto;
+  border-collapse: separate;
+  border-spacing: 0 0.6em;       /* vertical gaps between row-bands */
+  font-size: 0.92em;
+  counter-reset: tw;             /* step numbers restart per table */
+}
+.tweak table thead { display: none; }   /* labels kept for a11y; visually self-evident */
+.tweak table td {
+  background: #fff;
+  border-top: 1px solid #e2e4e8;
+  border-bottom: 1px solid #e2e4e8;
+  padding: 0.66em 1.1em;
+  vertical-align: middle;
+  box-shadow: 0 2px 4px rgba(60, 60, 70, 0.10);     /* bottom lift only — no shadow on the seam */
+}
+.tweak table td:first-child {           /* number segment + やりたいこと (intent) */
+  position: relative;
+  text-align: left;
+  font-weight: 600;
+  border-left: 1px solid #e2e4e8;
+  border-right: none;                    /* drop the global first-col gray divider */
+  border-top-left-radius: 11px;
+  border-bottom-left-radius: 11px;
+  padding-left: 3.6em;                   /* room for the number segment */
+  padding-right: 1.1em;
+}
+.tweak table td:first-child::before {   /* auto step number, partitioned off on the left */
+  counter-increment: tw;
+  content: counter(tw);
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2.4em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top-left-radius: 11px;
+  border-bottom-left-radius: 11px;
+  background: #fbeee9;                  /* faint coral tint — the tint alone separates the number */
+  color: #f76d5e;
+  font-weight: 700;
+}
+.tweak table td:last-child {            /* the code, in its own cell split by a vertical bar */
+  text-align: center;
+  border-left: 2px solid #b9bfc8;        /* clear vertical divider between intent and code */
+  border-right: 1px solid #e2e4e8;
+  border-top-right-radius: 11px;
+  border-bottom-right-radius: 11px;
+  padding-left: 1.2em;
+  padding-right: 1.2em;
+  box-shadow: 2px 2px 4px rgba(60, 60, 70, 0.10);   /* right + bottom lift on the band's right end */
+}
+.tweak table td code {                   /* plain code inside the cell — no box of its own */
+  font-size: 1.05em;
+}
+/* Task-type tweak: each action is its own numbered band too */
+.tweak ul { margin: 0; padding: 0; list-style: none !important; counter-reset: tw; }
+.tweak li {
+  counter-increment: tw;
+  position: relative;
+  background: #fff;
+  border: 1px solid #e2e4e8;
+  border-radius: 11px;
+  padding: 0.66em 1.4em 0.66em 3.8em;   /* room for the number segment on the left */
+  margin: 0 0 0.6em;
+  box-shadow: 2px 2px 4px rgba(60, 60, 70, 0.10);   /* slight lift, right + bottom */
+}
+.tweak li:last-child { margin-bottom: 0; }
+/* high specificity to beat the deck's masked-circle bullet (.slide-body ul > li::before) */
+.reveal .slide-body .tweak li::before {  /* auto step number, partitioned off on the left */
+  content: counter(tw);
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2.6em;
+  height: auto;                  /* override theme bullet's height:0.58em so top/bottom stretch */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top-left-radius: 11px;
+  border-bottom-left-radius: 11px;
+  color: #f76d5e;
+  font-weight: 700;
+  background: #fbeee9;                  /* faint coral tint — the tint alone separates the number */
+  -webkit-mask: none;
+  mask: none;
+  margin: 0;
 }
 .reveal .cite {
   position: absolute;
@@ -559,14 +763,14 @@ pre.shell code > span > a:first-child::before {
 .code-copy-outer-scaffold:has(pre.shell)::before {
   position: absolute;
   top: 2px;
-  right: 30px;
+  left: 22px;
   font-size: 10px;
   color: #bbb;
   pointer-events: none;
   z-index: 2;
 }
 .code-copy-outer-scaffold:has(pre.python)::before {
-  content: "Python";
+  content: "Code";
 }
 .code-copy-outer-scaffold:has(pre.shell)::before {
   content: "Shell";
@@ -742,10 +946,11 @@ a.lightbox[href]::after {
   text-shadow: none;
 }
 /* Rosette preset badges (injected by badge-ui.js). The top-right corner is
-   reserved for badges (home/search buttons live at the bottom-right). Absolutely
-   positioned within the section so it tracks the title's right shoulder, not the
-   viewport corner. Title gets right-padding (set inline by the script) so a long
-   heading wraps before the badge zone. */
+   reserved for badges (home/search buttons live at the bottom-right), so the
+   badge can be big and slightly tilted — overflowing the corner a little is
+   intentional. Absolutely positioned within the section so it tracks the
+   title's right shoulder, not the viewport corner. Title gets right-padding
+   (set inline by the script) so a long heading wraps before the badge zone. */
 .reveal .slides section > .slide-badge-group {
   position: absolute;
   top: 2px;              /* high in the corner, head fully visible (no top bleed) */
@@ -772,7 +977,8 @@ a.lightbox[href]::after {
    orange and caution to red (amber + white text is unreadable). */
 .reveal .callout .callout-title { color: #fff !important; }
 .reveal .callout .callout-title p,
-.reveal .callout .callout-title strong { color: #fff !important; }
+.reveal .callout .callout-title strong,
+.reveal .callout .callout-title code { color: #fff !important; }   /* code in a header bar must be white too */
 .reveal .callout .callout-icon::before { filter: brightness(0) invert(1) !important; }
 
 .reveal .callout-note      .callout-title { background: #1c7ed6 !important; }
@@ -802,7 +1008,8 @@ a.lightbox[href]::after {
 .reveal .pdf-gate::after{content:none!important}
 .reveal a.backlink{position:absolute;top:0;right:0;font-size:.46em;font-weight:600;color:#2a76dd!important;text-decoration:none!important;z-index:20}
 .reveal .idx-lead{color:#8a93a0!important;font-size:.5em;margin:.1em 0 1em}
-.reveal #lecture-search{margin-bottom:1.1em}
+.reveal #lecture-search{margin:.5em 0 1.1em}
+.reveal #search-input{width:100%;font-size:1.4rem;padding:8px 14px;border:2px solid #5dade2;border-radius:6px;box-sizing:border-box;background:#fff}
 .reveal .lectures{counter-reset:lec}
 .reveal .lectures .sec{background:none!important;font-size:.62em!important;font-weight:700;color:#6b7280;
   letter-spacing:.03em;margin:1em 0 .5em!important;padding:0 0 .35em!important;border:none!important;

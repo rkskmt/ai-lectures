@@ -405,6 +405,13 @@
     document.addEventListener('keydown', function(e) {
       try {
         if (!window.Reveal) return;
+        // Never hijack keys while the user is typing in a field.
+        var t = e.target;
+        if (t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable)) return;
+        // Every modal overlay (search, code zoom, peek — and a peeked iframe's
+        // locked-down deck) disables Reveal's keyboard; this handler must stand
+        // down with it, or arrows navigate the page out from under the modal.
+        if (Reveal.getConfig && Reveal.getConfig().keyboard === false) return;
         if (isFirstSlide() && (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp')) {
           goHome();
         }
@@ -413,6 +420,22 @@
         }
       } catch (e) {}
     });
+
+    // A code-fold 解答例 near the bottom of an overflowing slide opens BELOW
+    // the fold — the details element grows off-screen and the click looks like
+    // a no-op. Scroll the opened summary to the top of the slide's scroll box
+    // so the revealed content is actually visible. ('toggle' doesn't bubble;
+    // listen in the capture phase.)
+    document.addEventListener('toggle', function(e) {
+      try {
+        var d = e.target;
+        if (!d || d.tagName !== 'DETAILS' || !d.open) return;
+        var sec = d.closest('.reveal .slides section');
+        if (!sec || sec.scrollHeight <= sec.clientHeight) return;
+        var sum = d.querySelector(':scope > summary');
+        (sum || d).scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } catch (e) {}
+    }, true);
 
     function setup() {
       try {
