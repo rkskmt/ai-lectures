@@ -50,7 +50,11 @@ Use Python as the vehicle, but frame concepts as broadly as possible. Where a co
 - **`search-ui.js` provides site-wide full-text search**: a 検索 button + modal on every deck (shipped by the cleanslidekit extension) and the inline box on `index.qmd` (`#search-input`/`#search-results`). It reads Quarto's generated `search.json` and deep-links to slides via `#/slide-id` — no per-lecture maintenance.
 - **Never add numbers to slide section headers or `index.qmd` link text.** Numbered slides (e.g. `## １. ...`) and numbered links (e.g. `第N回`) break on reorder — every insert or swap requires renaming every entry after it. Use plain titles only (e.g. `## 汎化性能を測る`, `[過学習と汎化](classification-evaluation.qmd)`).
 - Use Quarto callouts (`.callout-note`) for key concepts
-- Slide text should use **bullet points**, not prose sentences
+- Slide text should use **bullet points**, not prose sentences. **Exception: exercise/task statements.** A 演習 uses the exam-problem register — directive and concise beats polite filler, as long as it doesn't turn harsh:
+   - **Problem statement**: one prose sentence in **命令形** (`…を自分のコードで確かめよ`, `…を実装せよ`). Name the concrete action (`CSVで読み込み`), not vague framing (`〜を使って`).
+   - **Steps**: a numbered list in **体言止め** — drop trailing する/出す (`columns で列名を確認`, `平均を比較`). Setup (data download) is **step 0** so the whole list aligns.
+   - **Required outputs are explicit**: state them in parentheses (`（差分値も表示）`) instead of leaving what to print implicit.
+   - Do NOT cram instructions into bullets or arrow chains (`まず予想 → 何度ちがう？ → 自分で書く`), and don't spoon-feed what students can discover with a taught tool.
 - **Every sentence on a slide must be written for the student — author-side circumstances are never slide content.** Litmus test: *does the student gain anything from reading this line?* Banned categories (each has been found and scrubbed in a real audit of the sibling IP3200 repo):
    - **Authoring/build decisions**: 「（この節だけでも実行できるよう、読み込みから用意）」「本スライドは `"directory"` を使っている — 教室のWi-Fiが切れても動くように」
    - **Curriculum decisions** — especially naming untaught material only to exclude it: 「`.plot.bar()` は今回は使わない」「だから3Dはこの回で扱った」
