@@ -192,6 +192,11 @@
     }
   </style>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="custom.css">
+  <script src="slide-ui.js" defer=""></script>
+  <script src="search-ui.js" defer=""></script>
+  <script src="peek-ui.js" defer=""></script>
+  <script src="badge-ui.js" defer=""></script>
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -213,7 +218,7 @@ rkskmt
 <section id="初回の約束覚えているか" class="slide level2">
 <h2>初回の約束、覚えているか</h2>
 <div class="slide-body">
-<div id="ab912132" class="cell" data-execution_count="1">
+<div id="6c23099e" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -237,7 +242,7 @@ rkskmt
 <ul>
 <li>手書き数字の定番データセット。<strong>訓練6万枚・テスト1万枚</strong>、各28×28ピクセル</li>
 </ul>
-<div id="c34d2adc" class="cell" data-execution_count="2">
+<div id="b463541f" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> torch</span>
 <span id="cb1-2"><a></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
 <span id="cb1-3"><a></a><span class="im">from</span> torchvision <span class="im">import</span> datasets, transforms</span>
@@ -254,7 +259,7 @@ rkskmt
 1枚の形: (1, 28, 28)  正解ラベル: 5</code></pre>
 </div>
 </div>
-<div id="95349d50" class="cell" data-execution_count="3">
+<div id="e2581732" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -324,7 +329,7 @@ rkskmt
 <section id="モデル見慣れた3層" class="slide level2">
 <h2>モデル<span class="fw-colon">：</span>見慣れた3層</h2>
 <div class="slide-body">
-<div id="233dff9f" class="cell" data-execution_count="4">
+<div id="c357ec03" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a>torch.manual_seed(<span class="dv">0</span>)</span>
 <span id="cb3-2"><a></a></span>
 <span id="cb3-3"><a></a>model <span class="op">=</span> nn.Sequential(</span>
@@ -367,7 +372,7 @@ rkskmt
 <li>6万枚まとめて勾配を計算すると重い → <strong>128枚ずつ</strong>取り出して1歩ずつ進む</li>
 <li>データを一巡することを <strong>1エポック</strong> と呼ぶ</li>
 </ul>
-<div id="d957dad4" class="cell" data-execution_count="5">
+<div id="0726bd43" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a>train_loader <span class="op">=</span> torch.utils.data.DataLoader(train_ds, batch_size<span class="op">=</span><span class="dv">128</span>, shuffle<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb5-2"><a></a>test_loader  <span class="op">=</span> torch.utils.data.DataLoader(test_ds,  batch_size<span class="op">=</span><span class="dv">1000</span>)</span>
 <span id="cb5-3"><a></a></span>
@@ -382,7 +387,7 @@ rkskmt
 <section id="学習する" class="slide level2">
 <h2>学習する</h2>
 <div class="slide-body">
-<div id="f5d4400b" class="cell" data-execution_count="6">
+<div id="f56a7120" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">4</span>):</span>
 <span id="cb6-2"><a></a>    <span class="cf">for</span> x_batch, y_batch <span class="kw">in</span> train_loader:</span>
 <span id="cb6-3"><a></a>        optimizer.zero_grad()</span>
@@ -411,7 +416,7 @@ rkskmt
 <section id="読めている様子" class="slide level2">
 <h2>読めている様子</h2>
 <div class="slide-body">
-<div id="ec114943" class="cell" data-execution_count="7">
+<div id="2ee8e877" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -428,7 +433,7 @@ rkskmt
 <section id="間違いを眺める" class="slide level2">
 <h2>間違いを眺める</h2>
 <div class="slide-body">
-<div id="06486277" class="cell" data-execution_count="8">
+<div id="e82258c0" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>

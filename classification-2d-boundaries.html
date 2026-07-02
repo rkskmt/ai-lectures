@@ -192,6 +192,11 @@
     }
   </style>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="custom.css">
+  <script src="slide-ui.js" defer=""></script>
+  <script src="search-ui.js" defer=""></script>
+  <script src="peek-ui.js" defer=""></script>
+  <script src="badge-ui.js" defer=""></script>
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -306,7 +311,7 @@ rkskmt
 <h2>データの準備</h2>
 <div class="slide-body">
 <p>新しく輝度のデータを追加した（各40匹）。</p>
-<div id="f95831a8" class="cell" data-execution_count="1">
+<div id="d830ab79" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="co"># Salmon（40匹）の重さ (g)</span></span>
 <span id="cb1-2"><a></a>salmon_weights <span class="op">=</span> [<span class="dv">2149</span>, <span class="dv">1959</span>, <span class="dv">2194</span>, <span class="dv">2457</span>, <span class="dv">1930</span>, <span class="dv">1930</span>, <span class="dv">2474</span>, <span class="dv">2230</span>, <span class="dv">1859</span>, <span class="dv">2163</span>,</span>
 <span id="cb1-3"><a></a>                  <span class="dv">1861</span>, <span class="dv">1860</span>, <span class="dv">2073</span>, <span class="dv">1426</span>, <span class="dv">1483</span>, <span class="dv">1831</span>, <span class="dv">1696</span>, <span class="dv">2094</span>, <span class="dv">1728</span>, <span class="dv">1576</span>,</span>
@@ -337,7 +342,7 @@ rkskmt
 <h2>準備</h2>
 <div class="slide-body">
 <p>必要なライブラリをインポートする。</p>
-<div id="c5803f81" class="cell" data-execution_count="2">
+<div id="525edd59" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>全体を表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a><span class="co"># Setup</span></span>
@@ -372,7 +377,7 @@ rkskmt
 <section id="目で見て境界線を想像垂線とする" class="slide level2">
 <h2>目で見て境界線を想像（垂線とする）</h2>
 <div class="slide-body">
-<div id="4f2cd16b" class="cell fig-medium" data-execution_count="3">
+<div id="0530757a" class="cell fig-medium" data-execution_count="3">
 <details class="code-fold">
 <summary>code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">7</span>))</span>
@@ -434,7 +439,7 @@ rkskmt
 <section id="この辺だとどうか" class="slide level2">
 <h2>この辺だとどうか</h2>
 <div class="slide-body">
-<div id="a537904c" class="cell fig-small" data-execution_count="4">
+<div id="88b4a258" class="cell fig-small" data-execution_count="4">
 <details class="code-fold">
 <summary>code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">7</span>))</span>
@@ -545,7 +550,7 @@ rkskmt
 <section id="ジニ不純度を計算してみる" class="slide level2">
 <h2>ジニ不純度を計算してみる</h2>
 <div class="slide-body">
-<div id="e37b15d1" class="cell" data-execution_count="5">
+<div id="6fa8eaa9" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a><span class="kw">def</span> gini_impurity(labels):</span>
@@ -597,7 +602,7 @@ rkskmt
 <section id="いくつかの閾値を試してみる" class="slide level2">
 <h2>いくつかの閾値を試してみる</h2>
 <div class="slide-body">
-<div id="f22d1ca2" class="cell" data-execution_count="6">
+<div id="a0353650" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a></a><span class="co"># 輝度でいくつかの閾値を試す</span></span>
@@ -669,7 +674,7 @@ rkskmt
 ルール<span class="fw-colon">：</span>特徴量を交互に使う
 </div>
 <p>1回目は輝度、2回目は重さ、3回目は輝度…と<strong>交互に使う</strong>ことで、階段状の境界を作る。</p>
-<div id="a40a9778" class="cell" data-execution_count="7">
+<div id="eb904a65" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a></a><span class="kw">def</span> find_best_split_for_feature(X, y, feature_idx):</span>
@@ -730,7 +735,7 @@ rkskmt
 <section id="可視化1回目の分割" class="slide level2">
 <h2>可視化<span class="fw-colon">：</span>1回目の分割</h2>
 <div class="slide-body">
-<div id="b5572361" class="cell" data-execution_count="8">
+<div id="ee34d8bc" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -745,7 +750,7 @@ rkskmt
 <h2>ステップ2: 2回目の分割（重さで分ける）</h2>
 <div class="slide-body">
 <p>左側と右側をそれぞれ<strong>重さで分割</strong>する。</p>
-<div id="c1535ac7" class="cell" data-execution_count="9">
+<div id="c30b8418" class="cell" data-execution_count="9">
 <details class="code-fold">
 <summary>code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a></a>split2_feature <span class="op">=</span> <span class="dv">1</span>  <span class="co"># Weight（交互なので重さ）</span></span>
@@ -792,7 +797,7 @@ rkskmt
 <section id="可視化2回目の分割" class="slide level2">
 <h2>可視化<span class="fw-colon">：</span>2回目の分割</h2>
 <div class="slide-body">
-<div id="70bdb6e7" class="cell" data-execution_count="10">
+<div id="75dde08e" class="cell" data-execution_count="10">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -807,7 +812,7 @@ rkskmt
 <h2>この境界線の性能は？</h2>
 <div class="slide-body">
 <p>階段状の境界線で分類した結果を評価する。</p>
-<div id="4e481bf4" class="cell" data-execution_count="11">
+<div id="f35ba7e1" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a></a><span class="co"># 簡易的な予測関数</span></span>
@@ -886,7 +891,7 @@ rkskmt
 </div>
 </div>
 </div>
-<div id="beefda1c" class="cell" data-execution_count="12">
+<div id="2c467669" class="cell" data-execution_count="12">
 <details class="code-fold">
 <summary>code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a></a><span class="co"># 決定木モデル（深さ3まで）</span></span>
@@ -918,7 +923,7 @@ rkskmt
 <section id="決定境界の可視化決定木" class="slide level2">
 <h2>決定境界の可視化（決定木）</h2>
 <div class="slide-body">
-<div id="06597f75" class="cell" data-execution_count="13">
+<div id="cd230ac9" class="cell" data-execution_count="13">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -977,7 +982,7 @@ rkskmt
 <section id="ロジスティック回帰で学習" class="slide level2">
 <h2>ロジスティック回帰で学習</h2>
 <div class="slide-body">
-<div id="784f6d44" class="cell" data-execution_count="14">
+<div id="ad86984d" class="cell" data-execution_count="14">
 <details class="code-fold">
 <summary>code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a></a><span class="co"># ロジスティック回帰モデル</span></span>
@@ -1009,7 +1014,7 @@ rkskmt
 <section id="決定境界の可視化ロジスティック回帰" class="slide level2">
 <h2>決定境界の可視化（ロジスティック回帰）</h2>
 <div class="slide-body">
-<div id="285cbb61" class="cell" data-execution_count="15">
+<div id="f8f067c1" class="cell" data-execution_count="15">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1055,7 +1060,7 @@ rkskmt
 <section id="性能比較表" class="slide level2">
 <h2>性能比較表</h2>
 <div class="slide-body">
-<div id="718ad024" class="cell" data-execution_count="16">
+<div id="a2589ccd" class="cell" data-execution_count="16">
 <div class="cell-output cell-output-stdout">
 <pre><code>      モデル Accuracy Precision Recall
       決定木    0.975     0.952  1.000
@@ -1084,7 +1089,7 @@ rkskmt
 <li>深さ＝ if-then ルールの段数。深いほど複雑な境界が作れる</li>
 <li>深さ 1・3・無制限で学習し、同じデータで採点してみる</li>
 </ul>
-<div id="b0ffea5a" class="cell" data-execution_count="17">
+<div id="beb9d798" class="cell" data-execution_count="17">
 <details class="code-fold">
 <summary>code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a></a><span class="cf">for</span> depth <span class="kw">in</span> [<span class="dv">1</span>, <span class="dv">3</span>, <span class="va">None</span>]:</span>
@@ -1120,7 +1125,7 @@ rkskmt
 <section id="peek-overfit-boundary" class="slide level2">
 <h2>深さ無制限の境界を見てみる</h2>
 <div class="slide-body">
-<div id="8900b7f2" class="cell" data-execution_count="18">
+<div id="0bf5ea53" class="cell" data-execution_count="18">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1161,7 +1166,7 @@ rkskmt
 <section id="混同行列で詳しく見る決定木" class="slide level2">
 <h2>混同行列で詳しく見る（決定木）</h2>
 <div class="slide-body">
-<div id="8edb1617" class="cell" data-execution_count="19">
+<div id="f2ad4a2b" class="cell" data-execution_count="19">
 <details class="code-fold">
 <summary>code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a></a><span class="co"># 決定木（深さ3）の混同行列</span></span>
