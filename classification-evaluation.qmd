@@ -221,7 +221,7 @@ print(f"テストデータ精度: {test_acc:.3f}  ← 本当の精度")
 
 ::: {.callout-tip title="2つの精度を比べる"}
 - **訓練精度 ≈ テスト精度**：うまく汎化できている
-- **訓練精度 >> テスト精度**：過学習の疑い（暗記している）
+- **訓練精度 >> テスト精度**：過学習（[overfitting]{.en}）の疑い（暗記している）
 :::
 
 
@@ -252,6 +252,10 @@ plt.show()
 ## 深さ無制限の決定木を、新しい魚で採点する
 
 - 前回の「[あやしい満点](classification-2d-boundaries.qmd#peek-overfit-boundary){.peek}」に、いま手に入れた道具（train/test）を使う
+
+::: {.callout-important title="ここで予想"}
+訓練で満点だったこの木 — 新しい24匹のうち、何匹当てられる？
+:::
 
 ```{python}
 #| echo: true
@@ -376,9 +380,9 @@ plt.show()
 
 | 状態 | 訓練精度 | テスト精度 |
 |---|---|---|
-| 未学習（underfitting） | 低い | 低い |
+| 未学習（[underfitting]{.en}） | 低い | 低い |
 | ちょうど良い | 高い | 高い |
-| **過学習（overfitting）** | **ほぼ満点** | **低い** |
+| **過学習（[overfitting]{.en}）** | **ほぼ満点** | **低い** |
 
 ::: {.callout-tip title="対策"}
 - モデルの複雑さを抑える（決定木なら**深さを制限**）

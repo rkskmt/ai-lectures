@@ -85,7 +85,7 @@ $$L(a, b) = \frac{1}{N} \sum_{i} \left( \underbrace{a x_i + b}_{\text{予測}} -
 
 ::: {.fragment}
 - 絶対値は 0 のところで**微分できない**（カクッと折れている）
-- 二乗なら微分がきれい — シグモイド＋交差エントロピーを選んだのと**同じ理由**
+- 二乗なら微分がきれい
 - 勾配降下法を使う前提で、損失は「微分しやすいもの」を選ぶ
 :::
 
@@ -98,7 +98,7 @@ $$\frac{\partial L}{\partial a} = \frac{2}{N} \sum_i (a x_i + b - t_i) \, x_i
 \qquad
 \frac{\partial L}{\partial b} = \frac{2}{N} \sum_i (a x_i + b - t_i)$$
 
-- 構造は分類のときと同じ：**「予測と正解の差」を入力の大きさに応じて配る**
+- 構造は単純：**「予測と正解の差」を入力の大きさに応じて配る**
 - あとは勾配降下法に渡すだけ：
 
 $$a \leftarrow a - \eta \frac{\partial L}{\partial a}, \qquad b \leftarrow b - \eta \frac{\partial L}{\partial b}$$

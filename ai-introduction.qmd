@@ -171,7 +171,7 @@ from sklearn.datasets import make_blobs
 from sklearn.linear_model import LogisticRegression
 from sklearn.cluster import KMeans
 
-fig, axes = plt.subplots(1, 4, figsize=(13, 3.2))
+fig, axes = plt.subplots(1, 3, figsize=(10, 3.2))
 
 X_b, y_b = make_blobs(n_samples=80, centers=2, cluster_std=1.1, random_state=7)
 clf = LogisticRegression().fit(X_b, y_b)
@@ -195,10 +195,6 @@ labels = KMeans(n_clusters=3, n_init=10, random_state=0).fit_predict(X_c)
 for k, col in enumerate(["#16a085", "#d68910", "#884ea0"]):
     axes[2].scatter(X_c[labels == k, 0], X_c[labels == k, 1], c=col, s=18)
 axes[2].set_title("クラスタリング：どんなまとまり？", fontsize=11)
-
-strip = np.hstack([digits.images[i] for i in [0, 1, 2, 3]])
-axes[3].imshow(strip, cmap="gray_r")
-axes[3].set_title("生成：新しく作る", fontsize=11)
 
 for ax in axes:
     ax.set_xticks([]); ax.set_yticks([])
@@ -314,15 +310,18 @@ plt.show()
   - 例：「AならばB」のような推論規則
     - 「人は死ぬ」「坂本は人」という事実 ⇒ 「坂本は死ぬ」と推論
 - 人間が知識を記述してコンピュータに書き込む発想
-  - 記述できる知識を形式知という（[explicit knowledge]{.en}）
-  - 逆に、言葉で語れない知識は暗黙知という（[tacit knowledge]{.en}）
+  - 記述できる知識を**形式知（[explicit knowledge]{.en}）**という
+  - 逆に、言葉で語れない知識は**暗黙知（[tacit knowledge]{.en}）**という
 - ゴール：形式知と論理的推論で、専門家の代わりが務まるのでは？
   - エキスパートシステム
-- やってみると色々な問題が噴出
-  - 知識の記述はどうするのが適当？
-  - ルールは論理的推論だけだと不十分なのだがどうすればいい？
-  - 誰がどこにどうやってすべての知識を入力するの？
-    - 文章化されている法律すら非常に困難であることが判明
+
+
+## 古典的AI：やってみると問題が噴出
+
+- 知識の記述はどうするのが適当？
+- ルールは論理的推論だけだと不十分なのだがどうすればいい？
+- 誰がどこにどうやってすべての知識を入力するの？
+  - 文章化されている法律すら非常に困難であることが判明
 
 
 ## 古典的AIの流れ
@@ -426,15 +425,19 @@ plt.show()
   - 机の下の影は？
   - 机に置かれた紙は？
   - 机がぶつかった椅子は？
-- 例外条件を全部書く必要が出てくる
-  - 電気のスイッチを押す
-  - スイッチの状態が変わる
+- 間接的な変化は連鎖する
+  - 電気のスイッチを押すと、スイッチの状態が変わる
   - 部屋の明るさも変わる
   - 人の見え方や行動可能性も変わるかもしれない
-  - 「ドアを開ける」と書いても、鍵がかかっていたら開かない
-  - ドアが壊れていても開かない
-  - 押すドアを引いても開かない
-  - 誰かが反対側から押さえていても開かない
+
+
+## 例外条件を全部書けるか
+
+- 「ドアを開ける」と書いても、鍵がかかっていたら開かない
+- ドアが壊れていても開かない
+- 押すドアを引いても開かない
+- 誰かが反対側から押さえていても開かない
+- 1つの行動に、例外条件が際限なく付いてくる
 
 ## M.ミンスキーのフレーム理論
 
@@ -568,6 +571,8 @@ plt.show()
 ### 知識を書くのではなく、経験から更新する
 
 - ルールを人間が全部書くのではなく、データからパターンを学ぶ
+- 学んだパターンの入れ物が**モデル（[model]{.en}）**：入力から出力を計算する仕組み
+  - 学習では、モデルの**パラメータ（[parameter]{.en}）**をデータに合わせて調整する
 - 代表的な学習の形：
   - **教師あり学習（[supervised learning]{.en}）**：入力と正解ラベルから学ぶ
   - **教師なし学習（[unsupervised learning]{.en}）**：データのまとまりや構造を見つける
