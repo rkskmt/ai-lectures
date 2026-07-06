@@ -219,7 +219,7 @@ rkskmt
 <section id="初回の約束覚えているか" class="slide level2">
 <h2>初回の約束、覚えているか</h2>
 <div class="slide-body">
-<div id="21ea0c1f" class="cell" data-execution_count="1">
+<div id="a97858cc" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -243,7 +243,7 @@ rkskmt
 <ul>
 <li>手書き数字の定番データセット。<strong>訓練6万枚・テスト1万枚</strong>、各28×28ピクセル</li>
 </ul>
-<div id="8db10f49" class="cell" data-execution_count="2">
+<div id="56ad3bcc" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> torch</span>
 <span id="cb1-2"><a></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
 <span id="cb1-3"><a></a><span class="im">from</span> torchvision <span class="im">import</span> datasets, transforms</span>
@@ -260,7 +260,7 @@ rkskmt
 1枚の形: (1, 28, 28)  正解ラベル: 5</code></pre>
 </div>
 </div>
-<div id="8a1847c4" class="cell" data-execution_count="3">
+<div id="590da4ab" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -330,7 +330,7 @@ rkskmt
 <section id="モデル見慣れた3層" class="slide level2">
 <h2>モデル<span class="fw-colon">：</span>見慣れた3層</h2>
 <div class="slide-body">
-<div id="64f395da" class="cell" data-execution_count="4">
+<div id="85393ad7" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a>torch.manual_seed(<span class="dv">0</span>)</span>
 <span id="cb3-2"><a></a></span>
 <span id="cb3-3"><a></a>model <span class="op">=</span> nn.Sequential(</span>
@@ -373,7 +373,7 @@ rkskmt
 <li>6万枚まとめて勾配を計算すると重い → <strong>128枚ずつ</strong>取り出して1歩ずつ進む</li>
 <li>データを一巡することを <strong>1エポック</strong> と呼ぶ</li>
 </ul>
-<div id="53953c39" class="cell" data-execution_count="5">
+<div id="b38574d9" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a>train_loader <span class="op">=</span> torch.utils.data.DataLoader(train_ds, batch_size<span class="op">=</span><span class="dv">128</span>, shuffle<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb5-2"><a></a>test_loader  <span class="op">=</span> torch.utils.data.DataLoader(test_ds,  batch_size<span class="op">=</span><span class="dv">1000</span>)</span>
 <span id="cb5-3"><a></a></span>
@@ -388,7 +388,7 @@ rkskmt
 <section id="peek-mnist-train" class="slide level2">
 <h2>学習する</h2>
 <div class="slide-body">
-<div id="0502608e" class="cell" data-execution_count="6">
+<div id="07c64766" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">4</span>):</span>
 <span id="cb6-2"><a></a>    <span class="cf">for</span> x_batch, y_batch <span class="kw">in</span> train_loader:</span>
 <span id="cb6-3"><a></a>        optimizer.zero_grad()</span>
@@ -468,7 +468,7 @@ rkskmt
 <section id="読めている様子" class="slide level2">
 <h2>読めている様子</h2>
 <div class="slide-body">
-<div id="72d461a3" class="cell" data-execution_count="7">
+<div id="137cd67e" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -485,7 +485,7 @@ rkskmt
 <section id="間違いを眺める" class="slide level2">
 <h2>間違いを眺める</h2>
 <div class="slide-body">
-<div id="b9f30db7" class="cell" data-execution_count="8">
+<div id="2d33185a" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -504,7 +504,7 @@ rkskmt
 <h2>自分の字は読めるのか（持ち帰りデモ）</h2>
 <div class="slide-body">
 <p>紙に数字を書いて撮影し、この機械に読ませてみよう。 ただし<strong>写真をそのまま28×28に縮めても、まず読めない</strong> — MNISTの画像は「数字を20ピクセル角に収め、重心をど真ん中に置く」ように揃えてあり、撮った写真はそうなっていないから。同じ揃え方を自分でやってから見せる<span class="fw-colon">：</span></p>
-<div id="5ec6170c" class="cell" data-execution_count="9">
+<div id="2e484c8f" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a></a><span class="im">from</span> PIL <span class="im">import</span> Image</span>
 <span id="cb8-2"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb8-3"><a></a><span class="im">import</span> torch</span>

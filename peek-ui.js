@@ -20,6 +20,26 @@
   try {
     var DECK_W = 1280, DECK_H = 720;  // fallback deck size; refined from Reveal config
 
+    // UI strings follow the document language: Japanese when <html lang>
+    // starts with "ja" (the format default), English otherwise.
+    var JA = (((document.documentElement && document.documentElement.lang) || 'ja')
+              .toLowerCase().indexOf('ja') === 0);
+    var T = JA ? {
+      loading: '読み込み中…',
+      closeLabel: '閉じる',
+      closeTitle: '閉じる（Esc）',
+      hint: 'Esc・背景クリック・× で閉じる',
+      from: '出典：',
+      frameTitle: 'スライドプレビュー'
+    } : {
+      loading: 'Loading…',
+      closeLabel: 'Close',
+      closeTitle: 'Close (Esc)',
+      hint: 'Esc / click outside / × to close',
+      from: 'From: ',
+      frameTitle: 'Slide preview'
+    };
+
     var STYLE = [
       // the inline link marker: dotted underline + magnifier, "preview" cursor
       'a.peek {',
@@ -73,7 +93,7 @@
       '.reveal .controls, .reveal .progress, .reveal .slide-number,',
       '.reveal .footer, .reveal .slide-menu-button, .slide-menu-button,',
       '.reveal-viewport > .backarrow,',
-      '#search-btn, #slide-nav, #home-btn { display: none !important; }',
+      '#search-btn, #slide-nav, #home-btn, #toc-btn { display: none !important; }',
       'html, body { overflow: hidden !important; }'
     ].join('\n');
 
@@ -112,7 +132,7 @@
       if (modal) modal.classList.remove('peek-open');
       // drop the iframe so its deck stops running (timers, plotly, audio…)
       var wrap = document.getElementById('peek-frame-wrap');
-      if (wrap) wrap.innerHTML = '<div id="peek-loading">読み込み中…</div>';
+      if (wrap) wrap.innerHTML = '<div id="peek-loading">' + T.loading + '</div>';
       setRevealKeyboard(true);
     }
 
@@ -125,10 +145,10 @@
       modal.setAttribute('aria-modal', 'true');
       modal.innerHTML =
         '<div id="peek-panel">' +
-        '<button id="peek-close" type="button" aria-label="閉じる" title="閉じる（Esc）">×</button>' +
+        '<button id="peek-close" type="button" aria-label="' + T.closeLabel + '" title="' + T.closeTitle + '">×</button>' +
         '<div id="peek-source"></div>' +
-        '<div id="peek-frame-wrap"><div id="peek-loading">読み込み中…</div></div>' +
-        '<div id="peek-hint">Esc・背景クリック・× で閉じる</div>' +
+        '<div id="peek-frame-wrap"><div id="peek-loading">' + T.loading + '</div></div>' +
+        '<div id="peek-hint">' + T.hint + '</div>' +
         '</div>';
       document.body.appendChild(modal);
       // backdrop click closes
@@ -169,8 +189,18 @@
 
     function sourceLabel(doc) {
       var t = '';
-      try { t = (doc && doc.title ? doc.title : '').split(/[–—|]/)[0].trim(); } catch (e) {}
-      return t ? ('出典：' + t) : '';
+      try {
+        // Prefer the deck's own title slide heading. Fall back to <title>,
+        // where Quarto websites use "<site title> – <page title>" — take the
+        // LAST segment (the page), not the first (the site).
+        var h = doc && doc.querySelector ? doc.querySelector('.reveal h1.title') : null;
+        if (h && h.textContent.trim()) t = h.textContent.trim();
+        if (!t && doc && doc.title) {
+          var parts = doc.title.split(/[–—|]/);
+          t = parts[parts.length - 1].trim();
+        }
+      } catch (e) {}
+      return t ? (T.from + t) : '';
     }
 
     // Once the inner Reveal is ready, lock it down to a single non-navigable
@@ -253,14 +283,14 @@
       var wrap = document.getElementById('peek-frame-wrap');
       var source = document.getElementById('peek-source');
       if (source) source.textContent = '';
-      if (wrap) wrap.innerHTML = '<div id="peek-loading">読み込み中…</div>';
+      if (wrap) wrap.innerHTML = '<div id="peek-loading">' + T.loading + '</div>';
       setRevealKeyboard(false);
       modal.classList.add('peek-open');
 
       // build a fresh iframe each time (clean state, stops the old deck)
       var frame = document.createElement('iframe');
       frame.id = 'peek-frame';
-      frame.setAttribute('title', 'スライドプレビュー');
+      frame.setAttribute('title', T.frameTitle);
       // same-page peek (no page part) targets the current document
       var base = page || window.location.href.split('#')[0];
       frame.src = base + '#/' + frag;
