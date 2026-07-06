@@ -311,3 +311,66 @@ for layer in reversed(layers):
 層が深くなると、勾配を**全パラメータに**届ける必要がある。
 今日は2層分を手で書いたが、100層では？ — 連鎖律で機械的に流す**バックプロパゲーション**へ。
 :::
+
+
+## 練習問題
+
+以下の問題を**手計算**と**Pythonコード**の両方で解け。
+
+### 問題1：ReLU 2本で山を作る
+
+入力 $x$ は1次元。中間の変換2つと出力を、次のパラメータに固定する（学習はしない）：
+
+$$h_1 = \mathrm{ReLU}(x), \qquad h_2 = \mathrm{ReLU}(x - 1), \qquad y = h_1 - 2 h_2$$
+
+1. $x = -1, 0, 1, 2, 3$ での $y$ を手計算せよ（$h_1, h_2$ も示す）
+2. この折れ線の**折り目**は $x$ がいくつの場所にあるか。それぞれどちらの ReLU が作った折り目か
+3. $-2 \leq x \leq 3$ で $y$ をプロットし、手計算と一致することを確かめよ
+
+ヒント：折り目は「その ReLU の入り口 $z$ がちょうど 0 になる場所」にできる。
+
+
+## 問題1の解答例
+
+### 手計算
+
+| $x$ | $h_1 = \mathrm{ReLU}(x)$ | $h_2 = \mathrm{ReLU}(x-1)$ | $y = h_1 - 2h_2$ |
+|---|---|---|---|
+| $-1$ | $0$ | $0$ | $0$ |
+| $0$ | $0$ | $0$ | $0$ |
+| $1$ | $1$ | $0$ | $1$ |
+| $2$ | $2$ | $1$ | $0$ |
+| $3$ | $3$ | $2$ | $-1$ |
+
+折り目は **$x = 0$（$h_1$ の入り口がゼロ）** と **$x = 1$（$h_2$ の入り口がゼロ）** の2箇所。
+
+### コードで確認
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "解答例を見る"
+import numpy as np
+import matplotlib.pyplot as plt
+import japanize_matplotlib
+
+def relu(z):
+    return np.maximum(0, z)
+
+x = np.linspace(-2, 3, 300)
+y = relu(x) - 2 * relu(x - 1)
+
+plt.figure(figsize=(6.5, 3.2))
+plt.plot(x, y, color="#e74c3c", lw=2.5)
+plt.plot([-1, 0, 1, 2, 3], [0, 0, 1, 0, -1], "ko", ms=7)   # 手計算した5点
+plt.axvline(0, color="gray", ls=":", lw=1)
+plt.axvline(1, color="gray", ls=":", lw=1)
+plt.xlabel("x"); plt.ylabel("y")
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+- 平ら → 登り → 下り、の**山**が1つできた。たった ReLU 2本の仕事
+- 本編の三日月の境界も、原理はこれと同じ：**折り目を置きたい場所に、ReLU の入り口ゼロを学習で持ってくる**
+- 発展：$y = h_1 - 2h_2$ の $-2$ を $+2$ に変えるとどんな形になるか、予想してから実行してみよう

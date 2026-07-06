@@ -498,3 +498,63 @@ print(f"平均精度: {scores.mean():.3f}  ±  {scores.std():.3f}")
 ::: {.callout-note title="次回予告"}
 「分類にはラベルが必要だった。**ラベルがない場合はどうする？**」
 :::
+
+
+## 練習問題
+
+問題1は**手計算**、問題2は**Pythonコード**で解け。
+
+### 問題1：どちらのモデルを仕入れる？
+
+新しい魚20匹（Salmon 10・Sea bass 10）で、モデルAを試したら：
+Salmon は10匹中8匹を正しく Salmon と判定、Sea bass は10匹中9匹を正しく Sea bass と判定した。
+
+1. モデルAの混同行列を書け
+2. モデルAの正答率を求めよ
+3. モデルBは**訓練データで100%**、この20匹では**70%**だった。工場に納品するならどちらか、理由とともに答えよ
+
+### 問題2：ちょうど良い深さを交差検証で選ぶ
+
+本編の魚データ `X, y` を使って：
+
+1. 深さ 1〜10 の決定木それぞれについて、5-fold 交差検証の平均精度を求めよ
+2. 平均精度が最大になる深さを選べ（訓練精度は見ない）
+
+
+## 問題1の解答例
+
+**混同行列（行＝正解、列＝予測）:**
+
+| | Salmon と予測 | Sea bass と予測 |
+|---|---|---|
+| 正解 Salmon | 8 | 2 |
+| 正解 Sea bass | 1 | 9 |
+
+**正答率:** $(8 + 9) / 20 = 85\%$
+
+**選ぶのはモデルA。** モデルBの「訓練100%・新データ70%」は典型的な**過学習のギャップ**。
+性能は**見たことのないデータへの正答率（汎化性能）**で比べる — 訓練の成績は当てにならない。
+
+
+## 問題2の解答例
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "解答例を見る"
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import cross_val_score
+
+mean_scores = []
+for depth in range(1, 11):
+    tree = DecisionTreeClassifier(max_depth=depth, random_state=0)
+    scores = cross_val_score(tree, X, y, cv=5)
+    mean_scores.append(scores.mean())
+    print(f"深さ {depth:2d}: 平均精度 {scores.mean():.3f}")
+
+best_depth = int(np.argmax(mean_scores)) + 1
+print(f"\n★ 交差検証で選んだ深さ: {best_depth}")
+```
+
+- 深くするほど良くなるわけではない — 平均精度は途中で**頭打ちか下り坂**になる
+- 訓練精度で選んだら深さ10一択（そして過学習）。**複雑さは、見ていないデータに選ばせる**

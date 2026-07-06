@@ -104,7 +104,7 @@ $$\frac{\partial L}{\partial a} = \frac{2}{N} \sum_i (a x_i + b - t_i) \, x_i
 $$a \leftarrow a - \eta \frac{\partial L}{\partial a}, \qquad b \leftarrow b - \eta \frac{\partial L}{\partial b}$$
 
 
-## 勾配降下法で fit する
+## 勾配降下法で fit する {#peek-gdfit-code}
 
 - スケールを揃えてから（[クラスタリングの回の教訓](clustering-kmeans.qmd#peek-scale){.peek}。学習率を1つで済ませるため）
 
@@ -127,6 +127,26 @@ for i in range(1, 101):
 ```
 
 - 50回あたりで動かなくなった ＝ **収束**
+
+
+## **Tweak**：学習率をいじって収束を壊す {.badge-practice}
+
+- [さっきのコード](#peek-gdfit-code){.peek} の `lr = 0.1` を**書き換えて実行**
+
+::: {.tweak}
+| やりたいこと | コード |
+|--|--|
+| 目で見て分かるほど遅くする | `lr = 0.01` |
+| ギリギリを攻める | `lr = 0.9` |
+| 壊す | `lr = 1.1` |
+:::
+
+::: {.callout-tip}
+## ここで観察
+
+- `0.9` は行きすぎて戻ってを繰り返しながら、それでも収束する
+- `1.1` は MSE がどうなっていく？ — 前回の「学習率が大きすぎると発散」を、本物の `fit()` で再現できた
+:::
 
 
 ## 直線が合っていく様子
@@ -281,7 +301,7 @@ $$L = \mathrm{MSE} + \alpha \sum_j w_j^2$$
 - 訓練データに合わせたい力と、係数を小さく保ちたい力の**綱引き**。$\alpha$ がその強さ
 
 
-## Ridge で手なずける
+## Ridge で手なずける {#peek-ridge-code}
 
 ```{python}
 #| echo: true
@@ -317,6 +337,26 @@ NN でも同じ道具（L2正則化＝weight decay）がそのまま使われる
 :::
 
 
+## **Tweak**：罰金の強さで曲線が化ける {.badge-practice}
+
+- [さっきのコード](#peek-ridge-code){.peek} の `Ridge(alpha=1.0)` を**書き換えて実行**
+
+::: {.tweak}
+| やりたいこと | コード |
+|--|--|
+| 罰金をほぼゼロにする | `Ridge(alpha=1e-6)` |
+| 罰金を強烈にする | `Ridge(alpha=1000)` |
+:::
+
+::: {.callout-tip}
+## ここで観察
+
+- `1e-6`：罰金がほぼゼロなのに、左端の大暴れは**ほぼ消える**（係数の最大絶対値 20万 → 1万）— あの暴走は、ごくわずかな罰金にすら耐えられない不安定な解だった
+- `1000`：曲線はほぼ**まっすぐ寝る** — 罰金が強すぎて、訓練データに合わせる力が負けた
+- ちょうど良い $\alpha$ は問題ごとに違う。**訓練データではなくテストデータの MSE** で選ぶ
+:::
+
+
 ## まとめ
 
 - **回帰**：数値を予測する。損失は**二乗誤差（MSE）**— 微分しやすさで選ぶ
@@ -329,3 +369,79 @@ NN でも同じ道具（L2正則化＝weight decay）がそのまま使われる
 回帰の `fit()` は開けた。次は**分類**の `fit()` —
 ロジスティック回帰を勾配降下法で開けると、そこに**ニューラルネットワークの最小単位**が現れる。
 :::
+
+
+## 練習問題
+
+以下の問題を**手計算**と**Pythonコード**の両方で解け。
+
+### 問題1：魚2匹だけの世界で fit する
+
+データは2点だけ：$(x_1, t_1) = (-1, 0)$、$(x_2, t_2) = (1, 2)$。
+直線 $ax + b$ を勾配降下法で fit する。初期値 $a = 0, b = 0$、学習率 $\eta = 0.1$。
+
+1. 勾配の式に代入して、$\dfrac{\partial L}{\partial a}$ と $\dfrac{\partial L}{\partial b}$ を求めよ
+2. 更新を3回、手計算で示せ
+3. 同じ更新をコードで100回繰り返し、`sklearn` の答えと比較せよ
+
+ヒント：2点を通る直線は $y = x + 1$。つまり答えは $a = 1, b = 1$ になるはず。
+
+
+## 問題1の解答例
+
+### 準備（$a = 0, b = 0$ での勾配）
+
+予測は2点とも 0。差（予測 − 実際）は $(0 - 0, 0 - 2) = (0, -2)$：
+
+$$\frac{\partial L}{\partial a} = \frac{2}{2}\left[ 0 \times (-1) + (-2) \times 1 \right] = -2$$
+$$\frac{\partial L}{\partial b} = \frac{2}{2}\left[ 0 + (-2) \right] = -2$$
+
+### 反復1
+
+$$a = 0 - 0.1 \times (-2) = 0.2, \qquad b = 0 - 0.1 \times (-2) = 0.2$$
+
+### 反復2
+
+差は $(b - a,\; a + b - 2) = (0, -1.6)$：
+
+$$\frac{\partial L}{\partial a} = \frac{2}{2}\left[0 + (-1.6)\right] = -1.6, \qquad
+a = 0.2 + 0.16 = 0.36$$
+
+$b$ もまったく同じ計算で $b = 0.36$。
+
+### 反復3
+
+差は $(0, -1.28)$、勾配はどちらも $-1.28$：
+
+$$a = 0.36 + 0.128 = 0.488, \qquad b = 0.488$$
+
+$a$ と $b$ が揃って $1$ に近づいていく。
+
+### コードで確認
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "解答例を見る"
+import numpy as np
+from sklearn.linear_model import LinearRegression
+
+x = np.array([-1.0, 1.0])
+t = np.array([0.0, 2.0])
+
+a, b = 0.0, 0.0
+lr = 0.1
+for i in range(1, 101):
+    pred   = a * x + b
+    grad_a = 2 * np.mean((pred - t) * x)
+    grad_b = 2 * np.mean(pred - t)
+    a -= lr * grad_a
+    b -= lr * grad_b
+    if i in (1, 2, 3, 100):
+        print(f"更新 {i:3d}回 | a={a:.4f} b={b:.4f}")
+
+reg = LinearRegression().fit(x.reshape(-1, 1), t)
+print(f"\nsklearn の fit: a={reg.coef_[0]:.4f}, b={reg.intercept_:.4f}")
+```
+
+手計算の3回（0.2 → 0.36 → 0.488）とコードの出力が一致し、100回で $a = b = 1$（`sklearn` と同じ）に収束する。

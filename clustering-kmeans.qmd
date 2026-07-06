@@ -486,3 +486,68 @@ km.inertia_         # クラスタ内二乗和（エルボー法に使う）
 ## 次回予告
 「特徴量を増やせば精度が上がった。では増やし続けたらどうなる？」
 :::
+
+
+## 練習問題
+
+問題1は**手計算**、問題2は**Pythonコード**で解け。
+
+### 問題1：k-means を手で1周回す
+
+4点だけの世界：$A(0, 0)$、$B(0, 2)$、$C(4, 0)$、$D(4, 2)$。$k = 2$、最初の重心を $M_1 = (0, 0)$、$M_2 = (0, 2)$ に置く。
+
+1. **assign**：各点を近い方の重心に割り当てよ（距離はユークリッド距離）
+2. **update**：割り当てから新しい重心を計算せよ
+3. assign が変わらなくなるまで繰り返せ。最終的なクラスタ分けと inertia（各点から自分の重心までの**二乗**距離の合計）を求めよ
+4. このデータの「自然な」分け方 $\{A, B\}$ と $\{C, D\}$ の inertia も計算し、3.の結果と比較せよ
+
+### 問題2：n_init がこの罠を救うことを確かめる
+
+1. `KMeans(n_clusters=2, init=np.array([[0.0, 0.0], [0.0, 2.0]]), n_init=1)` で問題1を再現し、`labels_` と `inertia_` を表示せよ
+2. `KMeans(n_clusters=2, n_init=10, random_state=0)` で再実行し、`inertia_` を比較せよ
+
+
+## 問題1の解答例
+
+**1周目 assign**：$A \to M_1$（距離0）、$B \to M_2$（距離0）、$C \to M_1$（$4 < \sqrt{20}$）、$D \to M_2$（$4 < \sqrt{20}$）
+
+**1周目 update**：$M_1 = \text{mean}(A, C) = (2, 0)$、$M_2 = \text{mean}(B, D) = (2, 2)$
+
+**2周目 assign**：$A \to M_1$（$2 < 2\sqrt{2}$）、$B \to M_2$、$C \to M_1$、$D \to M_2$ — **変化なし、収束**
+
+**結果**：$\{A, C\}$ と $\{B, D\}$（上下の分割）。各点は重心から距離2なので
+
+$$\text{inertia} = 2^2 \times 4 = 16$$
+
+**自然な分け方** $\{A, B\}, \{C, D\}$：重心は $(0,1)$ と $(4,1)$、各点は距離1なので inertia $= 1^2 \times 4 = 4$。
+
+::: {.callout-important}
+## 手計算で罠にはまった
+
+k-means の手順を**正しく**回したのに、inertia 16 の**悪い答え**で止まった（最適は 4）。
+assign → update は inertia を減らすことしかできず、**最初の重心の置き方**が悪いと抜け出せない。
+本編の「変な分け方に落ち着く」を、4点で完全に再現できた。
+:::
+
+
+## 問題2の解答例
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "解答例を見る"
+import numpy as np
+from sklearn.cluster import KMeans
+
+P = np.array([[0.0, 0.0], [0.0, 2.0], [4.0, 0.0], [4.0, 2.0]])   # A, B, C, D
+
+bad = KMeans(n_clusters=2, init=np.array([[0.0, 0.0], [0.0, 2.0]]), n_init=1).fit(P)
+print(f"悪い初期値: labels={bad.labels_}, inertia={bad.inertia_:.1f}")
+
+good = KMeans(n_clusters=2, n_init=10, random_state=0).fit(P)
+print(f"n_init=10 : labels={good.labels_}, inertia={good.inertia_:.1f}")
+```
+
+- 悪い初期値からは手計算どおり inertia 16 の分割に落ちる
+- `n_init=10` は初期値を変えて10回回し、inertia 最小（4）の分割を選んでくれる
+- この「何回も試して一番良いのを選ぶ」作戦の一般論は、参考資料 **[ローカルミニマムの罠](optimization-local-minima-appendix.qmd)** で

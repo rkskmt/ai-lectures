@@ -290,3 +290,112 @@ plt.show()
 部品はすべて揃った。次回、**NumPy だけで**多層ネットワークを組み、
 講義の初回に見せた「機械が自力で見つけた曲がる境界」を**自分のコードで再現**する。
 :::
+
+
+## 練習問題
+
+以下の問題を**手計算**で解き、**数値微分**で検算せよ。
+
+ネットワークは本編と同じ5パラメータ。値だけ差し替える：
+
+| 記号 | 値 |
+|---|---|
+| 入力 $x_1, x_2$ | $0.5,\; 1.0$ |
+| 正解 $y$ | $0$（Sea bass） |
+| $\alpha_1, \alpha_2, b$ | $0.4,\; 0.3,\; -0.1$ |
+| $w, c$ | $-0.5,\; 0.2$ |
+
+### 問題1：1往復せよ
+
+1. 往路：$z, h, u, p, L$ を順に求めよ（正解が $y=0$ なので $L = -\log(1-p)$）
+2. 復路：$\delta_{\text{out}}$ と $\delta_{\text{mid}}$、そして5つの勾配をすべて求めよ
+3. 本編の数値微分のコードに値を差し替えて、検算せよ
+
+### 問題2：入力を $x_1 = -1.0,\; x_2 = 0.5$ に変えて、もう1往復せよ
+
+ヒント：$\sigma(0) = 0.5$、$\sigma(0.2) \approx 0.5498$。この2つしか使わない。
+
+::: {.callout-tip}
+手計算の答えは捨てないこと。**PyTorch入門の練習問題で、この数値がそのまま再登場する。**
+:::
+
+
+## 問題1の解答例
+
+### 往路
+
+$$z = 0.4 \times 0.5 + 0.3 \times 1.0 - 0.1 = 0.4$$
+$$h = \mathrm{ReLU}(0.4) = 0.4, \qquad u = -0.5 \times 0.4 + 0.2 = 0$$
+$$p = \sigma(0) = 0.5, \qquad L = -\log(0.5) = 0.6931$$
+
+ちょうどコイン投げ。正解は 0 なので、$p$ をもっと**下げたい**。
+
+### 復路
+
+$$\delta_{\text{out}} = p - y = 0.5$$
+$$\frac{\partial L}{\partial w} = 0.5 \times 0.4 = 0.2, \qquad
+\frac{\partial L}{\partial c} = 0.5$$
+
+$$\delta_{\text{mid}} = 0.5 \times (-0.5) \times 1 = -0.25$$
+
+$$\frac{\partial L}{\partial \alpha_1} = -0.25 \times 0.5 = -0.125, \qquad
+\frac{\partial L}{\partial \alpha_2} = -0.25, \qquad
+\frac{\partial L}{\partial b} = -0.25$$
+
+$w$ が負なので、中間層に流れる誤差は**符号が反転**する — $\delta$ は素通りではなく、通り道の重みに染まる。
+
+### 数値微分で検算
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "解答例を見る"
+import numpy as np
+
+x1, x2, y = 0.5, 1.0, 0.0
+
+def loss(a1, a2, b, w, c):
+    z = a1*x1 + a2*x2 + b
+    h = max(0.0, z)
+    u = w*h + c
+    p = 1 / (1 + np.exp(-u))
+    return -np.log(1 - p)   # 正解が y=0 のとき
+
+params = dict(a1=0.4, a2=0.3, b=-0.1, w=-0.5, c=0.2)
+base = loss(**params)
+print(f"L = {base:.4f}")
+
+eps = 1e-6
+for name in params:
+    shifted = dict(params)
+    shifted[name] += eps
+    grad = (loss(**shifted) - base) / eps
+    print(f"∂L/∂{name} = {grad:.4f}")
+```
+
+
+## 問題2の解答例
+
+### 往路
+
+$$z = 0.4 \times (-1.0) + 0.3 \times 0.5 - 0.1 = -0.35$$
+$$h = \mathrm{ReLU}(-0.35) = 0, \qquad u = 0.2, \qquad p = \sigma(0.2) \approx 0.5498$$
+
+### 復路
+
+$$\delta_{\text{out}} = 0.5498, \qquad
+\frac{\partial L}{\partial w} = 0.5498 \times h = 0, \qquad
+\frac{\partial L}{\partial c} = 0.5498$$
+
+$$\delta_{\text{mid}} = 0.5498 \times (-0.5) \times \mathrm{ReLU}'(-0.35) = 0$$
+$$\Rightarrow\quad
+\frac{\partial L}{\partial \alpha_1} = \frac{\partial L}{\partial \alpha_2} = \frac{\partial L}{\partial b} = 0$$
+
+::: {.callout-important}
+## この魚は、ネットの左半分に何も教えない
+
+$z < 0$ で ReLU に折られた瞬間、$\mathrm{ReLU}'(z) = 0$ が復路の掛け算を**ゼロで潰す**。
+勾配が届くのは $c$ だけ（$w$ も $h = 0$ に掛けられて消えた）。
+
+前回の「折られた側には誤差が流れない」を、自分の手で確認できた。
+:::

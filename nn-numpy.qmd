@@ -96,7 +96,7 @@ def backward(X, y, Z, H, w2, p):
   - 「$\delta$ × その層への入力」が各勾配
 
 
-## 学習ループ：あとは勾配降下法
+## 学習ループ：あとは勾配降下法 {#peek-nn-train}
 
 ```{python}
 #| echo: true
@@ -188,7 +188,27 @@ plt.show()
 ```
 
 - 中間2個では折り目が足りない。16個なら滑らかに曲がる — [「変換を重ねる」の回の結論](nn-multilayer.qmd#peek-curved-boundary){.peek}を、自作コードで追試できた
-- `hidden` や学習率をいじって遊んでみること。**壊れても全部自分のコードなので、原因も自分で追える**
+
+
+## **Tweak**：自作NNをいじり倒す {.badge-practice}
+
+- [学習ループのコード](#peek-nn-train){.peek} を**書き換えて実行**（境界の描画コードまで続けて実行すると形の変化が見える）
+- **壊れても全部自分のコードなので、原因も自分で追える**
+
+::: {.tweak}
+| やりたいこと | コード |
+|--|--|
+| 折り目を2本に減らす | `hidden = 2` |
+| 盛大に増やす | `hidden = 100` |
+| 乱数を変えて別の谷へ | `default_rng(0)` → `default_rng(1)` |
+:::
+
+::: {.callout-tip}
+## ここで観察
+
+- 乱数シードを変えると、正答率は同じでも**境界の形が微妙に違う** — 初期値しだいで別の谷に落ちている。
+  [ローカルミニマムの罠（参考資料）](optimization-local-minima-appendix.qmd)が、本物のNNで起きている瞬間
+:::
 
 
 ## まとめ
@@ -201,3 +221,53 @@ plt.show()
 全部自分で書けるようになった**からこそ**、次回はライブラリ（PyTorch）で楽をする。
 最大の見せ場：手計算した backprop の勾配を、`loss.backward()` が**一発で言い当てる**。
 :::
+
+
+## 練習問題
+
+以下の問題を**Pythonコード**で解け。
+
+### 問題1：自作 `backward` を数値微分で検品する
+
+自分の書いた `backward` が正しい保証はまだない。前回の検算法（数値微分）を、行列版にも適用せよ。
+
+1. ランダム初期化した直後のパラメータで、`backward` が返す勾配 `g_W1[0, 0]` を表示せよ
+2. `W1[0, 0]` だけを $\varepsilon = 10^{-6}$ ずらして損失を再計算し、数値微分 $\dfrac{L(W_1[0,0]+\varepsilon) - L(W_1[0,0])}{\varepsilon}$ を求めよ
+3. 2つが一致することを確かめよ
+
+ヒント：損失（交差エントロピー）の計算は学習ループの中にある。関数に切り出すと楽。
+
+
+## 問題1の解答例
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "解答例を見る"
+def cross_entropy(X, y, W1, b1, w2, c2):
+    _, _, _, p = forward(X, W1, b1, w2, c2)
+    eps = 1e-10
+    return -np.mean(y * np.log(np.clip(p, eps, 1)) +
+                    (1 - y) * np.log(np.clip(1 - p, eps, 1)))
+
+# ランダム初期化（学習前）
+rng_check = np.random.default_rng(0)
+W1c = rng_check.normal(0, 1.0, (2, 16)); b1c = np.zeros(16)
+w2c = rng_check.normal(0, 1.0, 16); c2c = 0.0
+
+# backprop の答え
+Z, H, u, p = forward(X, W1c, b1c, w2c, c2c)
+g_W1, _, _, _ = backward(X, y, Z, H, w2c, p)
+print(f"backprop:  ∂L/∂W1[0,0] = {g_W1[0, 0]:.6f}")
+
+# 数値微分の答え
+eps = 1e-6
+base = cross_entropy(X, y, W1c, b1c, w2c, c2c)
+W1_shifted = W1c.copy()
+W1_shifted[0, 0] += eps
+num = (cross_entropy(X, y, W1_shifted, b1c, w2c, c2c) - base) / eps
+print(f"数値微分:  ∂L/∂W1[0,0] = {num:.6f}")
+```
+
+- 一致すれば、少なくともこの成分の backprop は正しい
+- 実務のライブラリ開発でも、autograd の実装はこうやって**数値微分と突き合わせてテスト**されている

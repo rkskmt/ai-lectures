@@ -127,7 +127,7 @@ print(model)
 - **新しい概念はゼロ**。全部、名前が付いただけ
 
 
-## 学習ループ：3拍子
+## 学習ループ：3拍子 {#peek-train-loop}
 
 ```{python}
 #| echo: true
@@ -189,6 +189,27 @@ plt.show()
 - 浮いた労力は、**モデルとデータを考えること**に使う
 
 
+## **Tweak**：ネットワークを組み替えて再学習 {.badge-practice}
+
+- [学習ループのコード](#peek-train-loop){.peek} を**書き換えて実行**（境界の図まで続けて実行すると変化が見える）
+
+::: {.tweak}
+| やりたいこと | コード |
+|--|--|
+| 中間の変換を2個に減らす | `nn.Linear(2, 2), nn.ReLU(), nn.Linear(2, 1)` |
+| ReLU を素通しに変える | `nn.ReLU()` → `nn.Identity()` |
+| 学習率を下げる | `lr=0.05` |
+:::
+
+::: {.callout-tip}
+## ここで観察
+
+- 変換2個：「変換を重ねる」の回では2個でも分けられたのに、ここでは**87%止まり**（`torch.manual_seed(3)` だと50%まで転落）。表現力はあっても、**良い谷にたどり着けるかは別問題** — 16個の「余裕」は学習の保険でもある（[ローカルミニマムの罠](optimization-local-minima-appendix.qmd)）
+- `nn.Identity()`：折り目ゼロ — **境界が直線に戻り、87%で頭打ち**。「線形は重ねても線形」を PyTorch でも再確認
+- どれを変えても、学習ループの3拍子は**一切書き換えない**で済む — それが部品化の威力
+:::
+
+
 ## まとめ
 
 - **autograd**：`loss.backward()` ＝ 連鎖律の自動化。手計算と全桁一致を確認した
@@ -200,3 +221,54 @@ plt.show()
 道具は完成した。次回、初回に約束した**手書き数字を読み取る機械**を作る。
 入力は 28×28 ピクセル — **784次元**。次元の話、覚えてる？
 :::
+
+
+## 練習問題
+
+以下の問題を**Pythonコード**で解け。
+
+### 問題1：autograd に自分の手計算を言い当てさせる
+
+バックプロパゲーションの回の**練習問題1**（$x = (0.5, 1.0)$、$y = 0$、$\alpha = (0.4, 0.3)$、$b = -0.1$、$w = -0.5$、$c = 0.2$）を PyTorch で組み、`loss.backward()` の勾配が自分の手計算と一致することを確かめよ。
+
+1. 本編の「山場」のコードを、上の数値に差し替える（正解が $y = 0$ なので損失は $L = -\log(1-p)$）
+2. 5つの勾配を表示し、手計算の答え $(-0.125, -0.25)$、$-0.25$、$0.2$、$0.5$ と照合せよ
+
+### 問題2：ReLU に折られた入力でも試す
+
+入力を $x = (-1.0, 0.5)$ に変えて実行し、$\alpha, b, w$ の勾配が**ちょうどゼロ**になることを確かめよ。
+（バックプロパゲーションの回の練習問題2 — autograd も、折られた経路には勾配を流さない）
+
+
+## 解答例
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "解答例を見る"
+import torch
+
+def hand_check(x1, x2):
+    a = torch.tensor([0.4, 0.3], requires_grad=True)   # α1, α2
+    b = torch.tensor(-0.1, requires_grad=True)
+    w = torch.tensor(-0.5, requires_grad=True)
+    c = torch.tensor(0.2,  requires_grad=True)
+    x = torch.tensor([x1, x2])
+
+    z = a @ x + b
+    h = torch.relu(z)
+    u = w * h + c
+    p = torch.sigmoid(u)
+    L = -torch.log(1 - p)     # 正解 y=0
+    L.backward()
+
+    print(f"x = ({x1}, {x2}) | L = {L.item():.4f}")
+    print(f"  ∂L/∂α = {a.grad.numpy().round(4)}, ∂L/∂b = {b.grad.item():.4f}, "
+          f"∂L/∂w = {w.grad.item():.4f}, ∂L/∂c = {c.grad.item():.4f}")
+
+hand_check(0.5, 1.0)    # 問題1：手計算 (-0.125, -0.25), -0.25, 0.2, 0.5 と一致するはず
+hand_check(-1.0, 0.5)   # 問題2：α, b, w の勾配はゼロになるはず
+```
+
+- 問題1：**全桁一致**。autograd は連鎖律の機械化であって、魔法ではない
+- 問題2：$\mathrm{ReLU}'(z) = 0$ の「ゼロで潰す」まで、忠実に再現される
