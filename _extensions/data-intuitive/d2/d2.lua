@@ -260,6 +260,17 @@ local function render_graph(globalOptions)
         -- box already matches the diagram's aspect ratio.
         if data and options.format == "svg" then
           data = data:gsub('xMinYMin meet', 'xMidYMid meet')
+          -- Local patch 2: d2's outer <svg> carries a viewBox but no
+          -- width/height, so as an <img> it has no intrinsic size and
+          -- browsers fall back to 300x150 — the lightbox zoom renders tiny.
+          -- Copy the viewBox size onto the outer tag as width/height.
+          local firstTag = data:match('<svg[^>]*>')
+          if firstTag and not firstTag:find(' width=') then
+            local vb_w, vb_h = firstTag:match('viewBox="[%-%d%.]+ [%-%d%.]+ ([%d%.]+) ([%d%.]+)"')
+            if vb_w then
+              data = data:gsub('<svg ', '<svg width="' .. vb_w .. '" height="' .. vb_h .. '" ', 1)
+            end
+          end
         end
 
         -- default for png and gif format

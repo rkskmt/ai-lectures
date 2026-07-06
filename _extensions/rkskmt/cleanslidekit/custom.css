@@ -1096,3 +1096,37 @@ a.lightbox[href]::after {
 .reveal .lectures .sec.cat5{color:#c44d6e!important;border-bottom-color:#f6d6df!important}
 .reveal .lectures .grid.cat5 li>a::before{color:#c44d6e!important;background:#fcebf0!important}
 .reveal .lectures .grid.cat5 li:hover{border-color:#eeb6c6!important;background:#fdf4f7!important}
+
+/* =========================================================================
+   Compact tabset — restyles Quarto's native .panel-tabset (works in reveal
+   decks via Tabby) into a small segmented control, so alternate views
+   (e.g. an index split into 前期/後期) don't stack on one slide.
+     :::: {.panel-tabset}  ### 前期 …  ### 後期 …  ::::
+   Only direct-child headings become tabs; headings nested in divs (like the
+   card-grid .sec headers) stay inside the pane. Selectors are doubled
+   ([role=…] + .panel-tabset-tabby) because Tabby assigns roles at runtime.
+   ========================================================================= */
+.reveal .panel-tabset [role=tablist],
+.reveal .panel-tabset .panel-tabset-tabby{display:inline-flex;gap:3px;width:auto!important;
+  list-style:none!important;margin:0 0 .45em!important;padding:3px!important;
+  border:none!important;background:#eef0f4;border-radius:10px}
+.reveal .panel-tabset [role=tablist] li,
+.reveal .panel-tabset .panel-tabset-tabby li{display:inline-block;margin:0!important;padding:0!important}
+.reveal .panel-tabset .panel-tabset-tabby li::before{content:none!important}
+.reveal .panel-tabset [role=tab],
+.reveal .panel-tabset .panel-tabset-tabby a{display:block;margin:0!important;border:none!important;
+  border-radius:8px;padding:.32em 1.15em!important;font-size:.5em;font-weight:700;line-height:1.25;
+  letter-spacing:.05em;color:#8a93a0!important;text-decoration:none!important;transition:.13s}
+.reveal .panel-tabset [role=tab]::after,
+.reveal .panel-tabset .panel-tabset-tabby a::after{content:none!important}
+.reveal .panel-tabset [role=tab]:hover:not([aria-selected=true]){border:none!important;color:#5b6472!important}
+.reveal .panel-tabset [role=tab][aria-selected=true]{background:#fff!important;border:none!important;
+  color:#2a6fd6!important;box-shadow:0 1px 3px rgba(25,45,80,.18)}
+.reveal .panel-tabset .tab-content{padding:0!important;border:none!important}
+
+/* Standalone images center on slides. Quarto wraps captioned figures in
+   .quarto-figure-center, but a bare image alone in its own paragraph — e.g.
+   the quarto-d2 filter's output, or a plain ![](img) line, with or without
+   a lightbox anchor — stays an inline-left <img>. Center those. */
+.reveal .slides p:has(> img:only-child),
+.reveal .slides p:has(> a:only-child > img){text-align:center}

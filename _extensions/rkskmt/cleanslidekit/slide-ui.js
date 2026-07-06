@@ -437,6 +437,70 @@
       } catch (e) {}
     }, true);
 
+    // GLightbox's sourceType() sniffs file extensions only, so a data-URI
+    // image href (e.g. the quarto-d2 filter's inline SVG) falls through to
+    // "external" and opens in a small fixed-size iframe instead of a
+    // fit-to-screen image. Force the type and re-init the instance quarto
+    // already created (its inline init script runs before this defer script).
+    function fixDataUriLightbox() {
+      try {
+        var links = document.querySelectorAll('a.lightbox[href^="data:image/"]');
+        if (!links.length) return;
+        var changed = false;
+        links.forEach(function (a) {
+          var cfg = a.getAttribute('data-glightbox') || '';
+          if (!/(^|;)\s*type\s*:/.test(cfg)) {
+            a.setAttribute('data-glightbox', cfg ? cfg + '; type: image' : 'type: image');
+            changed = true;
+          }
+        });
+        if (changed && window.lightboxQuarto &&
+            typeof lightboxQuarto.reload === 'function') {
+          lightboxQuarto.reload();
+        }
+      } catch (e) {}
+    }
+
+    // Tabset persistence: remember the selected tab per page and restore it
+    // on the next visit — e.g. leaving an index's 後期 tab for a lecture and
+    // coming back keeps 後期 active. Tabby dispatches a bubbling "tabby"
+    // CustomEvent on the tab anchor for every toggle (click, focus, arrows),
+    // and its init runs in an inline script before this defer script, so a
+    // programmatic click here is picked up normally.
+    function initTabsetMemory() {
+      try {
+        if (!window.localStorage) return;
+        var base = 'cleanslidekit-tab:' + location.pathname + '#';
+        document.addEventListener('tabby', function (e) {
+          try {
+            var a = e.target;
+            var list = a && a.closest ? a.closest('.panel-tabset ul') : null;
+            if (!list || !list.id) return;
+            localStorage.setItem(base + list.id, a.getAttribute('href') || '');
+          } catch (err) {}
+        }, true);
+        // Quarto constructs Tabby in a DOMContentLoaded listener that was
+        // registered before this defer script runs, so restoring here would
+        // be too early (the click would hit no listener, then Tabby's init
+        // would select its default tab). Retry until Tabby has initialized —
+        // detectable by aria-selected appearing on the tab links.
+        var restoreTabs = function () {
+          try {
+            document.querySelectorAll('.panel-tabset ul[id]').forEach(function (list) {
+              if (!list.querySelector('a[aria-selected]')) return;  // Tabby not ready
+              var saved = localStorage.getItem(base + list.id);
+              if (!saved) return;
+              var link = list.querySelector('a[href="' + saved + '"]');
+              if (link && link.getAttribute('aria-selected') !== 'true') link.click();
+            });
+          } catch (err) {}
+        };
+        restoreTabs();
+        document.addEventListener('DOMContentLoaded', restoreTabs);
+        window.addEventListener('load', restoreTabs);
+      } catch (e) {}
+    }
+
     function setup() {
       try {
         new MutationObserver(function() {
@@ -450,6 +514,8 @@
         createHome();
         createNav();
         initCodeExpand();
+        fixDataUriLightbox();
+        initTabsetMemory();
       } catch (e) {}
     }
 
