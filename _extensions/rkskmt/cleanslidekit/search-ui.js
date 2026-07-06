@@ -4,6 +4,26 @@
 // (a #search-input / #search-results pair, if present on the page).
 (function () {
   try {
+    // UI strings follow the document language: Japanese when <html lang>
+    // starts with "ja" (the format default), English otherwise.
+    var JA = (((document.documentElement && document.documentElement.lang) || 'ja')
+              .toLowerCase().indexOf('ja') === 0);
+    var T = JA ? {
+      minChars: '2文字以上で検索',
+      noHits: 'ヒットなし',
+      loadFail: '検索インデックスを読み込めませんでした',
+      placeholder: '全文検索 — どの回に出てきたか探せる（Esc で閉じる）',
+      btnTitle: '全文検索（Ctrl+F または / で開く）',
+      btnLabel: '全文検索'
+    } : {
+      minChars: 'Type at least 2 characters',
+      noHits: 'No results',
+      loadFail: 'Could not load the search index',
+      placeholder: 'Search all lectures (Esc to close)',
+      btnTitle: 'Full-text search (Ctrl+F or /)',
+      btnLabel: 'Full-text search'
+    };
+
     var STYLE = [
       // same visual language as the code-expand button (white circle, gray icon)
       '#search-btn {',
@@ -83,7 +103,7 @@
       var q = qRaw.trim().toLowerCase();
       if (q.length < 2) {
         resultsEl.innerHTML = q.length === 1
-          ? '<div class="search-note">2文字以上で検索</div>' : '';
+          ? '<div class="search-note">' + T.minChars + '</div>' : '';
         return;
       }
       loadIndex().then(function (idx) {
@@ -94,7 +114,7 @@
           if (hay.indexOf(q) >= 0) hits.push(e);
         }
         if (hits.length === 0) {
-          resultsEl.innerHTML = '<div class="search-note">ヒットなし</div>';
+          resultsEl.innerHTML = '<div class="search-note">' + T.noHits + '</div>';
           return;
         }
         resultsEl.innerHTML = hits.map(function (e) {
@@ -106,7 +126,7 @@
         }).join('');
       }).catch(function () {
         resultsEl.innerHTML =
-          '<div class="search-note">検索インデックスを読み込めませんでした</div>';
+          '<div class="search-note">' + T.loadFail + '</div>';
       });
     }
 
@@ -146,7 +166,7 @@
       modal.innerHTML =
         '<div id="search-modal-panel">' +
         '<input id="search-modal-input" type="search" ' +
-        'placeholder="全文検索 — どの回に出てきたか探せる（Esc で閉じる）" autocomplete="off">' +
+        'placeholder="' + T.placeholder + '" autocomplete="off">' +
         '<div id="search-modal-results" class="search-ui-results"></div>' +
         '</div>';
       document.body.appendChild(modal);
@@ -215,8 +235,8 @@
       var btn = document.createElement('button');
       btn.id = 'search-btn';
       btn.type = 'button';
-      btn.title = '全文検索（Ctrl+F または / で開く）';
-      btn.setAttribute('aria-label', '全文検索');
+      btn.title = T.btnTitle;
+      btn.setAttribute('aria-label', T.btnLabel);
       btn.innerHTML =
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" ' +
         'stroke-linecap="round" aria-hidden="true">' +

@@ -73,7 +73,7 @@ Use Python as the vehicle, but frame concepts as broadly as possible. Where a co
 - **One slide = one idea.** If bullets + code + output + note don't fit the 720px slide, split the slide at the conceptual seam rather than shrinking the content. Some scroll on code+figure slides is idiomatic in this course; a caption or callout stranded far below the fold is not.
 - **String literals in student-visible code use double quotes** (`"数学I"`, `{"User-Agent": "..."}`). Inside f-string braces keep single quotes for Python <3.12 compatibility (`f"{d['title']}"`); genuine Python repr output shows singles — leave real output as-is.
 - Image sizing via `.fig-small` (300px) and `.fig-medium` (400px) CSS classes
-- **Highlight marker (`==text==`):** `hl.lua` filter turns `==text==` into a highlighted span (white text + cyan outline). For text with spaces use `[a b]{.hl}`.
+- **Highlight marker (`==text==`):** `hl.lua` filter turns `==text==` into a highlighted span (white text + cyan outline). Since cleanslidekit v1.4.0 phrases with spaces work too (`==a b==`); a literal `a == b` or an unclosed `==` stays untouched. `[a b]{.hl}` also still works.
 - **MathJax `\vec{}` height fix:** `\vec{a}` and `\vec{b}` render at different heights because `b` has an ascender. Use `\vec{\vphantom{b}a}` to match the arrow height of shorter letters to `b`.
 
 ## Error Handling

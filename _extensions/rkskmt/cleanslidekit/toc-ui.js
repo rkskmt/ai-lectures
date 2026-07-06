@@ -11,6 +11,28 @@
 // the search and code-zoom modals).
 (function () {
   try {
+    // UI strings follow the document language: Japanese when <html lang>
+    // starts with "ja" (the format default), English otherwise.
+    var JA = (((document.documentElement && document.documentElement.lang) || 'ja')
+              .toLowerCase().indexOf('ja') === 0);
+    var T = JA ? {
+      heading: 'スライド一覧',
+      count: function (n) { return n + '枚'; },
+      close: '閉じる',
+      hint: '<kbd>↑</kbd><kbd>↓</kbd> 移動　<kbd>Enter</kbd> 表示　<kbd>Esc</kbd> 閉じる',
+      untitled: '（スライド）',
+      btnTitle: 'スライド一覧（t または Ctrl+L で開く）',
+      badge: { important: '重要', practice: '手を動かせ', fyi: '参考まで' }
+    } : {
+      heading: 'Slides',
+      count: function (n) { return n + (n === 1 ? ' slide' : ' slides'); },
+      close: 'Close',
+      hint: '<kbd>↑</kbd><kbd>↓</kbd> move&emsp;<kbd>Enter</kbd> open&emsp;<kbd>Esc</kbd> close',
+      untitled: '(slide)',
+      btnTitle: 'Slide list (t or Ctrl+L)',
+      badge: { important: 'Important', practice: 'Hands-on', fyi: 'FYI' }
+    };
+
     var STYLE = [
       // same translucent-circle style as the home/search buttons, stacked
       // above the home button in the bottom-right corner
@@ -110,9 +132,9 @@
 
     // badge-* slide classes → dot color (palette from badge-ui.js)
     var BADGE = {
-      important: { color: '#f76d5e', ja: '重要' },
-      practice:  { color: '#3a8dde', ja: '手を動かせ' },
-      fyi:       { color: '#f6b394', ja: '参考まで' }
+      important: { color: '#f76d5e' },
+      practice:  { color: '#3a8dde' },
+      fyi:       { color: '#f6b394' }
     };
 
     var keyboardPrev = null;
@@ -157,7 +179,7 @@
       // untitled slide: first bit of body text so it is still recognizable
       var t = (sec.textContent || '').replace(/\s+/g, ' ').trim();
       return {
-        text: t ? t.slice(0, 42) + (t.length > 42 ? '…' : '') : '（スライド）',
+        text: t ? t.slice(0, 42) + (t.length > 42 ? '…' : '') : T.untitled,
         kind: 'untitled'
       };
     }
@@ -167,7 +189,7 @@
       Array.prototype.forEach.call(sec.classList, function (cl) {
         var m = /^badge-(important|practice|fyi)(-ja)?$/.exec(cl);
         if (m && BADGE[m[1]]) {
-          html += '<span class="toc-dot" title="' + BADGE[m[1]].ja +
+          html += '<span class="toc-dot" title="' + T.badge[m[1]] +
                   '" style="background:' + BADGE[m[1]].color + '"></span>';
         }
       });
@@ -181,17 +203,17 @@
       modal.id = 'toc-modal';
       modal.setAttribute('role', 'dialog');
       modal.setAttribute('aria-modal', 'true');
-      modal.setAttribute('aria-label', 'スライド一覧');
+      modal.setAttribute('aria-label', T.heading);
       modal.innerHTML =
         '<div id="toc-backdrop"></div>' +
         '<div id="toc-panel">' +
         '<div id="toc-header">' +
-        '<span id="toc-heading">スライド一覧</span>' +
+        '<span id="toc-heading">' + T.heading + '</span>' +
         '<span id="toc-count"></span>' +
-        '<button id="toc-close" type="button" aria-label="閉じる">&times;</button>' +
+        '<button id="toc-close" type="button" aria-label="' + T.close + '">&times;</button>' +
         '</div>' +
         '<div id="toc-list"></div>' +
-        '<div id="toc-hint"><kbd>↑</kbd><kbd>↓</kbd> 移動　<kbd>Enter</kbd> 表示　<kbd>Esc</kbd> 閉じる</div>' +
+        '<div id="toc-hint">' + T.hint + '</div>' +
         '</div>';
       document.body.appendChild(modal);
       var backdrop = document.getElementById('toc-backdrop');
@@ -214,7 +236,7 @@
       var current = null;
       try { current = Reveal.getCurrentSlide(); } catch (e) {}
       var secs = flatSections();
-      if (countEl) countEl.textContent = secs.length + '枚';
+      if (countEl) countEl.textContent = T.count(secs.length);
       var currentItem = null;
       secs.forEach(function (sec, i) {
         var indices;
@@ -334,8 +356,8 @@
       var btn = document.createElement('button');
       btn.id = 'toc-btn';
       btn.type = 'button';
-      btn.title = 'スライド一覧（t または Ctrl+L で開く）';
-      btn.setAttribute('aria-label', 'スライド一覧');
+      btn.title = T.btnTitle;
+      btn.setAttribute('aria-label', T.heading);
       btn.innerHTML =
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" ' +
         'stroke-linecap="round" aria-hidden="true">' +

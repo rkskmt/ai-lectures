@@ -1,5 +1,25 @@
 (function() {
   try {
+    // UI strings follow the document language: Japanese when <html lang>
+    // starts with "ja" (the format default), English otherwise.
+    var JA = (((document.documentElement && document.documentElement.lang) || 'ja')
+              .toLowerCase().indexOf('ja') === 0);
+    var T = JA ? {
+      home: 'Home（一覧に戻る）',
+      copyTitle: 'コピー',
+      copyLabel: 'コードをコピー',
+      closeLabel: '閉じる',
+      zoomTitle: '拡大',
+      zoomLabel: 'コードを拡大表示'
+    } : {
+      home: 'Home (back to the index)',
+      copyTitle: 'Copy',
+      copyLabel: 'Copy code',
+      closeLabel: 'Close',
+      zoomTitle: 'Zoom',
+      zoomLabel: 'Zoom code'
+    };
+
     var counterInit = false;
     var codeExpandInit = false;
     var codeZoomFontSize = 2.2;
@@ -31,7 +51,7 @@
         var home = document.createElement('a');
         home.id = 'home-btn';
         home.href = './index.html';
-        home.title = 'Home（一覧に戻る）';
+        home.title = T.home;
         home.setAttribute('aria-label', 'Home');
         // same visual language as the search button (icon in a translucent circle)
         home.innerHTML =
@@ -125,7 +145,7 @@
         modal.id = 'code-zoom-modal';
         modal.setAttribute('role', 'dialog');
         modal.setAttribute('aria-modal', 'true');
-        modal.innerHTML = '<div id="code-zoom-panel"><button id="code-zoom-copy" type="button" title="コピー" aria-label="コードをコピー"></button><button id="code-zoom-close" type="button" aria-label="閉じる">&times;</button><div id="code-zoom-content"></div></div>';
+        modal.innerHTML = '<div id="code-zoom-panel"><button id="code-zoom-copy" type="button" title="' + T.copyTitle + '" aria-label="' + T.copyLabel + '"></button><button id="code-zoom-close" type="button" aria-label="' + T.closeLabel + '">&times;</button><div id="code-zoom-content"></div></div>';
         document.body.appendChild(modal);
         modal.addEventListener('click', function(e) {
           if (e.target === modal) closeCodeZoom();
@@ -331,8 +351,8 @@
           btn.type = 'button';
           btn.className = 'code-expand-button';
           btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter"/></svg>';
-          btn.title = '拡大';
-          btn.setAttribute('aria-label', 'コードを拡大表示');
+          btn.title = T.zoomTitle;
+          btn.setAttribute('aria-label', T.zoomLabel);
           btn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
