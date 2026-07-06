@@ -284,7 +284,7 @@ rkskmt
 <li>80匹分の測定データ（輝度・重さ）は手元にある</li>
 <li>ところが<strong>どれが Salmon でどれが Sea bass か、記録が消えた</strong></li>
 </ul>
-<div id="e167bcee" class="cell" data-execution_count="1">
+<div id="895aafa1" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>魚データの定義（クリックして展開）</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -316,7 +316,7 @@ rkskmt
 <span id="cb1-27"><a></a>])</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="108581f8" class="cell" data-execution_count="2">
+<div id="c6cbaead" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -396,7 +396,7 @@ rkskmt
 <section id="試行1-そのまま-k-means-にかける" class="slide level2">
 <h2>試行1: そのまま k-means にかける</h2>
 <div class="slide-body">
-<div id="c8cd0c94" class="cell" data-execution_count="3">
+<div id="b414d21d" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> KMeans</span>
 <span id="cb2-2"><a></a></span>
 <span id="cb2-3"><a></a><span class="co"># ラベルを使わずに k=2 でクラスタリング</span></span>
@@ -424,7 +424,7 @@ rkskmt
 <section id="試行1の結果" class="slide level2">
 <h2>試行1の結果</h2>
 <div class="slide-body">
-<div id="53cbfa61" class="cell" data-execution_count="4">
+<div id="ba247bcf" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a></a>colors  <span class="op">=</span> [<span class="st">"#e74c3c"</span>, <span class="st">"#2980b9"</span>]</span>
 <span id="cb4-2"><a></a>markers <span class="op">=</span> [<span class="st">"o"</span>, <span class="st">"s"</span>]</span>
 <span id="cb4-3"><a></a></span>
@@ -500,7 +500,7 @@ rkskmt
 <section id="peek-scale" class="slide level2">
 <h2>試行2: スケールを揃えて再挑戦</h2>
 <div class="slide-body">
-<div id="81f388a5" class="cell" data-execution_count="5">
+<div id="52203feb" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
 <span id="cb5-2"><a></a></span>
 <span id="cb5-3"><a></a>X_scaled <span class="op">=</span> StandardScaler().fit_transform(X)   <span class="co"># 各特徴量を平均0・分散1に</span></span>
@@ -537,7 +537,7 @@ rkskmt
 <ul>
 <li>このデータの正体は、これまでの講義で使ってきた Salmon / Sea bass</li>
 </ul>
-<div id="3915cabc" class="cell" data-execution_count="6">
+<div id="fce0f700" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a></a>y_true <span class="op">=</span> np.array([<span class="dv">1</span>]<span class="op">*</span><span class="dv">40</span> <span class="op">+</span> [<span class="dv">0</span>]<span class="op">*</span><span class="dv">40</span>)   <span class="co"># 1=Salmon, 0=Sea bass（隠していた正解）</span></span>
 <span id="cb6-2"><a></a></span>
 <span id="cb6-3"><a></a>agree <span class="op">=</span> np.mean(cluster_labels2 <span class="op">==</span> y_true)</span>
@@ -547,7 +547,7 @@ rkskmt
 <pre><code>正解ラベルとの一致: 92.5%（74/80匹）</code></pre>
 </div>
 </div>
-<div id="02384914" class="cell" data-execution_count="7">
+<div id="ba05e18d" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -574,7 +574,7 @@ rkskmt
 <section id="k-means-の動き中で起きていたこと" class="slide level2">
 <h2>k-means の動き（中で起きていたこと）</h2>
 <div class="slide-body">
-<div id="579a0f64" class="cell" data-execution_count="8">
+<div id="3f876a8b" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -596,7 +596,7 @@ rkskmt
 <li>「assign → update」は<strong>最初の重心の位置</strong>から始まる — そこは<strong>ランダム</strong>に選ばれる</li>
 <li>運の悪い初期値だと、おかしな所で落ち着く（下の左<span class="fw-colon">：</span>青が2つの塊を飲み込んだ）</li>
 </ul>
-<div id="9cb55495" class="cell" data-execution_count="9">
+<div id="50bce8e5" class="cell" data-execution_count="9">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -640,7 +640,7 @@ rkskmt
 <li>本当のラベルなしデータでは <strong>k 自体を決める必要がある</strong></li>
 <li><strong>エルボー法</strong><span class="fw-colon">：</span>k を変えながら「クラスタ内のまとまり度」を測る</li>
 </ul>
-<div id="934a1280" class="cell" data-execution_count="10">
+<div id="c51ed9e7" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a></a>inertias <span class="op">=</span> []</span>
 <span id="cb8-2"><a></a>ks <span class="op">=</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">9</span>)</span>
 <span id="cb8-3"><a></a></span>
@@ -683,7 +683,7 @@ rkskmt
 <section id="k-means-の限界" class="slide level2">
 <h2>k-means の限界</h2>
 <div class="slide-body">
-<div id="c69f9cdc" class="cell" data-execution_count="11">
+<div id="7f6ce748" class="cell" data-execution_count="11">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -759,6 +759,78 @@ rkskmt
 </div>
 </div>
 </div>
+</div>
+</section>
+<section id="練習問題" class="slide level2 scrollable">
+<h2>練習問題</h2>
+<div class="slide-body">
+<p>問題1は<strong>手計算</strong>、問題2は<strong>Pythonコード</strong>で解け。</p>
+<h3 id="問題1k-means-を手で1周回す">問題1<span class="fw-colon">：</span>k-means を手で1周回す</h3>
+<p>4点だけの世界<span class="fw-colon">：</span><span class="math inline">\(A(0, 0)\)</span>、<span class="math inline">\(B(0, 2)\)</span>、<span class="math inline">\(C(4, 0)\)</span>、<span class="math inline">\(D(4, 2)\)</span>。<span class="math inline">\(k = 2\)</span>、最初の重心を <span class="math inline">\(M_1 = (0, 0)\)</span>、<span class="math inline">\(M_2 = (0, 2)\)</span> に置く。</p>
+<ol type="1">
+<li><strong>assign</strong><span class="fw-colon">：</span>各点を近い方の重心に割り当てよ（距離はユークリッド距離）</li>
+<li><strong>update</strong><span class="fw-colon">：</span>割り当てから新しい重心を計算せよ</li>
+<li>assign が変わらなくなるまで繰り返せ。最終的なクラスタ分けと inertia（各点から自分の重心までの<strong>二乗</strong>距離の合計）を求めよ</li>
+<li>このデータの「自然な」分け方 <span class="math inline">\(\{A, B\}\)</span> と <span class="math inline">\(\{C, D\}\)</span> の inertia も計算し、3.の結果と比較せよ</li>
+</ol>
+<h3 id="問題2n_init-がこの罠を救うことを確かめる">問題2<span class="fw-colon">：</span>n_init がこの罠を救うことを確かめる</h3>
+<ol type="1">
+<li><code>KMeans(n_clusters=2, init=np.array([[0.0, 0.0], [0.0, 2.0]]), n_init=1)</code> で問題1を再現し、<code>labels_</code> と <code>inertia_</code> を表示せよ</li>
+<li><code>KMeans(n_clusters=2, n_init=10, random_state=0)</code> で再実行し、<code>inertia_</code> を比較せよ</li>
+</ol>
+</div>
+</section>
+<section id="問題1の解答例" class="slide level2">
+<h2>問題1の解答例</h2>
+<div class="slide-body">
+<p><strong>1周目 assign</strong><span class="fw-colon">：</span><span class="math inline">\(A \to M_1\)</span>（距離0）、<span class="math inline">\(B \to M_2\)</span>（距離0）、<span class="math inline">\(C \to M_1\)</span>（<span class="math inline">\(4 &lt; \sqrt{20}\)</span>）、<span class="math inline">\(D \to M_2\)</span>（<span class="math inline">\(4 &lt; \sqrt{20}\)</span>）</p>
+<p><strong>1周目 update</strong><span class="fw-colon">：</span><span class="math inline">\(M_1 = \text{mean}(A, C) = (2, 0)\)</span>、<span class="math inline">\(M_2 = \text{mean}(B, D) = (2, 2)\)</span></p>
+<p><strong>2周目 assign</strong><span class="fw-colon">：</span><span class="math inline">\(A \to M_1\)</span>（<span class="math inline">\(2 &lt; 2\sqrt{2}\)</span>）、<span class="math inline">\(B \to M_2\)</span>、<span class="math inline">\(C \to M_1\)</span>、<span class="math inline">\(D \to M_2\)</span> — <strong>変化なし、収束</strong></p>
+<p><strong>結果</strong><span class="fw-colon">：</span><span class="math inline">\(\{A, C\}\)</span> と <span class="math inline">\(\{B, D\}\)</span>（上下の分割）。各点は重心から距離2なので</p>
+<p><span class="math display">\[\text{inertia} = 2^2 \times 4 = 16\]</span></p>
+<p><strong>自然な分け方</strong> <span class="math inline">\(\{A, B\}, \{C, D\}\)</span><span class="fw-colon">：</span>重心は <span class="math inline">\((0,1)\)</span> と <span class="math inline">\((4,1)\)</span>、各点は距離1なので inertia <span class="math inline">\(= 1^2 \times 4 = 4\)</span>。</p>
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>手計算で罠にはまった</strong></p>
+</div>
+<div class="callout-content">
+<p>k-means の手順を<strong>正しく</strong>回したのに、inertia 16 の<strong>悪い答え</strong>で止まった（最適は 4）。 assign → update は inertia を減らすことしかできず、<strong>最初の重心の置き方</strong>が悪いと抜け出せない。 本編の「変な分け方に落ち着く」を、4点で完全に再現できた。</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="問題2の解答例" class="slide level2">
+<h2>問題2の解答例</h2>
+<div class="slide-body">
+<div id="c2fec679" class="cell" data-execution_count="12">
+<details class="code-fold">
+<summary>解答例を見る</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb10-2"><a></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> KMeans</span>
+<span id="cb10-3"><a></a></span>
+<span id="cb10-4"><a></a>P <span class="op">=</span> np.array([[<span class="fl">0.0</span>, <span class="fl">0.0</span>], [<span class="fl">0.0</span>, <span class="fl">2.0</span>], [<span class="fl">4.0</span>, <span class="fl">0.0</span>], [<span class="fl">4.0</span>, <span class="fl">2.0</span>]])   <span class="co"># A, B, C, D</span></span>
+<span id="cb10-5"><a></a></span>
+<span id="cb10-6"><a></a>bad <span class="op">=</span> KMeans(n_clusters<span class="op">=</span><span class="dv">2</span>, init<span class="op">=</span>np.array([[<span class="fl">0.0</span>, <span class="fl">0.0</span>], [<span class="fl">0.0</span>, <span class="fl">2.0</span>]]), n_init<span class="op">=</span><span class="dv">1</span>).fit(P)</span>
+<span id="cb10-7"><a></a><span class="bu">print</span>(<span class="ss">f"悪い初期値: labels=</span><span class="sc">{</span>bad<span class="sc">.</span>labels_<span class="sc">}</span><span class="ss">, inertia=</span><span class="sc">{</span>bad<span class="sc">.</span>inertia_<span class="sc">:.1f}</span><span class="ss">"</span>)</span>
+<span id="cb10-8"><a></a></span>
+<span id="cb10-9"><a></a>good <span class="op">=</span> KMeans(n_clusters<span class="op">=</span><span class="dv">2</span>, n_init<span class="op">=</span><span class="dv">10</span>, random_state<span class="op">=</span><span class="dv">0</span>).fit(P)</span>
+<span id="cb10-10"><a></a><span class="bu">print</span>(<span class="ss">f"n_init=10 : labels=</span><span class="sc">{</span>good<span class="sc">.</span>labels_<span class="sc">}</span><span class="ss">, inertia=</span><span class="sc">{</span>good<span class="sc">.</span>inertia_<span class="sc">:.1f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>悪い初期値: labels=[0 1 0 1], inertia=16.0
+n_init=10 : labels=[1 1 0 0], inertia=4.0</code></pre>
+</div>
+</div>
+<ul>
+<li>悪い初期値からは手計算どおり inertia 16 の分割に落ちる</li>
+<li><code>n_init=10</code> は初期値を変えて10回回し、inertia 最小（4）の分割を選んでくれる</li>
+<li>この「何回も試して一番良いのを選ぶ」作戦の一般論は、参考資料 <strong><a href="./optimization-local-minima-appendix.html">ローカルミニマムの罠</a></strong> で</li>
+</ul>
 
 
 <div id="3ade8a4a-fb1d-4a6c-8409-ac45482d5fc9" class="hidden">

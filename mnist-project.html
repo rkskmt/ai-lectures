@@ -219,7 +219,7 @@ rkskmt
 <section id="初回の約束覚えているか" class="slide level2">
 <h2>初回の約束、覚えているか</h2>
 <div class="slide-body">
-<div id="5babffd7" class="cell" data-execution_count="1">
+<div id="21ea0c1f" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -243,7 +243,7 @@ rkskmt
 <ul>
 <li>手書き数字の定番データセット。<strong>訓練6万枚・テスト1万枚</strong>、各28×28ピクセル</li>
 </ul>
-<div id="b5ba7129" class="cell" data-execution_count="2">
+<div id="8db10f49" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> torch</span>
 <span id="cb1-2"><a></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
 <span id="cb1-3"><a></a><span class="im">from</span> torchvision <span class="im">import</span> datasets, transforms</span>
@@ -260,7 +260,7 @@ rkskmt
 1枚の形: (1, 28, 28)  正解ラベル: 5</code></pre>
 </div>
 </div>
-<div id="8e74ecb4" class="cell" data-execution_count="3">
+<div id="8a1847c4" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -330,7 +330,7 @@ rkskmt
 <section id="モデル見慣れた3層" class="slide level2">
 <h2>モデル<span class="fw-colon">：</span>見慣れた3層</h2>
 <div class="slide-body">
-<div id="5b6e3cce" class="cell" data-execution_count="4">
+<div id="64f395da" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a>torch.manual_seed(<span class="dv">0</span>)</span>
 <span id="cb3-2"><a></a></span>
 <span id="cb3-3"><a></a>model <span class="op">=</span> nn.Sequential(</span>
@@ -373,7 +373,7 @@ rkskmt
 <li>6万枚まとめて勾配を計算すると重い → <strong>128枚ずつ</strong>取り出して1歩ずつ進む</li>
 <li>データを一巡することを <strong>1エポック</strong> と呼ぶ</li>
 </ul>
-<div id="a0551d6d" class="cell" data-execution_count="5">
+<div id="53953c39" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a>train_loader <span class="op">=</span> torch.utils.data.DataLoader(train_ds, batch_size<span class="op">=</span><span class="dv">128</span>, shuffle<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb5-2"><a></a>test_loader  <span class="op">=</span> torch.utils.data.DataLoader(test_ds,  batch_size<span class="op">=</span><span class="dv">1000</span>)</span>
 <span id="cb5-3"><a></a></span>
@@ -385,10 +385,10 @@ rkskmt
 </ul>
 </div>
 </section>
-<section id="学習する" class="slide level2">
+<section id="peek-mnist-train" class="slide level2">
 <h2>学習する</h2>
 <div class="slide-body">
-<div id="4d069be5" class="cell" data-execution_count="6">
+<div id="0502608e" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">4</span>):</span>
 <span id="cb6-2"><a></a>    <span class="cf">for</span> x_batch, y_batch <span class="kw">in</span> train_loader:</span>
 <span id="cb6-3"><a></a>        optimizer.zero_grad()</span>
@@ -410,14 +410,65 @@ rkskmt
 </div>
 <ul>
 <li>見たことのない手書き1万枚を、<strong>96%以上</strong>の精度で読めるようになった</li>
-<li>エポック数や中間の変換の数を増やすと、どこまで伸びるか試してみよう</li>
 </ul>
+</div>
+</section>
+<section id="tweakどこまで賢くできるか" class="slide level2 badge-practice">
+<h2><strong>Tweak</strong><span class="fw-colon">：</span>どこまで賢くできるか</h2>
+<div class="slide-body">
+<ul>
+<li><a href="#/peek-mnist-train" class="peek">モデル定義と学習ループ</a> を<strong>書き換えて実行</strong>（学習に数分かかる変更もある）</li>
+</ul>
+<div class="tweak">
+<table class="caption-top">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>やりたいこと</th>
+<th>コード</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>長く学習させる</td>
+<td><code>range(1, 4)</code> → <code>range(1, 9)</code></td>
+</tr>
+<tr class="even">
+<td>中間を太くする</td>
+<td><code>nn.Linear(784, 128)</code> と <code>nn.Linear(128, 10)</code> の <code>128</code> → <code>512</code></td>
+</tr>
+<tr class="odd">
+<td>中間をもう1段重ねる</td>
+<td><code>nn.Linear(784, 128), nn.ReLU(), nn.Linear(128, 128), nn.ReLU(), nn.Linear(128, 10)</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ここで観察</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>どの変更が「テスト正答率1%」あたりのコスパが良い？　97%の壁、98%の壁はどこで破れる？</li>
+<li>伸びが止まったら<strong>訓練データの正答率</strong>も出して比べてみる — ギャップが開き始めたら、それは見覚えのある現象（過学習）</li>
+</ul>
+</div>
+</div>
+</div>
 </div>
 </section>
 <section id="読めている様子" class="slide level2">
 <h2>読めている様子</h2>
 <div class="slide-body">
-<div id="94ab6613" class="cell" data-execution_count="7">
+<div id="72d461a3" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -434,7 +485,7 @@ rkskmt
 <section id="間違いを眺める" class="slide level2">
 <h2>間違いを眺める</h2>
 <div class="slide-body">
-<div id="a0793327" class="cell" data-execution_count="8">
+<div id="b9f30db7" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -447,6 +498,56 @@ rkskmt
 <li>間違えた字をよく見ると、<strong>人間でも迷うものが多い</strong></li>
 <li>精度の数字だけでなく<strong>間違いの中身</strong>を見るのが、モデルと付き合うコツ（混同行列の発想）</li>
 </ul>
+</div>
+</section>
+<section id="自分の字は読めるのか持ち帰りデモ" class="slide level2">
+<h2>自分の字は読めるのか（持ち帰りデモ）</h2>
+<div class="slide-body">
+<p>紙に数字を書いて撮影し、この機械に読ませてみよう。 ただし<strong>写真をそのまま28×28に縮めても、まず読めない</strong> — MNISTの画像は「数字を20ピクセル角に収め、重心をど真ん中に置く」ように揃えてあり、撮った写真はそうなっていないから。同じ揃え方を自分でやってから見せる<span class="fw-colon">：</span></p>
+<div id="5ec6170c" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a></a><span class="im">from</span> PIL <span class="im">import</span> Image</span>
+<span id="cb8-2"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb8-3"><a></a><span class="im">import</span> torch</span>
+<span id="cb8-4"><a></a></span>
+<span id="cb8-5"><a></a><span class="co"># 1. 読み込み：グレースケール化して「インク=1、紙=0」に正規化</span></span>
+<span id="cb8-6"><a></a>a <span class="op">=</span> np.array(Image.<span class="bu">open</span>(<span class="st">"my_digit.png"</span>).convert(<span class="st">"L"</span>), dtype<span class="op">=</span>np.float32)</span>
+<span id="cb8-7"><a></a>a <span class="op">=</span> (a.<span class="bu">max</span>() <span class="op">-</span> a) <span class="op">/</span> (a.<span class="bu">max</span>() <span class="op">-</span> a.<span class="bu">min</span>())</span>
+<span id="cb8-8"><a></a></span>
+<span id="cb8-9"><a></a><span class="co"># 2. MNISTと同じ揃え方：数字を切り出し → 長辺20pxに縮小 → 重心を中央へ</span></span>
+<span id="cb8-10"><a></a>rows, cols <span class="op">=</span> np.where(a <span class="op">&gt;</span> <span class="fl">0.3</span>)</span>
+<span id="cb8-11"><a></a>a <span class="op">=</span> a[rows.<span class="bu">min</span>():rows.<span class="bu">max</span>()<span class="op">+</span><span class="dv">1</span>, cols.<span class="bu">min</span>():cols.<span class="bu">max</span>()<span class="op">+</span><span class="dv">1</span>]</span>
+<span id="cb8-12"><a></a>h, w <span class="op">=</span> a.shape</span>
+<span id="cb8-13"><a></a>s <span class="op">=</span> <span class="fl">20.0</span> <span class="op">/</span> <span class="bu">max</span>(h, w)</span>
+<span id="cb8-14"><a></a>img <span class="op">=</span> Image.fromarray((a <span class="op">*</span> <span class="dv">255</span>).astype(np.uint8)).resize((<span class="bu">round</span>(w<span class="op">*</span>s), <span class="bu">round</span>(h<span class="op">*</span>s)))</span>
+<span id="cb8-15"><a></a>a <span class="op">=</span> np.array(img, dtype<span class="op">=</span>np.float32) <span class="op">/</span> <span class="fl">255.0</span></span>
+<span id="cb8-16"><a></a>x28 <span class="op">=</span> np.zeros((<span class="dv">28</span>, <span class="dv">28</span>), dtype<span class="op">=</span>np.float32)</span>
+<span id="cb8-17"><a></a>h, w <span class="op">=</span> a.shape</span>
+<span id="cb8-18"><a></a>x28[(<span class="dv">28</span><span class="op">-</span>h)<span class="op">//</span><span class="dv">2</span>:(<span class="dv">28</span><span class="op">-</span>h)<span class="op">//</span><span class="dv">2</span><span class="op">+</span>h, (<span class="dv">28</span><span class="op">-</span>w)<span class="op">//</span><span class="dv">2</span>:(<span class="dv">28</span><span class="op">-</span>w)<span class="op">//</span><span class="dv">2</span><span class="op">+</span>w] <span class="op">=</span> a</span>
+<span id="cb8-19"><a></a>ys, xs <span class="op">=</span> np.mgrid[<span class="dv">0</span>:<span class="dv">28</span>, <span class="dv">0</span>:<span class="dv">28</span>]</span>
+<span id="cb8-20"><a></a>cy, cx <span class="op">=</span> (x28<span class="op">*</span>ys).<span class="bu">sum</span>()<span class="op">/</span>x28.<span class="bu">sum</span>(), (x28<span class="op">*</span>xs).<span class="bu">sum</span>()<span class="op">/</span>x28.<span class="bu">sum</span>()</span>
+<span id="cb8-21"><a></a>x28 <span class="op">=</span> np.roll(x28, (<span class="bu">round</span>(<span class="dv">14</span><span class="op">-</span>cy), <span class="bu">round</span>(<span class="dv">14</span><span class="op">-</span>cx)), axis<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb8-22"><a></a></span>
+<span id="cb8-23"><a></a><span class="co"># 3. 推論</span></span>
+<span id="cb8-24"><a></a>x <span class="op">=</span> torch.tensor(x28).unsqueeze(<span class="dv">0</span>).unsqueeze(<span class="dv">0</span>)</span>
+<span id="cb8-25"><a></a><span class="bu">print</span>(<span class="st">"予測:"</span>, model(x).argmax(dim<span class="op">=</span><span class="dv">1</span>).item())</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>うまく読めないとき</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li><strong>太いペンで、大きく</strong>書く（MNISTの字は線が太い）。紙は白く、明るい場所で撮る</li>
+<li>それでも読めない字は「間違いを眺める」の仲間入り — 訓練データの字と自分の字の<strong>分布の違い</strong>が原因</li>
+<li>精度96%とは「<strong>100枚中4枚は間違える</strong>」という意味でもある。1枚読ませて外れても、それはこの機械の正直な実力</li>
+</ul>
+</div>
+</div>
+</div>
 </div>
 </section>
 <section id="約束は果たされたか部品の棚卸し" class="slide level2">
@@ -557,26 +658,17 @@ rkskmt
 <li>満点を疑うこと（過学習）、スケールを揃えること、テストで採点すること</li>
 <li>最後に、<strong>手書き数字を読む機械</strong>を自分の部品で組み上げた</li>
 </ul>
-<div title="持ち帰り課題（任意）">
+<div title="持ち帰り">
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>持ち帰り課題（任意）</strong></p>
+<p><strong>持ち帰り</strong></p>
 </div>
 <div class="callout-content">
-<p>紙に数字を書いて撮影し、28×28 のグレースケールに縮小して読ませてみよう<span class="fw-colon">：</span></p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a></a><span class="im">from</span> PIL <span class="im">import</span> Image</span>
-<span id="cb8-2"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb8-3"><a></a><span class="im">import</span> torch</span>
-<span id="cb8-4"><a></a></span>
-<span id="cb8-5"><a></a>img <span class="op">=</span> Image.<span class="bu">open</span>(<span class="st">"my_digit.png"</span>).convert(<span class="st">"L"</span>).resize((<span class="dv">28</span>, <span class="dv">28</span>))</span>
-<span id="cb8-6"><a></a>x <span class="op">=</span> <span class="fl">1.0</span> <span class="op">-</span> np.array(img, dtype<span class="op">=</span>np.float32) <span class="op">/</span> <span class="fl">255.0</span>   <span class="co"># MNISTは白地に黒ではなく黒地に白</span></span>
-<span id="cb8-7"><a></a>x <span class="op">=</span> torch.tensor(x).unsqueeze(<span class="dv">0</span>).unsqueeze(<span class="dv">0</span>)        <span class="co"># (1, 1, 28, 28)</span></span>
-<span id="cb8-8"><a></a><span class="bu">print</span>(<span class="st">"予測:"</span>, model(x).argmax(dim<span class="op">=</span><span class="dv">1</span>).item())</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
-<p>うまく読めないときは、なぜかを考えるところからが本番（ヒント<span class="fw-colon">：</span>訓練データと自分の字の「分布」の違い）。</p>
+<p>「自分の字は読めるのか」のデモを、ぜひ家で。読めたら勝ち、読めなくても<strong>なぜかを説明できる</strong> — それがこの講義の到達点。</p>
 </div>
 </div>
 </div>

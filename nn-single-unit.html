@@ -271,7 +271,7 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">Aff
 <h2>Step 2<span class="fw-colon">：</span>シグモイド（<span class="en">Sigmoid</span>）で「確率」にする</h2>
 <div class="slide-body">
 <p><span class="math display">\[p = \sigma(z) = \frac{1}{1 + e^{-z}}\]</span></p>
-<div id="f82c84a3" class="cell" data-execution_count="1">
+<div id="46ffe9c1" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -395,7 +395,7 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">Aff
 <section id="peek-forward" class="slide level2">
 <h2>実装<span class="fw-colon">：</span>必要な関数は4つだけ</h2>
 <div class="slide-body">
-<div id="d43f6816" class="cell" data-execution_count="2">
+<div id="c8cfaff3" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>魚データの定義（クリックして展開）</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -434,7 +434,7 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">Aff
 <span id="cb1-34"><a></a>y      <span class="op">=</span> y[order]</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="25571acb" class="cell" data-execution_count="3">
+<div id="0bf112f3" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a><span class="kw">def</span> sigmoid(z):</span>
 <span id="cb2-2"><a></a>    <span class="cf">return</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>z))</span>
 <span id="cb2-3"><a></a></span>
@@ -462,7 +462,7 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">Aff
 <ul>
 <li>1匹見るたびにパラメータが少し動く</li>
 </ul>
-<div id="3a7428f1" class="cell" data-execution_count="4">
+<div id="d64ec082" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a>alpha <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">0.0</span>])   <span class="co"># 重みはゼロからスタート</span></span>
 <span id="cb3-2"><a></a>b  <span class="op">=</span> <span class="fl">0.0</span></span>
 <span id="cb3-3"><a></a>lr <span class="op">=</span> <span class="fl">0.5</span>                       <span class="co"># 学習率</span></span>
@@ -498,7 +498,7 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">Aff
 <section id="境界が動く様子を見る" class="slide level2">
 <h2>境界が動く様子を見る</h2>
 <div class="slide-body">
-<div id="7691a41e" class="cell" data-execution_count="5">
+<div id="c0e62628" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -557,6 +557,50 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">Aff
 </div>
 </div>
 </section>
+<section id="tweak学習の様子をいじって観察する" class="slide level2 badge-practice">
+<h2><strong>Tweak</strong><span class="fw-colon">：</span>学習の様子をいじって観察する</h2>
+<div class="slide-body">
+<ul>
+<li><a href="#/peek-one-at-a-time" class="peek">1匹ずつ学習するコード</a> を<strong>書き換えて実行</strong></li>
+</ul>
+<div class="tweak">
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>やりたいこと</th>
+<th>コード</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>ゆっくり学ばせる</td>
+<td><code>lr = 0.05</code></td>
+</tr>
+<tr class="even">
+<td>80匹全部見せる</td>
+<td><code>for i in range(80):</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ここで観察</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li><code>lr = 0.05</code><span class="fw-colon">：</span>正答率は 90% で並ぶのに、<strong>Loss は 0.59 vs 0.33</strong> と大差 — パラメータが5分の1しか動いておらず、当ててはいるが<strong>自信がない</strong>（<span class="math inline">\(p\)</span> が 0.5 の近くにいる）。正答率に出ない差を Loss が見ている</li>
+<li>80匹全部見せると正答率はどこまで上がる？　途中で<strong>下がる瞬間</strong>が何度もある（間違えた魚に境界が引っ張られる音）</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</section>
 <section id="まとめ" class="slide level2">
 <h2>まとめ</h2>
 <div class="slide-body">
@@ -583,6 +627,66 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">Aff
 </div>
 </div>
 </div>
+</div>
+</section>
+<section id="練習問題" class="slide level2 scrollable">
+<h2>練習問題</h2>
+<div class="slide-body">
+<p>以下の問題を<strong>手計算</strong>と<strong>Pythonコード</strong>の両方で解け。</p>
+<h3 id="問題1ニューロン1個を2歩だけ学習させる">問題1<span class="fw-colon">：</span>ニューロン1個を2歩だけ学習させる</h3>
+<p>2匹だけのミニ世界。標準化済みの特徴量（輝度, 重さ）で、 1匹目 <span class="math inline">\(x^{(1)} = (2, 1)\)</span> は Salmon（<span class="math inline">\(y=1\)</span>）、2匹目 <span class="math inline">\(x^{(2)} = (-1, 1)\)</span> は Sea bass（<span class="math inline">\(y=0\)</span>）。 初期値 <span class="math inline">\(\alpha = (0, 0)\)</span>、<span class="math inline">\(b = 0\)</span>、学習率 <span class="math inline">\(\eta = 0.5\)</span>。</p>
+<ol type="1">
+<li>1匹目を見せたときの <span class="math inline">\(z\)</span>、<span class="math inline">\(p = \sigma(z)\)</span>、差 <span class="math inline">\(\delta = p - y\)</span> を求めよ</li>
+<li>更新式 <span class="math inline">\(\alpha \leftarrow \alpha - \eta\,\delta\,x\)</span>、<span class="math inline">\(b \leftarrow b - \eta\,\delta\)</span> で更新せよ</li>
+<li>続けて2匹目でもう1歩更新せよ</li>
+<li>同じ計算をコードで実行し、手計算と一致することを確かめよ</li>
+</ol>
+<p>ヒント<span class="fw-colon">：</span><span class="math inline">\(\sigma(0) = 0.5\)</span>。実は <span class="math inline">\(\sigma\)</span> の値はこれしか使わない。</p>
+</div>
+</section>
+<section id="問題1の解答例" class="slide level2">
+<h2>問題1の解答例</h2>
+<div class="slide-body">
+<div id="匹目x-2-1y-1" class="slide-body-heading">
+1匹目（<span class="math inline">\(x = (2, 1)\)</span>、<span class="math inline">\(y = 1\)</span>）
+</div>
+<p><span class="math display">\[z = 0 \times 2 + 0 \times 1 + 0 = 0, \qquad p = \sigma(0) = 0.5, \qquad \delta = 0.5 - 1 = -0.5\]</span></p>
+<p><strong>更新:</strong> <span class="math display">\[\alpha \leftarrow (0, 0) - 0.5 \times (-0.5) \times (2, 1) = (0.5,\; 0.25)\]</span> <span class="math display">\[b \leftarrow 0 + 0.25 = 0.25\]</span></p>
+<p>まだ何も知らないので <span class="math inline">\(p = 0.5\)</span>（五分五分）。Salmon と言い切れなかったぶん、境界が動いた。</p>
+<h3 id="匹目x--1-1y-0">2匹目（<span class="math inline">\(x = (-1, 1)\)</span>、<span class="math inline">\(y = 0\)</span>）</h3>
+<p><span class="math display">\[z = 0.5 \times (-1) + 0.25 \times 1 + 0.25 = 0, \qquad p = 0.5, \qquad \delta = 0.5\]</span></p>
+<p>偶然にも2匹目は<strong>ちょうど境界の上</strong>（<span class="math inline">\(z = 0\)</span>）に乗っていた。</p>
+<p><strong>更新:</strong> <span class="math display">\[\alpha \leftarrow (0.5, 0.25) - 0.5 \times 0.5 \times (-1, 1) = (0.75,\; 0)\]</span> <span class="math display">\[b \leftarrow 0.25 - 0.25 = 0\]</span></p>
+<h3 id="コードで確認">コードで確認</h3>
+<div id="b97ec90d" class="cell" data-execution_count="6">
+<details class="code-fold">
+<summary>解答例を見る</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb5-2"><a></a></span>
+<span id="cb5-3"><a></a><span class="kw">def</span> sigmoid(z):</span>
+<span id="cb5-4"><a></a>    <span class="cf">return</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>z))</span>
+<span id="cb5-5"><a></a></span>
+<span id="cb5-6"><a></a>alpha <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">0.0</span>])</span>
+<span id="cb5-7"><a></a>b  <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb5-8"><a></a>lr <span class="op">=</span> <span class="fl">0.5</span></span>
+<span id="cb5-9"><a></a></span>
+<span id="cb5-10"><a></a>fishes <span class="op">=</span> [(np.array([<span class="fl">2.0</span>, <span class="fl">1.0</span>]), <span class="dv">1</span>),    <span class="co"># Salmon</span></span>
+<span id="cb5-11"><a></a>          (np.array([<span class="op">-</span><span class="fl">1.0</span>, <span class="fl">1.0</span>]), <span class="dv">0</span>)]   <span class="co"># Sea bass</span></span>
+<span id="cb5-12"><a></a></span>
+<span id="cb5-13"><a></a><span class="cf">for</span> i, (xi, yi) <span class="kw">in</span> <span class="bu">enumerate</span>(fishes, <span class="dv">1</span>):</span>
+<span id="cb5-14"><a></a>    z     <span class="op">=</span> xi <span class="op">@</span> alpha <span class="op">+</span> b</span>
+<span id="cb5-15"><a></a>    p     <span class="op">=</span> sigmoid(z)</span>
+<span id="cb5-16"><a></a>    delta <span class="op">=</span> p <span class="op">-</span> yi</span>
+<span id="cb5-17"><a></a>    alpha <span class="op">=</span> alpha <span class="op">-</span> lr <span class="op">*</span> delta <span class="op">*</span> xi</span>
+<span id="cb5-18"><a></a>    b     <span class="op">=</span> b <span class="op">-</span> lr <span class="op">*</span> delta</span>
+<span id="cb5-19"><a></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">匹目: z=</span><span class="sc">{</span>z<span class="sc">:.2f}</span><span class="ss">, p=</span><span class="sc">{</span>p<span class="sc">:.2f}</span><span class="ss">, δ=</span><span class="sc">{</span>delta<span class="sc">:+.2f}</span><span class="ss"> → α=</span><span class="sc">{</span>alpha<span class="sc">}</span><span class="ss">, b=</span><span class="sc">{</span>b<span class="sc">:.2f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>1匹目: z=0.00, p=0.50, δ=-0.50 → α=[0.5  0.25], b=0.25
+2匹目: z=0.00, p=0.50, δ=+0.50 → α=[0.75 0.  ], b=0.00</code></pre>
+</div>
+</div>
+<p>手計算どおり、<span class="math inline">\(\alpha = (0.5, 0.25) \to (0.75, 0)\)</span>、<span class="math inline">\(b = 0.25 \to 0\)</span> と動く。</p>
 
 
 <div id="3ade8a4a-fb1d-4a6c-8409-ac45482d5fc9" class="hidden">
