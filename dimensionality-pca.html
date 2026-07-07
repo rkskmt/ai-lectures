@@ -274,7 +274,7 @@ rkskmt
 </div>
 </section>
 <section id="クイズいちばん近い点までどれくらい" class="slide level2">
-<h2>クイズ<span class="fw-colon">：</span>いちばん近い点まで、どれくらい？</h2>
+<h2>クイズ：いちばん近い点まで、どれくらい？</h2>
 <div class="slide-body">
 <ul>
 <li>各特徴量は 0〜1 に正規化してあるとする（各軸の長さ＝1）</li>
@@ -298,7 +298,7 @@ rkskmt
 </div>
 </div>
 <div class="fragment">
-<div id="195a0036" class="cell" data-execution_count="1">
+<div id="5c0895fa" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-3"><a></a><span class="im">import</span> japanize_matplotlib</span>
@@ -326,7 +326,7 @@ rkskmt
 20次元: いちばん近い点まで 1.195</code></pre>
 </div>
 </div>
-<div id="df7143a8" class="cell" data-execution_count="2">
+<div id="67bac04f" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -343,15 +343,15 @@ rkskmt
 </div>
 </section>
 <section id="なぜ-その1真ん中に居続けられない" class="slide level2">
-<h2>なぜ？　その1<span class="fw-colon">：</span>真ん中に居続けられない</h2>
+<h2>なぜ？　その1：真ん中に居続けられない</h2>
 <div class="slide-body">
 <ul>
 <li>ある点が、ある軸で「中央寄り」（その軸の<strong>中央50%</strong>）に入る確率は <span class="math inline">\(\dfrac{1}{2}\)</span></li>
-<li><span class="math inline">\(d\)</span> 次元で「<strong>全部の軸</strong>で中央寄り」でいられる確率は<span class="fw-colon">：</span></li>
+<li><span class="math inline">\(d\)</span> 次元で「<strong>全部の軸</strong>で中央寄り」でいられる確率は：</li>
 </ul>
 <p><span class="math display">\[\left(\frac{1}{2}\right)^d \qquad
 \text{1次元: } 50\% \quad \text{3次元: } 12.5\% \quad \text{10次元: } 0.1\% \quad \text{20次元: } 100万分の1\]</span></p>
-<div id="569e1997" class="cell" data-execution_count="3">
+<div id="eb01f2fc" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -373,21 +373,21 @@ rkskmt
 <p><strong>ノート</strong></p>
 </div>
 <div class="callout-content">
-<p>教科書によく出る言い換え<span class="fw-colon">：</span>「単位立方体に内接する球（＝どの軸でも中央寄りの領域）の体積は、 高次元で 0 に向かう」。いま見たのと同じ現象。</p>
+<p>教科書によく出る言い換え：「単位立方体に内接する球（＝どの軸でも中央寄りの領域）の体積は、 高次元で 0 に向かう」。いま見たのと同じ現象。</p>
 </div>
 </div>
 </div>
 </div>
 </section>
 <section id="なぜ-その2ご近所を集めると世界を覆ってしまう" class="slide level2">
-<h2>なぜ？　その2<span class="fw-colon">：</span>「ご近所」を集めると世界を覆ってしまう</h2>
+<h2>なぜ？　その2：「ご近所」を集めると世界を覆ってしまう</h2>
 <div class="slide-body">
 <ul>
 <li>k-NN の気持ちになって、周りの<strong>データの1%</strong>を「ご近所」として集めたい</li>
-<li>各軸を割合 <span class="math inline">\(r\)</span> だけ切り取った箱は、データの <span class="math inline">\(r^d\)</span> 割を含む → 1% 集めるには<span class="fw-colon">：</span></li>
+<li>各軸を割合 <span class="math inline">\(r\)</span> だけ切り取った箱は、データの <span class="math inline">\(r^d\)</span> 割を含む → 1% 集めるには：</li>
 </ul>
 <p><span class="math display">\[r = 0.01^{1/d}\]</span></p>
-<div id="47b9f78f" class="cell" data-execution_count="4">
+<div id="7801dd49" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -409,7 +409,7 @@ rkskmt
 <li>k-NN やロジスティック回帰など、多くの手法は<strong>距離</strong>に依存している</li>
 <li>高次元では最近傍と最遠傍の距離差が消えていく</li>
 </ul>
-<div id="7d4eddc3" class="cell" data-execution_count="5">
+<div id="ee1dba32" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a>np.random.seed(<span class="dv">42</span>)</span>
 <span id="cb3-2"><a></a>dims    <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">50</span>, <span class="dv">100</span>]</span>
 <span id="cb3-3"><a></a>cv_list <span class="op">=</span> []   <span class="co"># 変動係数 = std / mean</span></span>
@@ -457,7 +457,7 @@ rkskmt
 <ul>
 <li>同じサンプル数でも、次元が増えると空間が広くなりすぎる</li>
 </ul>
-<div id="5fb66adf" class="cell" data-execution_count="6">
+<div id="7f46cf6e" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -520,9 +520,9 @@ rkskmt
 </div>
 <div class="callout-content">
 <ol type="1">
-<li><strong>特徴量選択</strong><span class="fw-colon">：</span>重要な特徴量だけを残す</li>
-<li><strong>次元削減</strong><span class="fw-colon">：</span>情報を保ったまま次元を圧縮する（← 今回）</li>
-<li><strong>正則化（<span class="en">regularization</span>）</strong><span class="fw-colon">：</span>過学習を防ぐ（回帰問題で詳しく）</li>
+<li><strong>特徴量選択</strong>：重要な特徴量だけを残す</li>
+<li><strong>次元削減</strong>：情報を保ったまま次元を圧縮する（← 今回）</li>
+<li><strong>正則化（<span class="en">regularization</span>）</strong>：過学習を防ぐ（回帰問題で詳しく）</li>
 </ol>
 </div>
 </div>
@@ -536,12 +536,12 @@ rkskmt
 </div>
 </section>
 <section id="つ目の特徴量体長" class="slide level2">
-<h2>3つ目の特徴量<span class="fw-colon">：</span>体長</h2>
+<h2>3つ目の特徴量：体長</h2>
 <div class="slide-body">
 <ul>
 <li>重さ・輝度で精度が上がった。気を良くして、80匹全部の<strong>体長</strong>も測った</li>
 </ul>
-<div id="d3ce3b4d" class="cell" data-execution_count="7">
+<div id="f587af63" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>魚データの定義（クリックして展開）</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a></a>salmon_weights     <span class="op">=</span> np.array([<span class="dv">2149</span>, <span class="dv">1959</span>, <span class="dv">2194</span>, <span class="dv">2457</span>, <span class="dv">1930</span>, <span class="dv">1930</span>, <span class="dv">2474</span>, <span class="dv">2230</span>, <span class="dv">1859</span>, <span class="dv">2163</span>,</span>
@@ -570,7 +570,7 @@ rkskmt
 <span id="cb4-24"><a></a>lengths <span class="op">=</span> np.<span class="bu">round</span>(np.cbrt(weights) <span class="op">*</span> <span class="fl">4.5</span> <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="fl">1.0</span>, <span class="bu">len</span>(weights)), <span class="dv">1</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="ca8c7ea8" class="cell" data-execution_count="8">
+<div id="c769960e" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-stdout">
 <pre><code>体長（先頭5匹）: [58.4 55.3 59.2 61.7 54.1] cm
 体長の範囲: 45.0〜61.7 cm</code></pre>
@@ -596,7 +596,7 @@ rkskmt
 <section id="体長と重さを並べてみる" class="slide level2">
 <h2>体長と重さを並べてみる</h2>
 <div class="slide-body">
-<div id="dd257b00" class="cell" data-execution_count="9">
+<div id="299c3299" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">5.5</span>, <span class="fl">3.6</span>))</span>
 <span id="cb6-2"><a></a>plt.scatter(lengths, weights, alpha<span class="op">=</span><span class="fl">0.6</span>, s<span class="op">=</span><span class="dv">40</span>, c<span class="op">=</span><span class="st">"#5dade2"</span>, edgecolors<span class="op">=</span><span class="st">"gray"</span>)</span>
 <span id="cb6-3"><a></a>plt.xlabel(<span class="st">"体長 (cm)"</span>)<span class="op">;</span> plt.ylabel(<span class="st">"重さ (g)"</span>)</span>
@@ -633,7 +633,7 @@ rkskmt
 <li>斜めに細長い雲は、もとの2軸より「<strong>長い方向</strong>と<strong>細い方向</strong>」で見るほうが自然</li>
 <li>データの<strong>分散（<span class="en">variance</span>）が最大になる方向</strong>に新しい軸（主成分）を取る</li>
 </ul>
-<div id="aeb09582" class="cell" data-execution_count="10">
+<div id="5fcb534f" class="cell" data-execution_count="10">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -654,7 +654,7 @@ rkskmt
 <li>実はどちらも「<strong>足（誤差）の二乗和が最小になる直線</strong>」を探している</li>
 <li>違うのは<strong>足の向き</strong>だけ</li>
 </ul>
-<div id="43f31a8e" class="cell" data-execution_count="11">
+<div id="8184a215" class="cell" data-execution_count="11">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -664,8 +664,8 @@ rkskmt
 </div>
 </div>
 <ul>
-<li><strong>最小二乗法（<span class="en">least squares</span>）</strong><span class="fw-colon">：</span>仕事は「<span class="math inline">\(y\)</span> を当てる」→ 誤差は<strong>縦</strong>に測る（<a href="./linear-regression.html">線形回帰の回</a>で本格的に使う）</li>
-<li><strong>PCA</strong><span class="fw-colon">：</span>仕事は「データの形を要約する」→ 誤差は直線への<strong>最短距離（垂直の足）</strong>で測る</li>
+<li><strong>最小二乗法（<span class="en">least squares</span>）</strong>：仕事は「<span class="math inline">\(y\)</span> を当てる」→ 誤差は<strong>縦</strong>に測る（<a href="./linear-regression.html">線形回帰の回</a>で本格的に使う）</li>
+<li><strong>PCA</strong>：仕事は「データの形を要約する」→ 誤差は直線への<strong>最短距離（垂直の足）</strong>で測る</li>
 <li>足の向きが違うので、選ばれる直線も<strong>少し違う</strong>（回帰の傾き 0.97、PC1 の傾き 1.00）</li>
 </ul>
 <div title="「分散最大」と「垂直の足最小」は同じこと">
@@ -691,9 +691,9 @@ rkskmt
 <ul>
 <li>探している<strong>直線の向き</strong>を、<strong>単位ベクトル</strong> <span class="math inline">\(\mathbf{v}\)</span>（<span class="math inline">\(\|\mathbf{v}\| = 1\)</span>）で表す</li>
 <li>中心化した点 <span class="math inline">\(\tilde{\mathbf{x}}_i\)</span> のその直線への<strong>影（射影, <span class="en">projection</span>）</strong>は、内積 <span class="math inline">\(z_i = \tilde{\mathbf{x}}_i^{\mathsf T} \mathbf{v}\)</span>（ただの数）</li>
-<li>80匹ぶんの影は、行列とベクトルの積で<strong>一度に</strong>出せる<span class="fw-colon">：</span><span class="math inline">\(\mathbf{z} = \tilde{X} \mathbf{v}\)</span></li>
+<li>80匹ぶんの影は、行列とベクトルの積で<strong>一度に</strong>出せる：<span class="math inline">\(\mathbf{z} = \tilde{X} \mathbf{v}\)</span></li>
 </ul>
-<p>知りたい「影の分散」を、少しずつ変形していく<span class="fw-colon">：</span></p>
+<p>知りたい「影の分散」を、少しずつ変形していく：</p>
 <p><span class="math display">\[\text{影の分散} = \frac{1}{n-1} \sum_i z_i^2
 = \frac{1}{n-1} \mathbf{z}^{\mathsf T} \mathbf{z}
 \qquad \text{（2乗和は「自分との内積」）}\]</span></p>
@@ -704,7 +704,7 @@ rkskmt
 \qquad \text{（真ん中のかたまりに名前をつける）}\]</span></p>
 <ul>
 <li><strong>共分散行列（<span class="en">covariance matrix</span>）<span class="math inline">\(C\)</span> は、影の分散を変形すると自然に現れる</strong>（ここが登場理由）</li>
-<li>つまり PCA の探しものはこう書ける<span class="fw-colon">：</span></li>
+<li>つまり PCA の探しものはこう書ける：</li>
 </ul>
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
@@ -725,10 +725,10 @@ rkskmt
 <h2>ところで「固有ベクトル」と「固有値」とは</h2>
 <div class="slide-body">
 <ul>
-<li>行列 <span class="math inline">\(A\)</span> は、ベクトルを別のベクトルへ移す<strong>変換</strong>（回して・伸ばす機械）。次の <span class="math inline">\(A\)</span> で実験<span class="fw-colon">：</span></li>
+<li>行列 <span class="math inline">\(A\)</span> は、ベクトルを別のベクトルへ移す<strong>変換</strong>（回して・伸ばす機械）。次の <span class="math inline">\(A\)</span> で実験：</li>
 </ul>
 <p><span class="math display">\[A = \begin{pmatrix} 1.75 &amp; 1.25 \\ 1.25 &amp; 1.75 \end{pmatrix}\]</span></p>
-<div id="80cf3f7d" class="cell" data-execution_count="12">
+<div id="377c906b" class="cell" data-execution_count="12">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -737,8 +737,8 @@ rkskmt
 </div>
 </div>
 </div>
-<p>同じ変換を、名画にかけてみると<span class="fw-colon">：</span></p>
-<div id="d2058039" class="cell" data-execution_count="13">
+<p>同じ変換を、名画にかけてみると：</p>
+<div id="bea9634a" class="cell" data-execution_count="13">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -747,11 +747,11 @@ rkskmt
 </div>
 </div>
 </div>
-<p>（絵<span class="fw-colon">：</span>レオナルド・ダ・ヴィンチ《モナ・リザ》 — <a href="https://commons.wikimedia.org/wiki/File:Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg">Wikimedia Commons</a>、パブリックドメイン）</p>
+<p>（絵：レオナルド・ダ・ヴィンチ《モナ・リザ》 — <a href="https://commons.wikimedia.org/wiki/File:Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg">Wikimedia Commons</a>、パブリックドメイン）</p>
 <ul>
 <li>ほとんどの矢印は、変換されると<strong>回ってしまう</strong>（「ふつうの矢印」＝紺色）</li>
 <li>でも<strong>回らない方向が2本だけ</strong>ある（赤と橙）— 向きはそのまま、<strong>伸び縮みするだけ</strong></li>
-<li>その方向が<strong>固有ベクトル（<span class="en">eigenvector</span>）</strong> <span class="math inline">\(\mathbf{v}\)</span>、伸び縮みの倍率が<strong>固有値（<span class="en">eigenvalue</span>）</strong> <span class="math inline">\(\lambda\)</span><span class="fw-colon">：</span></li>
+<li>その方向が<strong>固有ベクトル（<span class="en">eigenvector</span>）</strong> <span class="math inline">\(\mathbf{v}\)</span>、伸び縮みの倍率が<strong>固有値（<span class="en">eigenvalue</span>）</strong> <span class="math inline">\(\lambda\)</span>：</li>
 </ul>
 <p><span class="math display">\[A \mathbf{v} = \lambda \mathbf{v} \qquad \text{（向きはそのまま、長さだけ } \lambda \text{ 倍）}\]</span></p>
 <div class="callout callout-note callout-titled callout-style-default">
@@ -770,14 +770,14 @@ rkskmt
 </div>
 </section>
 <section id="a-の正体回して伸ばして戻す" class="slide level2">
-<h2>A の正体<span class="fw-colon">：</span>回して・伸ばして・戻す</h2>
+<h2>A の正体：回して・伸ばして・戻す</h2>
 <div class="slide-body">
-<p>種明かし<span class="fw-colon">：</span>この <span class="math inline">\(A\)</span> は、おなじみの<strong>回転行列</strong>と<strong>軸ごとの伸縮</strong>だけで組み立ててありました。</p>
+<p>種明かし：この <span class="math inline">\(A\)</span> は、おなじみの<strong>回転行列</strong>と<strong>軸ごとの伸縮</strong>だけで組み立ててありました。</p>
 <p><span class="math display">\[A = R\, S\, R^{\mathsf T}, \qquad
 R = \begin{pmatrix} \cos 45^\circ &amp; -\sin 45^\circ \\ \sin 45^\circ &amp; \cos 45^\circ \end{pmatrix}, \qquad
 S = \begin{pmatrix} 3 &amp; 0 \\ 0 &amp; 0.5 \end{pmatrix}\]</span></p>
-<p>読み方は<strong>右から</strong>（ベクトルに近い順）。モナ・リザで1段ずつ<span class="fw-colon">：</span></p>
-<div id="e1bc10d6" class="cell" data-execution_count="14">
+<p>読み方は<strong>右から</strong>（ベクトルに近い順）。モナ・リザで1段ずつ：</p>
+<div id="0c4da147" class="cell" data-execution_count="14">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -787,13 +787,13 @@ S = \begin{pmatrix} 3 &amp; 0 \\ 0 &amp; 0.5 \end{pmatrix}\]</span></p>
 </div>
 </div>
 <ul>
-<li><strong>① <span class="math inline">\(R^{\mathsf T}\)</span></strong><span class="fw-colon">：</span><span class="math inline">\(-45^\circ\)</span> 回して、「回らない方向」（赤・橙）を<strong>座標軸にそろえる</strong></li>
-<li><strong>② <span class="math inline">\(S\)</span></strong><span class="fw-colon">：</span>軸に沿って伸縮するだけ — ②の絵では赤い矢印が <span class="math inline">\(x\)</span> 軸の上に乗っている</li>
-<li><strong>③ <span class="math inline">\(R\)</span></strong><span class="fw-colon">：</span><span class="math inline">\(45^\circ\)</span> 回して、元の向きに戻す</li>
+<li><strong>① <span class="math inline">\(R^{\mathsf T}\)</span></strong>：<span class="math inline">\(-45^\circ\)</span> 回して、「回らない方向」（赤・橙）を<strong>座標軸にそろえる</strong></li>
+<li><strong>② <span class="math inline">\(S\)</span></strong>：軸に沿って伸縮するだけ — ②の絵では赤い矢印が <span class="math inline">\(x\)</span> 軸の上に乗っている</li>
+<li><strong>③ <span class="math inline">\(R\)</span></strong>：<span class="math inline">\(45^\circ\)</span> 回して、元の向きに戻す</li>
 <li>つまり「回らない方向」の正体は、<strong><span class="math inline">\(S\)</span> がただ伸縮するだけの軸を、<span class="math inline">\(R\)</span> が <span class="math inline">\(45^\circ\)</span> に向けた先</strong></li>
 <li><strong>固有ベクトル＝ <span class="math inline">\(R\)</span> の列</strong>（軸の向き先）、<strong>固有値＝ <span class="math inline">\(S\)</span> の対角成分</strong>（3 と 0.5）</li>
 </ul>
-<div id="fd73dd23" class="cell" data-execution_count="15">
+<div id="d72bb979" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a></a><span class="co"># 組み立てて確認：R S R^T がたしかに A になる</span></span>
 <span id="cb8-2"><a></a><span class="bu">print</span>(R_rot <span class="op">@</span> S_str <span class="op">@</span> R_rot.T)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -822,7 +822,7 @@ S = \begin{pmatrix} 3 &amp; 0 \\ 0 &amp; 0.5 \end{pmatrix}\]</span></p>
 <ul>
 <li><span class="math inline">\(\|\mathbf{v}\| = 1\)</span> は「<span class="math inline">\(\mathbf{v}\)</span> の先端は半径1の球面の上」という意味</li>
 <li>球面上の<strong>てっぺん</strong>では、球面に沿ってどちらへ動いても <span class="math inline">\(\mathbf{v}^{\mathsf T} C \mathbf{v}\)</span> は増えない</li>
-<li>増える向きを表すのは勾配 <span class="math inline">\(2C\mathbf{v}\)</span>。これが球面の法線方向（<span class="math inline">\(\mathbf{v}\)</span> 自身）と<strong>平行</strong>になるしかない<span class="fw-colon">：</span></li>
+<li>増える向きを表すのは勾配 <span class="math inline">\(2C\mathbf{v}\)</span>。これが球面の法線方向（<span class="math inline">\(\mathbf{v}\)</span> 自身）と<strong>平行</strong>になるしかない：</li>
 </ul>
 <p><span class="math display">\[C \mathbf{v} = \lambda \mathbf{v} \quad \text{（固有ベクトルの定義式そのもの！）}\]</span></p>
 <ul>
@@ -848,10 +848,10 @@ S = \begin{pmatrix} 3 &amp; 0 \\ 0 &amp; 0.5 \end{pmatrix}\]</span></p>
 </div>
 </section>
 <section id="総当たりで確かめる全方向の分散を測る" class="slide level2">
-<h2>総当たりで確かめる<span class="fw-colon">：</span>全方向の分散を測る</h2>
+<h2>総当たりで確かめる：全方向の分散を測る</h2>
 <div class="slide-body">
 <p>固有値分解を信じる前に、<strong>力ずく</strong>で確認してみる。方向 <span class="math inline">\(\mathbf{v}\)</span> を1度刻みで全部試す。</p>
-<div id="9498a167" class="cell" data-execution_count="16">
+<div id="474a6c1b" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a></a>thetas <span class="op">=</span> np.radians(np.arange(<span class="dv">0</span>, <span class="dv">181</span>))</span>
 <span id="cb10-2"><a></a>proj_var <span class="op">=</span> np.array([</span>
 <span id="cb10-3"><a></a>    np.var(X_lw_sc <span class="op">@</span> np.array([np.cos(t), np.sin(t)]), ddof<span class="op">=</span><span class="dv">1</span>)</span>
@@ -867,7 +867,7 @@ S = \begin{pmatrix} 3 &amp; 0 \\ 0 &amp; 0.5 \end{pmatrix}\]</span></p>
 分散が最小の角度: 135°（分散 0.0275）</code></pre>
 </div>
 </div>
-<div id="f1e42859" class="cell" data-execution_count="17">
+<div id="4d4d6aed" class="cell" data-execution_count="17">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -887,7 +887,7 @@ S = \begin{pmatrix} 3 &amp; 0 \\ 0 &amp; 0.5 \end{pmatrix}\]</span></p>
 <h2>NumPy で確かめる</h2>
 <div class="slide-body">
 <p>スライドの式を<strong>そのまま</strong>コードにして、sklearn の答えと突き合わせる。</p>
-<div id="7ae52fa7" class="cell" data-execution_count="18">
+<div id="5f5cc746" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a></a><span class="co"># 1) 式のとおりに共分散行列を作る（専用関数は要らない）</span></span>
 <span id="cb12-2"><a></a>Xc <span class="op">=</span> X_lw_sc <span class="op">-</span> X_lw_sc.mean(axis<span class="op">=</span><span class="dv">0</span>)     <span class="co"># 中心化 X~</span></span>
 <span id="cb12-3"><a></a>C  <span class="op">=</span> Xc.T <span class="op">@</span> Xc <span class="op">/</span> (<span class="bu">len</span>(Xc) <span class="op">-</span> <span class="dv">1</span>)          <span class="co"># C = X~^T X~ / (n-1)</span></span>
@@ -928,7 +928,7 @@ components_.T（sklearn）:
 </div>
 <div class="callout-content">
 <p>実務の PCA は、共分散行列を作らずに中心化したデータを <strong>SVD（特異値分解）</strong> に かけて同じ答えを出している（大きいデータで速く、数値的にも安定）。</p>
-<div id="4b7d73cb" class="cell" data-execution_count="19">
+<div id="30665a10" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a></a>U, S, Vt <span class="op">=</span> np.linalg.svd(Xc)</span>
 <span id="cb14-2"><a></a><span class="bu">print</span>(<span class="st">"SVD から出した分散:"</span>, (S<span class="op">**</span><span class="dv">2</span> <span class="op">/</span> (<span class="bu">len</span>(Xc) <span class="op">-</span> <span class="dv">1</span>)).<span class="bu">round</span>(<span class="dv">4</span>))   <span class="co"># ↑の固有値と一致</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -946,7 +946,7 @@ components_.T（sklearn）:
 <ul>
 <li>輝度・重さ・体長の<strong>3特徴量</strong>を PCA にかけてみる</li>
 </ul>
-<div id="bc659228" class="cell" data-execution_count="20">
+<div id="8b0eb978" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a></a>X3 <span class="op">=</span> np.column_stack([brightness, weights, lengths])   <span class="co"># 3特徴量</span></span>
 <span id="cb16-2"><a></a></span>
 <span id="cb16-3"><a></a>X3_scaled <span class="op">=</span> StandardScaler().fit_transform(X3)   <span class="co"># スケールを揃えてから PCA</span></span>
@@ -990,7 +990,7 @@ components_.T（sklearn）:
 <section id="次元に圧縮しても何も失わない" class="slide level2">
 <h2>2次元に圧縮しても何も失わない</h2>
 <div class="slide-body">
-<div id="044c9011" class="cell" data-execution_count="21">
+<div id="ac470a94" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a></a>colors  <span class="op">=</span> [<span class="st">"#e74c3c"</span>, <span class="st">"#2980b9"</span>]</span>
 <span id="cb18-2"><a></a></span>
 <span id="cb18-3"><a></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">5.8</span>, <span class="fl">3.8</span>))</span>
@@ -1034,8 +1034,8 @@ components_.T（sklearn）:
 <section id="次元データを2次元に圧縮iris" class="slide level2">
 <h2>4次元データを2次元に圧縮（Iris）</h2>
 <div class="slide-body">
-<p>Fisher の Iris データセット<span class="fw-colon">：</span>4特徴量（がく片長さ・幅、花弁長さ・幅）</p>
-<div id="02051eb0" class="cell" data-execution_count="22">
+<p>Fisher の Iris データセット：4特徴量（がく片長さ・幅、花弁長さ・幅）</p>
+<div id="4d75ec90" class="cell" data-execution_count="22">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> load_iris</span>
 <span id="cb19-2"><a></a></span>
 <span id="cb19-3"><a></a>iris   <span class="op">=</span> load_iris()</span>
@@ -1088,7 +1088,7 @@ components_.T（sklearn）:
 <section id="寄与率explained-variance-ratio" class="slide level2">
 <h2>寄与率（<span class="en">Explained Variance Ratio</span>）</h2>
 <div class="slide-body">
-<div id="bf2ea623" class="cell" data-execution_count="23">
+<div id="736888e2" class="cell" data-execution_count="23">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a></a>ratios     <span class="op">=</span> pca4.explained_variance_ratio_</span>
 <span id="cb20-2"><a></a>cumulative <span class="op">=</span> np.cumsum(ratios)</span>
 <span id="cb20-3"><a></a></span>
@@ -1138,9 +1138,9 @@ components_.T（sklearn）:
 <h2>まとめ</h2>
 <div class="slide-body">
 <ul>
-<li><strong>次元の呪い</strong><span class="fw-colon">：</span>次元が増えると空間が広くなり、距離が意味をなさなくなる</li>
-<li><strong>特徴量を増やしても情報が増えるとは限らない</strong><span class="fw-colon">：</span>体長は重さの言い換えだった</li>
-<li><strong>PCA</strong><span class="fw-colon">：</span>分散が最大の方向（= 共分散行列の固有ベクトル）に軸を取り直す
+<li><strong>次元の呪い</strong>：次元が増えると空間が広くなり、距離が意味をなさなくなる</li>
+<li><strong>特徴量を増やしても情報が増えるとは限らない</strong>：体長は重さの言い換えだった</li>
+<li><strong>PCA</strong>：分散が最大の方向（= 共分散行列の固有ベクトル）に軸を取り直す
 <ul>
 <li>寄与率を見れば「データの<strong>実質的な次元</strong>」がわかる（魚は3次元に見えて実質2次元）</li>
 </ul></li>
@@ -1195,30 +1195,30 @@ components_.T（sklearn）:
 <h2>練習問題</h2>
 <div class="slide-body">
 <p>問題1は<strong>手計算</strong>、問題2は<strong>Pythonコード</strong>で解け。</p>
-<h3 id="問題1この4点本当は何次元">問題1<span class="fw-colon">：</span>この4点、本当は何次元？</h3>
-<p>4点のデータ<span class="fw-colon">：</span><span class="math inline">\((2, 1)\)</span>、<span class="math inline">\((4, 2)\)</span>、<span class="math inline">\((6, 3)\)</span>、<span class="math inline">\((8, 4)\)</span>。</p>
+<h3 id="問題1この4点本当は何次元">問題1：この4点、本当は何次元？</h3>
+<p>4点のデータ：<span class="math inline">\((2, 1)\)</span>、<span class="math inline">\((4, 2)\)</span>、<span class="math inline">\((6, 3)\)</span>、<span class="math inline">\((8, 4)\)</span>。</p>
 <ol type="1">
 <li><span class="math inline">\(x\)</span> 方向の分散と <span class="math inline">\(y\)</span> 方向の分散を求めよ（<span class="math inline">\(N\)</span> で割る定義で）</li>
 <li>第1主成分の方向を予想せよ（プロットしてよい）</li>
 <li>このデータを1次元に圧縮すると、情報はどれだけ失われるか。つまり<strong>実質的な次元</strong>はいくつか</li>
 </ol>
-<h3 id="問題2pca-に答え合わせをさせる">問題2<span class="fw-colon">：</span>PCA に答え合わせをさせる</h3>
+<h3 id="問題2pca-に答え合わせをさせる">問題2：PCA に答え合わせをさせる</h3>
 <p>問題1の4点に <code>PCA(n_components=2)</code> を適用し、<code>explained_variance_ratio_</code> を表示して、問題1の3.の答えを確かめよ。</p>
 </div>
 </section>
 <section id="問題1の解答例" class="slide level2">
 <h2>問題1の解答例</h2>
 <div class="slide-body">
-<p><strong><span class="math inline">\(x\)</span> 方向</strong><span class="fw-colon">：</span>平均 <span class="math inline">\(5\)</span>、分散 <span class="math inline">\(= \dfrac{(-3)^2 + (-1)^2 + 1^2 + 3^2}{4} = \dfrac{20}{4} = 5\)</span></p>
-<p><strong><span class="math inline">\(y\)</span> 方向</strong><span class="fw-colon">：</span>平均 <span class="math inline">\(2.5\)</span>、分散 <span class="math inline">\(= \dfrac{2.25 + 0.25 + 0.25 + 2.25}{4} = 1.25\)</span></p>
-<p><strong>第1主成分</strong><span class="fw-colon">：</span>4点はすべて直線 <span class="math inline">\(y = x/2\)</span> の上に<strong>ぴったり</strong>乗っている。 分散最大の方向はこの直線の方向 <span class="math inline">\((2, 1)/\sqrt{5}\)</span>。</p>
-<p><strong>実質的な次元</strong><span class="fw-colon">：</span>直線上にあるので、直線に沿った1つの座標だけで4点を完全に表せる。 <strong>1次元に圧縮しても情報は何も失われない</strong> — 実質1次元。</p>
+<p><strong><span class="math inline">\(x\)</span> 方向</strong>：平均 <span class="math inline">\(5\)</span>、分散 <span class="math inline">\(= \dfrac{(-3)^2 + (-1)^2 + 1^2 + 3^2}{4} = \dfrac{20}{4} = 5\)</span></p>
+<p><strong><span class="math inline">\(y\)</span> 方向</strong>：平均 <span class="math inline">\(2.5\)</span>、分散 <span class="math inline">\(= \dfrac{2.25 + 0.25 + 0.25 + 2.25}{4} = 1.25\)</span></p>
+<p><strong>第1主成分</strong>：4点はすべて直線 <span class="math inline">\(y = x/2\)</span> の上に<strong>ぴったり</strong>乗っている。 分散最大の方向はこの直線の方向 <span class="math inline">\((2, 1)/\sqrt{5}\)</span>。</p>
+<p><strong>実質的な次元</strong>：直線上にあるので、直線に沿った1つの座標だけで4点を完全に表せる。 <strong>1次元に圧縮しても情報は何も失われない</strong> — 実質1次元。</p>
 </div>
 </section>
 <section id="問題2の解答例" class="slide level2">
 <h2>問題2の解答例</h2>
 <div class="slide-body">
-<div id="d8beba94" class="cell" data-execution_count="24">
+<div id="db497660" class="cell" data-execution_count="24">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>

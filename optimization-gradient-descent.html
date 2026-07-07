@@ -224,7 +224,7 @@ rkskmt
 </ul>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a>model.fit(X, y)   <span class="co"># ← この中で何が起きている？</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <ul>
-<li><code>fit()</code> の仕事<span class="fw-colon">：</span>パラメータを動かして、<strong>損失（ダメさの点数）が最小になる場所</strong>を探すこと</li>
+<li><code>fit()</code> の仕事：パラメータを動かして、<strong>損失（ダメさの点数）が最小になる場所</strong>を探すこと</li>
 <li>つまり中身の正体は<strong>最適化</strong></li>
 </ul>
 <div title="今回の問い">
@@ -282,7 +282,7 @@ rkskmt
 <section id="パラメータは図の中に見えている" class="slide level2">
 <h2>パラメータは図の中に見えている</h2>
 <div class="slide-body">
-<div id="cb9b6ce2" class="cell" data-execution_count="1">
+<div id="0f070110" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -316,7 +316,7 @@ rkskmt
 <div id="機械学習の中心課題" class="slide-body-heading">
 機械学習の中心課題
 </div>
-<p>これまで学んだ手法も、裏ではすべて<strong>最適化問題</strong>を解いていた<span class="fw-colon">：</span></p>
+<p>これまで学んだ手法も、裏ではすべて<strong>最適化問題</strong>を解いていた：</p>
 <ul>
 <li><strong>しきい値分類</strong>: 誤分類が最も少なくなる場所にしきい値を置く</li>
 <li><strong>k-means</strong>: 各点から中心までの距離の合計（inertia）を最小にする</li>
@@ -338,7 +338,7 @@ rkskmt
 </div>
 </div>
 <h3 id="今回扱う問題">今回扱う問題</h3>
-<p>次の関数の最小値を求めます<span class="fw-colon">：</span></p>
+<p>次の関数の最小値を求めます：</p>
 <p><span class="math display">\[f(x) = x^2 - 4x + 3\]</span></p>
 <p>数学的には簡単だが、今回は<strong>数値的に</strong>（機械のやり方で）解く。</p>
 <h3 id="今回の目標">今回の目標</h3>
@@ -349,9 +349,9 @@ rkskmt
 </div>
 </section>
 <section id="準備pythonのセットアップ" class="slide level2">
-<h2>準備<span class="fw-colon">：</span>Pythonのセットアップ</h2>
+<h2>準備：Pythonのセットアップ</h2>
 <div class="slide-body">
-<div id="1eff63b4" class="cell" data-execution_count="2">
+<div id="9fe46179" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb2-2"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb2-3"><a></a><span class="im">import</span> japanize_matplotlib</span>
@@ -361,7 +361,7 @@ rkskmt
 <span id="cb2-7"><a></a>plt.rcParams[<span class="st">"figure.dpi"</span>] <span class="op">=</span> <span class="dv">100</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <h3 id="関数の定義">関数の定義</h3>
-<div id="b0292c77" class="cell" data-execution_count="3">
+<div id="58e14a2c" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a><span class="kw">def</span> f(x):</span>
 <span id="cb3-2"><a></a>    <span class="co">"""目的関数 f(x) = x^2 - 4x + 3"""</span></span>
 <span id="cb3-3"><a></a>    <span class="cf">return</span> x<span class="op">**</span><span class="dv">2</span> <span class="op">-</span> <span class="dv">4</span><span class="op">*</span>x <span class="op">+</span> <span class="dv">3</span></span>
@@ -390,7 +390,7 @@ rkskmt
 <li>また傾きを測る</li>
 <li>繰り返して最小値を探す</li>
 </ol>
-<div id="21788342" class="cell" data-execution_count="4">
+<div id="39db9b21" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -424,7 +424,7 @@ rkskmt
 </div>
 </section>
 <section id="勾配降下法手計算で実行" class="slide level2">
-<h2>勾配降下法<span class="fw-colon">：</span>手計算で実行</h2>
+<h2>勾配降下法：手計算で実行</h2>
 <div class="slide-body">
 <div id="設定" class="slide-body-heading">
 設定
@@ -436,14 +436,14 @@ rkskmt
 <li><strong>学習率: <span class="math inline">\(\alpha = 0.3\)</span></strong></li>
 </ul>
 <h3 id="反復1">反復1</h3>
-<h4 id="ステップ1現在の位置">ステップ1<span class="fw-colon">：</span>現在の位置</h4>
+<h4 id="ステップ1現在の位置">ステップ1：現在の位置</h4>
 <p><span class="math display">\[x = 0\]</span></p>
-<h4 id="ステップ2関数値を計算">ステップ2<span class="fw-colon">：</span>関数値を計算</h4>
+<h4 id="ステップ2関数値を計算">ステップ2：関数値を計算</h4>
 <p><span class="math display">\[f(0) = 0^2 - 4 \times 0 + 3 = 3\]</span></p>
-<h4 id="ステップ3勾配を計算">ステップ3<span class="fw-colon">：</span>勾配を計算</h4>
+<h4 id="ステップ3勾配を計算">ステップ3：勾配を計算</h4>
 <p><span class="math display">\[f'(0) = 2 \times 0 - 4 = -4\]</span></p>
 <p><strong>意味</strong>: 傾きが<span class="math inline">\(-4\)</span>（負）なので、右に行くほど値が小さくなる</p>
-<h4 id="ステップ4更新">ステップ4<span class="fw-colon">：</span>更新</h4>
+<h4 id="ステップ4更新">ステップ4：更新</h4>
 <p><strong>更新式:</strong> <span class="math display">\[x_{\text{new}} = x - \alpha \cdot f'(x)\]</span></p>
 <p><strong>代入:</strong> <span class="math display">\[x_{\text{new}} = 0 - 0.3 \times (-4)\]</span></p>
 <p><strong>計算:</strong> <span class="math display">\[\begin{align}
@@ -464,7 +464,7 @@ rkskmt
 </div>
 </div>
 </div>
-<div id="7a9a96a9" class="cell" data-execution_count="6">
+<div id="50969b6b" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -474,13 +474,13 @@ rkskmt
 </div>
 </div>
 <h3 id="反復2">反復2</h3>
-<h4 id="ステップ1現在の位置-1">ステップ1<span class="fw-colon">：</span>現在の位置</h4>
+<h4 id="ステップ1現在の位置-1">ステップ1：現在の位置</h4>
 <p><span class="math display">\[x = 1.2\]</span></p>
-<h4 id="ステップ2関数値">ステップ2<span class="fw-colon">：</span>関数値</h4>
+<h4 id="ステップ2関数値">ステップ2：関数値</h4>
 <p><span class="math display">\[f(1.2) = 1.2^2 - 4 \times 1.2 + 3 = 1.44 - 4.8 + 3 = -0.36\]</span></p>
-<h4 id="ステップ3勾配">ステップ3<span class="fw-colon">：</span>勾配</h4>
+<h4 id="ステップ3勾配">ステップ3：勾配</h4>
 <p><span class="math display">\[f'(1.2) = 2 \times 1.2 - 4 = 2.4 - 4 = -1.6\]</span></p>
-<h4 id="ステップ4更新-1">ステップ4<span class="fw-colon">：</span>更新</h4>
+<h4 id="ステップ4更新-1">ステップ4：更新</h4>
 <p><span class="math display">\[x_{\text{new}} = 1.2 - 0.3 \times (-1.6) = 1.2 + 0.48 = 1.68\]</span></p>
 <div class="callout callout-important callout-titled callout-style-default">
 <div class="callout-body">
@@ -495,7 +495,7 @@ rkskmt
 </div>
 </div>
 </div>
-<div id="c9c9c34f" class="cell" data-execution_count="7">
+<div id="2538f505" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -507,7 +507,7 @@ rkskmt
 </div>
 </section>
 <section id="手計算で実行反復を続ける" class="slide level2">
-<h2>手計算で実行<span class="fw-colon">：</span>反復を続ける</h2>
+<h2>手計算で実行：反復を続ける</h2>
 <div class="slide-body">
 <div id="反復3" class="slide-body-heading">
 反復3
@@ -518,7 +518,7 @@ rkskmt
 <p><span class="math display">\[f'(1.68) = 2 \times 1.68 - 4 = 3.36 - 4 = -0.64\]</span></p>
 <h4 id="更新">更新</h4>
 <p><span class="math display">\[x_{\text{new}} = 1.68 - 0.3 \times (-0.64) = 1.68 + 0.192 = 1.872\]</span></p>
-<div id="cd89443f" class="cell" data-execution_count="8">
+<div id="638cf683" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -534,7 +534,7 @@ rkskmt
 <p><span class="math display">\[f'(1.872) = 2 \times 1.872 - 4 = 3.744 - 4 = -0.256\]</span></p>
 <h4 id="更新-1">更新</h4>
 <p><span class="math display">\[x_{\text{new}} = 1.872 - 0.3 \times (-0.256) = 1.872 + 0.0768 = 1.9488\]</span></p>
-<div id="813746af" class="cell" data-execution_count="9">
+<div id="0c61a527" class="cell" data-execution_count="9">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -592,7 +592,7 @@ rkskmt
 </tr>
 </tbody>
 </table>
-<div id="b361c0cb" class="cell" data-execution_count="10">
+<div id="88121074" class="cell" data-execution_count="10">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -617,9 +617,9 @@ rkskmt
 </div>
 </section>
 <section id="勾配降下法python実装" class="slide level2">
-<h2>勾配降下法<span class="fw-colon">：</span>Python実装</h2>
+<h2>勾配降下法：Python実装</h2>
 <div class="slide-body">
-<div id="21373f02" class="cell" data-execution_count="11">
+<div id="c5e91881" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a></a><span class="co"># 初期設定</span></span>
@@ -751,7 +751,7 @@ f'(x) = -0.0066
 <div id="学習率の選択が難しい" class="slide-body-heading">
 学習率の選択が難しい
 </div>
-<div id="39fbe03b" class="cell" data-execution_count="12">
+<div id="da3cfce1" class="cell" data-execution_count="12">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -789,7 +789,7 @@ f'(x) = -0.0066
 <div class="slide-body">
 <ul>
 <li>弱点（学習率の調整・遅さ）があるのに、<strong>ディープラーニングのエンジンは勾配降下法</strong></li>
-<li>理由<span class="fw-colon">：</span>パラメータが<strong>数百万個</strong>あっても、1次微分さえ計算できれば動く（軽い）</li>
+<li>理由：パラメータが<strong>数百万個</strong>あっても、1次微分さえ計算できれば動く（軽い）</li>
 <li>学習率は、自動で加減する改良版（Adam など）が実用では使われている</li>
 </ul>
 <div title="参考資料">
@@ -817,11 +817,11 @@ f'(x) = -0.0066
 <div class="slide-body">
 <ul>
 <li><strong>最適化</strong> ＝ パラメータを動かして、損失が最小の場所を探すこと（<code>fit()</code> の正体）</li>
-<li><strong>勾配降下法</strong><span class="fw-colon">：</span>傾きを測り、逆方向に少し進む、を繰り返す</li>
+<li><strong>勾配降下法</strong>：傾きを測り、逆方向に少し進む、を繰り返す</li>
 </ul>
 <p><span class="math display">\[x_{\text{new}} = x - \alpha \cdot f'(x)\]</span></p>
 <ul>
-<li><strong>学習率 <span class="math inline">\(\alpha\)</span></strong> が唯一の調整つまみ<span class="fw-colon">：</span>小さすぎると遅い、大きすぎると発散</li>
+<li><strong>学習率 <span class="math inline">\(\alpha\)</span></strong> が唯一の調整つまみ：小さすぎると遅い、大きすぎると発散</li>
 <li>シンプルで軽いからこそ、<strong>大規模問題（ディープラーニング）の標準エンジン</strong></li>
 </ul>
 </div>
@@ -840,14 +840,14 @@ f'(x) = -0.0066
 <h2>練習問題</h2>
 <div class="slide-body">
 <p>以下の問題を<strong>手計算</strong>と<strong>Pythonコード</strong>の両方で解け。</p>
-<h3 id="問題1勾配降下法">問題1<span class="fw-colon">：</span>勾配降下法</h3>
-<p>関数 <span class="math inline">\(f(x) = x^2 + 6x + 5\)</span> について<span class="fw-colon">：</span></p>
+<h3 id="問題1勾配降下法">問題1：勾配降下法</h3>
+<p>関数 <span class="math inline">\(f(x) = x^2 + 6x + 5\)</span> について：</p>
 <ol type="1">
 <li>1次微分を求めよ</li>
 <li>初期値 <span class="math inline">\(x_0 = 0\)</span>、学習率 <span class="math inline">\(\alpha = 0.2\)</span> で勾配降下法を実行せよ</li>
 <li>反復1、反復2、反復3を手計算で示せ</li>
 </ol>
-<p>発展課題<span class="fw-colon">：</span><a href="./newton-method-appendix.html">Newton法（参考資料）</a>の練習問題で、同じ関数を別の手法で解いて速さを比較する。</p>
+<p>発展課題：<a href="./newton-method-appendix.html">Newton法（参考資料）</a>の練習問題で、同じ関数を別の手法で解いて速さを比較する。</p>
 </div>
 </section>
 <section id="問題1の解答例" class="slide level2">
@@ -870,7 +870,7 @@ f'(x) = -0.0066
 <p><strong>現在</strong>: <span class="math inline">\(x = -1.92\)</span></p>
 <p><span class="math display">\[f'(-1.92) = 2(-1.92) + 6 = -3.84 + 6 = 2.16\]</span></p>
 <p><strong>更新:</strong> <span class="math display">\[x_{\text{new}} = -1.92 - 0.2 \times 2.16 = -1.92 - 0.432 = -2.352\]</span></p>
-<div id="02435393" class="cell" data-execution_count="13">
+<div id="d5494c54" class="cell" data-execution_count="13">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>

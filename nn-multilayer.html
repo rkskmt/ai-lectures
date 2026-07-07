@@ -244,7 +244,7 @@ rkskmt
 <section id="直線では絶対に分けられないデータ" class="slide level2">
 <h2>直線では絶対に分けられないデータ</h2>
 <div class="slide-body">
-<div id="c87cb815" class="cell" data-execution_count="1">
+<div id="feae61f1" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -276,7 +276,7 @@ rkskmt
 <section id="最小単位の限界" class="slide level2">
 <h2>最小単位の限界</h2>
 <div class="slide-body">
-<div id="9d55a903" class="cell" data-execution_count="2">
+<div id="4a8c2fbe" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -316,7 +316,7 @@ rkskmt
 <li>展開すると<strong>ただのアフィン変換1回分</strong>。何回重ねても同じ</li>
 <li>線形（アフィン）変換は、重ねても線形のまま — <strong>境界は直線のまま</strong></li>
 </ul>
-<div id="df404d7d" class="cell" data-execution_count="3">
+<div id="fc410da5" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -332,10 +332,10 @@ rkskmt
 </div>
 </section>
 <section id="間に非線形を挟むrelu" class="slide level2">
-<h2>間に「非線形」を挟む<span class="fw-colon">：</span>ReLU</h2>
+<h2>間に「非線形」を挟む：ReLU</h2>
 <div class="slide-body">
 <p><span class="math display">\[h = \mathrm{ReLU}(z) = \max(0, z)\]</span></p>
-<div id="8a9f9179" class="cell" data-execution_count="4">
+<div id="b9ff6c4c" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -356,7 +356,7 @@ rkskmt
 <div class="slide-body">
 <p><span class="math display">\[x \;\xrightarrow{\;\alpha^{\mathsf T} x + b\;}\; z \;\xrightarrow{\;\mathrm{ReLU}\;}\; h \;\xrightarrow{\;w h + c\;}\; y \;\xrightarrow{\;\sigma\;}\; p\]</span></p>
 <ul>
-<li>パラメータは5個<span class="fw-colon">：</span><span class="math inline">\(\alpha_1, \alpha_2, b\)</span>（中間）＋ <span class="math inline">\(w, c\)</span>（出力）</li>
+<li>パラメータは5個：<span class="math inline">\(\alpha_1, \alpha_2, b\)</span>（中間）＋ <span class="math inline">\(w, c\)</span>（出力）</li>
 <li>中間の変換が「特徴を作る」、出力の変換が「まとめて判定する」</li>
 <li>これが<strong>2層</strong>のネットワーク。「層」とは変換の段数のこと</li>
 </ul>
@@ -379,15 +379,15 @@ rkskmt
 <h2>誤差はどうやって奥まで届くのか</h2>
 <div class="slide-body">
 <ul>
-<li>出力側の勾配は前回と同じ<span class="fw-colon">：</span><span class="math inline">\(\delta_{\text{out}} = p - y\)</span></li>
-<li>中間のパラメータには、<strong>出力の重み <span class="math inline">\(w\)</span> を通して</strong>誤差を配る<span class="fw-colon">：</span></li>
+<li>出力側の勾配は前回と同じ：<span class="math inline">\(\delta_{\text{out}} = p - y\)</span></li>
+<li>中間のパラメータには、<strong>出力の重み <span class="math inline">\(w\)</span> を通して</strong>誤差を配る：</li>
 </ul>
 <p><span class="math display">\[\delta_{\text{mid}} = \delta_{\text{out}} \cdot w \cdot \mathrm{ReLU}'(z)\]</span></p>
 <ul>
 <li><span class="math inline">\(\mathrm{ReLU}'(z)\)</span> は <span class="math inline">\(z &gt; 0\)</span> なら 1、<span class="math inline">\(z \leq 0\)</span> なら 0（折られた側には誤差が流れない）</li>
-<li>各パラメータの更新は前回と同じ形<span class="fw-colon">：</span><span class="math inline">\(\alpha \leftarrow \alpha - \eta\, \delta_{\text{mid}}\, x\)</span></li>
+<li>各パラメータの更新は前回と同じ形：<span class="math inline">\(\alpha \leftarrow \alpha - \eta\, \delta_{\text{mid}}\, x\)</span></li>
 </ul>
-<div id="98d26c6e" class="cell" data-execution_count="5">
+<div id="163f7914" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -446,7 +446,7 @@ y &amp;= w_1 h_1 + w_2 h_2 + c, \quad p = \sigma(y)
 <section id="peek-curved-boundary" class="slide level2">
 <h2>折り目が増えると境界が曲がる</h2>
 <div class="slide-body">
-<div id="d5b79a3e" class="cell" data-execution_count="6">
+<div id="d54b85bf" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -503,8 +503,8 @@ y &amp;= w_1 h_1 + w_2 h_2 + c, \quad p = \sigma(y)
 </ul>
 </div>
 <ul>
-<li>解決策<span class="fw-colon">：</span><strong>ランダム初期化</strong>で最初から全員を別の場所に置く（対称性を破る）</li>
-<li>補助策<span class="fw-colon">：</span>学習中にランダムに変換を休ませる <strong>Dropout</strong>（依存しすぎを防ぐ）</li>
+<li>解決策：<strong>ランダム初期化</strong>で最初から全員を別の場所に置く（対称性を破る）</li>
+<li>補助策：学習中にランダムに変換を休ませる <strong>Dropout</strong>（依存しすぎを防ぐ）</li>
 </ul>
 </div>
 </section>
@@ -595,15 +595,15 @@ y &amp;= w_1 h_1 + w_2 h_2 + c, \quad p = \sigma(y)
 <h2>練習問題</h2>
 <div class="slide-body">
 <p>以下の問題を<strong>手計算</strong>と<strong>Pythonコード</strong>の両方で解け。</p>
-<h3 id="問題1relu-2本で山を作る">問題1<span class="fw-colon">：</span>ReLU 2本で山を作る</h3>
-<p>入力 <span class="math inline">\(x\)</span> は1次元。中間の変換2つと出力を、次のパラメータに固定する（学習はしない）<span class="fw-colon">：</span></p>
+<h3 id="問題1relu-2本で山を作る">問題1：ReLU 2本で山を作る</h3>
+<p>入力 <span class="math inline">\(x\)</span> は1次元。中間の変換2つと出力を、次のパラメータに固定する（学習はしない）：</p>
 <p><span class="math display">\[h_1 = \mathrm{ReLU}(x), \qquad h_2 = \mathrm{ReLU}(x - 1), \qquad y = h_1 - 2 h_2\]</span></p>
 <ol type="1">
 <li><span class="math inline">\(x = -1, 0, 1, 2, 3\)</span> での <span class="math inline">\(y\)</span> を手計算せよ（<span class="math inline">\(h_1, h_2\)</span> も示す）</li>
 <li>この折れ線の<strong>折り目</strong>は <span class="math inline">\(x\)</span> がいくつの場所にあるか。それぞれどちらの ReLU が作った折り目か</li>
 <li><span class="math inline">\(-2 \leq x \leq 3\)</span> で <span class="math inline">\(y\)</span> をプロットし、手計算と一致することを確かめよ</li>
 </ol>
-<p>ヒント<span class="fw-colon">：</span>折り目は「その ReLU の入り口 <span class="math inline">\(z\)</span> がちょうど 0 になる場所」にできる。</p>
+<p>ヒント：折り目は「その ReLU の入り口 <span class="math inline">\(z\)</span> がちょうど 0 になる場所」にできる。</p>
 </div>
 </section>
 <section id="問題1の解答例" class="slide level2">
@@ -662,7 +662,7 @@ y &amp;= w_1 h_1 + w_2 h_2 + c, \quad p = \sigma(y)
 </table>
 <p>折り目は <strong><span class="math inline">\(x = 0\)</span>（<span class="math inline">\(h_1\)</span> の入り口がゼロ）</strong> と <strong><span class="math inline">\(x = 1\)</span>（<span class="math inline">\(h_2\)</span> の入り口がゼロ）</strong> の2箇所。</p>
 <h3 id="コードで確認">コードで確認</h3>
-<div id="4207b528" class="cell" data-execution_count="7">
+<div id="c0f52b3c" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -695,8 +695,8 @@ y &amp;= w_1 h_1 + w_2 h_2 + c, \quad p = \sigma(y)
 </div>
 <ul>
 <li>平ら → 登り → 下り、の<strong>山</strong>が1つできた。たった ReLU 2本の仕事</li>
-<li>本編の三日月の境界も、原理はこれと同じ<span class="fw-colon">：</span><strong>折り目を置きたい場所に、ReLU の入り口ゼロを学習で持ってくる</strong></li>
-<li>発展<span class="fw-colon">：</span><span class="math inline">\(y = h_1 - 2h_2\)</span> の <span class="math inline">\(-2\)</span> を <span class="math inline">\(+2\)</span> に変えるとどんな形になるか、予想してから実行してみよう</li>
+<li>本編の三日月の境界も、原理はこれと同じ：<strong>折り目を置きたい場所に、ReLU の入り口ゼロを学習で持ってくる</strong></li>
+<li>発展：<span class="math inline">\(y = h_1 - 2h_2\)</span> の <span class="math inline">\(-2\)</span> を <span class="math inline">\(+2\)</span> に変えるとどんな形になるか、予想してから実行してみよう</li>
 </ul>
 
 

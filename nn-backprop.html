@@ -245,7 +245,7 @@ rkskmt
 <h2>正面から微分すると地獄</h2>
 <div class="slide-body">
 <ul>
-<li>前回の2層ネット。<span class="math inline">\(\alpha_1\)</span> の勾配を<strong>直接</strong>書き下すと<span class="fw-colon">：</span></li>
+<li>前回の2層ネット。<span class="math inline">\(\alpha_1\)</span> の勾配を<strong>直接</strong>書き下すと：</li>
 </ul>
 <p><span class="math display">\[\frac{\partial L}{\partial \alpha_1} = \frac{\partial}{\partial \alpha_1} \left[ -\log \sigma\!\Big( w \cdot \mathrm{ReLU}(\alpha_1 x_1 + \alpha_2 x_2 + b) + c \Big) \right]\]</span></p>
 <div title="クイズ">
@@ -272,10 +272,10 @@ rkskmt
 </div>
 </section>
 <section id="連鎖律微分は掛け算でつなげる" class="slide level2">
-<h2>連鎖律<span class="fw-colon">：</span>微分は掛け算でつなげる</h2>
+<h2>連鎖律：微分は掛け算でつなげる</h2>
 <div class="slide-body">
 <ul>
-<li>関数が数珠つなぎなら、微分も数珠つなぎ<span class="fw-colon">：</span></li>
+<li>関数が数珠つなぎなら、微分も数珠つなぎ：</li>
 </ul>
 <p><span class="math display">\[y = f(g(x)) \quad \Rightarrow \quad \frac{dy}{dx} = \frac{dy}{dg} \cdot \frac{dg}{dx}\]</span></p>
 <ul>
@@ -297,7 +297,7 @@ rkskmt
 \xrightarrow{\;u = w h + c\;} u
 \xrightarrow{\;\sigma\;} p
 \xrightarrow{\;-\log\;} L\]</span></p>
-<p>これを<strong>具体的な数値で1往復</strong>する<span class="fw-colon">：</span></p>
+<p>これを<strong>具体的な数値で1往復</strong>する：</p>
 <table class="caption-top">
 <thead>
 <tr class="header">
@@ -327,10 +327,10 @@ rkskmt
 </div>
 </section>
 <section id="往路forward数値を流す" class="slide level2">
-<h2>往路（<span class="en">Forward</span>）<span class="fw-colon">：</span>数値を流す</h2>
+<h2>往路（<span class="en">Forward</span>）：数値を流す</h2>
 <div class="slide-body">
 <p><span class="math display">\[z = 0.3 \times 1.0 + (-0.2) \times 0.5 + 0.1 = 0.30\]</span> <span class="math display">\[h = \mathrm{ReLU}(0.30) = 0.30\]</span> <span class="math display">\[u = 0.5 \times 0.30 + (-0.1) = 0.05\]</span> <span class="math display">\[p = \sigma(0.05) = 0.5125\]</span> <span class="math display">\[L = -\log(0.5125) = 0.6685\]</span></p>
-<div id="d14328be" class="cell" data-execution_count="1">
+<div id="a84c5bdb" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -346,7 +346,7 @@ rkskmt
 </div>
 </section>
 <section id="peek-handcalc" class="slide level2">
-<h2>復路（<span class="en">Backward</span>）<span class="fw-colon">：</span>出力側から勾配を貯める</h2>
+<h2>復路（<span class="en">Backward</span>）：出力側から勾配を貯める</h2>
 <div class="slide-body">
 <div id="出力層" class="slide-body-heading">
 出力層
@@ -367,7 +367,7 @@ rkskmt
 <ul>
 <li>5個の勾配が<strong>掛け算と代入だけ</strong>で出揃った。新しい微分は1つもしていない</li>
 </ul>
-<div id="2f1a6cfa" class="cell" data-execution_count="2">
+<div id="6c127e69" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -382,12 +382,12 @@ rkskmt
 </div>
 </section>
 <section id="検算機械に微分の定義でやらせる" class="slide level2">
-<h2>検算<span class="fw-colon">：</span>機械に「微分の定義」でやらせる</h2>
+<h2>検算：機械に「微分の定義」でやらせる</h2>
 <div class="slide-body">
 <ul>
 <li>微分の定義 <span class="math inline">\(\dfrac{L(\theta + \varepsilon) - L(\theta)}{\varepsilon}\)</span> で、手計算を検算できる（<strong>数値微分</strong>）</li>
 </ul>
-<div id="38ed91a4" class="cell" data-execution_count="3">
+<div id="b1d74a46" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a></a></span>
 <span id="cb1-3"><a></a>x1, x2, y <span class="op">=</span> <span class="fl">1.0</span>, <span class="fl">0.5</span>, <span class="fl">1.0</span></span>
@@ -427,10 +427,10 @@ rkskmt
 </div>
 </section>
 <section id="一般形何層でも同じ漸化式" class="slide level2">
-<h2>一般形<span class="fw-colon">：</span>何層でも同じ漸化式</h2>
+<h2>一般形：何層でも同じ漸化式</h2>
 <div class="slide-body">
 <ul>
-<li>層がいくつあっても、復路は<strong>同じ形の繰り返し</strong><span class="fw-colon">：</span></li>
+<li>層がいくつあっても、復路は<strong>同じ形の繰り返し</strong>：</li>
 </ul>
 <p><span class="math display">\[\delta^{(\ell)} = \delta^{(\ell+1)} \cdot w^{(\ell+1)} \cdot f'(z^{(\ell)})\]</span></p>
 <ul>
@@ -468,7 +468,7 @@ rkskmt
 <li>中間層に ReLU が選ばれる大きな理由</li>
 </ul></li>
 </ul>
-<div id="ab250de2" class="cell" data-execution_count="4">
+<div id="4393f89e" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -497,7 +497,7 @@ rkskmt
 <div class="slide-body">
 <ul>
 <li>勾配の計算は、<strong>連鎖律で出力側から掛けて貯める</strong> — 展開不要、微分は部品ごと</li>
-<li>手計算1往復<span class="fw-colon">：</span>forward の値を保存 → <span class="math inline">\(\delta\)</span> を逆流させて各勾配</li>
+<li>手計算1往復：forward の値を保存 → <span class="math inline">\(\delta\)</span> を逆流させて各勾配</li>
 <li><strong>数値微分</strong>は検算には最高、実用には遅すぎる</li>
 <li>何層でも同じ漸化式 <span class="math inline">\(\delta^{(\ell)} = \delta^{(\ell+1)} w^{(\ell+1)} f'(z^{(\ell)})\)</span> が回るだけ</li>
 </ul>
@@ -522,7 +522,7 @@ rkskmt
 <h2>練習問題</h2>
 <div class="slide-body">
 <p>以下の問題を<strong>手計算</strong>で解き、<strong>数値微分</strong>で検算せよ。</p>
-<p>ネットワークは本編と同じ5パラメータ。値だけ差し替える<span class="fw-colon">：</span></p>
+<p>ネットワークは本編と同じ5パラメータ。値だけ差し替える：</p>
 <table class="caption-top">
 <thead>
 <tr class="header">
@@ -549,14 +549,14 @@ rkskmt
 </tr>
 </tbody>
 </table>
-<h3 id="問題11往復せよ">問題1<span class="fw-colon">：</span>1往復せよ</h3>
+<h3 id="問題11往復せよ">問題1：1往復せよ</h3>
 <ol type="1">
-<li>往路<span class="fw-colon">：</span><span class="math inline">\(z, h, u, p, L\)</span> を順に求めよ（正解が <span class="math inline">\(y=0\)</span> なので <span class="math inline">\(L = -\log(1-p)\)</span>）</li>
-<li>復路<span class="fw-colon">：</span><span class="math inline">\(\delta_{\text{out}}\)</span> と <span class="math inline">\(\delta_{\text{mid}}\)</span>、そして5つの勾配をすべて求めよ</li>
+<li>往路：<span class="math inline">\(z, h, u, p, L\)</span> を順に求めよ（正解が <span class="math inline">\(y=0\)</span> なので <span class="math inline">\(L = -\log(1-p)\)</span>）</li>
+<li>復路：<span class="math inline">\(\delta_{\text{out}}\)</span> と <span class="math inline">\(\delta_{\text{mid}}\)</span>、そして5つの勾配をすべて求めよ</li>
 <li>本編の数値微分のコードに値を差し替えて、検算せよ</li>
 </ol>
-<h3 id="問題2入力を-x_1--1.0-x_2-0.5-に変えてもう1往復せよ">問題2<span class="fw-colon">：</span>入力を <span class="math inline">\(x_1 = -1.0,\; x_2 = 0.5\)</span> に変えて、もう1往復せよ</h3>
-<p>ヒント<span class="fw-colon">：</span><span class="math inline">\(\sigma(0) = 0.5\)</span>、<span class="math inline">\(\sigma(0.2) \approx 0.5498\)</span>。この2つしか使わない。</p>
+<h3 id="問題2入力を-x_1--1.0-x_2-0.5-に変えてもう1往復せよ">問題2：入力を <span class="math inline">\(x_1 = -1.0,\; x_2 = 0.5\)</span> に変えて、もう1往復せよ</h3>
+<p>ヒント：<span class="math inline">\(\sigma(0) = 0.5\)</span>、<span class="math inline">\(\sigma(0.2) \approx 0.5498\)</span>。この2つしか使わない。</p>
 <div class="callout callout-tip callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -589,7 +589,7 @@ rkskmt
 \frac{\partial L}{\partial b} = -0.25\]</span></p>
 <p><span class="math inline">\(w\)</span> が負なので、中間層に流れる誤差は<strong>符号が反転</strong>する — <span class="math inline">\(\delta\)</span> は素通りではなく、通り道の重みに染まる。</p>
 <h3 id="数値微分で検算">数値微分で検算</h3>
-<div id="c510bfde" class="cell" data-execution_count="5">
+<div id="6bd2ecfc" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>

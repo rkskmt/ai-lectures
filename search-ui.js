@@ -78,6 +78,17 @@
                       .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
+    // Filename (before the #hash), lowercased — used to float hits from the
+    // deck the user is currently viewing to the top of the results.
+    function deckFile(href) {
+      return String(href || '').split('#')[0].split('/').pop().toLowerCase();
+    }
+    function currentDeckFile() {
+      var p = location.pathname;
+      try { p = decodeURIComponent(p); } catch (e) {}
+      return p.split('/').pop().toLowerCase();
+    }
+
     function loadIndex() {
       if (indexData !== null) return Promise.resolve(indexData);
       return fetch('search.json')
@@ -108,7 +119,7 @@
       }
       loadIndex().then(function (idx) {
         var hits = [];
-        for (var i = 0; i < idx.length && hits.length < 30; i++) {
+        for (var i = 0; i < idx.length; i++) {
           var e = idx[i];
           var hay = (e.title + '\n' + (e.section || '') + '\n' + (e.text || '')).toLowerCase();
           if (hay.indexOf(q) >= 0) hits.push(e);
@@ -117,6 +128,17 @@
           resultsEl.innerHTML = '<div class="search-note">' + T.noHits + '</div>';
           return;
         }
+        // Float hits from the deck the user is currently viewing to the top,
+        // preserving the original order within each group (stable sort). Done
+        // before the 30-hit cap so a current-deck hit late in the index still
+        // wins its place.
+        var cur = currentDeckFile();
+        if (cur) {
+          hits.sort(function (a, b) {
+            return (deckFile(a.href) === cur ? 0 : 1) - (deckFile(b.href) === cur ? 0 : 1);
+          });
+        }
+        hits = hits.slice(0, 30);
         resultsEl.innerHTML = hits.map(function (e) {
           var href = e.href.replace('#', '#/');
           var loc = esc(e.title) + (e.section ? ' › ' + esc(e.section) : '');

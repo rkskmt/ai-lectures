@@ -74,7 +74,7 @@
    chip competes with the content; near-black reads as title *structure*.
    Weight 600 (not 700) keeps the small white-on-dark type from bloating.
    Generic — it keys off position (direct child of h2), not any specific word —
-   so `## **Tweak**：…`, `## **重要**：…`, `## **例**：…` all get the chip,
+   so `## **Tweak** …`, `## **重要** …`, `## **例** …` all get the chip,
    showing whatever word was bolded. Bold is otherwise meaningless in an
    already-bold title, so nothing is displaced. Kept inline (not inline-block)
    and smaller than the title's line box, so a title on the slide's first row
@@ -94,15 +94,6 @@
     margin-right: 0.55em;
     vertical-align: 0.28em;     /* optical center against the 2.5rem title glyphs */
     -webkit-text-stroke: 0;     /* same guard as .en strong: no double-weighting */
-}
-/* Sources keep the readable `**Tweak**：…` notation, but after the chip the
-   full-width colon is a leftover text separator — the chip's own margin
-   already separates. fw-colon.lua wraps every ： in span.fw-colon, so the one
-   directly following the chip can be hidden without touching the source.
-   Display-only: slide ids and search text keep the colon; colons elsewhere in
-   the title (and in chip-less titles like `## 演習：…`) are untouched. */
-.reveal h2 > strong + .fw-colon {
-    display: none;
 }
 .reveal h3 {
     font-style: normal !important;
@@ -912,9 +903,6 @@ a.lightbox[href]::after {
 }
 .reveal strong {
   padding: 0 0.1em;
-}
-.reveal .fw-colon {
-  font-weight: 300;
 }
 .cell:has(details.code-fold) {
   display: flex;

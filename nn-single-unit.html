@@ -220,9 +220,9 @@ rkskmt
 <h2>ここまでの道具</h2>
 <div class="slide-body">
 <ul>
-<li><strong>勾配降下法</strong><span class="fw-colon">：</span>傾きの逆方向に少しずつ進んで最小値を探す（最適化の回）</li>
-<li><strong>回帰の <code>fit()</code> は自作済み</strong><span class="fw-colon">：</span>体長→重さの直線を勾配降下で当て、sklearn と一致した（前回）</li>
-<li>残るは<strong>分類</strong><span class="fw-colon">：</span>ロジスティック回帰の <code>fit()</code> は、決定境界の回からブラックボックスのまま</li>
+<li><strong>勾配降下法</strong>：傾きの逆方向に少しずつ進んで最小値を探す（最適化の回）</li>
+<li><strong>回帰の <code>fit()</code> は自作済み</strong>：体長→重さの直線を勾配降下で当て、sklearn と一致した（前回）</li>
+<li>残るは<strong>分類</strong>：ロジスティック回帰の <code>fit()</code> は、決定境界の回からブラックボックスのまま</li>
 </ul>
 <div title="今回の問い">
 <div class="callout callout-note callout-titled callout-style-default">
@@ -251,14 +251,14 @@ rkskmt
 <h2>入力から出力まで、たった2ステップ</h2>
 <div class="slide-body">
 <div id="step-1アフィン変換affine-transformation" class="slide-body-heading">
-Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">Affine Transformation</span>）
+Step 1：アフィン変換（<span class="en">Affine Transformation</span>）
 </div>
 <p><span class="math display">\[z = \alpha_1 x_1 + \alpha_2 x_2 + b\]</span></p>
 <ul>
-<li><span class="math inline">\(x_1, x_2\)</span><span class="fw-colon">：</span>入力（輝度、重さ）</li>
-<li><span class="math inline">\(\alpha_1, \alpha_2\)</span><span class="fw-colon">：</span><strong>重み（<span class="en">weight</span>）</strong>（どの特徴量をどれだけ重視するか）</li>
-<li><span class="math inline">\(b\)</span><span class="fw-colon">：</span><strong>バイアス（<span class="en">bias</span>）</strong>（全体のオフセット）</li>
-<li><span class="math inline">\(z\)</span><span class="fw-colon">：</span>スカラー1個</li>
+<li><span class="math inline">\(x_1, x_2\)</span>：入力（輝度、重さ）</li>
+<li><span class="math inline">\(\alpha_1, \alpha_2\)</span>：<strong>重み（<span class="en">weight</span>）</strong>（どの特徴量をどれだけ重視するか）</li>
+<li><span class="math inline">\(b\)</span>：<strong>バイアス（<span class="en">bias</span>）</strong>（全体のオフセット）</li>
+<li><span class="math inline">\(z\)</span>：スカラー1個</li>
 </ul>
 <h3 id="幾何的な意味">幾何的な意味</h3>
 <ul>
@@ -268,10 +268,10 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">Aff
 </div>
 </section>
 <section id="step-2シグモイドsigmoidで確率にする" class="slide level2">
-<h2>Step 2<span class="fw-colon">：</span>シグモイド（<span class="en">Sigmoid</span>）で「確率」にする</h2>
+<h2>Step 2：シグモイド（<span class="en">Sigmoid</span>）で「確率」にする</h2>
 <div class="slide-body">
 <p><span class="math display">\[p = \sigma(z) = \frac{1}{1 + e^{-z}}\]</span></p>
-<div id="838fd5d0" class="cell" data-execution_count="1">
+<div id="bc6e1858" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -322,7 +322,7 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">Aff
 </div>
 </section>
 <section id="何を最小化するか損失関数" class="slide level2">
-<h2>何を最小化するか<span class="fw-colon">：</span>損失関数</h2>
+<h2>何を最小化するか：損失関数</h2>
 <div class="slide-body">
 <ul>
 <li>「いまのパラメータがどれだけダメか」を1つの数字にする</li>
@@ -330,7 +330,7 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">Aff
 <p><span class="math display">\[L = -\frac{1}{N}\sum_{i} \left[ y_i \log p_i + (1 - y_i) \log (1 - p_i) \right]\]</span></p>
 <ul>
 <li><strong>交差エントロピー（<span class="en">cross entropy</span>）</strong>と呼ぶ</li>
-<li>例<span class="fw-colon">：</span>正解 <span class="math inline">\(y=1\)</span>（Salmon）なのに <span class="math inline">\(p = 0.4\)</span> しか出せない
+<li>例：正解 <span class="math inline">\(y=1\)</span>（Salmon）なのに <span class="math inline">\(p = 0.4\)</span> しか出せない
 <ul>
 <li><span class="math inline">\(L = -\log(0.4) \approx 0.92\)</span>（大きい＝ダメ）</li>
 </ul></li>
@@ -374,7 +374,7 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">Aff
 </ul>
 <p><span class="math display">\[\frac{\partial L}{\partial z} = p - y\]</span></p>
 <ul>
-<li>各パラメータの更新式（学習率 <span class="math inline">\(\eta\)</span>）<span class="fw-colon">：</span></li>
+<li>各パラメータの更新式（学習率 <span class="math inline">\(\eta\)</span>）：</li>
 </ul>
 <p><span class="math display">\[\alpha \leftarrow \alpha - \eta\,(p - y)\,x, \qquad b \leftarrow b - \eta\,(p - y)\]</span></p>
 <div class="callout callout-note callout-titled callout-style-default">
@@ -393,9 +393,9 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">Aff
 </div>
 </section>
 <section id="peek-forward" class="slide level2">
-<h2>実装<span class="fw-colon">：</span>必要な関数は4つだけ</h2>
+<h2>実装：必要な関数は4つだけ</h2>
 <div class="slide-body">
-<div id="6fbda189" class="cell" data-execution_count="2">
+<div id="7fd6d05f" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>魚データの定義（クリックして展開）</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -434,7 +434,7 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">Aff
 <span id="cb1-34"><a></a>y      <span class="op">=</span> y[order]</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="cd16d6f5" class="cell" data-execution_count="3">
+<div id="24a4fd72" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a><span class="kw">def</span> sigmoid(z):</span>
 <span id="cb2-2"><a></a>    <span class="cf">return</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>z))</span>
 <span id="cb2-3"><a></a></span>
@@ -462,7 +462,7 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">Aff
 <ul>
 <li>1匹見るたびにパラメータが少し動く</li>
 </ul>
-<div id="657e4a43" class="cell" data-execution_count="4">
+<div id="443515c6" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a>alpha <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">0.0</span>])   <span class="co"># 重みはゼロからスタート</span></span>
 <span id="cb3-2"><a></a>b  <span class="op">=</span> <span class="fl">0.0</span></span>
 <span id="cb3-3"><a></a>lr <span class="op">=</span> <span class="fl">0.5</span>                       <span class="co"># 学習率</span></span>
@@ -498,7 +498,7 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">Aff
 <section id="境界が動く様子を見る" class="slide level2">
 <h2>境界が動く様子を見る</h2>
 <div class="slide-body">
-<div id="31821a52" class="cell" data-execution_count="5">
+<div id="fada30d2" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -516,7 +516,7 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">Aff
 <h2>学習されたパラメータを読む</h2>
 <div class="slide-body">
 <ul>
-<li>最終的な重み<span class="fw-colon">：</span><span class="math inline">\(\alpha \approx [-0.74,\; 1.15]\)</span></li>
+<li>最終的な重み：<span class="math inline">\(\alpha \approx [-0.74,\; 1.15]\)</span></li>
 </ul>
 <table class="caption-top">
 <thead>
@@ -557,8 +557,8 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">Aff
 </div>
 </div>
 </section>
-<section id="tweak学習の様子をいじって観察する" class="slide level2 badge-practice">
-<h2><strong>Tweak</strong><span class="fw-colon">：</span>学習の様子をいじって観察する</h2>
+<section id="tweak-学習の様子をいじって観察する" class="slide level2 badge-practice">
+<h2><strong>Tweak</strong> 学習の様子をいじって観察する</h2>
 <div class="slide-body">
 <ul>
 <li><a href="#/peek-one-at-a-time" class="peek">1匹ずつ学習するコード</a> を<strong>書き換えて実行</strong></li>
@@ -593,7 +593,7 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">Aff
 </div>
 <div class="callout-content">
 <ul>
-<li><code>lr = 0.05</code><span class="fw-colon">：</span>正答率は 90% で並ぶのに、<strong>Loss は 0.59 vs 0.33</strong> と大差 — パラメータが5分の1しか動いておらず、当ててはいるが<strong>自信がない</strong>（<span class="math inline">\(p\)</span> が 0.5 の近くにいる）。正答率に出ない差を Loss が見ている</li>
+<li><code>lr = 0.05</code>：正答率は 90% で並ぶのに、<strong>Loss は 0.59 vs 0.33</strong> と大差 — パラメータが5分の1しか動いておらず、当ててはいるが<strong>自信がない</strong>（<span class="math inline">\(p\)</span> が 0.5 の近くにいる）。正答率に出ない差を Loss が見ている</li>
 <li>80匹全部見せると正答率はどこまで上がる？　途中で<strong>下がる瞬間</strong>が何度もある（間違えた魚に境界が引っ張られる音）</li>
 </ul>
 </div>
@@ -633,7 +633,7 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">Aff
 <h2>練習問題</h2>
 <div class="slide-body">
 <p>以下の問題を<strong>手計算</strong>と<strong>Pythonコード</strong>の両方で解け。</p>
-<h3 id="問題1ニューロン1個を2歩だけ学習させる">問題1<span class="fw-colon">：</span>ニューロン1個を2歩だけ学習させる</h3>
+<h3 id="問題1ニューロン1個を2歩だけ学習させる">問題1：ニューロン1個を2歩だけ学習させる</h3>
 <p>2匹だけのミニ世界。標準化済みの特徴量（輝度, 重さ）で、 1匹目 <span class="math inline">\(x^{(1)} = (2, 1)\)</span> は Salmon（<span class="math inline">\(y=1\)</span>）、2匹目 <span class="math inline">\(x^{(2)} = (-1, 1)\)</span> は Sea bass（<span class="math inline">\(y=0\)</span>）。 初期値 <span class="math inline">\(\alpha = (0, 0)\)</span>、<span class="math inline">\(b = 0\)</span>、学習率 <span class="math inline">\(\eta = 0.5\)</span>。</p>
 <ol type="1">
 <li>1匹目を見せたときの <span class="math inline">\(z\)</span>、<span class="math inline">\(p = \sigma(z)\)</span>、差 <span class="math inline">\(\delta = p - y\)</span> を求めよ</li>
@@ -641,7 +641,7 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">Aff
 <li>続けて2匹目でもう1歩更新せよ</li>
 <li>同じ計算をコードで実行し、手計算と一致することを確かめよ</li>
 </ol>
-<p>ヒント<span class="fw-colon">：</span><span class="math inline">\(\sigma(0) = 0.5\)</span>。実は <span class="math inline">\(\sigma\)</span> の値はこれしか使わない。</p>
+<p>ヒント：<span class="math inline">\(\sigma(0) = 0.5\)</span>。実は <span class="math inline">\(\sigma\)</span> の値はこれしか使わない。</p>
 </div>
 </section>
 <section id="問題1の解答例" class="slide level2">
@@ -658,7 +658,7 @@ Step 1<span class="fw-colon">：</span>アフィン変換（<span class="en">Aff
 <p>偶然にも2匹目は<strong>ちょうど境界の上</strong>（<span class="math inline">\(z = 0\)</span>）に乗っていた。</p>
 <p><strong>更新:</strong> <span class="math display">\[\alpha \leftarrow (0.5, 0.25) - 0.5 \times 0.5 \times (-1, 1) = (0.75,\; 0)\]</span> <span class="math display">\[b \leftarrow 0.25 - 0.25 = 0\]</span></p>
 <h3 id="コードで確認">コードで確認</h3>
-<div id="2e3b3ad3" class="cell" data-execution_count="6">
+<div id="daa7326c" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>

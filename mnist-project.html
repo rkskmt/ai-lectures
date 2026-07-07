@@ -219,7 +219,7 @@ rkskmt
 <section id="初回の約束覚えているか" class="slide level2">
 <h2>初回の約束、覚えているか</h2>
 <div class="slide-body">
-<div id="a97858cc" class="cell" data-execution_count="1">
+<div id="05a2e9d0" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -238,12 +238,12 @@ rkskmt
 </div>
 </section>
 <section id="データmnist" class="slide level2">
-<h2>データ<span class="fw-colon">：</span>MNIST</h2>
+<h2>データ：MNIST</h2>
 <div class="slide-body">
 <ul>
 <li>手書き数字の定番データセット。<strong>訓練6万枚・テスト1万枚</strong>、各28×28ピクセル</li>
 </ul>
-<div id="56ad3bcc" class="cell" data-execution_count="2">
+<div id="da6e9869" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> torch</span>
 <span id="cb1-2"><a></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
 <span id="cb1-3"><a></a><span class="im">from</span> torchvision <span class="im">import</span> datasets, transforms</span>
@@ -260,7 +260,7 @@ rkskmt
 1枚の形: (1, 28, 28)  正解ラベル: 5</code></pre>
 </div>
 </div>
-<div id="590da4ab" class="cell" data-execution_count="3">
+<div id="9188cb8f" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -288,14 +288,14 @@ rkskmt
 <p><strong>ノート</strong></p>
 </div>
 <div class="callout-content">
-<p>784次元でも、やることは魚の2次元と<strong>完全に同じ</strong><span class="fw-colon">：</span> 特徴量ベクトル → 変換を重ねる → 確率 → 損失 → 勾配降下。</p>
+<p>784次元でも、やることは魚の2次元と<strong>完全に同じ</strong>： 特徴量ベクトル → 変換を重ねる → 確率 → 損失 → 勾配降下。</p>
 </div>
 </div>
 </div>
 </div>
 </section>
 <section id="出力層を付け替える10クラス分類" class="slide level2">
-<h2>出力層を付け替える<span class="fw-colon">：</span>10クラス分類</h2>
+<h2>出力層を付け替える：10クラス分類</h2>
 <div class="slide-body">
 <ul>
 <li>答えは Salmon / Sea bass の2択ではなく、<strong>0〜9 の10択</strong></li>
@@ -322,15 +322,15 @@ rkskmt
 <p><span class="math display">\[\mathrm{softmax}(u_k) = \frac{e^{u_k}}{\sum_{j} e^{u_j}}
 \qquad \text{10個の出力を「合計1の確率」に変換}\]</span></p>
 <ul>
-<li>損失は多クラス版の交差エントロピー<span class="fw-colon">：</span>正解クラスの確率 <span class="math inline">\(p_{\text{正解}}\)</span> に対して <span class="math inline">\(-\log p_{\text{正解}}\)</span></li>
+<li>損失は多クラス版の交差エントロピー：正解クラスの確率 <span class="math inline">\(p_{\text{正解}}\)</span> に対して <span class="math inline">\(-\log p_{\text{正解}}\)</span></li>
 <li>PyTorch では <code>nn.CrossEntropyLoss</code> がソフトマックスごとやってくれる（打ち消しの恩恵もそのまま）</li>
 </ul>
 </div>
 </section>
 <section id="モデル見慣れた3層" class="slide level2">
-<h2>モデル<span class="fw-colon">：</span>見慣れた3層</h2>
+<h2>モデル：見慣れた3層</h2>
 <div class="slide-body">
-<div id="85393ad7" class="cell" data-execution_count="4">
+<div id="f6fe10ea" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a>torch.manual_seed(<span class="dv">0</span>)</span>
 <span id="cb3-2"><a></a></span>
 <span id="cb3-3"><a></a>model <span class="op">=</span> nn.Sequential(</span>
@@ -367,13 +367,13 @@ rkskmt
 </div>
 </section>
 <section id="ミニバッチ6万枚は一口ずつ" class="slide level2">
-<h2>ミニバッチ<span class="fw-colon">：</span>6万枚は一口ずつ</h2>
+<h2>ミニバッチ：6万枚は一口ずつ</h2>
 <div class="slide-body">
 <ul>
 <li>6万枚まとめて勾配を計算すると重い → <strong>128枚ずつ</strong>取り出して1歩ずつ進む</li>
 <li>データを一巡することを <strong>1エポック</strong> と呼ぶ</li>
 </ul>
-<div id="b38574d9" class="cell" data-execution_count="5">
+<div id="30c0b661" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a>train_loader <span class="op">=</span> torch.utils.data.DataLoader(train_ds, batch_size<span class="op">=</span><span class="dv">128</span>, shuffle<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb5-2"><a></a>test_loader  <span class="op">=</span> torch.utils.data.DataLoader(test_ds,  batch_size<span class="op">=</span><span class="dv">1000</span>)</span>
 <span id="cb5-3"><a></a></span>
@@ -388,7 +388,7 @@ rkskmt
 <section id="peek-mnist-train" class="slide level2">
 <h2>学習する</h2>
 <div class="slide-body">
-<div id="07c64766" class="cell" data-execution_count="6">
+<div id="f1729b57" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">4</span>):</span>
 <span id="cb6-2"><a></a>    <span class="cf">for</span> x_batch, y_batch <span class="kw">in</span> train_loader:</span>
 <span id="cb6-3"><a></a>        optimizer.zero_grad()</span>
@@ -413,8 +413,8 @@ rkskmt
 </ul>
 </div>
 </section>
-<section id="tweakどこまで賢くできるか" class="slide level2 badge-practice">
-<h2><strong>Tweak</strong><span class="fw-colon">：</span>どこまで賢くできるか</h2>
+<section id="tweak-どこまで賢くできるか" class="slide level2 badge-practice">
+<h2><strong>Tweak</strong> どこまで賢くできるか</h2>
 <div class="slide-body">
 <ul>
 <li><a href="#/peek-mnist-train" class="peek">モデル定義と学習ループ</a> を<strong>書き換えて実行</strong>（学習に数分かかる変更もある）</li>
@@ -468,7 +468,7 @@ rkskmt
 <section id="読めている様子" class="slide level2">
 <h2>読めている様子</h2>
 <div class="slide-body">
-<div id="137cd67e" class="cell" data-execution_count="7">
+<div id="40477b79" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -485,7 +485,7 @@ rkskmt
 <section id="間違いを眺める" class="slide level2">
 <h2>間違いを眺める</h2>
 <div class="slide-body">
-<div id="2d33185a" class="cell" data-execution_count="8">
+<div id="aed48e3a" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -503,8 +503,8 @@ rkskmt
 <section id="自分の字は読めるのか持ち帰りデモ" class="slide level2">
 <h2>自分の字は読めるのか（持ち帰りデモ）</h2>
 <div class="slide-body">
-<p>紙に数字を書いて撮影し、この機械に読ませてみよう。 ただし<strong>写真をそのまま28×28に縮めても、まず読めない</strong> — MNISTの画像は「数字を20ピクセル角に収め、重心をど真ん中に置く」ように揃えてあり、撮った写真はそうなっていないから。同じ揃え方を自分でやってから見せる<span class="fw-colon">：</span></p>
-<div id="2e484c8f" class="cell" data-execution_count="9">
+<p>紙に数字を書いて撮影し、この機械に読ませてみよう。 ただし<strong>写真をそのまま28×28に縮めても、まず読めない</strong> — MNISTの画像は「数字を20ピクセル角に収め、重心をど真ん中に置く」ように揃えてあり、撮った写真はそうなっていないから。同じ揃え方を自分でやってから見せる：</p>
+<div id="8ba57209" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a></a><span class="im">from</span> PIL <span class="im">import</span> Image</span>
 <span id="cb8-2"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb8-3"><a></a><span class="im">import</span> torch</span>
@@ -551,7 +551,7 @@ rkskmt
 </div>
 </section>
 <section id="約束は果たされたか部品の棚卸し" class="slide level2">
-<h2>約束は果たされたか<span class="fw-colon">：</span>部品の棚卸し</h2>
+<h2>約束は果たされたか：部品の棚卸し</h2>
 <div class="slide-body">
 <p>この機械の中に、説明できない部品が残っていないか確認する。</p>
 <table class="caption-top">
@@ -629,7 +629,7 @@ rkskmt
 <ul>
 <li>単語同士の関係に重みをつける <strong>Attention</strong> → <strong>Transformer</strong> → いまの<strong>大規模言語モデル（LLM）</strong></li>
 </ul></li>
-<li>どちらも今日の機械と同じ原理の上に立つ<span class="fw-colon">：</span><strong>変換を重ねて、損失を決めて、勾配で学習する</strong></li>
+<li>どちらも今日の機械と同じ原理の上に立つ：<strong>変換を重ねて、損失を決めて、勾配で学習する</strong></li>
 </ul>
 <div class="callout callout-tip callout-titled callout-style-default">
 <div class="callout-body">

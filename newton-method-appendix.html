@@ -224,7 +224,7 @@ rkskmt
 <li>勾配降下法の弱点（学習率の手動調整・収束の遅さ）を、<strong>2次微分</strong>で解決する手法</li>
 <li>ディープラーニングでは使われないが、<code>scikit-learn</code> のロジスティック回帰などの中で現役</li>
 </ul>
-<div id="8486f42a" class="cell" data-execution_count="1">
+<div id="67c65c03" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-3"><a></a><span class="im">import</span> japanize_matplotlib</span>
@@ -249,7 +249,7 @@ rkskmt
 <section id="なぜnewton法が必要か" class="slide level2">
 <h2>なぜNewton法が必要か</h2>
 <div class="slide-body">
-<p>勾配降下法の問題<span class="fw-colon">：</span></p>
+<p>勾配降下法の問題：</p>
 <ul>
 <li>学習率を手動で調整</li>
 <li>収束が遅い</li>
@@ -290,14 +290,14 @@ rkskmt
 <p><strong>2次微分の計算</strong></p>
 </div>
 <div class="callout-content">
-<p>1次微分をもう一度微分するだけ<span class="fw-colon">：</span> <span class="math display">\[f'(x) = 2x - 4\]</span> <span class="math display">\[f''(x) = 2 \times 1 - 0 = 2\]</span></p>
+<p>1次微分をもう一度微分するだけ： <span class="math display">\[f'(x) = 2x - 4\]</span> <span class="math display">\[f''(x) = 2 \times 1 - 0 = 2\]</span></p>
 </div>
 </div>
 </div>
 </div>
 <h3 id="ヘッセ行列hessian-matrixとは">ヘッセ行列（<span class="en">Hessian Matrix</span>）とは</h3>
 <p><strong>注意</strong>: 1変数の場合、2次微分は単なる数値なので「ヘッセ行列」とは呼ばない。</p>
-<p><strong>ヘッセ行列は2変数以上で使う用語</strong><span class="fw-colon">：</span></p>
+<p><strong>ヘッセ行列は2変数以上で使う用語</strong>：</p>
 <p><span class="math display">\[H = \begin{bmatrix}
 \frac{\partial^2 f}{\partial x^2} &amp; \frac{\partial^2 f}{\partial x \partial y} \\
 \frac{\partial^2 f}{\partial y \partial x} &amp; \frac{\partial^2 f}{\partial y^2}
@@ -334,8 +334,8 @@ rkskmt
 <li><strong>学習率不要！</strong></li>
 </ul>
 <h3 id="なぜこの式">なぜこの式？</h3>
-<p>現在地点で関数を2次関数で近似<span class="fw-colon">：</span> <span class="math display">\[f(x) \approx f(x_0) + f'(x_0)(x-x_0) + \frac{1}{2}f''(x_0)(x-x_0)^2\]</span></p>
-<p>この2次関数の最小値を求めると<span class="fw-colon">：</span> <span class="math display">\[x_{\text{min}} = x_0 - \frac{f'(x_0)}{f''(x_0)}\]</span></p>
+<p>現在地点で関数を2次関数で近似： <span class="math display">\[f(x) \approx f(x_0) + f'(x_0)(x-x_0) + \frac{1}{2}f''(x_0)(x-x_0)^2\]</span></p>
+<p>この2次関数の最小値を求めると： <span class="math display">\[x_{\text{min}} = x_0 - \frac{f'(x_0)}{f''(x_0)}\]</span></p>
 <div class="callout callout-important callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -352,7 +352,7 @@ rkskmt
 </div>
 </section>
 <section id="newton法手計算で実行" class="slide level2">
-<h2>Newton法<span class="fw-colon">：</span>手計算で実行</h2>
+<h2>Newton法：手計算で実行</h2>
 <div class="slide-body">
 <div id="設定" class="slide-body-heading">
 設定
@@ -364,15 +364,15 @@ rkskmt
 <li>初期値: <span class="math inline">\(x_0 = 0\)</span></li>
 </ul>
 <h3 id="反復1">反復1</h3>
-<h4 id="ステップ1現在の位置">ステップ1<span class="fw-colon">：</span>現在の位置</h4>
+<h4 id="ステップ1現在の位置">ステップ1：現在の位置</h4>
 <p><span class="math display">\[x = 0\]</span></p>
-<h4 id="ステップ2関数値">ステップ2<span class="fw-colon">：</span>関数値</h4>
+<h4 id="ステップ2関数値">ステップ2：関数値</h4>
 <p><span class="math display">\[f(0) = 0^2 - 4 \times 0 + 3 = 3\]</span></p>
-<h4 id="ステップ31次微分勾配">ステップ3<span class="fw-colon">：</span>1次微分（勾配）</h4>
+<h4 id="ステップ31次微分勾配">ステップ3：1次微分（勾配）</h4>
 <p><span class="math display">\[f'(0) = 2 \times 0 - 4 = -4\]</span></p>
-<h4 id="ステップ42次微分曲率">ステップ4<span class="fw-colon">：</span>2次微分（曲率）</h4>
+<h4 id="ステップ42次微分曲率">ステップ4：2次微分（曲率）</h4>
 <p><span class="math display">\[f''(0) = 2\]</span></p>
-<h4 id="ステップ5newton法で更新">ステップ5<span class="fw-colon">：</span>Newton法で更新</h4>
+<h4 id="ステップ5newton法で更新">ステップ5：Newton法で更新</h4>
 <p><strong>更新式:</strong> <span class="math display">\[x_{\text{new}} = x - \frac{f'(x)}{f''(x)}\]</span></p>
 <p><strong>代入:</strong> <span class="math display">\[x_{\text{new}} = 0 - \frac{-4}{2}\]</span></p>
 <p><strong>計算:</strong> <span class="math display">\[\begin{align}
@@ -393,12 +393,12 @@ rkskmt
 </div>
 </div>
 </div>
-<h3 id="反復2収束確認">反復2<span class="fw-colon">：</span>収束確認</h3>
-<h4 id="ステップ1現在の位置-1">ステップ1<span class="fw-colon">：</span>現在の位置</h4>
+<h3 id="反復2収束確認">反復2：収束確認</h3>
+<h4 id="ステップ1現在の位置-1">ステップ1：現在の位置</h4>
 <p><span class="math display">\[x = 2\]</span></p>
-<h4 id="ステップ2関数値-1">ステップ2<span class="fw-colon">：</span>関数値</h4>
+<h4 id="ステップ2関数値-1">ステップ2：関数値</h4>
 <p><span class="math display">\[f(2) = 2^2 - 4 \times 2 + 3 = 4 - 8 + 3 = -1\]</span></p>
-<h4 id="ステップ31次微分">ステップ3<span class="fw-colon">：</span>1次微分</h4>
+<h4 id="ステップ31次微分">ステップ3：1次微分</h4>
 <p><span class="math display">\[f'(2) = 2 \times 2 - 4 = 4 - 4 = 0\]</span></p>
 <div title="収束！">
 <div class="callout callout-note callout-titled callout-style-default">
@@ -421,9 +421,9 @@ rkskmt
 </div>
 </section>
 <section id="newton法python実装" class="slide level2">
-<h2>Newton法<span class="fw-colon">：</span>Python実装</h2>
+<h2>Newton法：Python実装</h2>
 <div class="slide-body">
-<div id="cc0d4d9d" class="cell" data-execution_count="2">
+<div id="935e7a2c" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a><span class="co"># 初期値</span></span>
@@ -527,7 +527,7 @@ f''(x) = 2.0000
 <section id="可視化で比較" class="slide level2">
 <h2>可視化で比較</h2>
 <div class="slide-body">
-<div id="5cc8d012" class="cell" data-execution_count="3">
+<div id="465384fd" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -623,7 +623,7 @@ f''(x) = 2.0000
 <div id="視覚的説明" class="slide-body-heading">
 視覚的説明
 </div>
-<div id="cda466f0" class="cell" data-execution_count="4">
+<div id="13b627e5" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -677,8 +677,8 @@ f''(x) = 2.0000
 <p><strong>どちらを使うべきか</strong></p>
 </div>
 <div class="callout-content">
-<p><strong>勾配降下法を使う場合:</strong> - パラメータ数が多い（数万〜数百万） - メモリが限られている - オンライン学習（データが逐次的に来る） - 例<span class="fw-colon">：</span>ディープラーニング</p>
-<p><strong>Newton法を使う場合:</strong> - パラメータ数が少ない（数個〜数千） - 高精度な解が必要 - バッチ学習 - 例<span class="fw-colon">：</span>ロジスティック回帰、一般化線形モデル</p>
+<p><strong>勾配降下法を使う場合:</strong> - パラメータ数が多い（数万〜数百万） - メモリが限られている - オンライン学習（データが逐次的に来る） - 例：ディープラーニング</p>
+<p><strong>Newton法を使う場合:</strong> - パラメータ数が少ない（数個〜数千） - 高精度な解が必要 - バッチ学習 - 例：ロジスティック回帰、一般化線形モデル</p>
 </div>
 </div>
 </div>
@@ -687,7 +687,7 @@ f''(x) = 2.0000
 <section id="練習問題" class="slide level2 scrollable">
 <h2>練習問題</h2>
 <div class="slide-body">
-<p>本編の練習問題と同じ関数 <span class="math inline">\(f(x) = x^2 + 6x + 5\)</span> について<span class="fw-colon">：</span></p>
+<p>本編の練習問題と同じ関数 <span class="math inline">\(f(x) = x^2 + 6x + 5\)</span> について：</p>
 <ol type="1">
 <li>2次微分を求めよ</li>
 <li>初期値 <span class="math inline">\(x_0 = 0\)</span> でNewton法を実行せよ</li>

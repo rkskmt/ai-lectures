@@ -56,11 +56,11 @@
     "text": "境界も同じものが出る\n\n\n\n描画コード\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\nplt.rcParams[\"font.size\"] = 11\nplt.rcParams[\"figure.dpi\"] = 100\n\nxx, yy = np.meshgrid(np.linspace(X[:, 0].min() - 0.4, X[:, 0].max() + 0.4, 300),\n                     np.linspace(X[:, 1].min() - 0.4, X[:, 1].max() + 0.4, 300))\ngrid = torch.tensor(np.c_[xx.ravel(), yy.ravel()], dtype=torch.float32)\n\nwith torch.no_grad():                       # 推論だけなので履歴の記録は不要\n    Zb = (torch.sigmoid(model(grid)) &gt;= 0.5).numpy().reshape(xx.shape)\n\nplt.figure(figsize=(5.5, 3.8))\nplt.contourf(xx, yy, Zb, alpha=0.25, levels=1, colors=[\"#5dade2\", \"#f5b7b1\"])\nfor cls, col, m in [(0, \"#2980b9\", \"s\"), (1, \"#e74c3c\", \"o\")]:\n    mask = y == cls\n    plt.scatter(X[mask, 0], X[mask, 1], c=col, marker=m, s=25, edgecolors=\"gray\", lw=0.4)\nplt.xticks([]); plt.yticks([])\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\nNumPy 版で書いた forward / backward 計60行ほどが、PyTorch では学習ループ込みで十数行\n浮いた労力は、モデルとデータを考えることに使う"
   },
   {
-    "objectID": "pytorch-intro.html#tweakネットワークを組み替えて再学習",
-    "href": "pytorch-intro.html#tweakネットワークを組み替えて再学習",
+    "objectID": "pytorch-intro.html#tweak-ネットワークを組み替えて再学習",
+    "href": "pytorch-intro.html#tweak-ネットワークを組み替えて再学習",
     "title": "PyTorch入門",
-    "section": "Tweak：ネットワークを組み替えて再学習",
-    "text": "Tweak：ネットワークを組み替えて再学習\n\n\n学習ループのコード を書き換えて実行（境界の図まで続けて実行すると変化が見える）\n\n\n\n\n\n\n\n\n\nやりたいこと\nコード\n\n\n\n\n中間の変換を2個に減らす\nnn.Linear(2, 2), nn.ReLU(), nn.Linear(2, 1)\n\n\nReLU を素通しに変える\nnn.ReLU() → nn.Identity()\n\n\n学習率を下げる\nlr=0.05\n\n\n\n\n\n\n\n\n\n\nここで観察\n\n\n\n変換2個：「変換を重ねる」の回では2個でも分けられたのに、ここでは87%止まり（torch.manual_seed(3) だと50%まで転落）。表現力はあっても、良い谷にたどり着けるかは別問題 — 16個の「余裕」は学習の保険でもある（ローカルミニマムの罠）\nnn.Identity()：折り目ゼロ — 境界が直線に戻り、87%で頭打ち。「線形は重ねても線形」を PyTorch でも再確認\nどれを変えても、学習ループの3拍子は一切書き換えないで済む — それが部品化の威力"
+    "section": "Tweak ネットワークを組み替えて再学習",
+    "text": "Tweak ネットワークを組み替えて再学習\n\n\n学習ループのコード を書き換えて実行（境界の図まで続けて実行すると変化が見える）\n\n\n\n\n\n\n\n\n\nやりたいこと\nコード\n\n\n\n\n中間の変換を2個に減らす\nnn.Linear(2, 2), nn.ReLU(), nn.Linear(2, 1)\n\n\nReLU を素通しに変える\nnn.ReLU() → nn.Identity()\n\n\n学習率を下げる\nlr=0.05\n\n\n\n\n\n\n\n\n\n\nここで観察\n\n\n\n変換2個：「変換を重ねる」の回では2個でも分けられたのに、ここでは87%止まり（torch.manual_seed(3) だと50%まで転落）。表現力はあっても、良い谷にたどり着けるかは別問題 — 16個の「余裕」は学習の保険でもある（ローカルミニマムの罠）\nnn.Identity()：折り目ゼロ — 境界が直線に戻り、87%で頭打ち。「線形は重ねても線形」を PyTorch でも再確認\nどれを変えても、学習ループの3拍子は一切書き換えないで済む — それが部品化の威力"
   },
   {
     "objectID": "pytorch-intro.html#まとめ",
@@ -259,11 +259,11 @@
     "text": "折り目の数で遊ぶ\n\n\n\n\n\n\n\n\n\n\n\n中間2個では折り目が足りない。16個なら滑らかに曲がる — 「変換を重ねる」の回の結論を、自作コードで追試できた"
   },
   {
-    "objectID": "nn-numpy.html#tweak自作nnをいじり倒す",
-    "href": "nn-numpy.html#tweak自作nnをいじり倒す",
+    "objectID": "nn-numpy.html#tweak-自作nnをいじり倒す",
+    "href": "nn-numpy.html#tweak-自作nnをいじり倒す",
     "title": "実装：NumPyだけでニューラルネットワーク",
-    "section": "Tweak：自作NNをいじり倒す",
-    "text": "Tweak：自作NNをいじり倒す\n\n\n学習ループのコード を書き換えて実行（境界の描画コードまで続けて実行すると形の変化が見える）\n壊れても全部自分のコードなので、原因も自分で追える\n\n\n\n\n\nやりたいこと\nコード\n\n\n\n\n折り目を2本に減らす\nhidden = 2\n\n\n盛大に増やす\nhidden = 100\n\n\n乱数を変えて別の谷へ\ndefault_rng(0) → default_rng(1)\n\n\n\n\n\n\n\n\n\n\nここで観察\n\n\n\n乱数シードを変えると、正答率は同じでも境界の形が微妙に違う — 初期値しだいで別の谷に落ちている。 ローカルミニマムの罠（参考資料）が、本物のNNで起きている瞬間"
+    "section": "Tweak 自作NNをいじり倒す",
+    "text": "Tweak 自作NNをいじり倒す\n\n\n学習ループのコード を書き換えて実行（境界の描画コードまで続けて実行すると形の変化が見える）\n壊れても全部自分のコードなので、原因も自分で追える\n\n\n\n\n\nやりたいこと\nコード\n\n\n\n\n折り目を2本に減らす\nhidden = 2\n\n\n盛大に増やす\nhidden = 100\n\n\n乱数を変えて別の谷へ\ndefault_rng(0) → default_rng(1)\n\n\n\n\n\n\n\n\n\n\nここで観察\n\n\n\n乱数シードを変えると、正答率は同じでも境界の形が微妙に違う — 初期値しだいで別の谷に落ちている。 ローカルミニマムの罠（参考資料）が、本物のNNで起きている瞬間"
   },
   {
     "objectID": "nn-numpy.html#まとめ",
@@ -427,11 +427,11 @@
     "text": "学習する\n\n\nfor epoch in range(1, 4):\n    for x_batch, y_batch in train_loader:\n        optimizer.zero_grad()\n        loss = loss_fn(model(x_batch), y_batch)\n        loss.backward()\n        optimizer.step()\n\n    # テストデータ（見ていない1万枚）で採点 — 過学習と汎化の回の鉄則\n    correct = 0\n    with torch.no_grad():\n        for x_batch, y_batch in test_loader:\n            correct += (model(x_batch).argmax(dim=1) == y_batch).sum().item()\n    print(f\"エポック {epoch} | テスト正答率: {correct / len(test_ds):.2%}\")\n\nエポック 1 | テスト正答率: 93.50%\nエポック 2 | テスト正答率: 95.14%\nエポック 3 | テスト正答率: 96.33%\n\n\n\n見たことのない手書き1万枚を、96%以上の精度で読めるようになった"
   },
   {
-    "objectID": "mnist-project.html#tweakどこまで賢くできるか",
-    "href": "mnist-project.html#tweakどこまで賢くできるか",
+    "objectID": "mnist-project.html#tweak-どこまで賢くできるか",
+    "href": "mnist-project.html#tweak-どこまで賢くできるか",
     "title": "手書き数字分類プロジェクト",
-    "section": "Tweak：どこまで賢くできるか",
-    "text": "Tweak：どこまで賢くできるか\n\n\nモデル定義と学習ループ を書き換えて実行（学習に数分かかる変更もある）\n\n\n\n\n\n\n\n\n\nやりたいこと\nコード\n\n\n\n\n長く学習させる\nrange(1, 4) → range(1, 9)\n\n\n中間を太くする\nnn.Linear(784, 128) と nn.Linear(128, 10) の 128 → 512\n\n\n中間をもう1段重ねる\nnn.Linear(784, 128), nn.ReLU(), nn.Linear(128, 128), nn.ReLU(), nn.Linear(128, 10)\n\n\n\n\n\n\n\n\n\n\nここで観察\n\n\n\nどの変更が「テスト正答率1%」あたりのコスパが良い？　97%の壁、98%の壁はどこで破れる？\n伸びが止まったら訓練データの正答率も出して比べてみる — ギャップが開き始めたら、それは見覚えのある現象（過学習）"
+    "section": "Tweak どこまで賢くできるか",
+    "text": "Tweak どこまで賢くできるか\n\n\nモデル定義と学習ループ を書き換えて実行（学習に数分かかる変更もある）\n\n\n\n\n\n\n\n\n\nやりたいこと\nコード\n\n\n\n\n長く学習させる\nrange(1, 4) → range(1, 9)\n\n\n中間を太くする\nnn.Linear(784, 128) と nn.Linear(128, 10) の 128 → 512\n\n\n中間をもう1段重ねる\nnn.Linear(784, 128), nn.ReLU(), nn.Linear(128, 128), nn.ReLU(), nn.Linear(128, 10)\n\n\n\n\n\n\n\n\n\n\nここで観察\n\n\n\nどの変更が「テスト正答率1%」あたりのコスパが良い？　97%の壁、98%の壁はどこで破れる？\n伸びが止まったら訓練データの正答率も出して比べてみる — ギャップが開き始めたら、それは見覚えのある現象（過学習）"
   },
   {
     "objectID": "mnist-project.html#読めている様子",
@@ -1659,11 +1659,11 @@
     "text": "勾配降下法で fit する\n\n\nスケールを揃えてから（クラスタリングの回の教訓。学習率を1つで済ませるため）\n\n\nx = (lengths - lengths.mean()) / lengths.std()   # 標準化した体長\nt = (weights - weights.mean()) / weights.std()   # 標準化した重さ\n\na, b = 0.0, 0.0   # 直線はゼロからスタート\nlr = 0.1          # 学習率\n\nfor i in range(1, 101):\n    pred   = a * x + b\n    grad_a = 2 * np.mean((pred - t) * x)\n    grad_b = 2 * np.mean(pred - t)\n    a -= lr * grad_a\n    b -= lr * grad_b\n    if i in (1, 3, 10, 50, 100):\n        print(f\"更新 {i:3d}回 | a={a:.4f} b={b:.4f} | MSE={np.mean((a*x+b - t)**2):.4f}\")\n\n更新   1回 | a=0.1946 b=0.0000 | MSE=0.6593\n更新   3回 | a=0.4747 b=0.0000 | MSE=0.3017\n更新  10回 | a=0.8684 b=0.0000 | MSE=0.0645\n更新  50回 | a=0.9728 b=0.0000 | MSE=0.0536\n更新 100回 | a=0.9728 b=0.0000 | MSE=0.0536\n\n\n\n50回あたりで動かなくなった ＝ 収束"
   },
   {
-    "objectID": "linear-regression.html#tweak学習率をいじって収束を壊す",
-    "href": "linear-regression.html#tweak学習率をいじって収束を壊す",
+    "objectID": "linear-regression.html#tweak-学習率をいじって収束を壊す",
+    "href": "linear-regression.html#tweak-学習率をいじって収束を壊す",
     "title": "線形回帰と正則化",
-    "section": "Tweak：学習率をいじって収束を壊す",
-    "text": "Tweak：学習率をいじって収束を壊す\n\n\nさっきのコード の lr = 0.1 を書き換えて実行\n\n\n\n\n\nやりたいこと\nコード\n\n\n\n\n目で見て分かるほど遅くする\nlr = 0.01\n\n\nギリギリを攻める\nlr = 0.9\n\n\n壊す\nlr = 1.1\n\n\n\n\n\n\n\n\n\n\nここで観察\n\n\n\n0.9 は行きすぎて戻ってを繰り返しながら、それでも収束する\n1.1 は MSE がどうなっていく？ — 前回の「学習率が大きすぎると発散」を、本物の fit() で再現できた"
+    "section": "Tweak 学習率をいじって収束を壊す",
+    "text": "Tweak 学習率をいじって収束を壊す\n\n\nさっきのコード の lr = 0.1 を書き換えて実行\n\n\n\n\n\nやりたいこと\nコード\n\n\n\n\n目で見て分かるほど遅くする\nlr = 0.01\n\n\nギリギリを攻める\nlr = 0.9\n\n\n壊す\nlr = 1.1\n\n\n\n\n\n\n\n\n\n\nここで観察\n\n\n\n0.9 は行きすぎて戻ってを繰り返しながら、それでも収束する\n1.1 は MSE がどうなっていく？ — 前回の「学習率が大きすぎると発散」を、本物の fit() で再現できた"
   },
   {
     "objectID": "linear-regression.html#直線が合っていく様子",
@@ -1722,11 +1722,11 @@
     "text": "Ridge で手なずける\n\n\nfrom sklearn.linear_model import Ridge\n\nfig, axes = plt.subplots(1, 2, figsize=(9.5, 3.6))\nfor ax, (model, name) in zip(axes, [\n        (make_pipeline(PolynomialFeatures(9), StandardScaler(), LinearRegression()),\n         \"次数9（正則化なし）\"),\n        (make_pipeline(PolynomialFeatures(9), StandardScaler(), Ridge(alpha=1.0)),\n         \"次数9 + Ridge\")]):\n    model.fit(X_train, y_train)\n    mse = mean_squared_error(y_test, model.predict(X_test))\n    ax.scatter(X_train, y_train, c=\"#2980b9\", s=45)\n    ax.scatter(X_test, y_test, c=\"#e74c3c\", marker=\"s\", s=45)\n    ax.plot(grid, model.predict(grid), \"k-\", lw=2)\n    ax.set_ylim(800, 2900)\n    ax.set_title(f\"{name}　テストMSE {mse:,.0f}\", fontsize=10)\n    ax.set_xlabel(\"体長 (cm)\")\n    print(f\"{name}: 係数の最大絶対値 = {np.abs(model[-1].coef_).max():,.0f}\")\naxes[0].set_ylabel(\"重さ (g)\")\nplt.tight_layout()\nplt.show()\n\n次数9（正則化なし）: 係数の最大絶対値 = 204,382\n次数9 + Ridge: 係数の最大絶対値 = 74\n\n\n\n\n\n\n\n\n\n\n同じ次数9なのに、罰金を入れただけで素直な曲線に戻った\nテストMSEは3桁以上改善\n\n\n\n\n\n\n\n\n過学習スレッド、完結\n\n\n引き（決定木のあやしい満点）→ 正体（訓練とテストのギャップ）→ 対抗手段（複雑さの制御と正則化）。 NN でも同じ道具（L2正則化＝weight decay）がそのまま使われる。"
   },
   {
-    "objectID": "linear-regression.html#tweak罰金の強さで曲線が化ける",
-    "href": "linear-regression.html#tweak罰金の強さで曲線が化ける",
+    "objectID": "linear-regression.html#tweak-罰金の強さで曲線が化ける",
+    "href": "linear-regression.html#tweak-罰金の強さで曲線が化ける",
     "title": "線形回帰と正則化",
-    "section": "Tweak：罰金の強さで曲線が化ける",
-    "text": "Tweak：罰金の強さで曲線が化ける\n\n\nさっきのコード の Ridge(alpha=1.0) を書き換えて実行\n\n\n\n\n\nやりたいこと\nコード\n\n\n\n\n罰金をほぼゼロにする\nRidge(alpha=1e-6)\n\n\n罰金を強烈にする\nRidge(alpha=1000)\n\n\n\n\n\n\n\n\n\n\nここで観察\n\n\n\n1e-6：罰金がほぼゼロなのに、左端の大暴れはほぼ消える（係数の最大絶対値 20万 → 1万）— あの暴走は、ごくわずかな罰金にすら耐えられない不安定な解だった\n1000：曲線はほぼまっすぐ寝る — 罰金が強すぎて、訓練データに合わせる力が負けた\nちょうど良い \\(\\alpha\\) は問題ごとに違う。訓練データではなくテストデータの MSE で選ぶ"
+    "section": "Tweak 罰金の強さで曲線が化ける",
+    "text": "Tweak 罰金の強さで曲線が化ける\n\n\nさっきのコード の Ridge(alpha=1.0) を書き換えて実行\n\n\n\n\n\nやりたいこと\nコード\n\n\n\n\n罰金をほぼゼロにする\nRidge(alpha=1e-6)\n\n\n罰金を強烈にする\nRidge(alpha=1000)\n\n\n\n\n\n\n\n\n\n\nここで観察\n\n\n\n1e-6：罰金がほぼゼロなのに、左端の大暴れはほぼ消える（係数の最大絶対値 20万 → 1万）— あの暴走は、ごくわずかな罰金にすら耐えられない不安定な解だった\n1000：曲線はほぼまっすぐ寝る — 罰金が強すぎて、訓練データに合わせる力が負けた\nちょうど良い \\(\\alpha\\) は問題ごとに違う。訓練データではなくテストデータの MSE で選ぶ"
   },
   {
     "objectID": "linear-regression.html#まとめ",
@@ -2030,11 +2030,11 @@
     "text": "学習されたパラメータを読む\n\n\n最終的な重み：\\(\\alpha \\approx [-0.74,\\; 1.15]\\)\n\n\n\n\nパラメータ\n値\n意味\n\n\n\n\n\\(\\alpha_1\\)（輝度）\n負\n暗いほど Salmon 寄り\n\n\n\\(\\alpha_2\\)（重さ）\n正\n重いほど Salmon 寄り\n\n\n\n\n1次元分類・2次元分類の回に目で見て発見したことを、機械が数値として再発見した\n\n\n\n\n\n\n\nノート\n\n\nsklearn の fit() がやっているのは、本質的にこのループ（の高速・安定版）。 ブラックボックスが1つ開いた。"
   },
   {
-    "objectID": "nn-single-unit.html#tweak学習の様子をいじって観察する",
-    "href": "nn-single-unit.html#tweak学習の様子をいじって観察する",
+    "objectID": "nn-single-unit.html#tweak-学習の様子をいじって観察する",
+    "href": "nn-single-unit.html#tweak-学習の様子をいじって観察する",
     "title": "ニューラルネットワークの最小単位",
-    "section": "Tweak：学習の様子をいじって観察する",
-    "text": "Tweak：学習の様子をいじって観察する\n\n\n1匹ずつ学習するコード を書き換えて実行\n\n\n\n\n\nやりたいこと\nコード\n\n\n\n\nゆっくり学ばせる\nlr = 0.05\n\n\n80匹全部見せる\nfor i in range(80):\n\n\n\n\n\n\n\n\n\n\nここで観察\n\n\n\nlr = 0.05：正答率は 90% で並ぶのに、Loss は 0.59 vs 0.33 と大差 — パラメータが5分の1しか動いておらず、当ててはいるが自信がない（\\(p\\) が 0.5 の近くにいる）。正答率に出ない差を Loss が見ている\n80匹全部見せると正答率はどこまで上がる？　途中で下がる瞬間が何度もある（間違えた魚に境界が引っ張られる音）"
+    "section": "Tweak 学習の様子をいじって観察する",
+    "text": "Tweak 学習の様子をいじって観察する\n\n\n1匹ずつ学習するコード を書き換えて実行\n\n\n\n\n\nやりたいこと\nコード\n\n\n\n\nゆっくり学ばせる\nlr = 0.05\n\n\n80匹全部見せる\nfor i in range(80):\n\n\n\n\n\n\n\n\n\n\nここで観察\n\n\n\nlr = 0.05：正答率は 90% で並ぶのに、Loss は 0.59 vs 0.33 と大差 — パラメータが5分の1しか動いておらず、当ててはいるが自信がない（\\(p\\) が 0.5 の近くにいる）。正答率に出ない差を Loss が見ている\n80匹全部見せると正答率はどこまで上がる？　途中で下がる瞬間が何度もある（間違えた魚に境界が引っ張られる音）"
   },
   {
     "objectID": "nn-single-unit.html#まとめ",

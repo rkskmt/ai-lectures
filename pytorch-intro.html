@@ -253,8 +253,8 @@ rkskmt
 <li>ディープラーニングの<strong>業界標準ライブラリ</strong>のひとつ</li>
 <li>今日使う機能は実質2つだけ
 <ul>
-<li><strong>autograd</strong><span class="fw-colon">：</span>backward を自動でやってくれる</li>
-<li><strong>nn</strong><span class="fw-colon">：</span>層・損失・最適化の部品セット</li>
+<li><strong>autograd</strong>：backward を自動でやってくれる</li>
+<li><strong>nn</strong>：層・損失・最適化の部品セット</li>
 </ul></li>
 </ul>
 <div class="callout callout-note callout-titled callout-style-default">
@@ -273,9 +273,9 @@ rkskmt
 </div>
 </section>
 <section id="tensornumpy-配列の親戚" class="slide level2">
-<h2>tensor<span class="fw-colon">：</span>NumPy 配列の親戚</h2>
+<h2>tensor：NumPy 配列の親戚</h2>
 <div class="slide-body">
-<div id="eaa1099b" class="cell" data-execution_count="1">
+<div id="662c7ad4" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> torch</span>
 <span id="cb1-2"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a></a></span>
@@ -288,9 +288,9 @@ rkskmt
 </div>
 </div>
 <ul>
-<li>違いは2つ<span class="fw-colon">：</span><strong>GPU に載せられる</strong>こと、そして<strong>勾配を覚えられる</strong>こと</li>
+<li>違いは2つ：<strong>GPU に載せられる</strong>こと、そして<strong>勾配を覚えられる</strong>こと</li>
 </ul>
-<div id="3860ad6a" class="cell" data-execution_count="2">
+<div id="906e3ea9" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a>a <span class="op">=</span> torch.tensor([<span class="fl">0.3</span>, <span class="op">-</span><span class="fl">0.2</span>], requires_grad<span class="op">=</span><span class="va">True</span>)   <span class="co"># 「勾配を追跡せよ」の印</span></span>
 <span id="cb3-2"><a></a><span class="bu">print</span>(a)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -303,12 +303,12 @@ rkskmt
 </div>
 </section>
 <section id="山場autograd-が手計算を言い当てる" class="slide level2">
-<h2>山場<span class="fw-colon">：</span>autograd が手計算を言い当てる</h2>
+<h2>山場：autograd が手計算を言い当てる</h2>
 <div class="slide-body">
 <ul>
 <li>バックプロパゲーションの回と<strong>まったく同じ</strong>ネットワーク・同じ数値を流す</li>
 </ul>
-<div id="ed802d06" class="cell" data-execution_count="3">
+<div id="55362136" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a>a <span class="op">=</span> torch.tensor([<span class="fl">0.3</span>, <span class="op">-</span><span class="fl">0.2</span>], requires_grad<span class="op">=</span><span class="va">True</span>)   <span class="co"># α1, α2</span></span>
 <span id="cb5-2"><a></a>b <span class="op">=</span> torch.tensor(<span class="fl">0.1</span>,  requires_grad<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb5-3"><a></a>w <span class="op">=</span> torch.tensor(<span class="fl">0.5</span>,  requires_grad<span class="op">=</span><span class="va">True</span>)</span>
@@ -359,7 +359,7 @@ rkskmt
 <ul>
 <li>forward の間、PyTorch は<strong>計算の履歴（計算グラフ）</strong>を記録している</li>
 <li><code>backward()</code> は、その履歴を<strong>逆順にたどって連鎖律を適用</strong>するだけ</li>
-<li>やっていることは<a href="./nn-backprop.html#peek-handcalc" class="peek">前回の手計算1往復</a>と同じ<span class="fw-colon">：</span>
+<li>やっていることは<a href="./nn-backprop.html#peek-handcalc" class="peek">前回の手計算1往復</a>と同じ：
 <ul>
 <li>往路の途中の値を保存（だからメモリを食う）</li>
 <li><span class="math inline">\(\delta\)</span> を出力側から掛けて貯める</li>
@@ -381,9 +381,9 @@ rkskmt
 </div>
 </section>
 <section id="nn部品には全部見覚えがある" class="slide level2">
-<h2>nn<span class="fw-colon">：</span>部品には全部、見覚えがある</h2>
+<h2>nn：部品には全部、見覚えがある</h2>
 <div class="slide-body">
-<div id="fd95c14d" class="cell" data-execution_count="4">
+<div id="8c5a763d" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
 <span id="cb7-2"><a></a></span>
 <span id="cb7-3"><a></a>model <span class="op">=</span> nn.Sequential(</span>
@@ -440,9 +440,9 @@ rkskmt
 </div>
 </section>
 <section id="peek-train-loop" class="slide level2">
-<h2>学習ループ<span class="fw-colon">：</span>3拍子</h2>
+<h2>学習ループ：3拍子</h2>
 <div class="slide-body">
-<div id="1443a620" class="cell" data-execution_count="5">
+<div id="02c075e2" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> make_moons</span>
 <span id="cb9-2"><a></a></span>
 <span id="cb9-3"><a></a>X, y <span class="op">=</span> make_moons(n_samples<span class="op">=</span><span class="dv">200</span>, noise<span class="op">=</span><span class="fl">0.1</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
@@ -480,7 +480,7 @@ rkskmt
 <section id="境界も同じものが出る" class="slide level2">
 <h2>境界も同じものが出る</h2>
 <div class="slide-body">
-<div id="a56b360d" class="cell" data-execution_count="6">
+<div id="db0e79fa" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>描画コード</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -518,8 +518,8 @@ rkskmt
 </ul>
 </div>
 </section>
-<section id="tweakネットワークを組み替えて再学習" class="slide level2 badge-practice">
-<h2><strong>Tweak</strong><span class="fw-colon">：</span>ネットワークを組み替えて再学習</h2>
+<section id="tweak-ネットワークを組み替えて再学習" class="slide level2 badge-practice">
+<h2><strong>Tweak</strong> ネットワークを組み替えて再学習</h2>
 <div class="slide-body">
 <ul>
 <li><a href="#/peek-train-loop" class="peek">学習ループのコード</a> を<strong>書き換えて実行</strong>（境界の図まで続けて実行すると変化が見える）</li>
@@ -562,8 +562,8 @@ rkskmt
 </div>
 <div class="callout-content">
 <ul>
-<li>変換2個<span class="fw-colon">：</span>「変換を重ねる」の回では2個でも分けられたのに、ここでは<strong>87%止まり</strong>（<code>torch.manual_seed(3)</code> だと50%まで転落）。表現力はあっても、<strong>良い谷にたどり着けるかは別問題</strong> — 16個の「余裕」は学習の保険でもある（<a href="./optimization-local-minima-appendix.html">ローカルミニマムの罠</a>）</li>
-<li><code>nn.Identity()</code><span class="fw-colon">：</span>折り目ゼロ — <strong>境界が直線に戻り、87%で頭打ち</strong>。「線形は重ねても線形」を PyTorch でも再確認</li>
+<li>変換2個：「変換を重ねる」の回では2個でも分けられたのに、ここでは<strong>87%止まり</strong>（<code>torch.manual_seed(3)</code> だと50%まで転落）。表現力はあっても、<strong>良い谷にたどり着けるかは別問題</strong> — 16個の「余裕」は学習の保険でもある（<a href="./optimization-local-minima-appendix.html">ローカルミニマムの罠</a>）</li>
+<li><code>nn.Identity()</code>：折り目ゼロ — <strong>境界が直線に戻り、87%で頭打ち</strong>。「線形は重ねても線形」を PyTorch でも再確認</li>
 <li>どれを変えても、学習ループの3拍子は<strong>一切書き換えない</strong>で済む — それが部品化の威力</li>
 </ul>
 </div>
@@ -575,7 +575,7 @@ rkskmt
 <h2>まとめ</h2>
 <div class="slide-body">
 <ul>
-<li><strong>autograd</strong><span class="fw-colon">：</span><code>loss.backward()</code> ＝ 連鎖律の自動化。手計算と全桁一致を確認した</li>
+<li><strong>autograd</strong>：<code>loss.backward()</code> ＝ 連鎖律の自動化。手計算と全桁一致を確認した</li>
 <li><strong>nn の部品</strong>は全部、この講義で自作した部品の別名（対応表）</li>
 <li>学習ループは <code>zero_grad → backward → step</code> の3拍子</li>
 <li>中身を知っているから、安心して楽ができる</li>
@@ -587,7 +587,7 @@ rkskmt
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>次回予告<span class="fw-colon">：</span>最終回</strong></p>
+<p><strong>次回予告：最終回</strong></p>
 </div>
 <div class="callout-content">
 <p>道具は完成した。次回、初回に約束した<strong>手書き数字を読み取る機械</strong>を作る。 入力は 28×28 ピクセル — <strong>784次元</strong>。次元の話、覚えてる？</p>
@@ -601,20 +601,20 @@ rkskmt
 <h2>練習問題</h2>
 <div class="slide-body">
 <p>以下の問題を<strong>Pythonコード</strong>で解け。</p>
-<h3 id="問題1autograd-に自分の手計算を言い当てさせる">問題1<span class="fw-colon">：</span>autograd に自分の手計算を言い当てさせる</h3>
+<h3 id="問題1autograd-に自分の手計算を言い当てさせる">問題1：autograd に自分の手計算を言い当てさせる</h3>
 <p>バックプロパゲーションの回の<strong>練習問題1</strong>（<span class="math inline">\(x = (0.5, 1.0)\)</span>、<span class="math inline">\(y = 0\)</span>、<span class="math inline">\(\alpha = (0.4, 0.3)\)</span>、<span class="math inline">\(b = -0.1\)</span>、<span class="math inline">\(w = -0.5\)</span>、<span class="math inline">\(c = 0.2\)</span>）を PyTorch で組み、<code>loss.backward()</code> の勾配が自分の手計算と一致することを確かめよ。</p>
 <ol type="1">
 <li>本編の「山場」のコードを、上の数値に差し替える（正解が <span class="math inline">\(y = 0\)</span> なので損失は <span class="math inline">\(L = -\log(1-p)\)</span>）</li>
 <li>5つの勾配を表示し、手計算の答え <span class="math inline">\((-0.125, -0.25)\)</span>、<span class="math inline">\(-0.25\)</span>、<span class="math inline">\(0.2\)</span>、<span class="math inline">\(0.5\)</span> と照合せよ</li>
 </ol>
-<h3 id="問題2relu-に折られた入力でも試す">問題2<span class="fw-colon">：</span>ReLU に折られた入力でも試す</h3>
+<h3 id="問題2relu-に折られた入力でも試す">問題2：ReLU に折られた入力でも試す</h3>
 <p>入力を <span class="math inline">\(x = (-1.0, 0.5)\)</span> に変えて実行し、<span class="math inline">\(\alpha, b, w\)</span> の勾配が<strong>ちょうどゼロ</strong>になることを確かめよ。 （バックプロパゲーションの回の練習問題2 — autograd も、折られた経路には勾配を流さない）</p>
 </div>
 </section>
 <section id="解答例" class="slide level2">
 <h2>解答例</h2>
 <div class="slide-body">
-<div id="9cb5ee1e" class="cell" data-execution_count="7">
+<div id="9ca670ce" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a></a><span class="im">import</span> torch</span>
@@ -648,8 +648,8 @@ x = (-1.0, 0.5) | L = 0.7981
 </div>
 </div>
 <ul>
-<li>問題1<span class="fw-colon">：</span><strong>全桁一致</strong>。autograd は連鎖律の機械化であって、魔法ではない</li>
-<li>問題2<span class="fw-colon">：</span><span class="math inline">\(\mathrm{ReLU}'(z) = 0\)</span> の「ゼロで潰す」まで、忠実に再現される</li>
+<li>問題1：<strong>全桁一致</strong>。autograd は連鎖律の機械化であって、魔法ではない</li>
+<li>問題2：<span class="math inline">\(\mathrm{ReLU}'(z) = 0\)</span> の「ゼロで潰す」まで、忠実に再現される</li>
 </ul>
 
 

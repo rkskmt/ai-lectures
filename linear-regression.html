@@ -220,7 +220,7 @@ rkskmt
 <h2>ここまでの道具</h2>
 <div class="slide-body">
 <ul>
-<li><strong>勾配降下法</strong><span class="fw-colon">：</span>傾きの逆方向に少しずつ進んで、損失が最小の場所を探す</li>
+<li><strong>勾配降下法</strong>：傾きの逆方向に少しずつ進んで、損失が最小の場所を探す</li>
 <li>ただし前回最小化したのは、練習用の数学の関数 <span class="math inline">\(f(x) = x^2 - 4x + 3\)</span> だった</li>
 </ul>
 <div title="今回の問い">
@@ -244,8 +244,8 @@ rkskmt
 <h2>回帰問題とは</h2>
 <div class="slide-body">
 <ul>
-<li><strong>分類</strong><span class="fw-colon">：</span>どのグループか答える（Salmon か Sea bass か）</li>
-<li><strong>回帰</strong><span class="fw-colon">：</span><strong>数値そのもの</strong>を予測する（重さは何グラムか）</li>
+<li><strong>分類</strong>：どのグループか答える（Salmon か Sea bass か）</li>
+<li><strong>回帰</strong>：<strong>数値そのもの</strong>を予測する（重さは何グラムか）</li>
 <li>概論の「AIが扱うタスク」の2番目が、今日ようやく登場</li>
 </ul>
 <table class="caption-top">
@@ -272,13 +272,13 @@ rkskmt
 </div>
 </section>
 <section id="今回の問題体長から重さを予測する" class="slide level2">
-<h2>今回の問題<span class="fw-colon">：</span>体長から重さを予測する</h2>
+<h2>今回の問題：体長から重さを予測する</h2>
 <div class="slide-body">
 <ul>
 <li>次元削減の回で測った<strong>体長</strong>を使う</li>
 <li>体長を測るだけで重さが分かれば、<strong>秤に乗せる手間が省ける</strong></li>
 </ul>
-<div id="bd29b239" class="cell" data-execution_count="1">
+<div id="995ea670" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>魚データの定義（クリックして展開）</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -303,7 +303,7 @@ rkskmt
 <span id="cb1-20"><a></a>lengths <span class="op">=</span> np.<span class="bu">round</span>(np.cbrt(weights) <span class="op">*</span> <span class="fl">4.5</span> <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="fl">1.0</span>, <span class="bu">len</span>(weights)), <span class="dv">1</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="4f006c58" class="cell" data-execution_count="2">
+<div id="6e891cc0" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -319,7 +319,7 @@ rkskmt
 </div>
 </section>
 <section id="損失関数二乗誤差mse" class="slide level2">
-<h2>損失関数<span class="fw-colon">：</span>二乗誤差（MSE）</h2>
+<h2>損失関数：二乗誤差（MSE）</h2>
 <div class="slide-body">
 <ul>
 <li>各魚について「予測と実際のズレ」を測り、二乗して平均する</li>
@@ -355,13 +355,13 @@ rkskmt
 <section id="勾配を手で出す" class="slide level2">
 <h2>勾配を手で出す</h2>
 <div class="slide-body">
-<p><span class="math inline">\(L\)</span> を <span class="math inline">\(a\)</span> と <span class="math inline">\(b\)</span> でそれぞれ微分する（合成関数の微分）<span class="fw-colon">：</span></p>
+<p><span class="math inline">\(L\)</span> を <span class="math inline">\(a\)</span> と <span class="math inline">\(b\)</span> でそれぞれ微分する（合成関数の微分）：</p>
 <p><span class="math display">\[\frac{\partial L}{\partial a} = \frac{2}{N} \sum_i (a x_i + b - t_i) \, x_i
 \qquad
 \frac{\partial L}{\partial b} = \frac{2}{N} \sum_i (a x_i + b - t_i)\]</span></p>
 <ul>
-<li>構造は単純<span class="fw-colon">：</span><strong>「予測と正解の差」を入力の大きさに応じて配る</strong></li>
-<li>あとは勾配降下法に渡すだけ<span class="fw-colon">：</span></li>
+<li>構造は単純：<strong>「予測と正解の差」を入力の大きさに応じて配る</strong></li>
+<li>あとは勾配降下法に渡すだけ：</li>
 </ul>
 <p><span class="math display">\[a \leftarrow a - \eta \frac{\partial L}{\partial a}, \qquad b \leftarrow b - \eta \frac{\partial L}{\partial b}\]</span></p>
 </div>
@@ -372,7 +372,7 @@ rkskmt
 <ul>
 <li>スケールを揃えてから（<a href="./clustering-kmeans.html#peek-scale" class="peek">クラスタリングの回の教訓</a>。学習率を1つで済ませるため）</li>
 </ul>
-<div id="e0ef19c4" class="cell" data-execution_count="3">
+<div id="4bcb5c60" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a>x <span class="op">=</span> (lengths <span class="op">-</span> lengths.mean()) <span class="op">/</span> lengths.std()   <span class="co"># 標準化した体長</span></span>
 <span id="cb2-2"><a></a>t <span class="op">=</span> (weights <span class="op">-</span> weights.mean()) <span class="op">/</span> weights.std()   <span class="co"># 標準化した重さ</span></span>
 <span id="cb2-3"><a></a></span>
@@ -400,8 +400,8 @@ rkskmt
 </ul>
 </div>
 </section>
-<section id="tweak学習率をいじって収束を壊す" class="slide level2 badge-practice">
-<h2><strong>Tweak</strong><span class="fw-colon">：</span>学習率をいじって収束を壊す</h2>
+<section id="tweak-学習率をいじって収束を壊す" class="slide level2 badge-practice">
+<h2><strong>Tweak</strong> 学習率をいじって収束を壊す</h2>
 <div class="slide-body">
 <ul>
 <li><a href="#/peek-gdfit-code" class="peek">さっきのコード</a> の <code>lr = 0.1</code> を<strong>書き換えて実行</strong></li>
@@ -451,7 +451,7 @@ rkskmt
 <section id="直線が合っていく様子" class="slide level2">
 <h2>直線が合っていく様子</h2>
 <div class="slide-body">
-<div id="bea3489c" class="cell" data-execution_count="4">
+<div id="edf92add" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -467,9 +467,9 @@ rkskmt
 </div>
 </section>
 <section id="答え合わせsklearn-と比べる" class="slide level2">
-<h2>答え合わせ<span class="fw-colon">：</span>sklearn と比べる</h2>
+<h2>答え合わせ：sklearn と比べる</h2>
 <div class="slide-body">
-<div id="3a18badf" class="cell" data-execution_count="5">
+<div id="5cd1c9a6" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
 <span id="cb4-2"><a></a></span>
 <span id="cb4-3"><a></a>reg <span class="op">=</span> LinearRegression().fit(x.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), t)</span>
@@ -510,7 +510,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <div class="slide-body">
 <ul>
 <li>別の仕入れ先から来た魚は、まだ<strong>15匹</strong>しか測れていない</li>
-<li>直線だけでなく、<strong>曲線</strong>も引ける<span class="fw-colon">：</span>多項式回帰</li>
+<li>直線だけでなく、<strong>曲線</strong>も引ける：多項式回帰</li>
 </ul>
 <p><span class="math display">\[\text{予測} = w_1 x + w_2 x^2 + \cdots + w_d x^d + b\]</span></p>
 <ul>
@@ -537,7 +537,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <section id="次数を上げてみる" class="slide level2">
 <h2>次数を上げてみる</h2>
 <div class="slide-body">
-<div id="a807e092" class="cell" data-execution_count="6">
+<div id="d055f5a6" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
@@ -580,9 +580,9 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 </div>
 </section>
 <section id="数字で見るまた会ったな過学習" class="slide level2">
-<h2>数字で見る<span class="fw-colon">：</span>また会ったな、過学習</h2>
+<h2>数字で見る：また会ったな、過学習</h2>
 <div class="slide-body">
-<div id="f5ad470d" class="cell" data-execution_count="7">
+<div id="b2bff069" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a></a>degrees <span class="op">=</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">10</span>)</span>
 <span id="cb7-2"><a></a>train_mse, test_mse <span class="op">=</span> [], []</span>
 <span id="cb7-3"><a></a><span class="cf">for</span> deg <span class="kw">in</span> degrees:</span>
@@ -614,12 +614,12 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 </div>
 </section>
 <section id="正則化大きい係数に罰金を払わせる" class="slide level2">
-<h2>正則化<span class="fw-colon">：</span>大きい係数に罰金を払わせる</h2>
+<h2>正則化：大きい係数に罰金を払わせる</h2>
 <div class="slide-body">
 <ul>
 <li>暴れている曲線の正体は、<strong>巨大な係数</strong></li>
 </ul>
-<div id="d82efb9c" class="cell" data-execution_count="8">
+<div id="601c3662" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a></a>plain <span class="op">=</span> make_pipeline(PolynomialFeatures(<span class="dv">9</span>), StandardScaler(), LinearRegression())</span>
 <span id="cb8-2"><a></a>plain.fit(X_train, y_train)</span>
 <span id="cb8-3"><a></a><span class="bu">print</span>(<span class="st">"次数9の係数の最大絶対値:"</span>, <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">abs</span>(plain[<span class="op">-</span><span class="dv">1</span>].coef_)<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
@@ -628,7 +628,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 </div>
 </div>
 <ul>
-<li>そこで、損失に「係数の大きさ」への<strong>罰金</strong>を足す<span class="fw-colon">：</span></li>
+<li>そこで、損失に「係数の大きさ」への<strong>罰金</strong>を足す：</li>
 </ul>
 <p><span class="math display">\[L = \mathrm{MSE} + \alpha \sum_j w_j^2\]</span></p>
 <ul>
@@ -640,7 +640,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <section id="peek-ridge-code" class="slide level2">
 <h2>Ridge で手なずける</h2>
 <div class="slide-body">
-<div id="46f2fc0f" class="cell" data-execution_count="9">
+<div id="07762714" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> Ridge</span>
 <span id="cb10-2"><a></a></span>
 <span id="cb10-3"><a></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="fl">9.5</span>, <span class="fl">3.6</span>))</span>
@@ -694,8 +694,8 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 </div>
 </div>
 </section>
-<section id="tweak罰金の強さで曲線が化ける" class="slide level2 badge-practice">
-<h2><strong>Tweak</strong><span class="fw-colon">：</span>罰金の強さで曲線が化ける</h2>
+<section id="tweak-罰金の強さで曲線が化ける" class="slide level2 badge-practice">
+<h2><strong>Tweak</strong> 罰金の強さで曲線が化ける</h2>
 <div class="slide-body">
 <ul>
 <li><a href="#/peek-ridge-code" class="peek">さっきのコード</a> の <code>Ridge(alpha=1.0)</code> を<strong>書き換えて実行</strong></li>
@@ -730,8 +730,8 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 </div>
 <div class="callout-content">
 <ul>
-<li><code>1e-6</code><span class="fw-colon">：</span>罰金がほぼゼロなのに、左端の大暴れは<strong>ほぼ消える</strong>（係数の最大絶対値 20万 → 1万）— あの暴走は、ごくわずかな罰金にすら耐えられない不安定な解だった</li>
-<li><code>1000</code><span class="fw-colon">：</span>曲線はほぼ<strong>まっすぐ寝る</strong> — 罰金が強すぎて、訓練データに合わせる力が負けた</li>
+<li><code>1e-6</code>：罰金がほぼゼロなのに、左端の大暴れは<strong>ほぼ消える</strong>（係数の最大絶対値 20万 → 1万）— あの暴走は、ごくわずかな罰金にすら耐えられない不安定な解だった</li>
+<li><code>1000</code>：曲線はほぼ<strong>まっすぐ寝る</strong> — 罰金が強すぎて、訓練データに合わせる力が負けた</li>
 <li>ちょうど良い <span class="math inline">\(\alpha\)</span> は問題ごとに違う。<strong>訓練データではなくテストデータの MSE</strong> で選ぶ</li>
 </ul>
 </div>
@@ -743,11 +743,11 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <h2>まとめ</h2>
 <div class="slide-body">
 <ul>
-<li><strong>回帰</strong><span class="fw-colon">：</span>数値を予測する。損失は<strong>二乗誤差（MSE）</strong>— 微分しやすさで選ぶ</li>
+<li><strong>回帰</strong>：数値を予測する。損失は<strong>二乗誤差（MSE）</strong>— 微分しやすさで選ぶ</li>
 <li>勾配降下法で fit を自作 → <code>sklearn</code> と<strong>完全一致</strong></li>
-<li><strong>多項式回帰</strong><span class="fw-colon">：</span>特徴量に <span class="math inline">\(x^2, x^3, \ldots\)</span> を足せば道具は線形回帰のまま</li>
-<li><strong>過学習は回帰でも起きる</strong><span class="fw-colon">：</span>次数を上げると訓練誤差↓・テスト誤差爆発</li>
-<li><strong>正則化（<span class="en">ridge</span>）</strong><span class="fw-colon">：</span>大きい係数に罰金 → 暴れる曲線を手なずける</li>
+<li><strong>多項式回帰</strong>：特徴量に <span class="math inline">\(x^2, x^3, \ldots\)</span> を足せば道具は線形回帰のまま</li>
+<li><strong>過学習は回帰でも起きる</strong>：次数を上げると訓練誤差↓・テスト誤差爆発</li>
+<li><strong>正則化（<span class="en">ridge</span>）</strong>：大きい係数に罰金 → 暴れる曲線を手なずける</li>
 </ul>
 <div title="次回予告">
 <div class="callout callout-note callout-titled callout-style-default">
@@ -770,14 +770,14 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <h2>練習問題</h2>
 <div class="slide-body">
 <p>以下の問題を<strong>手計算</strong>と<strong>Pythonコード</strong>の両方で解け。</p>
-<h3 id="問題1魚2匹だけの世界で-fit-する">問題1<span class="fw-colon">：</span>魚2匹だけの世界で fit する</h3>
-<p>データは2点だけ<span class="fw-colon">：</span><span class="math inline">\((x_1, t_1) = (-1, 0)\)</span>、<span class="math inline">\((x_2, t_2) = (1, 2)\)</span>。 直線 <span class="math inline">\(ax + b\)</span> を勾配降下法で fit する。初期値 <span class="math inline">\(a = 0, b = 0\)</span>、学習率 <span class="math inline">\(\eta = 0.1\)</span>。</p>
+<h3 id="問題1魚2匹だけの世界で-fit-する">問題1：魚2匹だけの世界で fit する</h3>
+<p>データは2点だけ：<span class="math inline">\((x_1, t_1) = (-1, 0)\)</span>、<span class="math inline">\((x_2, t_2) = (1, 2)\)</span>。 直線 <span class="math inline">\(ax + b\)</span> を勾配降下法で fit する。初期値 <span class="math inline">\(a = 0, b = 0\)</span>、学習率 <span class="math inline">\(\eta = 0.1\)</span>。</p>
 <ol type="1">
 <li>勾配の式に代入して、<span class="math inline">\(\dfrac{\partial L}{\partial a}\)</span> と <span class="math inline">\(\dfrac{\partial L}{\partial b}\)</span> を求めよ</li>
 <li>更新を3回、手計算で示せ</li>
 <li>同じ更新をコードで100回繰り返し、<code>sklearn</code> の答えと比較せよ</li>
 </ol>
-<p>ヒント<span class="fw-colon">：</span>2点を通る直線は <span class="math inline">\(y = x + 1\)</span>。つまり答えは <span class="math inline">\(a = 1, b = 1\)</span> になるはず。</p>
+<p>ヒント：2点を通る直線は <span class="math inline">\(y = x + 1\)</span>。つまり答えは <span class="math inline">\(a = 1, b = 1\)</span> になるはず。</p>
 </div>
 </section>
 <section id="問題1の解答例" class="slide level2">
@@ -786,21 +786,21 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <div id="準備a-0-b-0-での勾配" class="slide-body-heading">
 準備（<span class="math inline">\(a = 0, b = 0\)</span> での勾配）
 </div>
-<p>予測は2点とも 0。差（予測 − 実際）は <span class="math inline">\((0 - 0, 0 - 2) = (0, -2)\)</span><span class="fw-colon">：</span></p>
+<p>予測は2点とも 0。差（予測 − 実際）は <span class="math inline">\((0 - 0, 0 - 2) = (0, -2)\)</span>：</p>
 <p><span class="math display">\[\frac{\partial L}{\partial a} = \frac{2}{2}\left[ 0 \times (-1) + (-2) \times 1 \right] = -2\]</span> <span class="math display">\[\frac{\partial L}{\partial b} = \frac{2}{2}\left[ 0 + (-2) \right] = -2\]</span></p>
 <h3 id="反復1">反復1</h3>
 <p><span class="math display">\[a = 0 - 0.1 \times (-2) = 0.2, \qquad b = 0 - 0.1 \times (-2) = 0.2\]</span></p>
 <h3 id="反復2">反復2</h3>
-<p>差は <span class="math inline">\((b - a,\; a + b - 2) = (0, -1.6)\)</span><span class="fw-colon">：</span></p>
+<p>差は <span class="math inline">\((b - a,\; a + b - 2) = (0, -1.6)\)</span>：</p>
 <p><span class="math display">\[\frac{\partial L}{\partial a} = \frac{2}{2}\left[0 + (-1.6)\right] = -1.6, \qquad
 a = 0.2 + 0.16 = 0.36\]</span></p>
 <p><span class="math inline">\(b\)</span> もまったく同じ計算で <span class="math inline">\(b = 0.36\)</span>。</p>
 <h3 id="反復3">反復3</h3>
-<p>差は <span class="math inline">\((0, -1.28)\)</span>、勾配はどちらも <span class="math inline">\(-1.28\)</span><span class="fw-colon">：</span></p>
+<p>差は <span class="math inline">\((0, -1.28)\)</span>、勾配はどちらも <span class="math inline">\(-1.28\)</span>：</p>
 <p><span class="math display">\[a = 0.36 + 0.128 = 0.488, \qquad b = 0.488\]</span></p>
 <p><span class="math inline">\(a\)</span> と <span class="math inline">\(b\)</span> が揃って <span class="math inline">\(1\)</span> に近づいていく。</p>
 <h3 id="コードで確認">コードで確認</h3>
-<div id="74f4736a" class="cell" data-execution_count="10">
+<div id="85df741f" class="cell" data-execution_count="10">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
