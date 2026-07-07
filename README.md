@@ -84,7 +84,7 @@ doc/              執筆ガイド・トラブルシュート
 _extensions/      Quarto 拡張（cleanslidekit テーマ＝CSS/UI JS/Lua フィルタ同梱、d2、lightbox）
 ```
 
-Lua フィルタ（`hl.lua`・`fw-colon.lua`・`cite-image.lua` 等）は cleanslidekit 拡張に同梱されている（ルート直下には置かない）。
+Lua フィルタ（`hl.lua`・`cite-image.lua` 等）は cleanslidekit 拡張に同梱されている（ルート直下には置かない）。
 
 ## スライドの書き方
 
