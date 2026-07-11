@@ -93,6 +93,21 @@ Salmon / Sea bass の選別システムを全回で使い回す。**データを
 - **Tweak**（IP3200 から移植）：`## **Tweak** … {.badge-practice}` ＋ `.tweak` の2列表（やりたいこと｜コード）＋「ここで観察」callout。echo:true のコードがあるデッキのみに置く（隠しセルしかないデッキには置かない）。**観察 callout に書く挙動は必ず実測してから書く** — 直感と違った実例：Ridge α=1e-6 でも暴走はほぼ消える、PyTorch の hidden=2 は SGD だと 87% 止まり（seed 3 で 50%）、lr を1/10にしても正答率は並ぶが Loss に差が出る。
 - **相互リンク**：backprop 練習問題の数値は pytorch-intro の練習問題で再登場（autograd が手計算を言い当てる構成）。nn-numpy の Tweak（乱数シード）と pytorch-intro の Tweak（hidden=2）はローカルミニマム付録へリンク。
 
+## 授業内コアと発展（2026-07-11）
+
+長いデッキは別資料へ分解せず、ライブ授業で飛ばせる区間の入口と、コアへ戻る位置だけを区切る。スライド単体に追加説明は持たせない。
+
+- `ai-introduction.qmd`：発展「フレーム問題を深掘る」→ コア「ルールから学習へ」
+- `classification-2d-boundaries.qmd`：発展「決定木を手で作る」→ コア「ライブラリで使う」
+- `dimensionality-pca.qmd`：発展「なぜ固有ベクトルなのか」→ コア「PCAを使う」
+- `optimization-local-minima-appendix.qmd` と `newton-method-appendix.qmd` は資料全体が回数外の発展
+
+3つの到達点には、解説を増やさず、学生が口頭で説明するチェックを置く。
+
+- 分類幹の終わり：未知の魚をどう評価するか
+- NumPy実装の終わり：forward・backward・更新を60秒で説明
+- MNIST最終回：96.3%という1数値の裏にある誤りを3方向から説明
+
 ## 伏線の行
 
 - 各回のまとめに次回への問いを1行入れる（既存回は適用済み。例：「ラベルがない場合はどうする？」）。
@@ -134,7 +149,7 @@ llm コースと同じ3層構成。主役は自作：
 | 10 | TF Playground iframe（relu・circle・4ユニット初期設定）＋30秒チャレンジ | nn-multilayer | **済** |
 | 11 | environment.yml に plotly 追加、iframes/ を gitignore＋resources 登録 | 設定 | **済** |
 | 12 | 対象9デッキのレンダー＋Playwright 目視検証（explorer 3ビュー・全埋め込み・plotly 3D・D2 を確認） | 全体 | **済** |
-| 13 | **handouts PDF 再生成** — 9デッキ改稿のため theme リポの qmd2pdf を回し直す必要あり | pdf/ | 残 |
+| 13 | **handouts PDF 再生成** — 2026-07-11に全16デッキを最新版から再生成 | pdf/ | **済** |
 | 14 | 未対象デッキへの水平展開（ai-introduction・分類幹の D2／クイズ点検） | 第1幹 | **済**（下記） |
 
 ### 水平展開の内容（2026-07-11 第2弾）
