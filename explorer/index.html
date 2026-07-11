@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>自作NNエクスプローラ</title>
+<style>
+  :root {
+    --blue: #2980b9; --lightblue: #5dade2; --red: #e74c3c; --lightred: #f5b7b1;
+    --border: #d5dbdb; --bg: #fdfefe; --ink: #2c3e50; --green: #27ae60;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink);
+    font-family: "Hiragino Sans", "Noto Sans JP", "Yu Gothic", sans-serif; font-size: 13px; }
+  #app { display: flex; flex-direction: column; height: 100vh; padding: 8px 10px; gap: 8px; }
+  header { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  header h1 { font-size: 14px; margin: 0; }
+  header .hint { color: #7f8c8d; font-size: 11px; }
+  .tabs { display: flex; gap: 4px; }
+  .tab { border: 1px solid var(--border); border-radius: 5px; background: white;
+    padding: 3px 10px; cursor: pointer; font-size: 12px; }
+  .tab.on { border-color: var(--blue); background: #eaf2f8; font-weight: bold; }
+  #main { display: flex; gap: 12px; flex: 1; min-height: 0; overflow: auto; }
+  .col { display: flex; flex-direction: column; gap: 8px; }
+  .panel { border: 1px solid var(--border); border-radius: 8px; background: white; padding: 10px 12px; }
+  .panel h2 { font-size: 13px; margin: 0 0 6px; }
+  .note { color: #7f8c8d; font-size: 11px; margin: 4px 0; }
+  canvas { display: block; }
+  button { font-size: 12px; padding: 3px 10px; border: 1px solid var(--border);
+    border-radius: 5px; background: white; cursor: pointer; }
+  button:hover { border-color: var(--lightblue); }
+  button.primary { border-color: var(--blue); background: #eaf2f8; }
+  input[type=range] { width: 100%; }
+
+  /* boundary view */
+  #bd-canvas { border: 1px solid var(--border); border-radius: 6px; background: white; }
+  #bd-readout { font-family: monospace; font-size: 12px; }
+  .unitgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+  .unit { border: 2px solid var(--border); border-radius: 5px; background: white;
+    padding: 3px 5px; cursor: pointer; text-align: center; }
+  .unit:hover { border-color: var(--lightblue); }
+  .unit.sel { border-color: var(--blue); background: #eaf2f8; font-weight: bold; }
+  .unit .vote { height: 4px; border-radius: 2px; margin-top: 3px; }
+  .toggles { display: flex; gap: 10px; flex-wrap: wrap; font-size: 12px; }
+
+  /* draw view */
+  #dr-canvas { border: 2px solid var(--border); border-radius: 8px; background: white;
+    cursor: crosshair; touch-action: none; }
+  .prevbox { text-align: center; }
+  .prevbox canvas { border: 1px solid var(--border); image-rendering: pixelated; margin: 0 auto; }
+  .bars .bar { display: flex; align-items: center; gap: 6px; margin: 3px 0; }
+  .bars .ch { width: 26px; text-align: center; font-weight: bold; border: 1px solid var(--border);
+    border-radius: 4px; background: #f8f9f9; }
+  .bars .fill { height: 15px; background: var(--lightblue); border-radius: 3px; min-width: 1px; }
+  .bars .bar.top .fill { background: var(--red); }
+  .bars .bar.top .ch { background: #fdecea; border-color: var(--red); }
+  .bars .p { color: #7f8c8d; font-size: 11px; }
+  #dr-big { font-size: 42px; font-weight: bold; text-align: center; min-height: 56px; }
+  .strip { display: flex; gap: 4px; flex-wrap: wrap; }
+  .strip .chip { border: 2px solid var(--border); border-radius: 4px; padding: 1px;
+    background: white; cursor: pointer; }
+  .strip .chip:hover { border-color: var(--lightblue); }
+  .strip .chip.bad { border-color: var(--lightred); }
+  .strip .chip canvas { image-rendering: pixelated; }
+  .strip .cl { font-size: 9px; text-align: center; color: #7f8c8d; }
+
+  /* weights view */
+  #wt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(58px, 1fr)); gap: 4px; }
+  #wt-grid .chip { border: 2px solid transparent; border-radius: 4px; padding: 1px;
+    background: white; cursor: pointer; }
+  #wt-grid .chip:hover { border-color: var(--lightblue); }
+  #wt-grid .chip.sel { border-color: var(--blue); }
+  #wt-grid canvas { width: 100%; image-rendering: pixelated; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>自作NNエクスプローラ</h1>
+    <nav class="tabs">
+      <button class="tab" data-view="boundary">境界（三日月）</button>
+      <button class="tab" data-view="draw">手書き（MNIST）</button>
+      <button class="tab" data-view="weights">重み（MNIST）</button>
+    </nav>
+    <span class="hint" id="hint"></span>
+  </header>
+  <div id="main"></div>
+</div>
+<script src="data_ai.js"></script>
+<script>
+"use strict";
+const DATA = window.EXPLORER_DATA;
+const MAIN = document.getElementById("main");
+const HINTS = {
+  boundary: "スライダー＝学習の時間旅行／マスをクリック＝その変換の折り目だけを表示",
+  draw: "マウスやタッチで数字を書く — 講義で学習させた本物の重みが判定する",
+  weights: "1マス＝中間の変換1個。784個の重みを28×28に並べ直したもの（クリックで拡大）",
+};
+
+// ---- state (initialised from the URL hash) ----
+const S = { view: "boundary", it: null, unit: -1, wunit: 0 };
+function parseHash() {
+  const p = new URLSearchParams(location.hash.replace(/^#/, ""));
+  const v = p.get("view");
+  S.view = ["boundary", "draw", "weights"].includes(v) ? v : "boundary";
+  S.it = p.has("it") ? +p.get("it") : DATA.moons.snapshots.length - 1;
+  S.it = Math.max(0, Math.min(S.it, DATA.moons.snapshots.length - 1));
+  S.unit = p.has("unit") ? +p.get("unit") : -1;
+  S.wunit = p.has("wunit") ? +p.get("wunit") : 0;
+}
+parseHash();
+window.addEventListener("hashchange", () => { parseHash(); renderAll(); });
+
+function setTabs() {
+  document.querySelectorAll(".tab").forEach(b => {
+    b.classList.toggle("on", b.dataset.view === S.view);
+    b.onclick = () => { S.view = b.dataset.view; location.hash = "view=" + S.view; };
+  });
+  document.getElementById("hint").textContent = HINTS[S.view];
+}
+
+// =================================================================
+// view 1: moons decision boundary
+// =================================================================
+const M = DATA.moons;
+const BD = { W: 470, H: 350, pad: 0.4 };
+(function () {
+  const xs = M.X.map(p => p[0]), ys = M.X.map(p => p[1]);
+  BD.x0 = Math.min(...xs) - BD.pad; BD.x1 = Math.max(...xs) + BD.pad;
+  BD.y0 = Math.min(...ys) - BD.pad; BD.y1 = Math.max(...ys) + BD.pad;
+})();
+const sx = x => (x - BD.x0) / (BD.x1 - BD.x0) * BD.W;
+const sy = y => BD.H - (y - BD.y0) / (BD.y1 - BD.y0) * BD.H;
+
+function snapParams() { return M.snapshots[S.it]; }
+// weights are stored flat: W1 row-major (2 rows x hidden), w2 (hidden)
+function unitParams(s, j) { return { a1: s.W1[j], a2: s.W1[M.hidden + j], b: s.b1[j], v: s.w2[j] }; }
+
+function moonsForwardP(s, x, yv) {
+  let u = s.c2;
+  for (let j = 0; j < M.hidden; j++) {
+    const z = s.W1[j] * x + s.W1[M.hidden + j] * yv + s.b1[j];
+    if (z > 0) u += s.w2[j] * z;
+  }
+  return 1 / (1 + Math.exp(-u));
+}
+
+let playTimer = null;
+function renderBoundary() {
+  MAIN.innerHTML = `
+    <div class="col">
+      <div class="panel" style="padding:8px">
+        <canvas id="bd-canvas" width="${BD.W}" height="${BD.H}"></canvas>
+        <div id="bd-readout" style="margin-top:6px"></div>
+      </div>
+    </div>
+    <div class="col" style="flex:1; min-width:250px; max-width:330px">
+      <div class="panel">
+        <h2>学習の時間旅行</h2>
+        <input type="range" id="bd-slider" min="0" max="${M.snapshots.length - 1}" step="1" value="${S.it}">
+        <div style="display:flex; justify-content:space-between; align-items:center">
+          <span class="note" id="bd-itlabel"></span>
+          <button id="bd-play">▶ 再生</button>
+        </div>
+        <canvas id="bd-spark" width="290" height="56" style="margin-top:4px"></canvas>
+        <div class="note">損失の下がり方（横軸は更新回数、対数目盛）</div>
+      </div>
+      <div class="panel">
+        <h2>中間の変換 ${M.hidden} 個 — 折り目と票</h2>
+        <div class="unitgrid" id="bd-units"></div>
+        <div class="note">下の色棒＝出力層での票（<span style="color:var(--red)">赤クラスへ</span>／<span style="color:var(--blue)">青クラスへ</span>）</div>
+        <div class="toggles" style="margin-top:6px">
+          <label><input type="checkbox" id="bd-all"> すべての折り目</label>
+          <label><input type="checkbox" id="bd-fill" checked> 塗り分け</label>
+          <button id="bd-clear">選択解除</button>
+        </div>
+        <div class="note" id="bd-unitinfo"></div>
+      </div>
+    </div>`;
+
+  const cv = document.getElementById("bd-canvas"), ctx = cv.getContext("2d");
+  const slider = document.getElementById("bd-slider");
+  const allBox = document.getElementById("bd-all");
+  const fillBox = document.getElementById("bd-fill");
+
+  function paint() {
+    const s = snapParams();
+    ctx.clearRect(0, 0, BD.W, BD.H);
+    if (fillBox.checked) {
+      const gw = 188, gh = 140;
+      const off = document.createElement("canvas");
+      off.width = gw; off.height = gh;
+      const octx = off.getContext("2d");
+      const im = octx.createImageData(gw, gh);
+      for (let gy = 0; gy < gh; gy++) {
+        const yv = BD.y1 - (gy + 0.5) / gh * (BD.y1 - BD.y0);
+        for (let gx = 0; gx < gw; gx++) {
+          const xv = BD.x0 + (gx + 0.5) / gw * (BD.x1 - BD.x0);
+          const p = moonsForwardP(s, xv, yv);
+          const k = (gy * gw + gx) * 4;
+          if (p >= 0.5) { im.data[k] = 245; im.data[k + 1] = 183; im.data[k + 2] = 177; }
+          else { im.data[k] = 93; im.data[k + 1] = 173; im.data[k + 2] = 226; }
+          im.data[k + 3] = 70;
+        }
+      }
+      octx.putImageData(im, 0, 0);
+      ctx.drawImage(off, 0, 0, BD.W, BD.H);
+    }
+    // fold lines: z_j(x,y) = 0
+    const drawFold = (j, color, width) => {
+      const { a1, a2, b } = unitParams(s, j);
+      const pts = [];
+      // intersections with the frame
+      const cand = [];
+      if (Math.abs(a2) > 1e-9) {
+        cand.push([BD.x0, -(a1 * BD.x0 + b) / a2], [BD.x1, -(a1 * BD.x1 + b) / a2]);
+      }
+      if (Math.abs(a1) > 1e-9) {
+        cand.push([-(a2 * BD.y0 + b) / a1, BD.y0], [-(a2 * BD.y1 + b) / a1, BD.y1]);
+      }
+      for (const [px, py] of cand)
+        if (px >= BD.x0 - 1e-6 && px <= BD.x1 + 1e-6 && py >= BD.y0 - 1e-6 && py <= BD.y1 + 1e-6)
+          pts.push([px, py]);
+      if (pts.length < 2) return;
+      ctx.strokeStyle = color; ctx.lineWidth = width;
+      ctx.beginPath();
+      ctx.moveTo(sx(pts[0][0]), sy(pts[0][1]));
+      ctx.lineTo(sx(pts[1][0]), sy(pts[1][1]));
+      ctx.stroke();
+      // arrows into the active half-plane (z > 0)
+      if (width > 1.5) {
+        const n = Math.hypot(a1, a2);
+        for (const t of [0.3, 0.5, 0.7]) {
+          const mx = pts[0][0] + t * (pts[1][0] - pts[0][0]);
+          const my = pts[0][1] + t * (pts[1][1] - pts[0][1]);
+          const ex = mx + a1 / n * 0.12, ey = my + a2 / n * 0.12;
+          ctx.beginPath();
+          ctx.moveTo(sx(mx), sy(my)); ctx.lineTo(sx(ex), sy(ey));
+          ctx.stroke();
+        }
+      }
+    };
+    if (allBox.checked)
+      for (let j = 0; j < M.hidden; j++) if (j !== S.unit) drawFold(j, "rgba(127,140,141,0.45)", 1);
+    if (S.unit >= 0) {
+      const v = unitParams(snapParams(), S.unit).v;
+      drawFold(S.unit, v >= 0 ? "#e74c3c" : "#2980b9", 2.5);
+    }
+    // data points (same colors/markers as the decks)
+    for (let i = 0; i < M.X.length; i++) {
+      const [px, py] = M.X[i];
+      ctx.fillStyle = M.y[i] ? "#e74c3c" : "#2980b9";
+      ctx.strokeStyle = "gray"; ctx.lineWidth = 0.5;
+      if (M.y[i]) {
+        ctx.beginPath(); ctx.arc(sx(px), sy(py), 3.2, 0, 7); ctx.fill(); ctx.stroke();
+      } else {
+        ctx.fillRect(sx(px) - 2.8, sy(py) - 2.8, 5.6, 5.6);
+        ctx.strokeRect(sx(px) - 2.8, sy(py) - 2.8, 5.6, 5.6);
+      }
+    }
+    const s2 = snapParams();
+    document.getElementById("bd-readout").textContent =
+      `更新 ${s2.it} 回 | Loss ${s2.loss.toFixed(4)} | 正答率 ${(s2.acc * 100).toFixed(1)}%`;
+    document.getElementById("bd-itlabel").textContent =
+      `スナップショット: ${M.snapshots.map(t => t.it).join(" → ")}`;
+    paintSpark();
+    paintUnitInfo();
+  }
+
+  function paintSpark() {
+    const c = document.getElementById("bd-spark"), g = c.getContext("2d");
+    g.clearRect(0, 0, c.width, c.height);
+    const it = M.curve.it, lo = M.curve.loss;
+    const lmax = Math.max(...lo);
+    const X = i => 4 + Math.log10(it[i]) / Math.log10(4000) * (c.width - 8);
+    const Y = v => c.height - 4 - v / lmax * (c.height - 8);
+    g.strokeStyle = "#2980b9"; g.lineWidth = 1.5; g.beginPath();
+    for (let i = 0; i < it.length; i++) i ? g.lineTo(X(i), Y(lo[i])) : g.moveTo(X(i), Y(lo[i]));
+    g.stroke();
+    const cur = snapParams().it;
+    if (cur > 0) {
+      const xx = 4 + Math.log10(cur) / Math.log10(4000) * (c.width - 8);
+      g.strokeStyle = "#e74c3c"; g.lineWidth = 1;
+      g.beginPath(); g.moveTo(xx, 0); g.lineTo(xx, c.height); g.stroke();
+    }
+  }
+
+  function paintUnits() {
+    const box = document.getElementById("bd-units");
+    box.innerHTML = "";
+    const s = snapParams();
+    const vmax = Math.max(...s.w2.map(Math.abs), 1e-9);
+    for (let j = 0; j < M.hidden; j++) {
+      const d = document.createElement("div");
+      d.className = "unit" + (j === S.unit ? " sel" : "");
+      const v = s.w2[j];
+      d.innerHTML = `${j + 1}<div class="vote" style="width:${Math.abs(v) / vmax * 100}%;
+        background:${v >= 0 ? "var(--red)" : "var(--blue)"}"></div>`;
+      d.onclick = () => { S.unit = (S.unit === j ? -1 : j); paintUnits(); paint(); };
+      box.appendChild(d);
+    }
+  }
+
+  function paintUnitInfo() {
+    const el = document.getElementById("bd-unitinfo");
+    if (S.unit < 0) { el.textContent = ""; return; }
+    const { a1, a2, b, v } = unitParams(snapParams(), S.unit);
+    el.innerHTML = `変換 ${S.unit + 1}：z = ${a1.toFixed(2)}·x₁ ${a2 < 0 ? "−" : "+"} ${Math.abs(a2).toFixed(2)}·x₂ ` +
+      `${b < 0 ? "−" : "+"} ${Math.abs(b).toFixed(2)}　線の矢印側で z > 0（ReLUが通す側）。` +
+      `票 w = ${v.toFixed(2)}（${v >= 0 ? "赤" : "青"}クラスへ）`;
+  }
+
+  slider.oninput = () => { S.it = +slider.value; paint(); };
+  allBox.onchange = paint;
+  fillBox.onchange = paint;
+  document.getElementById("bd-clear").onclick = () => { S.unit = -1; paintUnits(); paint(); };
+  document.getElementById("bd-play").onclick = function () {
+    if (playTimer) { clearInterval(playTimer); playTimer = null; this.textContent = "▶ 再生"; return; }
+    S.it = 0; slider.value = 0; paint();
+    this.textContent = "⏸ 停止";
+    playTimer = setInterval(() => {
+      if (S.it >= M.snapshots.length - 1) {
+        clearInterval(playTimer); playTimer = null;
+        document.getElementById("bd-play").textContent = "▶ 再生";
+        return;
+      }
+      S.it += 1; slider.value = S.it; paint();
+    }, 800);
+  };
+  paintUnits();
+  paint();
+}
+
+// =================================================================
+// shared MNIST forward (real trained weights)
+// =================================================================
+const MN = DATA.mnist;
+function mnistForward(x) {
+  const h = new Float32Array(128);
+  for (let j = 0; j < 128; j++) {
+    let s = MN.b1[j];
+    const off = j * 784;
+    for (let i = 0; i < 784; i++) s += MN.W1[off + i] * x[i];
+    h[j] = s > 0 ? s : 0;
+  }
+  const u = new Float32Array(10);
+  for (let k = 0; k < 10; k++) {
+    let s = MN.b2[k];
+    const off = k * 128;
+    for (let j = 0; j < 128; j++) s += MN.W2[off + j] * h[j];
+    u[k] = s;
+  }
+  const m = Math.max(...u);
+  let Z = 0;
+  const p = new Float32Array(10);
+  for (let k = 0; k < 10; k++) { p[k] = Math.exp(u[k] - m); Z += p[k]; }
+  for (let k = 0; k < 10; k++) p[k] /= Z;
+  return { h, u, p };
+}
+
+function paint28(canvas, x, scale) {
+  canvas.width = 28; canvas.height = 28;
+  canvas.style.width = canvas.style.height = (scale || 140) + "px";
+  const g = canvas.getContext("2d");
+  const im = g.createImageData(28, 28);
+  for (let i = 0; i < 784; i++) {
+    const v = 255 - Math.round(x[i] * 255);   // ink=1 -> black
+    im.data[i * 4] = im.data[i * 4 + 1] = im.data[i * 4 + 2] = v;
+    im.data[i * 4 + 3] = 255;
+  }
+  g.putImageData(im, 0, 0);
+}
+
+// =================================================================
+// view 2: draw a digit
+// =================================================================
+function renderDraw() {
+  MAIN.innerHTML = `
+    <div class="col" style="flex:none">
+      <div class="panel" style="padding:8px; width:fit-content">
+        <canvas id="dr-canvas" width="280" height="280"></canvas>
+        <div style="display:flex; gap:6px; margin-top:6px">
+          <button id="dr-clear" class="primary">消す</button>
+          <span class="note">太く・大きく書くのがコツ（MNISTの字は線が太い）</span>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>本物のMNISTを流す</h2>
+        <div class="strip" id="dr-strip"></div>
+        <div class="note">薄赤枠＝この機械が読み間違えるテスト画像（予測→正解）</div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="panel prevbox">
+        <h2>モデルに見えている28×28</h2>
+        <canvas id="dr-prev"></canvas>
+        <div class="note">切り出し → 長辺20px → 重心を中央へ<br>（MNISTと同じ揃え方）</div>
+      </div>
+    </div>
+    <div class="col" style="min-width:230px">
+      <div class="panel">
+        <h2>10個の出力 → ソフトマックスで確率に</h2>
+        <div id="dr-big"></div>
+        <div class="bars" id="dr-bars"></div>
+        <div class="note">テスト1万枚の正答率 ${(MN.test_acc * 100).toFixed(1)}%（3エポック学習の実重み）</div>
+      </div>
+    </div>`;
+
+  const cv = document.getElementById("dr-canvas"), ctx = cv.getContext("2d");
+  ctx.lineWidth = 18; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.strokeStyle = "#000";
+  let drawing = false, last = null;
+
+  function pos(e) {
+    const r = cv.getBoundingClientRect();
+    const t = e.touches ? e.touches[0] : e;
+    return [(t.clientX - r.left) * cv.width / r.width, (t.clientY - r.top) * cv.height / r.height];
+  }
+  function start(e) { drawing = true; last = pos(e); e.preventDefault(); }
+  function move(e) {
+    if (!drawing) return;
+    const p = pos(e);
+    ctx.beginPath(); ctx.moveTo(last[0], last[1]); ctx.lineTo(p[0], p[1]); ctx.stroke();
+    last = p; e.preventDefault();
+    throttledPredict();
+  }
+  function end() { if (drawing) { drawing = false; predictFromCanvas(); } }
+  cv.addEventListener("mousedown", start); cv.addEventListener("mousemove", move);
+  window.addEventListener("mouseup", end);
+  cv.addEventListener("touchstart", start); cv.addEventListener("touchmove", move);
+  cv.addEventListener("touchend", end);
+
+  let tId = null;
+  function throttledPredict() {
+    if (tId) return;
+    tId = setTimeout(() => { tId = null; predictFromCanvas(); }, 120);
+  }
+
+  document.getElementById("dr-clear").onclick = () => {
+    ctx.clearRect(0, 0, 280, 280); showResult(null);
+  };
+
+  // preprocessing = the take-home demo code from mnist-project.qmd, in JS
+  function preprocess() {
+    const d = ctx.getImageData(0, 0, 280, 280).data;
+    const a = new Float32Array(280 * 280);
+    let ink = 0;
+    for (let i = 0; i < a.length; i++) { a[i] = d[i * 4 + 3] / 255; ink += a[i]; }
+    if (ink < 20) return null;
+    let rmin = 280, rmax = -1, cmin = 280, cmax = -1;
+    for (let r = 0; r < 280; r++)
+      for (let c = 0; c < 280; c++)
+        if (a[r * 280 + c] > 0.3) {
+          if (r < rmin) rmin = r; if (r > rmax) rmax = r;
+          if (c < cmin) cmin = c; if (c > cmax) cmax = c;
+        }
+    const h = rmax - rmin + 1, w = cmax - cmin + 1;
+    const s = 20 / Math.max(h, w);
+    const sw = Math.max(1, Math.round(w * s)), sh = Math.max(1, Math.round(h * s));
+    const off = document.createElement("canvas");
+    off.width = 28; off.height = 28;
+    const octx = off.getContext("2d");
+    octx.drawImage(cv, cmin, rmin, w, h,
+      Math.floor((28 - sw) / 2), Math.floor((28 - sh) / 2), sw, sh);
+    const dd = octx.getImageData(0, 0, 28, 28).data;
+    let x = new Float32Array(784);
+    for (let i = 0; i < 784; i++) x[i] = dd[i * 4 + 3] / 255;
+    // centre of mass -> middle (np.roll equivalent, wrap-around)
+    let sum = 0, cy = 0, cx = 0;
+    for (let r = 0; r < 28; r++)
+      for (let c = 0; c < 28; c++) {
+        const v = x[r * 28 + c]; sum += v; cy += v * r; cx += v * c;
+      }
+    if (sum > 0) {
+      const dy = Math.round(14 - cy / sum), dx = Math.round(14 - cx / sum);
+      const x2 = new Float32Array(784);
+      for (let r = 0; r < 28; r++)
+        for (let c = 0; c < 28; c++) {
+          const nr = ((r + dy) % 28 + 28) % 28, nc = ((c + dx) % 28 + 28) % 28;
+          x2[nr * 28 + nc] = x[r * 28 + c];
+        }
+      x = x2;
+    }
+    return x;
+  }
+
+  function showResult(x) {
+    const prev = document.getElementById("dr-prev");
+    const bars = document.getElementById("dr-bars");
+    const big = document.getElementById("dr-big");
+    if (!x) {
+      paint28(prev, new Float32Array(784));
+      bars.innerHTML = ""; big.textContent = "";
+      return;
+    }
+    paint28(prev, x);
+    const { p } = mnistForward(x);
+    const top = p.indexOf(Math.max(...p));
+    big.textContent = String(top);
+    bars.innerHTML = "";
+    for (let k = 0; k < 10; k++) {
+      const row = document.createElement("div");
+      row.className = "bar" + (k === top ? " top" : "");
+      row.innerHTML = `<span class="ch">${k}</span>
+        <div class="fill" style="width:${(p[k] * 150).toFixed(1)}px"></div>
+        <span class="p">${(p[k] * 100).toFixed(1)}%</span>`;
+      bars.appendChild(row);
+    }
+  }
+
+  function predictFromCanvas() { showResult(preprocess()); }
+
+  // sample strip: real test images (already MNIST-aligned -> no preprocessing)
+  const strip = document.getElementById("dr-strip");
+  MN.samples.forEach(smp => {
+    const chip = document.createElement("div");
+    const bad = smp.pred !== smp.label;
+    chip.className = "chip" + (bad ? " bad" : "");
+    const c = document.createElement("canvas");
+    chip.appendChild(c);
+    const lab = document.createElement("div");
+    lab.className = "cl";
+    lab.textContent = bad ? `${smp.pred}→${smp.label}` : String(smp.label);
+    chip.appendChild(lab);
+    const x = new Float32Array(784);
+    for (let i = 0; i < 784; i++) x[i] = smp.px[i] / 255;
+    paint28(c, x, 40);
+    chip.onclick = () => { ctx.clearRect(0, 0, 280, 280); showResult(x); };
+    strip.appendChild(chip);
+  });
+
+  showResult(null);
+}
+
+// =================================================================
+// view 3: first-layer weight gallery
+// =================================================================
+function weightImage(canvas, j, scale) {
+  canvas.width = 28; canvas.height = 28;
+  if (scale) canvas.style.width = canvas.style.height = scale + "px";
+  const g = canvas.getContext("2d");
+  const im = g.createImageData(28, 28);
+  const off = j * 784;
+  let vmax = 1e-9;
+  for (let i = 0; i < 784; i++) vmax = Math.max(vmax, Math.abs(MN.W1[off + i]));
+  for (let i = 0; i < 784; i++) {
+    const t = MN.W1[off + i] / vmax;   // -1 .. 1
+    const k = i * 4;
+    if (t >= 0) {  // white -> red (#e74c3c)
+      im.data[k] = 255 - Math.round((255 - 231) * t);
+      im.data[k + 1] = 255 - Math.round((255 - 76) * t);
+      im.data[k + 2] = 255 - Math.round((255 - 60) * t);
+    } else {       // white -> blue (#2980b9)
+      im.data[k] = 255 - Math.round((255 - 41) * -t);
+      im.data[k + 1] = 255 - Math.round((255 - 128) * -t);
+      im.data[k + 2] = 255 - Math.round((255 - 185) * -t);
+    }
+    im.data[k + 3] = 255;
+  }
+  g.putImageData(im, 0, 0);
+}
+
+function renderWeights() {
+  MAIN.innerHTML = `
+    <div class="col" style="flex:1; min-width:0">
+      <div class="panel" style="overflow-y:auto">
+        <h2>第1層 Linear(784, 128) の重み — 128個の「見張り」</h2>
+        <div id="wt-grid"></div>
+      </div>
+    </div>
+    <div class="col" style="min-width:260px; max-width:300px">
+      <div class="panel prevbox">
+        <h2 id="wt-title"></h2>
+        <canvas id="wt-big"></canvas>
+        <div class="note"><span style="color:var(--red)">赤＝インクがあると足す</span>／<span style="color:var(--blue)">青＝あると引く</span></div>
+      </div>
+      <div class="panel">
+        <h2>この見張りの票（出力層の重み）</h2>
+        <div class="bars" id="wt-votes"></div>
+        <div class="note">反応すると、どの数字に票が入るか</div>
+      </div>
+    </div>`;
+
+  const grid = document.getElementById("wt-grid");
+  const chips = [];
+  for (let j = 0; j < 128; j++) {
+    const chip = document.createElement("div");
+    chip.className = "chip" + (j === S.wunit ? " sel" : "");
+    const c = document.createElement("canvas");
+    chip.appendChild(c);
+    weightImage(c, j);
+    chip.onclick = () => {
+      S.wunit = j;
+      chips.forEach((el, k) => el.classList.toggle("sel", k === j));
+      paintDetail();
+    };
+    grid.appendChild(chip);
+    chips.push(chip);
+  }
+
+  function paintDetail() {
+    const j = S.wunit;
+    document.getElementById("wt-title").textContent = `見張り ${j + 1} の模様`;
+    weightImage(document.getElementById("wt-big"), j, 196);
+    const votes = document.getElementById("wt-votes");
+    votes.innerHTML = "";
+    let vmax = 1e-9;
+    for (let k = 0; k < 10; k++) vmax = Math.max(vmax, Math.abs(MN.W2[k * 128 + j]));
+    for (let k = 0; k < 10; k++) {
+      const v = MN.W2[k * 128 + j];
+      const row = document.createElement("div");
+      row.className = "bar";
+      row.innerHTML = `<span class="ch">${k}</span>
+        <div class="fill" style="width:${(Math.abs(v) / vmax * 130).toFixed(1)}px;
+          background:${v >= 0 ? "var(--red)" : "var(--blue)"}"></div>
+        <span class="p">${v.toFixed(2)}</span>`;
+      votes.appendChild(row);
+    }
+  }
+  paintDetail();
+}
+
+// =================================================================
+function renderAll() {
+  if (playTimer) { clearInterval(playTimer); playTimer = null; }
+  setTabs();
+  if (S.view === "boundary") renderBoundary();
+  else if (S.view === "draw") renderDraw();
+  else renderWeights();
+}
+renderAll();
+</script>
+</body>
+</html>
