@@ -438,6 +438,50 @@ print(f"理論値との誤差: {abs(x - 2.0):.6f}")
 ```
 
 
+## パラメータが2個になっても、同じ
+
+- ここまでパラメータは $x$ の1個。実際の機械学習では**何万個** — でも更新式は同じで、全パラメータが**同時に**1歩ずつ降りる
+- 2個の場合なら地形ごと目で見える：$f(w_1, w_2) = w_1^2 + 3 w_2^2$ を $(-4, 2)$ から学習率 0.25 で
+
+```{python}
+#| echo: false
+import os
+import plotly.graph_objects as go
+
+w1g, w2g = np.meshgrid(np.linspace(-4.5, 4.5, 80), np.linspace(-3, 3, 80))
+Fg = w1g**2 + 3 * w2g**2
+
+pt = np.array([-4.0, 2.0])
+traj = [pt.copy()]
+for _ in range(25):
+    pt = pt - 0.25 * np.array([2 * pt[0], 6 * pt[1]])
+    traj.append(pt.copy())
+traj = np.array(traj)
+
+fig3d = go.Figure()
+fig3d.add_trace(go.Surface(x=w1g, y=w2g, z=Fg, colorscale="Blues",
+                           opacity=0.75, showscale=False))
+fig3d.add_trace(go.Scatter3d(
+    x=traj[:, 0], y=traj[:, 1], z=traj[:, 0]**2 + 3 * traj[:, 1]**2 + 0.2,
+    mode="lines+markers", name="勾配降下の道のり",
+    line=dict(color="#e74c3c", width=6), marker=dict(size=3.5, color="#e74c3c")))
+fig3d.update_layout(
+    scene=dict(xaxis_title="w1", yaxis_title="w2", zaxis_title="f(w1, w2)",
+               camera=dict(eye=dict(x=1.5, y=-1.5, z=0.9))),
+    margin=dict(l=0, r=0, t=0, b=0), legend=dict(x=0.02, y=0.98),
+    width=880, height=500)
+os.makedirs("iframes", exist_ok=True)
+fig3d.write_html("iframes/gd_bowl_3d.html", include_plotlyjs="directory")
+```
+
+::: {.plotly-iframe src="iframes/gd_bowl_3d.html" height="510"}
+:::
+
+- ==ドラッグで回す==。**真上から**見ると、進み方の癖がよく見える
+- 急な方向（$w_2$、係数3）では**ジグザグに振動**しながら降り、緩い方向（$w_1$）ではゆっくり進む — 1つの学習率で全方向を賄う難しさ
+- 実際の機械学習の「損失地形」はこれの高次元版。目では見えないが、やることはこの図と同じ
+
+
 ## 勾配降下法の問題点
 
 ### 学習率の選択が難しい

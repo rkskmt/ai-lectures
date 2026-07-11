@@ -71,6 +71,15 @@ plt.show()
 
 ## 実はロジスティック回帰
 
+```{.d2 sketch="true" width="85%"}
+direction: right
+X: "入力\nx₁（輝度）\nx₂（重さ）" { style.fill: "#e1f5ff" }
+A: "アフィン変換\nz = α₁x₁ + α₂x₂ + b" { style.fill: "#fff4e1" }
+S: "シグモイド\np = σ(z)" { shape: hexagon; style.fill: "#fdebd0" }
+P: "確率 p\n（0〜1）" { style.fill: "#d5f5e3" }
+X -> A -> S -> P
+```
+
 - 「アフィン変換 → シグモイド」 — この2ステップが**ニューラルネットワークの最小単位** ＝ 1個の**ニューロン（[neuron]{.en}）**
 - そして、これは**ロジスティック回帰そのもの**
 - `sklearn` の `LogisticRegression` が中でやっているのもこの計算
@@ -107,6 +116,33 @@ $$L = -\frac{1}{N}\sum_{i} \left[ y_i \log p_i + (1 - y_i) \log (1 - p_i) \right
 - 正答率はパラメータを少し動かしても**階段状にしか変化しない** → 微分が 0 か未定義
 - 勾配降下法が使えない。**滑らかな代理**として交差エントロピーを最小化する
 :::
+
+
+## 外すほど急に効く：−log の形 {#peek-neglog}
+
+```{python}
+#| echo: false
+#| fig-align: center
+pp = np.linspace(0.005, 1.0, 400)
+plt.figure(figsize=(6.0, 3.2))
+plt.plot(pp, -np.log(pp), color="#e74c3c", lw=2.5)
+for px, dx, dy, note in [(0.4, 0.05, 0.35, "p=0.4 → 損失 0.92"),
+                         (0.99, -0.32, 0.55, "p=0.99 → 損失 0.01")]:
+    lv = -np.log(px)
+    plt.scatter([px], [lv], s=60, color="#2c3e50", zorder=5)
+    plt.annotate(note, (px, lv), xytext=(px + dx, lv + dy), fontsize=10,
+                 arrowprops={"arrowstyle": "->", "color": "gray"})
+plt.xlabel("正解クラスに出した確率 p")
+plt.ylabel("損失 −log p")
+plt.ylim(-0.2, 5.5)
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+- 正解に近い（$p \to 1$）ほど損失はほぼ 0。外れるほど**急カーブ**で跳ね上がる
+- $p \to 0$（自信満々の間違い）では青天井 — 機械が最も避けたがるのはこれ
+- 正解が $y = 0$ の魚では左右反転して $-\log(1-p)$（式の第2項）
 
 
 ## 勾配が驚くほど簡単になる

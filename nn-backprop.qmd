@@ -37,7 +37,20 @@ $$\frac{\partial L}{\partial \alpha_1} = \frac{\partial}{\partial \alpha_1} \lef
 
 $$y = f(g(x)) \quad \Rightarrow \quad \frac{dy}{dx} = \frac{dy}{dg} \cdot \frac{dg}{dx}$$
 
-- NN は「アフィン → ReLU → アフィン → シグモイド → 損失」という**数珠つなぎそのもの**
+::: {.callout-important title="クイズ（高校の道具の再確認）"}
+$y = (3x+1)^2$ を、**展開せずに**微分すると？
+:::
+
+::: {.fragment}
+- 外側 $u^2$ の微分は $2u$、内側 $3x+1$ の微分は $3$。掛けて $\dfrac{dy}{dx} = 2(3x+1) \times 3 = 18x + 6$
+- 展開して微分（$9x^2 + 6x + 1 \to 18x + 6$）と一致 — **部品の微分を掛けるだけで、展開は要らなかった**
+- 今日はこの1つの道具だけで、NN の全パラメータの勾配を出す
+:::
+
+
+## NN は数珠つなぎそのもの
+
+- 「アフィン → ReLU → アフィン → シグモイド → 損失」— NN は関数の**数珠つなぎ**
 
 $$\frac{\partial L}{\partial \alpha_1}
 = \frac{\partial L}{\partial p} \cdot \frac{\partial p}{\partial u} \cdot \frac{\partial u}{\partial h} \cdot \frac{\partial h}{\partial z} \cdot \frac{\partial z}{\partial \alpha_1}$$
@@ -72,75 +85,15 @@ $$u = 0.5 \times 0.30 + (-0.1) = 0.05$$
 $$p = \sigma(0.05) = 0.5125$$
 $$L = -\log(0.5125) = 0.6685$$
 
-```{python}
-#| echo: false
-#| fig-align: center
-import numpy as np
-import matplotlib.pyplot as plt
-import japanize_matplotlib
-
-def draw_graph(backward=False):
-    fig, ax = plt.subplots(figsize=(12.5, 4.0 if backward else 2.6))
-    ax.set_xlim(-0.4, 12.2)
-    ax.set_ylim(-1.9 if backward else 0.8, 3.1)
-    ax.axis("off")
-
-    nodes = [
-        (0.7,  "入力", r"$x_1=1.0$" + "\n" + r"$x_2=0.5$", "#eaf2f8"),
-        (3.0,  "アフィン", r"$z=\alpha_1 x_1+\alpha_2 x_2+b$", "#d6eaf8"),
-        (5.3,  "ReLU", r"$h=\mathrm{ReLU}(z)$", "#d6eaf8"),
-        (7.4,  "アフィン", r"$u=wh+c$", "#d6eaf8"),
-        (9.3,  "シグモイド", r"$p=\sigma(u)$", "#d6eaf8"),
-        (11.3, "損失", r"$L=-\log p$", "#fdebd0"),
-    ]
-    y = 1.6
-    for cx, name, formula, fc in nodes:
-        ax.text(cx, y, f"{name}\n{formula}", ha="center", va="center", fontsize=10,
-                bbox={"boxstyle": "round,pad=0.4", "fc": fc, "ec": "#2471a3"})
-
-    fwd_vals = [None, "0.30", "0.30", "0.05", "0.5125", "0.6685"]
-    for i in range(len(nodes) - 1):
-        x0, x1 = nodes[i][0], nodes[i + 1][0]
-        ax.annotate("", xy=(x1 - 0.85, y), xytext=(x0 + 0.85, y),
-                    arrowprops={"arrowstyle": "->", "color": "#1e8449", "lw": 2.2})
-    for (cx, _, _, _), v in zip(nodes, fwd_vals):
-        if v is not None:
-            ax.text(cx, 2.75, v, ha="center", fontsize=11, color="#1e8449",
-                    fontweight="bold")
-    ax.text(-0.3, 2.75, "往路の値", fontsize=10, color="#1e8449",
-            fontweight="bold", ha="left")
-
-    if backward:
-        yb = 0.3
-        deltas = [
-            (11.3, 7.4, r"$\delta_{\mathrm{out}}=p-y=-0.4875$"),
-            (7.4, 3.0, r"$\delta_{\mathrm{mid}}=\delta_{\mathrm{out}}\cdot w\cdot \mathrm{ReLU}'(z)=-0.2438$"),
-        ]
-        for x_from, x_to, label in deltas:
-            ax.annotate("", xy=(x_to, yb), xytext=(x_from, yb),
-                        arrowprops={"arrowstyle": "->", "color": "#c0392b", "lw": 2.2})
-            ax.text((x_from + x_to) / 2, yb + 0.22, label, ha="center",
-                    fontsize=9.5, color="#c0392b")
-        ax.text(-0.3, yb + 0.22, "復路（δ）", fontsize=10, color="#c0392b",
-                fontweight="bold", ha="left")
-        ax.text(3.0, -1.15,
-                r"$\partial L/\partial\alpha_1=-0.2438$" + "\n"
-                + r"$\partial L/\partial\alpha_2=-0.1219$" + "\n"
-                + r"$\partial L/\partial b=-0.2438$",
-                ha="center", fontsize=9.5, color="#c0392b",
-                bbox={"boxstyle": "round,pad=0.35", "fc": "#fdedec", "ec": "#c0392b"})
-        ax.text(7.4, -1.15,
-                r"$\partial L/\partial w=-0.1463$" + "\n"
-                + r"$\partial L/\partial c=-0.4875$",
-                ha="center", fontsize=9.5, color="#c0392b",
-                bbox={"boxstyle": "round,pad=0.35", "fc": "#fdedec", "ec": "#c0392b"})
-        for cx in (3.0, 7.4):
-            ax.annotate("", xy=(cx, -0.55), xytext=(cx, yb - 0.05),
-                        arrowprops={"arrowstyle": "->", "color": "#c0392b", "lw": 1.6})
-    plt.tight_layout()
-    plt.show()
-
-draw_graph(backward=False)
+```{.d2 sketch="true" width="100%"}
+direction: right
+X: "入力\nx₁=1.0, x₂=0.5" { style.fill: "#e1f5ff" }
+A1: "アフィン\nz = 0.30" { style.fill: "#fff4e1" }
+R: "ReLU\nh = 0.30" { shape: hexagon; style.fill: "#fdebd0" }
+A2: "アフィン\nu = 0.05" { style.fill: "#fff4e1" }
+S: "シグモイド\np = 0.5125" { shape: hexagon; style.fill: "#fdebd0" }
+L: "損失\nL = 0.6685" { style.fill: "#f5b7b1" }
+X -> A1 -> R -> A2 -> S -> L
 ```
 
 - 予測は 0.5125 —「ほぼコイン投げ」。正解は 1 なので、もっと上げたい
@@ -172,13 +125,20 @@ $$\frac{\partial L}{\partial \alpha_1} = \delta_{\text{mid}} \cdot x_1 = -0.2438
 
 - 5個の勾配が**掛け算と代入だけ**で出揃った。新しい微分は1つもしていない
 
-```{python}
-#| echo: false
-#| fig-align: center
-draw_graph(backward=True)
+```{.d2 sketch="true" width="90%"}
+direction: right
+X: "入力" { style.fill: "#e1f5ff" }
+A1: "アフィン\n（α, b）" { style.fill: "#fff4e1" }
+R: "ReLU" { shape: hexagon; style.fill: "#fdebd0" }
+A2: "アフィン\n（w, c）" { style.fill: "#fff4e1" }
+S: "σ" { shape: hexagon; style.fill: "#fdebd0" }
+L: "損失 L" { style.fill: "#f5b7b1" }
+X -> A1 -> R -> A2 -> S -> L
+L -> A2: "δ_out = −0.4875" { style.stroke: "#c0392b"; style.font-color: "#c0392b"; style.font-size: 24; style.stroke-width: 3 }
+A2 -> A1: "δ_mid = −0.2438" { style.stroke: "#c0392b"; style.font-color: "#c0392b"; style.font-size: 24; style.stroke-width: 3 }
 ```
 
-- 上の緑が**往路**、下の赤が**復路** — 誤差 $\delta$ が右から左へ流れ、通り道のパラメータに勾配を配っていく
+- 黒い矢印が**往路**、赤い矢印が**復路** — 誤差 $\delta$ が右から左へ流れ、通りかかった層のパラメータに勾配を置いていく
 
 
 ## 検算：機械に「微分の定義」でやらせる
@@ -242,6 +202,10 @@ $$\delta^{(\ell)} = \delta^{(\ell+1)} \cdot w^{(\ell+1)} \cdot f'(z^{(\ell)})$$
 ```{python}
 #| echo: false
 #| fig-align: center
+import numpy as np
+import matplotlib.pyplot as plt
+import japanize_matplotlib
+
 fig, axes = plt.subplots(1, 2, figsize=(11, 3.6))
 zz = np.linspace(-5, 5, 300)
 sig = 1 / (1 + np.exp(-zz))

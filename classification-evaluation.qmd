@@ -179,10 +179,24 @@ print(f"全データで学習 → 同じ全データで評価: {same_data_acc:.3
 :::
 
 
-## ホールドアウト法
+## ホールドアウト法 {#peek-holdout}
 
 - データの一部を、最初から評価用に取り分ける
 - 手軽なので、最初に試す評価方法としてよく使う
+
+```{.d2 sketch="true" width="82%"}
+direction: right
+A: "全データ\n120匹" { style.fill: "#e1f5ff" }
+TR: "訓練データ 96匹" { style.fill: "#aed6f1" }
+TE: "テストデータ 24匹\n（金庫にしまう）" { style.fill: "#f5b7b1" }
+F: "fit（学習）" { shape: hexagon; style.fill: "#fff4e1" }
+S: "採点\n（本当の実力）" { style.fill: "#d5f5e3" }
+A -> TR: 8割
+A -> TE: 2割
+TR -> F
+F -> S: 学習済みモデル
+TE -> S: 初見の問題 {style.stroke-dash: 3}
+```
 
 ```{python}
 #| echo: true
@@ -459,7 +473,7 @@ plt.show()
 ```
 
 
-## `cross_val_score` で交差検証
+## `cross_val_score` で交差検証 {#peek-cv}
 
 ```{python}
 #| echo: true
@@ -477,6 +491,27 @@ print(f"平均精度: {scores.mean():.3f}  ±  {scores.std():.3f}")
 - 第1引数：モデル（`fit` 前でOK。内部で k 回 fit してくれる）
 - `cv=k`：k-fold の k を指定（よく使うのは 5 か 10）
 - 返り値は k 個の精度の配列 → `.mean()` / `.std()` で集計
+:::
+
+
+## **Tweak** 分け方の運を試す {.badge-practice}
+
+- [ホールドアウトのコード](#peek-holdout){.peek}と[交差検証のコード](#peek-cv){.peek}を**書き換えて実行**（精度のセルまで続けて実行）
+
+::: {.tweak}
+| やりたいこと | コード |
+|--|--|
+| 分け方の運を変える | `random_state=42` → `1` |
+| テストに半分回す | `test_size=0.2` → `0.5` |
+| 10-fold にする | `cv=5` → `cv=10` |
+:::
+
+::: {.callout-tip}
+## ここで観察
+
+- `random_state=1` だとテスト精度 **91.7%**（42 では 79.2%）— ==同じモデルなのに12ポイント上振れ==。1回の分割の数字には運が乗っている — だから交差検証
+- `test_size=0.5` は訓練が60匹に減り、テスト精度 78.3% — 訓練とテストの**取り分のトレードオフ**
+- `cv=10` は平均 0.80 とほぼ同じだが、ばらつきは ±0.026 → **±0.085** に増える — 1 fold が12匹しかないため。fold は細かくすればいいものでもない
 :::
 
 

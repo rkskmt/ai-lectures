@@ -89,8 +89,35 @@ plt.show()
 $$\mathrm{softmax}(u_k) = \frac{e^{u_k}}{\sum_{j} e^{u_j}}
 \qquad \text{10個の出力を「合計1の確率」に変換}$$
 
-- 損失は多クラス版の交差エントロピー：正解クラスの確率 $p_{\text{正解}}$ に対して $-\log p_{\text{正解}}$
+- 損失は多クラス版の交差エントロピー：正解クラスの確率 $p_{\text{正解}}$ に対して $-\log p_{\text{正解}}$（[あの −log のカーブ](nn-single-unit.qmd#peek-neglog){.peek}の10クラス版）
 - PyTorch では `nn.CrossEntropyLoss` がソフトマックスごとやってくれる（打ち消しの恩恵もそのまま）
+
+
+## ソフトマックスの仕事ぶり
+
+```{python}
+#| echo: false
+#| fig-align: center
+u_demo = np.array([2.0, 1.0, 0.1])
+p_demo = np.exp(u_demo) / np.exp(u_demo).sum()
+
+fig, axes = plt.subplots(1, 2, figsize=(9.5, 3.2))
+labels = ["クラスA", "クラスB", "クラスC"]
+axes[0].bar(labels, u_demo, color="#5dade2")
+axes[0].set_title("入力：3個のスコア u", fontsize=11)
+axes[0].grid(axis="y", alpha=0.3)
+axes[1].bar(labels, p_demo, color="#e74c3c")
+for i, v in enumerate(p_demo):
+    axes[1].text(i, v + 0.02, f"{v:.2f}", ha="center", fontsize=10)
+axes[1].set_ylim(0, 0.85)
+axes[1].set_title("出力：softmax(u) — 合計はきっちり 1", fontsize=11)
+axes[1].grid(axis="y", alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+- スコアが大きいほど確率も大きい。ただし $e^u$ を通すので**差が強調される**（スコア差 1.0 が、確率では 0.66 対 0.24）
+- 合計 1 の「自信の配分」になる — 10クラスなら10個のスコアを10個の確率に
 
 
 ## モデル：見慣れた3層
@@ -110,6 +137,17 @@ n_params = sum(p.numel() for p in model.parameters())
 print(f"パラメータ総数: {n_params:,}")
 ```
 
+```{.d2 sketch="true" width="100%"}
+direction: right
+I: "画像\n(28, 28)" { style.fill: "#e1f5ff" }
+F: "nn.Flatten()\n→ 784" { style.fill: "#eaf2f8" }
+L1: "nn.Linear(784, 128)\nアフィン変換" { style.fill: "#fff4e1" }
+R: "nn.ReLU()\n折る" { shape: hexagon; style.fill: "#fdebd0" }
+L2: "nn.Linear(128, 10)\n出力層" { style.fill: "#fff4e1" }
+O: "10個のスコア\n→ softmax で確率" { style.fill: "#d5f5e3" }
+I -> F -> L1 -> R -> L2 -> O
+```
+
 - 魚の最小単位は**3個**だった。いまや**10万個** — それでも学習ループは同じ3拍子
 
 ::: {.callout-note title="Adam — 最適化回の伏線回収"}
@@ -120,8 +158,8 @@ print(f"パラメータ総数: {n_params:,}")
 
 ## ミニバッチ：6万枚は一口ずつ
 
-- 6万枚まとめて勾配を計算すると重い → **128枚ずつ**取り出して1歩ずつ進む
-- データを一巡することを **1エポック** と呼ぶ
+- 6万枚まとめて勾配を計算すると重い → **128枚ずつ**取り出して1歩ずつ進む — この一口が**ミニバッチ**（[mini-batch]{.en}）
+- データを一巡することを **1エポック**（[epoch]{.en}）と呼ぶ
 
 ```{python}
 #| echo: true
@@ -227,6 +265,128 @@ plt.show()
 
 - 間違えた字をよく見ると、**人間でも迷うものが多い**
 - 精度の数字だけでなく**間違いの中身**を見るのが、モデルと付き合うコツ（混同行列の発想）
+
+
+## どの数字とどの数字が混ざるのか
+
+::: {.callout-important title="クイズ"}
+0〜9 のうち、この機械が**いちばん混同しやすいペア**はどれだと思う？
+:::
+
+```{python}
+#| echo: false
+#| fig-align: center
+with torch.no_grad():
+    all_preds, all_true = [], []
+    for x_batch, y_batch in test_loader:
+        all_preds.append(model(x_batch).argmax(dim=1))
+        all_true.append(y_batch)
+    preds_all = torch.cat(all_preds)
+    true_all  = torch.cat(all_true)
+
+conf = torch.zeros(10, 10, dtype=torch.int64)
+for t, pr in zip(true_all, preds_all):
+    conf[t, pr] += 1
+
+off_diag = conf.clone()
+off_diag.fill_diagonal_(0)
+
+fig, ax = plt.subplots(figsize=(6.2, 5.0))
+im = ax.imshow(off_diag, cmap="Reds")
+ax.set_xticks(range(10)); ax.set_yticks(range(10))
+ax.set_xlabel("予測"); ax.set_ylabel("正解")
+for i in range(10):
+    for j in range(10):
+        if i != j and conf[i, j] >= 10:
+            ax.text(j, i, str(conf[i, j].item()), ha="center", va="center", fontsize=9)
+ax.set_title("混同行列（間違いのみ着色。10枚以上のマスに枚数）", fontsize=11)
+fig.colorbar(im, ax=ax, shrink=0.8)
+plt.tight_layout()
+plt.show()
+```
+
+- 過学習と汎化の回の混同行列は2×2だった。これはその**10クラス版**
+- 最多は **4→9（22枚）**、逆向きの 9→4 も14枚 — **4と9はお互いに紛らわしい**。次点は 7→9・5→3
+- 間違いはランダムに散らばらない。**形の似たペア**に集中する
+
+
+## 自信満々の間違い
+
+```{python}
+#| echo: false
+#| fig-align: center
+with torch.no_grad():
+    X_all = torch.stack([test_ds[i][0] for i in range(len(test_ds))])
+    probs_all = torch.softmax(model(X_all), dim=1)
+conf_top = probs_all.max(dim=1)
+wrong_idx = (conf_top.indices != true_all).nonzero().squeeze(1)
+order = conf_top.values[wrong_idx].argsort(descending=True)[:6]
+
+fig, axes = plt.subplots(1, 6, figsize=(11, 2.4))
+for ax, k in zip(axes.flat, order):
+    i = wrong_idx[k].item()
+    ax.imshow(X_all[i].squeeze(), cmap="gray_r")
+    ax.set_title(f"予測{conf_top.indices[i].item()}（{conf_top.values[i].item():.1%}）\n正解{true_all[i].item()}",
+                 fontsize=9, color="red")
+    ax.axis("off")
+plt.tight_layout()
+plt.show()
+```
+
+- 最上位は「9」を **99.5%の自信で「4」と誤読** — 精度96%の機械は、間違えるときも自信満々のことがある
+- [−log のカーブ](nn-single-unit.qmd#peek-neglog){.peek}の左端そのもの。学習中ならこの1枚が**莫大な損失**を出して重みを大きく動かす
+- 確率はあくまで**モデルの主観**。「自信がある＝正しい」ではない
+
+
+## 育った重みを覗く
+
+- 第1層 `nn.Linear(784, 128)` の各ユニットは、784本の重みを持つ ＝ **28×28の「模様」**として絵にできる
+
+```{python}
+#| echo: false
+#| fig-align: center
+torch.manual_seed(0)
+fresh = nn.Sequential(nn.Flatten(), nn.Linear(784, 128), nn.ReLU(), nn.Linear(128, 10))
+W_init    = fresh[1].weight.detach().numpy()
+W_trained = model[1].weight.detach().numpy()
+
+fig, axes = plt.subplots(2, 8, figsize=(11, 3.1))
+for row, W, label in [(0, W_init, "学習前"), (1, W_trained, "学習後")]:
+    for k in range(8):
+        w_img = W[k].reshape(28, 28)
+        v = np.abs(w_img).max()
+        axes[row, k].imshow(w_img, cmap="RdBu_r", vmin=-v, vmax=v)
+        axes[row, k].set_xticks([]); axes[row, k].set_yticks([])
+    axes[row, 0].set_ylabel(label, fontsize=11)
+plt.tight_layout()
+plt.show()
+```
+
+- **赤い場所にインクが乗ると足し、青い場所なら引く** — その合計が ReLU の入り口 $z$
+- 学習前（同じシードで初期化し直したもの）は一様な砂嵐。学習後は**中央にインクの通り道の模様**が育っている
+- 魚のとき[学習された $\alpha$ を読んだ](nn-single-unit.qmd)のと同じことを、10万パラメータでやっただけ
+
+
+## 128人の見張りを全員閲覧する
+
+<iframe src="explorer/index.html#view=weights" width="100%" height="560" loading="lazy" style="border: 1px solid #ccc; border-radius: 6px; background: white;"></iframe>
+
+[エクスプローラを別タブで開く](explorer/index.html#view=weights){target="_blank"}
+
+- 1マス＝中間ユニット1個の模様（さっきの図の**128人全員版**）。クリックで拡大
+- 右の票バー＝そのユニットが反応したとき、**どの数字に票が入るか**（出力層の重み）
+- お気に入りを1人選んで、「こいつは何を探している係か」を隣の人に説明してみよう
+
+
+## その場で書いて、読ませる
+
+<iframe src="explorer/index.html#view=draw" width="100%" height="560" loading="lazy" style="border: 1px solid #ccc; border-radius: 6px; background: white;"></iframe>
+
+[エクスプローラを別タブで開く](explorer/index.html#view=draw){target="_blank"}
+
+- 今日学習させた**実物の重み**（テスト正答率 96.3%）がブラウザの中で動いている。マウスで数字を書いてみる
+- 「モデルに見えている28×28」の枠に、MNIST と同じ揃え方（切り出し→縮小→センタリング）を通った姿が映る
+- 下の見本ボタンは本物のテスト画像。**薄赤枠の6枚はこの機械が誤読した字** — 君は正しく読める？
 
 
 ## 自分の字は読めるのか（持ち帰りデモ）

@@ -246,18 +246,27 @@ plt.show()
 1. **右（P/N）** 判定結果 → Positive（サケ）or Negative（それ以外）
 2. **左（T/F）** その答え合わせ → True（正解）or False（不正解）
 
+```{.d2 sketch="true" width="78%"}
+direction: right
+J: "判定器の出力" { style.fill: "#e1f5ff" }
+P: "Positive\n（Salmon だ）" { style.fill: "#fff4e1" }
+N: "Negative\n（Salmon ではない）" { style.fill: "#fff4e1" }
+TP: "TP" { style.fill: "#d5f5e3" }
+FP: "FP" { style.fill: "#f5b7b1" }
+TN: "TN" { style.fill: "#d5f5e3" }
+FN: "FN" { style.fill: "#f5b7b1" }
+J -> P
+J -> N
+P -> TP: 当たり
+P -> FP: はずれ
+N -> TN: 当たり
+N -> FN: はずれ
+```
 
-つまり、ある魚をみて識別した結果、
-
-- **TP**: Positiveと判定 → True (正しかった！)
-- **FP**: Positiveと判定 → False (間違ってた...)
-- **TN**: Negativeと判定 → True (正しかった！)
-- **FN**: Negativeと判定 → False (間違ってた...)
 
 
 
-
-## 混同行列（[Confusion Matrix]{.en}）
+## 混同行列（[Confusion Matrix]{.en}） {#peek-cm-1800}
 
 ```{python}
 #| echo: true
@@ -494,7 +503,7 @@ FP=`{python} FP`, FN=`{python} FN`
 - Salmonの取りこぼしを最小化。シャケ全部入れるマン
 - → 低めの閾値（1600g）
 
-## コストを考慮した最適化
+## コストを考慮した最適化 {#peek-cost}
 
 誤分類のコストが異なる場合、総コストを最小化するしきい値を選べる。
 $$
@@ -535,6 +544,26 @@ print(cost_df.to_string(index=False))
 ```
 
 **このコスト関数での最適なしきい値**: 2000g（総コスト最小）
+
+## **Tweak** しきい値を振り回す {.badge-practice}
+
+- [混同行列のコード](#peek-cm-1800){.peek}の `threshold` と、[コスト最適化のコード](#peek-cost){.peek}を**書き換えて実行**（指標のセルまで続けて実行）
+
+::: {.tweak}
+| やりたいこと | コード |
+|--|--|
+| 全部 Salmon と言い張る | `threshold = 1000` |
+| 全部 Sea bass と言い張る | `threshold = 2500` |
+| 再選別のほうが高くつく世界 | `C_FP = 500`、`C_FN = 10000` |
+:::
+
+::: {.callout-tip}
+## ここで観察
+
+- `threshold = 1000` で **Recall は 100%** になる — 全部 Salmon と言えばタダで手に入る数字（そのとき Precision は 50%、Accuracy も 50%）。==単独の指標は当てにならない==
+- コストを入れ替えると、最適しきい値が **2000g から 1600g に反転**する — 「境界線は方針の選択」が数字で見える
+:::
+
 
 ## 試行1の結論
 

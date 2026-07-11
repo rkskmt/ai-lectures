@@ -46,13 +46,24 @@ print(t.numpy())      # NumPy 配列との相互変換も簡単
 
 - 違いは2つ：**GPU に載せられる**こと、そして**勾配を覚えられる**こと
 
+
+## requires_grad：勾配を覚える印
+
+- まず**いちばん小さな例**で挙動を見る。$y = x^2$ の $x = 3$ での微分は、高校の答えなら $2x = 6$
+
 ```{python}
 #| echo: true
-a = torch.tensor([0.3, -0.2], requires_grad=True)   # 「勾配を追跡せよ」の印
-print(a)
+import torch
+
+x = torch.tensor(3.0, requires_grad=True)   # 「勾配を追跡せよ」の印
+y = x ** 2
+y.backward()                                # ← 微分はこの1行
+print(x.grad)
 ```
 
 - `requires_grad=True` を付けた tensor は、**自分が関わった計算をすべて記録**する
+- `backward()` を呼ぶと、記録を逆にたどって微分が計算され、`x.grad` に入る
+- $x^2$ で当たるのは当たり前？ — 次で、**前回1往復ぶん手計算したネットワーク**に同じことをやらせる
 
 
 ## 山場：autograd が手計算を言い当てる
@@ -116,6 +127,16 @@ model = nn.Sequential(
 print(model)
 ```
 
+```{.d2 sketch="true" width="95%"}
+direction: right
+X: "入力 (2)" { style.fill: "#e1f5ff" }
+L1: "nn.Linear(2, 16)\nアフィン変換" { style.fill: "#fff4e1" }
+R: "nn.ReLU()\n折る" { shape: hexagon; style.fill: "#fdebd0" }
+L2: "nn.Linear(16, 1)\n出力層" { style.fill: "#fff4e1" }
+O: "スコア u\n（σ は損失の中）" { style.fill: "#d5f5e3" }
+X -> L1 -> R -> L2 -> O
+```
+
 | PyTorch の名前 | この講義で作った部品 |
 |---|---|
 | `nn.Linear` | アフィン変換（`X @ W1 + b1`） |
@@ -125,6 +146,29 @@ print(model)
 | `loss.backward()` | バックプロパゲーション |
 
 - **新しい概念はゼロ**。全部、名前が付いただけ
+
+
+## nn.Linear の中身を覗く
+
+- 部品を1個だけ取り出して、素性を確認する
+
+```{python}
+#| echo: true
+import torch
+import torch.nn as nn
+
+torch.manual_seed(0)
+lin = nn.Linear(2, 3)          # 2次元 → 3個の変換
+print(lin.weight)              # W（3行2列） ランダム初期化済み
+print(lin.bias)                # b（3個）
+
+x = torch.tensor([[1.0, 2.0]])
+print(lin(x))                  # Linear に通す
+print(x @ lin.weight.T + lin.bias)   # 自分で計算しても、同じ
+```
+
+- 中身は本当に**ただのアフィン変換** — 重みの持ち方が転置（`W.T`）なことだけ流儀が違う
+- `requires_grad=True` も最初から付いている（`nn` の部品は学習される前提）
 
 
 ## 学習ループ：3拍子 {#peek-train-loop}
@@ -157,6 +201,34 @@ for i in range(1, 4001):
 - NumPy 版と同じく **100%**。`zero_grad → backward → step` の3拍子はどんなネットでも同じ
 
 
+## 3拍子の①は、なぜ要る？
+
+::: {.callout-important title="クイズ"}
+`optimizer.zero_grad()` を消したら、何が起きると思う？
+:::
+
+```{python}
+#| echo: true
+import torch
+
+theta = torch.tensor(2.0, requires_grad=True)
+opt = torch.optim.SGD([theta], lr=0.1)
+
+loss = theta ** 2
+loss.backward()
+print(theta.grad)    # dL/dθ = 2θ = 4
+opt.step()
+print(theta)         # 2 − 0.1 × 4 = 1.6（step は勾配降下そのもの）
+
+loss = theta ** 2    # zero_grad しないで、もう1周
+loss.backward()
+print(theta.grad)    # 2θ = 3.2 のはず……が？
+```
+
+- `grad` は上書きではなく**足し込み**（4 + 3.2 = 7.2）— 前回の勾配が残ったまま歩くと方向を誤る
+- だから毎周リセットが①。`step()` が③（`θ -= lr * grad` そのもの）
+
+
 ## 境界も同じものが出る
 
 ```{python}
@@ -187,6 +259,19 @@ plt.show()
 
 - NumPy 版で書いた forward / backward 計60行ほどが、PyTorch では**学習ループ込みで十数行**
 - 浮いた労力は、**モデルとデータを考えること**に使う
+
+
+## 学習後の16人の票を読む
+
+学習が終わった中間の変換16個は、それぞれ**どちらのクラスに票を投じる係**になったのか — 実物で確認：
+
+<iframe src="explorer/index.html#view=boundary" width="100%" height="560" loading="lazy" style="border: 1px solid #ccc; border-radius: 6px; background: white;"></iframe>
+
+[エクスプローラを別タブで開く](explorer/index.html#view=boundary){target="_blank"}
+
+- マスの下の色棒＝出力層の重み（票）。**赤に押す係10人・青に押す係6人**に自然と分業している
+- 票の大きさは係ごとにまるで違う（最大 6.05、ほぼ無票の 0.22 も）— 無票の係の折り目はどこに立っている？　クリックして確かめる
+- この分業、誰も指示していない。損失と勾配降下だけでこうなった
 
 
 ## **Tweak** ネットワークを組み替えて再学習 {.badge-practice}

@@ -58,6 +58,18 @@ plt.show()
 - 200点まとめて流すのも行列のまま：$Z = X W_1 + \mathbf{b}_1$ は $(200, 16)$
 - 「変換16個 × データ200点」が**たった1回の行列積**
 
+```{.d2 sketch="true" width="100%"}
+direction: right
+X: "X\n(200, 2)" { style.fill: "#e1f5ff" }
+A1: "X @ W1 + b1\nW1: (2, 16)" { style.fill: "#fff4e1" }
+Z: "Z\n(200, 16)" { style.fill: "#eaf2f8" }
+R: "ReLU" { shape: hexagon; style.fill: "#fdebd0" }
+H: "H\n(200, 16)" { style.fill: "#eaf2f8" }
+A2: "H @ w2 + c2 → σ" { style.fill: "#fff4e1" }
+P: "p\n(200,)" { style.fill: "#d5f5e3" }
+X -> A1 -> Z -> R -> H -> A2 -> P
+```
+
 
 ## Forward：4行
 
@@ -155,7 +167,24 @@ plt.show()
 :::
 
 
+## 学習の一部始終を再生する
+
+いま回した学習ループ（`rng(0)`・lr 0.5・4000回）の途中経過を保存してある。**▶ 再生**を押す：
+
+<iframe src="explorer/index.html#view=boundary&it=0" width="100%" height="560" loading="lazy" style="border: 1px solid #ccc; border-radius: 6px; background: white;"></iframe>
+
+[エクスプローラを別タブで開く](explorer/index.html#view=boundary&it=0){target="_blank"}
+
+- 更新0回（ランダム初期値）の境界は**でたらめ**（正答率 57.5%）。それが 1000 回で 100% に届く
+- 変換のマスをクリックしたままスライダーを動かす — **折り目が引っ越していく**のが見える
+- 更新 500 回（99.5%）→ 1000 回（100%）：最後の1匹を拾うための微調整
+
+
 ## 折り目の数で遊ぶ
+
+::: {.callout-important title="クイズ"}
+中間の変換16個で 100% だった。**2個**まで減らしたら、正答率はどこまで落ちると思う？
+:::
 
 ```{python}
 #| echo: false

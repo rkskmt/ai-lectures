@@ -770,7 +770,7 @@ print("SVD から出した分散:", (S**2 / (len(Xc) - 1)).round(4))   # ↑の�
 :::
 
 
-## scikit-learn で PCA（魚は本当は何次元か）
+## scikit-learn で PCA（魚は本当は何次元か） {#peek-pca-fish}
 
 - 輝度・重さ・体長の**3特徴量**を PCA にかけてみる
 
@@ -796,6 +796,38 @@ PC3 の寄与率は **1% 未満**。これは何を意味している？
 - 体長と重さがほぼ同じ情報だから、3本目の軸には**情報が残っていない**
 - この魚データは、3次元に見えて**実質2次元**だった
 :::
+
+
+## 「実質2次元」を目で確かめる
+
+```{python}
+#| echo: false
+import os
+import plotly.graph_objects as go
+
+fig3d = go.Figure()
+for label, name, col, sym in [(1, "Salmon", "#e74c3c", "circle"),
+                              (0, "Sea bass", "#2980b9", "square")]:
+    m = y == label
+    fig3d.add_trace(go.Scatter3d(
+        x=X3_scaled[m, 0], y=X3_scaled[m, 1], z=X3_scaled[m, 2],
+        mode="markers", name=name,
+        marker=dict(size=4, color=col, symbol=sym, opacity=0.85)))
+fig3d.update_layout(
+    scene=dict(xaxis_title="輝度（標準化）", yaxis_title="重さ（標準化）",
+               zaxis_title="体長（標準化）"),
+    margin=dict(l=0, r=0, t=0, b=0), legend=dict(x=0.02, y=0.98),
+    width=880, height=520)
+os.makedirs("iframes", exist_ok=True)
+fig3d.write_html("iframes/pca_fish_3d.html", include_plotlyjs="directory")
+```
+
+::: {.plotly-iframe src="iframes/pca_fish_3d.html" height="530"}
+:::
+
+- 3特徴量（輝度・重さ・体長）の実データを、そのまま3Dで。==ドラッグで回す==
+- ある角度では立体的な雲。回していくと、**ぺったんこな板**に見える瞬間がある
+- 板の厚み方向が PC3（寄与率1%未満）— 3本目の軸は最初から**ほぼ空**だった。「実質2次元」は比喩ではない
 
 
 ## 2次元に圧縮しても何も失わない
@@ -902,6 +934,27 @@ plt.show()
 ## 何次元に削減するか？
 一般的には**累積寄与率が 80〜95%** を超える次元数を選ぶ。
 Iris は PC1+PC2 だけで約 96% に達するので2次元で十分。
+:::
+
+
+## **Tweak** 軸の中身を覗く {.badge-practice}
+
+- [魚3特徴量の PCA](#peek-pca-fish){.peek}のコードを**書き換えて実行**
+
+::: {.tweak}
+| やりたいこと | コード |
+|--|--|
+| スケールを揃えず PCA | `X3_scaled = StandardScaler().fit_transform(X3)` → `X3_scaled = X3` |
+| 軸の「レシピ」を見る | `print(pca.components_.round(2))` を足す |
+| Iris を3軸まで残す | Iris のセルで `PCA(n_components=2)` → `3` |
+:::
+
+::: {.callout-tip}
+## ここで観察
+
+- スケールを揃えないと **PC1 の寄与率が 100.0%** になる — 目盛りの大きい「重さ（グラム）」の独裁。k-means の回と同じ病気がここでも出る
+- レシピの1行目（PC1）は重さと体長を**同じ重み（0.62）**で足している — 「2つはほぼ同じ情報」を PCA が自力で見抜いた証拠。3行目（PC3）は重さ−体長の**差分（0.71, −0.71）**、だから空っぽ
+- Iris の3軸目を足しても累積寄与率は 95.8% → **99.5%** — 2軸で十分の判断は変わらない
 :::
 
 
