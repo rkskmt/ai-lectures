@@ -571,6 +571,13 @@
         if (scrollHintInit || !window.Reveal || !Reveal.on) return;
         scrollHintInit = true;
         Reveal.on('slidechanged', maybeShowScrollHint);
+        // A tab switch can turn a short slide into an overflowing one without
+        // firing slidechanged. Tabby emits this after revealing the new panel;
+        // defer once so its layout is measurable before checking again.
+        document.addEventListener('tabby', function() {
+          removeScrollHint();
+          setTimeout(maybeShowScrollHint, 0);
+        }, true);
         if (Reveal.isReady && Reveal.isReady()) {
           maybeShowScrollHint();
         } else {
