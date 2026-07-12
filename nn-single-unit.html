@@ -271,7 +271,7 @@ Step 1：アフィン変換（<span class="en">Affine Transformation</span>）
 <h2>Step 2：シグモイド（<span class="en">Sigmoid</span>）で「確率」にする</h2>
 <div class="slide-body">
 <p><span class="math display">\[p = \sigma(z) = \frac{1}{1 + e^{-z}}\]</span></p>
-<div id="31f0a96c" class="cell" data-execution_count="1">
+<div id="8c974e07" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -363,7 +363,7 @@ Step 1：アフィン変換（<span class="en">Affine Transformation</span>）
 <section id="peek-neglog" class="slide level2">
 <h2>外すほど急に効く：−log の形</h2>
 <div class="slide-body">
-<div id="2f3ca976" class="cell" data-execution_count="2">
+<div id="ca7fe2c7" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -415,7 +415,7 @@ Step 1：アフィン変換（<span class="en">Affine Transformation</span>）
 <section id="peek-forward" class="slide level2">
 <h2>実装：必要な関数は4つだけ</h2>
 <div class="slide-body">
-<div id="c5cefd9c" class="cell" data-execution_count="3">
+<div id="3aee87c4" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>魚データの定義（クリックして展開）</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -454,7 +454,7 @@ Step 1：アフィン変換（<span class="en">Affine Transformation</span>）
 <span id="cb1-34"><a></a>y      <span class="op">=</span> y[order]</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="359d8fe2" class="cell" data-execution_count="4">
+<div id="353f34a6" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a><span class="kw">def</span> sigmoid(z):</span>
 <span id="cb2-2"><a></a>    <span class="cf">return</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>z))</span>
 <span id="cb2-3"><a></a></span>
@@ -482,7 +482,7 @@ Step 1：アフィン変換（<span class="en">Affine Transformation</span>）
 <ul>
 <li>1匹見るたびにパラメータが少し動く</li>
 </ul>
-<div id="d2e8cefc" class="cell" data-execution_count="5">
+<div id="24f6966e" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a>alpha <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">0.0</span>])   <span class="co"># 重みはゼロからスタート</span></span>
 <span id="cb3-2"><a></a>b  <span class="op">=</span> <span class="fl">0.0</span></span>
 <span id="cb3-3"><a></a>lr <span class="op">=</span> <span class="fl">0.5</span>                       <span class="co"># 学習率</span></span>
@@ -518,7 +518,7 @@ Step 1：アフィン変換（<span class="en">Affine Transformation</span>）
 <section id="境界が動く様子を見る" class="slide level2">
 <h2>境界が動く様子を見る</h2>
 <div class="slide-body">
-<div id="78cee022" class="cell" data-execution_count="6">
+<div id="4575f046" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -667,18 +667,23 @@ Step 1：アフィン変換（<span class="en">Affine Transformation</span>）
 <section id="問題1の解答例" class="slide level2">
 <h2>問題1の解答例</h2>
 <div class="slide-body">
-<div id="匹目x-2-1y-1" class="slide-body-heading">
-1匹目（<span class="math inline">\(x = (2, 1)\)</span>、<span class="math inline">\(y = 1\)</span>）
-</div>
+<div class="panel-tabset">
+<ul id="tabset-1" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-1-1">1匹目（<span class="math inline">\(x = (2, 1)\)</span>、<span class="math inline">\(y = 1\)</span>）</a></li><li><a href="#tabset-1-2">2匹目（<span class="math inline">\(x = (-1, 1)\)</span>、<span class="math inline">\(y = 0\)</span>）</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1">
 <p><span class="math display">\[z = 0 \times 2 + 0 \times 1 + 0 = 0, \qquad p = \sigma(0) = 0.5, \qquad \delta = 0.5 - 1 = -0.5\]</span></p>
 <p><strong>更新:</strong> <span class="math display">\[\alpha \leftarrow (0, 0) - 0.5 \times (-0.5) \times (2, 1) = (0.5,\; 0.25)\]</span> <span class="math display">\[b \leftarrow 0 + 0.25 = 0.25\]</span></p>
 <p>まだ何も知らないので <span class="math inline">\(p = 0.5\)</span>（五分五分）。Salmon と言い切れなかったぶん、境界が動いた。</p>
-<h3 id="匹目x--1-1y-0">2匹目（<span class="math inline">\(x = (-1, 1)\)</span>、<span class="math inline">\(y = 0\)</span>）</h3>
+</div>
+<div id="tabset-1-2">
 <p><span class="math display">\[z = 0.5 \times (-1) + 0.25 \times 1 + 0.25 = 0, \qquad p = 0.5, \qquad \delta = 0.5\]</span></p>
 <p>偶然にも2匹目は<strong>ちょうど境界の上</strong>（<span class="math inline">\(z = 0\)</span>）に乗っていた。</p>
 <p><strong>更新:</strong> <span class="math display">\[\alpha \leftarrow (0.5, 0.25) - 0.5 \times 0.5 \times (-1, 1) = (0.75,\; 0)\]</span> <span class="math display">\[b \leftarrow 0.25 - 0.25 = 0\]</span></p>
+</div>
+</div>
+</div>
 <h3 id="コードで確認">コードで確認</h3>
-<div id="333df898" class="cell" data-execution_count="7">
+<div id="5cfb5a4a" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>

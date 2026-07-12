@@ -276,7 +276,7 @@ rkskmt
 <section id="pythonでの定義" class="slide level2">
 <h2>Pythonでの定義</h2>
 <div class="slide-body">
-<div id="5f07f7dc" class="cell" data-execution_count="1">
+<div id="55cb2c3a" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-3"><a></a><span class="im">import</span> japanize_matplotlib</span>
@@ -297,7 +297,7 @@ rkskmt
 <h2>まずグラフを描いてみよう</h2>
 <div class="slide-body">
 <p>どんな形の関数なのか、<strong>まず目で見る</strong>ことが大切です。</p>
-<div id="f095de58" class="cell" data-execution_count="2">
+<div id="79c8f7d3" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -339,7 +339,7 @@ rkskmt
 <p>本編の勾配降下法の更新式を、<strong>そのまま</strong>使います：</p>
 <p><span class="math display">\[x_{\text{new}} = x - \alpha \cdot f'(x)\]</span></p>
 <p>学習率は <span class="math inline">\(\alpha = 0.1\)</span> に固定。同じ式・同じ学習率で、<strong>スタート地点だけ変えて</strong>2回実験します。</p>
-<div id="4e567adf" class="cell" data-execution_count="3">
+<div id="4e76d864" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a><span class="kw">def</span> gradient_descent(f, fp, x0, alpha<span class="op">=</span><span class="fl">0.1</span>, tol<span class="op">=</span><span class="fl">1e-6</span>, max_iter<span class="op">=</span><span class="dv">10000</span>):</span>
 <span id="cb2-2"><a></a>    <span class="co">"""勾配降下法：収束した場所・そこでの f(x)・通り道を返す"""</span></span>
 <span id="cb2-3"><a></a>    x <span class="op">=</span> x0</span>
@@ -360,17 +360,25 @@ rkskmt
 <div id="手計算で追いかけてみよう" class="slide-body-heading">
 手計算で追いかけてみよう
 </div>
-<h4 id="反復1">反復1</h4>
+<div class="panel-tabset">
+<ul id="tabset-1" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-1-1">反復1</a></li><li><a href="#tabset-1-2">反復2</a></li><li><a href="#tabset-1-3">反復3</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1">
 <p><strong>現在の位置</strong>: <span class="math inline">\(x = 0.5\)</span></p>
 <p><strong>傾きを計算:</strong> <span class="math display">\[f'(0.5) = 0.4 \times 0.5^3 - 3 \times 0.5^2 + 4 \times 0.5 = 0.05 - 0.75 + 2.0 = 1.3\]</span></p>
 <p><strong>更新（傾きの逆へ、少しだけ）:</strong> <span class="math display">\[x_{\text{new}} = 0.5 - 0.1 \times 1.3 = 0.5 - 0.13 = 0.37\]</span></p>
-<h4 id="反復2">反復2</h4>
+</div>
+<div id="tabset-1-2">
 <p><strong>現在の位置</strong>: <span class="math inline">\(x = 0.37\)</span></p>
 <p><span class="math display">\[f'(0.37) \approx 1.090\]</span> <span class="math display">\[x_{\text{new}} = 0.37 - 0.109 = 0.261\]</span></p>
-<h4 id="反復3">反復3</h4>
+</div>
+<div id="tabset-1-3">
 <p><strong>現在の位置</strong>: <span class="math inline">\(x = 0.261\)</span></p>
 <p><span class="math display">\[f'(0.261) \approx 0.847\]</span> <span class="math display">\[x_{\text{new}} = 0.261 - 0.085 = 0.176\]</span></p>
 <p>傾きの逆へ少しずつ、左の谷底 <span class="math inline">\(x = 0\)</span> に向かって降りています。続きはPythonに任せましょう。</p>
+</div>
+</div>
+</div>
 <div class="callout callout-important callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -385,7 +393,7 @@ rkskmt
 </div>
 </div>
 <h3 id="pythonで確認">Pythonで確認</h3>
-<div id="1fc30647" class="cell" data-execution_count="4">
+<div id="09f57f2b" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a><span class="co"># 実験1: x0 = 0.5 からスタート</span></span>
@@ -421,17 +429,25 @@ rkskmt
 <div id="手計算で追いかけてみよう-1" class="slide-body-heading">
 手計算で追いかけてみよう
 </div>
-<h4 id="反復1-1">反復1</h4>
+<div class="panel-tabset">
+<ul id="tabset-2" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-2-1">反復1</a></li><li><a href="#tabset-2-2">反復2</a></li><li><a href="#tabset-2-3">反復3</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1">
 <p><strong>現在の位置</strong>: <span class="math inline">\(x = 5.5\)</span></p>
 <p><strong>傾きを計算:</strong> <span class="math display">\[f'(5.5) = 0.4 \times 5.5^3 - 3 \times 5.5^2 + 4 \times 5.5\]</span> <span class="math display">\[= 66.55 - 90.75 + 22.0 = -2.2\]</span></p>
 <p><strong>更新（傾きがマイナス＝右下り坂なので、右へ進む）:</strong> <span class="math display">\[x_{\text{new}} = 5.5 - 0.1 \times (-2.2) = 5.5 + 0.22 = 5.72\]</span></p>
-<h4 id="反復2-1">反復2</h4>
+</div>
+<div id="tabset-2-2">
 <p><strong>現在の位置</strong>: <span class="math inline">\(x = 5.72\)</span></p>
 <p><span class="math display">\[f'(5.72) \approx -0.416\]</span> <span class="math display">\[x_{\text{new}} = 5.72 + 0.042 = 5.762\]</span></p>
-<h4 id="反復3-1">反復3</h4>
+</div>
+<div id="tabset-2-3">
 <p><strong>現在の位置</strong>: <span class="math inline">\(x = 5.762\)</span></p>
 <p><span class="math display">\[f'(5.762) \approx -0.037\]</span></p>
 <p>傾きはもうほぼゼロ。<strong>谷底に到着です。</strong></p>
+</div>
+</div>
+</div>
 <div class="callout callout-important callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -447,7 +463,7 @@ rkskmt
 </div>
 </div>
 <h3 id="pythonで確認-1">Pythonで確認</h3>
-<div id="19c558d1" class="cell" data-execution_count="5">
+<div id="b68f690d" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a><span class="co"># 実験2: x0 = 5.5 からスタート</span></span>
@@ -478,7 +494,7 @@ rkskmt
 <section id="つの実験を並べてみよう" class="slide level2">
 <h2>2つの実験を並べてみよう</h2>
 <div class="slide-body">
-<div id="19b17036" class="cell" data-execution_count="6">
+<div id="fb90d26e" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -553,7 +569,7 @@ rkskmt
 <p>いま体験した現象には、ちゃんと名前がついています。</p>
 <p><strong>ローカルミニマム（局所的最小値, <span class="en">local minimum</span>）</strong>: 「その周辺では一番低い」けど、関数全体で見ると<strong>もっと低い場所がある</strong>点。 実験1で到達した<strong>左の谷（x = 0）</strong>がこれです。</p>
 <p><strong>グローバルミニマム（大域的最小値, <span class="en">global minimum</span>）</strong>: 関数全体で<strong>本当に一番低い</strong>点。 実験2で到達した<strong>右の谷（x ≈ 5.77）</strong>がこれです。</p>
-<div id="cfe2733b" class="cell" data-execution_count="7">
+<div id="57dc7c8f" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -604,7 +620,7 @@ rkskmt
 <section id="どの初期値がどの谷に落ちるのか" class="slide level2">
 <h2>どの初期値が、どの谷に落ちるのか</h2>
 <div class="slide-body">
-<div id="16409cbe" class="cell" data-execution_count="8">
+<div id="b01f89e1" class="cell" data-execution_count="8">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a></a><span class="co"># 初期値を -1.5 から 7.5 まで細かく変えて、全部試す</span></span>
@@ -613,7 +629,7 @@ rkskmt
 <span id="cb7-4"><a></a>    [gradient_descent(f_poly, f_poly_prime, x0)[<span class="dv">0</span>] <span class="cf">for</span> x0 <span class="kw">in</span> x0_dense_gd])</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="63bbde49" class="cell" data-execution_count="9">
+<div id="739af835" class="cell" data-execution_count="9">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -684,22 +700,30 @@ rkskmt
 <h2>方法1：手で初期値を変えて比較する</h2>
 <div class="slide-body">
 <p>まず、3つの初期値から比較してみましょう。</p>
-<h3 id="x_0-0-からスタート"><span class="math inline">\(x_0 = 0\)</span> からスタート</h3>
+<div class="panel-tabset">
+<ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-3-1"><span class="math inline">\(x_0 = 0\)</span> からスタート</a></li><li><a href="#tabset-3-2"><span class="math inline">\(x_0 = 2\)</span> からスタート</a></li><li><a href="#tabset-3-3"><span class="math inline">\(x_0 = 6\)</span> からスタート</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1">
 <p><span class="math display">\[f'(0) = 0.4 \times 0 - 3 \times 0 + 4 \times 0 = 0\]</span></p>
 <p>傾きがゼロなので、勾配降下法は<strong>一歩も動きません</strong>。<span class="math inline">\(x = 0\)</span>、<span class="math inline">\(f(0) = 1\)</span> で即「収束」。</p>
 <p><span class="math inline">\(f''(0) = 4 &gt; 0\)</span> なので、ここはちゃんと谷です。ただし<strong>谷底ど真ん中スタートだと、隣にもっと深い谷があっても永遠に気づけない</strong>。</p>
-<h3 id="x_0-2-からスタート"><span class="math inline">\(x_0 = 2\)</span> からスタート</h3>
+</div>
+<div id="tabset-3-2">
 <p><span class="math display">\[f'(2) = 0.4 \times 8 - 3 \times 4 + 4 \times 2 = 3.2 - 12 + 8 = -0.8\]</span></p>
 <p>傾きがマイナス（右下り坂）→ 一歩は<strong>右へ</strong>：</p>
 <p><span class="math display">\[x_{\text{new}} = 2 - 0.1 \times (-0.8) = 2.08\]</span></p>
 <p>→ そのまま坂を下り続けて、右の谷（グローバルミニマム）へ。</p>
-<h3 id="x_0-6-からスタート"><span class="math inline">\(x_0 = 6\)</span> からスタート</h3>
+</div>
+<div id="tabset-3-3">
 <p><span class="math display">\[f'(6) = 0.4 \times 216 - 3 \times 36 + 4 \times 6 = 86.4 - 108 + 24 = 2.4\]</span></p>
 <p>傾きがプラス（右上り坂）→ 一歩は<strong>左へ</strong>：</p>
 <p><span class="math display">\[x_{\text{new}} = 6 - 0.1 \times 2.4 = 5.76\]</span></p>
 <p>→ こちらも右の谷へ。</p>
+</div>
+</div>
+</div>
 <h3 id="つの結果を比較">3つの結果を比較</h3>
-<div id="e9df72a5" class="cell" data-execution_count="11">
+<div id="4ba1eb7f" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a></a><span class="co"># 3つの初期値から実行して比較</span></span>
 <span id="cb8-2"><a></a>starting_points <span class="op">=</span> [<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">6</span>]</span>
 <span id="cb8-3"><a></a></span>
@@ -749,11 +773,11 @@ rkskmt
 <div class="slide-body">
 <p>手で3つ試すのも良いですが、コンピュータなら<strong>20個でも100個でも</strong>試せます。初期値の選び方は2通りあります。</p>
 <div class="panel-tabset">
-<ul id="tabset-1" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-1-1">方法2：ランダムリスタート</a></li><li><a href="#tabset-1-2">方法3：グリッドサーチ</a></li></ul>
+<ul id="tabset-4" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-4-1">方法2：ランダムリスタート</a></li><li><a href="#tabset-4-2">方法3：グリッドサーチ</a></li></ul>
 <div class="tab-content">
-<div id="tabset-1-1">
+<div id="tabset-4-1">
 <p>初期値を<strong>ランダムに</strong>選ぶ方法です。</p>
-<div id="eaba746a" class="cell" data-execution_count="12">
+<div id="c256f4f4" class="cell" data-execution_count="12">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a></a><span class="co"># 20個のランダムな初期値から試す</span></span>
@@ -794,9 +818,9 @@ rkskmt
 </div>
 </div>
 </div>
-<div id="tabset-1-2">
+<div id="tabset-4-2">
 <p>ランダムではなく、<strong>等間隔に並べる</strong>方法もあります。</p>
-<div id="a8d7f2e4" class="cell" data-execution_count="13">
+<div id="32ca8646" class="cell" data-execution_count="13">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a></a><span class="co"># 等間隔に15個の初期値を用意</span></span>
@@ -840,7 +864,7 @@ rkskmt
 ★ 最良: x0=3.57 → x=5.7656, f(x)=-13.6726</code></pre>
 </div>
 </div>
-<div id="57622e8d" class="cell" data-execution_count="14">
+<div id="df26afa7" class="cell" data-execution_count="14">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -989,7 +1013,7 @@ rkskmt
 <h2>実装テンプレート</h2>
 <div class="slide-body">
 <p>上の4ステップをまとめたコードです。コピーして使えます。</p>
-<div id="d91be35d" class="cell" data-execution_count="15">
+<div id="0049fd99" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a></a><span class="kw">def</span> robust_optimization(f, fp, fpp, x0_list, alpha<span class="op">=</span><span class="fl">0.1</span>, max_iter<span class="op">=</span><span class="dv">10000</span>):</span>
 <span id="cb14-2"><a></a>    <span class="co">"""</span></span>
 <span id="cb14-3"><a></a><span class="co">    複数の初期値を使ったロバストな最適化（勾配降下法版）</span></span>
@@ -1080,7 +1104,7 @@ rkskmt
 <p><a href="./newton-method-appendix.html">Newton法（参考資料）</a>は、いまいる場所に放物線を当てはめて、<strong>その頂点へ一気にジャンプ</strong>する方法でした：</p>
 <p><span class="math display">\[x_{\text{new}} = x - \frac{f'(x)}{f''(x)}\]</span></p>
 <p>実験1・実験2と同じ初期値で、Newton法を走らせてみます。</p>
-<div id="9e7372a7" class="cell" data-execution_count="16">
+<div id="093c72c0" class="cell" data-execution_count="16">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a></a><span class="kw">def</span> newton_naive(f, fp, fpp, x0, tol<span class="op">=</span><span class="fl">1e-6</span>, max_iter<span class="op">=</span><span class="dv">100</span>):</span>
@@ -1121,7 +1145,7 @@ x0 = 5.5: Newton法  4 回 / 勾配降下法  6 回  →  x = 5.7656</code></pre
 <li>同じ更新式を回すと：<span class="math inline">\(1.5 \rightarrow 1.761 \rightarrow 1.735 \rightarrow\)</span> 停止（<span class="math inline">\(f' \approx 0\)</span>）</li>
 <li>左に下り坂があるのに、<strong>坂を登って丘のてっぺんで止まった</strong></li>
 </ul>
-<div id="f770b4fa" class="cell" data-execution_count="17">
+<div id="7f16e32a" class="cell" data-execution_count="17">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1167,7 +1191,7 @@ x0 = 5.5: Newton法  4 回 / 勾配降下法  6 回  →  x = 5.7656</code></pre
 <h2>Newton法の引力圏を可視化しよう</h2>
 <div class="slide-body">
 <p>勾配降下法では「丘のてっぺんを境にきれいな2分割」でした。Newton法ではどうなるでしょうか。</p>
-<div id="5d25e7e7" class="cell" data-execution_count="18">
+<div id="4178ae8f" class="cell" data-execution_count="18">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a></a><span class="kw">def</span> newton_optimize(f, fp, fpp, x0, max_iter<span class="op">=</span><span class="dv">50</span>):</span>
@@ -1197,7 +1221,7 @@ x0 = 5.5: Newton法  4 回 / 勾配降下法  6 回  →  x = 5.7656</code></pre
 <span id="cb18-25"><a></a>convergence_values <span class="op">=</span> np.array(convergence_values)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="d8f5f8d4" class="cell" data-execution_count="19">
+<div id="361daa9b" class="cell" data-execution_count="19">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1239,7 +1263,7 @@ x0 = 5.5: Newton法  4 回 / 勾配降下法  6 回  →  x = 5.7656</code></pre
 <h2>なぜ「すぐ手前の帯」が左へ飛ぶのか</h2>
 <div class="slide-body">
 <p>x0 = 4.0 から始めたときの<strong>最初の1歩</strong>を解剖してみます。</p>
-<div id="df7251f0" class="cell" data-execution_count="20">
+<div id="a929cf91" class="cell" data-execution_count="20">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1330,7 +1354,7 @@ x0 = 5.5: Newton法  4 回 / 勾配降下法  6 回  →  x = 5.7656</code></pre
 <section id="修理版newton法検査12入り" class="slide level2">
 <h2>修理版Newton法（検査1・2入り）</h2>
 <div class="slide-body">
-<div id="33800569" class="cell" data-execution_count="21">
+<div id="4d66f967" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a></a><span class="kw">def</span> newton_safe(f, fp, fpp, x0, max_iter<span class="op">=</span><span class="dv">100</span>):</span>
 <span id="cb19-2"><a></a>    <span class="co">"""Newton法＋検査1（降下方向）＋検査2（実測バックトラッキング）"""</span></span>
 <span id="cb19-3"><a></a>    x <span class="op">=</span> x0</span>
@@ -1366,7 +1390,7 @@ x0 = 4.0 → x = 5.7656, f(x) = -13.6726</code></pre>
 <section id="修理後の引力圏" class="slide level2">
 <h2>修理後の引力圏</h2>
 <div class="slide-body">
-<div id="42320b42" class="cell" data-execution_count="22">
+<div id="e8e084cf" class="cell" data-execution_count="22">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1498,7 +1522,7 @@ x0 = 4.0 → x = 5.7656, f(x) = -13.6726</code></pre>
 <h2>問題1の解答例</h2>
 <div class="slide-body">
 <p><strong>導関数（手計算）:</strong> <span class="math display">\[g'(x) = 4x^3 - 16x + 3\]</span></p>
-<div id="c0e3ca2e" class="cell" data-execution_count="23">
+<div id="0e29e5e2" class="cell" data-execution_count="23">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
