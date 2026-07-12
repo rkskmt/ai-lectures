@@ -35,6 +35,16 @@ quarto preview --port 4321
 
 ブラウザで `http://localhost:4321` が開く。ファイルを保存するとホットリロードされる。
 
+CSS・テーマの見た目だけを素早く確認するときは、対象デッキ1本に絞り、
+Pythonセルを実行しない軽量プレビューを使う：
+
+```bash
+tools/preview-style classification-basics-1d.qmd
+```
+
+このモードでは計算セルの出力を生成しない。コードや図の変更を確認するときは
+通常の `quarto preview`、公開前は `quarto render` を使う。
+
 ### ビルド・デプロイ
 
 ```bash
