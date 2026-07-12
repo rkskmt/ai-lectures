@@ -275,7 +275,7 @@ rkskmt
 <section id="tensornumpy-配列の親戚" class="slide level2">
 <h2>tensor：NumPy 配列の親戚</h2>
 <div class="slide-body">
-<div id="4c51e6c9" class="cell" data-execution_count="1">
+<div id="c20b9828" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> torch</span>
 <span id="cb1-2"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a></a></span>
@@ -298,7 +298,7 @@ rkskmt
 <ul>
 <li>まず<strong>いちばん小さな例</strong>で挙動を見る。<span class="math inline">\(y = x^2\)</span> の <span class="math inline">\(x = 3\)</span> での微分は、高校の答えなら <span class="math inline">\(2x = 6\)</span></li>
 </ul>
-<div id="3e11e806" class="cell" data-execution_count="2">
+<div id="d57bf27c" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a><span class="im">import</span> torch</span>
 <span id="cb3-2"><a></a></span>
 <span id="cb3-3"><a></a>x <span class="op">=</span> torch.tensor(<span class="fl">3.0</span>, requires_grad<span class="op">=</span><span class="va">True</span>)   <span class="co"># 「勾配を追跡せよ」の印</span></span>
@@ -322,7 +322,7 @@ rkskmt
 <ul>
 <li>バックプロパゲーションの回と<strong>まったく同じ</strong>ネットワーク・同じ数値を流す</li>
 </ul>
-<div id="6ab7fb15" class="cell" data-execution_count="3">
+<div id="a40317b3" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a>a <span class="op">=</span> torch.tensor([<span class="fl">0.3</span>, <span class="op">-</span><span class="fl">0.2</span>], requires_grad<span class="op">=</span><span class="va">True</span>)   <span class="co"># α1, α2</span></span>
 <span id="cb5-2"><a></a>b <span class="op">=</span> torch.tensor(<span class="fl">0.1</span>,  requires_grad<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb5-3"><a></a>w <span class="op">=</span> torch.tensor(<span class="fl">0.5</span>,  requires_grad<span class="op">=</span><span class="va">True</span>)</span>
@@ -397,7 +397,7 @@ rkskmt
 <section id="nn部品には全部見覚えがある" class="slide level2">
 <h2>nn：部品には全部、見覚えがある</h2>
 <div class="slide-body">
-<div id="3e2e5268" class="cell" data-execution_count="4">
+<div id="690a8509" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
 <span id="cb7-2"><a></a></span>
 <span id="cb7-3"><a></a>model <span class="op">=</span> nn.Sequential(</span>
@@ -460,7 +460,7 @@ rkskmt
 <ul>
 <li>部品を1個だけ取り出して、素性を確認する</li>
 </ul>
-<div id="8b74829b" class="cell" data-execution_count="5">
+<div id="5d1373aa" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a></a><span class="im">import</span> torch</span>
 <span id="cb9-2"><a></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
 <span id="cb9-3"><a></a></span>
@@ -492,7 +492,7 @@ tensor([[ 0.7393, -1.0621,  0.0441]], grad_fn=&lt;AddBackward0&gt;)</code></pre>
 <section id="peek-train-loop" class="slide level2">
 <h2>学習ループ：3拍子</h2>
 <div class="slide-body">
-<div id="480fb51f" class="cell" data-execution_count="6">
+<div id="a970abc4" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> make_moons</span>
 <span id="cb11-2"><a></a></span>
 <span id="cb11-3"><a></a>X, y <span class="op">=</span> make_moons(n_samples<span class="op">=</span><span class="dv">200</span>, noise<span class="op">=</span><span class="fl">0.1</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
@@ -545,7 +545,7 @@ tensor([[ 0.7393, -1.0621,  0.0441]], grad_fn=&lt;AddBackward0&gt;)</code></pre>
 </div>
 </div>
 </div>
-<div id="cce21637" class="cell" data-execution_count="7">
+<div id="478c70fe" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a></a><span class="im">import</span> torch</span>
 <span id="cb13-2"><a></a></span>
 <span id="cb13-3"><a></a>theta <span class="op">=</span> torch.tensor(<span class="fl">2.0</span>, requires_grad<span class="op">=</span><span class="va">True</span>)</span>
@@ -575,7 +575,7 @@ tensor(7.2000)</code></pre>
 <section id="境界も同じものが出る" class="slide level2">
 <h2>境界も同じものが出る</h2>
 <div class="slide-body">
-<div id="9fb64ec3" class="cell" data-execution_count="8">
+<div id="9b9202da" class="cell" data-execution_count="8">
 <details class="code-fold">
 <summary>描画コード</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -723,7 +723,7 @@ tensor(7.2000)</code></pre>
 <section id="解答例" class="slide level2">
 <h2>解答例</h2>
 <div class="slide-body">
-<div id="a162e436" class="cell" data-execution_count="9">
+<div id="8cdaa385" class="cell" data-execution_count="9">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a></a><span class="im">import</span> torch</span>

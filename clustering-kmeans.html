@@ -284,7 +284,7 @@ rkskmt
 <li>80匹分の測定データ（輝度・重さ）は手元にある</li>
 <li>ところが<strong>どれが Salmon でどれが Sea bass か、記録が消えた</strong></li>
 </ul>
-<div id="8baac4bd" class="cell" data-execution_count="1">
+<div id="0ab0db11" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>魚データの定義（クリックして展開）</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -316,7 +316,7 @@ rkskmt
 <span id="cb1-27"><a></a>])</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="8501342d" class="cell" data-execution_count="2">
+<div id="ee4b8348" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -397,7 +397,7 @@ rkskmt
 <section id="試行1-そのまま-k-means-にかける" class="slide level2">
 <h2>試行1: そのまま k-means にかける</h2>
 <div class="slide-body">
-<div id="83d26cf3" class="cell" data-execution_count="3">
+<div id="500db3c2" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> KMeans</span>
 <span id="cb2-2"><a></a></span>
 <span id="cb2-3"><a></a><span class="co"># ラベルを使わずに k=2 でクラスタリング</span></span>
@@ -425,7 +425,7 @@ rkskmt
 <section id="試行1の結果" class="slide level2">
 <h2>試行1の結果</h2>
 <div class="slide-body">
-<div id="1b9797df" class="cell" data-execution_count="4">
+<div id="526b9040" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a></a>colors  <span class="op">=</span> [<span class="st">"#e74c3c"</span>, <span class="st">"#2980b9"</span>]</span>
 <span id="cb4-2"><a></a>markers <span class="op">=</span> [<span class="st">"o"</span>, <span class="st">"s"</span>]</span>
 <span id="cb4-3"><a></a></span>
@@ -501,7 +501,7 @@ rkskmt
 <section id="peek-scale" class="slide level2">
 <h2>試行2: スケールを揃えて再挑戦</h2>
 <div class="slide-body">
-<div id="fc515bc0" class="cell" data-execution_count="5">
+<div id="3fb2904b" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
 <span id="cb5-2"><a></a></span>
 <span id="cb5-3"><a></a>X_scaled <span class="op">=</span> StandardScaler().fit_transform(X)   <span class="co"># 各特徴量を平均0・分散1に</span></span>
@@ -538,7 +538,7 @@ rkskmt
 <ul>
 <li>このデータの正体は、これまでの講義で使ってきた Salmon / Sea bass</li>
 </ul>
-<div id="a09b3cb1" class="cell" data-execution_count="6">
+<div id="6103ff30" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a></a>y_true <span class="op">=</span> np.array([<span class="dv">1</span>]<span class="op">*</span><span class="dv">40</span> <span class="op">+</span> [<span class="dv">0</span>]<span class="op">*</span><span class="dv">40</span>)   <span class="co"># 1=Salmon, 0=Sea bass（隠していた正解）</span></span>
 <span id="cb6-2"><a></a></span>
 <span id="cb6-3"><a></a>agree <span class="op">=</span> np.mean(cluster_labels2 <span class="op">==</span> y_true)</span>
@@ -548,7 +548,7 @@ rkskmt
 <pre><code>正解ラベルとの一致: 92.5%（74/80匹）</code></pre>
 </div>
 </div>
-<div id="165c27b4" class="cell" data-execution_count="7">
+<div id="2b1b5076" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -575,7 +575,7 @@ rkskmt
 <section id="k-means-の動き中で起きていたこと" class="slide level2">
 <h2>k-means の動き（中で起きていたこと）</h2>
 <div class="slide-body">
-<div id="3aff8420" class="cell" data-execution_count="8">
+<div id="1d7c4ddc" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -597,7 +597,7 @@ rkskmt
 <li>「assign → update」は<strong>最初の重心の位置</strong>から始まる — そこは<strong>ランダム</strong>に選ばれる</li>
 <li>運の悪い初期値だと、おかしな所で落ち着く（下の左：青が2つの塊を飲み込んだ）</li>
 </ul>
-<div id="ba76bca5" class="cell" data-execution_count="9">
+<div id="c5bcf89a" class="cell" data-execution_count="9">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -641,7 +641,7 @@ rkskmt
 <li>本当のラベルなしデータでは <strong>k 自体を決める必要がある</strong></li>
 <li><strong>エルボー法</strong>：k を変えながら「クラスタ内のまとまり度」を測る</li>
 </ul>
-<div id="9471eb53" class="cell" data-execution_count="10">
+<div id="d1768b6f" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a></a>inertias <span class="op">=</span> []</span>
 <span id="cb8-2"><a></a>ks <span class="op">=</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">9</span>)</span>
 <span id="cb8-3"><a></a></span>
@@ -737,7 +737,7 @@ rkskmt
 <section id="k-means-の限界" class="slide level2">
 <h2>k-means の限界</h2>
 <div class="slide-body">
-<div id="a68d629d" class="cell" data-execution_count="11">
+<div id="895cb989" class="cell" data-execution_count="11">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -861,7 +861,7 @@ rkskmt
 <section id="問題2の解答例" class="slide level2">
 <h2>問題2の解答例</h2>
 <div class="slide-body">
-<div id="826f6657" class="cell" data-execution_count="12">
+<div id="aaef8563" class="cell" data-execution_count="12">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>

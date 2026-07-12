@@ -36,7 +36,10 @@
 
     function createNav() {
       try {
-        if (document.getElementById('slide-nav')) return;
+        // The course index is a directory page, not a deck. Quarto still
+        // renders it as a one-slide reveal document, so a counter there would
+        // be meaningless (and can briefly read 0 / 1 before Reveal is ready).
+        if (isIndexPage() || document.getElementById('slide-nav')) return;
         var footer = document.querySelector('.reveal > .footer');
         if (!footer) return;
         var nav = document.createElement('span');
@@ -84,7 +87,7 @@
 
     function initCounter() {
       try {
-        if (counterInit || !window.Reveal) return;
+        if (isIndexPage() || counterInit || !window.Reveal) return;
         counterInit = true;
         updateCounter();
         Reveal.on('slidechanged', updateCounter);
