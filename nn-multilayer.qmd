@@ -5,11 +5,16 @@ subtitle: "曲がる境界の正体"
 
 ## 前回の振り返り
 
-- NN の最小単位 ＝ アフィン変換 → シグモイド（＝ロジスティック回帰）
-- 勾配降下法で境界が動く様子を、自分のコードで見た
-- ただし、この最小単位が引けるのは**直線だけ**
+- ロジスティック回帰を自作した：**線形結合 → シグモイド** で確率を出し、交差エントロピー＋勾配降下法で fit
+- 勾配は $p - y$。境界が動く様子を、自分のコードで見た
+
+::: {.callout-note title="種明かし"}
+あの「線形結合 → シグモイド」の2ステップは、実は1個の**ニューロン（[neuron]{.en}）** —
+**ニューラルネットワークの最小単位**。NN は、この最小単位の組み合わせでできている。
+:::
 
 ::: {.callout-note title="今回の問い"}
+ただし、この最小単位が引けるのは**直線だけ**。
 直線では絶対に分けられないデータが来たら、どうする？
 :::
 
@@ -81,7 +86,7 @@ plt.show()
 ## 重ねればいい？ — 落とし穴
 
 ::: {.callout-important title="クイズ"}
-アフィン変換を**2回**重ねたら、曲がった境界になる？
+線形変換（線形結合＋バイアス）を**2回**重ねたら、曲がった境界になる？
 
 $$z_2 = \alpha_2 (\alpha_1 x + b_1) + b_2$$
 :::
@@ -89,8 +94,8 @@ $$z_2 = \alpha_2 (\alpha_1 x + b_1) + b_2$$
 ::: {.fragment}
 $$z_2 = \underbrace{(\alpha_2 \alpha_1)}_{\text{新しい傾き}} x + \underbrace{(\alpha_2 b_1 + b_2)}_{\text{新しい切片}}$$
 
-- 展開すると**ただのアフィン変換1回分**。何回重ねても同じ
-- 線形（アフィン）変換は、重ねても線形のまま — **境界は直線のまま**
+- 展開すると**ただの線形変換1回分**。何回重ねても同じ
+- 線形変換は、重ねても線形のまま — **境界は直線のまま**
 
 ```{python}
 #| echo: false
@@ -102,7 +107,7 @@ stacked_affine = MLPClassifier(hidden_layer_sizes=(16,), activation="identity",
 
 fig, ax = plt.subplots(figsize=(5.5, 3.3))
 plot_boundary(ax, stacked_affine, X_moon, y_moon,
-              f"アフィン変換を16個重ねて学習　正答率 {stacked_affine.score(X_moon, y_moon):.0%}")
+              f"線形変換を16個重ねて学習　正答率 {stacked_affine.score(X_moon, y_moon):.0%}")
 plt.tight_layout()
 plt.show()
 ```
@@ -130,7 +135,7 @@ plt.show()
 
 - 正ならそのまま、負なら 0 に潰す — それだけ
 - 直線をここで**折る**ことができる（折れ曲がり＝非線形）
-- アフィン変換 → ReLU → アフィン変換 と挟めば、重ねた意味が消えない
+- 線形変換 → ReLU → 線形変換 と挟めば、重ねた意味が消えない
 
 
 ## 中間に変換を1つ挟む
@@ -140,9 +145,9 @@ $$x \;\xrightarrow{\;\alpha^{\mathsf T} x + b\;}\; z \;\xrightarrow{\;\mathrm{Re
 ```{.d2 sketch="true" width="95%"}
 direction: right
 X: "入力 x" { style.fill: "#e1f5ff" }
-A1: "アフィン変換\n（α, b）" { style.fill: "#fff4e1" }
+A1: "線形変換\n（α, b）" { style.fill: "#fff4e1" }
 R: "ReLU\n（折る）" { shape: hexagon; style.fill: "#fdebd0" }
-A2: "アフィン変換\n（w, c）" { style.fill: "#fff4e1" }
+A2: "線形変換\n（w, c）" { style.fill: "#fff4e1" }
 S: "σ" { shape: hexagon; style.fill: "#fdebd0" }
 P: "確率 p" { style.fill: "#d5f5e3" }
 X -> A1 -> R -> A2 -> S -> P
@@ -170,9 +175,9 @@ $$\delta_{\text{mid}} = \delta_{\text{out}} \cdot w \cdot \mathrm{ReLU}'(z)$$
 ```{.d2 sketch="true" width="100%"}
 direction: right
 X: "入力 x" { style.fill: "#e1f5ff" }
-A1: "アフィン\n（α, b）" { style.fill: "#fff4e1" }
+A1: "線形\n（α, b）" { style.fill: "#fff4e1" }
 R: "ReLU" { shape: hexagon; style.fill: "#fdebd0" }
-A2: "アフィン\n（w, c）" { style.fill: "#fff4e1" }
+A2: "線形\n（w, c）" { style.fill: "#fff4e1" }
 S: "σ" { shape: hexagon; style.fill: "#fdebd0" }
 L: "損失 L" { style.fill: "#f5b7b1" }
 X -> A1 -> R -> A2 -> S -> L

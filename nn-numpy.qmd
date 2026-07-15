@@ -5,7 +5,7 @@ subtitle: "初回の図を自分のコードで再現する"
 
 ## 部品はすべて揃っている
 
-- アフィン変換・ReLU・シグモイド・交差エントロピー（最小単位／変換を重ねるの回）
+- 線形変換・ReLU・シグモイド・交差エントロピー（ロジスティック回帰／変換を重ねるの回）
 - 勾配降下法（最適化の回）
 - 全パラメータの勾配を出す backprop（前回）
 
@@ -76,14 +76,14 @@ X -> A1 -> Z -> R -> H -> A2 -> P
 ```{python}
 #| echo: true
 def forward(X, W1, b1, w2, c2):
-    Z = X @ W1 + b1          # アフィン変換（全変換まとめて）
+    Z = X @ W1 + b1          # 線形変換（全変換まとめて）
     H = np.maximum(0, Z)     # ReLU（折る）
     u = H @ w2 + c2          # 出力層（多数決）
     p = 1 / (1 + np.exp(-u)) # シグモイド（確率に）
     return Z, H, u, p
 ```
 
-- [最小単位の回の `forward`](nn-single-unit.qmd#peek-forward){.peek} と見比べると、**スカラーが行列になっただけ**
+- [ロジスティック回帰の回の `forward`](logistic-regression.qmd#peek-forward){.peek} と見比べると、**スカラーが行列になっただけ**
 - $Z, H$ も返すのは、**復路（[backprop]{.en}）で使うから**（前回の伏線）
 
 
@@ -243,7 +243,7 @@ plt.show()
 ## まとめ
 
 - NumPy の行列演算で、**forward 4行・backward 6行**の多層ネットワークができた
-- 中身は既習の部品のみ：アフィン変換・ReLU・$(p-y)$・$\delta$ の漸化式・勾配降下法
+- 中身は既習の部品のみ：線形変換・ReLU・$(p-y)$・$\delta$ の漸化式・勾配降下法
 - 初回のコールドオープンの図を、自分のコードで再現した
 
 ::: {.callout-note title="次回予告"}

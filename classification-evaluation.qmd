@@ -8,7 +8,7 @@ subtitle: "モデルの「本当の実力」を測る"
 ### 2次元分類と「あやしい満点」
 
 - 重さ + 輝度の **2特徴量** で Salmon / Sea bass を分類
-- 決定木・ロジスティック回帰で決定境界を学習した
+- 手動の直線と決定木で決定境界を学習した
 - **深さ無制限の決定木は正答率 100%** — ただし採点は**学習に使った同じデータ**
 - 境界には、数匹のためだけの**飛び地**ができていた
 
@@ -158,15 +158,16 @@ plt.show()
 
 ## 前回と同じ採点方法
 
+- モデルは前回の主役 — **深さ無制限の決定木**
 - まずは全データで学習し、同じ全データで評価する
 - これは「学習済みデータへの精度」を測っている
 
 ```{python}
 #| echo: true
-from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score
 
-same_data_model = LogisticRegression(max_iter=1000)
+same_data_model = DecisionTreeClassifier(max_depth=None, random_state=42)
 same_data_model.fit(X, y)
 
 same_data_acc = accuracy_score(y, same_data_model.predict(X))
@@ -174,6 +175,7 @@ print(f"全データで学習 → 同じ全データで評価: {same_data_acc:.3
 ```
 
 ::: {.callout-note}
+- 入り混じりゾーンが増えた120匹でも、またしても**満点**
 - この値だけでは、新しい魚にも通用するかは分からない
 - 次に、データを「学習用」と「評価用」に分ける
 :::
@@ -220,22 +222,34 @@ print(f"テストデータ: {len(X_test)} 匹")
 
 ## 見ていないデータで評価する
 
+- 前回の「[あやしい満点](classification-2d-boundaries.qmd#peek-overfit-boundary){.peek}」の木に、金庫にしまっておいたテストデータをぶつける
+
+::: {.callout-important title="ここで予想"}
+訓練で満点のこの木 — 初見の24匹のうち、何匹当てられる？
+:::
+
 ```{python}
 #| echo: true
+from sklearn.tree import DecisionTreeClassifier
 
-model = LogisticRegression(max_iter=1000)
-model.fit(X_train, y_train)         # 訓練データだけで学習
+deep_tree = DecisionTreeClassifier(max_depth=None, random_state=42)
+deep_tree.fit(X_train, y_train)         # 訓練データだけで学習
 
-train_acc = accuracy_score(y_train, model.predict(X_train))
-test_acc  = accuracy_score(y_test,  model.predict(X_test))
+train_acc = accuracy_score(y_train, deep_tree.predict(X_train))
+test_acc  = accuracy_score(y_test,  deep_tree.predict(X_test))
 
 print(f"訓練データ精度: {train_acc:.3f}  ← 学習済みデータへの精度（楽観的）")
 print(f"テストデータ精度: {test_acc:.3f}  ← 本当の精度")
 ```
 
+::: {.fragment}
+- 訓練では**満点**。ところが新しい魚では**4割近く間違える**
+- 満点の正体は実力ではなく**暗記**だった
+:::
+
 ::: {.callout-tip title="2つの精度を比べる"}
 - **訓練精度 ≈ テスト精度**：うまく汎化できている
-- **訓練精度 >> テスト精度**：過学習（[overfitting]{.en}）の疑い（暗記している）
+- **訓練精度 >> テスト精度**：過学習（[overfitting]{.en}）の疑い（暗記している）— 今回は明白にこれ
 :::
 
 
@@ -246,7 +260,7 @@ print(f"テストデータ精度: {test_acc:.3f}  ← 本当の精度")
 #| fig-align: center
 from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
 
-cm = confusion_matrix(y_test, model.predict(X_test))
+cm = confusion_matrix(y_test, deep_tree.predict(X_test))
 disp = ConfusionMatrixDisplay(confusion_matrix=cm,
                               display_labels=["Sea bass (0)", "Salmon (1)"])
 disp.plot(colorbar=False, cmap="Blues")
@@ -259,35 +273,7 @@ plt.show()
 ## {background-color="white" .center .break-slide}
 
 ::: {.break-title}
-満点の正体を暴く
-:::
-
-
-## 深さ無制限の決定木を、新しい魚で採点する
-
-- 前回の「[あやしい満点](classification-2d-boundaries.qmd#peek-overfit-boundary){.peek}」に、いま手に入れた道具（train/test）を使う
-
-::: {.callout-important title="ここで予想"}
-訓練で満点だったこの木 — 新しい24匹のうち、何匹当てられる？
-:::
-
-```{python}
-#| echo: true
-from sklearn.tree import DecisionTreeClassifier
-
-deep_tree = DecisionTreeClassifier(max_depth=None, random_state=42)
-deep_tree.fit(X_train, y_train)               # 訓練データだけで学習
-
-deep_train_acc = accuracy_score(y_train, deep_tree.predict(X_train))
-deep_test_acc  = accuracy_score(y_test,  deep_tree.predict(X_test))
-
-print(f"訓練データ精度: {deep_train_acc:.3f}")
-print(f"テストデータ精度: {deep_test_acc:.3f}")
-```
-
-::: {.fragment}
-- 訓練では**満点**。ところが新しい魚では**4割近く間違える**
-- 満点の正体は実力ではなく**暗記**だった
+「暗記」を目で見る
 :::
 
 
@@ -419,9 +405,10 @@ plt.show()
 
 ```{python}
 #| echo: true
+tree = DecisionTreeClassifier(max_depth=None, random_state=42)
 for seed in range(5):
     Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=seed)
-    acc = accuracy_score(yte, LogisticRegression(max_iter=1000).fit(Xtr, ytr).predict(Xte))
+    acc = accuracy_score(yte, tree.fit(Xtr, ytr).predict(Xte))
     print(f"seed={seed}  テスト精度: {acc:.3f}")
 ```
 
@@ -480,12 +467,14 @@ plt.show()
 from sklearn.model_selection import cross_val_score
 
 scores = cross_val_score(
-    LogisticRegression(max_iter=1000), X, y, cv=5   # cv=5 で 5-fold
+    DecisionTreeClassifier(max_depth=None, random_state=42), X, y, cv=5   # cv=5 で 5-fold
 )
 
 print("各 fold の精度:", scores.round(3))
 print(f"平均精度: {scores.mean():.3f}  ±  {scores.std():.3f}")
 ```
+
+- 平均 **0.60 ± 0.10** — 「あの満点の木の本当の実力は、6割そこそこ」と、ようやく安定した数字で言える
 
 ::: {.callout-tip title="`cross_val_score` の引数"}
 - 第1引数：モデル（`fit` 前でOK。内部で k 回 fit してくれる）
@@ -501,7 +490,7 @@ print(f"平均精度: {scores.mean():.3f}  ±  {scores.std():.3f}")
 ::: {.tweak}
 | やりたいこと | コード |
 |--|--|
-| 分け方の運を変える | `random_state=42` → `1` |
+| 分け方の運を変える | `random_state=42` → `4` |
 | テストに半分回す | `test_size=0.2` → `0.5` |
 | 10-fold にする | `cv=5` → `cv=10` |
 :::
@@ -509,9 +498,9 @@ print(f"平均精度: {scores.mean():.3f}  ±  {scores.std():.3f}")
 ::: {.callout-tip}
 ## ここで観察
 
-- `random_state=1` だとテスト精度 **91.7%**（42 では 79.2%）— ==同じモデルなのに12ポイント上振れ==。1回の分割の数字には運が乗っている — だから交差検証
-- `test_size=0.5` は訓練が60匹に減り、テスト精度 78.3% — 訓練とテストの**取り分のトレードオフ**
-- `cv=10` は平均 0.80 とほぼ同じだが、ばらつきは ±0.026 → **±0.085** に増える — 1 fold が12匹しかないため。fold は細かくすればいいものでもない
+- `random_state=4` だとテスト精度 **79.2%**（42 では 62.5%）— ==同じモデルなのに17ポイント上振れ==。1回の分割の数字には運が乗っている — だから交差検証
+- `test_size=0.5` は訓練が60匹に減り、テスト精度 66.7% — 訓練とテストの**取り分のトレードオフ**
+- `cv=10` は平均 0.67 ± 0.14（cv=5 では 0.60 ± 0.10）— 1 fold が12匹しかなく、魚1匹の重みが大きい。fold は細かくすればいいものでもない
 :::
 
 
@@ -523,7 +512,7 @@ print(f"平均精度: {scores.mean():.3f}  ±  {scores.std():.3f}")
   - 決定境界で見ると、数匹のためだけの**回廊・飛び地**として現れる
 - **汎化**：未知データへの対応能力を測ることが本来の目的
 - **`train_test_split`**：手軽だが分割次第で精度が揺れる
-- **k-fold 交差検証**：k 回の平均で安定した評価が得られる
+- **k-fold 交差検証**：k 回の平均で安定した評価が得られる（満点の木の実力は、平均すると6割だった）
 
 | 手法 | 特徴 |
 |---|---|

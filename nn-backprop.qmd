@@ -50,7 +50,7 @@ $y = (3x+1)^2$ を、**展開せずに**微分すると？
 
 ## NN は数珠つなぎそのもの
 
-- 「アフィン → ReLU → アフィン → シグモイド → 損失」— NN は関数の**数珠つなぎ**
+- 「線形 → ReLU → 線形 → シグモイド → 損失」— NN は関数の**数珠つなぎ**
 
 $$\frac{\partial L}{\partial \alpha_1}
 = \frac{\partial L}{\partial p} \cdot \frac{\partial p}{\partial u} \cdot \frac{\partial u}{\partial h} \cdot \frac{\partial h}{\partial z} \cdot \frac{\partial z}{\partial \alpha_1}$$
@@ -88,9 +88,9 @@ $$L = -\log(0.5125) = 0.6685$$
 ```{.d2 sketch="true" width="100%"}
 direction: right
 X: "入力\nx₁=1.0, x₂=0.5" { style.fill: "#e1f5ff" }
-A1: "アフィン\nz = 0.30" { style.fill: "#fff4e1" }
+A1: "線形\nz = 0.30" { style.fill: "#fff4e1" }
 R: "ReLU\nh = 0.30" { shape: hexagon; style.fill: "#fdebd0" }
-A2: "アフィン\nu = 0.05" { style.fill: "#fff4e1" }
+A2: "線形\nu = 0.05" { style.fill: "#fff4e1" }
 S: "シグモイド\np = 0.5125" { shape: hexagon; style.fill: "#fdebd0" }
 L: "損失\nL = 0.6685" { style.fill: "#f5b7b1" }
 X -> A1 -> R -> A2 -> S -> L
@@ -106,7 +106,7 @@ X -> A1 -> R -> A2 -> S -> L
 
 $$\delta_{\text{out}} = \frac{\partial L}{\partial u} = p - y = 0.5125 - 1 = -0.4875$$
 
-（シグモイド＋交差エントロピーの「打ち消し合い」— 最小単位の回の道具）
+（シグモイド＋交差エントロピーの「打ち消し合い」— ロジスティック回帰の回の道具）
 
 $$\frac{\partial L}{\partial w} = \delta_{\text{out}} \cdot h = -0.4875 \times 0.30 = -0.1463
 \qquad
@@ -128,9 +128,9 @@ $$\frac{\partial L}{\partial \alpha_1} = \delta_{\text{mid}} \cdot x_1 = -0.2438
 ```{.d2 sketch="true" width="90%"}
 direction: right
 X: "入力" { style.fill: "#e1f5ff" }
-A1: "アフィン\n（α, b）" { style.fill: "#fff4e1" }
+A1: "線形\n（α, b）" { style.fill: "#fff4e1" }
 R: "ReLU" { shape: hexagon; style.fill: "#fdebd0" }
-A2: "アフィン\n（w, c）" { style.fill: "#fff4e1" }
+A2: "線形\n（w, c）" { style.fill: "#fff4e1" }
 S: "σ" { shape: hexagon; style.fill: "#fdebd0" }
 L: "損失 L" { style.fill: "#f5b7b1" }
 X -> A1 -> R -> A2 -> S -> L
@@ -238,7 +238,7 @@ plt.show()
 ```
 
 ::: {.callout-tip}
-最小単位の回の「$p - y$ のきれいさ」も、ReLU の「1 か 0」も、
+ロジスティック回帰の回の「$p - y$ のきれいさ」も、ReLU の「1 か 0」も、
 ぜんぶ**復路の掛け算を壊さないための部品選び**だった。
 :::
 

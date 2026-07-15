@@ -6,7 +6,7 @@ title: "機械学習：分類問題"
 
 ### 目標
 - **2つの特徴量（[feature]{.en}）**を使った分類
-- **手動で直線を引く** → **決定木** → **ロジスティック回帰**の順で理解
+- **手動で直線を引く** → **決定木**の順で理解
 - **決定境界**を可視化する
 
 ::: {.callout-note title="ここがポイント"}
@@ -89,7 +89,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import japanize_matplotlib
 import pandas as pd
-from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix
 
@@ -639,67 +638,22 @@ plot_decision_boundary(tree_model, X, y,
 :::
 
 
-## 試行3: ロジスティック回帰（線形分類器）
-
-### 考え方
-
-**数学的に最適な直線**を見つける
-
-- 数式: $w_1 \times \text{輝度} + w_2 \times \text{重さ} + b = 0$
-- この直線で2クラスを最もうまく分ける
-- **斜めの直線**が引ける
-
-::: {.callout-tip title="ロジスティック回帰"}
-**線形分類器**の代表的な手法。確率も計算できる。
-:::
-
-
-## ロジスティック回帰で学習
-
-```{python}
-#| echo: true
-
-# ロジスティック回帰モデル
-lr_model = LogisticRegression()
-lr_model.fit(X, y)
-
-# 予測
-y_pred_lr = lr_model.predict(X)
-
-# 評価
-accuracy_lr = accuracy_score(y, y_pred_lr)
-precision_lr = precision_score(y, y_pred_lr)
-recall_lr = recall_score(y, y_pred_lr)
-
-print(f"ロジスティック回帰の性能:")
-print(f"  Accuracy:  {accuracy_lr:.3f}")
-print(f"  Precision: {precision_lr:.3f}")
-print(f"  Recall:    {recall_lr:.3f}")
-```
-
-
-## 決定境界の可視化（ロジスティック回帰）
-
-```{python}
-#| echo: false
-#| fig-align: center
-
-plot_decision_boundary(lr_model, X, y, 
-                      "Logistic Regression: Linear Decision Boundary",
-                      salmon_brightness, salmon_weights,
-                      seabass_brightness, seabass_weights)
-```
-
-:::{.callout-note}
-- 青い直線が**決定境界**
-- 背景色: 赤＝Salmon領域、青＝Sea bass領域
-- **斜めの直線1本**でシンプルに分離
-:::
-
-
-## 2つのアルゴリズムの比較
+## 手動 vs 決定木
 
 :::: {.columns}
+
+::: {.column width="50%"}
+### 手動の直線
+
+**メリット:**
+- 単純で、理由を説明しやすい
+- データを**目で見る**過程が入る
+
+**デメリット:**
+- 最適である保証がない
+- 特徴量が3つ以上になると目で見えない
+- 自動化できない
+:::
 
 ::: {.column width="50%"}
 ### 決定木
@@ -707,24 +661,10 @@ plot_decision_boundary(lr_model, X, y,
 **メリット:**
 - 解釈しやすい（if-thenルール）
 - 自動で最適化（ジニ不純度）
-- 軸に平行な境界
 
 **デメリット:**
 - 過学習（[overfitting]{.en}）しやすい
 - 階段状の境界のみ
-:::
-
-::: {.column width="50%"}
-### ロジスティック回帰
-
-**メリット:**
-- 数学的に最適
-- シンプル（斜めの直線）
-- 過学習しにくい
-
-**デメリット:**
-- 線形のみ
-- 複雑なパターンに弱い
 :::
 
 ::::
@@ -735,11 +675,16 @@ plot_decision_boundary(lr_model, X, y,
 ```{python}
 #| echo: false
 
+y_pred_hand = (X[:, 0] < lightness_threshold).astype(int)
+accuracy_hand  = accuracy_score(y, y_pred_hand)
+precision_hand = precision_score(y, y_pred_hand)
+recall_hand    = recall_score(y, y_pred_hand)
+
 comparison_df = pd.DataFrame({
-    "モデル": ["決定木", "ロジスティック回帰"],
-    'Accuracy': [f"{accuracy_tree:.3f}", f"{accuracy_lr:.3f}"],
-    'Precision': [f"{precision_tree:.3f}", f"{precision_lr:.3f}"],
-    'Recall': [f"{recall_tree:.3f}", f"{recall_lr:.3f}"]
+    "モデル": ["手動の縦線（輝度 5.5）", "決定木（深さ3）"],
+    'Accuracy': [f"{accuracy_hand:.3f}", f"{accuracy_tree:.3f}"],
+    'Precision': [f"{precision_hand:.3f}", f"{precision_tree:.3f}"],
+    'Recall': [f"{recall_hand:.3f}", f"{recall_tree:.3f}"]
 })
 
 print(comparison_df.to_string(index=False))
@@ -912,12 +857,12 @@ print(f"\nTP={TP}, FP={FP}, FN={FN}, TN={TN}")
    - 重さ + 輝度の組み合わせで、より正確に分類
 
 2. **まず目で見て、次にアルゴリズム**
-   - 手動の直線 → 決定木 → ロジスティック回帰
+   - 手動の直線 → 決定木
    - 段階的に理解を深める
 
-3. **アルゴリズムによって決定境界が異なる**
+3. **手法によって決定境界が異なる**
+   - 手動: 縦線（しきい値の2次元版）
    - 決定木: 階段状（軸に平行）
-   - ロジスティック回帰: 斜めの直線
 
 4. **トレードオフを理解する**
    - シンプル vs 複雑
@@ -934,7 +879,7 @@ print(f"\nTP={TP}, FP={FP}, FN={FN}, TN={TN}")
    - グラフを見て、自分で境界線を決める
    - その境界線でのTP, FP, FN, TNを計算
 
-2. **決定木と ロジスティック回帰を両方実装**
+2. **決定木を実装**
    - 提供されたデータで学習
 
 3. **決定木の深さを1, 2, 3, 4, 5で試す**
@@ -942,8 +887,8 @@ print(f"\nTP={TP}, FP={FP}, FN={FN}, TN={TN}")
    - どの深さが最適か考察
 
 4. **考察**
-   - 手動の境界線 vs 決定木 vs ロジスティック回帰
-   - どれが最も良かったか？その理由は？
+   - 手動の境界線 vs 決定木
+   - どちらが良かったか？その理由は？
    - 2次元にすることで、1次元と比べてどう改善したか？
 
 
@@ -952,3 +897,4 @@ print(f"\nTP={TP}, FP={FP}, FN={FN}, TN={TN}")
 - 深さ無制限の決定木は「同じデータで採点」して満点だった
 - 次回、この**あやしい満点**の正体を、**新しい魚で採点する**ことで暴く
 - 正体には名前がある — **過学習（[overfitting]{.en}）**
+- そしてもう1つの宿題：観察で見えた**斜めの直線**は、まだ引けていない。数式で最適な直線を fit する道具は、fit() の中身を開ける流れで自作する

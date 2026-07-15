@@ -89,7 +89,7 @@ plt.show()
 $$\mathrm{softmax}(u_k) = \frac{e^{u_k}}{\sum_{j} e^{u_j}}
 \qquad \text{10個の出力を「合計1の確率」に変換}$$
 
-- 損失は多クラス版の交差エントロピー：正解クラスの確率 $p_{\text{正解}}$ に対して $-\log p_{\text{正解}}$（[あの −log のカーブ](nn-single-unit.qmd#peek-neglog){.peek}の10クラス版）
+- 損失は多クラス版の交差エントロピー：正解クラスの確率 $p_{\text{正解}}$ に対して $-\log p_{\text{正解}}$（[あの −log のカーブ](logistic-regression.qmd#peek-neglog){.peek}の10クラス版）
 - PyTorch では `nn.CrossEntropyLoss` がソフトマックスごとやってくれる（打ち消しの恩恵もそのまま）
 
 
@@ -128,7 +128,7 @@ torch.manual_seed(0)
 
 model = nn.Sequential(
     nn.Flatten(),          # (28,28) → 784
-    nn.Linear(784, 128),   # アフィン変換
+    nn.Linear(784, 128),   # 線形変換
     nn.ReLU(),             # 折る
     nn.Linear(128, 10),    # 出力層（10クラスぶんのスコア）
 )
@@ -141,14 +141,14 @@ print(f"パラメータ総数: {n_params:,}")
 direction: right
 I: "画像\n(28, 28)" { style.fill: "#e1f5ff" }
 F: "nn.Flatten()\n→ 784" { style.fill: "#eaf2f8" }
-L1: "nn.Linear(784, 128)\nアフィン変換" { style.fill: "#fff4e1" }
+L1: "nn.Linear(784, 128)\n線形変換" { style.fill: "#fff4e1" }
 R: "nn.ReLU()\n折る" { shape: hexagon; style.fill: "#fdebd0" }
 L2: "nn.Linear(128, 10)\n出力層" { style.fill: "#fff4e1" }
 O: "10個のスコア\n→ softmax で確率" { style.fill: "#d5f5e3" }
 I -> F -> L1 -> R -> L2 -> O
 ```
 
-- 魚の最小単位は**3個**だった。いまや**10万個** — それでも学習ループは同じ3拍子
+- 魚のロジスティック回帰はパラメータ**3個**だった。いまや**10万個** — それでも学習ループは同じ3拍子
 
 ::: {.callout-note title="Adam — 最適化回の伏線回収"}
 勾配降下法の回で名前だけ出た「学習率を自動で加減する改良版」。
@@ -170,7 +170,7 @@ loss_fn   = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 ```
 
-- NN最小単位の回で[「魚を1匹ずつ見せる」](nn-single-unit.qmd#peek-one-at-a-time){.peek}とやったのと同じ発想（あちらはバッチサイズ1）
+- ロジスティック回帰の回で[「魚を1匹ずつ見せる」](logistic-regression.qmd#peek-one-at-a-time){.peek}とやったのと同じ発想（あちらはバッチサイズ1）
 
 
 ## 学習する {#peek-mnist-train}
@@ -334,7 +334,7 @@ plt.show()
 ```
 
 - 最上位は「9」を **99.5%の自信で「4」と誤読** — 精度96%の機械は、間違えるときも自信満々のことがある
-- [−log のカーブ](nn-single-unit.qmd#peek-neglog){.peek}の左端そのもの。学習中ならこの1枚が**莫大な損失**を出して重みを大きく動かす
+- [−log のカーブ](logistic-regression.qmd#peek-neglog){.peek}の左端そのもの。学習中ならこの1枚が**莫大な損失**を出して重みを大きく動かす
 - 確率はあくまで**モデルの主観**。「自信がある＝正しい」ではない
 
 
@@ -364,7 +364,7 @@ plt.show()
 
 - **赤い場所にインクが乗ると足し、青い場所なら引く** — その合計が ReLU の入り口 $z$
 - 学習前（同じシードで初期化し直したもの）は一様な砂嵐。学習後は**中央にインクの通り道の模様**が育っている
-- 魚のとき[学習された $\alpha$ を読んだ](nn-single-unit.qmd)のと同じことを、10万パラメータでやっただけ
+- 魚のとき[学習された $\alpha$ を読んだ](logistic-regression.qmd)のと同じことを、10万パラメータでやっただけ
 
 
 ## 128人の見張りを全員閲覧する
@@ -439,9 +439,9 @@ print("予測:", model(x).argmax(dim=1).item())
 
 | 部品 | 正体 | 学んだ回 |
 |---|---|---|
-| `nn.Linear` | アフィン変換（傾きと切片の一般化） | 決定境界／NN最小単位 |
+| `nn.Linear` | 線形変換（傾きと切片の一般化） | ロジスティック回帰／変換を重ねる |
 | `nn.ReLU` | 空間を折る非線形 | 変換を重ねる |
-| ソフトマックス＋交差エントロピー | 微分しやすい損失 | NN最小単位／今回 |
+| ソフトマックス＋交差エントロピー | 微分しやすい損失 | ロジスティック回帰／今回 |
 | `loss.backward()` | 連鎖律の自動化 | バックプロパゲーション |
 | `Adam` | 勾配降下法の改良版 | 最適化と勾配降下法 |
 | テストデータで採点 | 汎化を測る鉄則 | 過学習と汎化 |

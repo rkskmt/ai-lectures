@@ -78,7 +78,7 @@ w = torch.tensor(0.5,  requires_grad=True)
 c = torch.tensor(-0.1, requires_grad=True)
 x = torch.tensor([1.0, 0.5])                        # 入力（正解 y=1）
 
-z = a @ x + b          # アフィン変換
+z = a @ x + b          # 線形変換
 h = torch.relu(z)      # ReLU
 u = w * h + c          # 出力層
 p = torch.sigmoid(u)   # シグモイド
@@ -120,7 +120,7 @@ print(f"∂L/∂c = {c.grad.item():.4f}")
 import torch.nn as nn
 
 model = nn.Sequential(
-    nn.Linear(2, 16),   # アフィン変換 X @ W1 + b1（パラメータは自動で用意・初期化）
+    nn.Linear(2, 16),   # 線形変換 X @ W1 + b1（パラメータは自動で用意・初期化）
     nn.ReLU(),          # 折る
     nn.Linear(16, 1),   # 出力層 H @ w2 + c2
 )
@@ -130,7 +130,7 @@ print(model)
 ```{.d2 sketch="true" width="95%"}
 direction: right
 X: "入力 (2)" { style.fill: "#e1f5ff" }
-L1: "nn.Linear(2, 16)\nアフィン変換" { style.fill: "#fff4e1" }
+L1: "nn.Linear(2, 16)\n線形変換" { style.fill: "#fff4e1" }
 R: "nn.ReLU()\n折る" { shape: hexagon; style.fill: "#fdebd0" }
 L2: "nn.Linear(16, 1)\n出力層" { style.fill: "#fff4e1" }
 O: "スコア u\n（σ は損失の中）" { style.fill: "#d5f5e3" }
@@ -139,7 +139,7 @@ X -> L1 -> R -> L2 -> O
 
 | PyTorch の名前 | この講義で作った部品 |
 |---|---|
-| `nn.Linear` | アフィン変換（`X @ W1 + b1`） |
+| `nn.Linear` | 線形変換（`X @ W1 + b1`） |
 | `nn.ReLU` | $\max(0, z)$ |
 | `nn.BCEWithLogitsLoss` | シグモイド＋交差エントロピー（打ち消しもやってくれる） |
 | `torch.optim.SGD` | 勾配降下法（`θ -= lr * grad`） |
@@ -167,7 +167,7 @@ print(lin(x))                  # Linear に通す
 print(x @ lin.weight.T + lin.bias)   # 自分で計算しても、同じ
 ```
 
-- 中身は本当に**ただのアフィン変換** — 重みの持ち方が転置（`W.T`）なことだけ流儀が違う
+- 中身は本当に**ただの線形変換** — 重みの持ち方が転置（`W.T`）なことだけ流儀が違う
 - `requires_grad=True` も最初から付いている（`nn` の部品は学習される前提）
 
 
