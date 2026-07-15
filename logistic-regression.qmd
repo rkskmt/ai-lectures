@@ -111,16 +111,20 @@ plt.show()
 
 ## これがロジスティック回帰（[Logistic Regression]{.en}）
 
-```{.d2 sketch="true" width="85%"}
+```{.d2 sketch="true" width="90%"}
 direction: right
 X: "入力\nx₁（輝度）\nx₂（重さ）" { style.fill: "#e1f5ff" }
-A: "線形結合＋バイアス\nz = α₁x₁ + α₂x₂ + b" { style.fill: "#fff4e1" }
-S: "シグモイド\np = σ(z)" { shape: hexagon; style.fill: "#fdebd0" }
+LR: "ロジスティック回帰" {
+  A: "Step 1\n線形結合＋バイアス\nz = α₁x₁ + α₂x₂ + b" { style.fill: "#fff4e1" }
+  S: "Step 2\nシグモイド\np = σ(z)" { shape: hexagon; style.fill: "#fdebd0" }
+  A -> S
+}
 P: "確率 p\n（0〜1）" { style.fill: "#d5f5e3" }
-X -> A -> S -> P
+X -> LR.A
+LR.S -> P
 ```
 
-- この2ステップが**ロジスティック回帰** — 分類の定番モデル
+- 枠で囲んだ**2ステップ**が**ロジスティック回帰** — 分類の定番モデル
 - `sklearn` の `LogisticRegression` が中でやっているのもこの計算
 
 ::: {.callout-note title="「回帰」なのに分類？"}
