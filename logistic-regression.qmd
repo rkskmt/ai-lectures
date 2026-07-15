@@ -20,6 +20,7 @@ subtitle: "分類の fit() を開ける"
 ```{python}
 #| echo: false
 #| fig-align: center
+#| classes: fig-medium
 import numpy as np
 import matplotlib.pyplot as plt
 import japanize_matplotlib
@@ -58,8 +59,68 @@ plt.show()
 ```
 
 - 縦線（輝度 5.5）の正答率は **86%**（決定境界の回で手計算した）
-- 右上がりの**斜め**ならもっと分けられそう — でも「斜め」は無限にある
-- どの斜めが**最適**かは、目では決められない
+- 目で見ると、**右上がりの斜め**ならもっと分けられそう
+
+
+## この線を求めたい
+
+```{python}
+#| echo: false
+#| fig-align: center
+#| classes: fig-medium
+bb = np.linspace(1.6, 10.4, 50)
+plt.figure(figsize=(6.5, 4.0))
+plt.scatter(salmon_brightness, salmon_weights, c="black", marker="o", s=35,
+            alpha=0.7)
+plt.scatter(seabass_brightness, seabass_weights, c="red", marker="s", s=35,
+            alpha=0.7)
+plt.plot(bb, 120 * bb + 1050, color="blue", linestyle="--", linewidth=2.5)
+plt.text(2.0, 2560, "線の上 → Salmon", fontsize=12, color="#2c3e50", fontweight="bold")
+plt.text(7.0, 1030, "線の下 → Sea bass", fontsize=12, color="#c0392b", fontweight="bold")
+plt.xlabel("輝度"); plt.ylabel("重さ (g)")
+plt.ylim(950, 2700)
+plt.title("手で引いた斜めの線　正答率 91%")
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+- 例えばこの線：正答率 **91%**（縦線は 86% だった）
+- **この線さえあれば、判別は「線の上か下か」だけ** — これが**決定境界**
+- ただし「斜め」は無限にある。最適の保証もない — **機械に求めさせたい**
+
+
+## この線は、回帰直線ではない
+
+```{python}
+#| echo: false
+#| fig-align: center
+weights_all = np.concatenate([salmon_weights, seabass_weights]).astype(float)
+rng = np.random.default_rng(42)
+lengths = np.round(np.cbrt(weights_all) * 4.5 + rng.normal(0, 1.0, len(weights_all)), 1)
+a_reg, b_reg = np.polyfit(lengths, weights_all, 1)
+
+fig, axes = plt.subplots(1, 2, figsize=(11, 3.8))
+gx = np.linspace(lengths.min(), lengths.max(), 50)
+axes[0].scatter(lengths, weights_all, alpha=0.6, s=30, c="#5dade2", edgecolors="gray")
+axes[0].plot(gx, a_reg * gx + b_reg, "r-", lw=2.5)
+axes[0].set_title("前回：回帰直線 — 点の真ん中を通る", fontsize=11)
+axes[0].set_xlabel("体長 (cm)"); axes[0].set_ylabel("重さ (g)")
+bb = np.linspace(1.6, 10.4, 50)
+axes[1].scatter(salmon_brightness, salmon_weights, c="black", marker="o", s=30, alpha=0.7)
+axes[1].scatter(seabass_brightness, seabass_weights, c="red", marker="s", s=30, alpha=0.7)
+axes[1].plot(bb, 120 * bb + 1050, "b--", lw=2.5)
+axes[1].set_title("今回：決定境界 — 点の間を通る", fontsize=11)
+axes[1].set_xlabel("輝度"); axes[1].set_ylabel("重さ (g)")
+for ax in axes:
+    ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+- 前回の線形回帰と**見た目はそっくり**。でも役割は**正反対**
+- **回帰直線**：点の**真ん中**を通る — 縦軸の値（重さ）を**予測する**線
+- **決定境界**：点の**間**を通る — 2クラスを**分ける**線。予測したい「魚の種類」は軸ではなく**色**で乗っている
 
 
 ## {background-color="white" .center .break-slide}
@@ -69,22 +130,53 @@ plt.show()
 :::
 
 
-## 直線を数式で持つ
+## これがロジスティック回帰（[Logistic Regression]{.en}）
+
+```{.d2 sketch="true" width="90%"}
+direction: right
+X: "入力\nx₁（輝度）\nx₂（重さ）" { style.fill: "#e1f5ff" }
+LR: "ロジスティック回帰" {
+  A: "Step 1\n線形結合＋バイアス\nz = α₁x₁ + α₂x₂ + b" { style.fill: "#fff4e1" }
+  S: "Step 2\nシグモイド\np = σ(z)" { shape: hexagon; style.fill: "#fdebd0" }
+  A -> S
+}
+P: "確率 p\n（0〜1）" { style.fill: "#d5f5e3" }
+X -> LR.A
+LR.S -> P
+```
+
+- 「最適な直線で、上か下かを判別する」機械 — それが**ロジスティック回帰**
+- 中身は**2ステップ**：Step 1 が**直線**、Step 2 が**確率** — 1つずつ開ける
+- `sklearn` の `LogisticRegression` が中でやっているのもこの計算
+
+::: {.callout-note title="「回帰」なのに分類？"}
+予測しているのが 0/1 のラベルではなく「Salmon である**確率**」という連続値だから。
+確率を回帰して、最後にしきい値 0.5 で分類している。
+:::
+
+
+## Step 1：線形結合＋バイアス
 
 $$z = \alpha_1 x_1 + \alpha_2 x_2 + b$$
 
 - $x_1, x_2$：入力（輝度、重さ）
 - $\alpha_1, \alpha_2$：**重み（[weight]{.en}）**（どの特徴量をどれだけ重視するか）
 - $b$：**バイアス（[bias]{.en}）**（全体のオフセット）
-
-### この式が「斜めの直線」を持っている
-
-- $z = 0$ になる点の集まりが、平面上の**斜めの直線** — これを決定境界にする
-- $z$ の**符号**が直線のどちら側か、**大きさ**が直線からの遠さ
-- $\alpha_1, \alpha_2, b$ を動かせば、直線は**どんな斜め・どんな位置**にもなる
+- 魚を1匹測って入れると、$z$ という**1つの数**が出てくる
 
 
-## $z$ を「確率」にする：シグモイド（[Sigmoid]{.en}）
+## 実は、見覚えのある式
+
+- $z = 0$ と置くと：
+
+$$\underbrace{\alpha_1}_{a}\, x_1 + \underbrace{\alpha_2}_{b}\, x_2 + \underbrace{\;b\;}_{c} = 0$$
+
+- 数学でおなじみの**直線の式 $ax + by + c = 0$** そのもの — さっきの斜めの線の正体はこれ（決定境界）
+- $z$ の**符号**が「線の上か下か」、**大きさ**が線からの遠さ
+- 求めたいのは結局、**この $a, b, c$（ここでは $\alpha_1, \alpha_2, b$）の3つの数** — これを機械に探させる
+
+
+## Step 2：$z$ を「確率」にする — シグモイド（[Sigmoid]{.en}）
 
 $$p = \sigma(z) = \frac{1}{1 + e^{-z}}$$
 
@@ -107,30 +199,6 @@ plt.show()
 - $p \geq 0.5$ → Salmon、$p < 0.5$ → Sea bass と判定
 - $z = 0$（＝決定境界の上）のとき、ちょうど $p = 0.5$
 - 判定だけなら $z$ の符号で足りるが、$p$ は「**どれくらい自信があるか**」まで持っている — これが後で学習の鍵になる
-
-
-## これがロジスティック回帰（[Logistic Regression]{.en}）
-
-```{.d2 sketch="true" width="90%"}
-direction: right
-X: "入力\nx₁（輝度）\nx₂（重さ）" { style.fill: "#e1f5ff" }
-LR: "ロジスティック回帰" {
-  A: "Step 1\n線形結合＋バイアス\nz = α₁x₁ + α₂x₂ + b" { style.fill: "#fff4e1" }
-  S: "Step 2\nシグモイド\np = σ(z)" { shape: hexagon; style.fill: "#fdebd0" }
-  A -> S
-}
-P: "確率 p\n（0〜1）" { style.fill: "#d5f5e3" }
-X -> LR.A
-LR.S -> P
-```
-
-- 枠で囲んだ**2ステップ**が**ロジスティック回帰** — 分類の定番モデル
-- `sklearn` の `LogisticRegression` が中でやっているのもこの計算
-
-::: {.callout-note title="「回帰」なのに分類？"}
-予測しているのが 0/1 のラベルではなく「Salmon である**確率**」という連続値だから。
-確率を回帰して、最後にしきい値 0.5 で分類している。
-:::
 
 
 ## 名前の由来 — 何が「ロジスティック」？
