@@ -220,7 +220,7 @@ rkskmt
 <h2>部品はすべて揃っている</h2>
 <div class="slide-body">
 <ul>
-<li>アフィン変換・ReLU・シグモイド・交差エントロピー（最小単位／変換を重ねるの回）</li>
+<li>線形変換・ReLU・シグモイド・交差エントロピー（ロジスティック回帰／変換を重ねるの回）</li>
 <li>勾配降下法（最適化の回）</li>
 <li>全パラメータの勾配を出す backprop（前回）</li>
 </ul>
@@ -244,7 +244,7 @@ rkskmt
 <section id="データあの三日月" class="slide level2">
 <h2>データ：あの三日月</h2>
 <div class="slide-body">
-<div id="a5ab7b5e" class="cell" data-execution_count="1">
+<div id="682292fd" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-3"><a></a><span class="im">import</span> japanize_matplotlib</span>
@@ -326,16 +326,16 @@ rkskmt
 <section id="forward4行" class="slide level2">
 <h2>Forward：4行</h2>
 <div class="slide-body">
-<div id="92b4dff9" class="cell" data-execution_count="2">
+<div id="f048631d" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a><span class="kw">def</span> forward(X, W1, b1, w2, c2):</span>
-<span id="cb3-2"><a></a>    Z <span class="op">=</span> X <span class="op">@</span> W1 <span class="op">+</span> b1          <span class="co"># アフィン変換（全変換まとめて）</span></span>
+<span id="cb3-2"><a></a>    Z <span class="op">=</span> X <span class="op">@</span> W1 <span class="op">+</span> b1          <span class="co"># 線形変換（全変換まとめて）</span></span>
 <span id="cb3-3"><a></a>    H <span class="op">=</span> np.maximum(<span class="dv">0</span>, Z)     <span class="co"># ReLU（折る）</span></span>
 <span id="cb3-4"><a></a>    u <span class="op">=</span> H <span class="op">@</span> w2 <span class="op">+</span> c2          <span class="co"># 出力層（多数決）</span></span>
 <span id="cb3-5"><a></a>    p <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>u)) <span class="co"># シグモイド（確率に）</span></span>
 <span id="cb3-6"><a></a>    <span class="cf">return</span> Z, H, u, p</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <ul>
-<li><a href="./nn-single-unit.html#peek-forward" class="peek">最小単位の回の <code>forward</code></a> と見比べると、<strong>スカラーが行列になっただけ</strong></li>
+<li><a href="./logistic-regression.html#peek-forward" class="peek">ロジスティック回帰の回の <code>forward</code></a> と見比べると、<strong>スカラーが行列になっただけ</strong></li>
 <li><span class="math inline">\(Z, H\)</span> も返すのは、<strong>復路（<span class="en">backprop</span>）で使うから</strong>（前回の伏線）</li>
 </ul>
 </div>
@@ -343,7 +343,7 @@ rkskmt
 <section id="backward前回の漸化式をそのまま書く" class="slide level2">
 <h2>Backward：前回の漸化式をそのまま書く</h2>
 <div class="slide-body">
-<div id="ca42c61e" class="cell" data-execution_count="3">
+<div id="a8afe696" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a></a><span class="kw">def</span> backward(X, y, Z, H, w2, p):</span>
 <span id="cb4-2"><a></a>    N <span class="op">=</span> <span class="bu">len</span>(X)</span>
 <span id="cb4-3"><a></a>    delta_out <span class="op">=</span> (p <span class="op">-</span> y) <span class="op">/</span> N                    <span class="co"># 出力層の誤差（p - y）</span></span>
@@ -367,7 +367,7 @@ rkskmt
 <section id="peek-nn-train" class="slide level2">
 <h2>学習ループ：あとは勾配降下法</h2>
 <div class="slide-body">
-<div id="fc190ac5" class="cell" data-execution_count="4">
+<div id="5ceb7e11" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">0</span>)</span>
 <span id="cb5-2"><a></a>hidden <span class="op">=</span> <span class="dv">16</span></span>
 <span id="cb5-3"><a></a>W1 <span class="op">=</span> rng.normal(<span class="dv">0</span>, <span class="fl">1.0</span>, (<span class="dv">2</span>, hidden))   <span class="co"># ランダム初期化（対称性を破る）</span></span>
@@ -406,7 +406,7 @@ rkskmt
 <section id="コールドオープン回収初回の図再現完了" class="slide level2">
 <h2>コールドオープン回収：初回の図、再現完了</h2>
 <div class="slide-body">
-<div id="46d443ad" class="cell" data-execution_count="5">
+<div id="29998b3b" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>描画コード</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a></a>xx, yy <span class="op">=</span> np.meshgrid(np.linspace(X[:, <span class="dv">0</span>].<span class="bu">min</span>() <span class="op">-</span> <span class="fl">0.4</span>, X[:, <span class="dv">0</span>].<span class="bu">max</span>() <span class="op">+</span> <span class="fl">0.4</span>, <span class="dv">300</span>),</span>
@@ -481,7 +481,7 @@ rkskmt
 </div>
 </div>
 </div>
-<div id="46df382f" class="cell" data-execution_count="6">
+<div id="d44b2063" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -548,7 +548,7 @@ rkskmt
 <div class="slide-body">
 <ul>
 <li>NumPy の行列演算で、<strong>forward 4行・backward 6行</strong>の多層ネットワークができた</li>
-<li>中身は既習の部品のみ：アフィン変換・ReLU・<span class="math inline">\((p-y)\)</span>・<span class="math inline">\(\delta\)</span> の漸化式・勾配降下法</li>
+<li>中身は既習の部品のみ：線形変換・ReLU・<span class="math inline">\((p-y)\)</span>・<span class="math inline">\(\delta\)</span> の漸化式・勾配降下法</li>
 <li>初回のコールドオープンの図を、自分のコードで再現した</li>
 </ul>
 <div title="次回予告">
@@ -598,7 +598,7 @@ rkskmt
 <section id="問題1の解答例" class="slide level2">
 <h2>問題1の解答例</h2>
 <div class="slide-body">
-<div id="c2ed414e" class="cell" data-execution_count="7">
+<div id="e1cda856" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a></a><span class="kw">def</span> cross_entropy(X, y, W1, b1, w2, c2):</span>

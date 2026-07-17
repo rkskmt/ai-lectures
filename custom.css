@@ -463,10 +463,15 @@ table td:first-child {
 /* Search button (created by search-ui.js at top:54px) moved to the bottom-right
    so the top-right corner is reserved for the badge. */
 #search-btn { top: auto !important; bottom: 14px !important; }
+/* Quarto's footer spans the viewport by default. Shrink-wrap the navigation so
+   the invisible remainder cannot intercept controls on a scrolled slide. */
 .reveal > .footer {
   display: flex !important;
   align-items: center;
   justify-content: center;
+  left: 50%;
+  width: fit-content;
+  transform: translateX(-50%);
   padding: 0 16px;
   height: auto !important;
   overflow: visible !important;
