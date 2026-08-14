@@ -7,7 +7,7 @@ subtitle: "勾配を全パラメータに届ける仕組み"
 
 - 変換を重ねると**曲がる境界**が作れる（ReLU の折り目）
 - 学習に必要なのは、**全パラメータの勾配** $\partial L / \partial \theta$
-- 前回は「誤差が逆向きに流れる」とだけ言って、種明かしを保留した
+- 前回は「誤差が逆向きに流れる」とだけ言って、仕組みの説明を保留した
 
 ::: {.callout-note title="今回の問い"}
 パラメータが5個、100個、100万個 — **全部の勾配**をどうやって計算する？
@@ -20,7 +20,7 @@ subtitle: "勾配を全パラメータに届ける仕組み"
 
 $$\frac{\partial L}{\partial \alpha_1} = \frac{\partial}{\partial \alpha_1} \left[ -\log \sigma\!\Big( w \cdot \mathrm{ReLU}(\alpha_1 x_1 + \alpha_2 x_2 + b) + c \Big) \right]$$
 
-::: {.callout-important title="クイズ"}
+::: {.callout-important title="質問"}
 パラメータは5個。この調子で5本の式を全部展開する？
 100層・100万パラメータになったら？
 :::
@@ -37,7 +37,7 @@ $$\frac{\partial L}{\partial \alpha_1} = \frac{\partial}{\partial \alpha_1} \lef
 
 $$y = f(g(x)) \quad \Rightarrow \quad \frac{dy}{dx} = \frac{dy}{dg} \cdot \frac{dg}{dx}$$
 
-::: {.callout-important title="クイズ（高校の道具の再確認）"}
+::: {.callout-important title="質問（高校の道具の再確認）"}
 $y = (3x+1)^2$ を、**展開せずに**微分すると？
 :::
 

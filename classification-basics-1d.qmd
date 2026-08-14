@@ -3,6 +3,71 @@ title: "機械学習 Classification"
 subtitle: "最も単純な２クラス分類"
 ---
 
+
+
+## このデータを分離する
+
+```{python}
+#| echo: false
+#| fig-align: center
+import numpy as np
+import matplotlib.pyplot as plt
+import japanize_matplotlib
+from sklearn.datasets import make_moons
+plt.rcParams["font.size"] = 11
+plt.rcParams["figure.dpi"] = 100
+
+X_moon, y_moon = make_moons(n_samples=200, noise=0.1, random_state=42)
+
+plt.figure(figsize=(5.5, 3.8))
+for cls, col, m in [(0, "#2980b9", "s"), (1, "#e74c3c", "o")]:
+    mask = y_moon == cls
+    plt.scatter(X_moon[mask, 0], X_moon[mask, 1], c=col, marker=m, s=25,
+                edgecolors="gray", lw=0.4)
+plt.xticks([]); plt.yticks([])
+plt.tight_layout()
+plt.show()
+```
+
+- 青と赤のデータを分離する**境界**を描きたい
+
+::: {.callout-important title="単純に考えると"}
+直線では分離不可能
+:::
+
+
+## 機械が自力で見つけた境界
+
+```{python}
+#| echo: false
+#| fig-align: center
+from sklearn.neural_network import MLPClassifier
+
+mlp = MLPClassifier(hidden_layer_sizes=(16,), activation="relu", solver="lbfgs",
+                    max_iter=5000, random_state=0).fit(X_moon, y_moon)
+
+xx, yy = np.meshgrid(np.linspace(X_moon[:, 0].min() - 0.4, X_moon[:, 0].max() + 0.4, 300),
+                     np.linspace(X_moon[:, 1].min() - 0.4, X_moon[:, 1].max() + 0.4, 300))
+Z = mlp.predict(np.c_[xx.ravel(), yy.ravel()]).reshape(xx.shape)
+
+plt.figure(figsize=(5.5, 3.8))
+plt.contourf(xx, yy, Z, alpha=0.25, levels=1, colors=["#5dade2", "#f5b7b1"])
+for cls, col, m in [(0, "#2980b9", "s"), (1, "#e74c3c", "o")]:
+    mask = y_moon == cls
+    plt.scatter(X_moon[mask, 0], X_moon[mask, 1], c=col, marker=m, s=25,
+                edgecolors="gray", lw=0.4)
+plt.xticks([]); plt.yticks([])
+plt.tight_layout()
+plt.show()
+```
+
+- 数式も規則も**誰も教えていない**。データを見せただけで、機械がこの境界を自力で見つけた
+
+::: {.callout-note title="この講義の約束"}
+最終回までに、この仕組みを**中身から全部**自分の手で組み立てる。
+ブラックボックスは残さない。
+:::
+
 ## 分類問題
 
 ### 目標
@@ -47,7 +112,7 @@ Salmon と Sea bass の**2クラス識別(2-class classification)**問題
 ::: {.columns .columns-tight}
 ::: {.column width="60%" .column-center}
 ```{.d2 sketch="true" width="100%"}
-direction: right
+direction: down
 A: ベルトコンベアに魚を流す { style.fill: "#e1f5ff" }
 B: 途中で重さを測定 { style.fill: "#fff4e1" }
 D: 何かしらの判定器 { shape: diamond; style.fill: "#ffd9d9" }
@@ -65,7 +130,7 @@ D -> F: Sea bass
 
 
 
-## 試行1: 重さだけで分類してみる
+## 重さだけで分類してみる
 
 ### アプローチ
 
@@ -120,7 +185,7 @@ pip install pandas numpy matplotlib scikit-learn
 ```{python}
 
 #| echo: true
-#| code-fold: true
+#| code-fold: false
 #| code-summary: "全体を表示"
 
 # Setup
@@ -170,7 +235,7 @@ plt.show()
 ```{python}
 #| echo: true
 #| fig-align: center
-#| code-fold: true
+#| code-fold: false
 #| code-summary: "code"
 print(f"Salmon   - 最小: {min(salmon_weights)}g, 最大: {max(salmon_weights)}g, 平均: {np.mean(salmon_weights):.0f}g")
 print(f"Sea bass - 最小: {min(seabass_weights)}g, 最大: {max(seabass_weights)}g, 平均: {np.mean(seabass_weights):.0f}g")
@@ -181,9 +246,9 @@ if overlap_max >= overlap_min:
 ```
 
 :::{.callout-warning}
-## 発見
+## ここまでで分かること
 - **双峰型の分布**：2つの山が見える
-  -  **重なっている** が、まあ分けられそう？
+  -  **かなり重なっている** が、まあ分けてみましょう
 :::
 
 ## 境界線（閾値）を考える
@@ -191,12 +256,14 @@ if overlap_max >= overlap_min:
 大体でいいので **しきい値（[threshold]{.en}）** を設定する。
 
 ### 方針
+
 **1800g以上** → Salmon
+
 **1800g未満** → Sea bass
 
 この判定ルールで分類してみる。
 
-## 青破線で切ったとしたら
+## 青の破線で切ったとしたら
 
 ```{python}
 #| echo: false
@@ -230,10 +297,10 @@ plt.show()
 
 | 実際の魚 | 判定結果 | 略称 | 説明 |
 |----|----|------|--------|
-| Salmon | Salmon | **TP** (True Positive) | **正しく**Salmonと判定 |
-| Sea bass | Sea bass | **TN** (True Negative) | **正しく**Salmonでは**ない**と判定 |
-| Sea bass | Salmon | **FP** (False Positive) | **誤って**Salmonと判定 |
-| Salmon | Sea bass | **FN** (False Negative) | Salmonを**見逃し** |
+| Salmon | Salmon | **TP** (True Positive) | **正しくSalmon**と判定 |
+| Sea bass | Sea bass | **TN** (True Negative) | **正しくSalmonではない**と判定 |
+| Sea bass | Salmon | **FP** (False Positive) | **誤ってSalmon**と判定 |
+| Salmon | Sea bass | **FN** (False Negative) | **Salmonを見逃し** |
 
 
 ## TP/FP/TN/FNの覚え方
@@ -248,7 +315,7 @@ plt.show()
 ```{.d2 sketch="true" width="78%"}
 direction: right
 J: "判定器の出力" { style.fill: "#e1f5ff" }
-P: "Positive\n（Salmon だ）" { style.fill: "#fff4e1" }
+P: "Positive\n（Salmon である）" { style.fill: "#fff4e1" }
 N: "Negative\n（Salmon ではない）" { style.fill: "#fff4e1" }
 TP: "TP" { style.fill: "#d5f5e3" }
 FP: "FP" { style.fill: "#f5b7b1" }
@@ -396,10 +463,10 @@ print(df.to_string(index=False))
 ```
 
 :::{.callout-important}
-- **境界を下げる（1600g）** → Recall ↑、Precision ↓  
+- **決定境界の閾値を下げる（1600g）** → Recall ↑、Precision ↓  
   - Salmonを逃さない（FN減）が、Sea bassの誤判定（FP増）
   
-- **境界を上げる（2000g）** → Precision ↑、Recall ↓  
+- **決定境界の閾値を上げる（2000g）** → Precision ↑、Recall ↓  
   - Salmon判定の信頼性は高いが、Salmonを見逃す（FN増）
 :::
 
@@ -482,9 +549,10 @@ precision = TP / (TP + FP) if (TP + FP) > 0 else 0
 recall = TP / (TP + FN) if (TP + FN) > 0 else 0
 ```
 
-FP=`{python} FP`, FN=`{python} FN`
-**Precision**: `{python} f"{precision:.1%}"` (高い)  
-**Recall**: `{python} f"{recall:.1%}"` (低い)
+- FP=`{python} FP`
+- FN=`{python} FN`
+- **Precision**: `{python} f"{precision:.1%}"` (高い)  
+- **Recall**: `{python} f"{recall:.1%}"` (低い)
 
 :::
 
@@ -564,10 +632,10 @@ print(cost_df.to_string(index=False))
 :::
 
 
-## 試行1の結論
+## 重さだけで分類した結論
 
 :::{.callout-important}
-## 重要なポイント
+## 重要ポイント
 
 1. **重さだけでは完全な分類は不可能**
    - データの分布が重なっている
@@ -576,7 +644,7 @@ print(cost_df.to_string(index=False))
    - 正解/不正解ではなく、用途に応じた最適化（[optimization]{.en}）
    
 3. **評価指標はトレードオフ**
-   - Precision ↑ → Recall ↓
+   - 例：Precision ↑ だと Recall ↓
    - どちらを重視するかは用途次第
 :::
 

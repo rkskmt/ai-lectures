@@ -3,7 +3,7 @@ title: "次元の呪いと次元削減"
 subtitle: "特徴量を増やし続けると何が起きるか"
 ---
 
-## ここまでの流れ
+## 特徴量の数を増やすのが最強か？
 
 - **重さだけ**でサーモンを分類 → ある程度できた
 - **輝度も追加**して2次元で分類 → 精度が上がった
@@ -36,13 +36,13 @@ subtitle: "特徴量を増やし続けると何が起きるか"
 :::
 
 
-## クイズ：いちばん近い点まで、どれくらい？
+## 質問：いちばん近い点まで、どれくらい？
 
 - 各特徴量は 0〜1 に正規化してあるとする（各軸の長さ＝1）
 - そこに**100個の点**をランダムにばらまく
 - **1次元**なら、いちばん近い点までの距離はだいたい **0.003**（ぎゅうぎゅう）
 
-::: {.callout-important title="クイズ"}
+::: {.callout-important title="質問"}
 特徴量を増やして **10次元** にしたら、いちばん近い点までの距離はいくつになると思う？
 
 （各軸の長さは1のまま。点の数も100個のまま）
@@ -317,7 +317,7 @@ print("体長（先頭5匹）:", lengths[:5], "cm")
 print(f"体長の範囲: {lengths.min():.1f}〜{lengths.max():.1f} cm")
 ```
 
-::: {.callout-important title="クイズ"}
+::: {.callout-important title="質問"}
 特徴量が 2 → 3 に増えた。**手に入る情報も 1.5 倍**になったと思う？
 :::
 
@@ -613,7 +613,7 @@ $$A \mathbf{v} = \lambda \mathbf{v} \qquad \text{（向きはそのまま、長�
 
 ## A の正体：回して・伸ばして・戻す
 
-種明かし：この $A$ は、おなじみの**回転行列**と**軸ごとの伸縮**だけで組み立ててありました。
+実は、この $A$ は、おなじみの**回転行列**と**軸ごとの伸縮**だけで組み立ててありました。
 
 $$A = R\, S\, R^{\mathsf T}, \qquad
 R = \begin{pmatrix} \cos 45^\circ & -\sin 45^\circ \\ \sin 45^\circ & \cos 45^\circ \end{pmatrix}, \qquad
@@ -780,7 +780,7 @@ print("SVD から出した分散:", (S**2 / (len(Xc) - 1)).round(4))   # ↑の�
 ## {background-color="white" .center .break-slide}
 
 ::: {.break-title}
-授業内コアへ戻る：PCAを使う
+PCAを使う
 :::
 
 
@@ -802,7 +802,7 @@ for i, r in enumerate(pca.explained_variance_ratio_):
     print(f"  PC{i+1}: {r:.1%}")
 ```
 
-::: {.callout-important title="クイズ"}
+::: {.callout-important title="質問"}
 PC3 の寄与率は **1% 未満**。これは何を意味している？
 :::
 
