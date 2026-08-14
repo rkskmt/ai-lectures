@@ -216,7 +216,7 @@ Mermaid は使わない（D2 に移行済み）。
 
 ## 参考ドキュメント
 
-- [doc/course-arc.md](doc/course-arc.md) — 講義全体のアーク設計・各回の仕様
+- [doc/measured-log.md](doc/measured-log.md) — スライド断定数値の実測ログ（新しい数値はまず tools/ で測ってここへ）
 - [doc/engaging-lecture-design.md](doc/engaging-lecture-design.md) — 講義設計の装置（コールドオープン、問いかけ→めくり等）
 - [doc/slide-tone-rules.md](doc/slide-tone-rules.md) — スライドの語り口ルール（機能ラベルのタイトル、ゲーム語彙禁止、正確さ優先）
 - [doc/troubleshooting.md](doc/troubleshooting.md) — CSS変更時の注意点（編集すべき custom.css の場所、キャッシュ）

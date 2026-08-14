@@ -61,5 +61,5 @@
 ## 関連
 
 - [engaging-lecture-design.md](engaging-lecture-design.md) — 講義設計の装置（問いかけ→めくり 等）
-- [course-arc.md](course-arc.md) — コース全体のアーク設計
-- リポジトリ直下の CLAUDE.md — 文レベルの日本語・スライド記法の規約はそちら
+- [measured-log.md](measured-log.md) — スライド断定数値の実測ログ
+- リポジトリ直下の CLAUDE.md — 文レベルの日本語・スライド記法・執筆方針の規約はそちら
