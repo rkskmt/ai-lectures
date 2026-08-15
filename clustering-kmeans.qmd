@@ -460,9 +460,6 @@ plt.show()
 
 ## k-means の限界
 
-TODO：同心円が同心円にみえないので、もっと分離したデータでつくりなおす
-
-
 ```{python}
 #| echo: false
 #| fig-align: center
@@ -470,17 +467,21 @@ from sklearn.datasets import make_circles, make_moons
 
 fig, axes = plt.subplots(1, 2, figsize=(9, 3.5))
 
-for ax, (make_fn, title) in zip(axes, [
-    (make_circles, "同心円（k-means は苦手）"),
-    (make_moons,   "三日月形（k-means は苦手）")
+X_circ, _ = make_circles(n_samples=200, noise=0.04, factor=0.4, random_state=42)
+X_moon, _ = make_moons(n_samples=200, noise=0.05, random_state=42)
+
+for ax, (X_ex, title) in zip(axes, [
+    (X_circ, "同心円（k-means は苦手）"),
+    (X_moon, "三日月形（k-means は苦手）")
 ]):
-    X_ex, _ = make_fn(n_samples=200, noise=0.05, random_state=42)
-    km_ex   = KMeans(n_clusters=2, random_state=42, n_init=10)
-    labs    = km_ex.fit_predict(X_ex)
+    km_ex = KMeans(n_clusters=2, random_state=42, n_init=10)
+    labs  = km_ex.fit_predict(X_ex)
     for c_id, col in enumerate(["#e74c3c", "#2980b9"]):
         ax.scatter(X_ex[labs == c_id, 0], X_ex[labs == c_id, 1],
                    c=col, s=20, alpha=0.7)
-    ax.set_title(title, fontsize=10); ax.axis("off")
+    ax.set_title(title, fontsize=10)
+    ax.set_aspect("equal")
+    ax.axis("off")
 
 plt.suptitle("k-means は球状クラスタを仮定している", fontsize=11)
 plt.tight_layout()

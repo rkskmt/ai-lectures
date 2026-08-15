@@ -11,14 +11,16 @@ subtitle: "約束の回収"
 import numpy as np
 import matplotlib.pyplot as plt
 import japanize_matplotlib
-from sklearn.datasets import load_digits
+from torchvision import datasets, transforms
 plt.rcParams["font.size"] = 11
 plt.rcParams["figure.dpi"] = 100
 
-digits = load_digits()
+transform_preview = transforms.ToTensor()
+mnist_preview = datasets.MNIST(root="data", train=True, download=True,
+                               transform=transform_preview)
 fig, axes = plt.subplots(2, 8, figsize=(10, 2.8))
-for ax, img, label in zip(axes.flat, digits.images, digits.target):
-    ax.imshow(img, cmap="gray_r")
+for ax, (img, label) in zip(axes.flat, mnist_preview):
+    ax.imshow(img.squeeze(), cmap="gray_r")
     ax.set_title(str(label), fontsize=10)
     ax.axis("off")
 plt.tight_layout()
@@ -27,8 +29,8 @@ plt.show()
 
 > 最終回までに、この仕組みを**中身から全部**自分の手で組み立てる。ブラックボックスは残さない。
 
-- 今日が最終回。**手書き数字を読み取る機械**を完成させる
-- 必要な部品は、ここまでの13回で**すべて自作済み**
+- **手書き数字を読み取る機械**を完成させる
+- 必要な部品は、ここまでに自作するか手計算で中身を確認してきた
 
 
 ## データ：MNIST
@@ -64,15 +66,62 @@ plt.show()
 ```
 
 
+## 訓練6万枚とテスト1万枚の役割
+
+| データ | 学習中にすること | 目的 |
+|---|---|---|
+| 訓練データ 60,000枚 | 損失を計算し、重みを更新する | パターンを学ぶ |
+| テストデータ 10,000枚 | 予測して採点するだけ | 未知の字にも通用するか測る |
+
+- テスト画像の正解を使って重みを更新してはいけない
+- 訓練画像だけ覚えても、初めて見る人の字を読めなければ役に立たない
+- このデッキで報告する「96%以上」は、学習に使っていない1万枚での正答率
+
+::: {.takeaway}
+訓練は練習問題、テストは初見の試験。役割を混ぜずに評価する
+:::
+
+
 ## 画像は784次元のベクトル
 
 - 28 × 28 = **784個の数字の並び** — モデルにとって画像は784次元のベクトル
-- 魚は2次元（輝度・重さ）だった。[次元の呪いの回で遊んだ高次元](dimensionality-pca.qmd#peek-curse){.peek}が、**本物の入力**としてやってきた
+- 魚は2次元（輝度・重さ）だった。[次元の呪いの回で扱った高次元](dimensionality-pca.qmd#peek-curse){.peek}が、**本物の入力**として現れる
 - `nn.Flatten()` が「画像 → ベクトル」の変換をやる
+
+```{python}
+#| echo: true
+import torch
+import torch.nn as nn
+
+sample = torch.zeros(1, 1, 28, 28)  # 1枚ぶんのダミー画像
+flat = nn.Flatten()(sample)
+print("変換前:", tuple(sample.shape))
+print("変換後:", tuple(flat.shape))
+```
 
 ::: {.callout-note}
 784次元でも、やることは魚の2次元と**完全に同じ**：
 特徴量ベクトル → 変換を重ねる → 確率 → 損失 → 勾配降下。
+:::
+
+
+## 1画素は0〜1の数値になる
+
+`transforms.ToTensor()` は、元画像の0〜255を0〜1へ変換する：
+
+$$x_{\rm tensor}=\frac{x_{\rm pixel}}{255}$$
+
+| 元の画素値 | tensorの値 | この画像での意味 |
+|---:|---:|---|
+| 0 | 0.0 | 背景 |
+| 128 | 約0.50 | 中間の濃さ |
+| 255 | 1.0 | 強い筆跡 |
+
+- 784個の特徴量は、各場所にどれくらい筆跡があるかを表す
+- 入力の尺度をそろえると、勾配降下法が扱いやすい
+
+::: {.callout-note}
+画像として見えていても、モデルへ入る時点では0〜1の数値784個
 :::
 
 
@@ -91,6 +140,29 @@ $$\mathrm{softmax}(u_k) = \frac{e^{u_k}}{\sum_{j} e^{u_j}}
 
 - 損失は多クラス版の交差エントロピー：正解クラスの確率 $p_{\text{正解}}$ に対して $-\log p_{\text{正解}}$（[あの −log のカーブ](logistic-regression.qmd#peek-neglog){.peek}の10クラス版）
 - PyTorch では `nn.CrossEntropyLoss` がソフトマックスごとやってくれる（打ち消しの恩恵もそのまま）
+
+
+## スコアを実際にソフトマックスへ入れる
+
+- 3クラスのスコアを $u=(2.0,\,1.0,\,0.1)$ とする：
+
+$$e^u=(e^2,e^1,e^{0.1})\approx(7.389,\,2.718,\,1.105)$$
+
+- 分母は3つの合計：
+
+$$7.389+2.718+1.105=11.213$$
+
+- それぞれを合計で割る：
+
+$$\mathrm{softmax}(u)
+\approx\left(\frac{7.389}{11.213},
+             \frac{2.718}{11.213},
+             \frac{1.105}{11.213}\right)
+\approx(0.66,\,0.24,\,0.10)$$
+
+::: {.takeaway}
+指数関数で全スコアを正にし、合計で割って「合計1の確率分布」にする
+:::
 
 
 ## ソフトマックスの仕事ぶり
@@ -120,7 +192,27 @@ plt.show()
 - 合計 1 の「自信の配分」になる — 10クラスなら10個のスコアを10個の確率に
 
 
-## モデル：見慣れた3層
+## `CrossEntropyLoss` はsoftmax込み
+
+```{python}
+#| echo: true
+import torch
+import torch.nn as nn
+
+logits = torch.tensor([[2.0, 1.0, 0.1]])  # 1件・3クラスのスコア
+target = torch.tensor([0])                 # 正解はクラス0
+loss_fn_demo = nn.CrossEntropyLoss()
+
+print("確率:", torch.softmax(logits, dim=1))
+print("損失:", loss_fn_demo(logits, target))
+```
+
+- モデルはsoftmax前のスコア `logits` をそのまま渡す
+- `CrossEntropyLoss` の中でsoftmaxと $-\log p_{\text{正解}}$ が計算される
+- 予測ラベルは、最大スコアの位置 `logits.argmax(dim=1)` で求められる
+
+
+## モデル：784 → 128 → 10
 
 ```{python}
 #| echo: true
@@ -150,9 +242,34 @@ I -> F -> L1 -> R -> L2 -> O
 
 - 魚のロジスティック回帰はパラメータ**3個**だった。いまや**10万個** — それでも学習ループは同じ3拍子
 
+$$\underbrace{784\times128+128}_{\text{第1層}}
++\underbrace{128\times10+10}_{\text{出力層}}
+=101{,}770$$
+
 ::: {.callout-note title="Adam — 最適化回の伏線回収"}
-勾配降下法の回で名前だけ出た「学習率を自動で加減する改良版」。
-中身は勾配降下法そのもの（勾配の使い方が少し賢いだけ）。大きなネットでは標準装備。
+- Adam は、勾配の履歴を使ってパラメータごとに歩幅を調整する最適化手法
+- `zero_grad → backward → step` の形は、SGD と同じ
+:::
+
+
+## 128枚がモデルを通るときの形
+
+```text
+入力画像          (128, 1, 28, 28)
+   ↓ Flatten
+784次元ベクトル   (128, 784)
+   ↓ Linear + ReLU
+中間表現          (128, 128)
+   ↓ Linear
+10クラスのlogits  (128, 10)
+```
+
+- 先頭の `128` は、どの段でもミニバッチ内の画像枚数
+- 最後の `10` は数字0〜9それぞれのスコア
+- 正解ラベル `y_batch` の形は `(128,)`。各画像につき整数が1個
+
+::: {.takeaway}
+モデルは1枚ずつの式を、128枚ぶん並行して計算する
 :::
 
 
@@ -168,9 +285,33 @@ test_loader  = torch.utils.data.DataLoader(test_ds,  batch_size=1000)
 
 loss_fn   = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+
+preview_generator = torch.Generator().manual_seed(123)
+preview_loader = torch.utils.data.DataLoader(
+    train_ds, batch_size=128, shuffle=False, generator=preview_generator
+)
+x_batch, y_batch = next(iter(preview_loader))
+print("画像バッチ:", tuple(x_batch.shape))
+print("ラベルバッチ:", tuple(y_batch.shape))
 ```
 
 - ロジスティック回帰の回で[「魚を1匹ずつ見せる」](logistic-regression.qmd#peek-one-at-a-time){.peek}とやったのと同じ発想（あちらはバッチサイズ1）
+
+
+## 1エポックで約469回更新する
+
+訓練画像60,000枚を128枚ずつに分けると：
+
+$$\left\lceil\frac{60{,}000}{128}\right\rceil=469\ \text{ミニバッチ}$$
+
+- 最初の468バッチは128枚、最後の1バッチは96枚
+- **1ミニバッチごとに** `zero_grad → backward → step` を1回実行する
+- したがって3エポックでは、約 $469\times3=1{,}407$ 回更新する
+- `shuffle=True` により、各エポックで画像の順番を入れ替える
+
+::: {.callout-note}
+「3エポック」は3回しか更新しないという意味ではない。全データを3周し、その途中で約1,407歩進む
+:::
 
 
 ## 学習する {#peek-mnist-train}
@@ -178,18 +319,22 @@ optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 ```{python}
 #| echo: true
 for epoch in range(1, 4):
+    loss_sum = 0.0
     for x_batch, y_batch in train_loader:
         optimizer.zero_grad()
         loss = loss_fn(model(x_batch), y_batch)
         loss.backward()
         optimizer.step()
+        loss_sum += loss.item() * len(x_batch)
 
     # テストデータ（見ていない1万枚）で採点 — 過学習と汎化の回の鉄則
     correct = 0
     with torch.no_grad():
         for x_batch, y_batch in test_loader:
             correct += (model(x_batch).argmax(dim=1) == y_batch).sum().item()
-    print(f"エポック {epoch} | テスト正答率: {correct / len(test_ds):.2%}")
+    train_loss = loss_sum / len(train_ds)
+    print(f"エポック {epoch} | 訓練Loss: {train_loss:.4f} "
+          f"| テスト正答率: {correct / len(test_ds):.2%}")
 ```
 
 - 見たことのない手書き1万枚を、**96%以上**の精度で読めるようになった
@@ -207,9 +352,9 @@ for epoch in range(1, 4):
 | 中間をもう1段重ねる | `nn.Linear(784, 128), nn.ReLU(), nn.Linear(128, 128), nn.ReLU(), nn.Linear(128, 10)` |
 :::
 
-::: {.callout-tip}
 ## ここで観察
 
+::: {.callout-tip}
 - どの変更が「テスト正答率1%」あたりのコスパが良い？　97%の壁、98%の壁はどこで破れる？
 - 伸びが止まったら**訓練データの正答率**も出して比べてみる — ギャップが開き始めたら、それは見覚えのある現象（過学習）
 :::
@@ -424,9 +569,9 @@ x = torch.tensor(x28).unsqueeze(0).unsqueeze(0)
 print("予測:", model(x).argmax(dim=1).item())
 ```
 
-::: {.callout-tip}
 ## うまく読めないとき
 
+::: {.callout-tip}
 - **太いペンで、大きく**書く（MNISTの字は線が太い）。紙は白く、明るい場所で撮る
 - それでも読めない字は「間違いを眺める」の仲間入り — 訓練データの字と自分の字の**分布の違い**が原因
 - 精度96%とは「**100枚中4枚は間違える**」という意味でもある。1枚読ませて外れても、それはこの機械の正直な実力
@@ -447,7 +592,7 @@ print("予測:", model(x).argmax(dim=1).item())
 | テストデータで採点 | 汎化を測る鉄則 | 過学習と汎化 |
 
 ::: {.callout-note title="約束の回収"}
-**ブラックボックス、ゼロ。** 全部品を手で作るか、手計算で検算済み。
+各部品が、どの数式・微分・更新に対応するかを説明できる。
 :::
 
 
@@ -485,5 +630,5 @@ print("予測:", model(x).argmax(dim=1).item())
 - 最後に、**手書き数字を読む機械**を自分の部品で組み上げた
 
 ::: {.callout-note title="持ち帰り"}
-「自分の字は読めるのか」のデモを、ぜひ家で。読めたら勝ち、読めなくても**なぜかを説明できる** — それがこの講義の到達点。
+「自分の字は読めるのか」のデモを家でも試せる。読めなかった場合も、訓練データとの違いから理由を考えられる。
 :::

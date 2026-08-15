@@ -43,7 +43,7 @@ subtitle: "決定境界と決定木"
 | 境界 | しきい値 | ？？ |
 
 
-## データの準備
+## 対象データ
 
 新しく輝度のデータを追加した（各40匹）。
 
@@ -78,7 +78,7 @@ seabass_brightness = [5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8,
 
 ## 準備
 
-必要なライブラリをインポートする。
+ライブラリをインポートと
 
 ```{python}
 #| echo: true
@@ -90,20 +90,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 import japanize_matplotlib
 import pandas as pd
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix
 
 # Matplotlib settings
 plt.rcParams["font.size"] = 11
 plt.rcParams["figure.dpi"] = 100
 
-# データをnumpy配列に変換
+# numpy配列にキャスト
 salmon_weights = np.array(salmon_weights)
 salmon_brightness = np.array(salmon_brightness)
 seabass_weights = np.array(seabass_weights)
 seabass_brightness = np.array(seabass_brightness)
 
-# 特徴量行列とラベルを作成
+# 特徴量行列およびラベルの作成
 X = np.vstack([
     np.column_stack([salmon_brightness, salmon_weights]),
     np.column_stack([seabass_brightness, seabass_weights])
@@ -194,20 +192,19 @@ plt.show()
 
 ## この縦線の性能は？
 
-- 判定ルール：**輝度 < 5.5 → Salmon、5.5 以上 → Sea bass**（Salmon を陽性とする）
-- 前の図で、線からはみ出した点を数えて、**混同行列を埋めよ**（各クラス40匹）
-   - 線の**右側**の黒丸 … 見逃した Salmon（FN）
-   - 線の**左側**の赤四角 … Salmon 扱いした Sea bass（FP）
+- 判定ルール：
+   - 輝度 < 5.5 → Salmon
+   - 5.5 以上 → Sea bass  **（Salmon を陽性とする）**
+- 線からはみ出した点を数えた**混同行列**（各クラス40匹）
+   - 線の**右側**の黒丸： 見逃した Salmon（FN）
+   - 線の**左側**の赤四角：Salmon 扱いした Sea bass（FP）
    - 残りが TP と TN
 
-::: {.fragment .table-compact}
-答え：
 
 |            | 予測Salmon | 予測Sea bass |
 |------------|------------|--------------|
 | 実際Salmon | **TP = 35** | FN = 5       |
 | 実際Sea bass | FP = 6     | **TN = 34**  |
-:::
 
 
 ## 答え合わせ：コードで数える
@@ -355,34 +352,69 @@ print("\n→ 加重平均が最小の閾値を選ぶ")
 
 
 ::: {.callout-tip}
-**実際は全てのユニーク値**（80個以上）を試して、最小を見つける。
+**実際は全てのユニーク値**を試して、最小を見つける。
 :::
 
 
-TODO：この後に結果のスライドを追加
+## 結果：全部の閾値を試す
 
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "code"
+#| fig-align: center
+
+# 輝度の全ユニーク値を閾値候補として総当たり
+thresholds, ginis = [], []
+for threshold in np.unique(X[:, 0]):
+    left_mask  = X[:, 0] < threshold
+    right_mask = ~left_mask
+    if sum(left_mask) == 0 or sum(right_mask) == 0:
+        continue
+    g = (sum(left_mask)  * gini_impurity(y[left_mask]) +
+         sum(right_mask) * gini_impurity(y[right_mask])) / len(y)
+    thresholds.append(threshold)
+    ginis.append(g)
+
+best_i = int(np.argmin(ginis))
+plt.figure(figsize=(7, 4))
+plt.plot(thresholds, ginis, "o-", color="#2980b9", markersize=4)
+plt.scatter([thresholds[best_i]], [ginis[best_i]], color="#e74c3c", s=120,
+            zorder=3, label=f"best: {thresholds[best_i]:.2f}")
+plt.xlabel("閾値（輝度）")
+plt.ylabel("加重平均ジニ不純度")
+plt.legend()
+plt.grid(True, alpha=0.4)
+plt.tight_layout()
+plt.show()
+
+print(f"最良の閾値: {thresholds[best_i]:.2f}（加重平均ジニ不純度 {ginis[best_i]:.3f}）")
+```
+
+::: {.callout-tip}
+## 結果
+
+- 最良は**輝度 5.00**（加重平均ジニ不純度 0.167）— 目で引いた 5.5 より少し左
+- 5.00 の縦線での誤分類は **8匹**（正答率 90.0%）。5.5 の 11匹（86.3%）より3匹良い
+:::
 
 
 ## 決定木のアルゴリズム（縦横交互）
 
-### ルール：特徴量を交互に使う
+自作版は簡単のため、使う特徴量を**輝度→重さの交互**に固定する（縦・横の分割を重ねて、階段状の境界を作る）。
 
-TODO：ここに具体的アルゴリズムを書く。いま、閾値の話とクラスの話と、分割後の領域の中での閾値探索の話がごっちゃになっている。図から見直し
-
-- ある特徴でGini不純度最適化の閾値
-
-1回目は輝度、2回目は重さ、3回目は輝度...と**交互に使う**ことで、階段状の境界を作る。
- 
-
+1. **全データ**を対象に、輝度のユニーク値を閾値候補として総当たりし、**加重平均ジニ不純度が最小**の閾値で左右に分割
+2. できた左右**それぞれの領域のデータだけ**で、こんどは重さの閾値を同じ方法で探して分割
+3. 決めた深さで打ち切り。**各領域は、その中の多数派クラスで判定**する
 
 ```{.d2 sketch="true" width="82%"}
 direction: right
-C: "分割される閾値候補を\n全部試して、各閾値のジニ不純度を記録" { style.fill: "#e1f5ff" }
-G: "ジニ不純度が\n最小の分割を採用" { style.fill: "#fff4e1" }
-R: "２つの特徴で\n繰り返し" { style.fill: "#fff4e1" }
-E: "N回（深さ上限） or\nこれ以上きれいにならない\n→ 終了" { style.fill: "#d5f5e3" }
+C: "いまの領域のデータだけで\n閾値候補を総当たり" { style.fill: "#e1f5ff" }
+G: "加重平均ジニ不純度が\n最小の閾値で2分割" { style.fill: "#fff4e1" }
+R: "できた各領域で\n特徴量を替えて繰り返し" { style.fill: "#fff4e1" }
+E: "深さ上限に達したら終了\n各領域は多数派クラスで判定" { style.fill: "#d5f5e3" }
 C -> G -> R
-R -> C: 次の段へ {style.stroke-dash: 3}
+R -> C: 領域ごとに {style.stroke-dash: 3}
 R -> E
 ```
 
@@ -575,14 +607,11 @@ def predict_alternating(brightness, weight):
 # 全データで予測
 y_pred_alternating = np.array([predict_alternating(X[i, 0], X[i, 1]) for i in range(len(X))])
 
-# 混同行列
-from sklearn.metrics import confusion_matrix
-cm = confusion_matrix(y, y_pred_alternating)
-
-TP = cm[1, 1]
-TN = cm[0, 0]
-FP = cm[0, 1]
-FN = cm[1, 0]
+# 混同行列（縦線のときと同じ手数え）
+TP = np.sum((y == 1) & (y_pred_alternating == 1))
+TN = np.sum((y == 0) & (y_pred_alternating == 0))
+FP = np.sum((y == 0) & (y_pred_alternating == 1))
+FN = np.sum((y == 1) & (y_pred_alternating == 0))
 
 # 評価指標
 accuracy_alt = (TP + TN) / (TP + TN + FP + FN)
@@ -606,27 +635,19 @@ print(f"  Recall:    {recall_alt:.3f}")
 
 ## scikit-learnの決定木と比較
 
-### 比較
-
-TODO：以下を綺麗に表にする
-
-- 自作の決定木：深さ2、交互分割
-- ライブラリの実装：**深さ3**、最良特徴量を選択
-
-:::{.callout-note}
-## 違い
-- **自作版**: 深さ2まで、輝度→重さと交互に使う
-- **scikit-learn**: 深さ3まで、毎回最良の特徴量を自動選択
-- → scikit-learnの方が**より細かい階段**になる
-
-TODO:scikit-learnのimportはここでやる。前にかいてるのは消せ
-
-:::
+|  | 自作の決定木 | scikit-learn の決定木 |
+|---|---|---|
+| 深さ | 2 | 3 |
+| 分割に使う特徴量 | 輝度→重さ、交互で固定 | 毎回、最良の特徴量を自動選択 |
+| できる境界 | 粗い階段 | より細かい階段 |
 
 ```{python}
 #| echo: true
 #| code-fold: true
 #| code-summary: "code"
+
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score, precision_score, recall_score
 
 # 決定木モデル（深さ3まで）
 tree_model = DecisionTreeClassifier(max_depth=3, random_state=42)
@@ -697,60 +718,29 @@ plot_decision_boundary(tree_model, X, y,
 
 ## 手動 vs 決定木
 
-
-TODO：折り返していて見にくいので、もっとうまく表現する
-
-:::: {.columns}
-
-::: {.column width="50%"}
-### 手動の直線
-
-**メリット:**
-- 単純で、理由を説明しやすい
-- データを**目で見る**過程が入る
-
-**デメリット:**
-- 最適である保証がない
-- 特徴量が3つ以上になると目で見えない
-- 自動化できない
-:::
-
-::: {.column width="50%"}
-### 決定木
-
-**メリット:**
-- 解釈しやすい（if-thenルール）
-- 自動で最適化（ジニ不純度）
-
-**デメリット:**
-- 過学習（[overfitting]{.en}）しやすい
-- 階段状の境界のみ
-:::
-
-::::
+|  | 手動の直線 | 決定木 |
+|---|---|---|
+| 境界の決め方 | 目で見て引く（データを眺める過程が入る） | ジニ不純度で自動最適化 |
+| 説明のしやすさ | 単純で、理由を説明しやすい | if-then ルールとして読める |
+| 特徴量が3つ以上 | 目で見えなくなる | そのまま扱える |
+| 弱点 | 最適の保証がない・自動化できない | 過学習（[overfitting]{.en}）しやすい・境界は階段状のみ |
 
 
 ## 性能比較表
 
-
-TODO：ずれてて見にくいので、直す。
-
 ```{python}
 #| echo: false
+#| output: asis
 
 y_pred_hand = (X[:, 0] < lightness_threshold).astype(int)
 accuracy_hand  = accuracy_score(y, y_pred_hand)
 precision_hand = precision_score(y, y_pred_hand)
 recall_hand    = recall_score(y, y_pred_hand)
 
-comparison_df = pd.DataFrame({
-    "モデル": ["手動の縦線（輝度 5.5）", "決定木（深さ3）"],
-    'Accuracy': [f"{accuracy_hand:.3f}", f"{accuracy_tree:.3f}"],
-    'Precision': [f"{precision_hand:.3f}", f"{precision_tree:.3f}"],
-    'Recall': [f"{recall_hand:.3f}", f"{recall_tree:.3f}"]
-})
-
-print(comparison_df.to_string(index=False))
+print("| モデル | Accuracy | Precision | Recall |")
+print("|---|---|---|---|")
+print(f"| 手動の縦線（輝度 5.5） | {accuracy_hand:.3f} | {precision_hand:.3f} | {recall_hand:.3f} |")
+print(f"| 決定木（深さ3） | {accuracy_tree:.3f} | {precision_tree:.3f} | {recall_tree:.3f} |")
 ```
 
 :::{.callout-important}
@@ -835,6 +825,7 @@ plt.show()
 #| code-summary: "code"
 
 # 決定木（深さ3）の混同行列
+from sklearn.metrics import confusion_matrix
 cm = confusion_matrix(y, y_pred_tree)
 
 TP = cm[1, 1]  # Salmon correctly classified as Salmon

@@ -19,10 +19,28 @@ subtitle: "自分で書けるから、楽をしていい"
 :::
 
 
+## NumPy版のどこをPyTorchへ任せるのか
+
+| NumPy版で自分で書いたもの | PyTorchで担当するもの |
+|---|---|
+| パラメータ配列と初期化 | `nn.Linear` |
+| `forward(...)` | `model(X)` |
+| `backward(...)` | `loss.backward()` |
+| `parameter -= lr * gradient` | `optimizer.step()` |
+| 勾配配列の管理 | 各パラメータの `.grad` |
+
+- モデルの計算内容は変わらない
+- 手で書いていた定型処理を、検証済みの部品へ任せる
+
+::: {.takeaway}
+PyTorchは別の学習原理ではない。NumPyで書いた**同じ計算を管理してくれる道具**
+:::
+
+
 ## PyTorch とは
 
-- ディープラーニングの**業界標準ライブラリ**のひとつ
-- 今日使う機能は実質2つだけ
+- ディープラーニングで広く使われるライブラリのひとつ
+- このデッキで使う中心機能は2つ
   - **autograd**：backward を自動でやってくれる
   - **nn**：層・損失・最適化の部品セット
 
@@ -47,6 +65,28 @@ print(t.numpy())      # NumPy 配列との相互変換も簡単
 - 違いは2つ：**GPU に載せられる**こと、そして**勾配を覚えられる**こと
 
 
+## tensor は形・型・置き場所を持つ
+
+```{python}
+#| echo: true
+import torch
+
+x = torch.tensor([[1.0, 2.0], [3.0, 4.0]], dtype=torch.float32)
+print("shape :", x.shape)
+print("dtype :", x.dtype)
+print("device:", x.device)
+```
+
+| 属性 | この例 | 意味 |
+|---|---|---|
+| `shape` | `(2,2)` | 配列の形 |
+| `dtype` | `float32` | 数値の型 |
+| `device` | `cpu` | 計算する装置 |
+
+- モデルの重みと入力は、原則として同じ `dtype`・同じ `device` に置く
+- ニューラルネットワークの入力と重みには通常 `float32` を使う
+
+
 ## requires_grad：勾配を覚える印
 
 - まず**いちばん小さな例**で挙動を見る。$y = x^2$ の $x = 3$ での微分は、高校の答えなら $2x = 6$
@@ -66,7 +106,28 @@ print(x.grad)
 - $x^2$ で当たるのは当たり前？ — 次で、**前回1往復ぶん手計算したネットワーク**に同じことをやらせる
 
 
-## 山場：autograd が手計算を言い当てる
+## forward中に計算グラフが作られる
+
+```{.d2 sketch="true" width="92%"}
+direction: right
+X: "x\nrequires_grad" { style.fill: "#e1f5ff" }
+M: "× 3" { style.fill: "#fff4e1" }
+A: "+ 1" { style.fill: "#fff4e1" }
+S: "2乗" { style.fill: "#fdebd0" }
+Y: "y" { style.fill: "#d5f5e3" }
+X -> M -> A -> S -> Y
+```
+
+- `y = ((x * 3) + 1) ** 2` を実行すると、演算のつながりも記録される
+- `y.backward()` は「2乗 → 足し算 → 掛け算」の逆順に局所微分を適用する
+- Pythonで書いた実際のforwardに応じて、その場でグラフが作られる
+
+::: {.callout-note}
+層を組み替えても、PyTorchが新しい計算グラフを記録するため、backwardを手で書き直さなくてよい
+:::
+
+
+## autograd を手計算と照合する
 
 - バックプロパゲーションの回と**まったく同じ**ネットワーク・同じ数値を流す
 
@@ -95,7 +156,23 @@ print(f"∂L/∂c = {c.grad.item():.4f}")
 
 ::: {.callout-note title="答え合わせ"}
 手計算（とNumPy検算）の答えは α: $(-0.2438, -0.1219)$、b: $-0.2438$、w: $-0.1463$、c: $-0.4875$。
-**全桁一致。** `loss.backward()` の中身は、前回自分の手でやった連鎖律の機械化にすぎない。
+**表示した小数第4位まで一致。** `loss.backward()` の中身は、前回自分の手でやった連鎖律の機械化。
+:::
+
+
+## `.grad` に入るのは学習したい値
+
+- `a, b, w, c`：人が用意したパラメータで `requires_grad=True`
+- `z, h, u, p, L`：forward中に作られた途中の値
+- `L.backward()` 後、学習に使う勾配は `a.grad`, `b.grad`, `w.grad`, `c.grad` に保存される
+
+| 種類 | 例 | 通常 `.grad` を残すか |
+|---|---|---|
+| 葉（[leaf tensor]{.en}） | `a`, `b`, `w`, `c` | 残す |
+| 中間結果 | `z`, `h`, `u`, `p` | 計算には使うが通常は残さない |
+
+::: {.takeaway}
+計算グラフは全勾配を計算するために使い、optimizerが必要とするパラメータの `.grad` を残す
 :::
 
 
@@ -110,6 +187,49 @@ print(f"∂L/∂c = {c.grad.item():.4f}")
 ::: {.callout-tip}
 ブラックボックスとして使うのと、中身を知って使うのは別物。
 われわれは**中身を手で再現済み**なので、堂々と楽をしてよい。
+:::
+
+
+## `BCEWithLogitsLoss` は2部品をまとめる
+
+- **logit（ロジット）** $u$：シグモイドへ入れる前の、範囲制限のないスコア
+- `BCEWithLogitsLoss`：シグモイドと2クラス交差エントロピーを1つにした損失関数
+
+$$u \xrightarrow{\;\sigma\;} p
+\xrightarrow{\;\text{交差エントロピー}\;} L$$
+
+```{python}
+#| echo: true
+import torch
+import torch.nn as nn
+
+logits = torch.tensor([-2.0, 0.0, 2.0])
+targets = torch.tensor([0.0, 1.0, 1.0])
+loss_each = nn.BCEWithLogitsLoss(reduction="none")
+
+print("確率:", torch.sigmoid(logits))
+print("損失:", loss_each(logits, targets))
+```
+
+- モデルは $u$ をそのまま損失関数へ渡す
+- 確率を表示・判定するときだけ `torch.sigmoid(u)` を使う
+
+
+## なぜ確率ではなくlogitを直接渡すのか
+
+数式上は、次の2通りは同じ：
+
+```text
+u → sigmoid → BCELoss
+u ─────────→ BCEWithLogitsLoss
+```
+
+- $|u|$ が大きいと、シグモイドの結果は計算機上で0や1へ極端に近づく
+- その後に `log(p)` や `log(1-p)` を計算すると、丸め誤差や `log(0)` が起きやすい
+- `BCEWithLogitsLoss` は同じ式を、数値的に安定する形へまとめて計算する
+
+::: {.callout-important}
+学習時は **raw logitsを損失へ**。確率が必要な表示・判定時だけ `torch.sigmoid`
 :::
 
 
@@ -145,7 +265,30 @@ X -> L1 -> R -> L2 -> O
 | `torch.optim.SGD` | 勾配降下法（`θ -= lr * grad`） |
 | `loss.backward()` | バックプロパゲーション |
 
-- **新しい概念はゼロ**。全部、名前が付いただけ
+- どの部品も、ここまでに自作・手計算したものと対応する
+
+
+## `nn.Module` がパラメータを登録する
+
+- `nn.Linear` の `weight` と `bias` は、自動的に学習対象として登録される
+- `nn.ReLU` には学習する数字がないので、登録パラメータはない
+- `nn.Sequential` は、入れた順に部品を呼び出す1つのモデル
+
+```python
+for name, parameter in model.named_parameters():
+    print(name, parameter.shape)
+```
+
+```text
+0.weight  torch.Size([16, 2])
+0.bias    torch.Size([16])
+2.weight  torch.Size([1, 16])
+2.bias    torch.Size([1])
+```
+
+::: {.callout-note}
+名前の `0` と `2` は `Sequential` 内の位置。`1` はパラメータを持たない ReLU
+:::
 
 
 ## nn.Linear の中身を覗く
@@ -171,6 +314,70 @@ print(x @ lin.weight.T + lin.bias)   # 自分で計算しても、同じ
 - `requires_grad=True` も最初から付いている（`nn` の部品は学習される前提）
 
 
+## このモデルの学習対象は65個
+
+```text
+Linear(2 → 16) : 2×16 個の重み + 16 個のバイアス = 48
+Linear(16 → 1) : 16×1 個の重み +  1 個のバイアス = 17
+----------------------------------------------------------
+合計                                                  65
+```
+
+Pythonでも確認できる：
+
+```python
+sum(p.numel() for p in model.parameters())  # 65
+```
+
+- `model.parameters()` は、この65個をまとめてoptimizerへ渡す
+- ネットワークを組み替えると、登録される数も自動で変わる
+
+
+## `optimizer.step()` が勾配降下の1歩
+
+```{python}
+#| echo: true
+import torch
+
+theta = torch.tensor(2.0, requires_grad=True)
+optimizer_demo = torch.optim.SGD([theta], lr=0.1)
+
+loss = theta ** 2
+loss.backward()
+print("勾配:", theta.grad)       # 2θ = 4
+
+optimizer_demo.step()
+print("更新後:", theta)          # 2 − 0.1 × 4 = 1.6
+```
+
+$$\theta \leftarrow \theta-0.1\frac{dL}{d\theta}
+=2-0.1\times4=1.6$$
+
+- `loss.backward()`：勾配を計算して `.grad` に入れる
+- `optimizer.step()`：その勾配を使ってパラメータを更新する
+
+
+## optimizerはパラメータへの参照を持つ
+
+```python
+optimizer = torch.optim.SGD(model.parameters(), lr=0.5)
+```
+
+- `model.parameters()`：更新対象をoptimizerへ渡す
+- `lr=0.5`：学習率 $\eta$
+- `step()`：各パラメータについて `parameter -= lr * parameter.grad`
+
+| 呼び出し | パラメータ | `.grad` |
+|---|---|---|
+| `loss.backward()` | 変えない | 計算して足す |
+| `optimizer.step()` | 更新する | 読むだけ |
+| `optimizer.zero_grad()` | 変えない | 0に戻す |
+
+::: {.takeaway}
+微分・更新・リセットは別の仕事。3つの命令を順番に呼ぶ
+:::
+
+
 ## 学習ループ：3拍子 {#peek-train-loop}
 
 ```{python}
@@ -194,11 +401,35 @@ for i in range(1, 4001):
     optimizer.step()             # ③ 勾配降下で1歩
 
     if i in (1, 100, 500, 2000, 4000):
-        acc = ((torch.sigmoid(logits) >= 0.5).float() == y_t).float().mean()
-        print(f"更新 {i:5d}回 | Loss: {loss.item():.4f} | 正答率: {acc.item():.1%}")
+        with torch.no_grad():
+            logits_log = model(X_t)
+            loss_log = loss_fn(logits_log, y_t)
+            acc = ((torch.sigmoid(logits_log) >= 0.5).float() == y_t).float().mean()
+        print(f"更新 {i:5d}回 | Loss: {loss_log.item():.4f} | 正答率: {acc.item():.1%}")
 ```
 
 - NumPy 版と同じく **100%**。`zero_grad → backward → step` の3拍子はどんなネットでも同じ
+
+
+## 入力・出力・正解の形をそろえる
+
+| tensor | 形 | 意味 |
+|---|---|---|
+| `X_t` | `(200,2)` | 200匹 × 2特徴量 |
+| `logits` | `(200,1)` | 200匹 × 出力スコア1個 |
+| `y_t` | `(200,1)` | 200匹 × 正解1個 |
+
+```python
+y_t = torch.tensor(y, dtype=torch.float32).unsqueeze(1)
+```
+
+- 元の `y` は `(200,)`。`unsqueeze(1)` で列を1本追加する
+- `BCEWithLogitsLoss` へ渡す `logits` と `y_t` は同じ形にする
+- 2クラスBCEの正解は0/1の**浮動小数点数**として渡す
+
+::: {.callout-tip}
+エラーが出たら、まず `X_t.shape`, `logits.shape`, `y_t.shape` を表示する
+:::
 
 
 ## 3拍子の①は、なぜ要る？
@@ -257,8 +488,28 @@ plt.tight_layout()
 plt.show()
 ```
 
-- NumPy 版で書いた forward / backward 計60行ほどが、PyTorch では**学習ループ込みで十数行**
+- NumPy 版で自分で書いた微分処理を、PyTorchでは `loss.backward()` に任せられる
 - 浮いた労力は、**モデルとデータを考えること**に使う
+
+
+## 推論では計算グラフを作らない
+
+学習後に予測するだけなら、復路は不要：
+
+```python
+model.eval()
+with torch.no_grad():
+    logits = model(grid)
+    probabilities = torch.sigmoid(logits)
+```
+
+| モード | forwardの履歴 | backward | パラメータ更新 |
+|---|---|---|---|
+| 学習 | 記録する | する | する |
+| 推論 | `no_grad()`で記録しない | しない | しない |
+
+- 履歴を作らないぶん、推論はメモリを節約できる
+- `model.eval()` は Dropout などを推論用の動作へ切り替える。今回の Linear＋ReLU では出力は変わらないが、習慣にしてよい
 
 
 ## 学習後の16人の票を読む
@@ -286,9 +537,9 @@ plt.show()
 | 学習率を下げる | `lr=0.05` |
 :::
 
-::: {.callout-tip}
 ## ここで観察
 
+::: {.callout-tip}
 - 変換2個：「変換を重ねる」の回では2個でも分けられたのに、ここでは**87%止まり**（`torch.manual_seed(3)` だと50%まで転落）。表現力はあっても、**良い谷にたどり着けるかは別問題** — 16個の「余裕」は学習の保険でもある（[ローカルミニマムの罠](optimization-local-minima-appendix.qmd)）
 - `nn.Identity()`：折り目ゼロ — **境界が直線に戻り、87%で頭打ち**。「線形は重ねても線形」を PyTorch でも再確認
 - どれを変えても、学習ループの3拍子は**一切書き換えない**で済む — それが部品化の威力
@@ -297,7 +548,7 @@ plt.show()
 
 ## まとめ
 
-- **autograd**：`loss.backward()` ＝ 連鎖律の自動化。手計算と全桁一致を確認した
+- **autograd**：`loss.backward()` ＝ 連鎖律の自動化。表示した小数第4位まで手計算と一致
 - **nn の部品**は全部、この講義で自作した部品の別名（対応表）
 - 学習ループは `zero_grad → backward → step` の3拍子
 - 中身を知っているから、安心して楽ができる
@@ -316,7 +567,7 @@ plt.show()
 
 バックプロパゲーションの回の**練習問題1**（$x = (0.5, 1.0)$、$y = 0$、$\alpha = (0.4, 0.3)$、$b = -0.1$、$w = -0.5$、$c = 0.2$）を PyTorch で組み、`loss.backward()` の勾配が自分の手計算と一致することを確かめよ。
 
-1. 本編の「山場」のコードを、上の数値に差し替える（正解が $y = 0$ なので損失は $L = -\log(1-p)$）
+1. 本編の「autograd を手計算と照合する」のコードを、上の数値に差し替える（正解が $y = 0$ なので損失は $L = -\log(1-p)$）
 2. 5つの勾配を表示し、手計算の答え $(-0.125, -0.25)$、$-0.25$、$0.2$、$0.5$ と照合せよ
 
 ### 問題2：ReLU に折られた入力でも試す
@@ -355,5 +606,5 @@ hand_check(0.5, 1.0)    # 問題1：手計算 (-0.125, -0.25), -0.25, 0.2, 0.5 �
 hand_check(-1.0, 0.5)   # 問題2：α, b, w の勾配はゼロになるはず
 ```
 
-- 問題1：**全桁一致**。autograd は連鎖律の機械化であって、魔法ではない
+- 問題1：表示した小数第4位まで一致。autograd は連鎖律を自動で適用している
 - 問題2：$\mathrm{ReLU}'(z) = 0$ の「ゼロで潰す」まで、忠実に再現される
