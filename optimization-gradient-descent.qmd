@@ -1,49 +1,160 @@
 ---
 title: "最適化と勾配降下法"
-subtitle: "fit() の中身を開ける"
+subtitle: "fit() の実態"
 ---
 
-## 2本目の幹へ
+## 今回のテーマ
 
-| ここまで | ここから |
+| 前回まで | 今回から |
 |---|---|
-| `fit()` を使って境界・重心・主成分を見つけた | ==`fit()` の中身を自分で作る== |
+| `fit()` を使って境界・重心・主成分を見つけた | [`fit()` の中身を自分で作る]{.hl} |
 | 学習後のモデルを観察した | 数字が学習される途中を追う |
 
-::: {.callout-important title="開ける問い"}
-損失が小さくなる数字を、機械はどうやって見つける？
+::: {.callout-important title="前半のテーマ"}
+損失が小さくなる数字を、機械はどうやって見つけているのか？
 :::
 
+## `fit()` の謎
 
-## `fit()` の中では何が起きているのか
-
-- 分類の回からずっと、この1行に頼ってきた
+- 今までscikitを使用した学習はいつも `fit()` の1行に頼ってきた
+  - しかし、中身は謎のまま
 
 ```python
-model.fit(X, y)   # ← この中で何が起きている？
+DecisionTreeClassifier(max_depth=3).fit(X, y)   # 決定木で分類
+KMeans(n_clusters=3).fit(X)                     # クラスタリング
+PCA(n_components=2).fit(X)                      # 次元削減
 ```
 
-- `fit()` の仕事：パラメータを動かして、**損失（ダメさの点数）が最小になる場所**を探すこと
-- つまり中身の正体は**最適化**
 
-::: {.callout-note title="今回の問い"}
-「関数の最小値を探す」を、機械はどうやってやるのか？
+::: {.callout-note}
+## 分かっていること
+なぜか `fit()` を通すと学習が完了している
 :::
 
 
-## パラメータとは？
+## `fit()` はモデルのパラメータを決める
 
-- モデルの中にある、**自由に動かせる数字**のこと
-- 実は、これまでの講義はずっと「パラメータを選ぶ作業」だった
+- `fit()` の仕事：データから、モデル内部の**パラメータ**を決めること
+- 多くのモデルでは、評価基準が最も良くなるパラメータを探す**最適化**として表せる
+
+::: {.callout-note title='学習とはパラメータという数字を決めること'}
+
+- **損失（[loss]{.en}）**：**ダメさ**を測る物差し。低いほど良い。
+- **パラメータ**：モデル（深さ2の決定木とか3-meansとか）の学習中に更新されていく値。学習が終われば固定
+- **損失関数（[loss function]{.en}）**：パラメータを入力したらlossを返す関数
+- **最適化**：lossを最小化する良い感じのパラメータを決める行為。**最適**とはいっているが、本当に最も適した**最高の値ではなく**、それっぽい値でも最適化と呼ぶ
+- **学習**：データからパラメータを決めること。多くのモデルでは最適化によって実現する
+:::
+
+
+## 損失関数を図で見る
+
+- 1次元分類のしきい値で考える。パラメータは**しきい値1個**
+- しきい値を1つ決めると、**誤分類の数（＝損失）**が1つ決まる
+- 右は**損失関数**のグラフ
+  - 横軸：パラメータ（しきい値）
+  - 縦軸：損失（誤分類の数）
+
+```{python}
+#| echo: false
+#| fig-align: center
+import numpy as np
+import matplotlib.pyplot as plt
+import japanize_matplotlib
+plt.rcParams["font.size"] = 11
+plt.rcParams["figure.dpi"] = 100
+
+# Same fish weights as the 1D-classification lecture (redefined identically in a later cell)
+salmon_weights  = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,
+                            1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,
+                            2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,
+                            1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652])
+seabass_weights = np.array([1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,
+                            1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,
+                            1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,
+                            1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531])
+
+def n_errors(t):
+    # predict salmon when weight >= t
+    return int((salmon_weights < t).sum() + (seabass_weights >= t).sum())
+
+thresholds = np.arange(1050, 2560, 10)
+losses = np.array([n_errors(t) for t in thresholds])
+best_t = int(thresholds[np.argmin(losses)])
+
+fig, axes = plt.subplots(1, 2, figsize=(11, 3.8))
+
+# Left: the familiar picture — the threshold is the parameter
+ax = axes[0]
+bins = np.arange(1000, 2600, 100)
+ax.hist(salmon_weights, bins=bins, histtype="step", lw=2, color="#e74c3c", label="Salmon")
+ax.hist(seabass_weights, bins=bins, histtype="step", lw=2, color="#2980b9", label="Sea bass")
+for t, col, ls in [(1600, "black", "--"), (2000, "gray", ":")]:
+    ax.axvline(t, color=col, ls=ls, lw=2)
+    ax.text(t, ax.get_ylim()[1] * 0.97, f"{t}g", ha="center", va="top",
+            fontsize=9, fontweight="bold", bbox=dict(fc="white", ec="none", alpha=0.8))
+ax.set_xlim(1000, 2600)
+ax.set_xlabel("重さ (g)"); ax.set_ylabel("匹数")
+ax.set_title("パラメータ＝しきい値の位置", fontsize=11)
+ax.legend(fontsize=9)
+ax.grid(True, alpha=0.3)
+
+# Right: the same thresholds, replotted on the loss axis
+ax = axes[1]
+ax.plot(thresholds, losses, color="#8e44ad", lw=2)
+for t, col in [(1600, "black"), (2000, "gray")]:
+    ax.scatter(t, n_errors(t), c=col, s=70, zorder=4)
+    ax.annotate(f"{t}g → {n_errors(t)}匹", (t, n_errors(t)),
+                textcoords="offset points", xytext=(10, 6), fontsize=9)
+ax.axvline(best_t, color="green", ls="--", alpha=0.5)
+ax.scatter(best_t, losses.min(), marker="*", c="green", s=180, zorder=5)
+ax.annotate(f"谷底：{best_t}g（誤分類{losses.min()}匹）", (best_t, losses.min()),
+            textcoords="offset points", xytext=(10, -16), fontsize=9, color="green")
+ax.set_xlim(1000, 2600)
+ax.set_ylim(0, losses.max() + 6)
+ax.set_xlabel("しきい値 (g) ＝ パラメータ"); ax.set_ylabel("誤分類の数 ＝ 損失")
+ax.set_title("損失関数：しきい値を入れると損失が返る", fontsize=11)
+ax.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-note title="要するに"}
+- 最小化する最適化問題は、グラフの**谷底探し**として考えられる
+:::
+
+
+## パラメータ
+
+- モデルの中にある、**自由に動かせる数字群（つまり変数）**のこと
+- モデルによって方法は違うが、評価基準が良くなるパラメータを決めている
 
 | 回 | モデル | パラメータ |
 |---|---|---|
-| 1次元分類 | しきい値で判定 | しきい値（数字1個） |
-| 2次元の決定境界 | 直線で判定 | 傾きと切片（数字2個） |
-| クラスタリング | k-means | 重心の座標（k個ぶん） |
+| 1次元分類 | しきい値で判定 | 重さのしきい値（変数1つ） |
+| 2次元の決定境界 | 直線で判定 | 傾きと切片（変数2つ） |
+| クラスタリング | k-means | 重心の座標リスト（N次元の変数k個） |
 
 
-## パラメータは図の中に見えている
+
+
+
+::: {.callout-caution}
+## kはハイパーパラメータ
+- k-meansのkは、ユーザが関数に与える変数、つまりプログラミングの意味では「パラメータ」だが、ハイパーパラメータ（[hyperparameter]{.en}）と呼ばれる
+   - つまり、学習中に更新されないからパラメータではない
+- 逆に、表題のパラメータ、最適化の過程で更新される側（k-meansなら重心の座標）は、学習可能パラメータ（[trainable parameter]{.en} / [learnable parameter]{.en}）と呼ばれる。
+   - モデルパラメータ（[model parameter]{.en}）という呼び方もある
+   - とはいえ**普通はこれをパラメータと呼ぶ**
+:::
+
+
+
+
+
+
+## 可視化されたパラメータ例
 
 ```{python}
 #| echo: false
@@ -109,13 +220,10 @@ plt.tight_layout()
 plt.show()
 ```
 
-- パラメータを変える ＝ **図の中で境界が動く**
-- 値しだいで正答率が大きく変わる
+- パラメータを変える ＝ **図の境界線が変わる**
+- 値によって正答率が大きく変わる
 
-::: {.callout-note}
-**学習とは、パラメータという数字を決めること。**
-どの値が良いかを測る物差しが**損失関数（[loss function]{.en}）**、良い値を探す手段が今日の**最適化**。
-:::
+
 
 
 ## 最適化問題とは
@@ -124,55 +232,29 @@ plt.show()
 
 これまで学んだ手法も、裏ではすべて**最適化問題**を解いていた：
 
-- **しきい値分類**: 誤分類が最も少なくなる場所にしきい値を置く
+- **しきい値による分類**: 誤分類が最も少なくなる場所にしきい値を置く
 - **k-means**: 各点から中心までの距離の合計（inertia）を最小にする
-- **さっきの境界**: 損失関数を最小にするパラメータを探す
+- **境界**: 損失関数を最小にするパラメータを探す
 
 ::: {.callout-note title="機械学習 = 最適化"}
 「どうパラメータを調整すれば、最も良い結果が得られるか？」を数値的に解く
 :::
 
-### 今回扱う問題
 
-次の関数の最小値を求めます：
+## 最適化の方法はモデルごとに違う
 
-$$f(x) = x^2 - 4x + 3$$
+| モデル | パラメータを決める主な方法 |
+|---|---|
+| 決定木 | 分割候補を順番に比較する |
+| k-means | 所属クラスタと重心の更新を交互に繰り返す |
+| PCA | 線形代数の計算で主成分を求める |
+| 回帰・ニューラルネットワーク | 勾配を使って損失を小さくする |
+
+::: {.callout-note title="ここから扱う方法"}
+すべての `fit()` が勾配降下法を使うわけではない。ここからは、回帰やニューラルネットワークで中心となる**勾配降下法**を学ぶ
+:::
 
 
-
-数学的には簡単だが、今回は**数値的に**（機械のやり方で）解く。
-
-### 今回の目標
-
-1. **勾配降下法（[gradient descent]{.en}）**を手計算で1ステップずつ実行し、Pythonでも実装する
-2. 唯一の調整つまみ「**学習率（[learning rate]{.en}）**」を変えて、収束・発散の違いを確かめる
-
-
-## 準備：Pythonのセットアップ
-
-```{python}
-#| echo: true
-import numpy as np
-import matplotlib.pyplot as plt
-import japanize_matplotlib
-
-# 日本語表示設定（必要に応じて）
-plt.rcParams["font.size"] = 11
-plt.rcParams["figure.dpi"] = 100
-```
-
-### 関数の定義
-
-```{python}
-#| echo: true
-def f(x):
-    """目的関数 f(x) = x^2 - 4x + 3"""
-    return x**2 - 4*x + 3
-
-def f_prime(x):
-    """1次微分 f'(x) = 2x - 4"""
-    return 2*x - 4
-```
 
 ## {background-color="white" .center .break-slide}
 
@@ -180,18 +262,65 @@ def f_prime(x):
 勾配降下法
 :::
 
-## 勾配降下法とは
 
-### 基本的な考え方
+## 目標
 
- 1. 現在地点での**傾き（勾配, [gradient]{.en}）**を測る
- 2. 傾きの**逆方向**に少し進む
- 3. また傾きを測る
- 4. 繰り返して最小値を探す
+1. **勾配降下法（[gradient descent]{.en}）**を手計算で1ステップずつ実行し、Pythonでも実装する
+2. 今回注目する主な調整値「**学習率（[learning rate]{.en}）**」を変えて、収束・発散の違いを確かめる
+
+
+### 今回やってみる対象
+
+次の関数の最小値を求める：
+
+$$f(x) = x^2 - 4x + 3$$
+
+数学的には簡単だが、今回は**数値的に**（機械のやり方で）解く。
+
+
+## 勾配降下法には滑らかな損失関数が必要
+
+- 先ほどの「誤分類の数」は、しきい値を少し動かしても値が変わらない
+- 段差のある関数では、足元の傾きから進む方向を判断できない
+- 勾配降下法では、傾きを計算できる**滑らかな損失関数**を使う
+- 分類では、誤分類数の代わりに滑らかな**代理損失（[surrogate loss]{.en}）**を使うことがある
+
+::: {.callout-note title="この例で確かめること"}
+まずは滑らかな二次関数 $f(x)=x^2-4x+3$ を使い、勾配降下法の動きだけに注目する
+:::
+
+
+
+## 基本方針：今いる位置から徐々に谷底を目指す
+
+- 今回の $f(x) = x^2 - 4x + 3$ なら、グラフを描けば最小値は $x = 2$ と一目で分かる
+- しかし実際の機械学習では、パラメータが多数ある。損失関数のグラフは**描けない**
+- グラフ全体が見えなくても、いまの位置 $x$ で**計算できる値**はある：
+  - 関数の値 $f(x)$
+  - 傾き $f'(x) = 2x - 4$
+
+::: {.callout-note title="今回の主題"}
+足元の**傾き（勾配, [gradient]{.en}）**だけを頼りに、一歩ずつ谷底へ降りるのが**勾配降下法**
+:::
+
+
+## 傾きの符号で進む方向が決まる
+
+- $x = 0$ から出発する。ここでの傾きは $f'(0) = 2 \cdot 0 - 4 = -4$
+- 傾きが**負** ＝ この場所では、右へ少し動くと $f(x)$ が下がる（下り坂は右）
+- 谷底に近づくには、傾きの**逆方向**（傾きが負なら右）へ少し進めばよい
 
 ```{python}
 #| echo: false
 #| fig-align: center
+#| classes: fig-small
+# Redefined identically (and visibly) in the implementation cell later
+def f(x):
+    return x**2 - 4*x + 3
+
+def f_prime(x):
+    return 2*x - 4
+
 xr_gd = np.linspace(-1.2, 5.2, 200)
 
 plt.figure(figsize=(6.5, 3.2))
@@ -211,20 +340,37 @@ plt.tight_layout()
 plt.show()
 ```
 
-**キーワード**: 少しずつ、手探りで
+::: {.callout-note title="要するに"}
+進んだ先でまた傾きを測れば、次の一歩も決まる。**繰り返せば谷底に近づく**
+:::
 
-### アルゴリズム
 
-**更新式:**
+## 更新式
+
+「傾きの逆方向に、少し進む」を式で書く：
+
 $$x_{\text{new}} = x - \alpha \cdot f'(x)$$
 
 - $x$: 現在の位置
-- $f'(x)$: 勾配（傾き）
-- $\alpha$: **学習率**（どれくらい進むか）
+- $f'(x)$: 傾き（勾配）
+- $\alpha$: **学習率**。1歩の大きさを決める正の数
 - $x_{\text{new}}$: 次の位置
 
 ::: {.callout-warning}
-**学習率$\alpha$は自分で決める必要がある**（これが難しい）
+**学習率 $\alpha$ は自分で決める必要がある**（これが難しい）
+:::
+
+
+## マイナスが「逆方向」を実現する
+
+更新式 $x_{\text{new}} = x - \alpha \cdot f'(x)$ を、傾きの符号で場合分けする：
+
+- 傾きが**負**（下り坂は右）→ $-\alpha \cdot f'(x)$ は**正** → 右へ進む
+- 傾きが**正**（下り坂は左）→ $-\alpha \cdot f'(x)$ は**負** → 左へ進む
+- 傾きが**0**（谷底）→ $-\alpha \cdot f'(x)$ も $0$ → 動かない
+
+::: {.callout-note title="要するに"}
+進む向きの場合分けは不要。**同じ式を繰り返すだけ**で谷底に近づいていく
 :::
 
 
@@ -412,54 +558,121 @@ plt.show()
 :::
 
 
-## 勾配降下法：Python実装
+## 勾配降下法の実装例
+
+- 手計算で使った更新式を、そのまま `for` 文で繰り返す
 
 ```{python}
 #| echo: true
-# 初期設定
+def f(x):
+    return x**2 - 4*x + 3
+
+def f_prime(x):
+    return 2*x - 4
+
 x = 0.0
-alpha = 0.3  # 学習率
+alpha = 0.3
+max_iter = 10
+tolerance = 0.01
 
-print("勾配降下法で最小値を求める")
-print("=" * 60)
+for iteration in range(1, max_iter + 1):
+    gradient = f_prime(x)
+    x = x - alpha * gradient
+    print(f"反復{iteration}: x = {x:.4f}")
 
-for iteration in range(1, 11):
-    print(f"\n--- 反復 {iteration} ---")
-    print(f"現在の x = {x:.4f}")
-    
-    # 関数値
-    fx = f(x)
-    print(f"f(x) = {fx:.4f}")
-    
-    # 勾配
-    fp = f_prime(x)
-    print(f"f'(x) = {fp:.4f}")
-    
-    # 更新
-    step = alpha * fp
-    x_new = x - step
-    
-    print(f"\n更新:")
-    print(f"  ステップ幅 = α × f'(x) = {alpha} × {fp:.4f} = {step:.4f}")
-    print(f"  x_new = {x:.4f} - {step:.4f} = {x_new:.4f}")
-    
-    x = x_new
-    
-    # 収束チェック
-    if abs(fp) < 0.01:
-        print(f"\n★ ほぼ収束（f'(x) < 0.01）")
+    if abs(f_prime(x)) < tolerance:
+        print("ほぼ収束（|f'(x)| < 0.01）")
         break
 
-print("\n" + "=" * 60)
-print(f"最終結果: x = {x:.4f}, f(x) = {f(x):.4f}")
-print(f"理論値との誤差: {abs(x - 2.0):.6f}")
+print(f"最終 x = {x:.4f}")
+print(f"最終 f(x) = {f(x):.4f}")
 ```
 
 
-## パラメータが2個になっても、同じ
+## 学習率で収束のしかたが変わる
 
-- ここまでパラメータは $x$ の1個。実際の機械学習では**何万個** — でも更新式は同じで、全パラメータが**同時に**1歩ずつ降りる
-- 2個の場合なら地形ごと目で見える：$f(w_1, w_2) = w_1^2 + 3 w_2^2$ を $(-4, 2)$ から学習率 0.25 で
+```{python}
+#| echo: false
+#| fig-align: center
+#| classes: fig-medium
+fig, axes = plt.subplots(2, 2, figsize=(10, 6))
+configs = [
+    (0.1, 15, "小さい α=0.1\nゆっくり収束"),
+    (0.35, 10, "α=0.35\n単調に収束"),
+    (0.75, 10, "α=0.75\n振動しながら収束"),
+    (1.1, 6, "大きすぎる α=1.1\n振幅が拡大して発散"),
+]
+
+for ax, (alpha, n_iter, title) in zip(axes.flat, configs):
+    x = 0.0
+    history = [x]
+    for _ in range(n_iter):
+        x = x - alpha * f_prime(x)
+        history.append(x)
+
+    left = min(-1.0, min(history) - 0.5)
+    right = max(5.0, max(history) + 0.5)
+    x_range = np.linspace(left, right, 200)
+    ax.plot(x_range, f(x_range), color="#2980b9", lw=2, alpha=0.4)
+    ax.plot(history, [f(h) for h in history], "o-", color="#e74c3c", ms=4)
+    ax.axvline(2, color="green", ls="--", alpha=0.5)
+    ax.set_title(title, fontsize=10, fontweight="bold")
+    ax.set_xlabel("x")
+    ax.set_ylabel("f(x)")
+    ax.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-note title="振動と発散は別"}
+- $\alpha=0.75$：谷をまたいで振動するが、振幅は小さくなり**収束する**
+- $\alpha=1.1$：谷をまたぐたびに振幅が大きくなり**発散する**
+:::
+
+
+## 学習率以外にも決める値がある
+
+- **初期値**：どこから探索を始めるか
+- **学習率**：1回の更新でどれだけ進むか
+- **最大反復回数**：終わらない場合に何回で打ち切るか
+- **停止条件**：$|f'(x)| < 0.01$ など、いつ収束したと判断するか
+
+::: {.callout-note title="今回注目する値"}
+勾配降下法の動きを大きく変える**学習率**を中心に比較する
+:::
+
+
+## 2変数では傾きが勾配ベクトルになる
+
+- 2変数では、それぞれの方向の傾きを**偏微分（[partial derivative]{.en}）**で求める
+- 偏微分を並べたベクトルが**勾配**
+
+$$
+f(w_1,w_2)=w_1^2+3w_2^2,
+\qquad
+\nabla f(w_1,w_2)=
+\begin{pmatrix}
+2w_1 \\
+6w_2
+\end{pmatrix}
+$$
+
+$$
+\begin{pmatrix}w_1\\w_2\end{pmatrix}_{\mathrm{new}}
+=
+\begin{pmatrix}w_1\\w_2\end{pmatrix}
+-\alpha\nabla f(w_1,w_2)
+$$
+
+::: {.callout-note title="1変数との共通点"}
+パラメータが増えても、各方向の傾きをまとめて引き、すべてのパラメータを同時に更新する
+:::
+
+
+## 2変数の勾配降下を地形で見る
+
+- $f(w_1,w_2)=w_1^2+3w_2^2$ を $(-4,2)$ から学習率 $\alpha=0.25$ で最小化する
 
 ```{python}
 #| echo: false
@@ -492,66 +705,19 @@ os.makedirs("iframes", exist_ok=True)
 fig3d.write_html("iframes/gd_bowl_3d.html", include_plotlyjs="directory")
 ```
 
-::: {.plotly-iframe src="iframes/gd_bowl_3d.html" height="510"}
+::: {.plotly-iframe src="iframes/gd_bowl_3d.html" height="420"}
 :::
 
 - ==ドラッグで回す==。**真上から**見ると、進み方の癖がよく見える
-- 急な方向（$w_2$、係数3）では**ジグザグに振動**しながら降り、緩い方向（$w_1$）ではゆっくり進む — 1つの学習率で全方向を賄う難しさ
-- 実際の機械学習の「損失地形」はこれの高次元版。目では見えないが、やることはこの図と同じ
-
-
-## 勾配降下法の問題点
-
-### 学習率の選択が難しい
-
-```{python}
-#| echo: false
-#| fig-align: center
-# 学習率による違い
-fig, axes = plt.subplots(1, 3, figsize=(14, 4))
-configs = [(0.1, 15, "小さすぎ（α=0.1）：のろのろ"),
-           (0.35, 15, "ちょうど良い（α=0.35）"),
-           (1.1, 7, "大きすぎ（α=1.1）：振動して発散")]
-x_range = np.linspace(-1, 5, 100)
-
-for ax, (alpha, n_iter, title) in zip(axes, configs):
-    x = 0.0
-    history = [x]
-    for i in range(n_iter):
-        x = x - alpha * f_prime(x)
-        history.append(x)
-
-    ax.plot(x_range, f(x_range), "b-", linewidth=2, alpha=0.3)
-    ax.plot(history, [f(h) for h in history], "ro-", markersize=6)
-    ax.axvline(x=2, color="g", linestyle="--", alpha=0.5)
-    ax.set_xlim(-1.5, 5.5)
-    ax.set_ylim(-1.6, 9)
-    ax.set_title(title, fontsize=11, fontweight="bold")
-    ax.set_xlabel("x")
-    ax.set_ylabel("f(x)")
-    ax.grid(True, alpha=0.3)
-
-plt.tight_layout()
-plt.show()
-```
-
-::: {.callout-warning}
-- **$\alpha$が小さすぎる**: 収束が遅い
-- **$\alpha$が大きすぎる**: 振動して収束しない
-- **適切な$\alpha$を探す**のが難しい
-:::
-
-### 収束が遅い
-
-- 単純な2次関数でも、収束判定（$|f'(x)| < 0.01$）まで**8回**の反復
-- 複雑な問題では数百〜数千回必要になることも
+- $w_1$ は谷の同じ側から近づき、$w_2$ は谷をまたいで**振動しながら収束**する
+- 実際の機械学習の損失地形はこの高次元版。目では描けなくても、勾配ベクトルを使って同じ更新を行う
 
 
 ## それでも主役は勾配降下法
 
 - 弱点（学習率の調整・遅さ）があるのに、**ディープラーニングのエンジンは勾配降下法**
-- 理由：パラメータが**数百万個**あっても、1次微分さえ計算できれば動く（軽い）
-- 学習率は、自動で加減する改良版（Adam など）が実用では使われている
+- 理由：パラメータが多数あっても、勾配を計算できれば更新できる
+- 実用では、パラメータごとに更新幅を調整する改良法（Adam など）も使われる
 
 ::: {.callout-note title="参考資料"}
 - もっと賢く進む手法もある → **[Newton法](newton-method-appendix.qmd)**（2次微分で一気にジャンプ）
@@ -561,20 +727,21 @@ plt.show()
 
 ## まとめ
 
-- **最適化** ＝ パラメータを動かして、損失が最小の場所を探すこと（`fit()` の正体）
+- **最適化**：評価基準が最も良くなるパラメータを探すこと。多くの `fit()` の中心にある
 - **勾配降下法**：傾きを測り、逆方向に少し進む、を繰り返す
 
 $$x_{\text{new}} = x - \alpha \cdot f'(x)$$
 
-- **学習率 $\alpha$** が唯一の調整つまみ：小さすぎると遅い、大きすぎると発散
-- シンプルで軽いからこそ、**大規模問題（ディープラーニング）の標準エンジン**
+- **学習率 $\alpha$** は主な調整値：小さいと遅く、大きすぎると発散する
+- 初期値・最大反復回数・停止条件も決める必要がある
+- シンプルで軽く、**大規模問題（ディープラーニング）の標準エンジン**となっている
 
 
 ## 次回予告
 
 - 今日手に入れた勾配降下法が、`fit()` の中身を開ける鍵になる
 - 次回、**本物のモデル（線形回帰）**を、この道具で自分の手で `fit` する
-- その先に分類モデル、そしてニューラルネットワーク — 勾配降下法は**ディープラーニングを動かしている本物のエンジン**
+- その先に分類モデル、そしてニューラルネットワークが続く。勾配降下法は**ディープラーニングを動かしている本物のエンジン**
 
 
 ## 練習問題
