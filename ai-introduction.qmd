@@ -12,7 +12,12 @@ subtitle: "AIの歴史"
 ```{python}
 #| echo: false
 #| fig-align: center
+import numpy as np
+import matplotlib.pyplot as plt
+import japanize_matplotlib
 from sklearn.datasets import load_digits
+plt.rcParams["font.size"] = 11
+plt.rcParams["figure.dpi"] = 100
 
 digits = load_digits()
 
@@ -94,7 +99,7 @@ AI: "人工知能（AI）" {
 - この講義は外側（AI全体の歴史）から始めて、内側（深層学習）へ進んでいく
 
 
-## AIが扱うタスク
+## AIが扱うタスク {#peek-ai-tasks}
 
 ```{python}
 #| echo: false
@@ -503,6 +508,16 @@ G: "さらに外へ…どこまで書けば「全部」？" {
 ```{python}
 #| echo: false
 #| fig-align: center
+from sklearn.datasets import make_moons
+from sklearn.neural_network import MLPClassifier
+
+X_moon, y_moon = make_moons(n_samples=200, noise=0.1, random_state=42)
+mlp = MLPClassifier(hidden_layer_sizes=(16,), activation="relu", solver="lbfgs",
+                    max_iter=5000, random_state=0).fit(X_moon, y_moon)
+xx, yy = np.meshgrid(np.linspace(X_moon[:, 0].min() - 0.4, X_moon[:, 0].max() + 0.4, 300),
+                     np.linspace(X_moon[:, 1].min() - 0.4, X_moon[:, 1].max() + 0.4, 300))
+Z = mlp.predict(np.c_[xx.ravel(), yy.ravel()]).reshape(xx.shape)
+
 rule_pred = (X_moon[:, 0] > 0.5).astype(int)
 rule_acc = (rule_pred == y_moon).mean()
 Z_rule = (xx > 0.5).astype(int)
@@ -523,7 +538,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-- 左：冒頭のデータに人間がルールを書いてみた場合 — どこに線を引いても**例外だらけ**
+- 左：このデータに人間がルールを書いてみた場合 — どこに線を引いても**例外だらけ**
 - 右：同じデータから、機械がパターンを**学習**した場合
 - 知識を「書く」時代から、データに「合わせる」時代へ — これが歴史の転換点
 
