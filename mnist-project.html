@@ -219,7 +219,7 @@ rkskmt
 <section id="初回の約束覚えているか" class="slide level2">
 <h2>初回の約束、覚えているか</h2>
 <div class="slide-body">
-<div id="8f34ed05" class="cell" data-execution_count="1">
+<div id="a17c086e" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -232,8 +232,8 @@ rkskmt
 <p>最終回までに、この仕組みを<strong>中身から全部</strong>自分の手で組み立てる。ブラックボックスは残さない。</p>
 </blockquote>
 <ul>
-<li>今日が最終回。<strong>手書き数字を読み取る機械</strong>を完成させる</li>
-<li>必要な部品は、ここまでの13回で<strong>すべて自作済み</strong></li>
+<li><strong>手書き数字を読み取る機械</strong>を完成させる</li>
+<li>必要な部品は、ここまでに自作するか手計算で中身を確認してきた</li>
 </ul>
 </div>
 </section>
@@ -243,7 +243,7 @@ rkskmt
 <ul>
 <li>手書き数字の定番データセット。<strong>訓練6万枚・テスト1万枚</strong>、各28×28ピクセル</li>
 </ul>
-<div id="6c984497" class="cell" data-execution_count="2">
+<div id="daff6fa7" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> torch</span>
 <span id="cb1-2"><a></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
 <span id="cb1-3"><a></a><span class="im">from</span> torchvision <span class="im">import</span> datasets, transforms</span>
@@ -260,7 +260,7 @@ rkskmt
 1枚の形: (1, 28, 28)  正解ラベル: 5</code></pre>
 </div>
 </div>
-<div id="a352cffc" class="cell" data-execution_count="3">
+<div id="2de69c33" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -271,14 +271,66 @@ rkskmt
 </div>
 </div>
 </section>
+<section id="訓練6万枚とテスト1万枚の役割" class="slide level2">
+<h2>訓練6万枚とテスト1万枚の役割</h2>
+<div class="slide-body">
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>データ</th>
+<th>学習中にすること</th>
+<th>目的</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>訓練データ 60,000枚</td>
+<td>損失を計算し、重みを更新する</td>
+<td>パターンを学ぶ</td>
+</tr>
+<tr class="even">
+<td>テストデータ 10,000枚</td>
+<td>予測して採点するだけ</td>
+<td>未知の字にも通用するか測る</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>テスト画像の正解を使って重みを更新してはいけない</li>
+<li>訓練画像だけ覚えても、初めて見る人の字を読めなければ役に立たない</li>
+<li>このデッキで報告する「96%以上」は、学習に使っていない1万枚での正答率</li>
+</ul>
+<div class="takeaway">
+<p>訓練は練習問題、テストは初見の試験。役割を混ぜずに評価する</p>
+</div>
+</div>
+</section>
 <section id="画像は784次元のベクトル" class="slide level2">
 <h2>画像は784次元のベクトル</h2>
 <div class="slide-body">
 <ul>
 <li>28 × 28 = <strong>784個の数字の並び</strong> — モデルにとって画像は784次元のベクトル</li>
-<li>魚は2次元（輝度・重さ）だった。<a href="./dimensionality-pca.html#peek-curse" class="peek">次元の呪いの回で遊んだ高次元</a>が、<strong>本物の入力</strong>としてやってきた</li>
+<li>魚は2次元（輝度・重さ）だった。<a href="./dimensionality-pca.html#peek-curse" class="peek">次元の呪いの回で扱った高次元</a>が、<strong>本物の入力</strong>として現れる</li>
 <li><code>nn.Flatten()</code> が「画像 → ベクトル」の変換をやる</li>
 </ul>
+<div id="4044fd63" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a><span class="im">import</span> torch</span>
+<span id="cb3-2"><a></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
+<span id="cb3-3"><a></a></span>
+<span id="cb3-4"><a></a>sample <span class="op">=</span> torch.zeros(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">28</span>, <span class="dv">28</span>)  <span class="co"># 1枚ぶんのダミー画像</span></span>
+<span id="cb3-5"><a></a>flat <span class="op">=</span> nn.Flatten()(sample)</span>
+<span id="cb3-6"><a></a><span class="bu">print</span>(<span class="st">"変換前:"</span>, <span class="bu">tuple</span>(sample.shape))</span>
+<span id="cb3-7"><a></a><span class="bu">print</span>(<span class="st">"変換後:"</span>, <span class="bu">tuple</span>(flat.shape))</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>変換前: (1, 1, 28, 28)
+変換後: (1, 784)</code></pre>
+</div>
+</div>
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -289,6 +341,56 @@ rkskmt
 </div>
 <div class="callout-content">
 <p>784次元でも、やることは魚の2次元と<strong>完全に同じ</strong>： 特徴量ベクトル → 変換を重ねる → 確率 → 損失 → 勾配降下。</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="画素は01の数値になる" class="slide level2">
+<h2>1画素は0〜1の数値になる</h2>
+<div class="slide-body">
+<p><code>transforms.ToTensor()</code> は、元画像の0〜255を0〜1へ変換する：</p>
+<p><span class="math display">\[x_{\rm tensor}=\frac{x_{\rm pixel}}{255}\]</span></p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th style="text-align: right;">元の画素値</th>
+<th style="text-align: right;">tensorの値</th>
+<th>この画像での意味</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0</td>
+<td>背景</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">128</td>
+<td style="text-align: right;">約0.50</td>
+<td>中間の濃さ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">255</td>
+<td style="text-align: right;">1.0</td>
+<td>強い筆跡</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>784個の特徴量は、各場所にどれくらい筆跡があるかを表す</li>
+<li>入力の尺度をそろえると、勾配降下法が扱いやすい</li>
+</ul>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<p>画像として見えていても、モデルへ入る時点では0〜1の数値784個</p>
 </div>
 </div>
 </div>
@@ -327,14 +429,38 @@ rkskmt
 </ul>
 </div>
 </section>
+<section id="スコアを実際にソフトマックスへ入れる" class="slide level2">
+<h2>スコアを実際にソフトマックスへ入れる</h2>
+<div class="slide-body">
+<ul>
+<li>3クラスのスコアを <span class="math inline">\(u=(2.0,\,1.0,\,0.1)\)</span> とする：</li>
+</ul>
+<p><span class="math display">\[e^u=(e^2,e^1,e^{0.1})\approx(7.389,\,2.718,\,1.105)\]</span></p>
+<ul>
+<li>分母は3つの合計：</li>
+</ul>
+<p><span class="math display">\[7.389+2.718+1.105=11.213\]</span></p>
+<ul>
+<li>それぞれを合計で割る：</li>
+</ul>
+<p><span class="math display">\[\mathrm{softmax}(u)
+\approx\left(\frac{7.389}{11.213},
+             \frac{2.718}{11.213},
+             \frac{1.105}{11.213}\right)
+\approx(0.66,\,0.24,\,0.10)\]</span></p>
+<div class="takeaway">
+<p>指数関数で全スコアを正にし、合計で割って「合計1の確率分布」にする</p>
+</div>
+</div>
+</section>
 <section id="ソフトマックスの仕事ぶり" class="slide level2">
 <h2>ソフトマックスの仕事ぶり</h2>
 <div class="slide-body">
-<div id="2e8c9cb7" class="cell" data-execution_count="4">
+<div id="d0c9487e" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="mnist-project_files/figure-revealjs/cell-5-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img data-src="mnist-project_files/figure-revealjs/cell-5-output-1.png" class="quarto-figure quarto-figure-center" width="936" height="307"></a></p>
+<p><a href="mnist-project_files/figure-revealjs/cell-6-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img data-src="mnist-project_files/figure-revealjs/cell-6-output-1.png" class="quarto-figure quarto-figure-center" width="936" height="307"></a></p>
 </figure>
 </div>
 </div>
@@ -345,21 +471,46 @@ rkskmt
 </ul>
 </div>
 </section>
-<section id="モデル見慣れた3層" class="slide level2">
-<h2>モデル：見慣れた3層</h2>
+<section id="crossentropyloss-はsoftmax込み" class="slide level2">
+<h2><code>CrossEntropyLoss</code> はsoftmax込み</h2>
 <div class="slide-body">
-<div id="35bd6089" class="cell" data-execution_count="5">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a>torch.manual_seed(<span class="dv">0</span>)</span>
-<span id="cb3-2"><a></a></span>
-<span id="cb3-3"><a></a>model <span class="op">=</span> nn.Sequential(</span>
-<span id="cb3-4"><a></a>    nn.Flatten(),          <span class="co"># (28,28) → 784</span></span>
-<span id="cb3-5"><a></a>    nn.Linear(<span class="dv">784</span>, <span class="dv">128</span>),   <span class="co"># 線形変換</span></span>
-<span id="cb3-6"><a></a>    nn.ReLU(),             <span class="co"># 折る</span></span>
-<span id="cb3-7"><a></a>    nn.Linear(<span class="dv">128</span>, <span class="dv">10</span>),    <span class="co"># 出力層（10クラスぶんのスコア）</span></span>
-<span id="cb3-8"><a></a>)</span>
-<span id="cb3-9"><a></a></span>
-<span id="cb3-10"><a></a>n_params <span class="op">=</span> <span class="bu">sum</span>(p.numel() <span class="cf">for</span> p <span class="kw">in</span> model.parameters())</span>
-<span id="cb3-11"><a></a><span class="bu">print</span>(<span class="ss">f"パラメータ総数: </span><span class="sc">{</span>n_params<span class="sc">:,}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="b9cc2393" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a><span class="im">import</span> torch</span>
+<span id="cb5-2"><a></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
+<span id="cb5-3"><a></a></span>
+<span id="cb5-4"><a></a>logits <span class="op">=</span> torch.tensor([[<span class="fl">2.0</span>, <span class="fl">1.0</span>, <span class="fl">0.1</span>]])  <span class="co"># 1件・3クラスのスコア</span></span>
+<span id="cb5-5"><a></a>target <span class="op">=</span> torch.tensor([<span class="dv">0</span>])                 <span class="co"># 正解はクラス0</span></span>
+<span id="cb5-6"><a></a>loss_fn_demo <span class="op">=</span> nn.CrossEntropyLoss()</span>
+<span id="cb5-7"><a></a></span>
+<span id="cb5-8"><a></a><span class="bu">print</span>(<span class="st">"確率:"</span>, torch.softmax(logits, dim<span class="op">=</span><span class="dv">1</span>))</span>
+<span id="cb5-9"><a></a><span class="bu">print</span>(<span class="st">"損失:"</span>, loss_fn_demo(logits, target))</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>確率: tensor([[0.6590, 0.2424, 0.0986]])
+損失: tensor(0.4170)</code></pre>
+</div>
+</div>
+<ul>
+<li>モデルはsoftmax前のスコア <code>logits</code> をそのまま渡す</li>
+<li><code>CrossEntropyLoss</code> の中でsoftmaxと <span class="math inline">\(-\log p_{\text{正解}}\)</span> が計算される</li>
+<li>予測ラベルは、最大スコアの位置 <code>logits.argmax(dim=1)</code> で求められる</li>
+</ul>
+</div>
+</section>
+<section id="モデル784-128-10" class="slide level2">
+<h2>モデル：784 → 128 → 10</h2>
+<div class="slide-body">
+<div id="f415b182" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a></a>torch.manual_seed(<span class="dv">0</span>)</span>
+<span id="cb7-2"><a></a></span>
+<span id="cb7-3"><a></a>model <span class="op">=</span> nn.Sequential(</span>
+<span id="cb7-4"><a></a>    nn.Flatten(),          <span class="co"># (28,28) → 784</span></span>
+<span id="cb7-5"><a></a>    nn.Linear(<span class="dv">784</span>, <span class="dv">128</span>),   <span class="co"># 線形変換</span></span>
+<span id="cb7-6"><a></a>    nn.ReLU(),             <span class="co"># 折る</span></span>
+<span id="cb7-7"><a></a>    nn.Linear(<span class="dv">128</span>, <span class="dv">10</span>),    <span class="co"># 出力層（10クラスぶんのスコア）</span></span>
+<span id="cb7-8"><a></a>)</span>
+<span id="cb7-9"><a></a></span>
+<span id="cb7-10"><a></a>n_params <span class="op">=</span> <span class="bu">sum</span>(p.numel() <span class="cf">for</span> p <span class="kw">in</span> model.parameters())</span>
+<span id="cb7-11"><a></a><span class="bu">print</span>(<span class="ss">f"パラメータ総数: </span><span class="sc">{</span>n_params<span class="sc">:,}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>パラメータ総数: 101,770</code></pre>
 </div>
@@ -368,6 +519,9 @@ rkskmt
 <ul>
 <li>魚のロジスティック回帰はパラメータ<strong>3個</strong>だった。いまや<strong>10万個</strong> — それでも学習ループは同じ3拍子</li>
 </ul>
+<p><span class="math display">\[\underbrace{784\times128+128}_{\text{第1層}}
++\underbrace{128\times10+10}_{\text{出力層}}
+=101{,}770\]</span></p>
 <div title="Adam — 最適化回の伏線回収">
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
@@ -378,10 +532,33 @@ rkskmt
 <p><strong>Adam — 最適化回の伏線回収</strong></p>
 </div>
 <div class="callout-content">
-<p>勾配降下法の回で名前だけ出た「学習率を自動で加減する改良版」。 中身は勾配降下法そのもの（勾配の使い方が少し賢いだけ）。大きなネットでは標準装備。</p>
+<ul>
+<li>Adam は、勾配の履歴を使ってパラメータごとに歩幅を調整する最適化手法</li>
+<li><code>zero_grad → backward → step</code> の形は、SGD と同じ</li>
+</ul>
 </div>
 </div>
 </div>
+</div>
+</div>
+</section>
+<section id="枚がモデルを通るときの形" class="slide level2">
+<h2>128枚がモデルを通るときの形</h2>
+<div class="slide-body">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb9-1"><a></a>入力画像          (128, 1, 28, 28)</span>
+<span id="cb9-2"><a></a>   ↓ Flatten</span>
+<span id="cb9-3"><a></a>784次元ベクトル   (128, 784)</span>
+<span id="cb9-4"><a></a>   ↓ Linear + ReLU</span>
+<span id="cb9-5"><a></a>中間表現          (128, 128)</span>
+<span id="cb9-6"><a></a>   ↓ Linear</span>
+<span id="cb9-7"><a></a>10クラスのlogits  (128, 10)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<ul>
+<li>先頭の <code>128</code> は、どの段でもミニバッチ内の画像枚数</li>
+<li>最後の <code>10</code> は数字0〜9それぞれのスコア</li>
+<li>正解ラベル <code>y_batch</code> の形は <code>(128,)</code>。各画像につき整数が1個</li>
+</ul>
+<div class="takeaway">
+<p>モデルは1枚ずつの式を、128枚ぶん並行して計算する</p>
 </div>
 </div>
 </section>
@@ -392,39 +569,81 @@ rkskmt
 <li>6万枚まとめて勾配を計算すると重い → <strong>128枚ずつ</strong>取り出して1歩ずつ進む — この一口が<strong>ミニバッチ</strong>（<span class="en">mini-batch</span>）</li>
 <li>データを一巡することを <strong>1エポック</strong>（<span class="en">epoch</span>）と呼ぶ</li>
 </ul>
-<div id="a6664da3" class="cell" data-execution_count="6">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a>train_loader <span class="op">=</span> torch.utils.data.DataLoader(train_ds, batch_size<span class="op">=</span><span class="dv">128</span>, shuffle<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb5-2"><a></a>test_loader  <span class="op">=</span> torch.utils.data.DataLoader(test_ds,  batch_size<span class="op">=</span><span class="dv">1000</span>)</span>
-<span id="cb5-3"><a></a></span>
-<span id="cb5-4"><a></a>loss_fn   <span class="op">=</span> nn.CrossEntropyLoss()</span>
-<span id="cb5-5"><a></a>optimizer <span class="op">=</span> torch.optim.Adam(model.parameters(), lr<span class="op">=</span><span class="fl">1e-3</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="35c9093b" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a></a>train_loader <span class="op">=</span> torch.utils.data.DataLoader(train_ds, batch_size<span class="op">=</span><span class="dv">128</span>, shuffle<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb10-2"><a></a>test_loader  <span class="op">=</span> torch.utils.data.DataLoader(test_ds,  batch_size<span class="op">=</span><span class="dv">1000</span>)</span>
+<span id="cb10-3"><a></a></span>
+<span id="cb10-4"><a></a>loss_fn   <span class="op">=</span> nn.CrossEntropyLoss()</span>
+<span id="cb10-5"><a></a>optimizer <span class="op">=</span> torch.optim.Adam(model.parameters(), lr<span class="op">=</span><span class="fl">1e-3</span>)</span>
+<span id="cb10-6"><a></a></span>
+<span id="cb10-7"><a></a>preview_generator <span class="op">=</span> torch.Generator().manual_seed(<span class="dv">123</span>)</span>
+<span id="cb10-8"><a></a>preview_loader <span class="op">=</span> torch.utils.data.DataLoader(</span>
+<span id="cb10-9"><a></a>    train_ds, batch_size<span class="op">=</span><span class="dv">128</span>, shuffle<span class="op">=</span><span class="va">False</span>, generator<span class="op">=</span>preview_generator</span>
+<span id="cb10-10"><a></a>)</span>
+<span id="cb10-11"><a></a>x_batch, y_batch <span class="op">=</span> <span class="bu">next</span>(<span class="bu">iter</span>(preview_loader))</span>
+<span id="cb10-12"><a></a><span class="bu">print</span>(<span class="st">"画像バッチ:"</span>, <span class="bu">tuple</span>(x_batch.shape))</span>
+<span id="cb10-13"><a></a><span class="bu">print</span>(<span class="st">"ラベルバッチ:"</span>, <span class="bu">tuple</span>(y_batch.shape))</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>画像バッチ: (128, 1, 28, 28)
+ラベルバッチ: (128,)</code></pre>
+</div>
 </div>
 <ul>
 <li>ロジスティック回帰の回で<a href="./logistic-regression.html#peek-one-at-a-time" class="peek">「魚を1匹ずつ見せる」</a>とやったのと同じ発想（あちらはバッチサイズ1）</li>
 </ul>
 </div>
 </section>
+<section id="エポックで約469回更新する" class="slide level2">
+<h2>1エポックで約469回更新する</h2>
+<div class="slide-body">
+<p>訓練画像60,000枚を128枚ずつに分けると：</p>
+<p><span class="math display">\[\left\lceil\frac{60{,}000}{128}\right\rceil=469\ \text{ミニバッチ}\]</span></p>
+<ul>
+<li>最初の468バッチは128枚、最後の1バッチは96枚</li>
+<li><strong>1ミニバッチごとに</strong> <code>zero_grad → backward → step</code> を1回実行する</li>
+<li>したがって3エポックでは、約 <span class="math inline">\(469\times3=1{,}407\)</span> 回更新する</li>
+<li><code>shuffle=True</code> により、各エポックで画像の順番を入れ替える</li>
+</ul>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<p>「3エポック」は3回しか更新しないという意味ではない。全データを3周し、その途中で約1,407歩進む</p>
+</div>
+</div>
+</div>
+</div>
+</section>
 <section id="peek-mnist-train" class="slide level2">
 <h2>学習する</h2>
 <div class="slide-body">
-<div id="b8f1e390" class="cell" data-execution_count="7">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">4</span>):</span>
-<span id="cb6-2"><a></a>    <span class="cf">for</span> x_batch, y_batch <span class="kw">in</span> train_loader:</span>
-<span id="cb6-3"><a></a>        optimizer.zero_grad()</span>
-<span id="cb6-4"><a></a>        loss <span class="op">=</span> loss_fn(model(x_batch), y_batch)</span>
-<span id="cb6-5"><a></a>        loss.backward()</span>
-<span id="cb6-6"><a></a>        optimizer.step()</span>
-<span id="cb6-7"><a></a></span>
-<span id="cb6-8"><a></a>    <span class="co"># テストデータ（見ていない1万枚）で採点 — 過学習と汎化の回の鉄則</span></span>
-<span id="cb6-9"><a></a>    correct <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb6-10"><a></a>    <span class="cf">with</span> torch.no_grad():</span>
-<span id="cb6-11"><a></a>        <span class="cf">for</span> x_batch, y_batch <span class="kw">in</span> test_loader:</span>
-<span id="cb6-12"><a></a>            correct <span class="op">+=</span> (model(x_batch).argmax(dim<span class="op">=</span><span class="dv">1</span>) <span class="op">==</span> y_batch).<span class="bu">sum</span>().item()</span>
-<span id="cb6-13"><a></a>    <span class="bu">print</span>(<span class="ss">f"エポック </span><span class="sc">{</span>epoch<span class="sc">}</span><span class="ss"> | テスト正答率: </span><span class="sc">{</span>correct <span class="op">/</span> <span class="bu">len</span>(test_ds)<span class="sc">:.2%}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="92d944ad" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">4</span>):</span>
+<span id="cb12-2"><a></a>    loss_sum <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb12-3"><a></a>    <span class="cf">for</span> x_batch, y_batch <span class="kw">in</span> train_loader:</span>
+<span id="cb12-4"><a></a>        optimizer.zero_grad()</span>
+<span id="cb12-5"><a></a>        loss <span class="op">=</span> loss_fn(model(x_batch), y_batch)</span>
+<span id="cb12-6"><a></a>        loss.backward()</span>
+<span id="cb12-7"><a></a>        optimizer.step()</span>
+<span id="cb12-8"><a></a>        loss_sum <span class="op">+=</span> loss.item() <span class="op">*</span> <span class="bu">len</span>(x_batch)</span>
+<span id="cb12-9"><a></a></span>
+<span id="cb12-10"><a></a>    <span class="co"># テストデータ（見ていない1万枚）で採点 — 過学習と汎化の回の鉄則</span></span>
+<span id="cb12-11"><a></a>    correct <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb12-12"><a></a>    <span class="cf">with</span> torch.no_grad():</span>
+<span id="cb12-13"><a></a>        <span class="cf">for</span> x_batch, y_batch <span class="kw">in</span> test_loader:</span>
+<span id="cb12-14"><a></a>            correct <span class="op">+=</span> (model(x_batch).argmax(dim<span class="op">=</span><span class="dv">1</span>) <span class="op">==</span> y_batch).<span class="bu">sum</span>().item()</span>
+<span id="cb12-15"><a></a>    train_loss <span class="op">=</span> loss_sum <span class="op">/</span> <span class="bu">len</span>(train_ds)</span>
+<span id="cb12-16"><a></a>    <span class="bu">print</span>(<span class="ss">f"エポック </span><span class="sc">{</span>epoch<span class="sc">}</span><span class="ss"> | 訓練Loss: </span><span class="sc">{</span>train_loss<span class="sc">:.4f}</span><span class="ss"> "</span></span>
+<span id="cb12-17"><a></a>          <span class="ss">f"| テスト正答率: </span><span class="sc">{</span>correct <span class="op">/</span> <span class="bu">len</span>(test_ds)<span class="sc">:.2%}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>エポック 1 | テスト正答率: 93.50%
-エポック 2 | テスト正答率: 95.14%
-エポック 3 | テスト正答率: 96.33%</code></pre>
+<pre><code>エポック 1 | 訓練Loss: 0.4125 | テスト正答率: 93.50%
+エポック 2 | 訓練Loss: 0.1968 | テスト正答率: 95.14%
+エポック 3 | 訓練Loss: 0.1431 | テスト正答率: 96.33%</code></pre>
 </div>
 </div>
 <ul>
@@ -466,13 +685,18 @@ rkskmt
 </tbody>
 </table>
 </div>
+</div>
+</section>
+<section id="ここで観察" class="slide level2">
+<h2>ここで観察</h2>
+<div class="slide-body">
 <div class="callout callout-tip callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>ここで観察</strong></p>
+<p><strong>ヒント</strong></p>
 </div>
 <div class="callout-content">
 <ul>
@@ -487,11 +711,11 @@ rkskmt
 <section id="読めている様子" class="slide level2">
 <h2>読めている様子</h2>
 <div class="slide-body">
-<div id="a961dbec" class="cell" data-execution_count="8">
+<div id="e1887cb4" class="cell" data-execution_count="10">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="mnist-project_files/figure-revealjs/cell-9-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img data-src="mnist-project_files/figure-revealjs/cell-9-output-1.png" class="quarto-figure quarto-figure-center" width="986" height="281"></a></p>
+<p><a href="mnist-project_files/figure-revealjs/cell-11-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img data-src="mnist-project_files/figure-revealjs/cell-11-output-1.png" class="quarto-figure quarto-figure-center" width="986" height="281"></a></p>
 </figure>
 </div>
 </div>
@@ -504,11 +728,11 @@ rkskmt
 <section id="間違いを眺める" class="slide level2">
 <h2>間違いを眺める</h2>
 <div class="slide-body">
-<div id="d02bba52" class="cell" data-execution_count="9">
+<div id="efa54e49" class="cell" data-execution_count="11">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="mnist-project_files/figure-revealjs/cell-10-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img data-src="mnist-project_files/figure-revealjs/cell-10-output-1.png" class="quarto-figure quarto-figure-center" width="1087" height="156"></a></p>
+<p><a href="mnist-project_files/figure-revealjs/cell-12-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img data-src="mnist-project_files/figure-revealjs/cell-12-output-1.png" class="quarto-figure quarto-figure-center" width="1087" height="156"></a></p>
 </figure>
 </div>
 </div>
@@ -522,14 +746,14 @@ rkskmt
 <section id="どの数字とどの数字が混ざるのか" class="slide level2">
 <h2>どの数字とどの数字が混ざるのか</h2>
 <div class="slide-body">
-<div title="クイズ">
+<div title="質問">
 <div class="callout callout-important callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>クイズ</strong></p>
+<p><strong>質問</strong></p>
 </div>
 <div class="callout-content">
 <p>0〜9 のうち、この機械が<strong>いちばん混同しやすいペア</strong>はどれだと思う？</p>
@@ -537,11 +761,11 @@ rkskmt
 </div>
 </div>
 </div>
-<div id="216096a7" class="cell" data-execution_count="10">
+<div id="90ddd5b4" class="cell" data-execution_count="12">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="mnist-project_files/figure-revealjs/cell-11-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img data-src="mnist-project_files/figure-revealjs/cell-11-output-1.png" class="quarto-figure quarto-figure-center" width="550" height="488"></a></p>
+<p><a href="mnist-project_files/figure-revealjs/cell-13-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img data-src="mnist-project_files/figure-revealjs/cell-13-output-1.png" class="quarto-figure quarto-figure-center" width="550" height="488"></a></p>
 </figure>
 </div>
 </div>
@@ -556,11 +780,11 @@ rkskmt
 <section id="自信満々の間違い" class="slide level2">
 <h2>自信満々の間違い</h2>
 <div class="slide-body">
-<div id="d00f40a1" class="cell" data-execution_count="11">
+<div id="6d60f7f0" class="cell" data-execution_count="13">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="mnist-project_files/figure-revealjs/cell-12-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img data-src="mnist-project_files/figure-revealjs/cell-12-output-1.png" class="quarto-figure quarto-figure-center" width="1087" height="215"></a></p>
+<p><a href="mnist-project_files/figure-revealjs/cell-14-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img data-src="mnist-project_files/figure-revealjs/cell-14-output-1.png" class="quarto-figure quarto-figure-center" width="1087" height="215"></a></p>
 </figure>
 </div>
 </div>
@@ -578,11 +802,11 @@ rkskmt
 <ul>
 <li>第1層 <code>nn.Linear(784, 128)</code> の各ユニットは、784本の重みを持つ ＝ <strong>28×28の「模様」</strong>として絵にできる</li>
 </ul>
-<div id="c96b44b2" class="cell" data-execution_count="12">
+<div id="52797bf7" class="cell" data-execution_count="14">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="mnist-project_files/figure-revealjs/cell-13-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img data-src="mnist-project_files/figure-revealjs/cell-13-output-1.png" class="quarto-figure quarto-figure-center" width="1087" height="274"></a></p>
+<p><a href="mnist-project_files/figure-revealjs/cell-15-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img data-src="mnist-project_files/figure-revealjs/cell-15-output-1.png" class="quarto-figure quarto-figure-center" width="1087" height="274"></a></p>
 </figure>
 </div>
 </div>
@@ -624,40 +848,45 @@ rkskmt
 <h2>自分の字は読めるのか（持ち帰りデモ）</h2>
 <div class="slide-body">
 <p>紙に数字を書いて撮影し、この機械に読ませてみよう。 ただし<strong>写真をそのまま28×28に縮めても、まず読めない</strong> — MNISTの画像は「数字を20ピクセル角に収め、重心をど真ん中に置く」ように揃えてあり、撮った写真はそうなっていないから。同じ揃え方を自分でやってから見せる：</p>
-<div id="51324eca" class="cell" data-execution_count="13">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a></a><span class="im">from</span> PIL <span class="im">import</span> Image</span>
-<span id="cb8-2"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb8-3"><a></a><span class="im">import</span> torch</span>
-<span id="cb8-4"><a></a></span>
-<span id="cb8-5"><a></a><span class="co"># 1. 読み込み：グレースケール化して「インク=1、紙=0」に正規化</span></span>
-<span id="cb8-6"><a></a>a <span class="op">=</span> np.array(Image.<span class="bu">open</span>(<span class="st">"my_digit.png"</span>).convert(<span class="st">"L"</span>), dtype<span class="op">=</span>np.float32)</span>
-<span id="cb8-7"><a></a>a <span class="op">=</span> (a.<span class="bu">max</span>() <span class="op">-</span> a) <span class="op">/</span> (a.<span class="bu">max</span>() <span class="op">-</span> a.<span class="bu">min</span>())</span>
-<span id="cb8-8"><a></a></span>
-<span id="cb8-9"><a></a><span class="co"># 2. MNISTと同じ揃え方：数字を切り出し → 長辺20pxに縮小 → 重心を中央へ</span></span>
-<span id="cb8-10"><a></a>rows, cols <span class="op">=</span> np.where(a <span class="op">&gt;</span> <span class="fl">0.3</span>)</span>
-<span id="cb8-11"><a></a>a <span class="op">=</span> a[rows.<span class="bu">min</span>():rows.<span class="bu">max</span>()<span class="op">+</span><span class="dv">1</span>, cols.<span class="bu">min</span>():cols.<span class="bu">max</span>()<span class="op">+</span><span class="dv">1</span>]</span>
-<span id="cb8-12"><a></a>h, w <span class="op">=</span> a.shape</span>
-<span id="cb8-13"><a></a>s <span class="op">=</span> <span class="fl">20.0</span> <span class="op">/</span> <span class="bu">max</span>(h, w)</span>
-<span id="cb8-14"><a></a>img <span class="op">=</span> Image.fromarray((a <span class="op">*</span> <span class="dv">255</span>).astype(np.uint8)).resize((<span class="bu">round</span>(w<span class="op">*</span>s), <span class="bu">round</span>(h<span class="op">*</span>s)))</span>
-<span id="cb8-15"><a></a>a <span class="op">=</span> np.array(img, dtype<span class="op">=</span>np.float32) <span class="op">/</span> <span class="fl">255.0</span></span>
-<span id="cb8-16"><a></a>x28 <span class="op">=</span> np.zeros((<span class="dv">28</span>, <span class="dv">28</span>), dtype<span class="op">=</span>np.float32)</span>
-<span id="cb8-17"><a></a>h, w <span class="op">=</span> a.shape</span>
-<span id="cb8-18"><a></a>x28[(<span class="dv">28</span><span class="op">-</span>h)<span class="op">//</span><span class="dv">2</span>:(<span class="dv">28</span><span class="op">-</span>h)<span class="op">//</span><span class="dv">2</span><span class="op">+</span>h, (<span class="dv">28</span><span class="op">-</span>w)<span class="op">//</span><span class="dv">2</span>:(<span class="dv">28</span><span class="op">-</span>w)<span class="op">//</span><span class="dv">2</span><span class="op">+</span>w] <span class="op">=</span> a</span>
-<span id="cb8-19"><a></a>ys, xs <span class="op">=</span> np.mgrid[<span class="dv">0</span>:<span class="dv">28</span>, <span class="dv">0</span>:<span class="dv">28</span>]</span>
-<span id="cb8-20"><a></a>cy, cx <span class="op">=</span> (x28<span class="op">*</span>ys).<span class="bu">sum</span>()<span class="op">/</span>x28.<span class="bu">sum</span>(), (x28<span class="op">*</span>xs).<span class="bu">sum</span>()<span class="op">/</span>x28.<span class="bu">sum</span>()</span>
-<span id="cb8-21"><a></a>x28 <span class="op">=</span> np.roll(x28, (<span class="bu">round</span>(<span class="dv">14</span><span class="op">-</span>cy), <span class="bu">round</span>(<span class="dv">14</span><span class="op">-</span>cx)), axis<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">1</span>))</span>
-<span id="cb8-22"><a></a></span>
-<span id="cb8-23"><a></a><span class="co"># 3. 推論</span></span>
-<span id="cb8-24"><a></a>x <span class="op">=</span> torch.tensor(x28).unsqueeze(<span class="dv">0</span>).unsqueeze(<span class="dv">0</span>)</span>
-<span id="cb8-25"><a></a><span class="bu">print</span>(<span class="st">"予測:"</span>, model(x).argmax(dim<span class="op">=</span><span class="dv">1</span>).item())</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="98359926" class="cell" data-execution_count="15">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a></a><span class="im">from</span> PIL <span class="im">import</span> Image</span>
+<span id="cb14-2"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb14-3"><a></a><span class="im">import</span> torch</span>
+<span id="cb14-4"><a></a></span>
+<span id="cb14-5"><a></a><span class="co"># 1. 読み込み：グレースケール化して「インク=1、紙=0」に正規化</span></span>
+<span id="cb14-6"><a></a>a <span class="op">=</span> np.array(Image.<span class="bu">open</span>(<span class="st">"my_digit.png"</span>).convert(<span class="st">"L"</span>), dtype<span class="op">=</span>np.float32)</span>
+<span id="cb14-7"><a></a>a <span class="op">=</span> (a.<span class="bu">max</span>() <span class="op">-</span> a) <span class="op">/</span> (a.<span class="bu">max</span>() <span class="op">-</span> a.<span class="bu">min</span>())</span>
+<span id="cb14-8"><a></a></span>
+<span id="cb14-9"><a></a><span class="co"># 2. MNISTと同じ揃え方：数字を切り出し → 長辺20pxに縮小 → 重心を中央へ</span></span>
+<span id="cb14-10"><a></a>rows, cols <span class="op">=</span> np.where(a <span class="op">&gt;</span> <span class="fl">0.3</span>)</span>
+<span id="cb14-11"><a></a>a <span class="op">=</span> a[rows.<span class="bu">min</span>():rows.<span class="bu">max</span>()<span class="op">+</span><span class="dv">1</span>, cols.<span class="bu">min</span>():cols.<span class="bu">max</span>()<span class="op">+</span><span class="dv">1</span>]</span>
+<span id="cb14-12"><a></a>h, w <span class="op">=</span> a.shape</span>
+<span id="cb14-13"><a></a>s <span class="op">=</span> <span class="fl">20.0</span> <span class="op">/</span> <span class="bu">max</span>(h, w)</span>
+<span id="cb14-14"><a></a>img <span class="op">=</span> Image.fromarray((a <span class="op">*</span> <span class="dv">255</span>).astype(np.uint8)).resize((<span class="bu">round</span>(w<span class="op">*</span>s), <span class="bu">round</span>(h<span class="op">*</span>s)))</span>
+<span id="cb14-15"><a></a>a <span class="op">=</span> np.array(img, dtype<span class="op">=</span>np.float32) <span class="op">/</span> <span class="fl">255.0</span></span>
+<span id="cb14-16"><a></a>x28 <span class="op">=</span> np.zeros((<span class="dv">28</span>, <span class="dv">28</span>), dtype<span class="op">=</span>np.float32)</span>
+<span id="cb14-17"><a></a>h, w <span class="op">=</span> a.shape</span>
+<span id="cb14-18"><a></a>x28[(<span class="dv">28</span><span class="op">-</span>h)<span class="op">//</span><span class="dv">2</span>:(<span class="dv">28</span><span class="op">-</span>h)<span class="op">//</span><span class="dv">2</span><span class="op">+</span>h, (<span class="dv">28</span><span class="op">-</span>w)<span class="op">//</span><span class="dv">2</span>:(<span class="dv">28</span><span class="op">-</span>w)<span class="op">//</span><span class="dv">2</span><span class="op">+</span>w] <span class="op">=</span> a</span>
+<span id="cb14-19"><a></a>ys, xs <span class="op">=</span> np.mgrid[<span class="dv">0</span>:<span class="dv">28</span>, <span class="dv">0</span>:<span class="dv">28</span>]</span>
+<span id="cb14-20"><a></a>cy, cx <span class="op">=</span> (x28<span class="op">*</span>ys).<span class="bu">sum</span>()<span class="op">/</span>x28.<span class="bu">sum</span>(), (x28<span class="op">*</span>xs).<span class="bu">sum</span>()<span class="op">/</span>x28.<span class="bu">sum</span>()</span>
+<span id="cb14-21"><a></a>x28 <span class="op">=</span> np.roll(x28, (<span class="bu">round</span>(<span class="dv">14</span><span class="op">-</span>cy), <span class="bu">round</span>(<span class="dv">14</span><span class="op">-</span>cx)), axis<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb14-22"><a></a></span>
+<span id="cb14-23"><a></a><span class="co"># 3. 推論</span></span>
+<span id="cb14-24"><a></a>x <span class="op">=</span> torch.tensor(x28).unsqueeze(<span class="dv">0</span>).unsqueeze(<span class="dv">0</span>)</span>
+<span id="cb14-25"><a></a><span class="bu">print</span>(<span class="st">"予測:"</span>, model(x).argmax(dim<span class="op">=</span><span class="dv">1</span>).item())</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+</div>
+</section>
+<section id="うまく読めないとき" class="slide level2">
+<h2>うまく読めないとき</h2>
+<div class="slide-body">
 <div class="callout callout-tip callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>うまく読めないとき</strong></p>
+<p><strong>ヒント</strong></p>
 </div>
 <div class="callout-content">
 <ul>
@@ -730,7 +959,7 @@ rkskmt
 <p><strong>約束の回収</strong></p>
 </div>
 <div class="callout-content">
-<p><strong>ブラックボックス、ゼロ。</strong> 全部品を手で作るか、手計算で検算済み。</p>
+<p>各部品が、どの数式・微分・更新に対応するかを説明できる。</p>
 </div>
 </div>
 </div>
@@ -801,7 +1030,7 @@ rkskmt
 <p><strong>持ち帰り</strong></p>
 </div>
 <div class="callout-content">
-<p>「自分の字は読めるのか」のデモを、ぜひ家で。読めたら勝ち、読めなくても<strong>なぜかを説明できる</strong> — それがこの講義の到達点。</p>
+<p>「自分の字は読めるのか」のデモを家でも試せる。読めなかった場合も、訓練データとの違いから理由を考えられる。</p>
 </div>
 </div>
 </div>

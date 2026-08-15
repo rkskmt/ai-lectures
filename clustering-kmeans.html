@@ -205,7 +205,7 @@
 
 <section id="title-slide" class="quarto-title-block center">
   <h1 class="title">教師なし学習とクラスタリング</h1>
-  <p class="subtitle">ラベルを失った魚たち</p>
+  <p class="subtitle">ラベルのない魚たち</p>
 
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
@@ -284,7 +284,7 @@ rkskmt
 <li>80匹分の測定データ（輝度・重さ）は手元にある</li>
 <li>ところが<strong>どれが Salmon でどれが Sea bass か、記録が消えた</strong></li>
 </ul>
-<div id="baf3d214" class="cell" data-execution_count="1">
+<div id="8d2dcadc" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>魚データの定義（クリックして展開）</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -316,7 +316,7 @@ rkskmt
 <span id="cb1-27"><a></a>])</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="c79ad1c8" class="cell" data-execution_count="2">
+<div id="3628c4b5" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -325,14 +325,14 @@ rkskmt
 </div>
 </div>
 </div>
-<div title="クイズ">
+<div title="質問">
 <div class="callout callout-important callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>クイズ</strong></p>
+<p><strong>質問</strong></p>
 </div>
 <div class="callout-content">
 <p>ラベルなしのこの図、<strong>何個のグループ</strong>に見える？</p>
@@ -397,7 +397,7 @@ rkskmt
 <section id="試行1-そのまま-k-means-にかける" class="slide level2">
 <h2>試行1: そのまま k-means にかける</h2>
 <div class="slide-body">
-<div id="68718f55" class="cell" data-execution_count="3">
+<div id="b0fbeaeb" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> KMeans</span>
 <span id="cb2-2"><a></a></span>
 <span id="cb2-3"><a></a><span class="co"># ラベルを使わずに k=2 でクラスタリング</span></span>
@@ -425,7 +425,7 @@ rkskmt
 <section id="試行1の結果" class="slide level2">
 <h2>試行1の結果</h2>
 <div class="slide-body">
-<div id="e0a7731a" class="cell" data-execution_count="4">
+<div id="1a3e568d" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a></a>colors  <span class="op">=</span> [<span class="st">"#e74c3c"</span>, <span class="st">"#2980b9"</span>]</span>
 <span id="cb4-2"><a></a>markers <span class="op">=</span> [<span class="st">"o"</span>, <span class="st">"s"</span>]</span>
 <span id="cb4-3"><a></a></span>
@@ -448,14 +448,14 @@ rkskmt
 </div>
 </div>
 </div>
-<div title="クイズ">
+<div title="質問">
 <div class="callout callout-important callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>クイズ</strong></p>
+<p><strong>質問</strong></p>
 </div>
 <div class="callout-content">
 <p>目に見える塊は「左上」と「右下」。なのに機械の答えは<strong>ほぼ真横の輪切り</strong>。 輝度を完全に無視しているのはなぜ？</p>
@@ -501,7 +501,7 @@ rkskmt
 <section id="peek-scale" class="slide level2">
 <h2>試行2: スケールを揃えて再挑戦</h2>
 <div class="slide-body">
-<div id="b2a2f37f" class="cell" data-execution_count="5">
+<div id="174c3281" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
 <span id="cb5-2"><a></a></span>
 <span id="cb5-3"><a></a>X_scaled <span class="op">=</span> StandardScaler().fit_transform(X)   <span class="co"># 各特徴量を平均0・分散1に</span></span>
@@ -538,7 +538,7 @@ rkskmt
 <ul>
 <li>このデータの正体は、これまでの講義で使ってきた Salmon / Sea bass</li>
 </ul>
-<div id="2589e0fc" class="cell" data-execution_count="6">
+<div id="17e07ceb" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a></a>y_true <span class="op">=</span> np.array([<span class="dv">1</span>]<span class="op">*</span><span class="dv">40</span> <span class="op">+</span> [<span class="dv">0</span>]<span class="op">*</span><span class="dv">40</span>)   <span class="co"># 1=Salmon, 0=Sea bass（隠していた正解）</span></span>
 <span id="cb6-2"><a></a></span>
 <span id="cb6-3"><a></a>agree <span class="op">=</span> np.mean(cluster_labels2 <span class="op">==</span> y_true)</span>
@@ -548,7 +548,7 @@ rkskmt
 <pre><code>正解ラベルとの一致: 92.5%（74/80匹）</code></pre>
 </div>
 </div>
-<div id="d46b7fa0" class="cell" data-execution_count="7">
+<div id="cb21be8c" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -575,7 +575,7 @@ rkskmt
 <section id="k-means-の動き中で起きていたこと" class="slide level2">
 <h2>k-means の動き（中で起きていたこと）</h2>
 <div class="slide-body">
-<div id="9232fd28" class="cell" data-execution_count="8">
+<div id="83853ccc" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -597,7 +597,7 @@ rkskmt
 <li>「assign → update」は<strong>最初の重心の位置</strong>から始まる — そこは<strong>ランダム</strong>に選ばれる</li>
 <li>運の悪い初期値だと、おかしな所で落ち着く（下の左：青が2つの塊を飲み込んだ）</li>
 </ul>
-<div id="3d09a1f1" class="cell" data-execution_count="9">
+<div id="a97278a7" class="cell" data-execution_count="9">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -641,7 +641,7 @@ rkskmt
 <li>本当のラベルなしデータでは <strong>k 自体を決める必要がある</strong></li>
 <li><strong>エルボー法</strong>：k を変えながら「クラスタ内のまとまり度」を測る</li>
 </ul>
-<div id="c5e14793" class="cell" data-execution_count="10">
+<div id="975e8e09" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a></a>inertias <span class="op">=</span> []</span>
 <span id="cb8-2"><a></a>ks <span class="op">=</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">9</span>)</span>
 <span id="cb8-3"><a></a></span>
@@ -721,13 +721,13 @@ rkskmt
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>ここで観察</strong></p>
+<p><strong>チェックポイント</strong></p>
 </div>
 <div class="callout-content">
 <ul>
 <li>k=3 の3つ目のクラスタは <strong>Sea bass 側を割って</strong>生まれる（Salmon 34匹の塊はほぼ無傷）— 増やした分は「一番ゆるい塊」が割られる</li>
 <li>グラム→キログラムに変えただけで、こんどは<span class="hl">輝度がほぼ独裁</span>して割り方が変わる — 「どの特徴量が偉いか」は<strong>単位次第</strong>。それを消すのがスケーリング</li>
-<li>この魚データでは1回勝負でも inertia は 67.8 前後でほぼ不動 — きれいな2山は初期値に強い（崩れる実例は「最初の重心」のスライドの3山データ）</li>
+<li>この魚データでは1回勝負でも inertia は 67.8 前後でほぼ不動 — きれいな2つの山は初期値に強い（崩れる実例は「最初の重心」のスライドの3つの山データ）</li>
 </ul>
 </div>
 </div>
@@ -737,11 +737,11 @@ rkskmt
 <section id="k-means-の限界" class="slide level2">
 <h2>k-means の限界</h2>
 <div class="slide-body">
-<div id="ccedcd54" class="cell" data-execution_count="11">
+<div id="1b6d3529" class="cell" data-execution_count="11">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="clustering-kmeans_files/figure-revealjs/cell-12-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img data-src="clustering-kmeans_files/figure-revealjs/cell-12-output-1.png" class="quarto-figure quarto-figure-center" width="886" height="346"></a></p>
+<p><a href="clustering-kmeans_files/figure-revealjs/cell-12-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img data-src="clustering-kmeans_files/figure-revealjs/cell-12-output-1.png" class="quarto-figure quarto-figure-center" width="802" height="346"></a></p>
 </figure>
 </div>
 </div>
@@ -861,7 +861,7 @@ rkskmt
 <section id="問題2の解答例" class="slide level2">
 <h2>問題2の解答例</h2>
 <div class="slide-body">
-<div id="497f40e7" class="cell" data-execution_count="12">
+<div id="9c3fa967" class="cell" data-execution_count="12">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
