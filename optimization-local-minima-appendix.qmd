@@ -126,7 +126,7 @@ $$x_{\text{new}} = x - \alpha \cdot f'(x)$$
 
 ```{python}
 #| echo: true
-def gradient_descent(f, fp, x0, alpha=0.1, tol=1e-6, max_iter=10000):
+def gradient_descent(f, fp, x0, lr=0.1, tol=1e-6, max_iter=10000):
     """勾配降下法：収束した場所・そこでの f(x)・通り道を返す"""
     x = x0
     history = [x]
@@ -134,7 +134,7 @@ def gradient_descent(f, fp, x0, alpha=0.1, tol=1e-6, max_iter=10000):
         grad = fp(x)
         if abs(grad) < tol:      # 傾きほぼゼロ → 収束
             break
-        x = x - alpha * grad     # 傾きの逆へ、少し進む
+        x = x - lr * grad     # Move a little against the gradient
         history.append(x)
     return x, f(x), history
 ```
@@ -792,7 +792,7 @@ $f(x)$ が**一番小さい**結果を選ぶ。
 
 ```{python}
 #| echo: true
-def robust_optimization(f, fp, fpp, x0_list, alpha=0.1, max_iter=10000):
+def robust_optimization(f, fp, fpp, x0_list, lr=0.1, max_iter=10000):
     """
     複数の初期値を使ったロバストな最適化（勾配降下法版）
 
@@ -802,7 +802,7 @@ def robust_optimization(f, fp, fpp, x0_list, alpha=0.1, max_iter=10000):
         目的関数とその1次微分、2次微分（2次微分は谷の検品用）
     x0_list : list
         初期値のリスト
-    alpha : float
+    lr : float
         学習率
     max_iter : int
         最大反復数
@@ -823,7 +823,7 @@ def robust_optimization(f, fp, fpp, x0_list, alpha=0.1, max_iter=10000):
             grad = fp(x)
             if abs(grad) < 1e-6:       # 傾きほぼゼロ → 収束
                 break
-            x = x - alpha * grad       # 傾きの逆へ、少し進む
+            x = x - lr * grad       # Move a little against the gradient
 
         all_results.append({
             "x0": x0,
@@ -1216,10 +1216,10 @@ def newton_safe(f, fp, fpp, x0, max_iter=100):
         d = -g / h if h != 0 else -g       # Newton法の「提案」
         if g * d >= 0:                     # 検査1：登りなら却下して
             d = -g                         #   最急降下に差し替え
-        alpha = 1.0
-        while f(x + alpha * d) > f(x) - 1e-4 * alpha * abs(g * d):
-            alpha /= 2                     # 検査2：実測で下がるまで歩幅半分
-        x = x + alpha * d
+        step_size = 1.0
+        while f(x + step_size * d) > f(x) - 1e-4 * step_size * abs(g * d):
+            step_size /= 2                 # Halve the step until the value decreases
+        x = x + step_size * d
     return x, f(x)
 
 # 故障していた2つの初期値で試運転

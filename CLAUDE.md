@@ -75,6 +75,9 @@ Use Python as the vehicle, but frame concepts as broadly as possible. Where a co
 - **Figure/image sizing: `#| out-width` and pixel `width` attributes do NOT work.** The theme's `.reveal img { width: auto; height: auto }` (custom.css) overrides HTML width/height attributes, so Quarto's `out-width` silently renders at natural size (verified 2026-08-15). Shrink figures with `#| classes: fig-small` (max-height 300px) / `fig-medium` (400px) on the cell, or wrap in `::: {.fig width="60%"}` — figscale.lua moves a *percentage* width onto the img as an inline style, which does win over the theme CSS. After resizing, check the rendered slide: a callout pushed below the fold by an oversized figure is the usual symptom.
 - **Highlight marker (`==text==`):** `hl.lua` filter turns `==text==` into a highlighted span (white text + cyan outline). Since cleanslidekit v1.4.0 phrases with spaces work too (`==a b==`); a literal `a == b` or an unclosed `==` stays untouched. `[a b]{.hl}` also still works.
 - **MathJax `\vec{}` height fix:** `\vec{a}` and `\vec{b}` render at different heights because `b` has an ascender. Use `\vec{\vphantom{b}a}` to match the arrow height of shorter letters to `b`.
+- **LaTeX backslash-loss check (recurring bug, fixed 2026-08-16):** Slide math has repeatedly lost its backslashes (`\alpha`→`alpha`, `,\qquad`→`,qquad`, `\dfrac`→`dfrac`), always clustered within one slide: that slide's text once passed through an escape-eating write path. Prevention: write `.qmd` content only via the Write/Edit tools (never shell heredoc/echo/redirection), and after touching any math run
+  `grep -nE '(^|[^\\a-zA-Z])(dfrac|qquad|quad|underbrace|mathbf|mathrm|leftarrow|infty|therefore)([^a-zA-Z]|$)' *.qmd`
+  (these commands never appear in prose/code, so any hit is a broken formula). Greek letters (`alpha` etc.) cannot be grepped globally because matplotlib code uses `alpha=`. For those, eyeball the `$...$` spans and the rendered slide.
 
 ## Deck-writing policies
 
@@ -100,7 +103,7 @@ quarto preview --port 4321   # local dev server (fixed port)
 quarto render                # build to _site/
 ```
 
-**Heavy render:** `mnist-project.qmd` downloads MNIST (~12MB, cached in gitignored `data/`) and trains an MLP for 3 epochs on CPU — expect a few minutes for that file. `pytorch-intro.qmd` and `nn-numpy.qmd` each train for a few seconds.
+**Heavy render:** `mnist-project.qmd` downloads MNIST (~12MB, cached in gitignored `data/`) and trains an MLP for 3 epochs on CPU — expect a few minutes for that file. `nn-backprop.qmd` and `pytorch-intro.qmd` each train for a few seconds.
 
 **After editing any `.qmd`, render the changed files before finishing** (`quarto render <file>.qmd`, with the `ai` conda env active) so `_site/` matches the source — the user reviews changes through qmd_editor, whose preview shows the rendered output; a stale `_site/` hides the edits. Do not run `quarto preview` or publish yourself — the user owns those. (Rule revised 2026-08-15; previously "never render".)
 
@@ -141,4 +144,5 @@ https://rkskmt.github.io/ai-lectures/
 - **[doc/troubleshooting.md](doc/troubleshooting.md)** — CSS/style changes: which custom.css to edit, Pandoc vs reveal layers, cache issues
 - **[doc/engaging-lecture-design.md](doc/engaging-lecture-design.md)** — lecture design playbook (cold open, 問いかけ→めくり, one-dataset-per-section). **Read before writing or restructuring any lecture.**
 - **[doc/slide-tone-rules.md](doc/slide-tone-rules.md)** — wording/tone rules (functional titles, no game/drama vocabulary, precision over vividness). **Read before writing or reviewing any slide text.**
+- **[doc/slide-clarity-rules.md](doc/slide-clarity-rules.md)** — rules for removing ambiguity from symbols, values, equations, code, and cross-slide references, with worked examples from the logistic-regression deck. **Read before writing or reviewing technical explanations.**
 - **[doc/measured-log.md](doc/measured-log.md)** — the verified numbers behind every assertive slide claim (see Deck-writing policies). Log new measurements here before citing them.

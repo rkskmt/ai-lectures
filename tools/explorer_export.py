@@ -4,7 +4,7 @@
 # doc/course-arc.md §実測ログ (never write a number on a slide that was not
 # printed by this script or by the deck itself).
 #
-#   moons : nn-numpy.qmd    — 2-16-1 MLP, full batch, lr 0.5, 4000 iters, rng(0)
+#   moons : nn-backprop.qmd — 2-16-1 MLP, full batch, lr 0.5, 4000 iters, rng(0)
 #   mnist : mnist-project.qmd — Flatten/Linear(784,128)/ReLU/Linear(128,10),
 #                               Adam lr 1e-3, batch 128 shuffle, 3 epochs, seed 0
 #
@@ -35,7 +35,7 @@ def rl(a, nd=ND):
 
 
 # ---------------------------------------------------------------- moons ----
-# Mirrors nn-numpy.qmd line for line (forward / backward / training loop).
+# Mirrors nn-backprop.qmd line for line (forward / backward / training loop).
 
 def forward(X, W1, b1, w2, c2):
     Z = X @ W1 + b1

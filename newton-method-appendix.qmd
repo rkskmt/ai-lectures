@@ -252,10 +252,10 @@ ax1.axvline(x=2, color="gray", linestyle="--", alpha=0.5, label="Minimum x=2")
 
 # 勾配降下法
 x_gd = 0.0
-alpha = 0.3
+lr = 0.3
 gd_history = [x_gd]
 for i in range(10):
-    x_gd = x_gd - alpha * f_prime(x_gd)
+    x_gd = x_gd - lr * f_prime(x_gd)
     gd_history.append(x_gd)
 
 ax1.plot(gd_history, [f(h) for h in gd_history], "mo-",

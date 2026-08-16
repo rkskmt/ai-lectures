@@ -218,5 +218,7 @@ Mermaid は使わない（D2 に移行済み）。
 
 - [doc/measured-log.md](doc/measured-log.md) — スライド断定数値の実測ログ（新しい数値はまず tools/ で測ってここへ）
 - [doc/engaging-lecture-design.md](doc/engaging-lecture-design.md) — 講義設計の装置（コールドオープン、問いかけ→めくり等）
+- [doc/slide-tone-rules.md](doc/slide-tone-rules.md) — スライドの語り口、タイトル、言葉の選び方
+- [doc/slide-clarity-rules.md](doc/slide-clarity-rules.md) — 記号・数値・数式・コードの曖昧さを残さない編集ルール
 - [doc/slide-tone-rules.md](doc/slide-tone-rules.md) — スライドの語り口ルール（機能ラベルのタイトル、ゲーム語彙禁止、正確さ優先）
 - [doc/troubleshooting.md](doc/troubleshooting.md) — CSS変更時の注意点（編集すべき custom.css の場所、キャッシュ）

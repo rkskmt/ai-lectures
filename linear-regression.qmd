@@ -6,18 +6,36 @@ subtitle: "fit() を自分の手で作る"
 ## ここまでの道具
 
 - **勾配降下法**：傾きの逆方向に少しずつ進んで、損失が最小の場所を探す
-- ただし前回最小化したのは、練習用の数学の関数 $f(x) = x^2 - 4x + 3$ だった
+- ただし前回最小化したのは、簡単な関数 $f(x) = x^2 - 4x + 3$ だった
 
-::: {.callout-note title="今回の問い"}
-勾配降下法で、**本物のモデル**を `fit` できるか？ — `fit()` の自作、第1号
+::: {.callout-note title="今回の目的"}
+勾配降下法で回帰モデルを`fit` する
 :::
+
+
+## モデルとは
+
+- これまでの「モデル」を、2つの部分に分けてみる：
+
+| 回 | 計算の形（人間が決めた） | 空欄の数字（データが決めた） |
+|---|---|---|
+| 1次元分類 | 重さをしきい値と比べて判定 | しきい値（1個） |
+| 2次元の決定境界 | 直線の上下で判定 | 傾きと切片（2個） |
+| クラスタリング | 一番近い重心に割り当て | 重心の座標（k個） |
+
+::: {.callout-important title="モデル（model）"}
+- 入力から出力を計算するやり方。ただし、**形**だけが決まっていて、中の数字は**空欄**
+- 空欄の名前が**パラメータ**
+- 空欄をデータで埋めるのが**学習**（`fit()` がやっていたこと）
+:::
+
+- 今回もまず、人間が**形**を決める。何を選ぶかは、データを見てから
 
 
 ## 回帰問題とは
 
 - **分類**：どのグループか答える（Salmon か Sea bass か）
-- **回帰**：**数値そのもの**を予測する（重さは何グラムか）
-- [概論の「AIが扱うタスク」](ai-introduction.qmd#peek-ai-tasks){.peek}の2番目が、今日ようやく登場
+- **回帰（[regression]{.en}）**：**数値そのもの**を予測する（重さは何グラムか）
 
 | | 分類 | 回帰 |
 |---|---|---|
@@ -78,15 +96,12 @@ plt.show()
 $$L(a, b) = \frac{1}{N} \sum_{i} \left( \underbrace{a x_i + b}_{\text{予測}} - \underbrace{t_i}_{\text{実際}} \right)^2$$
 
 - **MSE（[**Mean Squared Error**]{.en} / 平均二乗誤差）**と呼ぶ
+- 全魚のズレを1本のベクトルと見ると、MSE はその**ノルム（[norm]{.en}・ベクトルの長さ）**の2乗を $N$ で割ったもの
 
-::: {.callout-important title="質問"}
-ズレの測り方なら**絶対値**でもいいはず。なぜ二乗？
-:::
-
-::: {.fragment}
-- 絶対値は 0 のところで**微分できない**（カクッと折れている）
-- 二乗なら微分がきれい
-- 勾配降下法を使う前提で、損失は「微分しやすいもの」を選ぶ
+::: {.callout-note title="損失関数は MSE だけではない"}
+- ズレの**絶対値**の平均でも「小さいほど良い直線」は測れる — **MAE（[Mean Absolute Error]{.en} / 平均絶対誤差）**
+- ズレの4乗の平均でもよい。「ズレが減るほど小さくなる」関数なら損失関数の候補になれる
+- 今回 MSE を選ぶ理由は**微分のしやすさ**：絶対値は 0 のところで折れていて微分できない。二乗なら微分がきれい
 :::
 
 
@@ -101,12 +116,18 @@ $$\frac{\partial L}{\partial a} = \frac{2}{N} \sum_i (a x_i + b - t_i) \, x_i
 - 構造は単純：**「予測と正解の差」を入力の大きさに応じて配る**
 - あとは勾配降下法に渡すだけ：
 
-$$a \leftarrow a - \eta \frac{\partial L}{\partial a}, \qquad b \leftarrow b - \eta \frac{\partial L}{\partial b}$$
+$$a \leftarrow a - \alpha \frac{\partial L}{\partial a}, \qquad b \leftarrow b - \alpha \frac{\partial L}{\partial b}$$
+
+::: {.callout-tip title="数式とコードの名前"}
+- 数式では、勾配降下法の回と同じく学習率を $\alpha$ と書く
+- コードでは、learning rateを略して `lr` と書く
+:::
 
 
 ## 勾配降下法で fit する {#peek-gdfit-code}
 
 - スケールを揃えてから（[クラスタリングの回の教訓](clustering-kmeans.qmd#peek-scale){.peek}。学習率を1つで済ませるため）
+
 
 ```{python}
 #| echo: true
@@ -114,7 +135,7 @@ x = (lengths - lengths.mean()) / lengths.std()   # 標準化した体長
 t = (weights - weights.mean()) / weights.std()   # 標準化した重さ
 
 a, b = 0.0, 0.0   # 直線はゼロからスタート
-lr = 0.1          # 学習率
+lr = 0.1          # Learning rate alpha in the equation
 
 for i in range(1, 101):
     pred   = a * x + b
@@ -178,6 +199,19 @@ plt.show()
 - ロジスティック回帰の回で見る「境界が動く」と**同じ現象の回帰版**
 
 
+## 回帰直線でできること
+
+- 新しい魚は、体長を測って式に入れるだけで重さを**予測**できる。秤に乗せなくてよい
+- 「数値から数値を予測する」問題は、身の回りにいくらでもある：
+
+| 入力 | 予測したい数値 |
+|---|---|
+| 気温 | アイスクリームの売り上げ |
+| 部屋の広さ・駅からの距離 | 家賃 |
+| 広告費 | 商品の売り上げ |
+
+- どれも今回と同じ手順で解ける：モデルの形を決め、損失を決め、勾配降下法で `fit` する
+
 ## 答え合わせ：sklearn と比べる
 
 ```{python}
@@ -204,10 +238,9 @@ print(f"sklearn の fit: a={reg.coef_[0]:.4f}, b={reg.intercept_:.4f}")
 :::
 
 
-## 新しい仕入れ先の魚は15匹しかない
+## モデルを曲線にする
 
-- 別の仕入れ先から来た魚は、まだ**15匹**しか測れていない
-- 直線だけでなく、**曲線**も引ける：多項式回帰
+- 回帰式は直線だけでなく、**曲線**でもよい：多項式回帰
 
 $$\text{予測} = w_1 x + w_2 x^2 + \cdots + w_d x^d + b$$
 
@@ -293,43 +326,83 @@ plain.fit(X_train, y_train)
 print("次数9の係数の最大絶対値:", f"{np.abs(plain[-1].coef_).max():,.0f}")
 ```
 
-- そこで、損失に「係数の大きさ」への**罰金**を足す：
+- そこで、損失に「係数の大きさ」への**ペナルティ**を課すことを考える：
 
-$$L = \mathrm{MSE} + \alpha \sum_j w_j^2$$
+$$L = \mathrm{MSE} + \lambda \sum_j w_j^2$$
 
-- これが **Ridge 回帰**（L2正則化）
-- 訓練データに合わせたい力と、係数を小さく保ちたい力の**綱引き**。$\alpha$ がその強さ
+- このように、モデルの暴走を抑える罰則を損失に足す手法を**正則化（[regularization]{.en}）**という
+- MSE だけではなく、係数の大きさも loss に入れ込む
+- $\lambda$（ラムダ）が罰金の強さ。$\lambda = 0$ なら今までどおりの MSE
 
 
-## Ridge で手なずける {#peek-ridge-code}
+## 正則化の実装：自作の勾配降下法に罰金を足す {#peek-ridge-code}
+
+- sklearn には任せない。冒頭で自作した勾配降下法に、**罰金の項を足すだけ**
+- 罰金 $\lambda \sum w^2$ の微分は $2\lambda w$。各係数の勾配に足せばよい
 
 ```{python}
 #| echo: true
-#| fig-align: center
-from sklearn.linear_model import Ridge
+# 特徴量 x, x², …, x⁹ も自分で作る（列が x^1 〜 x^9 の配列）
+P_train = X_train ** np.arange(1, 10)          # 形 (10, 9)
+P_test  = X_test  ** np.arange(1, 10)
+mu, sd  = P_train.mean(axis=0), P_train.std(axis=0)
+P_train = (P_train - mu) / sd                  # スケールを揃える（いつもの）
+P_test  = (P_test  - mu) / sd
+t_mean, t_std = y_train.mean(), y_train.std()
+tt = (y_train - t_mean) / t_std                # 重さも標準化
+
+lam  = 0.1        # 罰金の強さ λ
+w, b = np.zeros(9), 0.0
+lr   = 0.01
+for i in range(10_000):
+    pred   = P_train @ w + b
+    grad_w = np.array([2 * np.mean((pred - tt) * P_train[:, d]) for d in range(9)]) \
+             + 2 * lam * w                     # ← MSEの勾配 ＋ 罰金の勾配
+    grad_b = 2 * np.mean(pred - tt)
+    w -= lr * grad_w
+    b -= lr * grad_b
+
+test_pred = (P_test @ w + b) * t_std + t_mean  # 元の単位（g）に戻す
+print("係数の最大絶対値:", f"{np.abs(w * t_std).max():,.0f}")
+print("テストMSE:", f"{np.mean((test_pred - y_test) ** 2):,.0f}")
+```
+
+- 係数の最大絶対値は **204,382 → 74**。罰金が係数の暴走を実際に止めた
+- 勾配降下法のループは冒頭の自作コードと同じ形。増えたのは `+ 2 * lam * w` の1項だけ
+
+
+## 罰金あり・なしを見比べる
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "描画コード"
+P_grid    = ((grid ** np.arange(1, 10)) - mu) / sd
+own_curve = (P_grid @ w + b) * t_std + t_mean
 
 fig, axes = plt.subplots(1, 2, figsize=(9.5, 3.6))
-for ax, (model, name) in zip(axes, [
-        (make_pipeline(PolynomialFeatures(9), StandardScaler(), LinearRegression()),
-         "次数9（正則化なし）"),
-        (make_pipeline(PolynomialFeatures(9), StandardScaler(), Ridge(alpha=1.0)),
-         "次数9 + Ridge")]):
-    model.fit(X_train, y_train)
-    mse = mean_squared_error(y_test, model.predict(X_test))
+for ax, curve, name, mse in [
+        (axes[0], plain.predict(grid), "次数9（正則化なし）",
+         mean_squared_error(y_test, plain.predict(X_test))),
+        (axes[1], own_curve, "次数9 + 正則化（自作の勾配降下法）",
+         np.mean((test_pred - y_test) ** 2))]:
     ax.scatter(X_train, y_train, c="#2980b9", s=45)
     ax.scatter(X_test, y_test, c="#e74c3c", marker="s", s=45)
-    ax.plot(grid, model.predict(grid), "k-", lw=2)
+    ax.plot(grid, curve, "k-", lw=2)
     ax.set_ylim(800, 2900)
     ax.set_title(f"{name}　テストMSE {mse:,.0f}", fontsize=10)
     ax.set_xlabel("体長 (cm)")
-    print(f"{name}: 係数の最大絶対値 = {np.abs(model[-1].coef_).max():,.0f}")
 axes[0].set_ylabel("重さ (g)")
 plt.tight_layout()
 plt.show()
 ```
 
-- 同じ次数9なのに、罰金を入れただけで素直な曲線に戻った
-- テストMSEは**3桁以上**改善
+- 同じ次数9なのに、罰金の項を1つ足しただけで素直な曲線に戻った
+- テストMSEは 9,286,680 → 3,427 と**3桁以上**改善
+
+::: {.callout-note title="（参考）世間での呼び名"}
+$\lambda \sum w^2$ 型の罰金は **L2正則化**、L2正則化つきの線形回帰は**リッジ回帰（[Ridge regression]{.en}）**と呼ばれる。`sklearn` にも `Ridge` として入っている。
+:::
 
 ::: {.callout-note title="過学習スレッド、完結"}
 引き（決定木のあやしい満点）→ 正体（訓練とテストのギャップ）→ **対抗手段（複雑さの制御と正則化）**。
@@ -337,23 +410,23 @@ NN でも同じ道具（L2正則化＝weight decay）がそのまま使われる
 :::
 
 
-## **Tweak** 罰金の強さで曲線が化ける {.badge-practice}
+## **Tweak** 罰金の強さで曲線が変わる {.badge-practice}
 
-- [さっきのコード](#peek-ridge-code){.peek} の `Ridge(alpha=1.0)` を**書き換えて実行**
+- [さっきのコード](#peek-ridge-code){.peek} の `lam = 0.1` を**書き換えて実行**（比較の図まで続けて実行すると形の変化が見える）
 
 ::: {.tweak}
 | やりたいこと | コード |
 |--|--|
-| 罰金をほぼゼロにする | `Ridge(alpha=1e-6)` |
-| 罰金を強烈にする | `Ridge(alpha=1000)` |
+| 罰金をゼロにする | `lam = 0.0` |
+| 罰金を強烈にする | `lam = 10` |
 :::
 
 ::: {.callout-tip}
 ## ここで観察
 
-- `1e-6`：罰金がほぼゼロなのに、左端の大暴れは**ほぼ消える**（係数の最大絶対値 20万 → 1万）— あの暴走は、ごくわずかな罰金にすら耐えられない不安定な解だった
-- `1000`：曲線はほぼ**まっすぐ寝る** — 罰金が強すぎて、訓練データに合わせる力が負けた
-- ちょうど良い $\alpha$ は問題ごとに違う。**訓練データではなくテストデータの MSE** で選ぶ
+- `0.0`：テストMSEは 3,427 → **21,721** と6倍以上悪化。ただし厳密解の大暴れ（929万）までは行かない。勾配降下法を1万回で打ち切ること自体が、暴走を途中で止める弱いブレーキになっているため
+- `10`：曲線はほぼ**まっすぐ寝て**、訓練MSEまで悪化する（3,585 → 35,665）。罰金が強すぎて、訓練データに合わせる力が負けた
+- ちょうど良い $\lambda$ は問題ごとに違う。**訓練データではなくテストデータの MSE** で選ぶ
 :::
 
 
@@ -363,7 +436,7 @@ NN でも同じ道具（L2正則化＝weight decay）がそのまま使われる
 - 勾配降下法で fit を自作 → `sklearn` と**完全一致**
 - **多項式回帰**：特徴量に $x^2, x^3, \ldots$ を足せば道具は線形回帰のまま
 - **過学習は回帰でも起きる**：次数を上げると訓練誤差↓・テスト誤差爆発
-- **正則化（[ridge]{.en}）**：大きい係数に罰金 → 暴れる曲線を手なずける
+- **正則化（[regularization]{.en}）**：大きい係数に罰金 → 暴れる曲線を手なずける
 
 ::: {.callout-note title="次回予告"}
 回帰の `fit()` は開けた。次は**分類**の `fit()` —
@@ -378,7 +451,7 @@ NN でも同じ道具（L2正則化＝weight decay）がそのまま使われる
 ### 問題1：魚2匹だけの世界で fit する
 
 データは2点だけ：$(x_1, t_1) = (-1, 0)$、$(x_2, t_2) = (1, 2)$。
-直線 $ax + b$ を勾配降下法で fit する。初期値 $a = 0, b = 0$、学習率 $\eta = 0.1$。
+直線 $ax + b$ を勾配降下法で fit する。初期値 $a = 0, b = 0$、学習率 $\alpha = 0.1$。
 
 1. 勾配の式に代入して、$\dfrac{\partial L}{\partial a}$ と $\dfrac{\partial L}{\partial b}$ を求めよ
 2. 更新を3回、手計算で示せ

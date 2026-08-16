@@ -6,12 +6,13 @@ subtitle: "分類の fit() を開ける"
 ## ここまでの道具
 
 - **勾配降下法**：傾きの逆方向に少しずつ進んで最小値を探す（最適化の回）
-- **回帰の `fit()` は自作済み**：体長→重さの直線を勾配降下で当て、sklearn と一致した（前回）
-- 分類はどうか — 決定境界の回では、直線を**目で見て**引いた
+- **回帰**：体長→重さの直線を勾配降下で当て、sklearn と一致した（前回）
+- **分類** — 決定境界の回では、直線を**目で見て**引いた
 
-::: {.callout-note title="今回の問い"}
-「斜めの直線で分けられそう」と言いながら、引けたのは縦線だけだった。
-**斜めの最適な直線**を、機械に fit させられるか？
+
+::: {.callout-note title="今回のテーマ"}
+- [「斜めの直線で分けられそう」と言いながら、引けたのは縦線だけだった](classification-2d-boundaries.qmd#peek-diagonal){.peek}。
+- **決定境界の斜めの最適な直線**を、機械に fit させられるか？
 :::
 
 
@@ -86,7 +87,7 @@ plt.show()
 ```
 
 - 例えば、この直線の正答率は **91%**（縦線は 86% ）
-   - TODO：ここに直線の式
+   - 図の直線の式：$\text{重さ} = 120 \times \text{輝度} + 1050$
 - **この線さえあれば、判別は「線の上か下か」だけでいい**
    - **決定境界**
 - ただし直線のパラメータは無限に考えられる
@@ -141,14 +142,14 @@ plt.show()
 :::
 
 
-## ロジスティック回帰（[Logistic Regression]{.en}）
+## ロジスティック回帰（[Logistic Regression]{.en}） {#peek-logistic-structure}
 
 ```{.d2 sketch="true" width="90%"}
 direction: right
 X: "入力\nx₁（輝度）\nx₂（重さ）" { style.fill: "#e1f5ff" }
 LR: "ロジスティック回帰" {
-  A: "Step 1\n線形結合＋バイアス\nz = α₁x₁ + α₂x₂ + b" { style.fill: "#fff4e1" }
-  S: "Step 2\nシグモイド\np = σ(z)" { shape: hexagon; style.fill: "#fdebd0" }
+  A: "Step 1\n線形結合＋バイアス\nz = w₁x₁ + w₂x₂ + b" { style.fill: "#fff4e1" }
+  S: "Step 2\nロジスティック関数\np = σ(z)" { shape: hexagon; style.fill: "#fdebd0" }
   A -> S
 }
 P: "確率 p\n（0〜1）" { style.fill: "#d5f5e3" }
@@ -158,8 +159,8 @@ LR.S -> P
 
 - **ロジスティック回帰**：直線のパラメータを最適化して分類
 - 中身は**2ステップ**
-   - Step 1 ：**直線**
-   - Step 2 ：**確率**
+   - Step 1 ：**直線を仮定**
+   - Step 2 ：**適合する確率を計算**
 
 ::: {.callout-note title="「回帰」なのに分類？"}
 - 予測対象が 0/1 のラベルではなく「Salmon である**確率**」という連続値だから
@@ -168,13 +169,13 @@ LR.S -> P
 :::
 
 
-## Step 1：線形結合＋バイアス
+## Step 1：直線のモデルを仮定（線形結合＋バイアス） {#peek-logistic-linear}
 
-$$z = \alpha_1 x_1 + \alpha_2 x_2 + b$$
+$$z = w_1 x_1 + w_2 x_2 + b$$
 
 - $x_1, x_2$：入力（輝度、重さ）
-- $\alpha_1, \alpha_2$：**重み（[weight]{.en}）**（どの特徴量をどれだけ重視するか）
-- $b$：**バイアス（[bias]{.en}）**（全体のオフセット）
+- $w_1, w_2$：**重み（[weight]{.en}）**（どの特徴量をどれだけ重視するか）
+- $b$：**バイアス（[bias]{.en}）**（直線の切片）
 
 ::: {.takeaway}
 魚1匹の $x_1, x_2$ を入力すると、$z$ という**1つの値**にまとまる
@@ -185,19 +186,50 @@ $$z = \alpha_1 x_1 + \alpha_2 x_2 + b$$
 
 - $z = 0$ と置くと：
 
-$$\underbrace{\alpha_1}_{a}\, x_1 + \underbrace{\alpha_2}_{b}\, x_2 + \underbrace{\;b\;}_{c} = 0$$
+$$\underbrace{w_1}_{A}\, x_1 + \underbrace{w_2}_{B}\, x_2 + \underbrace{\;b\;}_{C} = 0$$
 
-- **直線の式 $ax + by + c = 0$** そのもの — さっきの斜めの線の正体はこれ（決定境界）
-- $z$ の**符号**が「線の上か下か」、**大きさ**が線からの遠さ
-- 求めたいのは結局、**この $a, b, c$（ここでは $\alpha_1, \alpha_2, b$）の3つの数** — これを機械に探させる
+- **直線の式 $Ax_1 + Bx_2 + C = 0$** そのもの
+   - この直線を決定境界とする
+- $z$ の**符号**が「線の上か下か」を表現
+- $z$ の**大きさ**が「線からの遠さ」を表現
+
+```{python}
+#| echo: false
+#| fig-align: center
+#| classes: fig-small
+xx1 = np.linspace(-0.5, 4.5, 50)
+plt.figure(figsize=(6.2, 3.2))
+plt.fill_between(xx1, 2 - xx1, 4.5, color="#f5b7b1", alpha=0.4)
+plt.fill_between(xx1, -1.5, 2 - xx1, color="#aed6f1", alpha=0.4)
+plt.plot(xx1, 2 - xx1, "b--", lw=2.5)
+plt.scatter([3, 1], [2, 0.5], c="#2c3e50", s=55, zorder=5)
+plt.annotate("z = +3（線から遠い）", (3, 2), xytext=(1.5, 2.9), fontsize=10,
+             arrowprops={"arrowstyle": "->", "color": "gray"})
+plt.annotate("z = −0.5（線に近い）", (1, 0.5), xytext=(1.5, -1.1), fontsize=10,
+             arrowprops={"arrowstyle": "->", "color": "gray"})
+plt.text(3.0, 3.7, "z > 0 の側", fontsize=11, color="#c0392b", fontweight="bold")
+plt.text(-0.3, -0.2, "z < 0 の側", fontsize=11, color="#2471a3", fontweight="bold")
+plt.xlim(-0.5, 4.5); plt.ylim(-1.5, 4.5)
+plt.xlabel("$x_1$"); plt.ylabel("$x_2$")
+plt.title("例：$z = x_1 + x_2 - 2$ の場合", fontsize=11)
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-note title="最適化の対象"}
+-  **$A, B, C$（ここでは $w_1, w_2, b$）** をパラメータとして最適化する
+:::
 
 
-## Step 2：$z$ を「確率」にする — シグモイド（[Sigmoid]{.en}）
+## Step 2：$z$ を「確率」にする — ロジスティック関数 {#peek-logistic-function}
 
-$$p = \sigma(z) = \frac{1}{1 + e^{-z}}$$
+$$p=\sigma(z)=\frac{1}{1+e^{-z}}$$
 
-$$p = \sigma(\alpha_1 x_1 + \alpha_2 x_2 + b)
-= \frac{1}{1 + e^{-(\alpha_1 x_1 + \alpha_2 x_2 + b)}}$$
+- $\sigma$ がロジスティック関数、$z$ がその入力、$p$ が関数から得られる出力
+
+$$p = \sigma(w_1 x_1 + w_2 x_2 + b)
+= \frac{1}{1 + e^{-(w_1 x_1 + w_2 x_2 + b)}}$$
 
 ```{python}
 #| echo: false
@@ -208,104 +240,85 @@ plt.plot(zz, 1 / (1 + np.exp(-zz)), color="#e74c3c", lw=2.5)
 plt.axhline(0.5, color="gray", ls=":", lw=1)
 plt.axvline(0, color="gray", ls=":", lw=1)
 plt.xlabel("z"); plt.ylabel("p = σ(z)")
-plt.title("シグモイド関数")
+plt.title("ロジスティック関数")
 plt.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.show()
 ```
 
 - zの取りうる範囲である実数全体 $(-\infty, +\infty)$ を **0〜1 の範囲**に押し込む
-- $p \geq 0.5$ → Salmon、$p < 0.5$ → Sea bass と判定
+- [S字形の関数なので、機械学習では単に `sigmoid` と呼ぶことも多い](#peek-logistic-name){.peek}
+- $p \geq 0.5$ → Salmon、$p < 0.5$ → Sea bass と判定するとしましょう
 - $z = 0$（＝決定境界の上）のとき、ちょうど $p = 0.5$
 - 判定だけなら $z$ の符号で足りるが、$p$ は「**どれくらい自信があるか**」まで持っている
-   - これが後で学習の鍵になる
+   - これが学習の鍵になる
 
 
 ## $z = 1$ を実際に確率へ変換する
 
-- 実際に $z = 1$ をシグモイドへ入れる：
+- 実際に $z = 1$ のロジスティック関数を計算：
 
 $$p = \sigma(1) = \frac{1}{1 + e^{-1}} \approx 0.731$$
 
 - $z=1$ の魚を、Salmon である確率 $73.1\%$ と解釈できる
 
 
-## $e^x$ は微分しても $e^x$
+## ロジスティック関数を微分する {#peek-chain-rule}
 
-- 一般の指数関数（[exponential function]{.en}）$a^x$ を微分すると：
+- ロジスティック関数の傾きを、先に求めておく
+   - 勾配降下法で学習するには微分（傾き）が必要
+- 合成関数は、**外側の微分 × 内側の微分**：
 
-$$\frac{d}{dx}a^x=(\log a)a^x$$
+$$
+\frac{d}{dx}f(g(x))=f'(g(x))\,g'(x),
+\qquad
+\frac{dy}{dx}=\frac{dy}{du}\frac{du}{dx}
+$$
 
-- $\log a=1$ になる特別な底が $e\approx2.718$：
-
-$$\frac{d}{dx}e^x=e^x$$
-
-```{python}
-#| echo: false
-#| fig-align: center
-#| classes: fig-small
-xx = np.linspace(-2.2, 1.5, 300)
-plt.figure(figsize=(6.0, 3.0))
-plt.plot(xx, np.exp(xx), color="#e74c3c", lw=2.5, label="$y=e^x$")
-plt.plot(xx, xx + 1, color="#2980b9", ls="--", lw=2, label="$x=0$ での接線 $y=x+1$")
-plt.scatter([0], [1], color="#2c3e50", s=55, zorder=5)
-plt.annotate("値 1・傾き 1", (0, 1), xytext=(0.35, 0.45), fontsize=10,
-             arrowprops={"arrowstyle": "->", "color": "gray"})
-plt.xlabel("x")
-plt.ylabel("y")
-plt.ylim(-0.5, 4.8)
-plt.grid(True, alpha=0.3)
-plt.legend(fontsize=9, loc="upper left")
-plt.tight_layout()
-plt.show()
-```
-
-- 指数が $-z$ なら、連鎖律で内側の微分 $-1$ が掛かる：
-
-$$\frac{d}{dz}e^{-z}=e^{-z}\frac{d(-z)}{dz}=-e^{-z}$$
-
-::: {.takeaway}
-$e$ は、指数関数の**値と傾きが同じになるように選ばれた数**
-:::
-
-
-## シグモイドを微分する
-
-- $p=(1+e^{-z})^{-1}$ を $z$ で微分する：
+- $p=(1+e^{-z})^{-1}$ を合成関数として微分する：
+   - 外側：$(\;)^{-1}$
+   - 内側：$1+e^{-z}$（[指数関数の微分](#peek-exp-derivative){.peek}）
 
 $$\begin{aligned}
 \frac{dp}{dz}
-&=\frac{d}{dz}(1+e^{-z})^{-1} \\
-&=-(1+e^{-z})^{-2}(-e^{-z}) \\
+&=\underbrace{-(1+e^{-z})^{-2}}_{\text{外側の微分}}
+  \underbrace{(-e^{-z})}_{\text{内側の微分}} \\
 &=\frac{e^{-z}}{(1+e^{-z})^2}
 \end{aligned}$$
 
-- 一方、$p$ と $1-p$ を掛けると同じ形になる：
+
+## 実は、微分結果は $p$ だけで表せる
+
+- 微分した直後は、次の形になっている：
+
+$$
+\frac{dp}{dz}=\frac{e^{-z}}{(1+e^{-z})^2}
+\tag{1}
+$$
+
+- 一方、ロジスティック関数の出力は $p=\dfrac{1}{1+e^{-z}}$
+- $p(1-p)$ を計算すると、微分した直後と同じ形になる：
 
 $$p(1-p)
 =\frac{1}{1+e^{-z}}
  \left(1-\frac{1}{1+e^{-z}}\right)
-=\frac{e^{-z}}{(1+e^{-z})^2}$$
+=\frac{e^{-z}}{(1+e^{-z})^2}
+\tag{2}$$
+
+- (1)と(2)の右辺が同じなので、ロジスティック関数の微分は $p$ だけで書ける：
 
 $$\therefore \qquad \frac{dp}{dz}=p(1-p)$$
 
-- $z=1$、$p\approx0.731$ では $\dfrac{dp}{dz}\approx0.731(1-0.731)\approx0.197$
-
-::: {.callout-note title="勾配降下法につなぐには"}
-- 学習では $\alpha_j \to z \to p \to L$ を逆向きに微分する
-- シグモイドで分かるのは $z \to p$ の傾き。パラメータをどちらへ動かすかには、予測の悪さを表す**損失 $L$** も必要
+::: {.takeaway}
+$$
+\text{出力： }p=\sigma(z)
+\quad\Longrightarrow\quad
+\text{傾き： }\frac{dp}{dz}=p(1-p)
+$$
 :::
 
 
-## 名前の由来 — 何が「ロジスティック」？
 
-- **シグモイド（[sigmoid]{.en}）**は「S字型の」という意味の**総称**
-   - S字カーブの関数はみんなシグモイド
-- $\dfrac{1}{1+e^{-z}}$ の正式名は**ロジスティック関数（[logistic function]{.en}）**
-   - シグモイドの代表選手
-- 出自は機械学習ではなく、19世紀の**人口の成長モデル**
-   - 最初は勢いよく増え、資源の上限に近づくと頭打ちになる成長曲線がS字
-- ロジスティック関数で確率を出す回帰だから**ロジスティック回帰**
 
 
 ## {background-color="white" .center .break-slide}
@@ -319,63 +332,94 @@ $$\therefore \qquad \frac{dp}{dz}=p(1-p)$$
 
 ```{.d2 sketch="true" width="96%"}
 direction: right
-A: "現在のパラメータ\nα₁, α₂, b" { style.fill: "#fff4e1" }
+A: "現在のパラメータ\nw₁, w₂, b" { style.fill: "#fff4e1" }
 B: "予測\nz → p" { style.fill: "#e1f5ff" }
-C: "損失\nL(p, y)" { style.fill: "#fdebd0" }
+C: "全魚の平均損失\nL" { style.fill: "#fdebd0" }
 D: "微分\n勾配を求める" { style.fill: "#f5eef8" }
 E: "更新\nパラメータを動かす" { style.fill: "#d5f5e3" }
 A -> B -> C -> D -> E
 E -> A: "繰り返す"
 ```
 
-- 前の回と同じ更新式。$\eta$（イータ）は学習率：
+- 1匹分の損失を $\ell$、全魚の平均損失を $L$ と書き分ける
+- 前の回と同じ更新式。$\alpha$（アルファ）は学習率：
+   - コードではlearning rateを略して `lr` と書く
 
-$$\alpha_j \leftarrow \alpha_j-\eta\frac{\partial L}{\partial \alpha_j},
-\qquad b \leftarrow b-\eta\frac{\partial L}{\partial b}$$
+$$w_j \leftarrow w_j-\alpha\frac{\partial L}{\partial w_j},
+\qquad b \leftarrow b-\alpha\frac{\partial L}{\partial b}$$
 
+- ここで$j$ は「どの特徴量の重みか」を表す添字
+   - ここでは $j=1$（輝度）、$j=2$（重さ）
 - ロジスティック回帰で必要なのは：
    - 予測をどう採点するか：**損失 $L$**
-   - 損失を各パラメータでどう微分するか：**勾配**
-
-::: {.takeaway}
-このあとの微分は、勾配降下法の更新式に入れる**勾配を作るため**
-:::
+   - 採点結果をどう微分するか：**勾配**
 
 
-## 2クラスの確率は $p$ と $1-p$
+
+## 分類の確率
+
+### 2クラスに属する確率はそれぞれ $p$ と $1-p$
 
 - $p$：Salmon（$y=1$）になる確率
 - 2クラスしかないので、Sea bass（$y=0$）になる確率は残りの $1-p$
 
-$$P(y=1)=p, \qquad P(y=0)=1-p, \qquad p+(1-p)=1$$
+$$P(y=1)=p, \qquad P(y=0)=1-p$$
 
 - 例えば $p=0.4$ なら：
    - Salmon の確率は $0.4$
    - Sea bass の確率は $1-0.4=0.6$
 
 ::: {.takeaway}
-1つの出力 $p$ があれば、**両方のクラスの確率 $(p,\,1-p)$** が分かる
+1つの出力 $p$ は **両方のクラスの確率 $(p,\,1-p)$** を示している
 :::
 
 
-## 正解クラスに出した確率を採点する
+## 予測を採点する損失関数 — 交差エントロピー {#peek-cross-entropy}
 
-- 正解クラスに出した確率を $q$ と置く：
+- クラス $c$ ごとに、正解ラベル $y_c$ と予測確率 $p_c$ を用意する
+   - 正解クラスだけ $y_c=1$、それ以外は $y_c=0$
+
+$$
+\ell(\mathbf{y},\mathbf{p})
+=-\sum_c y_c\log p_c
+$$
+
+- $y_c=0$ の項は消えるので、正解クラスの項だけが残る
+- 正解クラスに出した確率を $q$ と置けば：
+
+$$\ell=-\log q$$
+
+::: {.takeaway}
+この損失関数を **交差エントロピー**（[cross entropy]{.en}）と呼ぶ
+:::
+
+
+## 2クラス版 — 二値交差エントロピー {#peek-binary-cross-entropy}
+
+- クラスの順を（Salmon、Sea bass）とする
+- Salmon の確率を $p$、正解ラベルを $y$ とすると：
+
+$$\mathbf{y}=(y,\,1-y),\qquad \mathbf{p}=(p,\,1-p)$$
+
+- この2つを一般の交差エントロピーへ代入すると：
+
+$$\ell(y,p)=-\left[y\log p+(1-y)\log(1-p)\right]$$
+
+- $y$ と $1-y$ は **0/1 のスイッチ**。正解側の項だけが残る
+
+::: {.takeaway}
+2クラス用交差エントロピーは **二値交差エントロピー**（[binary cross-entropy]{.en}）と呼ばれる
+:::
+
+
+## $p=0.4$ の魚を採点する {#peek-loss-value}
 
 | 正解 | 採点する確率 $q$ | $p=0.4$ のときの損失 $-\log q$ |
 |---|---:|---:|
 | $y=1$（Salmon） | $q=p$ | $-\log(0.4)\approx0.92$ |
 | $y=0$（Sea bass） | $q=1-p$ | $-\log(0.6)\approx0.51$ |
 
-$$\ell(y,p)=-\left[y\log p+(1-y)\log(1-p)\right]= -\log q$$
-
-- $y$ と $1-y$ は **0/1 のスイッチ**。正解側の項だけが残る
-- つまり、全魚の損失 $L=\dfrac{1}{N}\sum_i\ell(y_i,p_i)$
-
-
-::: {.takeaway}
- Lを交差エントロピー（[cross entropy]{.en}）と言う
-:::
+- 全魚の損失は平均する：$L=\dfrac{1}{N}\sum_i\ell(y_i,p_i)$
 
 
 ## −log の形：外すほど急に効く {#peek-neglog}
@@ -403,58 +447,106 @@ plt.show()
 - 正解クラスの確率が高い（$q \to 1$）ほど損失はほぼ 0
 - 外れるほど**急カーブ**で跳ね上がる
 - $q \to 0$（自信満々の間違い）では青天井
-   - 最も避けたいので急激に大きなlossとなる
+   - 急激に大きなlossになり都合がよい
 
 
-## 2つの微分を掛けると約分される
+## 二値交差エントロピーを $p$ で微分する {#peek-bce-derivative}
 
-- シグモイドの微分は、どちらの正解でも同じ：
+- **正解が $y=1$ のとき**：$\ell=-\log p$
 
-$$\frac{\partial p}{\partial z}=p(1-p)$$
+$$\frac{\partial\ell}{\partial p}=-\frac{1}{p}$$
 
-- 正解が $y=1$ のときは、交差エントロピーの微分に $1/p$ が現れる：
+- **正解が $y=0$ のとき**：$\ell=-\log(1-p)$
 
-$$\frac{\partial \ell}{\partial z}
-=\underbrace{\left(-\frac{1}{p}\right)}_{\text{交差エントロピー}}
- \underbrace{p(1-p)}_{\text{シグモイド}}
-=-(1-p)=p-1$$
-
-- 正解が $y=0$ のときは、$1/(1-p)$ が現れる：
-
-$$\frac{\partial \ell}{\partial z}
-=\underbrace{\frac{1}{1-p}}_{\text{交差エントロピー}}
- \underbrace{p(1-p)}_{\text{シグモイド}}
-=p$$
+$$\frac{\partial\ell}{\partial p}=\frac{1}{1-p}$$
 
 ::: {.takeaway}
-$p$ または $1-p$ が約分され、どちらの正解でも
-$\dfrac{\partial \ell}{\partial z}=p-y$ になる
+ここで求めたのは、$p$ が変化したときに損失 $\ell$ がどれだけ変化するか
 :::
 
 
-## 入力値が重みごとの勾配を決める
+## 2つの微分を掛けると $p-y$ になる {#peek-logistic-p-minus-y}
 
-- $z=\alpha_1x_1+\alpha_2x_2+b$ なので：
+- $p$ は $z$ から計算されるので、連鎖律で2つの微分を掛ける：
 
-$$\frac{\partial z}{\partial \alpha_j}=x_j, \qquad
+$$
+\frac{\partial\ell}{\partial z}
+=\frac{\partial\ell}{\partial p}\frac{dp}{dz}
+$$
+
+- ロジスティック関数の微分は、どちらの正解でも同じ：
+
+$$\frac{\partial p}{\partial z}=p(1-p)$$
+
+- **正解が $y=1$ のとき**：
+
+$$\frac{\partial \ell}{\partial z}
+=\underbrace{\left(-\frac{1}{p}\right)}_{\partial\ell/\partial p}
+ \underbrace{p(1-p)}_{dp/dz}
+=-(1-p)=p-1=p-y \qquad (y=1)$$
+
+- **正解が $y=0$ のとき**：
+
+$$\frac{\partial \ell}{\partial z}
+=\underbrace{\frac{1}{1-p}}_{\partial\ell/\partial p}
+ \underbrace{p(1-p)}_{dp/dz}
+=p=p-0=p-y \qquad (y=0)$$
+
+::: {.takeaway}
+なんと、どちらの正解でも
+$$\frac{\partial \ell}{\partial z}=p-y$$
+:::
+
+
+## 1匹分の入力からパラメータの勾配が決まる {#peek-parameter-gradients}
+
+- $z=w_1x_1+w_2x_2+b$ なので：
+
+$$\frac{\partial z}{\partial w_j}=x_j, \qquad
 \frac{\partial z}{\partial b}=1$$
 
-- 連鎖律（[chain rule]{.en}）で各パラメータまで戻る：
+- [いま求めた](#peek-logistic-p-minus-y){.peek} $\dfrac{\partial \ell}{\partial z}=p-y$ を使い、連鎖律（[chain rule]{.en}）で更新に必要な $w_j$ と $b$ の勾配を求める：
 
-$$\frac{\partial \ell}{\partial \alpha_j}
-=\frac{\partial \ell}{\partial z}\frac{\partial z}{\partial \alpha_j}
+$$\frac{\partial \ell}{\partial w_j}
+=\frac{\partial \ell}{\partial z}\frac{\partial z}{\partial w_j}
 =(p-y)x_j, \qquad
 \frac{\partial \ell}{\partial b}=p-y$$
 
-- 例：$p-y=-0.4$、$x=(2,\,0.5)$ なら：
-   - $\dfrac{\partial \ell}{\partial \alpha_1}=-0.4\times2=-0.8$
-   - $\dfrac{\partial \ell}{\partial \alpha_2}=-0.4\times0.5=-0.2$
-   - $|x_1|$ が $|x_2|$ の4倍なので、$\alpha_1$ の勾配も4倍
+- 先ほどの $p=0.4$、$y=1$（Salmon）の例なら、$p-y=0.4-1=-0.6$
+- ある魚の入力を $x=(2,\,0.5)$ とすると：
+   - $\dfrac{\partial \ell}{\partial w_1}=-0.6\times2=-1.2$
+   - $\dfrac{\partial \ell}{\partial w_2}=-0.6\times0.5=-0.3$
+   - $|x_1|$ が $|x_2|$ の4倍なので、$w_1$ の勾配も4倍
 
-- 学習率 $\eta$ を掛けて更新：
+- 学習率 $\alpha$ を掛けて更新：
 
-$$\alpha_j \leftarrow \alpha_j-\eta(p-y)x_j, \qquad
-b \leftarrow b-\eta(p-y)$$
+$$w_j \leftarrow w_j-\alpha(p-y)x_j, \qquad
+b \leftarrow b-\alpha(p-y)$$
+
+::: {.callout-important title="損失値そのものから勾配を求めたわけではない"}
+先ほど計算した $0.92$ は、現在の予測がどれくらい悪いかを表す値であって、この値から勾配を求めるわけではないことに注意。更新に使うのは、**現在のパラメータ位置における損失関数の傾き（=勾配）** であって、lossそのものではない。数値はあくまで目安。
+:::
+
+
+## 1匹分の勾配をコードに置き換える {#peek-gradient-code}
+
+数式の各部分へ、そのまま変数名を付ける：
+
+```python
+delta = p - y
+d_w = delta * x
+d_b = delta
+```
+
+| コード | 数式 | 意味 |
+|---|---|---|
+| `delta` | $p-y=\dfrac{\partial \ell}{\partial z}$ | 予測のずれが $z$ に与える勾配 |
+| `d_w[j]` | $(p-y)x_j=\dfrac{\partial \ell}{\partial w_j}$ | 重み $w_j$ の勾配 |
+| `d_b` | $p-y=\dfrac{\partial \ell}{\partial b}$ | バイアス $b$ の勾配 |
+
+::: {.callout-note}
+次回、NNとして実装するときは、この**出力側から各パラメータの勾配を求める処理**を `backward` と呼ぶ。
+:::
 
 
 ## 実装：必要な関数は4つだけ {#peek-forward}
@@ -504,13 +596,14 @@ y      = y[order]
 def sigmoid(z):
     return 1 / (1 + np.exp(-z))
 
-def forward(X, alpha, b):
+def forward(X, w, b):
     """線形結合＋バイアス → シグモイド"""
-    return sigmoid(X @ alpha + b)
+    return sigmoid(X @ w + b)
 
 def loss_fn(y_true, p):
-    """交差エントロピー"""
+    """全魚の二値交差エントロピーを平均する"""
     eps = 1e-10
+    # log(0) は計算できないため、確率が厳密な 0 / 1 にならないようにする
     p = np.clip(p, eps, 1 - eps)
     return -np.mean(y_true * np.log(p) + (1 - y_true) * np.log(1 - p))
 
@@ -518,32 +611,53 @@ def accuracy(y_true, p):
     return np.mean((p >= 0.5) == y_true)
 ```
 
-- `forward` が予測、`loss_fn` が採点。勾配は $(p-y)x$ なので関数すら要らない
+
+## 4つの関数の役割 {#peek-logistic-functions}
+
+| 関数 | 役割 |
+|---|---|
+| `sigmoid` | $z$ を確率 $p$ に変換する |
+| `forward` | 全魚の入力 $X$ から確率を予測する |
+| `loss_fn` | 全魚の二値交差エントロピー $L$ を計算する |
+| `accuracy` | $p\geq0.5$ を Salmon として正答率を計算する |
+
+- 1匹分の勾配は、直前の `delta`、`d_w`、`d_b` の3行で計算する
 
 
 ## 魚を1匹ずつ見せて学習する {#peek-one-at-a-time}
 
+- ここでは1匹分の損失 $\ell$ の勾配で更新する
+   - 全魚の平均損失 $L$ を一度に使わず１匹分だけ
 - 1匹見るたびにパラメータが少し動く
 
 ```{python}
 #| echo: true
-alpha = np.array([0.0, 0.0])   # 重みはゼロからスタート
+w = np.array([0.0, 0.0])   # Weights start at zero
 b  = 0.0
 lr = 0.5                       # 学習率
 
 for i in range(10):
     xi, yi = X_norm[i], y[i]
-    p_i   = sigmoid(xi @ alpha + b)   # Forward：1匹だけ予測
-    delta = p_i - yi                  # 予測と正解の差
-    alpha = alpha - lr * delta * xi   # 勾配降下で更新
-    b     = b  - lr * delta
+    # この1匹の損失 ℓ の勾配で、パラメータを更新する
+    p_i   = sigmoid(xi @ w + b)   # Forward：1匹だけ予測
+    delta = p_i - yi
+    d_w = delta * xi
+    d_b = delta
+    w = w - lr * d_w
+    b     = b  - lr * d_b
 
-    p_all = forward(X_norm, alpha, b)
+    # 全魚の Loss と正答率は、学習の様子を表示するためだけに計算する
+    p_all = forward(X_norm, w, b)
     print(f"{i+1}匹目 | Loss: {loss_fn(y, p_all):.4f} | 正答率: {accuracy(y, p_all):.1%} "
-          f"| α=[{alpha[0]:6.3f}, {alpha[1]:6.3f}] | b={b:6.3f}")
+          f"| w=[{w[0]:6.3f}, {w[1]:6.3f}] | b={b:6.3f}")
 ```
 
 - たった10匹で正答率 90% まで来た
+
+::: {.callout-note title="更新に使う値と、表示する値は別"}
+- **更新**：いま見ている1匹の勾配 `delta`、`d_w`、`d_b` を使う
+- **表示**：更新後に全魚の平均損失 $L$ と正答率を計算する。表示したLossの数値を更新式へ代入するわけではない
+:::
 
 
 ## 境界が動く様子を見る
@@ -551,16 +665,16 @@ for i in range(10):
 ```{python}
 #| echo: false
 #| fig-align: center
-alpha_v = np.array([0.0, 0.0])
+w_v = np.array([0.0, 0.0])
 b_v  = 0.0
-hist = [(alpha_v.copy(), b_v, None)]
+hist = [(w_v.copy(), b_v, None)]
 for i in range(10):
     xi, yi = X_norm[i], y[i]
-    p_i     = sigmoid(xi @ alpha_v + b_v)
+    p_i     = sigmoid(xi @ w_v + b_v)
     delta   = p_i - yi
-    alpha_v = alpha_v - lr * delta * xi
+    w_v = w_v - lr * delta * xi
     b_v     = b_v - lr * delta
-    hist.append((alpha_v.copy(), b_v, i))
+    hist.append((w_v.copy(), b_v, i))
 
 fig, axes = plt.subplots(2, 3, figsize=(11, 6.2))
 for ax, step in zip(axes.flat, [0, 1, 2, 3, 4, 10]):
@@ -583,23 +697,24 @@ plt.tight_layout()
 plt.show()
 ```
 
-- ◯印＝直前に見せた魚。**間違えるたびに境界がその魚の方へ動く**
+- ◯印＝直前に見せた魚。**予測が正解からずれている分だけ、境界がその魚を正しく分類する向きへ動く**
 - 縦線しか引けなかった人間と違い、機械は**斜めの直線**を自由に調整していく
 
 
-## 学習されたパラメータを読む
+## 10匹を見た後のパラメータを読む
 
-- 最終的な重み：$\alpha \approx [-0.74,\; 1.15]$
+- 10匹を見た後：$w \approx [-0.74,\; 1.15]$、$b\approx-0.29$
 
 | パラメータ | 値 | 意味 |
 |---|---|---|
-| $\alpha_1$（輝度） | 負 | **暗い**ほど Salmon 寄り |
-| $\alpha_2$（重さ） | 正 | **重い**ほど Salmon 寄り |
+| $w_1$（輝度） | 負 | **暗い**ほど Salmon 寄り |
+| $w_2$（重さ） | 正 | **重い**ほど Salmon 寄り |
+| $b$（バイアス） | 負 | 決定境界の位置を調整 |
 
 - 1次元分類・2次元分類の回に**目で見て**発見したことを、機械が数値として再発見した
 
 ::: {.callout-note}
-`sklearn` の `fit()` がやっているのは、本質的にこのループ（の高速・安定版）。
+`sklearn` の `fit()` も「予測 → 損失 → パラメータを更新」という考え方は同じ。ただし、この1匹ずつのループをそのまま実行するわけではなく、最適化方法や正則化などが加わる。
 **ブラックボックスが1つ開いた。**
 :::
 
@@ -622,6 +737,20 @@ plt.show()
 - 80匹全部見せると正答率はどこまで上がる？　途中で**下がる瞬間**が何度もある（間違えた魚に境界が引っ張られる音）
 :::
 
+## 名前の由来 — 何が「ロジスティック」？ {#peek-logistic-name}
+
+- **シグモイド（[sigmoid]{.en}）**は「S字型の」という意味の**総称**
+   - S字カーブの関数はみんなシグモイド
+- $\dfrac{1}{1+e^{-z}}$ の正式名は**ロジスティック関数（[logistic function]{.en}）**
+   - シグモイドの代表選手
+- 出自は機械学習ではなく、19世紀の**人口の成長モデル**
+   - 最初は勢いよく増え、資源の上限に近づくと頭打ちになる成長曲線がS字
+- ロジスティック関数で確率を出す回帰だから**ロジスティック回帰**
+
+::: {.fig width="30%"}
+![培養瓶の中のキイロショウジョウバエ。個体数の増え方がロジスティック曲線に当てはまることが確かめられた例（写真：Masur, Wikimedia Commons, CC BY-SA 4.0）](imgs/drosophila-culture-vial.jpg)
+:::
+
 
 ## {background-color="white" .center .break-slide}
 
@@ -632,7 +761,7 @@ plt.show()
 
 ## この式、なんと呼ばれているか
 
-$$z = \alpha_1 x_1 + \alpha_2 x_2 + b$$
+$$z = w_1 x_1 + w_2 x_2 + b$$
 
 - 教科書や解説記事は、これを入力の**線形結合（[linear combination]{.en}）**と呼ぶ
 - ロジスティック回帰は**線形分類器**、前回のは**線形回帰** — この先も「線形」だらけ
@@ -642,24 +771,24 @@ $$z = \alpha_1 x_1 + \alpha_2 x_2 + b$$
 :::
 
 
-## 線形結合は線形ではない
+## 「線形結合＋バイアス」は厳密には線形ではない
 
-- 「線形」は直線のことではない — 実は**この式自体が「線形」の定義を満たしていない**
+- 「線形」は直線のことではない — $b\neq0$ なら、**この式自体が「線形」の定義を満たしていない**
 - その定義 — **線形性（[linearity]{.en}）**＝「**定数倍と足し算だけ**」：
 
-$$f(c\,x) = c\,f(x) \;\;\text{（斉次性）} \qquad f(x_1 + x_2) = f(x_1) + f(x_2) \;\;\text{（加法性）}$$
+$$f(c\,u) = c\,f(u) \;\;\text{（斉次性）} \qquad f(u + v) = f(u) + f(v) \;\;\text{（加法性）}$$
 
 - 斉次性（[homogeneity]{.en}）：**先に**定数倍しても**後で**定数倍しても同じ
 - 加法性（[additivity]{.en}）：**先に**足しても**後で**足しても同じ
 - 例：$f(x) = 3x$ は線形。$f(x) = x^2$ は $f(1{+}1) = 4 \neq f(1) + f(1) = 2$ で失格
-- $f(x) = ax + b$ も失格 — 足してから入れると $+b$ は**1回**、入れてから足すと $+2b$ と**2回**でズレる
+- $f(x) = ax + b$ は、$b\neq0$ なら失格 — 足してから入れると $+b$ は**1回**、入れてから足すと $+2b$ と**2回**でズレる
 
 
-## 一発の見破り方：$f(0) = 0$
+## 簡単なチェック方法：$f(0) = 0$
 
 - 線形なら $f(0) = f(0 \cdot x) = 0 \cdot f(x) = 0$ — **0 を入れたら必ず 0 が出る**
 - 逆に言えば、$f(0) \neq 0$ の関数はその場で**線形失格**
-- さっき地道に確かめた $y = ax + b$ もこれなら一瞬：$f(0) = b \neq 0$ → **失格**。グラフは**直線**なのに、線形ではない
+- さっき地道に確かめた $y = ax + b$ もこれなら一瞬：$f(0) = b$。$b\neq0$ なら **失格**、$b=0$ ならこの検査を通過する
 
 ::: {.callout-important}
 「グラフが直線」（見た目）と「線形性」（性質）は**別物**。
@@ -671,25 +800,26 @@ $f(0) = 0$ は**失格者を見つける**検査。$f(0) = 0$ でも $x^2$ の�
 :::
 
 
-## 確かめる：$z = \alpha_1 x_1 + \alpha_2 x_2 + b$
+## 確かめる：$z = w_1 x_1 + w_2 x_2 + b$
 
 ::: {.callout-important title="質問"}
-「線形結合」を名乗るこの式の、**どこ**が線形の定義を破っているのか？
-$f(x_1, x_2) = \alpha_1 x_1 + \alpha_2 x_2 + b$ に、いまの $f(0) = 0$ 検査を当てよ。
+- 「線形結合」を名乗るこの式の、**どこ**が線形の定義を破っているのか？
+- $f(x_1, x_2) = w_1 x_1 + w_2 x_2 + b$ に、この $f(0) = 0$ で確かめよう
 :::
 
 ::: {.fragment}
-- $f(0, 0) = b \neq 0$ — 犯人は **$b$**。中身は「線形結合＋おまけの $b$」
-- さんざん「線形」と名乗りながら、$b$ が定義を破っている
+- $f(0, 0) = b$ — $b\neq0$ なら、線形の条件 $f(0,0)=0$ を満たさない
+- 犯人は **$b$**。中身は「線形結合＋おまけの $b$」
+- ただし $b=0$ なら、$w_1x_1+w_2x_2$ は線形
 - 世の中の教科書は、この $b$ を**平気な顔で**足したまま「線形」と呼び続けている
 :::
 
 
 ## $+b$ がついていても線形にするトリック
 
-- $b$ を「**常に 1 が入っている入力** $x_0$ への重み $\alpha_0$」と読み替える：
+- $b$ を「**常に 1 が入っている入力** $x_0$ への重み $w_0$」と読み替える：
 
-$$z = \alpha_0 \underbrace{x_0}_{=\,1} + \alpha_1 x_1 + \alpha_2 x_2$$
+$$z = w_0 \underbrace{x_0}_{=\,1} + w_1 x_1 + w_2 x_2$$
 
 - 入力を $(1, x_1, x_2)$ の3次元と見れば、$f(0,0,0) = 0$ — **正真正銘の線形結合**に戻る
 - 統計学ではデータ表に「全部 1 の列」を足す定番の手（切片項）。実装でも広く使われるトリック
@@ -702,8 +832,9 @@ $+b$ 込みの形（線形＋平行移動）は、文献では**アフィン変�
 
 ## 線形にこだわる理由
 
-- 「定数倍と足し算だけ」の計算は、**行列のかけ算**にそのまま乗る — 大量のデータを一括で計算できる（NumPy 実装の回で効いてくる）
-- 微分しても形が崩れない：$\dfrac{\partial z}{\partial \alpha_1} = x_1$ — 勾配降下法と相性が最高
+- 「定数倍と足し算だけ」の計算は、**行列のかけ算**にそのまま乗る
+  - 次回、ロジスティック回帰をNNの層としてNumPyで実装するときに使う
+- 微分しても形が崩れない：$\dfrac{\partial z}{\partial w_1} = x_1$ — 勾配降下法と相性が最高
 - 「線形か、そうでないか」は、**どの道具が使えるか**を分ける最初の仕分けになっている
 
 
@@ -711,16 +842,16 @@ $+b$ 込みの形（線形＋平行移動）は、文献では**アフィン変�
 
 ## まとめ
 
-- ロジスティック回帰 ＝ **線形結合（＋バイアス）→ シグモイド**。決定境界は $z = 0$ の直線
+- ロジスティック回帰 ＝ **線形結合（＋バイアス）→ ロジスティック関数**。決定境界は $z = 0$ の直線
 - 「線形」は直線の見た目ではなく「**定数倍と足し算だけ**」という性質 — $f(0) \neq 0$ なら線形失格
 - $+b$ は厳密には線形破り — 「常に 1 の入力 $x_0$」と読み替えれば線形結合に収まる（文献の呼び名：アフィン）
 - 学習 ＝ 交差エントロピーを**勾配降下法**で最小化
-  - 勾配は $(p - y) x$ — シグモイド＋交差エントロピーの組み合わせの妙
+  - 勾配は $(p - y) x$ — ロジスティック関数＋交差エントロピーの組み合わせの妙
 - `fit()` の中身は「予測 → 差を測る → 境界を少し動かす」の繰り返しだった
 
 ::: {.callout-note title="次回予告"}
-この機械、どれだけ学習しても引けるのは**直線だけ**。
-直線では絶対に分けられないデータが来たらどうする？
+- 今回の「線形結合 → ロジスティック関数」は、すでに最小構成のニューラルネットワーク
+- 次は同じ計算をNNの形と名前で書き直し、NumPyで学習まで実装する
 :::
 
 
@@ -735,17 +866,17 @@ $+b$ 込みの形（線形＋平行移動）は、文献では**アフィン変�
 $$\text{(a)}\; f(x) = 5x \qquad \text{(b)}\; f(x) = 3x + 2 \qquad \text{(c)}\; f(x) = x^2 \qquad \text{(d)}\; f(x_1, x_2) = 2x_1 - x_2$$
 
 1. まず $f(0) = 0$ チェックで失格者を探せ
-2. 残った関数について、加法性 $f(x_1 + x_2) = f(x_1) + f(x_2)$ が成り立つか確認せよ（破れるなら反例を1つ）
-3. コードで「先に足してから入れる」と「入れてから足す」を $x_1 = 1, x_2 = 2$ で計算し、判定と一致することを確かめよ
+2. 残った関数について、加法性 $f(u + v) = f(u) + f(v)$ が成り立つか確認せよ（破れるなら反例を1つ）
+3. コードで「先に足してから入れる」と「入れてから足す」を確認せよ。1変数の関数では $u=1, v=2$、(d) では $u=(1,2), v=(3,1)$ を使う
 
 ### 問題2：ロジスティック回帰を2歩だけ学習させる
 
 2匹だけのミニ世界。標準化済みの特徴量（輝度, 重さ）で、
 1匹目 $x^{(1)} = (2, 1)$ は Salmon（$y=1$）、2匹目 $x^{(2)} = (-1, 1)$ は Sea bass（$y=0$）。
-初期値 $\alpha = (0, 0)$、$b = 0$、学習率 $\eta = 0.5$。
+初期値 $w = (0, 0)$、$b = 0$、学習率 $\alpha = 0.5$。
 
 1. 1匹目を見せたときの $z$、$p = \sigma(z)$、差 $\delta = p - y$ を求めよ
-2. 更新式 $\alpha \leftarrow \alpha - \eta\,\delta\,x$、$b \leftarrow b - \eta\,\delta$ で更新せよ
+2. 更新式 $w \leftarrow w - \alpha\,\delta\,x$、$b \leftarrow b - \alpha\,\delta$ で更新せよ
 3. 続けて2匹目でもう1歩更新せよ
 4. 同じ計算をコードで実行し、手計算と一致することを確かめよ
 
@@ -767,7 +898,7 @@ $$\text{(a)}\; f(x) = 5x \qquad \text{(b)}\; f(x) = 3x + 2 \qquad \text{(c)}\; f
 
 - (a) $f(1+2) = 15 = f(1) + f(2) = 5 + 10$ — 成立。斉次性も $f(cx) = 5cx = c f(x)$ で成立 → **線形**
 - (c) $f(1+2) = 9 \neq f(1) + f(2) = 1 + 4 = 5$ — **非線形**。$f(0)=0$ を通過しても安心できない
-- (d) $2(x_1 + x_1') - (x_2 + x_2') = (2x_1 - x_2) + (2x_1' - x_2')$ — 成立 → **線形**
+- (d) $f(u+v)=2(u_1+v_1)-(u_2+v_2)=f(u)+f(v)$ — 成立 → **線形**
 
 :::
 
@@ -801,7 +932,7 @@ print(f"(d) 2x1-x2   f(0,0)={g(0, 0)} | f(1+3, 2+1)={g(4, 3)} vs f(1,2)+f(3,1)={
 $$z = 0 \times 2 + 0 \times 1 + 0 = 0, \qquad p = \sigma(0) = 0.5, \qquad \delta = 0.5 - 1 = -0.5$$
 
 **更新:**
-$$\alpha \leftarrow (0, 0) - 0.5 \times (-0.5) \times (2, 1) = (0.5,\; 0.25)$$
+$$w \leftarrow (0, 0) - 0.5 \times (-0.5) \times (2, 1) = (0.5,\; 0.25)$$
 $$b \leftarrow 0 + 0.25 = 0.25$$
 
 まだ何も知らないので $p = 0.5$（五分五分）。Salmon と言い切れなかったぶん、境界が動いた。
@@ -813,7 +944,7 @@ $$z = 0.5 \times (-1) + 0.25 \times 1 + 0.25 = 0, \qquad p = 0.5, \qquad \delta 
 偶然にも2匹目は**ちょうど境界の上**（$z = 0$）に乗っていた。
 
 **更新:**
-$$\alpha \leftarrow (0.5, 0.25) - 0.5 \times 0.5 \times (-1, 1) = (0.75,\; 0)$$
+$$w \leftarrow (0.5, 0.25) - 0.5 \times 0.5 \times (-1, 1) = (0.75,\; 0)$$
 $$b \leftarrow 0.25 - 0.25 = 0$$
 
 :::
@@ -829,7 +960,7 @@ import numpy as np
 def sigmoid(z):
     return 1 / (1 + np.exp(-z))
 
-alpha = np.array([0.0, 0.0])
+w = np.array([0.0, 0.0])
 b  = 0.0
 lr = 0.5
 
@@ -837,12 +968,51 @@ fishes = [(np.array([2.0, 1.0]), 1),    # Salmon
           (np.array([-1.0, 1.0]), 0)]   # Sea bass
 
 for i, (xi, yi) in enumerate(fishes, 1):
-    z     = xi @ alpha + b
+    z     = xi @ w + b
     p     = sigmoid(z)
     delta = p - yi
-    alpha = alpha - lr * delta * xi
+    w = w - lr * delta * xi
     b     = b - lr * delta
-    print(f"{i}匹目: z={z:.2f}, p={p:.2f}, δ={delta:+.2f} → α={alpha}, b={b:.2f}")
+    print(f"{i}匹目: z={z:.2f}, p={p:.2f}, δ={delta:+.2f} → w={w}, b={b:.2f}")
 ```
 
-手計算どおり、$\alpha = (0.5, 0.25) \to (0.75, 0)$、$b = 0.25 \to 0$ と動く。
+手計算どおり、$w = (0.5, 0.25) \to (0.75, 0)$、$b = 0.25 \to 0$ と動く。
+
+
+## 【参考】$e^x$ は微分しても $e^x$ {#peek-exp-derivative}
+
+- 一般の指数関数（[exponential function]{.en}）$a^x$ を微分すると：
+
+$$\frac{d}{dx}a^x=(\log a)a^x$$
+
+- $\log a=1$ になる特別な底が $e\approx2.718$：
+
+$$\frac{d}{dx}e^x=e^x$$
+
+```{python}
+#| echo: false
+#| fig-align: center
+#| classes: fig-small
+xx = np.linspace(-2.2, 1.5, 300)
+plt.figure(figsize=(6.0, 3.0))
+plt.plot(xx, np.exp(xx), color="#e74c3c", lw=2.5, label="$y=e^x$")
+plt.plot(xx, xx + 1, color="#2980b9", ls="--", lw=2, label="$x=0$ での接線 $y=x+1$")
+plt.scatter([0], [1], color="#2c3e50", s=55, zorder=5)
+plt.annotate("値 1・傾き 1", (0, 1), xytext=(0.35, 0.45), fontsize=10,
+             arrowprops={"arrowstyle": "->", "color": "gray"})
+plt.xlabel("x")
+plt.ylabel("y")
+plt.ylim(-0.5, 4.8)
+plt.grid(True, alpha=0.3)
+plt.legend(fontsize=9, loc="upper left")
+plt.tight_layout()
+plt.show()
+```
+
+- 指数が $-z$ なら、連鎖律で内側の微分 $-1$ が掛かる：
+
+$$\frac{d}{dz}e^{-z}=e^{-z}\frac{d(-z)}{dz}=-e^{-z}$$
+
+::: {.takeaway}
+$e$ は、指数関数の**値と傾きが同じになるように選ばれた数**
+:::

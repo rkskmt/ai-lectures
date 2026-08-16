@@ -1,0 +1,1036 @@
+---
+title: "ロジスティック回帰をNNとして実装する"
+subtitle: "はじめてのニューラルネットワーク"
+---
+
+## ニューロンは信号を受け取り、次のニューロンへ伝える
+
+:::: {.columns}
+
+::: {.column width="47%"}
+::: {.fig-cite src="imgs/chemical-synapse-schema-cropped.jpg" height="540px"}
+::: {.cite}
+出典: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Chemical_synapse_schema_cropped.jpg), Christy Krames / NIA
+:::
+:::
+:::
+
+::: {.column width="53%"}
+### 図の矢印を追う
+
+- 樹状突起（[dendrite]{.en}）：ほかのニューロンから信号を受け取る
+- 細胞体：受け取った信号が集まる
+- 軸索（[axon]{.en}）：電気信号を離れた場所へ伝える
+- シナプス（[synapse]{.en}）：神経伝達物質を介して、次のニューロンへ信号を渡す
+
+::: {.takeaway}
+ニューロンは1個で完結せず、ほかのニューロンと接続して信号を伝える
+:::
+:::
+
+::::
+
+
+## NNの丸はすべて「ノード」と呼ぶ
+
+- ノード（[node]{.en}）：NNの図に出てくる丸の総称
+- 入力値を置くノードを**入力ノード**、届いた値から新しい値を計算するノードを**ニューロン**と呼ぶ
+
+```{.d2 sketch="true" width="76%"}
+direction: right
+X1: "入力ノード\nx₁" { shape: circle; style.fill: "#e1f5ff" }
+X2: "入力ノード\nx₂" { shape: circle; style.fill: "#e1f5ff" }
+N: "ニューロン\nz = w₁x₁ + w₂x₂ + b\nh = f(z)" { shape: circle; style.fill: "#fff4e1"; style.stroke: "#e74c3c"; style.stroke-width: 5 }
+X1 -> N: "w₁"
+X2 -> N: "w₂"
+```
+
+| 図の部分 | 呼び方 | 役割 |
+|---|---|---|
+| $x_1,x_2$ の丸 | 入力ノード | 入力値を受け取り、次へ渡す |
+| $h$ の丸 | ニューロン | 届いた値から、新しい値を1個計算する |
+| 丸を結ぶ矢印 | 接続 | 前のノードの値を次へ渡す |
+| 矢印上の $w_1,w_2$ | 重み | 前のノードの値が次のニューロンへ与える影響の強さを調整する |
+
+
+## ニューロンを層としてつないだものがNN {#peek-nn-basic-structure}
+
+- ニューラルネットワーク（[neural network]{.en}、NN）：入力ノードとニューロンを層に並べ、層と層を重み付きの接続でつないだ計算モデル
+
+```{.d2 sketch="true" width="88%"}
+direction: right
+I: "入力層" {
+  X1: "入力ノード\nx₁" { shape: circle; style.fill: "#e1f5ff" }
+  X2: "入力ノード\nx₂" { shape: circle; style.fill: "#e1f5ff" }
+}
+H: "隠れ層" {
+  H1: "h₁" { shape: circle; style.fill: "#fdebd0" }
+  H2: "h₂" { shape: circle; style.fill: "#fdebd0" }
+}
+O: "出力層" {
+  A: "a" { shape: circle; style.fill: "#fff4e1" }
+}
+I.X1 -> H.H1
+I.X1 -> H.H2
+I.X2 -> H.H1
+I.X2 -> H.H2
+H.H1 -> O.A
+H.H2 -> O.A
+```
+
+- 入力層（[input layer]{.en}）：入力値を受け取り、次の層へ渡す
+- 隠れ層（[hidden layer]{.en}）：入力と最終出力の間で、新しい値を計算するニューロンが並ぶ
+- 出力層（[output layer]{.en}）：ネットワークの最終出力を計算するニューロンが並ぶ
+
+
+## 隠れ層と出力層の丸がニューロン
+
+```{.d2 sketch="true" width="88%"}
+direction: right
+I: "入力層" {
+  X1: "入力ノード\nx₁" { shape: circle; style.fill: "#e1f5ff" }
+  X2: "入力ノード\nx₂" { shape: circle; style.fill: "#e1f5ff" }
+}
+H: "隠れ層" {
+  H1: "h₁" { shape: circle; style.fill: "#fdebd0"; style.stroke: "#e74c3c"; style.stroke-width: 5 }
+  H2: "h₂" { shape: circle; style.fill: "#fdebd0"; style.stroke: "#e74c3c"; style.stroke-width: 5 }
+}
+O: "出力層" {
+  A: "a" { shape: circle; style.fill: "#fff4e1"; style.stroke: "#e74c3c"; style.stroke-width: 5 }
+}
+I.X1 -> H.H1
+I.X1 -> H.H2
+I.X2 -> H.H1
+I.X2 -> H.H2
+H.H1 -> O.A
+H.H2 -> O.A
+```
+
+- ニューロン（[neuron]{.en}）：届いた値から、新しい値を1個計算する単位
+- 隠れ層の $h_1,h_2$：途中の値を計算するニューロン
+- 出力層の $a$：最終出力を計算するニューロン
+- 入力層の丸は入力値を保持する入力ノードであり、ここでは計算するニューロンと区別する
+
+
+## 接続1本につき重みが1個ある
+
+```{.d2 sketch="true" width="88%"}
+direction: right
+I: "入力層" {
+  X1: "入力ノード\nx₁" { shape: circle; style.fill: "#e1f5ff" }
+  X2: "入力ノード\nx₂" { shape: circle; style.fill: "#e1f5ff" }
+}
+H: "隠れ層" {
+  H1: "h₁" { shape: circle; style.fill: "#fdebd0" }
+  H2: "h₂" { shape: circle; style.fill: "#fdebd0" }
+}
+O: "出力層" {
+  A: "a" { shape: circle; style.fill: "#fff4e1" }
+}
+I.X1 -> H.H1: "w₁" { style.stroke: "#e74c3c"; style.stroke-width: 5 }
+I.X2 -> H.H1: "w₂" { style.stroke: "#e74c3c"; style.stroke-width: 5 }
+I.X1 -> H.H2: "w₃" { style.stroke: "#e74c3c"; style.stroke-width: 5 }
+I.X2 -> H.H2: "w₄" { style.stroke: "#e74c3c"; style.stroke-width: 5 }
+H.H1 -> O.A: "v₁" { style.stroke: "#e74c3c"; style.stroke-width: 5 }
+H.H2 -> O.A: "v₂" { style.stroke: "#e74c3c"; style.stroke-width: 5 }
+```
+
+- 接続（[connection]{.en}）：前の層の値を、次の層のニューロンへ渡す矢印
+- 重み（[weight]{.en}）：接続を通る値の影響を調整するパラメータ
+- この図には接続が6本あり、$w_1,w_2,w_3,w_4,v_1,v_2$ の重みが1個ずつ対応する
+
+
+## 1個のニューロンは重み付き和を計算する
+
+```{.d2 sketch="true" width="88%"}
+direction: right
+I: "入力層" {
+  X1: "入力ノード\nx₁" { shape: circle; style.fill: "#e1f5ff" }
+  X2: "入力ノード\nx₂" { shape: circle; style.fill: "#e1f5ff" }
+}
+H: "隠れ層" {
+  H1: "h₁" { shape: circle; style.fill: "#fdebd0"; style.stroke: "#e74c3c"; style.stroke-width: 5 }
+  H2: "h₂" { shape: circle; style.fill: "#eeeeee" }
+}
+O: "出力層" {
+  A: "a" { shape: circle; style.fill: "#eeeeee" }
+}
+I.X1 -> H.H1: "w₁" { style.stroke: "#e74c3c"; style.stroke-width: 5 }
+I.X2 -> H.H1: "w₂" { style.stroke: "#e74c3c"; style.stroke-width: 5 }
+I.X1 -> H.H2 { style.stroke: "#bdbdbd" }
+I.X2 -> H.H2 { style.stroke: "#bdbdbd" }
+H.H1 -> O.A { style.stroke: "#bdbdbd" }
+H.H2 -> O.A { style.stroke: "#bdbdbd" }
+```
+
+$$
+z_1=w_1x_1+w_2x_2+b_1
+$$
+
+- 接続 $w_1$ を通る $x_1$ は $w_1x_1$、接続 $w_2$ を通る $x_2$ は $w_2x_2$ として計算へ入る
+- $b_1$ は、このニューロンが持つバイアス（[bias]{.en}）
+- 予測の計算では現在の重みとバイアスを使い、学習でそれらの値を更新する
+
+
+## 重み付き和へ活性化関数を適用する
+
+```{.d2 sketch="true" width="88%"}
+direction: right
+I: "入力層" {
+  X1: "入力ノード\nx₁" { shape: circle; style.fill: "#e1f5ff" }
+  X2: "入力ノード\nx₂" { shape: circle; style.fill: "#e1f5ff" }
+}
+H: "隠れ層" {
+  H1: "h₁" { shape: circle; style.fill: "#fdebd0"; style.stroke: "#e74c3c"; style.stroke-width: 5 }
+  H2: "h₂" { shape: circle; style.fill: "#eeeeee" }
+}
+O: "出力層" {
+  A: "a" { shape: circle; style.fill: "#eeeeee" }
+}
+I.X1 -> H.H1
+I.X2 -> H.H1
+I.X1 -> H.H2 { style.stroke: "#bdbdbd" }
+I.X2 -> H.H2 { style.stroke: "#bdbdbd" }
+H.H1 -> O.A { style.stroke: "#bdbdbd" }
+H.H2 -> O.A { style.stroke: "#bdbdbd" }
+```
+
+```{.d2 sketch="true" width="72%"}
+direction: right
+Z: "重み付き和\nz₁" { style.fill: "#fff4e1" }
+F: "活性化関数\nf" { shape: hexagon; style.fill: "#fdebd0" }
+H: "h₁ = f(z₁)" { shape: circle; style.fill: "#d5f5e3" }
+Z -> F -> H
+```
+
+- 活性化関数（[activation function]{.en}）：ニューロンが重み付き和へ適用する関数
+- 「活性化関数」は特定の式の名前ではなく、ニューロン内での役割の名前
+- 1個のニューロンは、**重み付き和 → 活性化関数**の2段階で出力を計算する
+
+
+## 隠れ層ではニューロンごとに別の重みを使う
+
+```{.d2 sketch="true" width="88%"}
+direction: right
+I: "入力層" {
+  X1: "入力ノード\nx₁" { shape: circle; style.fill: "#e1f5ff" }
+  X2: "入力ノード\nx₂" { shape: circle; style.fill: "#e1f5ff" }
+}
+H: "隠れ層" { style.stroke: "#e74c3c"; style.stroke-width: 5
+  H1: "h₁" { shape: circle; style.fill: "#fdebd0"; style.stroke: "#e74c3c"; style.stroke-width: 5 }
+  H2: "h₂" { shape: circle; style.fill: "#fdebd0"; style.stroke: "#e74c3c"; style.stroke-width: 5 }
+}
+O: "出力層" {
+  A: "a" { shape: circle; style.fill: "#eeeeee" }
+}
+I.X1 -> H.H1: "w₁" { style.stroke: "#e74c3c"; style.stroke-width: 5 }
+I.X2 -> H.H1: "w₂" { style.stroke: "#e74c3c"; style.stroke-width: 5 }
+I.X1 -> H.H2: "w₃" { style.stroke: "#e74c3c"; style.stroke-width: 5 }
+I.X2 -> H.H2: "w₄" { style.stroke: "#e74c3c"; style.stroke-width: 5 }
+H.H1 -> O.A { style.stroke: "#bdbdbd" }
+H.H2 -> O.A { style.stroke: "#bdbdbd" }
+```
+
+$$
+\begin{aligned}
+h_1&=f(w_1x_1+w_2x_2+b_1)\\
+h_2&=f(w_3x_1+w_4x_2+b_2)
+\end{aligned}
+$$
+
+- $h_1$ と $h_2$ は同じ入力を受け取るが、使う重みとバイアスが異なる
+- ニューロンごとに別の値を計算し、隠れ層の出力 $(h_1,h_2)$ を作る
+
+
+## 出力層も同じ2段階で最終出力を計算する
+
+```{.d2 sketch="true" width="88%"}
+direction: right
+I: "入力層" {
+  X1: "入力ノード\nx₁" { shape: circle; style.fill: "#eeeeee" }
+  X2: "入力ノード\nx₂" { shape: circle; style.fill: "#eeeeee" }
+}
+H: "隠れ層" {
+  H1: "h₁" { shape: circle; style.fill: "#fdebd0" }
+  H2: "h₂" { shape: circle; style.fill: "#fdebd0" }
+}
+O: "出力層" { style.stroke: "#e74c3c"; style.stroke-width: 5
+  A: "a" { shape: circle; style.fill: "#fff4e1"; style.stroke: "#e74c3c"; style.stroke-width: 5 }
+}
+I.X1 -> H.H1 { style.stroke: "#bdbdbd" }
+I.X1 -> H.H2 { style.stroke: "#bdbdbd" }
+I.X2 -> H.H1 { style.stroke: "#bdbdbd" }
+I.X2 -> H.H2 { style.stroke: "#bdbdbd" }
+H.H1 -> O.A: "v₁" { style.stroke: "#e74c3c"; style.stroke-width: 5 }
+H.H2 -> O.A: "v₂" { style.stroke: "#e74c3c"; style.stroke-width: 5 }
+```
+
+$$
+u=v_1h_1+v_2h_2+c,
+\qquad
+a=g(u)
+$$
+
+- 入力が $x_1,x_2$ から $h_1,h_2$ に変わっても、ニューロンの計算手順は同じ
+- NN全体では、**重み付き和 → 活性化関数**を層から層へ繰り返す
+
+
+## {background-color="white" .center .break-slide}
+
+::: {.break-title}
+ロジスティック回帰をNNとして読み直す
+:::
+
+
+## ロジスティック回帰は隠れ層を使わないNN {#peek-one-layer-structure}
+
+```{.d2 sketch="true" width="82%"}
+direction: right
+I: "入力層" {
+  X1: "x₁" { shape: circle; style.fill: "#e1f5ff" }
+  X2: "x₂" { shape: circle; style.fill: "#e1f5ff" }
+}
+O: "出力層" {
+  P: "z = w₁x₁ + w₂x₂ + b\np = σ(z)" { shape: circle; style.fill: "#fff4e1" }
+}
+I.X1 -> O.P: "w₁"
+I.X2 -> O.P: "w₂"
+```
+
+- 一般的なNNの隠れ層を使わず、入力層を出力層へ直接つなぐ
+- 出力層にはニューロンが1個あり、Salmon確率 $p$ を1個出す
+- [ロジスティック回帰の計算経路](logistic-regression.qmd#peek-logistic-structure){.peek}を、層・ニューロン・接続として描いた特殊で最小の構成
+
+
+## ロジスティック回帰では $g$ をロジスティック関数にする
+
+### 一般的な出力層の計算
+
+$$
+u=v_1h_1+v_2h_2+c,
+\qquad
+a=g(u)
+$$
+
+### ロジスティック回帰の出力層の計算
+
+$$
+z=w_1x_1+w_2x_2+b,
+\qquad
+p=\sigma(z)=\frac{1}{1+e^{-z}}
+$$
+
+- [ロジスティック関数](logistic-regression.qmd#peek-logistic-function){.peek}が、出力層で使う活性化関数
+- $z$ を0から1のSalmon確率 $p$ へ変える
+
+
+## NNとして読み直しても数式は変わらない {#peek-one-layer-equivalence}
+
+### ロジスティック回帰
+
+$$
+z=w_1x_1+w_2x_2+b,
+\qquad
+p=\sigma(z)
+$$
+
+### 隠れ層なし・出力層にニューロン1個のNN
+
+$$
+z=w_1x_1+w_2x_2+b,
+\qquad
+p=\sigma(z)
+$$
+
+- 入力 $x_1,x_2$、重み $w_1,w_2$、バイアス $b$、出力 $p$ の役割も同じ
+- 違う式へ変えたのではなく、同じ計算をNNの構造と用語で読み直した
+
+
+## {background-color="white" .center .break-slide}
+
+::: {.break-title}
+NNの学習を実装する
+:::
+
+
+## NNを作り、学習させるまでの5つの仕事
+
+```{.d2 sketch="true" width="92%"}
+direction: right
+A: "構成\n接続とパラメータ" { style.fill: "#e1f5ff" }
+B: "予測\n確率を計算" { style.fill: "#fff4e1" }
+C: "採点\n正解と比較" { style.fill: "#f5b7b1" }
+D: "方向\n動かす向きを調べる" { style.fill: "#fdebd0" }
+E: "更新\n値を動かす" { style.fill: "#d5f5e3" }
+A -> B -> C -> D -> E
+```
+
+- NNの学習は、この5つを順番に行う
+- 前回と同じ魚の値を使い、数値が図のどこを進むかを追う
+
+
+## NNを構成する：学習する値は $w_1,w_2,b$
+
+```{.d2 sketch="true" width="50%"}
+direction: right
+X1: "x₁" { shape: circle; style.fill: "#e1f5ff" }
+X2: "x₂" { shape: circle; style.fill: "#e1f5ff" }
+N: "z = w₁x₁ + w₂x₂ + b" { shape: circle; style.fill: "#fff4e1" }
+X1 -> N: "w₁"
+X2 -> N: "w₂"
+```
+
+- NNを構成する：入力数・ニューロン数・接続を決め、必要なパラメータを用意すること
+- 2個の入力ノードから、出力層のニューロン1個へ接続するので、重みは2個
+- 出力層のニューロンが1個なので、バイアスも1個
+
+
+## NumPyで $w_1,w_2,b$ を用意する
+
+```python
+import numpy as np
+
+# w[0] がw₁、w[1] がw₂
+w = np.array([-0.2, 0.0])
+
+# 出力層のニューロン1個のバイアス
+b = 0.0
+```
+
+- `w.shape == (2,)`：2本の接続の重み
+- `b`：出力層のニューロンのバイアス
+- `-0.2` と `0.0` は学習前の仮の値。学習によって変わる
+
+
+## 前回と同じ魚のデータを入力する
+
+- [ロジスティック回帰で勾配を追った魚](logistic-regression.qmd#peek-parameter-gradients){.peek}と同じ入力と正解を使う
+
+$$
+x=(2,\,0.5),
+\qquad
+y=1\;\text{（Salmon）}
+$$
+
+```python
+x = np.array([2.0, 0.5])
+y = 1.0
+```
+
+- $x_1=2$、$x_2=0.5$：この魚の2つの特徴量
+- $y=1$：この魚の正解ラベル。予測には使わず、後で予測を採点するときに使う
+
+
+## 1本目の接続で $x_1$ を $w_1$ 倍する
+
+```{.d2 sketch="true" width="64%"}
+direction: right
+X: "x₁ = 2" { shape: circle; style.fill: "#e1f5ff" }
+M: "重み w₁\n−0.2" { style.fill: "#fff4e1"; style.stroke-width: 4 }
+R: "−0.4" { shape: circle; style.fill: "#d5f5e3" }
+X -> M -> R
+```
+
+$$
+x_1w_1=2\times(-0.2)=-0.4
+$$
+
+```python
+x1w1 = x[0] * w[0]
+```
+
+
+## 2本目の接続で $x_2$ を $w_2$ 倍する
+
+```{.d2 sketch="true" width="64%"}
+direction: right
+X: "x₂ = 0.5" { shape: circle; style.fill: "#e1f5ff" }
+M: "重み w₂\n0.0" { style.fill: "#fff4e1"; style.stroke-width: 4 }
+R: "0.0" { shape: circle; style.fill: "#d5f5e3" }
+X -> M -> R
+```
+
+$$
+x_2w_2=0.5\times0.0=0.0
+$$
+
+```python
+x2w2 = x[1] * w[1]
+```
+
+
+## 出力層で2つの値と $b$ を足す
+
+$$
+\begin{aligned}
+z
+&=x_1w_1+x_2w_2+b \\
+&=-0.4+0.0+0.0 \\
+&=-0.4
+\end{aligned}
+$$
+
+```python
+def linear(x, w, b):
+    return x @ w + b
+
+z = linear(x, w, b)
+```
+
+- `x @ w` は、2つの掛け算を足す内積
+- `linear` が実装したのは、出力層の計算の1段階目だけ
+
+
+## 出力層で $z$ を確率 $p$ へ変える
+
+$$
+p=\sigma(-0.4)
+=\frac{1}{1+e^{0.4}}
+\approx0.4013
+$$
+
+```python
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
+
+p = sigmoid(z)
+```
+
+- 数式ではロジスティック関数 $\sigma$、コードでは一般的な関数名 `sigmoid`
+- このNNは、この魚をSalmonである確率が約40%と予測した
+
+
+## 入力から出力までの計算をForwardと呼ぶ
+
+```{.d2 sketch="true" width="78%"}
+direction: right
+X: "入力\nx" { style.fill: "#e1f5ff" }
+Z: "重み付き和\nz = x・w + b" { style.fill: "#fff4e1" }
+P: "活性化関数\np = σ(z)" { style.fill: "#fdebd0" }
+X -> Z -> P: "数値が進む向き"
+```
+
+- Forward（[forward pass]{.en}、順伝播）：入力から出力へ向かって、ネットワークの計算を順番に実行すること
+- 今回のForwardは、`linear` の後に `sigmoid` を実行する
+- Forwardは学習方法ではない。現在の $w,b$ で予測を計算する処理
+
+
+## 2段階をつないで `forward` を作る {#peek-one-fish-forward}
+
+```python
+def forward(x, w, b):
+    z = linear(x, w, b)
+    p = sigmoid(z)
+    return z, p
+
+z, p = forward(x, w, b)
+```
+
+```text
+z: -0.4
+p: 0.401312339887548
+```
+
+- `z`：活性化関数へ入る直前の値
+- `p`：出力層から出たSalmon確率
+- 前の回で使った $p=0.4$ は、この出力を丸めた値として再現できた
+
+
+## 予測 $p$ だけでは、正しかったか分からない
+
+```{.d2 sketch="true" width="60%"}
+direction: right
+P: "NNの予測\np = 0.4013" { style.fill: "#d5f5e3" }
+Y: "この魚の正解\ny = 1（Salmon）" { style.fill: "#e1f5ff" }
+Q: "どれくらい\n間違っているか" { style.fill: "#f5b7b1" }
+P -> Q
+Y -> Q
+```
+
+- $p$ はNNが出したSalmon確率
+- $y$ は教師データにある正解ラベル
+- 学習するには、$p$ と $y$ を比較する採点方法が必要
+
+
+## 二値交差エントロピーで予測を採点する {#peek-one-layer-loss}
+
+- [ロジスティック回帰で使った損失関数](logistic-regression.qmd#peek-binary-cross-entropy){.peek}を、そのまま使う
+
+$$
+\ell(y,p)
+=-\left[y\log p+(1-y)\log(1-p)\right]
+$$
+
+- $\ell$：この魚の予測に対する損失（[loss]{.en}）
+- $y$：正解ラベル
+- $p$：NNのForwardで得たSalmon確率
+
+
+## 損失関数をNumPyで実装する
+
+```python
+def binary_cross_entropy(y, p):
+    eps = 1e-10
+    # log(0)を避けるため、確率を0と1の内側へ収める
+    p = np.clip(p, eps, 1 - eps)
+    return -(
+        y * np.log(p) + (1 - y) * np.log(1 - p)
+    )
+```
+
+- 関数の入力は、この魚の正解 `y` と予測 `p`
+- 関数の出力は、この魚の予測に対する損失 `loss`
+
+
+## この魚の損失は約 $0.913$
+
+- 正解は $y=1$ なので、二値交差エントロピーの第1項だけが残る
+
+$$
+\ell(1,0.4013)
+=-\log(0.4013)
+\approx0.913
+$$
+
+```python
+loss = binary_cross_entropy(y, p)
+```
+
+```text
+loss: 0.9130152523999526
+```
+
+::: {.callout-note}
+[前の回で $p=0.4$ と丸めて計算した $0.92$](logistic-regression.qmd#peek-loss-value){.peek}と同じ魚の損失
+:::
+
+
+## 損失の値だけでは、重みをどちらへ動かすか分からない
+
+```{.d2 sketch="true" width="78%"}
+direction: right
+W: "現在のパラメータ\nw₁, w₂, b" { style.fill: "#fff4e1" }
+L: "現在の損失\nℓ = 0.913" { style.fill: "#f5b7b1" }
+Q: "w₁を増やす？\n減らす？" { style.fill: "#eeeeee" }
+W -> L -> Q
+```
+
+- $0.913$ は、現在の予測がどれくらい悪いかを表す
+- しかし、$w_1,w_2,b$ を増やすべきか減らすべきかは、この値だけでは決まらない
+- 各パラメータを少し変えたとき、損失がどちらへ変わるかを調べる
+
+
+## 現在のパラメータにおける損失関数の微分値を求める
+
+- 予測 $p$ は $w_1,w_2,b$ から計算されるため、損失関数 $\ell$ も $w_1,w_2,b$ によって変わる
+- 現在のパラメータは $w_1=-0.2,w_2=0,b=0$
+- この値の組において、損失関数を各パラメータについて偏微分する
+
+$$
+\frac{\partial\ell}{\partial w_1},
+\qquad
+\frac{\partial\ell}{\partial w_2},
+\qquad
+\frac{\partial\ell}{\partial b}
+$$
+
+- それぞれの微分値から、そのパラメータを増やしたときに損失が増えるか減るかが分かる
+
+
+## 3つの偏微分値をまとめたものが勾配
+
+$$
+\nabla_{w,b}\ell=
+\begin{bmatrix}
+\dfrac{\partial\ell}{\partial w_1}\\[4pt]
+\dfrac{\partial\ell}{\partial w_2}\\[4pt]
+\dfrac{\partial\ell}{\partial b}
+\end{bmatrix}
+$$
+
+- 勾配（[gradient]{.en}）：現在のパラメータの値において求めた、パラメータごとの偏微分値をまとめたもの
+
+
+## 更新に使うのは損失値そのものではなく偏微分値
+
+- 損失値 $\ell=0.913$：現在の予測がどの程度悪いかを表す
+- $\partial\ell/\partial w_1,\partial\ell/\partial w_2,\partial\ell/\partial b$：各パラメータをどちらへ動かすかを決める
+- 各微分値が正：そのパラメータを増やすと、損失関数の値は増える
+- 各微分値が負：そのパラメータを増やすと、損失関数の値は減る
+
+::: {.takeaway}
+損失関数は偏微分値を決める。$0.913$ という損失値自体を、更新式へ直接代入するわけではない
+:::
+
+
+## 各パラメータについての微分値を連鎖律で求める
+
+```{.d2 sketch="true" width="84%"}
+direction: left
+L: "損失 ℓ" { style.fill: "#f5b7b1" }
+P: "確率 p" { style.fill: "#d5f5e3" }
+Z: "重み付き和 z" { style.fill: "#fff4e1" }
+WB: "パラメータ\nw₁, w₂, b" { style.fill: "#e1f5ff" }
+L -> P: "微分"
+P -> Z: "微分"
+Z -> WB: "微分"
+```
+
+- 予測では $x\rightarrow z\rightarrow p\rightarrow\ell$ と右へ計算した
+- 微分では $\ell\rightarrow p\rightarrow z\rightarrow w,b$ と逆向きに関係をつなぐ
+
+
+## この逆向きの計算をBackwardと呼ぶ
+
+- Backward（[backward pass]{.en}、逆伝播）：連鎖律を使い、損失関数を各パラメータで偏微分した値を求める計算
+- 誤差逆伝播法（[backpropagation]{.en}、BP）：ネットワークの接続を逆向きにたどり、各偏微分値を求める方法
+
+```text
+Forward  : x ──→ z ──→ p ──→ ℓ
+Backward :       d_w, d_b ←── d_z ←── ℓ
+```
+
+- 今回はニューロン1個なので経路は短い
+- 隠れ層が増えても、出力側で求めた微分値から順につないでいく
+
+
+## 最初に損失関数を $z$ で微分する
+
+- [ロジスティック関数と二値交差エントロピーを微分した結果](logistic-regression.qmd#peek-logistic-p-minus-y){.peek}は次の式だった
+
+$$
+d_z
+=\frac{\partial\ell}{\partial z}
+=p-y
+$$
+
+- $d_z$ はコードで使う変数名
+- 数式の $\partial\ell/\partial z$ と同じ値を表す
+
+
+## この魚では $d_z\approx-0.5987$
+
+$$
+d_z=p-y
+=0.4013-1
+\approx-0.5987
+$$
+
+```python
+d_z = p - y
+```
+
+```text
+d_z: -0.598687660112452
+```
+
+- 負の値なので、$z$ を増やす方向へ動かすと損失が下がる
+
+
+## $w_1$ に関する微分値は $d_z$ に $x_1$ を掛ける
+
+```{.d2 sketch="true" width="64%"}
+direction: right
+X: "x₁ = 2" { shape: circle; style.fill: "#e1f5ff" }
+W: "接続 w₁" { style.fill: "#fff4e1"; style.stroke-width: 4 }
+Z: "z" { shape: circle; style.fill: "#eeeeee" }
+X -> W -> Z
+```
+
+$$
+d_{w_1}
+=\frac{\partial\ell}{\partial w_1}
+=d_zx_1
+=-0.5987\times2
+\approx-1.1974
+$$
+
+
+## $w_2$ に関する微分値は $d_z$ に $x_2$ を掛ける
+
+```{.d2 sketch="true" width="64%"}
+direction: right
+X: "x₂ = 0.5" { shape: circle; style.fill: "#e1f5ff" }
+W: "接続 w₂" { style.fill: "#fff4e1"; style.stroke-width: 4 }
+Z: "z" { shape: circle; style.fill: "#eeeeee" }
+X -> W -> Z
+```
+
+$$
+d_{w_2}
+=\frac{\partial\ell}{\partial w_2}
+=d_zx_2
+=-0.5987\times0.5
+\approx-0.2993
+$$
+
+
+## $b$ に関する微分値は $d_z$ と同じ
+
+- $z=w_1x_1+w_2x_2+b$ では、$b$ はそのまま1倍されている
+
+$$
+d_b
+=\frac{\partial\ell}{\partial b}
+=d_z\times1
+=d_z
+\approx-0.5987
+$$
+
+```python
+d_b = d_z
+```
+
+
+## 2本の重みに関する微分値をNumPyでまとめる
+
+$$
+\begin{bmatrix}d_{w_1}\\d_{w_2}\end{bmatrix}
+=d_z
+\begin{bmatrix}x_1\\x_2\end{bmatrix}
+$$
+
+```python
+d_w = d_z * x
+```
+
+```text
+d_w: [-1.19737532 -0.29934383]
+```
+
+- `d_w[0]` が $w_1$ に関する微分値
+- `d_w[1]` が $w_2$ に関する微分値
+
+
+## 3つの計算を `backward` へまとめる {#peek-one-layer-backward}
+
+```python
+def backward(x, y, p):
+    # ① 損失関数をzで微分した値
+    d_z = p - y
+
+    # ② 損失関数を2本の重みで偏微分した値
+    d_w = d_z * x
+
+    # ③ 損失関数をバイアスで偏微分した値
+    d_b = d_z
+    return d_w, d_b
+```
+
+- `backward` の入力：Forwardで使った `x`、正解 `y`、Forwardで得た `p`
+- `backward` の出力：更新に使う `d_w, d_b`
+
+
+## `backward` が返した値を確認する {#peek-one-layer-gradient-map}
+
+```python
+d_w, d_b = backward(x, y, p)
+```
+
+```text
+d_w: [-1.19737532 -0.29934383]
+d_b: -0.598687660112452
+```
+
+| 値 | 対応する微分値 | 更新するもの |
+|---|---|---|
+| `d_w[0]` | $\partial\ell/\partial w_1$ | 1本目の接続の $w_1$ |
+| `d_w[1]` | $\partial\ell/\partial w_2$ | 2本目の接続の $w_2$ |
+| `d_b` | $\partial\ell/\partial b$ | 出力層の $b$ |
+
+
+## 勾配と逆向きにパラメータを動かす
+
+- [ロジスティック回帰で使った勾配降下法](logistic-regression.qmd#peek-one-at-a-time){.peek}と同じ更新
+
+$$
+w_j\leftarrow w_j-\alpha d_{w_j},
+\qquad
+b\leftarrow b-\alpha d_b
+$$
+
+- $\alpha$：学習率（[learning rate]{.en}）。1回に動かす大きさを決める
+- コードではlearning rateを略して `lr` と書く
+
+
+## この魚では負の勾配を引く
+
+$$
+w_1\leftarrow-0.2
+-0.1\times(-1.1974)
+\approx-0.0803
+$$
+
+- $d_{w_1}$ は負なので、`- lr * d_w[0]` は正
+- その結果、$w_1$ は $-0.2$ から $-0.0803$ へ増える
+- 「勾配と逆向き」は、勾配を引く更新式が自動的に処理する
+
+
+## 更新処理を `update` として実装する
+
+```python
+def update(w, b, d_w, d_b, lr):
+    w = w - lr * d_w
+    b = b - lr * d_b
+    return w, b
+```
+
+- `w` と `b` の両方を、同じ時点で求めた勾配で更新する
+- 更新後の値を返し、次の予測で使う
+
+
+## 1回の更新で $w,b$ が変わる
+
+```python
+lr = 0.1
+w, b = update(w, b, d_w, d_b, lr)
+```
+
+```text
+更新前 w: [-0.2  0. ]
+更新前 b: 0.0
+
+更新後 w: [-0.08026247  0.02993438]
+更新後 b: 0.0598687660112452
+```
+
+- ネットワークの接続は同じ
+- 接続の重み $w_1,w_2$ と、出力層のバイアス $b$ が変わった
+
+
+## 更新後のパラメータでもう一度予測する
+
+```python
+z_after, p_after = forward(x, w, b)
+loss_after = binary_cross_entropy(y, p_after)
+```
+
+```text
+更新前 p:    0.4013
+更新後 p:    0.4786
+
+更新前 loss: 0.9130
+更新後 loss: 0.7369
+```
+
+- 正解はSalmon（$y=1$）なので、確率 $p$ は1へ近づいた
+- 損失は $0.9130$ から $0.7369$ へ下がった
+
+
+## これでNNの学習が1ステップ進んだ {#peek-nn-learning-cycle}
+
+```{.d2 sketch="true" width="90%"}
+direction: right
+F: "Forward\n現在のw,bで予測" { style.fill: "#fff4e1" }
+L: "Loss\npとyを比較" { style.fill: "#f5b7b1" }
+B: "Backward\nd_w,d_bを計算" { style.fill: "#fdebd0" }
+U: "Update\nw,bを更新" { style.fill: "#d5f5e3" }
+F -> L -> B -> U
+U -> F: "更新後のw,b"
+```
+
+- Forward → Loss → Backward → Update の一周を、学習の1ステップと呼ぶ
+- 次のステップでは、更新後の $w,b$ から再びForwardを始める
+
+
+## 1ステップは4つの関数呼び出し
+
+```python
+# 1. Forward：現在のパラメータで予測
+z, p = forward(x, w, b)
+
+# 2. Loss：予測を採点
+loss = binary_cross_entropy(y, p)
+
+# 3. Backward：パラメータの勾配を計算
+d_w, d_b = backward(x, y, p)
+
+# 4. Update：パラメータを更新
+w, b = update(w, b, d_w, d_b, lr)
+```
+
+
+## 次は入力層と出力層の間へ隠れ層を追加する
+
+```{.d2 sketch="true" width="90%"}
+direction: right
+X: "入力層\nX" { style.fill: "#e1f5ff" }
+H: "隠れ層" { style.fill: "#fdebd0"; style.stroke-width: 4 }
+O: "出力層" { style.fill: "#fff4e1" }
+P: "確率\nP" { style.fill: "#d5f5e3" }
+X -> H -> O -> P
+```
+
+- 今回：入力層 → 出力層
+- 次：入力層 → 隠れ層 → 出力層
+- Forward → Loss → Backward → Updateという学習の役割は変わらない
+
+
+## まとめ
+
+- NNは、計算するニューロンを重み付きの接続でつないだモデル
+- ロジスティック回帰は、隠れ層がなく、出力層にニューロンが1個のNN
+- Forwardは入力から予測、Backwardは損失からパラメータの勾配を計算
+- Updateで重みとバイアスを動かすと、次のForwardと損失が変わる
+
+
+## 練習問題
+
+### 問題：1回の学習ステップを自分で実装する
+
+先ほどの魚 $x=(2,0.5)$、$y=1$ について、学習率 `lr = 0.05` で1回更新せよ。
+
+1. `forward` で更新前の `p` と `loss` を計算
+2. `backward` で `d_w, d_b` を計算
+3. `update` で `w, b` を更新
+4. 更新後の `p` と `loss` を表示
+
+
+## 問題の解答例
+
+```{python}
+#| echo: true
+#| eval: false
+#| code-fold: true
+#| code-summary: "解答例を見る"
+import numpy as np
+
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
+
+def forward(x, w, b):
+    z = x @ w + b
+    return z, sigmoid(z)
+
+def binary_cross_entropy(y, p):
+    eps = 1e-10
+    p = np.clip(p, eps, 1 - eps)
+    return -(y * np.log(p) + (1 - y) * np.log(1 - p))
+
+def backward(x, y, p):
+    d_z = p - y
+    d_w = d_z * x
+    d_b = d_z
+    return d_w, d_b
+
+def update(w, b, d_w, d_b, lr):
+    return w - lr * d_w, b - lr * d_b
+
+x = np.array([2.0, 0.5])
+y = 1.0
+w = np.array([-0.2, 0.0])
+b = 0.0
+lr = 0.05
+
+_, p_before = forward(x, w, b)
+loss_before = binary_cross_entropy(y, p_before)
+d_w, d_b = backward(x, y, p_before)
+w, b = update(w, b, d_w, d_b, lr)
+_, p_after = forward(x, w, b)
+loss_after = binary_cross_entropy(y, p_after)
+
+print(f"更新前 p={p_before:.4f}, loss={loss_before:.4f}")
+print(f"更新後 p={p_after:.4f}, loss={loss_after:.4f}")
+print("更新後 w:", w)
+print("更新後 b:", b)
+```

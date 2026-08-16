@@ -63,5 +63,6 @@
 ## 関連
 
 - [engaging-lecture-design.md](engaging-lecture-design.md) — 講義設計の装置（問いかけ→めくり 等）
+- [slide-clarity-rules.md](slide-clarity-rules.md) — 記号・数値・数式・コードの接続を曖昧にしない編集ルール
 - [measured-log.md](measured-log.md) — スライド断定数値の実測ログ
 - リポジトリ直下の CLAUDE.md — 文レベルの日本語・スライド記法・執筆方針の規約はそちら

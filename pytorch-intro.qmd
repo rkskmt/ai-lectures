@@ -5,7 +5,8 @@ subtitle: "自分で書けるから、楽をしていい"
 
 ## 前回の振り返り
 
-- NumPy だけで多層ネットワークを組み、初回の図を再現した
+- 多層化の回でNumPyの `forward`、backpropの回で `backward` を実装した
+- 2つを学習ループへ接続し、NumPyだけで曲がる境界を学習させた
 - ただし `backward` は**自分で導出して書いた**
 
 ::: {.callout-important title="質問"}
@@ -133,42 +134,42 @@ X -> M -> A -> S -> Y
 
 ```{python}
 #| echo: true
-a = torch.tensor([0.3, -0.2], requires_grad=True)   # α1, α2
+w = torch.tensor([0.3, -0.2], requires_grad=True)   # w1, w2
 b = torch.tensor(0.1,  requires_grad=True)
-w = torch.tensor(0.5,  requires_grad=True)
+v = torch.tensor(0.5,  requires_grad=True)
 c = torch.tensor(-0.1, requires_grad=True)
 x = torch.tensor([1.0, 0.5])                        # 入力（正解 y=1）
 
-z = a @ x + b          # 線形変換
+z = w @ x + b          # 線形変換
 h = torch.relu(z)      # ReLU
-u = w * h + c          # 出力層
+u = v * h + c          # 出力層
 p = torch.sigmoid(u)   # シグモイド
 L = -torch.log(p)      # 交差エントロピー（正解1）
 
 L.backward()           # ← 復路はこの1行
 
 print(f"L = {L.item():.4f}")
-print(f"∂L/∂α = {a.grad.numpy().round(4)}")
+print(f"∂L/∂w = {w.grad.numpy().round(4)}")
 print(f"∂L/∂b = {b.grad.item():.4f}")
-print(f"∂L/∂w = {w.grad.item():.4f}")
+print(f"∂L/∂v = {v.grad.item():.4f}")
 print(f"∂L/∂c = {c.grad.item():.4f}")
 ```
 
 ::: {.callout-note title="答え合わせ"}
-手計算（とNumPy検算）の答えは α: $(-0.2438, -0.1219)$、b: $-0.2438$、w: $-0.1463$、c: $-0.4875$。
+手計算（とNumPy検算）の答えは $w$: $(-0.2438, -0.1219)$、$b$: $-0.2438$、$v$: $-0.1463$、$c$: $-0.4875$。
 **表示した小数第4位まで一致。** `loss.backward()` の中身は、前回自分の手でやった連鎖律の機械化。
 :::
 
 
 ## `.grad` に入るのは学習したい値
 
-- `a, b, w, c`：人が用意したパラメータで `requires_grad=True`
+- `w, b, v, c`：人が用意したパラメータで `requires_grad=True`
 - `z, h, u, p, L`：forward中に作られた途中の値
-- `L.backward()` 後、学習に使う勾配は `a.grad`, `b.grad`, `w.grad`, `c.grad` に保存される
+- `L.backward()` 後、学習に使う勾配は `w.grad`, `b.grad`, `v.grad`, `c.grad` に保存される
 
 | 種類 | 例 | 通常 `.grad` を残すか |
 |---|---|---|
-| 葉（[leaf tensor]{.en}） | `a`, `b`, `w`, `c` | 残す |
+| 葉（[leaf tensor]{.en}） | `w`, `b`, `v`, `c` | 残す |
 | 中間結果 | `z`, `h`, `u`, `p` | 計算には使うが通常は残さない |
 
 ::: {.takeaway}
@@ -364,7 +365,7 @@ optimizer = torch.optim.SGD(model.parameters(), lr=0.5)
 ```
 
 - `model.parameters()`：更新対象をoptimizerへ渡す
-- `lr=0.5`：学習率 $\eta$
+- `lr=0.5`：学習率 $\alpha$
 - `step()`：各パラメータについて `parameter -= lr * parameter.grad`
 
 | 呼び出し | パラメータ | `.grad` |
@@ -565,14 +566,14 @@ with torch.no_grad():
 
 ### 問題1：autograd に自分の手計算を言い当てさせる
 
-バックプロパゲーションの回の**練習問題1**（$x = (0.5, 1.0)$、$y = 0$、$\alpha = (0.4, 0.3)$、$b = -0.1$、$w = -0.5$、$c = 0.2$）を PyTorch で組み、`loss.backward()` の勾配が自分の手計算と一致することを確かめよ。
+バックプロパゲーションの回の**練習問題1**（$x = (0.5, 1.0)$、$y = 0$、$w = (0.4, 0.3)$、$b = -0.1$、$v = -0.5$、$c = 0.2$）を PyTorch で組み、`loss.backward()` の勾配が自分の手計算と一致することを確かめよ。
 
 1. 本編の「autograd を手計算と照合する」のコードを、上の数値に差し替える（正解が $y = 0$ なので損失は $L = -\log(1-p)$）
 2. 5つの勾配を表示し、手計算の答え $(-0.125, -0.25)$、$-0.25$、$0.2$、$0.5$ と照合せよ
 
 ### 問題2：ReLU に折られた入力でも試す
 
-入力を $x = (-1.0, 0.5)$ に変えて実行し、$\alpha, b, w$ の勾配が**ちょうどゼロ**になることを確かめよ。
+入力を $x = (-1.0, 0.5)$ に変えて実行し、$w, b, v$ の勾配が**ちょうどゼロ**になることを確かめよ。
 （バックプロパゲーションの回の練習問題2 — autograd も、折られた経路には勾配を流さない）
 
 
@@ -585,25 +586,25 @@ with torch.no_grad():
 import torch
 
 def hand_check(x1, x2):
-    a = torch.tensor([0.4, 0.3], requires_grad=True)   # α1, α2
+    w = torch.tensor([0.4, 0.3], requires_grad=True)   # w1, w2
     b = torch.tensor(-0.1, requires_grad=True)
-    w = torch.tensor(-0.5, requires_grad=True)
+    v = torch.tensor(-0.5, requires_grad=True)
     c = torch.tensor(0.2,  requires_grad=True)
     x = torch.tensor([x1, x2])
 
-    z = a @ x + b
+    z = w @ x + b
     h = torch.relu(z)
-    u = w * h + c
+    u = v * h + c
     p = torch.sigmoid(u)
     L = -torch.log(1 - p)     # 正解 y=0
     L.backward()
 
     print(f"x = ({x1}, {x2}) | L = {L.item():.4f}")
-    print(f"  ∂L/∂α = {a.grad.numpy().round(4)}, ∂L/∂b = {b.grad.item():.4f}, "
-          f"∂L/∂w = {w.grad.item():.4f}, ∂L/∂c = {c.grad.item():.4f}")
+    print(f"  ∂L/∂w = {w.grad.numpy().round(4)}, ∂L/∂b = {b.grad.item():.4f}, "
+          f"∂L/∂v = {v.grad.item():.4f}, ∂L/∂c = {c.grad.item():.4f}")
 
 hand_check(0.5, 1.0)    # 問題1：手計算 (-0.125, -0.25), -0.25, 0.2, 0.5 と一致するはず
-hand_check(-1.0, 0.5)   # 問題2：α, b, w の勾配はゼロになるはず
+hand_check(-1.0, 0.5)   # Problem 2: gradients for w, b, and v should be zero
 ```
 
 - 問題1：表示した小数第4位まで一致。autograd は連鎖律を自動で適用している
