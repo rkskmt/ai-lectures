@@ -3,32 +3,34 @@ title: "ロジスティック回帰をNNとして実装する"
 subtitle: "はじめてのニューラルネットワーク"
 ---
 
-## ニューロンは信号を受け取り、次のニューロンへ伝える
+## ニューラルネットワークのニューロンとは
 
-:::: {.columns}
+:::: {.columns .columns-v-center}
 
-::: {.column width="47%"}
-::: {.fig-cite src="imgs/chemical-synapse-schema-cropped.jpg" height="540px"}
+::: {.column width="30%"}
+::: {.fig-cite src="imgs/chemical-synapse-schema-cropped.jpg" height="300px"}
 ::: {.cite}
 出典: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Chemical_synapse_schema_cropped.jpg), Christy Krames / NIA
 :::
 :::
 :::
 
-::: {.column width="53%"}
-### 図の矢印を追う
+::: {.column width="70%"}
+### ニューロン：本来は脳の神経細胞
 
 - 樹状突起（[dendrite]{.en}）：ほかのニューロンから信号を受け取る
 - 細胞体：受け取った信号が集まる
 - 軸索（[axon]{.en}）：電気信号を離れた場所へ伝える
 - シナプス（[synapse]{.en}）：神経伝達物質を介して、次のニューロンへ信号を渡す
 
-::: {.takeaway}
-ニューロンは1個で完結せず、ほかのニューロンと接続して信号を伝える
-:::
 :::
 
 ::::
+
+::: {.takeaway}
+- 沢山のニューロンが繋がったネットワークがニューラルネット
+- は1個で完結せず、ほかのニューロンと接続して信号を伝える
+:::
 
 
 ## NNの丸はすべて「ノード」と呼ぶ
@@ -360,7 +362,7 @@ direction: right
 A: "構成\n接続とパラメータ" { style.fill: "#e1f5ff" }
 B: "予測\n確率を計算" { style.fill: "#fff4e1" }
 C: "採点\n正解と比較" { style.fill: "#f5b7b1" }
-D: "方向\n動かす向きを調べる" { style.fill: "#fdebd0" }
+D: "勾配\n動かす向きを調べる" { style.fill: "#fdebd0" }
 E: "更新\n値を動かす" { style.fill: "#d5f5e3" }
 A -> B -> C -> D -> E
 ```
@@ -369,7 +371,23 @@ A -> B -> C -> D -> E
 - 前回と同じ魚の値を使い、数値が図のどこを進むかを追う
 
 
-## NNを構成する：学習する値は $w_1,w_2,b$
+## 構成：NNを組み、パラメータを用意する
+
+```{.d2 sketch="true" width="92%"}
+direction: right
+A: "構成\n接続とパラメータ" { style.fill: "#e1f5ff"; style.stroke: "#e74c3c"; style.stroke-width: 5 }
+B: "予測\n確率を計算" { style.fill: "#eeeeee" }
+C: "採点\n正解と比較" { style.fill: "#eeeeee" }
+D: "勾配\n動かす向きを調べる" { style.fill: "#eeeeee" }
+E: "更新\n値を動かす" { style.fill: "#eeeeee" }
+A -> B -> C -> D -> E
+```
+
+- 入力ノード2個と出力層のニューロン1個をつなぎ、学習で動かす $w_1,w_2,b$ を用意する
+- 組むのは[さきほど読み直した、隠れ層なし・ニューロン1個のNN](#peek-one-layer-structure){.peek}。ロジスティック回帰と同じ計算になる
+
+
+## 構成：学習する値は $w_1,w_2,b$
 
 ```{.d2 sketch="true" width="50%"}
 direction: right
@@ -385,7 +403,7 @@ X2 -> N: "w₂"
 - 出力層のニューロンが1個なので、バイアスも1個
 
 
-## NumPyで $w_1,w_2,b$ を用意する
+## 構成：NumPyで $w_1,w_2,b$ を用意する
 
 ```python
 import numpy as np
@@ -402,7 +420,23 @@ b = 0.0
 - `-0.2` と `0.0` は学習前の仮の値。学習によって変わる
 
 
-## 前回と同じ魚のデータを入力する
+## 予測：現在の $w,b$ で確率を計算する
+
+```{.d2 sketch="true" width="92%"}
+direction: right
+A: "構成 ✓\nw=(−0.2, 0)\nb=0" { style.fill: "#e1f5ff" }
+B: "予測\n確率を計算" { style.fill: "#fff4e1"; style.stroke: "#e74c3c"; style.stroke-width: 5 }
+C: "採点\n正解と比較" { style.fill: "#eeeeee" }
+D: "勾配\n動かす向きを調べる" { style.fill: "#eeeeee" }
+E: "更新\n値を動かす" { style.fill: "#eeeeee" }
+A -> B -> C -> D -> E
+```
+
+- 用意した $w,b$ のもとで、魚1匹のSalmon確率 $p$ を計算する
+- 式は[前回のロジスティック回帰の予測](logistic-regression.qmd#peek-logistic-structure){.peek}と同じ。数値が接続と層をどう通るかを1歩ずつ追う
+
+
+## 予測：前回と同じ魚のデータを入力する
 
 - [ロジスティック回帰で勾配を追った魚](logistic-regression.qmd#peek-parameter-gradients){.peek}と同じ入力と正解を使う
 
@@ -421,7 +455,7 @@ y = 1.0
 - $y=1$：この魚の正解ラベル。予測には使わず、後で予測を採点するときに使う
 
 
-## 1本目の接続で $x_1$ を $w_1$ 倍する
+## 予測：1本目の接続で $x_1$ を $w_1$ 倍する
 
 ```{.d2 sketch="true" width="64%"}
 direction: right
@@ -440,7 +474,7 @@ x1w1 = x[0] * w[0]
 ```
 
 
-## 2本目の接続で $x_2$ を $w_2$ 倍する
+## 予測：2本目の接続で $x_2$ を $w_2$ 倍する
 
 ```{.d2 sketch="true" width="64%"}
 direction: right
@@ -459,7 +493,7 @@ x2w2 = x[1] * w[1]
 ```
 
 
-## 出力層で2つの値と $b$ を足す
+## 予測：出力層で2つの値と $b$ を足す
 
 $$
 \begin{aligned}
@@ -481,7 +515,7 @@ z = linear(x, w, b)
 - `linear` が実装したのは、出力層の計算の1段階目だけ
 
 
-## 出力層で $z$ を確率 $p$ へ変える
+## 予測：出力層で $z$ を確率 $p$ へ変える
 
 $$
 p=\sigma(-0.4)
@@ -500,7 +534,7 @@ p = sigmoid(z)
 - このNNは、この魚をSalmonである確率が約40%と予測した
 
 
-## 入力から出力までの計算をForwardと呼ぶ
+## 予測：入力から出力までの計算をForwardと呼ぶ
 
 ```{.d2 sketch="true" width="78%"}
 direction: right
@@ -515,7 +549,7 @@ X -> Z -> P: "数値が進む向き"
 - Forwardは学習方法ではない。現在の $w,b$ で予測を計算する処理
 
 
-## 2段階をつないで `forward` を作る {#peek-one-fish-forward}
+## 予測：2段階をつないで `forward` を作る {#peek-one-fish-forward}
 
 ```python
 def forward(x, w, b):
@@ -536,7 +570,23 @@ p: 0.401312339887548
 - 前の回で使った $p=0.4$ は、この出力を丸めた値として再現できた
 
 
-## 予測 $p$ だけでは、正しかったか分からない
+## 採点：予測 $p$ を正解 $y$ と比べる
+
+```{.d2 sketch="true" width="92%"}
+direction: right
+A: "構成 ✓\nw=(−0.2, 0)\nb=0" { style.fill: "#e1f5ff" }
+B: "予測 ✓\np=0.4013" { style.fill: "#fff4e1" }
+C: "採点\n正解と比較" { style.fill: "#f5b7b1"; style.stroke: "#e74c3c"; style.stroke-width: 5 }
+D: "勾配\n動かす向きを調べる" { style.fill: "#eeeeee" }
+E: "更新\n値を動かす" { style.fill: "#eeeeee" }
+A -> B -> C -> D -> E
+```
+
+- 予測 $p$ と正解 $y$ の違いを、1個の損失値にする
+- [前回、丸めた $p=0.4$ でこの魚を採点して $0.92$ を得た](logistic-regression.qmd#peek-loss-value){.peek}。同じ採点をコードにする
+
+
+## 採点：予測 $p$ だけでは、正しかったか分からない
 
 ```{.d2 sketch="true" width="60%"}
 direction: right
@@ -552,7 +602,7 @@ Y -> Q
 - 学習するには、$p$ と $y$ を比較する採点方法が必要
 
 
-## 二値交差エントロピーで予測を採点する {#peek-one-layer-loss}
+## 採点：損失関数は前回と同じ二値交差エントロピー {#peek-one-layer-loss}
 
 - [ロジスティック回帰で使った損失関数](logistic-regression.qmd#peek-binary-cross-entropy){.peek}を、そのまま使う
 
@@ -566,7 +616,7 @@ $$
 - $p$：NNのForwardで得たSalmon確率
 
 
-## 損失関数をNumPyで実装する
+## 採点：損失関数をNumPyで実装する
 
 ```python
 def binary_cross_entropy(y, p):
@@ -582,7 +632,7 @@ def binary_cross_entropy(y, p):
 - 関数の出力は、この魚の予測に対する損失 `loss`
 
 
-## この魚の損失は約 $0.913$
+## 採点：この魚の損失は約 $0.913$
 
 - 正解は $y=1$ なので、二値交差エントロピーの第1項だけが残る
 
@@ -605,7 +655,23 @@ loss: 0.9130152523999526
 :::
 
 
-## 損失の値だけでは、重みをどちらへ動かすか分からない
+## 勾配：損失が下がる向きを調べる
+
+```{.d2 sketch="true" width="92%"}
+direction: right
+A: "構成 ✓\nw=(−0.2, 0)\nb=0" { style.fill: "#e1f5ff" }
+B: "予測 ✓\np=0.4013" { style.fill: "#fff4e1" }
+C: "採点 ✓\nℓ=0.913" { style.fill: "#f5b7b1" }
+D: "勾配\n動かす向きを調べる" { style.fill: "#fdebd0"; style.stroke: "#e74c3c"; style.stroke-width: 5 }
+E: "更新\n値を動かす" { style.fill: "#eeeeee" }
+A -> B -> C -> D -> E
+```
+
+- $w_1,w_2,b$ をそれぞれどちらへ動かせば損失が下がるか、微分値で調べる
+- [前回、連鎖律で求めた3つの勾配](logistic-regression.qmd#peek-parameter-gradients){.peek}と同じ計算。今回は接続を逆向きにたどる順番で求める
+
+
+## 勾配：損失の値だけでは、重みをどちらへ動かすか分からない
 
 ```{.d2 sketch="true" width="78%"}
 direction: right
@@ -620,7 +686,7 @@ W -> L -> Q
 - 各パラメータを少し変えたとき、損失がどちらへ変わるかを調べる
 
 
-## 現在のパラメータにおける損失関数の微分値を求める
+## 勾配：現在のパラメータにおける損失関数の微分値を求める
 
 - 予測 $p$ は $w_1,w_2,b$ から計算されるため、損失関数 $\ell$ も $w_1,w_2,b$ によって変わる
 - 現在のパラメータは $w_1=-0.2,w_2=0,b=0$
@@ -637,7 +703,7 @@ $$
 - それぞれの微分値から、そのパラメータを増やしたときに損失が増えるか減るかが分かる
 
 
-## 3つの偏微分値をまとめたものが勾配
+## 勾配：3つの偏微分値をまとめて勾配と呼ぶ
 
 $$
 \nabla_{w,b}\ell=
@@ -651,19 +717,20 @@ $$
 - 勾配（[gradient]{.en}）：現在のパラメータの値において求めた、パラメータごとの偏微分値をまとめたもの
 
 
-## 更新に使うのは損失値そのものではなく偏微分値
+## 勾配：更新に使うのは損失値そのものではなく偏微分値
 
 - 損失値 $\ell=0.913$：現在の予測がどの程度悪いかを表す
 - $\partial\ell/\partial w_1,\partial\ell/\partial w_2,\partial\ell/\partial b$：各パラメータをどちらへ動かすかを決める
 - 各微分値が正：そのパラメータを増やすと、損失関数の値は増える
 - 各微分値が負：そのパラメータを増やすと、損失関数の値は減る
+- [前回、損失値の $0.92$ そのものから勾配を求めたわけではないと注意した](logistic-regression.qmd#peek-parameter-gradients){.peek}
 
 ::: {.takeaway}
 損失関数は偏微分値を決める。$0.913$ という損失値自体を、更新式へ直接代入するわけではない
 :::
 
 
-## 各パラメータについての微分値を連鎖律で求める
+## 勾配：各パラメータについての微分値を連鎖律で求める
 
 ```{.d2 sketch="true" width="84%"}
 direction: left
@@ -680,7 +747,7 @@ Z -> WB: "微分"
 - 微分では $\ell\rightarrow p\rightarrow z\rightarrow w,b$ と逆向きに関係をつなぐ
 
 
-## この逆向きの計算をBackwardと呼ぶ
+## 勾配：この逆向きの計算をBackwardと呼ぶ
 
 - Backward（[backward pass]{.en}、逆伝播）：連鎖律を使い、損失関数を各パラメータで偏微分した値を求める計算
 - 誤差逆伝播法（[backpropagation]{.en}、BP）：ネットワークの接続を逆向きにたどり、各偏微分値を求める方法
@@ -694,7 +761,7 @@ Backward :       d_w, d_b ←── d_z ←── ℓ
 - 隠れ層が増えても、出力側で求めた微分値から順につないでいく
 
 
-## 最初に損失関数を $z$ で微分する
+## 勾配：最初に損失関数を $z$ で微分する
 
 - [ロジスティック関数と二値交差エントロピーを微分した結果](logistic-regression.qmd#peek-logistic-p-minus-y){.peek}は次の式だった
 
@@ -708,7 +775,7 @@ $$
 - 数式の $\partial\ell/\partial z$ と同じ値を表す
 
 
-## この魚では $d_z\approx-0.5987$
+## 勾配：この魚では $d_z\approx-0.5987$
 
 $$
 d_z=p-y
@@ -725,9 +792,10 @@ d_z: -0.598687660112452
 ```
 
 - 負の値なので、$z$ を増やす方向へ動かすと損失が下がる
+- [前回、丸めた $p=0.4$ で手計算した $p-y=-0.6$](logistic-regression.qmd#peek-parameter-gradients){.peek} の丸め前の値
 
 
-## $w_1$ に関する微分値は $d_z$ に $x_1$ を掛ける
+## 勾配：$w_1$ に関する微分値は $d_z$ に $x_1$ を掛ける
 
 ```{.d2 sketch="true" width="64%"}
 direction: right
@@ -746,7 +814,7 @@ d_{w_1}
 $$
 
 
-## $w_2$ に関する微分値は $d_z$ に $x_2$ を掛ける
+## 勾配：$w_2$ に関する微分値は $d_z$ に $x_2$ を掛ける
 
 ```{.d2 sketch="true" width="64%"}
 direction: right
@@ -765,7 +833,7 @@ d_{w_2}
 $$
 
 
-## $b$ に関する微分値は $d_z$ と同じ
+## 勾配：$b$ に関する微分値は $d_z$ と同じ
 
 - $z=w_1x_1+w_2x_2+b$ では、$b$ はそのまま1倍されている
 
@@ -782,7 +850,7 @@ d_b = d_z
 ```
 
 
-## 2本の重みに関する微分値をNumPyでまとめる
+## 勾配：2本の重みに関する微分値をNumPyでまとめる
 
 $$
 \begin{bmatrix}d_{w_1}\\d_{w_2}\end{bmatrix}
@@ -802,7 +870,7 @@ d_w: [-1.19737532 -0.29934383]
 - `d_w[1]` が $w_2$ に関する微分値
 
 
-## 3つの計算を `backward` へまとめる {#peek-one-layer-backward}
+## 勾配：3つの計算を `backward` へまとめる {#peek-one-layer-backward}
 
 ```python
 def backward(x, y, p):
@@ -819,9 +887,10 @@ def backward(x, y, p):
 
 - `backward` の入力：Forwardで使った `x`、正解 `y`、Forwardで得た `p`
 - `backward` の出力：更新に使う `d_w, d_b`
+- [前回書いた勾配の3行](logistic-regression.qmd#peek-gradient-code){.peek}を、そのまま関数の形にした
 
 
-## `backward` が返した値を確認する {#peek-one-layer-gradient-map}
+## 勾配：`backward` が返した値を確認する {#peek-one-layer-gradient-map}
 
 ```python
 d_w, d_b = backward(x, y, p)
@@ -838,8 +907,26 @@ d_b: -0.598687660112452
 | `d_w[1]` | $\partial\ell/\partial w_2$ | 2本目の接続の $w_2$ |
 | `d_b` | $\partial\ell/\partial b$ | 出力層の $b$ |
 
+- [前回、同じ魚で手計算した $-1.2,\ -0.3,\ -0.6$](logistic-regression.qmd#peek-parameter-gradients){.peek} の丸め前の値が求まった
 
-## 勾配と逆向きにパラメータを動かす
+
+## 更新：求めた勾配で $w,b$ を動かす
+
+```{.d2 sketch="true" width="92%"}
+direction: right
+A: "構成 ✓\nw=(−0.2, 0)\nb=0" { style.fill: "#e1f5ff" }
+B: "予測 ✓\np=0.4013" { style.fill: "#fff4e1" }
+C: "採点 ✓\nℓ=0.913" { style.fill: "#f5b7b1" }
+D: "勾配 ✓\nd_w=(−1.1974, −0.2993)\nd_b=−0.5987" { style.fill: "#fdebd0" }
+E: "更新\n値を動かす" { style.fill: "#d5f5e3"; style.stroke: "#e74c3c"; style.stroke-width: 5 }
+A -> B -> C -> D -> E
+```
+
+- 求めた $d_w,d_b$ で $w_1,w_2,b$ を動かす。更新式は前回の勾配降下法と同じ
+- 動かした後、もう一度予測して、損失が下がることを確かめる
+
+
+## 更新：勾配と逆向きにパラメータを動かす
 
 - [ロジスティック回帰で使った勾配降下法](logistic-regression.qmd#peek-one-at-a-time){.peek}と同じ更新
 
@@ -853,7 +940,7 @@ $$
 - コードではlearning rateを略して `lr` と書く
 
 
-## この魚では負の勾配を引く
+## 更新：この魚では負の勾配を引く
 
 $$
 w_1\leftarrow-0.2
@@ -866,7 +953,7 @@ $$
 - 「勾配と逆向き」は、勾配を引く更新式が自動的に処理する
 
 
-## 更新処理を `update` として実装する
+## 更新：`update` として実装する
 
 ```python
 def update(w, b, d_w, d_b, lr):
@@ -879,7 +966,7 @@ def update(w, b, d_w, d_b, lr):
 - 更新後の値を返し、次の予測で使う
 
 
-## 1回の更新で $w,b$ が変わる
+## 更新：1回の実行で $w,b$ が変わる
 
 ```python
 lr = 0.1
@@ -898,7 +985,7 @@ w, b = update(w, b, d_w, d_b, lr)
 - 接続の重み $w_1,w_2$ と、出力層のバイアス $b$ が変わった
 
 
-## 更新後のパラメータでもう一度予測する
+## 更新：新しい $w,b$ でもう一度予測する
 
 ```python
 z_after, p_after = forward(x, w, b)
