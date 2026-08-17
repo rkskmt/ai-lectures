@@ -193,6 +193,50 @@
   </style>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="custom.css">
+  <script>
+  // MathJax v2's HTML-CSS renderer (Quarto hardcodes config=TeX-AMS_HTML-full)
+  // measures glyph widths in the live DOM, so when its TeX webfonts arrive
+  // after typesetting (VSCode webviews, high-DPI Windows, slow networks) the
+  // repaint leaves inline math wider than its reserved box and it overpaints
+  // the neighboring text. The CommonHTML renderer lays out from built-in
+  // metric tables and has no such race. Quarto offers no knob for this, so
+  // trap the Reveal global (reveal.js loads later, in <body>) and rewrite
+  // the math config before Reveal.initialize hands it to the math plugin.
+  //
+  // CommonHTML still sizes math by measuring an ex-height probe in the
+  // DOM next to each equation (matchFontHeight). reveal.css keeps every
+  // section display:none until Reveal's first layout, so when MathJax
+  // loads fast (warm HTTP cache) the initial whole-deck typeset runs
+  // against hidden slides: the probe measures 0, MathJax substitutes
+  // the 16px-body default ex but keeps the real 32px font-size, and
+  // every equation renders at ~50-61% — permanently, because MathJax
+  // never re-typesets processed math. A fixed scale with
+  // matchFontHeight off removes the DOM measurement entirely (which
+  // also fixes math inside collapsed code-fold / callout bodies —
+  // those always measured hidden). 127% is what the measurement
+  // itself yields for this theme's fonts when it works; retune it if
+  // the body font ever changes.
+  (function () {
+    var reveal;
+    Object.defineProperty(window, "Reveal", {
+      configurable: true,
+      get: function () { return reveal; },
+      set: function (value) {
+        reveal = value;
+        if (!value || typeof value.initialize !== "function" || value.__cskCHTML) return;
+        value.__cskCHTML = true;
+        var initialize = value.initialize;
+        value.initialize = function (config) {
+          if (config && config.math && typeof config.math.config === "string") {
+            config.math.config = config.math.config.replace("_HTML", "_CHTML");
+            config.math.CommonHTML = { scale: 127, matchFontHeight: false };
+          }
+          return initialize.call(this, config);
+        };
+      }
+    });
+  })();
+  </script>
   <script src="slide-ui.js" defer=""></script>
   <script src="search-ui.js" defer=""></script>
   <script src="peek-ui.js" defer=""></script>
@@ -219,7 +263,8 @@ rkskmt
 <section id="初回の約束覚えているか" class="slide level2">
 <h2>初回の約束、覚えているか</h2>
 <div class="slide-body">
-<div id="a17c086e" class="cell" data-execution_count="1">
+<p>TODO；おぼえてるわけねえだろ。くだらないことかくな</p>
+<div id="766020b2" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -243,7 +288,7 @@ rkskmt
 <ul>
 <li>手書き数字の定番データセット。<strong>訓練6万枚・テスト1万枚</strong>、各28×28ピクセル</li>
 </ul>
-<div id="daff6fa7" class="cell" data-execution_count="2">
+<div id="53e13330" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> torch</span>
 <span id="cb1-2"><a></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
 <span id="cb1-3"><a></a><span class="im">from</span> torchvision <span class="im">import</span> datasets, transforms</span>
@@ -260,7 +305,7 @@ rkskmt
 1枚の形: (1, 28, 28)  正解ラベル: 5</code></pre>
 </div>
 </div>
-<div id="2de69c33" class="cell" data-execution_count="3">
+<div id="339f0b97" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -318,7 +363,7 @@ rkskmt
 <li>魚は2次元（輝度・重さ）だった。<a href="./dimensionality-pca.html#peek-curse" class="peek">次元の呪いの回で扱った高次元</a>が、<strong>本物の入力</strong>として現れる</li>
 <li><code>nn.Flatten()</code> が「画像 → ベクトル」の変換をやる</li>
 </ul>
-<div id="4044fd63" class="cell" data-execution_count="4">
+<div id="7a72717f" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a><span class="im">import</span> torch</span>
 <span id="cb3-2"><a></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
 <span id="cb3-3"><a></a></span>
@@ -456,7 +501,7 @@ rkskmt
 <section id="ソフトマックスの仕事ぶり" class="slide level2">
 <h2>ソフトマックスの仕事ぶり</h2>
 <div class="slide-body">
-<div id="d0c9487e" class="cell" data-execution_count="5">
+<div id="ff2825af" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -474,7 +519,7 @@ rkskmt
 <section id="crossentropyloss-はsoftmax込み" class="slide level2">
 <h2><code>CrossEntropyLoss</code> はsoftmax込み</h2>
 <div class="slide-body">
-<div id="b9cc2393" class="cell" data-execution_count="6">
+<div id="d0a5f8f6" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a><span class="im">import</span> torch</span>
 <span id="cb5-2"><a></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
 <span id="cb5-3"><a></a></span>
@@ -499,7 +544,7 @@ rkskmt
 <section id="モデル784-128-10" class="slide level2">
 <h2>モデル：784 → 128 → 10</h2>
 <div class="slide-body">
-<div id="f415b182" class="cell" data-execution_count="7">
+<div id="029a3516" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a></a>torch.manual_seed(<span class="dv">0</span>)</span>
 <span id="cb7-2"><a></a></span>
 <span id="cb7-3"><a></a>model <span class="op">=</span> nn.Sequential(</span>
@@ -569,7 +614,7 @@ rkskmt
 <li>6万枚まとめて勾配を計算すると重い → <strong>128枚ずつ</strong>取り出して1歩ずつ進む — この一口が<strong>ミニバッチ</strong>（<span class="en">mini-batch</span>）</li>
 <li>データを一巡することを <strong>1エポック</strong>（<span class="en">epoch</span>）と呼ぶ</li>
 </ul>
-<div id="35c9093b" class="cell" data-execution_count="8">
+<div id="5848c4de" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a></a>train_loader <span class="op">=</span> torch.utils.data.DataLoader(train_ds, batch_size<span class="op">=</span><span class="dv">128</span>, shuffle<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb10-2"><a></a>test_loader  <span class="op">=</span> torch.utils.data.DataLoader(test_ds,  batch_size<span class="op">=</span><span class="dv">1000</span>)</span>
 <span id="cb10-3"><a></a></span>
@@ -589,7 +634,8 @@ rkskmt
 </div>
 </div>
 <ul>
-<li>ロジスティック回帰の回で<a href="./logistic-regression.html#peek-one-at-a-time" class="peek">「魚を1匹ずつ見せる」</a>とやったのと同じ発想（あちらはバッチサイズ1）</li>
+<li><a href="./nn-backprop.html#peek-full-batch" class="peek">NumPyで2層NNを学習した回</a>では、全200件を1つのバッチにして1回更新した</li>
+<li>今回は6万枚を128枚ずつのミニバッチへ分け、1ミニバッチごとに1回更新する</li>
 </ul>
 </div>
 </section>
@@ -622,7 +668,7 @@ rkskmt
 <section id="peek-mnist-train" class="slide level2">
 <h2>学習する</h2>
 <div class="slide-body">
-<div id="92d944ad" class="cell" data-execution_count="9">
+<div id="f1f10021" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">4</span>):</span>
 <span id="cb12-2"><a></a>    loss_sum <span class="op">=</span> <span class="fl">0.0</span></span>
 <span id="cb12-3"><a></a>    <span class="cf">for</span> x_batch, y_batch <span class="kw">in</span> train_loader:</span>
@@ -711,7 +757,7 @@ rkskmt
 <section id="読めている様子" class="slide level2">
 <h2>読めている様子</h2>
 <div class="slide-body">
-<div id="e1887cb4" class="cell" data-execution_count="10">
+<div id="748f5081" class="cell" data-execution_count="10">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -728,7 +774,7 @@ rkskmt
 <section id="間違いを眺める" class="slide level2">
 <h2>間違いを眺める</h2>
 <div class="slide-body">
-<div id="efa54e49" class="cell" data-execution_count="11">
+<div id="0916fb56" class="cell" data-execution_count="11">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -761,7 +807,7 @@ rkskmt
 </div>
 </div>
 </div>
-<div id="90ddd5b4" class="cell" data-execution_count="12">
+<div id="753ffea3" class="cell" data-execution_count="12">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -780,7 +826,7 @@ rkskmt
 <section id="自信満々の間違い" class="slide level2">
 <h2>自信満々の間違い</h2>
 <div class="slide-body">
-<div id="6d60f7f0" class="cell" data-execution_count="13">
+<div id="558c0364" class="cell" data-execution_count="13">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -802,7 +848,7 @@ rkskmt
 <ul>
 <li>第1層 <code>nn.Linear(784, 128)</code> の各ユニットは、784本の重みを持つ ＝ <strong>28×28の「模様」</strong>として絵にできる</li>
 </ul>
-<div id="52797bf7" class="cell" data-execution_count="14">
+<div id="e8763ecd" class="cell" data-execution_count="14">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -814,7 +860,7 @@ rkskmt
 <ul>
 <li><strong>赤い場所にインクが乗ると足し、青い場所なら引く</strong> — その合計が ReLU の入り口 <span class="math inline">\(z\)</span></li>
 <li>学習前（同じシードで初期化し直したもの）は一様な砂嵐。学習後は<strong>中央にインクの通り道の模様</strong>が育っている</li>
-<li>魚のとき<a href="./logistic-regression.html">学習された <span class="math inline">\(\alpha\)</span> を読んだ</a>のと同じことを、10万パラメータでやっただけ</li>
+<li>魚のとき<a href="./logistic-regression.html">学習された <span class="math inline">\(w\)</span> を読んだ</a>のと同じことを、10万パラメータでやっただけ</li>
 </ul>
 </div>
 </section>
@@ -848,7 +894,7 @@ rkskmt
 <h2>自分の字は読めるのか（持ち帰りデモ）</h2>
 <div class="slide-body">
 <p>紙に数字を書いて撮影し、この機械に読ませてみよう。 ただし<strong>写真をそのまま28×28に縮めても、まず読めない</strong> — MNISTの画像は「数字を20ピクセル角に収め、重心をど真ん中に置く」ように揃えてあり、撮った写真はそうなっていないから。同じ揃え方を自分でやってから見せる：</p>
-<div id="98359926" class="cell" data-execution_count="15">
+<div id="b35ed9f2" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a></a><span class="im">from</span> PIL <span class="im">import</span> Image</span>
 <span id="cb14-2"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb14-3"><a></a><span class="im">import</span> torch</span>

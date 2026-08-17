@@ -193,6 +193,50 @@
   </style>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="custom.css">
+  <script>
+  // MathJax v2's HTML-CSS renderer (Quarto hardcodes config=TeX-AMS_HTML-full)
+  // measures glyph widths in the live DOM, so when its TeX webfonts arrive
+  // after typesetting (VSCode webviews, high-DPI Windows, slow networks) the
+  // repaint leaves inline math wider than its reserved box and it overpaints
+  // the neighboring text. The CommonHTML renderer lays out from built-in
+  // metric tables and has no such race. Quarto offers no knob for this, so
+  // trap the Reveal global (reveal.js loads later, in <body>) and rewrite
+  // the math config before Reveal.initialize hands it to the math plugin.
+  //
+  // CommonHTML still sizes math by measuring an ex-height probe in the
+  // DOM next to each equation (matchFontHeight). reveal.css keeps every
+  // section display:none until Reveal's first layout, so when MathJax
+  // loads fast (warm HTTP cache) the initial whole-deck typeset runs
+  // against hidden slides: the probe measures 0, MathJax substitutes
+  // the 16px-body default ex but keeps the real 32px font-size, and
+  // every equation renders at ~50-61% — permanently, because MathJax
+  // never re-typesets processed math. A fixed scale with
+  // matchFontHeight off removes the DOM measurement entirely (which
+  // also fixes math inside collapsed code-fold / callout bodies —
+  // those always measured hidden). 127% is what the measurement
+  // itself yields for this theme's fonts when it works; retune it if
+  // the body font ever changes.
+  (function () {
+    var reveal;
+    Object.defineProperty(window, "Reveal", {
+      configurable: true,
+      get: function () { return reveal; },
+      set: function (value) {
+        reveal = value;
+        if (!value || typeof value.initialize !== "function" || value.__cskCHTML) return;
+        value.__cskCHTML = true;
+        var initialize = value.initialize;
+        value.initialize = function (config) {
+          if (config && config.math && typeof config.math.config === "string") {
+            config.math.config = config.math.config.replace("_HTML", "_CHTML");
+            config.math.CommonHTML = { scale: 127, matchFontHeight: false };
+          }
+          return initialize.call(this, config);
+        };
+      }
+    });
+  })();
+  </script>
   <script src="slide-ui.js" defer=""></script>
   <script src="search-ui.js" defer=""></script>
   <script src="peek-ui.js" defer=""></script>
@@ -219,7 +263,7 @@ rkskmt
 <section id="このデータを分離する" class="slide level2">
 <h2>このデータを分離する</h2>
 <div class="slide-body">
-<div id="b964b1aa" class="cell" data-execution_count="1">
+<div id="a12442e5" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -251,7 +295,7 @@ rkskmt
 <section id="機械が自力で見つけた境界" class="slide level2">
 <h2>機械が自力で見つけた境界</h2>
 <div class="slide-body">
-<div id="a9ca5f9b" class="cell" data-execution_count="2">
+<div id="1852a7a2" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -382,7 +426,7 @@ rkskmt
 <li>重量計をつけられそうなので、まず重さで識別できないかを考えた</li>
 <li>まずサンプルとして20匹ずつの重さを測定した</li>
 </ul>
-<div id="3d834b25" class="cell" data-execution_count="3">
+<div id="424155db" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="co"># Salmon（20匹）の重さ (g)</span></span>
 <span id="cb1-2"><a></a>salmon_weights <span class="op">=</span> [<span class="dv">2149</span>, <span class="dv">1959</span>, <span class="dv">2194</span>, <span class="dv">2457</span>, <span class="dv">1930</span>, <span class="dv">1930</span>, <span class="dv">2474</span>, <span class="dv">2230</span>, <span class="dv">1859</span>, <span class="dv">2163</span>,</span>
 <span id="cb1-3"><a></a>                  <span class="dv">1861</span>, <span class="dv">1860</span>, <span class="dv">2073</span>, <span class="dv">1426</span>, <span class="dv">1483</span>, <span class="dv">1831</span>, <span class="dv">1696</span>, <span class="dv">2094</span>, <span class="dv">1728</span>, <span class="dv">1576</span>]</span>
@@ -392,7 +436,7 @@ rkskmt
 <span id="cb1-7"><a></a>seabass_weights <span class="op">=</span> [<span class="dv">1677</span>, <span class="dv">1327</span>, <span class="dv">1486</span>, <span class="dv">1440</span>, <span class="dv">1857</span>, <span class="dv">1476</span>, <span class="dv">1749</span>, <span class="dv">2203</span>, <span class="dv">1979</span>, <span class="dv">1468</span>,</span>
 <span id="cb1-8"><a></a>                   <span class="dv">1496</span>, <span class="dv">1737</span>, <span class="dv">1099</span>, <span class="dv">1341</span>, <span class="dv">1748</span>, <span class="dv">1563</span>, <span class="dv">2181</span>, <span class="dv">1414</span>, <span class="dv">1286</span>, <span class="dv">1333</span>]</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="fdb2a88b" class="cell" data-execution_count="4">
+<div id="dd9379f8" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div>
 <figure>
@@ -409,7 +453,7 @@ rkskmt
 <p>pandas, numpy, matplotlib, scikit-learn をインストールする。</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a></a><span class="ex">pip</span> install pandas numpy matplotlib scikit-learn</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <p>続けて、以下を実行</p>
-<div id="55cac89a" class="cell" data-execution_count="5">
+<div id="1394423d" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a><span class="co"># Setup</span></span>
 <span id="cb3-2"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb3-3"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -428,7 +472,7 @@ rkskmt
 <section id="まずはヒストグラム" class="slide level2">
 <h2>まずはヒストグラム</h2>
 <div class="slide-body">
-<div id="8830284d" class="cell" data-execution_count="6">
+<div id="328356c5" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
@@ -460,7 +504,7 @@ rkskmt
 <section id="統計値を見る" class="slide level2">
 <h2>統計値を見る</h2>
 <div class="slide-body">
-<div id="eff14456" class="cell" data-execution_count="7">
+<div id="06b56cc4" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a><span class="bu">print</span>(<span class="ss">f"Salmon   - 最小: </span><span class="sc">{</span><span class="bu">min</span>(salmon_weights)<span class="sc">}</span><span class="ss">g, 最大: </span><span class="sc">{</span><span class="bu">max</span>(salmon_weights)<span class="sc">}</span><span class="ss">g, 平均: </span><span class="sc">{</span>np<span class="sc">.</span>mean(salmon_weights)<span class="sc">:.0f}</span><span class="ss">g"</span>)</span>
 <span id="cb5-2"><a></a><span class="bu">print</span>(<span class="ss">f"Sea bass - 最小: </span><span class="sc">{</span><span class="bu">min</span>(seabass_weights)<span class="sc">}</span><span class="ss">g, 最大: </span><span class="sc">{</span><span class="bu">max</span>(seabass_weights)<span class="sc">}</span><span class="ss">g, 平均: </span><span class="sc">{</span>np<span class="sc">.</span>mean(seabass_weights)<span class="sc">:.0f}</span><span class="ss">g"</span>)</span>
 <span id="cb5-3"><a></a>overlap_min <span class="op">=</span> <span class="bu">max</span>(<span class="bu">min</span>(salmon_weights), <span class="bu">min</span>(seabass_weights))</span>
@@ -507,7 +551,7 @@ Sea bass - 最小: 1099g, 最大: 2203g, 平均: 1593g
 <section id="青の破線で切ったとしたら" class="slide level2">
 <h2>青の破線で切ったとしたら</h2>
 <div class="slide-body">
-<div id="c85266ef" class="cell" data-execution_count="8">
+<div id="0835eaff" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -582,7 +626,7 @@ Sea bass - 最小: 1099g, 最大: 2203g, 平均: 1593g
 <section id="peek-cm-1800" class="slide level2">
 <h2>混同行列（<span class="en">Confusion Matrix</span>）</h2>
 <div class="slide-body">
-<div id="d5f38a3f" class="cell" data-execution_count="9">
+<div id="2d39eace" class="cell" data-execution_count="9">
 <details class="code-fold">
 <summary>code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a></a>threshold <span class="op">=</span> <span class="dv">1800</span></span>
@@ -652,7 +696,7 @@ Sea bass - 最小: 1099g, 最大: 2203g, 平均: 1593g
 <section id="判定器の評価" class="slide level2">
 <h2>判定器の評価</h2>
 <div class="slide-body">
-<div id="765427da" class="cell" data-execution_count="10">
+<div id="24ca5e70" class="cell" data-execution_count="10">
 <details class="code-fold">
 <summary>code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a></a><span class="co"># Calculate metrics</span></span>
@@ -687,7 +731,7 @@ Precision 0.789 Salmonと判定した中で実際にSalmonの割合
 <section id="しきい値を変えると" class="slide level2">
 <h2>しきい値を変えると？</h2>
 <div class="slide-body">
-<div id="ee730c93" class="cell" data-execution_count="11">
+<div id="4e01d93f" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a></a>thresholds <span class="op">=</span> [<span class="dv">1600</span>, <span class="dv">1800</span>, <span class="dv">2000</span>]</span>
@@ -754,7 +798,7 @@ Precision 0.789 Salmonと判定した中で実際にSalmonの割合
 <div class="slide-body">
 <div class="columns">
 <div class="column" style="width:50%;">
-<div id="811a01a6" class="cell" data-execution_count="12">
+<div id="779aa0c8" class="cell" data-execution_count="12">
 <div class="cell-output cell-output-display">
 <div>
 <figure>
@@ -771,7 +815,7 @@ Precision 0.789 Salmonと判定した中で実際にSalmonの割合
 <li><strong>Recall</strong>: 85.0% (高い)</li>
 </ul>
 </div><div class="column" style="width:50%;">
-<div id="089c504c" class="cell" data-execution_count="13">
+<div id="b6b24af7" class="cell" data-execution_count="13">
 <div class="cell-output cell-output-display">
 <div>
 <figure>
@@ -818,7 +862,7 @@ Precision 0.789 Salmonと判定した中で実際にSalmonの割合
 &amp;\quad \small{N(x): x\text{の個数},\; \text{Cost}(x): x\text{ 1個あたりのコスト}}
 \end{aligned}
 \]</span></p>
-<div id="4c7c55a9" class="cell" data-execution_count="14">
+<div id="6c937f66" class="cell" data-execution_count="14">
 <details class="code-fold">
 <summary>code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a></a><span class="co"># 例：Sea bass混入のクレーム対応コストが高い場合</span></span>
@@ -939,7 +983,7 @@ Precision 0.789 Salmonと判定した中で実際にSalmonの割合
 <h2>練習問題</h2>
 <div class="slide-body">
 <p>下記のデータ（それぞれ20匹ずつ追加した）について、以下の0〜4を実行して分類器をつくれ。</p>
-<div id="0f82dd52" class="cell" data-execution_count="15">
+<div id="83e09baa" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a></a>salmon_weights <span class="op">=</span> [<span class="dv">2149</span>, <span class="dv">1959</span>, <span class="dv">2194</span>, <span class="dv">2457</span>, <span class="dv">1930</span>, <span class="dv">1930</span>, <span class="dv">2474</span>, <span class="dv">2230</span>, <span class="dv">1859</span>, <span class="dv">2163</span>,</span>
 <span id="cb14-2"><a></a>                  <span class="dv">1861</span>, <span class="dv">1860</span>, <span class="dv">2073</span>, <span class="dv">1426</span>, <span class="dv">1483</span>, <span class="dv">1831</span>, <span class="dv">1696</span>, <span class="dv">2094</span>, <span class="dv">1728</span>, <span class="dv">1576</span>,</span>
 <span id="cb14-3"><a></a>                  <span class="dv">2028</span>, <span class="dv">1903</span>, <span class="dv">2057</span>, <span class="dv">1629</span>, <span class="dv">1884</span>, <span class="dv">1884</span>, <span class="dv">2240</span>, <span class="dv">2081</span>, <span class="dv">1838</span>, <span class="dv">2037</span>,</span>
@@ -966,7 +1010,7 @@ Precision 0.789 Salmonと判定した中で実際にSalmonの割合
 <section id="問0の答え" class="slide level2">
 <h2>問0の答え</h2>
 <div class="slide-body">
-<div id="505d0563" class="cell" data-execution_count="16">
+<div id="90fb3553" class="cell" data-execution_count="16">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>

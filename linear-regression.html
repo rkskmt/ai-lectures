@@ -193,6 +193,50 @@
   </style>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="custom.css">
+  <script>
+  // MathJax v2's HTML-CSS renderer (Quarto hardcodes config=TeX-AMS_HTML-full)
+  // measures glyph widths in the live DOM, so when its TeX webfonts arrive
+  // after typesetting (VSCode webviews, high-DPI Windows, slow networks) the
+  // repaint leaves inline math wider than its reserved box and it overpaints
+  // the neighboring text. The CommonHTML renderer lays out from built-in
+  // metric tables and has no such race. Quarto offers no knob for this, so
+  // trap the Reveal global (reveal.js loads later, in <body>) and rewrite
+  // the math config before Reveal.initialize hands it to the math plugin.
+  //
+  // CommonHTML still sizes math by measuring an ex-height probe in the
+  // DOM next to each equation (matchFontHeight). reveal.css keeps every
+  // section display:none until Reveal's first layout, so when MathJax
+  // loads fast (warm HTTP cache) the initial whole-deck typeset runs
+  // against hidden slides: the probe measures 0, MathJax substitutes
+  // the 16px-body default ex but keeps the real 32px font-size, and
+  // every equation renders at ~50-61% — permanently, because MathJax
+  // never re-typesets processed math. A fixed scale with
+  // matchFontHeight off removes the DOM measurement entirely (which
+  // also fixes math inside collapsed code-fold / callout bodies —
+  // those always measured hidden). 127% is what the measurement
+  // itself yields for this theme's fonts when it works; retune it if
+  // the body font ever changes.
+  (function () {
+    var reveal;
+    Object.defineProperty(window, "Reveal", {
+      configurable: true,
+      get: function () { return reveal; },
+      set: function (value) {
+        reveal = value;
+        if (!value || typeof value.initialize !== "function" || value.__cskCHTML) return;
+        value.__cskCHTML = true;
+        var initialize = value.initialize;
+        value.initialize = function (config) {
+          if (config && config.math && typeof config.math.config === "string") {
+            config.math.config = config.math.config.replace("_HTML", "_CHTML");
+            config.math.CommonHTML = { scale: 127, matchFontHeight: false };
+          }
+          return initialize.call(this, config);
+        };
+      }
+    });
+  })();
+  </script>
   <script src="slide-ui.js" defer=""></script>
   <script src="search-ui.js" defer=""></script>
   <script src="peek-ui.js" defer=""></script>
@@ -221,23 +265,79 @@ rkskmt
 <div class="slide-body">
 <ul>
 <li><strong>勾配降下法</strong>：傾きの逆方向に少しずつ進んで、損失が最小の場所を探す</li>
-<li>ただし前回最小化したのは、練習用の数学の関数 <span class="math inline">\(f(x) = x^2 - 4x + 3\)</span> だった</li>
+<li>ただし前回最小化したのは、簡単な関数 <span class="math inline">\(f(x) = x^2 - 4x + 3\)</span> だった</li>
 </ul>
-<div title="今回の問い">
+<div title="今回の目的">
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>今回の問い</strong></p>
+<p><strong>今回の目的</strong></p>
 </div>
 <div class="callout-content">
-<p>勾配降下法で、<strong>本物のモデル</strong>を <code>fit</code> できるか？ — <code>fit()</code> の自作、第1号</p>
+<p>勾配降下法で回帰モデルを<code>fit</code> する</p>
 </div>
 </div>
 </div>
 </div>
+</div>
+</section>
+<section id="モデルとは" class="slide level2">
+<h2>モデルとは</h2>
+<div class="slide-body">
+<ul>
+<li>これまでの「モデル」を、2つの部分に分けてみる：</li>
+</ul>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>回</th>
+<th>計算の形（人間が決めた）</th>
+<th>空欄の数字（データが決めた）</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1次元分類</td>
+<td>重さをしきい値と比べて判定</td>
+<td>しきい値（1個）</td>
+</tr>
+<tr class="even">
+<td>2次元の決定境界</td>
+<td>直線の上下で判定</td>
+<td>傾きと切片（2個）</td>
+</tr>
+<tr class="odd">
+<td>クラスタリング</td>
+<td>一番近い重心に割り当て</td>
+<td>重心の座標（k個）</td>
+</tr>
+</tbody>
+</table>
+<div title="モデル（model）">
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>モデル（model）</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>入力から出力を計算するやり方。ただし、<strong>形</strong>だけが決まっていて、中の数字は<strong>空欄</strong></li>
+<li>空欄の名前が<strong>パラメータ</strong></li>
+<li>空欄をデータで埋めるのが<strong>学習</strong>（<code>fit()</code> がやっていたこと）</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<ul>
+<li>今回もまず、人間が<strong>形</strong>を決める。何を選ぶかは、データを見てから</li>
+</ul>
 </div>
 </section>
 <section id="回帰問題とは" class="slide level2">
@@ -245,8 +345,7 @@ rkskmt
 <div class="slide-body">
 <ul>
 <li><strong>分類</strong>：どのグループか答える（Salmon か Sea bass か）</li>
-<li><strong>回帰</strong>：<strong>数値そのもの</strong>を予測する（重さは何グラムか）</li>
-<li><a href="./ai-introduction.html#peek-ai-tasks" class="peek">概論の「AIが扱うタスク」</a>の2番目が、今日ようやく登場</li>
+<li><strong>回帰（<span class="en">regression</span>）</strong>：<strong>数値そのもの</strong>を予測する（重さは何グラムか）</li>
 </ul>
 <table class="caption-top">
 <thead>
@@ -278,7 +377,7 @@ rkskmt
 <li>次元削減の回で測った<strong>体長</strong>を使う</li>
 <li>体長を測るだけで重さが分かれば、<strong>秤に乗せる手間が省ける</strong></li>
 </ul>
-<div id="d62a0480" class="cell" data-execution_count="1">
+<div id="61e5fda6" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>魚データの定義（クリックして展開）</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -303,7 +402,7 @@ rkskmt
 <span id="cb1-20"><a></a>lengths <span class="op">=</span> np.<span class="bu">round</span>(np.cbrt(weights) <span class="op">*</span> <span class="fl">4.5</span> <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="fl">1.0</span>, <span class="bu">len</span>(weights)), <span class="dv">1</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="ddff8c74" class="cell" data-execution_count="2">
+<div id="26778721" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -327,28 +426,26 @@ rkskmt
 <p><span class="math display">\[L(a, b) = \frac{1}{N} \sum_{i} \left( \underbrace{a x_i + b}_{\text{予測}} - \underbrace{t_i}_{\text{実際}} \right)^2\]</span></p>
 <ul>
 <li><strong>MSE（<span class="en"><strong>Mean Squared Error</strong></span> / 平均二乗誤差）</strong>と呼ぶ</li>
+<li>全魚のズレを1本のベクトルと見ると、MSE はその<strong>ノルム（<span class="en">norm</span>・ベクトルの長さ）</strong>の2乗を <span class="math inline">\(N\)</span> で割ったもの</li>
 </ul>
-<div title="質問">
-<div class="callout callout-important callout-titled callout-style-default">
+<div title="損失関数は MSE だけではない">
+<div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>質問</strong></p>
+<p><strong>損失関数は MSE だけではない</strong></p>
 </div>
 <div class="callout-content">
-<p>ズレの測り方なら<strong>絶対値</strong>でもいいはず。なぜ二乗？</p>
-</div>
-</div>
-</div>
-</div>
-<div class="fragment">
 <ul>
-<li>絶対値は 0 のところで<strong>微分できない</strong>（カクッと折れている）</li>
-<li>二乗なら微分がきれい</li>
-<li>勾配降下法を使う前提で、損失は「微分しやすいもの」を選ぶ</li>
+<li>ズレの<strong>絶対値</strong>の平均でも「小さいほど良い直線」は測れる — <strong>MAE（<span class="en">Mean Absolute Error</span> / 平均絶対誤差）</strong></li>
+<li>ズレの4乗の平均でもよい。「ズレが減るほど小さくなる」関数なら損失関数の候補になれる</li>
+<li>今回 MSE を選ぶ理由は<strong>微分のしやすさ</strong>：絶対値は 0 のところで折れていて微分できない。二乗なら微分がきれい</li>
 </ul>
+</div>
+</div>
+</div>
 </div>
 </div>
 </section>
@@ -363,7 +460,25 @@ rkskmt
 <li>構造は単純：<strong>「予測と正解の差」を入力の大きさに応じて配る</strong></li>
 <li>あとは勾配降下法に渡すだけ：</li>
 </ul>
-<p><span class="math display">\[a \leftarrow a - \eta \frac{\partial L}{\partial a}, \qquad b \leftarrow b - \eta \frac{\partial L}{\partial b}\]</span></p>
+<p><span class="math display">\[a \leftarrow a - \alpha \frac{\partial L}{\partial a}, \qquad b \leftarrow b - \alpha \frac{\partial L}{\partial b}\]</span></p>
+<div title="数式とコードの名前">
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>数式とコードの名前</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>数式では、勾配降下法の回と同じく学習率を <span class="math inline">\(\alpha\)</span> と書く</li>
+<li>コードでは、learning rateを略して <code>lr</code> と書く</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
 </div>
 </section>
 <section id="peek-gdfit-code" class="slide level2">
@@ -372,12 +487,12 @@ rkskmt
 <ul>
 <li>スケールを揃えてから（<a href="./clustering-kmeans.html#peek-scale" class="peek">クラスタリングの回の教訓</a>。学習率を1つで済ませるため）</li>
 </ul>
-<div id="31d7902e" class="cell" data-execution_count="3">
+<div id="193df94c" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a>x <span class="op">=</span> (lengths <span class="op">-</span> lengths.mean()) <span class="op">/</span> lengths.std()   <span class="co"># 標準化した体長</span></span>
 <span id="cb2-2"><a></a>t <span class="op">=</span> (weights <span class="op">-</span> weights.mean()) <span class="op">/</span> weights.std()   <span class="co"># 標準化した重さ</span></span>
 <span id="cb2-3"><a></a></span>
 <span id="cb2-4"><a></a>a, b <span class="op">=</span> <span class="fl">0.0</span>, <span class="fl">0.0</span>   <span class="co"># 直線はゼロからスタート</span></span>
-<span id="cb2-5"><a></a>lr <span class="op">=</span> <span class="fl">0.1</span>          <span class="co"># 学習率</span></span>
+<span id="cb2-5"><a></a>lr <span class="op">=</span> <span class="fl">0.1</span>          <span class="co"># Learning rate alpha in the equation</span></span>
 <span id="cb2-6"><a></a></span>
 <span id="cb2-7"><a></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">101</span>):</span>
 <span id="cb2-8"><a></a>    pred   <span class="op">=</span> a <span class="op">*</span> x <span class="op">+</span> b</span>
@@ -451,7 +566,7 @@ rkskmt
 <section id="直線が合っていく様子" class="slide level2">
 <h2>直線が合っていく様子</h2>
 <div class="slide-body">
-<div id="7a74d706" class="cell" data-execution_count="4">
+<div id="0d807932" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -466,10 +581,44 @@ rkskmt
 </ul>
 </div>
 </section>
+<section id="回帰直線でできること" class="slide level2">
+<h2>回帰直線でできること</h2>
+<div class="slide-body">
+<ul>
+<li>新しい魚は、体長を測って式に入れるだけで重さを<strong>予測</strong>できる。秤に乗せなくてよい</li>
+<li>「数値から数値を予測する」問題は、身の回りにいくらでもある：</li>
+</ul>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>入力</th>
+<th>予測したい数値</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>気温</td>
+<td>アイスクリームの売り上げ</td>
+</tr>
+<tr class="even">
+<td>部屋の広さ・駅からの距離</td>
+<td>家賃</td>
+</tr>
+<tr class="odd">
+<td>広告費</td>
+<td>商品の売り上げ</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>どれも今回と同じ手順で解ける：モデルの形を決め、損失を決め、勾配降下法で <code>fit</code> する</li>
+</ul>
+</div>
+</section>
 <section id="答え合わせsklearn-と比べる" class="slide level2">
 <h2>答え合わせ：sklearn と比べる</h2>
 <div class="slide-body">
-<div id="ff1af406" class="cell" data-execution_count="5">
+<div id="07dfa444" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
 <span id="cb4-2"><a></a></span>
 <span id="cb4-3"><a></a>reg <span class="op">=</span> LinearRegression().fit(x.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), t)</span>
@@ -505,12 +654,11 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <p>モデルを複雑にしてみる</p>
 </div>
 </section>
-<section id="新しい仕入れ先の魚は15匹しかない" class="slide level2">
-<h2>新しい仕入れ先の魚は15匹しかない</h2>
+<section id="モデルを曲線にする" class="slide level2">
+<h2>モデルを曲線にする</h2>
 <div class="slide-body">
 <ul>
-<li>別の仕入れ先から来た魚は、まだ<strong>15匹</strong>しか測れていない</li>
-<li>直線だけでなく、<strong>曲線</strong>も引ける：多項式回帰</li>
+<li>回帰式は直線だけでなく、<strong>曲線</strong>でもよい：多項式回帰</li>
 </ul>
 <p><span class="math display">\[\text{予測} = w_1 x + w_2 x^2 + \cdots + w_d x^d + b\]</span></p>
 <ul>
@@ -537,7 +685,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <section id="次数を上げてみる" class="slide level2">
 <h2>次数を上げてみる</h2>
 <div class="slide-body">
-<div id="65310bd9" class="cell" data-execution_count="6">
+<div id="7cd39283" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
@@ -582,7 +730,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <section id="数字で見るまた会ったな過学習" class="slide level2">
 <h2>数字で見る：また会ったな、過学習</h2>
 <div class="slide-body">
-<div id="1ccbaaf5" class="cell" data-execution_count="7">
+<div id="f27a3ab7" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a></a>degrees <span class="op">=</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">10</span>)</span>
 <span id="cb7-2"><a></a>train_mse, test_mse <span class="op">=</span> [], []</span>
 <span id="cb7-3"><a></a><span class="cf">for</span> deg <span class="kw">in</span> degrees:</span>
@@ -619,7 +767,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <ul>
 <li>暴れている曲線の正体は、<strong>巨大な係数</strong></li>
 </ul>
-<div id="ffc3c1ba" class="cell" data-execution_count="8">
+<div id="9bb55b05" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a></a>plain <span class="op">=</span> make_pipeline(PolynomialFeatures(<span class="dv">9</span>), StandardScaler(), LinearRegression())</span>
 <span id="cb8-2"><a></a>plain.fit(X_train, y_train)</span>
 <span id="cb8-3"><a></a><span class="bu">print</span>(<span class="st">"次数9の係数の最大絶対値:"</span>, <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">abs</span>(plain[<span class="op">-</span><span class="dv">1</span>].coef_)<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
@@ -628,55 +776,110 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 </div>
 </div>
 <ul>
-<li>そこで、損失に「係数の大きさ」への<strong>罰金</strong>を足す：</li>
+<li>そこで、損失に「係数の大きさ」への<strong>ペナルティ</strong>を課すことを考える：</li>
 </ul>
-<p><span class="math display">\[L = \mathrm{MSE} + \alpha \sum_j w_j^2\]</span></p>
+<p><span class="math display">\[L = \mathrm{MSE} + \lambda \sum_j w_j^2\]</span></p>
 <ul>
-<li>これが <strong>Ridge 回帰</strong>（L2正則化）</li>
-<li>訓練データに合わせたい力と、係数を小さく保ちたい力の<strong>綱引き</strong>。<span class="math inline">\(\alpha\)</span> がその強さ</li>
+<li>このように、モデルの暴走を抑える罰則を損失に足す手法を<strong>正則化（<span class="en">regularization</span>）</strong>という</li>
+<li>MSE だけではなく、係数の大きさも loss に入れ込む</li>
+<li><span class="math inline">\(\lambda\)</span>（ラムダ）が罰金の強さ。<span class="math inline">\(\lambda = 0\)</span> なら今までどおりの MSE</li>
 </ul>
 </div>
 </section>
 <section id="peek-ridge-code" class="slide level2">
-<h2>Ridge で手なずける</h2>
+<h2>正則化の実装：自作の勾配降下法に罰金を足す</h2>
 <div class="slide-body">
-<div id="ccbf2dec" class="cell" data-execution_count="9">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> Ridge</span>
-<span id="cb10-2"><a></a></span>
-<span id="cb10-3"><a></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="fl">9.5</span>, <span class="fl">3.6</span>))</span>
-<span id="cb10-4"><a></a><span class="cf">for</span> ax, (model, name) <span class="kw">in</span> <span class="bu">zip</span>(axes, [</span>
-<span id="cb10-5"><a></a>        (make_pipeline(PolynomialFeatures(<span class="dv">9</span>), StandardScaler(), LinearRegression()),</span>
-<span id="cb10-6"><a></a>         <span class="st">"次数9（正則化なし）"</span>),</span>
-<span id="cb10-7"><a></a>        (make_pipeline(PolynomialFeatures(<span class="dv">9</span>), StandardScaler(), Ridge(alpha<span class="op">=</span><span class="fl">1.0</span>)),</span>
-<span id="cb10-8"><a></a>         <span class="st">"次数9 + Ridge"</span>)]):</span>
-<span id="cb10-9"><a></a>    model.fit(X_train, y_train)</span>
-<span id="cb10-10"><a></a>    mse <span class="op">=</span> mean_squared_error(y_test, model.predict(X_test))</span>
-<span id="cb10-11"><a></a>    ax.scatter(X_train, y_train, c<span class="op">=</span><span class="st">"#2980b9"</span>, s<span class="op">=</span><span class="dv">45</span>)</span>
-<span id="cb10-12"><a></a>    ax.scatter(X_test, y_test, c<span class="op">=</span><span class="st">"#e74c3c"</span>, marker<span class="op">=</span><span class="st">"s"</span>, s<span class="op">=</span><span class="dv">45</span>)</span>
-<span id="cb10-13"><a></a>    ax.plot(grid, model.predict(grid), <span class="st">"k-"</span>, lw<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb10-14"><a></a>    ax.set_ylim(<span class="dv">800</span>, <span class="dv">2900</span>)</span>
-<span id="cb10-15"><a></a>    ax.set_title(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">　テストMSE </span><span class="sc">{</span>mse<span class="sc">:,.0f}</span><span class="ss">"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
-<span id="cb10-16"><a></a>    ax.set_xlabel(<span class="st">"体長 (cm)"</span>)</span>
-<span id="cb10-17"><a></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">: 係数の最大絶対値 = </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">abs</span>(model[<span class="op">-</span><span class="dv">1</span>].coef_)<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss">"</span>)</span>
-<span id="cb10-18"><a></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">"重さ (g)"</span>)</span>
-<span id="cb10-19"><a></a>plt.tight_layout()</span>
-<span id="cb10-20"><a></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<ul>
+<li>sklearn には任せない。冒頭で自作した勾配降下法に、<strong>罰金の項を足すだけ</strong></li>
+<li>罰金 <span class="math inline">\(\lambda \sum w^2\)</span> の微分は <span class="math inline">\(2\lambda w\)</span>。各係数の勾配に足せばよい</li>
+</ul>
+<div id="55797542" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a></a><span class="co"># 特徴量 x, x², …, x⁹ も自分で作る（列が x^1 〜 x^9 の配列）</span></span>
+<span id="cb10-2"><a></a>P_train <span class="op">=</span> X_train <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)          <span class="co"># 形 (10, 9)</span></span>
+<span id="cb10-3"><a></a>P_test  <span class="op">=</span> X_test  <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)</span>
+<span id="cb10-4"><a></a>mu, sd  <span class="op">=</span> P_train.mean(axis<span class="op">=</span><span class="dv">0</span>), P_train.std(axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb10-5"><a></a>P_train <span class="op">=</span> (P_train <span class="op">-</span> mu) <span class="op">/</span> sd                  <span class="co"># スケールを揃える（いつもの）</span></span>
+<span id="cb10-6"><a></a>P_test  <span class="op">=</span> (P_test  <span class="op">-</span> mu) <span class="op">/</span> sd</span>
+<span id="cb10-7"><a></a>t_mean, t_std <span class="op">=</span> y_train.mean(), y_train.std()</span>
+<span id="cb10-8"><a></a>tt <span class="op">=</span> (y_train <span class="op">-</span> t_mean) <span class="op">/</span> t_std                <span class="co"># 重さも標準化</span></span>
+<span id="cb10-9"><a></a></span>
+<span id="cb10-10"><a></a>lam  <span class="op">=</span> <span class="fl">0.1</span>        <span class="co"># 罰金の強さ λ</span></span>
+<span id="cb10-11"><a></a>w, b <span class="op">=</span> np.zeros(<span class="dv">9</span>), <span class="fl">0.0</span></span>
+<span id="cb10-12"><a></a>lr   <span class="op">=</span> <span class="fl">0.01</span></span>
+<span id="cb10-13"><a></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10_000</span>):</span>
+<span id="cb10-14"><a></a>    pred   <span class="op">=</span> P_train <span class="op">@</span> w <span class="op">+</span> b</span>
+<span id="cb10-15"><a></a>    grad_w <span class="op">=</span> np.array([<span class="dv">2</span> <span class="op">*</span> np.mean((pred <span class="op">-</span> tt) <span class="op">*</span> P_train[:, d]) <span class="cf">for</span> d <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">9</span>)]) <span class="op">\</span></span>
+<span id="cb10-16"><a></a>             <span class="op">+</span> <span class="dv">2</span> <span class="op">*</span> lam <span class="op">*</span> w                     <span class="co"># ← MSEの勾配 ＋ 罰金の勾配</span></span>
+<span id="cb10-17"><a></a>    grad_b <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> np.mean(pred <span class="op">-</span> tt)</span>
+<span id="cb10-18"><a></a>    w <span class="op">-=</span> lr <span class="op">*</span> grad_w</span>
+<span id="cb10-19"><a></a>    b <span class="op">-=</span> lr <span class="op">*</span> grad_b</span>
+<span id="cb10-20"><a></a></span>
+<span id="cb10-21"><a></a>test_pred <span class="op">=</span> (P_test <span class="op">@</span> w <span class="op">+</span> b) <span class="op">*</span> t_std <span class="op">+</span> t_mean  <span class="co"># 元の単位（g）に戻す</span></span>
+<span id="cb10-22"><a></a><span class="bu">print</span>(<span class="st">"係数の最大絶対値:"</span>, <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">abs</span>(w <span class="op">*</span> t_std)<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss">"</span>)</span>
+<span id="cb10-23"><a></a><span class="bu">print</span>(<span class="st">"テストMSE:"</span>, <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span>mean((test_pred <span class="op">-</span> y_test) <span class="op">**</span> <span class="dv">2</span>)<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>次数9（正則化なし）: 係数の最大絶対値 = 204,382
-次数9 + Ridge: 係数の最大絶対値 = 74</code></pre>
+<pre><code>係数の最大絶対値: 74
+テストMSE: 3,427</code></pre>
 </div>
+</div>
+<ul>
+<li>係数の最大絶対値は <strong>204,382 → 74</strong>。罰金が係数の暴走を実際に止めた</li>
+<li>勾配降下法のループは冒頭の自作コードと同じ形。増えたのは <code>+ 2 * lam * w</code> の1項だけ</li>
+</ul>
+</div>
+</section>
+<section id="罰金ありなしを見比べる" class="slide level2">
+<h2>罰金あり・なしを見比べる</h2>
+<div class="slide-body">
+<div id="a9a491eb" class="cell" data-execution_count="10">
+<details class="code-fold">
+<summary>描画コード</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a></a>P_grid    <span class="op">=</span> ((grid <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)) <span class="op">-</span> mu) <span class="op">/</span> sd</span>
+<span id="cb12-2"><a></a>own_curve <span class="op">=</span> (P_grid <span class="op">@</span> w <span class="op">+</span> b) <span class="op">*</span> t_std <span class="op">+</span> t_mean</span>
+<span id="cb12-3"><a></a></span>
+<span id="cb12-4"><a></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="fl">9.5</span>, <span class="fl">3.6</span>))</span>
+<span id="cb12-5"><a></a><span class="cf">for</span> ax, curve, name, mse <span class="kw">in</span> [</span>
+<span id="cb12-6"><a></a>        (axes[<span class="dv">0</span>], plain.predict(grid), <span class="st">"次数9（正則化なし）"</span>,</span>
+<span id="cb12-7"><a></a>         mean_squared_error(y_test, plain.predict(X_test))),</span>
+<span id="cb12-8"><a></a>        (axes[<span class="dv">1</span>], own_curve, <span class="st">"次数9 + 正則化（自作の勾配降下法）"</span>,</span>
+<span id="cb12-9"><a></a>         np.mean((test_pred <span class="op">-</span> y_test) <span class="op">**</span> <span class="dv">2</span>))]:</span>
+<span id="cb12-10"><a></a>    ax.scatter(X_train, y_train, c<span class="op">=</span><span class="st">"#2980b9"</span>, s<span class="op">=</span><span class="dv">45</span>)</span>
+<span id="cb12-11"><a></a>    ax.scatter(X_test, y_test, c<span class="op">=</span><span class="st">"#e74c3c"</span>, marker<span class="op">=</span><span class="st">"s"</span>, s<span class="op">=</span><span class="dv">45</span>)</span>
+<span id="cb12-12"><a></a>    ax.plot(grid, curve, <span class="st">"k-"</span>, lw<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb12-13"><a></a>    ax.set_ylim(<span class="dv">800</span>, <span class="dv">2900</span>)</span>
+<span id="cb12-14"><a></a>    ax.set_title(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">　テストMSE </span><span class="sc">{</span>mse<span class="sc">:,.0f}</span><span class="ss">"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb12-15"><a></a>    ax.set_xlabel(<span class="st">"体長 (cm)"</span>)</span>
+<span id="cb12-16"><a></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">"重さ (g)"</span>)</span>
+<span id="cb12-17"><a></a>plt.tight_layout()</span>
+<span id="cb12-18"><a></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-display">
-<div class="quarto-figure quarto-figure-center">
+<div>
 <figure>
-<p><a href="linear-regression_files/figure-revealjs/cell-10-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img data-src="linear-regression_files/figure-revealjs/cell-10-output-2.png" class="quarto-figure quarto-figure-center" width="936" height="346"></a></p>
+<p><a href="linear-regression_files/figure-revealjs/cell-11-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img data-src="linear-regression_files/figure-revealjs/cell-11-output-1.png" width="936" height="348"></a></p>
 </figure>
 </div>
 </div>
 </div>
 <ul>
-<li>同じ次数9なのに、罰金を入れただけで素直な曲線に戻った</li>
-<li>テストMSEは<strong>3桁以上</strong>改善</li>
+<li>同じ次数9なのに、罰金の項を1つ足しただけで素直な曲線に戻った</li>
+<li>テストMSEは 9,286,680 → 3,427 と<strong>3桁以上</strong>改善</li>
 </ul>
+<div title="（参考）世間での呼び名">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>（参考）世間での呼び名</strong></p>
+</div>
+<div class="callout-content">
+<p><span class="math inline">\(\lambda \sum w^2\)</span> 型の罰金は <strong>L2正則化</strong>、L2正則化つきの線形回帰は<strong>リッジ回帰（<span class="en">Ridge regression</span>）</strong>と呼ばれる。<code>sklearn</code> にも <code>Ridge</code> として入っている。</p>
+</div>
+</div>
+</div>
+</div>
 <div title="過学習スレッド、完結">
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
@@ -694,11 +897,11 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 </div>
 </div>
 </section>
-<section id="tweak-罰金の強さで曲線が化ける" class="slide level2 badge-practice">
-<h2><strong>Tweak</strong> 罰金の強さで曲線が化ける</h2>
+<section id="tweak-罰金の強さで曲線が変わる" class="slide level2 badge-practice">
+<h2><strong>Tweak</strong> 罰金の強さで曲線が変わる</h2>
 <div class="slide-body">
 <ul>
-<li><a href="#/peek-ridge-code" class="peek">さっきのコード</a> の <code>Ridge(alpha=1.0)</code> を<strong>書き換えて実行</strong></li>
+<li><a href="#/peek-ridge-code" class="peek">さっきのコード</a> の <code>lam = 0.1</code> を<strong>書き換えて実行</strong>（比較の図まで続けて実行すると形の変化が見える）</li>
 </ul>
 <div class="tweak">
 <table class="caption-top">
@@ -710,12 +913,12 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td>罰金をほぼゼロにする</td>
-<td><code>Ridge(alpha=1e-6)</code></td>
+<td>罰金をゼロにする</td>
+<td><code>lam = 0.0</code></td>
 </tr>
 <tr class="even">
 <td>罰金を強烈にする</td>
-<td><code>Ridge(alpha=1000)</code></td>
+<td><code>lam = 10</code></td>
 </tr>
 </tbody>
 </table>
@@ -730,9 +933,9 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 </div>
 <div class="callout-content">
 <ul>
-<li><code>1e-6</code>：罰金がほぼゼロなのに、左端の大暴れは<strong>ほぼ消える</strong>（係数の最大絶対値 20万 → 1万）— あの暴走は、ごくわずかな罰金にすら耐えられない不安定な解だった</li>
-<li><code>1000</code>：曲線はほぼ<strong>まっすぐ寝る</strong> — 罰金が強すぎて、訓練データに合わせる力が負けた</li>
-<li>ちょうど良い <span class="math inline">\(\alpha\)</span> は問題ごとに違う。<strong>訓練データではなくテストデータの MSE</strong> で選ぶ</li>
+<li><code>0.0</code>：テストMSEは 3,427 → <strong>21,721</strong> と6倍以上悪化。ただし厳密解の大暴れ（929万）までは行かない。勾配降下法を1万回で打ち切ること自体が、暴走を途中で止める弱いブレーキになっているため</li>
+<li><code>10</code>：曲線はほぼ<strong>まっすぐ寝て</strong>、訓練MSEまで悪化する（3,585 → 35,665）。罰金が強すぎて、訓練データに合わせる力が負けた</li>
+<li>ちょうど良い <span class="math inline">\(\lambda\)</span> は問題ごとに違う。<strong>訓練データではなくテストデータの MSE</strong> で選ぶ</li>
 </ul>
 </div>
 </div>
@@ -747,7 +950,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <li>勾配降下法で fit を自作 → <code>sklearn</code> と<strong>完全一致</strong></li>
 <li><strong>多項式回帰</strong>：特徴量に <span class="math inline">\(x^2, x^3, \ldots\)</span> を足せば道具は線形回帰のまま</li>
 <li><strong>過学習は回帰でも起きる</strong>：次数を上げると訓練誤差↓・テスト誤差爆発</li>
-<li><strong>正則化（<span class="en">ridge</span>）</strong>：大きい係数に罰金 → 暴れる曲線を手なずける</li>
+<li><strong>正則化（<span class="en">regularization</span>）</strong>：大きい係数に罰金 → 暴れる曲線を手なずける</li>
 </ul>
 <div title="次回予告">
 <div class="callout callout-note callout-titled callout-style-default">
@@ -771,7 +974,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <div class="slide-body">
 <p>以下の問題を<strong>手計算</strong>と<strong>Pythonコード</strong>の両方で解け。</p>
 <h3 id="問題1魚2匹だけの世界で-fit-する">問題1：魚2匹だけの世界で fit する</h3>
-<p>データは2点だけ：<span class="math inline">\((x_1, t_1) = (-1, 0)\)</span>、<span class="math inline">\((x_2, t_2) = (1, 2)\)</span>。 直線 <span class="math inline">\(ax + b\)</span> を勾配降下法で fit する。初期値 <span class="math inline">\(a = 0, b = 0\)</span>、学習率 <span class="math inline">\(\eta = 0.1\)</span>。</p>
+<p>データは2点だけ：<span class="math inline">\((x_1, t_1) = (-1, 0)\)</span>、<span class="math inline">\((x_2, t_2) = (1, 2)\)</span>。 直線 <span class="math inline">\(ax + b\)</span> を勾配降下法で fit する。初期値 <span class="math inline">\(a = 0, b = 0\)</span>、学習率 <span class="math inline">\(\alpha = 0.1\)</span>。</p>
 <ol type="1">
 <li>勾配の式に代入して、<span class="math inline">\(\dfrac{\partial L}{\partial a}\)</span> と <span class="math inline">\(\dfrac{\partial L}{\partial b}\)</span> を求めよ</li>
 <li>更新を3回、手計算で示せ</li>
@@ -808,28 +1011,28 @@ a = 0.2 + 0.16 = 0.36\]</span></p>
 </div>
 </div>
 <h3 id="コードで確認">コードで確認</h3>
-<div id="9c59fac4" class="cell" data-execution_count="10">
+<div id="94b610eb" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>解答例を見る</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb12-2"><a></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
-<span id="cb12-3"><a></a></span>
-<span id="cb12-4"><a></a>x <span class="op">=</span> np.array([<span class="op">-</span><span class="fl">1.0</span>, <span class="fl">1.0</span>])</span>
-<span id="cb12-5"><a></a>t <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">2.0</span>])</span>
-<span id="cb12-6"><a></a></span>
-<span id="cb12-7"><a></a>a, b <span class="op">=</span> <span class="fl">0.0</span>, <span class="fl">0.0</span></span>
-<span id="cb12-8"><a></a>lr <span class="op">=</span> <span class="fl">0.1</span></span>
-<span id="cb12-9"><a></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">101</span>):</span>
-<span id="cb12-10"><a></a>    pred   <span class="op">=</span> a <span class="op">*</span> x <span class="op">+</span> b</span>
-<span id="cb12-11"><a></a>    grad_a <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> np.mean((pred <span class="op">-</span> t) <span class="op">*</span> x)</span>
-<span id="cb12-12"><a></a>    grad_b <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> np.mean(pred <span class="op">-</span> t)</span>
-<span id="cb12-13"><a></a>    a <span class="op">-=</span> lr <span class="op">*</span> grad_a</span>
-<span id="cb12-14"><a></a>    b <span class="op">-=</span> lr <span class="op">*</span> grad_b</span>
-<span id="cb12-15"><a></a>    <span class="cf">if</span> i <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">100</span>):</span>
-<span id="cb12-16"><a></a>        <span class="bu">print</span>(<span class="ss">f"更新 </span><span class="sc">{</span>i<span class="sc">:3d}</span><span class="ss">回 | a=</span><span class="sc">{</span>a<span class="sc">:.4f}</span><span class="ss"> b=</span><span class="sc">{</span>b<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb12-17"><a></a></span>
-<span id="cb12-18"><a></a>reg <span class="op">=</span> LinearRegression().fit(x.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), t)</span>
-<span id="cb12-19"><a></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">sklearn の fit: a=</span><span class="sc">{</span>reg<span class="sc">.</span>coef_[<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss">, b=</span><span class="sc">{</span>reg<span class="sc">.</span>intercept_<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb13-2"><a></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
+<span id="cb13-3"><a></a></span>
+<span id="cb13-4"><a></a>x <span class="op">=</span> np.array([<span class="op">-</span><span class="fl">1.0</span>, <span class="fl">1.0</span>])</span>
+<span id="cb13-5"><a></a>t <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">2.0</span>])</span>
+<span id="cb13-6"><a></a></span>
+<span id="cb13-7"><a></a>a, b <span class="op">=</span> <span class="fl">0.0</span>, <span class="fl">0.0</span></span>
+<span id="cb13-8"><a></a>lr <span class="op">=</span> <span class="fl">0.1</span></span>
+<span id="cb13-9"><a></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">101</span>):</span>
+<span id="cb13-10"><a></a>    pred   <span class="op">=</span> a <span class="op">*</span> x <span class="op">+</span> b</span>
+<span id="cb13-11"><a></a>    grad_a <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> np.mean((pred <span class="op">-</span> t) <span class="op">*</span> x)</span>
+<span id="cb13-12"><a></a>    grad_b <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> np.mean(pred <span class="op">-</span> t)</span>
+<span id="cb13-13"><a></a>    a <span class="op">-=</span> lr <span class="op">*</span> grad_a</span>
+<span id="cb13-14"><a></a>    b <span class="op">-=</span> lr <span class="op">*</span> grad_b</span>
+<span id="cb13-15"><a></a>    <span class="cf">if</span> i <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">100</span>):</span>
+<span id="cb13-16"><a></a>        <span class="bu">print</span>(<span class="ss">f"更新 </span><span class="sc">{</span>i<span class="sc">:3d}</span><span class="ss">回 | a=</span><span class="sc">{</span>a<span class="sc">:.4f}</span><span class="ss"> b=</span><span class="sc">{</span>b<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb13-17"><a></a></span>
+<span id="cb13-18"><a></a>reg <span class="op">=</span> LinearRegression().fit(x.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), t)</span>
+<span id="cb13-19"><a></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">sklearn の fit: a=</span><span class="sc">{</span>reg<span class="sc">.</span>coef_[<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss">, b=</span><span class="sc">{</span>reg<span class="sc">.</span>intercept_<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>更新   1回 | a=0.2000 b=0.2000

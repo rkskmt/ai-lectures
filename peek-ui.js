@@ -26,6 +26,7 @@
     var DECK_W = 1280, DECK_H = 720;  // fallback deck size; refined from Reveal config
     var CHANNEL = 'cleanslidekit-peek-v1';
     var EMBED_PARAM = 'peek-embed';
+    var SLIDE_PARAM = 'peek-slide';
 
     // UI strings follow the document language: Japanese when <html lang>
     // starts with "ja" (the format default), English otherwise.
@@ -33,6 +34,7 @@
               .toLowerCase().indexOf('ja') === 0);
     var T = JA ? {
       loading: '読み込み中…',
+      missing: 'リンク先のデッキが見つかりません（まだレンダーされていないか、リンク切れ）',
       closeLabel: '閉じる',
       closeTitle: '閉じる（Esc）',
       hint: 'Esc・背景クリック・× で閉じる',
@@ -40,6 +42,7 @@
       frameTitle: 'スライドプレビュー'
     } : {
       loading: 'Loading…',
+      missing: 'The linked deck was not found (not rendered yet, or a broken link).',
       closeLabel: 'Close',
       closeTitle: 'Close (Esc)',
       hint: 'Esc / click outside / × to close',
@@ -49,11 +52,18 @@
 
     // ================= embedded mode (this document IS the peeked slide) ====
     if (new RegExp('[?&]' + EMBED_PARAM + '=1(?:&|$)').test(window.location.search)) {
-      runEmbedded();
+      // The query parameter is authoritative because this script is deferred:
+      // Reveal may normalize the startup hash to the title slide before this
+      // code runs. Keep the hash as a fallback for older host pages.
+      var slideMatch = new RegExp('[?&]' + SLIDE_PARAM + '=([^&]*)').exec(window.location.search);
+      var requestedFrag = slideMatch
+        ? decodeURIComponent(slideMatch[1])
+        : window.location.hash.replace(/^#\/?/, '');
+      runEmbedded(requestedFrag);
       return;
     }
 
-    function runEmbedded() {
+    function runEmbedded(requestedFrag) {
       // strip every bit of deck chrome and the buttons slide-ui.js /
       // search-ui.js inject, so the peek shows nothing but the slide and
       // offers no way to navigate off it
@@ -126,7 +136,7 @@
           }
           // ensure we're actually on the requested slide (src hash should
           // already have done this, but re-assert in case init raced the hash)
-          var frag = window.location.hash.replace(/^#\/?/, '');
+          var frag = requestedFrag || window.location.hash.replace(/^#\/?/, '');
           if (frag) {
             try { window.location.hash = '#/' + frag; } catch (e) {}
           }
@@ -211,6 +221,7 @@
     var activeFrame = null;      // the currently-open peek iframe
     var frameAspect = null;      // {w,h} reported by the frame's `ready`
     var pendingTimer = null;     // stale-frame fallback (frame never announces)
+    var openSeq = 0;             // invalidates async work of a closed/reopened peek
 
     function injectStyle() {
       if (document.getElementById('peek-ui-style')) return;
@@ -241,6 +252,7 @@
     }
 
     function closePeek() {
+      openSeq++;
       var modal = document.getElementById('peek-modal');
       if (modal) modal.classList.remove('peek-open');
       if (pendingTimer) { clearTimeout(pendingTimer); pendingTimer = null; }
@@ -339,14 +351,33 @@
       setRevealKeyboard(false);
       frameAspect = null;
       modal.classList.add('peek-open');
+      var seq = ++openSeq;
 
-      // build a fresh iframe each time (clean state, stops the old deck);
-      // same-page peek (no page part) targets the current document
+      // same-page peek (no page part) targets the current document, which
+      // obviously exists; a cross-deck target may not (not rendered yet in the
+      // editor preview, or a broken link on the published site), so probe it
+      // first and say so honestly instead of framing a 404 page
       var base = page || window.location.href.split('#')[0];
+      if (!page || typeof fetch !== 'function') { attachPeekFrame(base, frag); return; }
+      fetch(base, { method: 'HEAD' }).then(function (res) {
+        if (seq !== openSeq) return;                     // closed / reopened meanwhile
+        if (res.ok) { attachPeekFrame(base, frag); return; }
+        var w = document.getElementById('peek-frame-wrap');
+        if (w) w.innerHTML = '<div id="peek-loading">' + T.missing + '</div>';
+      }).catch(function () {
+        // probe failure (offline, file://) proves nothing: keep the old behavior
+        if (seq === openSeq) attachPeekFrame(base, frag);
+      });
+    }
+
+    function attachPeekFrame(base, frag) {
+      // build a fresh iframe each time (clean state, stops the old deck)
+      var wrap = document.getElementById('peek-frame-wrap');
       var frame = document.createElement('iframe');
       frame.id = 'peek-frame';
       frame.setAttribute('title', T.frameTitle);
-      frame.src = base + (base.indexOf('?') >= 0 ? '&' : '?') + EMBED_PARAM + '=1#/' + frag;
+      frame.src = base + (base.indexOf('?') >= 0 ? '&' : '?') +
+        EMBED_PARAM + '=1&' + SLIDE_PARAM + '=' + encodeURIComponent(frag) + '#/' + frag;
       frame.addEventListener('load', function () {
         // a target rendered with an old kit never announces `ready`; drop the
         // loader after a grace period so the slide still shows (untuned)
