@@ -1691,7 +1691,7 @@
     "href": "ai-introduction.html#この講義のゴール",
     "title": "人工知能概論",
     "section": "この講義のゴール",
-    "text": "この講義のゴール\n\n\n\n\n\n\n\n\n\n\n\n最終回、こうした手書き数字を読み取る機械を自分のコードで作る（PyTorch を使用）\nそのための部品（境界・損失・勾配・層）を、毎回1つずつ手に入れていく"
+    "text": "この講義のゴール\n\n\n\n\n\n\n\n\n\n\n\n最終回で手書き数字を読み取るコードの作成\nこれは分類問題（多クラス分類）であるため、分類問題をターゲットにしていく\nこの過程で以下のことを学ぶ\n\n決定木\nk-means\n勾配降下法\nロジスティック回帰\nニューラルネットワーク"
   },
   {
     "objectID": "ai-introduction.html#section",
@@ -1701,46 +1701,46 @@
     "text": "AIの歩み"
   },
   {
-    "objectID": "ai-introduction.html#年人間を負かし続けたチェス機械",
-    "href": "ai-introduction.html#年人間を負かし続けたチェス機械",
+    "objectID": "ai-introduction.html#年の自動チェスマシーン",
+    "href": "ai-introduction.html#年の自動チェスマシーン",
     "title": "人工知能概論",
-    "section": "1770年、人間を負かし続けたチェス「機械」",
-    "text": "1770年、人間を負かし続けたチェス「機械」\n\n\n出典: Wikimedia Commons（パブリックドメイン）\n\n\n\n「メカニカル・ターク」— 欧州を巡業し、ナポレオンやフランクリンとも対局した\n\n\n\n\n\n\n\n\n質問\n\n\n歯車の時代に、なぜチェスが指せた？\n\n\n\n\n\n答え：中に人間（チェスの達人）が隠れていた。 「知的に見えるふるまい」とは何か — この問いがAIの出発点になる"
+    "section": "1770年の自動チェスマシーン",
+    "text": "1770年の自動チェスマシーン\n\nメカニカル・ターク\n\n\n\n出典: Wikimedia Commons（パブリックドメイン）\n\n\n\n欧州を巡業し、ナポレオンやフランクリンとも対局した\n\n\n\n\n\n\n\n\n疑問\n\n\nでも、電気もない時代に、なぜチェスが指せたのか\n\n\n\n\n\n答え：中に人間が隠れていた。 「知的に見えるふるまい」ができるのは、まずは人間自身"
   },
   {
     "objectID": "ai-introduction.html#人工知能とは",
     "href": "ai-introduction.html#人工知能とは",
     "title": "人工知能概論",
     "section": "人工知能とは",
-    "text": "人工知能とは\n\n\n人間の知的なふるまいを機械で扱う\n\n\n人工知能（artificial intelligence）：知的に見える処理をコンピュータで実現する技術・研究分野\n例：\n\n画像を見て何が写っているか判定する\n文章を読んで要約する\nゲームで次の一手を選ぶ\nデータから将来の値を予測する\n\n\n\n\n\n\n\n\n\n大事な見方\n\n\n\nAIは「人間そのもの」を作るというより、知的なタスクを機械で扱うための考え方"
+    "text": "人工知能とは\n\n\n人間の知的なふるまいを機械で扱う\n\n\n人工知能（artificial intelligence）：知的に見える処理をコンピュータで実現する技術・研究分野\n例：\n\n画像を見て何が写っているか判定する\n文章を読んで要約する\nゲームで次の一手を選ぶ\nデータから将来の値を予測する\n\n\n\n\n\n\n\n\n\n注意\n\n\n\nAIというワードは「人間そのもの」の模倣ではなく、知的なタスクを機械で扱うこと全般を指す"
   },
   {
     "objectID": "ai-introduction.html#ai機械学習深層学習の関係",
     "href": "ai-introduction.html#ai機械学習深層学習の関係",
     "title": "人工知能概論",
     "section": "AI・機械学習・深層学習の関係",
-    "text": "AI・機械学習・深層学習の関係\n\n\n\nニュースで聞く言葉は、実は入れ子の関係にある\n外側から：機械学習（machine learning） ⊃ ニューラルネットワーク（neural network） ⊃ 深層学習（deep learning）\nこの講義は外側（AI全体の歴史）から始めて、内側（深層学習）へ進んでいく"
+    "text": "AI・機械学習・深層学習の関係\n\n\n\n機械学習（machine learning）\n  ⊃ ニューラルネットワーク（neural network）\n    ⊃ 深層学習（deep learning）"
   },
   {
     "objectID": "ai-introduction.html#peek-ai-tasks",
     "href": "ai-introduction.html#peek-ai-tasks",
     "title": "人工知能概論",
-    "section": "AIが扱うタスク",
-    "text": "AIが扱うタスク\n\n\n\n\n\n\n\n\n\n\n\n分類（classification）：どのグループに属するかを決める（魚の種類、迷惑メール判定）\n回帰（regression）：数値を予測する（気温、売上、株価、需要）\nクラスタリング（clustering）：ラベルのないデータを、似たもの同士に分ける\n生成（generation）：新しいデータを作る（文章、画像、音声、コード）"
+    "section": "主要なタスク",
+    "text": "主要なタスク\n\n\n\n\n\n\n\n\n\n\n\n分類（classification）\n\nどのグループに属するかの決定（魚の種類、迷惑メール判定）\n\n回帰（regression）\n\n数値の予測（気温、売上、株価、需要）\n\nクラスタリング（clustering）\n\nラベルのないデータを、似たもの同士に分ける\n\n生成（generation）\n\n新しいデータを作る（文章、画像、音声、コード）"
   },
   {
-    "objectID": "ai-introduction.html#aiの歴史を1枚で",
-    "href": "ai-introduction.html#aiの歴史を1枚で",
+    "objectID": "ai-introduction.html#タイムライン",
+    "href": "ai-introduction.html#タイムライン",
     "title": "人工知能概論",
-    "section": "AIの歴史を1枚で",
-    "text": "AIの歴史を1枚で\n\n\n\n\n\n\n\n\n\n\n\nAIは一直線に進歩したのではなく、ブームと冬を行き来してきた\nここからこの年表を、時代順にたどっていく"
+    "section": "タイムライン",
+    "text": "タイムライン\n\n\n\n\n\n\n\n\n\n\n\nAIは60年ほど前からブームと冬を行き来してきた"
   },
   {
-    "objectID": "ai-introduction.html#aiの70年は3つの作戦",
-    "href": "ai-introduction.html#aiの70年は3つの作戦",
+    "objectID": "ai-introduction.html#時代ごとのスタンス",
+    "href": "ai-introduction.html#時代ごとのスタンス",
     "title": "人工知能概論",
-    "section": "AIの70年は、3つの作戦",
-    "text": "AIの70年は、3つの作戦\n\n\n\n\n\n\n\n\n\n作戦\nやり方\n成果と壁\n\n\n\n\n知識を書く（〜1990s）\n人間が知識とルールを記述（「人は哺乳類」「哺乳類は体毛をもつ」）\n世界は書ききれないことが判明して頓挫\n\n\nパターンを学ぶ（1990s〜）\n数式のパラメータをデータに合わせる＝機械学習\nスパム判定・推薦・表情認識で成果。ただし「画像に車がある？」のような曖昧なものは識別困難\n\n\n物量で学ぶ（2010s〜）\n大量データ×大量計算の深層学習、関係まで学ぶアテンション\n汎化性（generalization；曖昧さへの耐性）が劇的に向上 — ついに犬を見分け、ことばを話す\n\n\n\n\nこれからこの3つの作戦を順に歩く — 前の作戦の壁が、次の作戦の動機になる"
+    "section": "時代ごとのスタンス",
+    "text": "時代ごとのスタンス\n\n\n\n\n\n\n\n\n\nアプローチ\n手段\n結果\n\n\n\n\n知識を書く（〜1990s）\n人間が知識とルールを記述（「人は哺乳類」「哺乳類は体毛をもつ」）\n世界は書ききれないことが判明して頓挫\n\n\nパターンを学習（1990s〜）\n数式のパラメータをデータに合わせる＝機械学習\nスパム判定・推薦・表情認識で成果。ただし「画像に車がある？」のような曖昧なものは識別困難\n\n\nニューラルネットと物量で学習（2010s〜）\n大量データ×大量計算の深層学習、関係まで学ぶアテンション\n汎化性（generalization；曖昧さへの耐性）が劇的に向上 — ついに犬を見分け、ことばを話す"
   },
   {
     "objectID": "ai-introduction.html#製品社会実装で見る流れ",
@@ -1750,11 +1750,18 @@
     "text": "製品・社会実装で見る流れ\n\n\n\n\n\n\n\n\n\n時代\n技術の流れ\n製品・出来事の例\n\n\n\n\n1980s\nルールベース、知識処理\n第五世代コンピュータ、CAPTAINシステム\n\n\n1990s\n探索、統計的手法\nDeep Blue\n\n\n2000s\nWebデータ、検索、広告\nGoogle検索、機械翻訳\n\n\n2010s前半\n深層学習、画像認識\nAlexNet、音声認識の改善\n\n\n2010s後半\nRNN、seq2seq、強化学習、Transformer\nGoogle翻訳、AlphaGo、GPT-2\n\n\n2020s\n大規模言語モデル、対話AI\nChatGPT\n\n\n\n\n\n\n\n\n\nノート\n\n\n\n製品は研究成果の「出口」\n研究の進歩から社会実装までは時間差がある"
   },
   {
-    "objectID": "ai-introduction.html#年機械がチェス世界王者を破る",
-    "href": "ai-introduction.html#年機械がチェス世界王者を破る",
+    "objectID": "ai-introduction.html#転換期コンピュータがチェス世界王者を破る1997",
+    "href": "ai-introduction.html#転換期コンピュータがチェス世界王者を破る1997",
     "title": "人工知能概論",
-    "section": "1997年：機械がチェス世界王者を破る",
-    "text": "1997年：機械がチェス世界王者を破る\n\n\n出典: Wikimedia Commons, James the photographer, CC BY 2.0\n\n\n\nIBM の Deep Blue が世界チャンピオンのカスパロフに勝利\n\n\n\n\n\n\n\n\n質問\n\n\nDeep Blue は、対局データから学習して強くなった？\n\n\n\n\n\n\n答えはノー。中身は学習ではなく力まかせの探索（1秒に約2億局面を評価）\nルールが明確で閉じた世界なら、古典的なアプローチでも人間を超えられた — 1770年の「機械」がついに本物になった"
+    "section": "転換期：コンピュータがチェス世界王者を破る（1997）",
+    "text": "転換期：コンピュータがチェス世界王者を破る（1997）\n\n\n出典: Wikimedia Commons, James the photographer, CC BY 2.0\n\n\n\n\n\n\n\n\n\n事実\n\n\n\nIBM の Deep Blue が世界チャンピオンのカスパロフに勝利したが、実は、過去の対局データを学習しておらず、力まかせの探索をしていた（1秒に約2億局面を評価）\n\nどちらかというと、計算速度の爆発的向上が寄与"
+  },
+  {
+    "objectID": "ai-introduction.html#section-1",
+    "href": "ai-introduction.html#section-1",
+    "title": "人工知能概論",
+    "section": "",
+    "text": "古典的AI"
   },
   {
     "objectID": "ai-introduction.html#古典的ai知識とルールの集合体",
@@ -1764,109 +1771,130 @@
     "text": "古典的AI：知識とルールの集合体\n\n\n初期は、記号（symbol）とルールが中心で設計された\n\n知識を記号で表し、ルールで推論すれば知能のふるまいを模せると考えた\n例：「AならばB」のような推論規則\n\n「人は死ぬ」「坂本は人」という事実 ⇒ 「坂本は死ぬ」と推論\n\n\n人間が知識を記述してコンピュータに書き込む発想\n\n記述できる知識を形式知（explicit knowledge）という\n逆に、言葉で語れない知識は暗黙知（tacit knowledge）という\n\nゴール：形式知と論理的推論で、専門家の代わりが務まるのでは？\n\nエキスパートシステム"
   },
   {
-    "objectID": "ai-introduction.html#古典的aiやってみると問題が噴出",
-    "href": "ai-introduction.html#古典的aiやってみると問題が噴出",
+    "objectID": "ai-introduction.html#古典的aiの問題",
+    "href": "ai-introduction.html#古典的aiの問題",
     "title": "人工知能概論",
-    "section": "古典的AI：やってみると問題が噴出",
-    "text": "古典的AI：やってみると問題が噴出\n\n\n知識の記述はどうするのが適当？\nルールは論理的推論だけだと不十分なのだがどうすればいい？\n誰がどこにどうやってすべての知識を入力するの？\n\n文章化されている法律すら非常に困難であることが判明"
+    "section": "古典的AIの問題",
+    "text": "古典的AIの問題\n\n\n記述の問題\n\n\nそもそも知識はどう記述するのが適切？\n\nある名詞が指している内容はどこまで？\n自転車の乗り方を十分記述するには？\n\n\n\n網羅性の問題\n\n\n誰がどこにどうやって必要な量と範囲の知識を入力するの？\n\nそもそも必要な量とはどこまで？"
   },
   {
-    "objectID": "ai-introduction.html#古典的aiの流れ",
-    "href": "ai-introduction.html#古典的aiの流れ",
+    "objectID": "ai-introduction.html#年のチャットボット",
+    "href": "ai-introduction.html#年のチャットボット",
     "title": "人工知能概論",
-    "section": "古典的AIの流れ",
-    "text": "古典的AIの流れ\n\n\n\n\n時代\n技術の中心\n社会・製品のイメージ\n\n\n\n\n1950s-60s\n推論、探索、初期の対話システム\nELIZA\n\n\n1970s-80s\nエキスパートシステム\n医療診断支援、知識ベース\n\n\n1980s\n第五世代コンピュータ\nCAPTAINシステムなどの情報化構想"
+    "section": "1966年のチャットボット",
+    "text": "1966年のチャットボット\n\n\n出典: Wikimedia Commons（パブリックドメイン）\n\n\n\nELIZA（画面は再現実装）は 単純なルールの集合\n\n精神科医の 模倣をする振る舞いを記述\n\n内容は相手の言葉をパターンで拾って オウム返し するだけ\n\nそれでも当時の人は本気で身の上話を始めた（イライザ効果）\n\nその場しのぎであれば 「知的に見える」を演出 することは意外と簡単"
   },
   {
-    "objectID": "ai-introduction.html#このチャットボットいつのもの",
-    "href": "ai-introduction.html#このチャットボットいつのもの",
+    "objectID": "ai-introduction.html#演習elizaを机上で作る",
+    "href": "ai-introduction.html#演習elizaを机上で作る",
     "title": "人工知能概論",
-    "section": "このチャットボット、いつのもの？",
-    "text": "このチャットボット、いつのもの？\n\n\n出典: Wikimedia Commons（パブリックドメイン）\n\n\n\n\n1966年の ELIZA（画面は再現実装）。精神科医のまねをする単純なルールの集まり\n相手の言葉をパターンで拾ってオウム返しするだけ — それでも当時の人は本気で身の上話を始めた（イライザ効果）\n「知的に見える」を作るのは、意外と簡単。「本当に分かっている」との差は何か？"
+    "section": "演習：ELIZAを机上で作る",
+    "text": "演習：ELIZAを机上で作る\n\n会話ごとにルールを増やすチャットボットを演じてみる。\n\n初期応答ルール\n\n\nもし相手の文に「〜がつらい」があれば「なぜ◯◯がつらいと思うのですか？」それ以外は「もう少し詳しく」と返答）\n\n\n現在のルールでは対応できない文がでたら、if文で対応できる程度のルールを考えて追加\nそのまま大抵の患者に対してNターンまでなんとか持たせるルールの集合を作成\n\n\nこのルール作り（量もif文も）が大変というのが古典AIの最大の問題"
   },
   {
-    "objectID": "ai-introduction.html#elizaごっこ",
-    "href": "ai-introduction.html#elizaごっこ",
+    "objectID": "ai-introduction.html#世界初の考えて動くロボット1966-72",
+    "href": "ai-introduction.html#世界初の考えて動くロボット1966-72",
     "title": "人工知能概論",
-    "section": "ELIZAごっこ",
-    "text": "ELIZAごっこ\n\n隣の人を相手に、ルール1個だけのチャットボットを自分で演じてみる。\n\n応答ルールを1つ決める（例：相手の文に「〜がつらい」があれば「なぜ◯◯がつらいと思うのですか？」と返す。それ以外は「もう少し詳しく」）\nルールだけを守って3往復、会話\n「知的に見えた瞬間」と「ボロが出た瞬間」を1つずつメモ\nボロを直すにはルールを何個足せばよさそうか、ペアで見積もり\n\n\n見積もりが「きりがない」に近づいたなら、それがこのあと話す古典的AIの壁の実感"
-  },
-  {
-    "objectID": "ai-introduction.html#世界初の考えて動くロボット",
-    "href": "ai-introduction.html#世界初の考えて動くロボット",
-    "title": "人工知能概論",
-    "section": "世界初の「考えて動く」ロボット",
-    "text": "世界初の「考えて動く」ロボット\n\n\n\n\n\n出典: Wikimedia Commons, SRI International, CC BY-SA 3.0\n\n\n\n\nシェーキー（Shakey） 1966-72年、SRI\nカメラで部屋を観察し、論理推論で行動計画を立てて動く\n「箱を隣の部屋へ押していけ」→ 手順を自分で考える\nただし、一歩動くたびに世界の記述を全部考え直す必要があった\n計画に時間がかかり、ガタガタ震えながら止まって考え込む様子が名前の由来（shaky = 震える）"
-  },
-  {
-    "objectID": "ai-introduction.html#section-1",
-    "href": "ai-introduction.html#section-1",
-    "title": "人工知能概論",
-    "section": "",
-    "text": "発展：フレーム問題を深掘る"
-  },
-  {
-    "objectID": "ai-introduction.html#フレーム問題",
-    "href": "ai-introduction.html#フレーム問題",
-    "title": "人工知能概論",
-    "section": "フレーム問題",
-    "text": "フレーム問題\n\n\n必要なすべての知識の記述は困難\n\n\nルールベースAIは、世界の状態をできるだけ明示的に書こうとした\n\nしかも、何か行動したら、一部の状態は変わってしまう\n\nこのとき、何が変わり、何が変わらないかを全部書かないといけない\n\n全部は明らかに無理\nこれが狭義の フレーム問題\n\n「変更のみ記述。変更がなければ維持する」の原則でいいのでは？？\n\nダメ。変更が及ぶ範囲を決めなくてはダメなので"
-  },
-  {
-    "objectID": "ai-introduction.html#机を動かすの影響はどこまで",
-    "href": "ai-introduction.html#机を動かすの影響はどこまで",
-    "title": "人工知能概論",
-    "section": "「机を動かす」の影響はどこまで？",
-    "text": "「机を動かす」の影響はどこまで？\n\n\n\n\n\n\n\n\n質問\n\n\nロボットに「机を動かす」を実行させる。位置が変わるのは机だけ、でいい？ ほかに変わってしまうものを、30秒で3つ挙げよ。\n\n\n\n\n\n\n\n影響は波紋のように広がり、書くべき「変化」と「不変」が無限に増えていく"
-  },
-  {
-    "objectID": "ai-introduction.html#狭義のフレーム問題",
-    "href": "ai-introduction.html#狭義のフレーム問題",
-    "title": "人工知能概論",
-    "section": "狭義のフレーム問題",
-    "text": "狭義のフレーム問題\n\n\n何が“変更”なのかを決める必要がある\n\n\n直接変わるものと、間接的に変わるものがある\n\n机を動かすと、机の位置は変わる\n机の上のコップの位置は？\n机の下の影は？\n机に置かれた紙は？\n机がぶつかった椅子は？\n\n間接的な変化は連鎖する\n\n電気のスイッチを押すと、スイッチの状態が変わる\n部屋の明るさも変わる\n人の見え方や行動可能性も変わるかもしれない"
-  },
-  {
-    "objectID": "ai-introduction.html#例外条件を全部書けるか",
-    "href": "ai-introduction.html#例外条件を全部書けるか",
-    "title": "人工知能概論",
-    "section": "例外条件を全部書けるか",
-    "text": "例外条件を全部書けるか\n\n\n「ドアを開ける」と書いても、鍵がかかっていたら開かない\nドアが壊れていても開かない\n押すドアを引いても開かない\n誰かが反対側から押さえていても開かない\n1つの行動に、例外条件が際限なく付いてくる"
-  },
-  {
-    "objectID": "ai-introduction.html#m.ミンスキーのフレーム理論",
-    "href": "ai-introduction.html#m.ミンスキーのフレーム理論",
-    "title": "人工知能概論",
-    "section": "M.ミンスキーのフレーム理論",
-    "text": "M.ミンスキーのフレーム理論\n\n\n世界全部を見るのではなく、枠で切り取る\n\n\n\n\n人間は、世界の全部を同時には考えない\nよって、窓枠のように、いま必要な範囲だけを切り取って見ればいいのでは？\n例：\n\nレストランなら「席」「注文」「会計」が関係ある\n授業なら「教室」「先生」「学生」「課題」が関係ある\n\n\n\n\n\n出典: Wikimedia Commons, Sethwoodworth (en.wikipedia), CC BY 3.0\n\n\nマービン・ミンスキー（1927-2016）\n\n\n\n\n\n\n\n\nシンボリックAIへの問い\n\n\n\n枠を使えば、考える範囲を絞ることはできる\nしかし、結局、その枠をどう作り、どう選ぶのかは簡単ではない"
-  },
-  {
-    "objectID": "ai-introduction.html#シンボリックaiの限界",
-    "href": "ai-introduction.html#シンボリックaiの限界",
-    "title": "人工知能概論",
-    "section": "シンボリックAIの限界",
-    "text": "シンボリックAIの限界\n\n\nそもそも、定義やルールのきれいな記述が困難\n\n\n\n\n\n出典: Wikimedia Commons, 各撮影者（リンク先参照）, CC BY-SA 3.0\n\n\nこれが全部「犬」。では犬の定義は？\n\n\n\n出典: Wikimedia Commons, Klaus, CC BY-SA 2.0\n\n\n卵を産む哺乳類、カモノハシ\n\n\n例外や曖昧なものはどう線引きする？ルールで書ききれない\n行動のように時系列と影響を伴うものはもっと困難（ラプラスの悪魔）\n\n\n\n\n\n\n\n\n古典的AIの限界\n\n\n\n「知識をたくさん書けばよい」は実は実現困難であった\n完全記述・完全予測という発想自体がまずかった"
-  },
-  {
-    "objectID": "ai-introduction.html#フレーム問題は現在も残る",
-    "href": "ai-introduction.html#フレーム問題は現在も残る",
-    "title": "人工知能概論",
-    "section": "フレーム問題は現在も残る",
-    "text": "フレーム問題は現在も残る\n\n\n完全自動運転はフレーム問題に必ず直面する\n\n\n\n\n自動運転では、車の周りのすべてを同時に扱う必要はない\nしかし、何を見て、何を無視してよいかの判断がとても難しい\n\n道路標識、歩行者、工事、天気、緊急車両\n落下物、予想外の動き、地域ごとの交通ルール\n「ふつうなら関係ないもの」が急に重要になる場面\n\n限定された場所・条件では実用化が進んでいる\nどこでも・どんな条件でも任せられる完全自動運転は別の難しさがある\n\n\n\n\n出典: Wikimedia Commons, Dllu, CC BY 4.0\n\n\nサンフランシスコを走る無人タクシー（Waymo）\n\n\n\n\n\n\n\n\nAI史として見る\n\n\n\nフレーム問題は、昔のシンボリックAIだけの話ではない\n現代のAIでも「どこまでの範囲を扱うべきか」は重要な問題"
+    "section": "世界初の「考えて動く」ロボット（1966-72）",
+    "text": "世界初の「考えて動く」ロボット（1966-72）\n\n\nシェーキー（Shakey）\n\n\n\n\n\n出典: Wikimedia Commons, SRI International, CC BY-SA 3.0\n\n\n\n\nカメラで部屋を観察し、論理推論で行動計画を立てて動く\n「箱を隣の部屋へ押していけ」→ 手順を自分で考える\nただし、一歩動くたびに世界の記述を全部考え直す必要があった\n計画に時間がかかり、ガタガタ震えながら止まって考え込む様子が名前の由来（shaky = 震える）\nLIFE誌が「世界初の電子人間」と紹介"
   },
   {
     "objectID": "ai-introduction.html#section-2",
     "href": "ai-introduction.html#section-2",
     "title": "人工知能概論",
     "section": "",
-    "text": "授業内コアへ戻る：ルールから学習へ"
+    "text": "フレーム問題"
+  },
+  {
+    "objectID": "ai-introduction.html#frame-mccarthy",
+    "href": "ai-introduction.html#frame-mccarthy",
+    "title": "人工知能概論",
+    "section": "行動が影響する範囲",
+    "text": "行動が影響する範囲\n\n\n\n\nマッカーシーとヘイズが1969年に提起\n出発点は、行動の前後を論理で記述する問題\n例：電話を持つ人が、電話帳で番号を調べる\n\n\n\n\n事実\n調べる前\n調べたあと\n\n\n\n\n相手の電話番号\n知らない\n知っている\n\n\n電話の所持\n持っている\n持っている\n\n\n\n\n\n\n出典: Wikimedia Commons, null0 / Roland Dobbins, CC BY 2.0\n\n\nジョン・マッカーシー\n\n\n\n\n\n\n\n\n人間には当然でも\n\n\n\n行動前の事実と「番号がわかる」という効果だけでは、行動後も電話を持っているとは論理的に導けない\n\n\n\n\n\n\n出典：John McCarthy & Patrick J. Hayes (1969), Some Philosophical Problems from the Standpoint of Artificial Intelligence, §“The Frame Problem”"
+  },
+  {
+    "objectID": "ai-introduction.html#frame-axioms",
+    "href": "ai-introduction.html#frame-axioms",
+    "title": "人工知能概論",
+    "section": "「変わらないこと」を大量に書かずに済ませたい",
+    "text": "「変わらないこと」を大量に書かずに済ませたい\n\n\n「番号を調べても、電話の所持は変わらない」という規則が必要\n\n「電話番号を調べる」という事実から「電話を所持している」ということは論理的推論で導出でない\nよって、人が公理として与える必要がある\nこの規則を フレーム公理（frame axiom）という\n\nフレーム公理をあらゆるものすべて記述するのは手間\n解決へのアイデア\n\n「変わる事実を記述し、それ以外は維持する」\nただし、何が変わるかについての知識は必要\n\n机を動かすとき、机の上のコップも動くのか？\n\n\n\n\n\n\n\n\n\nでも\n\n\nある変化は別の変化を引き起こしてしまうのでは？\n\n\n\n\n出典：McCarthy & Hayes (1969), “The Frame Problem”"
+  },
+  {
+    "objectID": "ai-introduction.html#frame-ramification",
+    "href": "ai-introduction.html#frame-ramification",
+    "title": "人工知能概論",
+    "section": "波及問題",
+    "text": "波及問題\n\n\nある変化が別の変化を引き起こし、影響がさらに広がる\n例：水の入ったコップがある机を動かしたときに、起こりうる連鎖\n\n\n\n\n\n\n\n\n\n間接的な影響をどう扱うか\n\n\n\n机の位置だけを書き換えても、その先の変化までは捉えられない\n波及問題（ramification problem）：行動が引き起こす間接的な影響を、どう記述・推論するか\n\n\n\n\n\n\n関連する現象：バタフライエフェクト（butterfly effect）\n\n天気などのカオス系では、初期状態の小さな違いが将来の大きな差につながる\n\n\n\n関連資料：Ramification and causality／カオス系の初期状態への鋭敏な依存性（図は説明用の例）"
+  },
+  {
+    "objectID": "ai-introduction.html#frame-minsky",
+    "href": "ai-introduction.html#frame-minsky",
+    "title": "人工知能概論",
+    "section": "フレーム：典型的な状況をひとまとまりで表す",
+    "text": "フレーム：典型的な状況をひとまとまりで表す\n\n\n\n\nミンスキー（M.Minsky）が1974年に提案\n記憶の中から「いまはこの状況だ」という枠（frame）をひとつ選び、その状況だけに限定して考える\n例：「誕生日会」なら、主役・招待客・贈り物とその関係をまとめておいて、それ以外は考慮しなくていい\n枠の中でわからないことは、通常の想定で補う\n想定と合わなければ、別の枠に切り替える\n\n\n\n\n出典: Wikimedia Commons, Sethwoodworth, CC BY 3.0\n\n\nマービン・ミンスキー\n\n\n出典：Marvin Minsky (1974), A Framework for Representing Knowledge, MIT-AI Memo 306"
+  },
+  {
+    "objectID": "ai-introduction.html#frame-dennett",
+    "href": "ai-introduction.html#frame-dennett",
+    "title": "人工知能概論",
+    "section": "フレーム問題（Frame Problem）",
+    "text": "フレーム問題（Frame Problem）\n\n\n\n\n哲学者 デネットが1984年に議論\n問題：すべての可能性を検討せずに、いま必要な知識や、見落としてはいけない影響をどう選ぶか。\n\n元来の問題から、現実の中で考え、行動するための問題へ\n必要な背景知識、行動の影響、例外、考慮する範囲を扱う\n\n\n\n\n\n出典: Wikimedia Commons, Mathias Schindler（切り抜き: User-duck）, CC BY-SA 3.0\n\n\nダニエル・デネット\n\n\n\n\n\n\n\n\n\n\nデネット曰く\n\n\n\n広い問題全体を「フレーム問題」と呼んで論じる\n\n\n\n\n\n\n出典：Daniel Dennett (1984), Cognitive Wheels: The Frame Problem of AI, Minds, Machines and Evolution 所収"
+  },
+  {
+    "objectID": "ai-introduction.html#frame-conditions",
+    "href": "ai-introduction.html#frame-conditions",
+    "title": "人工知能概論",
+    "section": "行動が成功する条件を、全部書けるか",
+    "text": "行動が成功する条件を、全部書けるか\n\n\nデネットが取り上げた、マッカーシーの「ボートで川を渡る」例\n\n\n\n\n書き足す条件の例\nそれでも残る問い\n\n\n\n\nオールがある\n壊れていたら？\n\n\nボートに穴がない\nほかに渡れなくなる原因は？\n\n\n想定した危険を除く\nまだ記述していない危険は？\n\n\n\n\n人間も「通常の状況なら」の条件を、すべて列挙してはいない\n\n\n\n\n\n\n\n\n必要な知識の記述\n\n\n\n現実に必要な条件・例外を、あらかじめ全部書けばよいとはいかない\n\n\n\n\n\n\n出典：McCarthy, Circumscription—A Form of Nonmonotonic Reasoning, §1／Dennett, Cognitive Wheels\n\n\nMcCarthy calls the difficulty of enumerating action preconditions the qualification problem. Dennett includes it in his discussion of the broader frame problem. The table paraphrases their boat examples; it is not a direct quotation."
+  },
+  {
+    "objectID": "ai-introduction.html#frame-society-of-mind",
+    "href": "ai-introduction.html#frame-society-of-mind",
+    "title": "人工知能概論",
+    "section": "『心の社会』：例外を書き足すと記述が膨らむ",
+    "text": "『心の社会』：例外を書き足すと記述が膨らむ\n\n\n\n\nミンスキーの 『心の社会』（1986年）\n「鳥は飛ぶ」に、条件を書き足す\n\n飛べない種類の鳥を除く\n翼をけがした鳥を除く\n鳥かごの中の鳥も除く\n\n例外をすべて織り込むと、ルールが扱いきれなくなる\n\n\n\n\n出典: Wikimedia Commons, Sethwoodworth, CC BY 3.0\n\n\nマービン・ミンスキー\n\n\n\n\n\n\n\n\n例外の扱い\n\n\n\nミンスキーは、典型的に成り立つルールと、個別の例外を分けて扱うことを提案\n\n\n\n\n\n\n出典：Minsky (1986), The Society of Mind, §12.9 “The Exception Principle”, Simon & Schuster（英語本文）"
+  },
+  {
+    "objectID": "ai-introduction.html#frame-driving",
+    "href": "ai-introduction.html#frame-driving",
+    "title": "人工知能概論",
+    "section": "現代でもフレーム問題はある",
+    "text": "現代でもフレーム問題はある\n\n\n\n\n例えば自動運転\n\n「青信号なら進む」に条件にはさらなる条件が\n\n横断中の人がいない\n交差点の先が詰まっていない\n警察官が停止を指示していない\n\n信号が消灯している場合は？\n雪で完全に隠れていて判然としない場合は？\n\n\n\n\n\n出典: Wikimedia Commons, Dllu, CC BY 4.0\n\n\n自動運転車の例：Waymo\n\n\n結局、すべての状況の想定は困難\n\n\n関連資料：Waymo, Waymo’s Safety Methodologies and Safety Readiness／Collision Avoidance Testing\n\n\nThe traffic examples are illustrative, not reports of specific Waymo incidents. The connection to the broader frame problem is a conceptual comparison. Waymo evaluates risks within an operational design domain and tests scenarios. Its publications do not identify the frame problem as the sole cause of automated-driving challenges."
+  },
+  {
+    "objectID": "ai-introduction.html#frame-driving-rare-events",
+    "href": "ai-introduction.html#frame-driving-rare-events",
+    "title": "人工知能概論",
+    "section": "まれな重大事故への備え",
+    "text": "まれな重大事故への備え\n\n\n想定できなかった状況への対処は、ルールに書き込みにくい\nまれな事例（rare events）は、学習・検証に使う実例も集まりにくい\n起きる頻度が低くても、死亡事故につながる状況は見過ごせない\n未経験でも対応できる場合はあるが、安全に対応できるかの検証が必要\n\n\n\n\n\n\n\n\nフレーム問題に加わる難しさ\n\n\n\n条件をどう記述するかに加え、実例が乏しい状況をどう学習・検証するかも課題\n\n\n\n\n\n\n対応例：シミュレーションで危険な状況をつくり、学習・検証する\n現実をどこまで再現できるかも、確認が必要\n\n\n技術資料：Waymo, Collision Avoidance Testing／The Waymo World Model"
+  },
+  {
+    "objectID": "ai-introduction.html#symbolic-ai-knowledge",
+    "href": "ai-introduction.html#symbolic-ai-knowledge",
+    "title": "人工知能概論",
+    "section": "【ここまでのまとめ】古典的AI≒シンボリックAI",
+    "text": "【ここまでのまとめ】古典的AI≒シンボリックAI\n\n\n古典的AIは知識を明示的に表している\n\nシンボリックAI（symbolic AI） と呼ばれる\n\nシンボリックAIの２大要素\n\n対象や関係を記号で表現\n明示的な規則に従って推論\n\nフレーム問題\n\nすべては記述できない\n\n\n\n\n\n\n\n\n\nでも、そもそもシンボルすら曖昧\n\n\n\n「犬」というシンボルを言葉で定義できない（記号接地問題）\n\n犬を辞書で引くと、「哺乳類」「生き物」など他の記号でしか説明できない\n\n「白いボール」の白ってどの色？（曖昧性）\n\n（表示できるかはさておき）白ってℝ色あるねん\n\n\n\n\n\n\n\n\n\n\n\n\n\nハーナッド曰く\n\n\n\n「形だけを手がかりに操作される無意味な記号の意味を、別の無意味な記号以外の何かに接地できるのか」\n── Stevan Harnad（1990）\n\n\n記号を辞書で引いても、出てくるのはまた別の記号\n\n中国語を、中国語‐中国語辞書だけで覚えようとするのと同じ\n\n記号の意味はシステムの中になく、それを読む人間の頭の中にある\n\n\n\n\n\n\n出典：Stevan Harnad (1990), The Symbol Grounding Problem, Physica D 42: 335-346"
+  },
+  {
+    "objectID": "ai-introduction.html#section-3",
+    "href": "ai-introduction.html#section-3",
+    "title": "人工知能概論",
+    "section": "",
+    "text": "ルールから学習へ"
+  },
+  {
+    "objectID": "ai-introduction.html#dog-recognition-rules",
+    "href": "ai-introduction.html#dog-recognition-rules",
+    "title": "人工知能概論",
+    "section": "犬を見分ける基準をルールで書けるか",
+    "text": "犬を見分ける基準をルールで書けるか\n\n\n\n\n\n出典: Wikimedia Commons, 各撮影者（リンク先参照）, CC BY-SA 3.0\n\n\n\n\n画像を「犬」と判定するルールを考える\n\n「脚が4本」「毛がある」だけなら、猫にも当てはまる\n犬同士でも、毛色・体形・耳の形が違う\n写る向きや隠れ方によって、見える特徴も変わる\n\n\n\n\n\n\n\n\n\n\n見分ける基準の記述\n\n\n\n人間が見分けられても、その基準をルールとして書くのは難しい\n「犬」「犬以外」の画像を例として与え、見分ける基準を学べないか"
   },
   {
     "objectID": "ai-introduction.html#ルールを書く-vs-データから学ぶ",
     "href": "ai-introduction.html#ルールを書く-vs-データから学ぶ",
     "title": "人工知能概論",
     "section": "ルールを書く vs データから学ぶ",
-    "text": "ルールを書く vs データから学ぶ\n\n\n\n\n\n\n\n\n\n\n\n左：このデータに人間がルールを書いてみた場合 — どこに線を引いても例外だらけ\n右：同じデータから、機械がパターンを学習した場合\n知識を「書く」時代から、データに「合わせる」時代へ — これが歴史の転換点"
+    "text": "ルールを書く vs データから学ぶ\n\n\n2つの数値で位置を表した点を、赤と青に分ける例\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n判定基準の作り方\n\n\n\n正解付きの例を与えて、判定の境界を学ぶ"
   },
   {
     "objectID": "ai-introduction.html#データからパターンを学習する時代",
@@ -1883,8 +1911,8 @@
     "text": "ニューラルネットワーク：現在の最有力アプローチ\n\n\n実は歴史が長い\n\n\n\n\nニューラルネットワークの考え方自体は古い\n\n右は 1958年の Perceptron Mark I。部屋サイズの配線で「学習する機械」を実装した\n\nバックプロパゲーションも1980年代に重要性が再認識された\n当時は、今ほど大きな成果にはつながりにくかった\n\nデータが少ない\n計算機が遅い\n多層ネットワークを安定して学習しにくい\n\nそのため、長い間、決定的な方法にはならなかった\n\n\n\n\n出典: Wikimedia Commons（パブリックドメイン）"
   },
   {
-    "objectID": "ai-introduction.html#section-3",
-    "href": "ai-introduction.html#section-3",
+    "objectID": "ai-introduction.html#section-4",
+    "href": "ai-introduction.html#section-4",
     "title": "人工知能概論",
     "section": "",
     "text": "ニューラルネットワークの劇的な進歩"
@@ -1943,7 +1971,14 @@
     "href": "ai-introduction.html#まとめ",
     "title": "人工知能概論",
     "section": "まとめ",
-    "text": "まとめ\n\n\nAIは、知的なタスクをコンピュータで扱うための技術・研究分野\n機械学習は、データからパターンを学ぶAIの代表的な方法\nモデルは、入力から出力を計算する仕組み\n学習は、モデルのパラメータをデータに合わせて調整すること\n本当に大事なのは、未知のデータにも通用するかどうか\n\n\n\n\n\n\n\n\n次に進む問い\n\n\n魚を重さだけで分類するには、どんなルールを作ればよいか？"
+    "text": "まとめ\n\n\n古典的AI：知識と規則を明示し、推論・探索で知的な処理を実現\nフレーム問題：変化・不変や例外を扱い、何を考慮すべきかを判断する難しさ\n機械学習・深層学習：判定基準や特徴をデータから学び、画像・音声などの認識が進展\nTransformer・LLM：Attentionを使う構造と大規模な学習により、文章処理・生成が発展\n\n\n\n\n\n\n\n\n現実の中で判断・行動する難しさ\n\n\n\n手法が進歩しても、想定外の状況や、まれな重大事例への対応は課題\n何を前提にし、どの情報や変化に対応すべきか"
+  },
+  {
+    "objectID": "ai-introduction.html#driving-scenario-exercise",
+    "href": "ai-introduction.html#driving-scenario-exercise",
+    "title": "人工知能概論",
+    "section": "演習：自動運転が判断に困る状況",
+    "text": "演習：自動運転が判断に困る状況\n\n自動運転が誤った判断をしそうな状況を1つ以上考え、次の3点を説明してレポートせよ。\n\n状況：どこで、何が起きているか\n判断の難しさ：何を見落としたり、取り違えたりしそうか\n対応の案：判断に必要な情報や、安全に行動する方法\n\n\n\n\n\n\n\n\n考えるポイント\n\n\n\n現実に起こりうる場面を具体化し、判断が難しい理由を説明\n主要なLLMの回答にない具体例を挙げられると高評価\n\n比較した場合は、使ったLLM・質問・回答も提示\n\n\n\n\n\n\n\n\n解答例\n\n\n状況：横断歩道の手前に立つ人が、道路の向こうへ手を振っている\n判断の難しさ：車に停止を求めているのか、向こう側の知人に挨拶しているのか、動作だけでは判断しにくい\n対応の案：視線・体の向き・周囲の人の動きなども確認し、横断する可能性を考慮して行動"
   },
   {
     "objectID": "classification-basics-1d.html#このデータを分離する",
