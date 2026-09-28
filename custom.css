@@ -502,15 +502,22 @@ table td:first-child {
    so the top-right corner is reserved for the badge. */
 #search-btn { top: auto !important; bottom: 14px !important; }
 /* Quarto's footer spans the viewport by default. Shrink-wrap the navigation so
-   the invisible remainder cannot intercept controls on a scrolled slide. */
+   the invisible remainder cannot intercept controls on a scrolled slide.
+   It sits bottom-right, just left of the search button, instead of bottom
+   center: body text is left-aligned, so the last lines of a long scrolled
+   slide rarely reach the right corner, while bottom center overlapped them.
+   right = search button's right (14px) + its width (34px) + an 8px gap;
+   bottom 15px + half the 32px button height puts the nav's center on the
+   search button's center (14px + 17px). */
 .reveal > .footer {
   display: flex !important;
   align-items: center;
   justify-content: center;
-  left: 50%;
+  left: auto;
+  right: 56px;
+  bottom: 15px;
   width: fit-content;
-  transform: translateX(-50%);
-  padding: 0 16px;
+  padding: 0;
   height: auto !important;
   overflow: visible !important;
   box-sizing: border-box;
@@ -518,31 +525,53 @@ table td:first-child {
 #slide-nav {
   display: flex;
   align-items: center;
-  gap: 8px;
 }
+/* Borderless thin chevrons flanking the counter: ‹ n / N ›. The glyph is
+   small (16px) but the round hit area stays 32px for tablets; hover and
+   press show only a faint disc. */
 #slide-nav button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  box-sizing: border-box;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
   background: transparent;
-  color: #f6b394;             /* badge peach (was theme blue) */
-  border: 1px solid #f6b394;
-  border-radius: 4px;
-  padding: 4px 14px;
-  font-size: 1rem;
+  color: #3a3d40;
   cursor: pointer;
+  transition: background 0.15s ease;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
+#slide-nav button svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+  pointer-events: none;
+}
+@media (hover: hover) {
+  #slide-nav button:hover {
+    background: rgba(19, 21, 22, 0.07);
+  }
+}
 #slide-nav button:active {
-  background: rgba(246, 179, 148, 0.25);
+  background: rgba(19, 21, 22, 0.12);
 }
 #slide-nav button.nav-disabled {
-  opacity: 0.3;
+  color: #c9cbcd;
+  background: transparent;
   cursor: default;
 }
 #nav-counter {
-  font-size: 0.9rem;
-  min-width: 56px;
+  font-size: 13px;
+  min-width: 50px;
   text-align: center;
-  color: #a8a8a8;             /* muted, so the page number doesn't read as body text */
+  font-variant-numeric: tabular-nums;  /* digits keep their width as n changes */
+  letter-spacing: 0.02em;
+  color: #8a8d90;             /* muted, so the page number doesn't read as body text */
 }
 .reveal .slide-number {
   display: none !important;
@@ -1183,7 +1212,7 @@ a.lightbox[href]::after {
    section) so it stays put while the section scrolls beneath it. The CSS
    animation owns the whole lifecycle: slide-ui.js removes the node on
    animationend. Self-centered via margin, keeping transform free for
-   the dips; bottom offset clears the footer nav (◀ n/m ▶). */
+   the dips. */
 #scroll-hint{position:absolute;left:50%;bottom:46px;margin-left:-20px;width:40px;height:40px;
   border-radius:50%;background:rgba(41,128,185,.82);box-shadow:0 2px 8px rgba(25,45,80,.28);
   display:flex;align-items:center;justify-content:center;color:#fff;pointer-events:none;
