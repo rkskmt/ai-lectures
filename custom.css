@@ -468,11 +468,15 @@ table td:first-child {
   background-repeat: no-repeat;
   background-position: center;
 }
+/* Bottom-right corner cluster (top-right is badge-only). The slide nav
+   (‹ n / N ›, 32px tall) takes the bottom row at bottom 14px; above it the
+   34px round buttons stack with 8px gaps: search 54px, Home 96px, slide
+   list 138px (toc-ui.js). Change one offset and the rest must follow. */
 /* Home button: same translucent-circle style as the search button,
-   stacked directly above it in the top-right corner. */
+   stacked directly above it. */
 #home-btn {
   position: fixed;
-  bottom: 56px;          /* moved to bottom-right: top-right is badge-only */
+  bottom: 96px;
   right: 14px;
   z-index: 100;
   width: 34px;
@@ -499,23 +503,22 @@ table td:first-child {
 }
 #home-btn svg { width: 18px; height: 18px; display: block; pointer-events: none; }
 /* Search button (created by search-ui.js at top:54px) moved to the bottom-right
-   so the top-right corner is reserved for the badge. */
-#search-btn { top: auto !important; bottom: 14px !important; }
+   cluster, directly above the slide nav. */
+#search-btn { top: auto !important; bottom: 54px !important; }
 /* Quarto's footer spans the viewport by default. Shrink-wrap the navigation so
    the invisible remainder cannot intercept controls on a scrolled slide.
-   It sits bottom-right, just left of the search button, instead of bottom
-   center: body text is left-aligned, so the last lines of a long scrolled
-   slide rarely reach the right corner, while bottom center overlapped them.
-   right = search button's right (14px) + its width (34px) + an 8px gap;
-   bottom 15px + half the 32px button height puts the nav's center on the
-   search button's center (14px + 17px). */
+   It sits in the bottom-right corner instead of bottom center: body text is
+   left-aligned, so the last lines of a long scrolled slide rarely reach the
+   right corner, while bottom center overlapped them. right: 15px puts the ›
+   button's center (15px + 16px) under the round buttons' center
+   (14px + 17px). */
 .reveal > .footer {
   display: flex !important;
   align-items: center;
   justify-content: center;
   left: auto;
-  right: 56px;
-  bottom: 15px;
+  right: 15px;
+  bottom: 14px;
   width: fit-content;
   padding: 0;
   height: auto !important;
