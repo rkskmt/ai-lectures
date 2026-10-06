@@ -30,9 +30,14 @@ plt.tight_layout()
 plt.show()
 ```
 
-- 最終回、こうした**手書き数字を読み取る機械**を自分のコードで作る（PyTorch を使用）
-- そのための部品（境界・損失・勾配・層）を、毎回1つずつ手に入れていく
-
+- 最終回で**手書き数字を読み取る**コードの作成
+- これは分類問題（多クラス分類）であるため、分類問題をターゲットにしていく
+- この過程で以下のことを学ぶ
+   - 決定木
+   - k-means
+   - 勾配降下法
+   - ロジスティック回帰
+   - ニューラルネットワーク
 
 ## {background-color="white" .center .break-slide}
 
@@ -41,7 +46,10 @@ AIの歩み
 :::
 
 
-## 1770年、人間を負かし続けたチェス「機械」
+## 1770年の自動チェスマシーン
+
+### **メカニカル・ターク**
+
 
 ::: {.fig-cite src="imgs/history/mechanical-turk.jpg" height="330px"}
 ::: {.cite}
@@ -49,15 +57,15 @@ AIの歩み
 :::
 :::
 
-- 「メカニカル・ターク」— 欧州を巡業し、ナポレオンやフランクリンとも対局した
+- 欧州を巡業し、ナポレオンやフランクリンとも対局した
 
-::: {.callout-important title="質問"}
-歯車の時代に、なぜチェスが指せた？
+::: {.callout-important title="疑問"}
+でも、電気もない時代に、なぜチェスが指せたのか
 :::
 
 ::: {.fragment}
-**答え：中に人間（チェスの達人）が隠れていた。**
-「知的に**見える**ふるまい」とは何か — この問いがAIの出発点になる
+**答え：中に人間が隠れていた。**
+「知的に**見える**ふるまい」ができるのは、まずは人間自身
 :::
 
 
@@ -72,8 +80,8 @@ AIの歩み
   - ゲームで次の一手を選ぶ
   - データから将来の値を予測する
 
-::: {.callout-note title="大事な見方"}
-- AIは「人間そのもの」を作るというより、**知的なタスクを機械で扱う**ための考え方
+::: {.callout-caution title="注意"}
+- AIというワードは「人間そのもの」の模倣ではなく、**知的なタスクを機械で扱う**こと全般を指す
 :::
 
 
@@ -93,13 +101,14 @@ AI: "人工知能（AI）" {
   }
 }
 ```
+::: {style="width: fit-content; margin: 0 auto;"}
+| **機械学習（[machine learning]{.en}）**
+|   ⊃ **ニューラルネットワーク（[neural network]{.en}）**
+|     ⊃ **深層学習（[deep learning]{.en}）**
+:::
 
-- ニュースで聞く言葉は、実は**入れ子の関係**にある
-- 外側から：**機械学習（[machine learning]{.en}）** ⊃ **ニューラルネットワーク（[neural network]{.en}）** ⊃ **深層学習（[deep learning]{.en}）**
-- この講義は外側（AI全体の歴史）から始めて、内側（深層学習）へ進んでいく
 
-
-## AIが扱うタスク {#peek-ai-tasks}
+## 主要なタスク {#peek-ai-tasks}
 
 ```{python}
 #| echo: false
@@ -148,13 +157,17 @@ plt.tight_layout()
 plt.show()
 ```
 
-- **分類（[classification]{.en}）**：どのグループに属するかを決める（魚の種類、迷惑メール判定）
-- **回帰（[regression]{.en}）**：数値を予測する（気温、売上、株価、需要）
-- **クラスタリング（[clustering]{.en}）**：ラベルのないデータを、似たもの同士に分ける
-- **生成（[generation]{.en}）**：新しいデータを作る（文章、画像、音声、コード）
+- **分類（[classification]{.en}）**
+   - どのグループに属するかの決定（魚の種類、迷惑メール判定）
+- **回帰（[regression]{.en}）**
+   - 数値の予測（気温、売上、株価、需要）
+- **クラスタリング（[clustering]{.en}）**
+   - ラベルのないデータを、似たもの同士に分ける
+- **生成（[generation]{.en}）**
+   - 新しいデータを作る（文章、画像、音声、コード）
 
 
-## AIの歴史を1枚で
+## タイムライン
 
 ```{python}
 #| echo: false
@@ -193,19 +206,17 @@ plt.tight_layout()
 plt.show()
 ```
 
-- AIは一直線に進歩したのではなく、**ブームと冬を行き来**してきた
-- ここからこの年表を、時代順にたどっていく
+- AIは60年ほど前から**ブームと冬を行き来**してきた
 
 
-## AIの70年は、3つの作戦
+## 時代ごとのスタンス
 
-| 作戦 | やり方 | 成果と壁 |
+| アプローチ | 手段 | 結果 |
 |---|---|---|
 | **知識を書く**（〜1990s） | 人間が知識とルールを記述（「人は哺乳類」「哺乳類は体毛をもつ」） | 世界は**書ききれない**ことが判明して頓挫 |
-| **パターンを学ぶ**（1990s〜） | 数式のパラメータをデータに合わせる＝**機械学習** | スパム判定・推薦・表情認識で成果。ただし「画像に車がある？」のような**曖昧なもの**は識別困難 |
-| **物量で学ぶ**（2010s〜） | 大量データ×大量計算の**深層学習**、関係まで学ぶ**アテンション** | 汎化性（[generalization]{.en}；曖昧さへの耐性）が劇的に向上 — ついに犬を見分け、ことばを話す |
+| **パターンを学習**（1990s〜） | 数式のパラメータをデータに合わせる＝**機械学習** | スパム判定・推薦・表情認識で成果。ただし「画像に車がある？」のような**曖昧なもの**は識別困難 |
+| **ニューラルネットと物量で学習**（2010s〜） | 大量データ×大量計算の**深層学習**、関係まで学ぶ**アテンション** | 汎化性（[generalization]{.en}；曖昧さへの耐性）が劇的に向上 — ついに犬を見分け、ことばを話す |
 
-- これからこの3つの作戦を順に歩く — 前の作戦の**壁**が、次の作戦の**動機**になる
 
 ## 製品・社会実装で見る流れ
 
@@ -224,7 +235,7 @@ plt.show()
 :::
 
 
-## 1997年：機械がチェス世界王者を破る
+## 転換期：コンピュータがチェス世界王者を破る（1997）
 
 ::: {.fig-cite src="imgs/history/deep-blue.jpg" height="340px"}
 ::: {.cite}
@@ -232,15 +243,14 @@ plt.show()
 :::
 :::
 
-- IBM の **Deep Blue** が世界チャンピオンのカスパロフに勝利
-
-::: {.callout-important title="質問"}
-Deep Blue は、対局データから**学習**して強くなった？
+::: {.callout-important title="事実"}
+- IBM の **Deep Blue** が世界チャンピオンのカスパロフに勝利したが、実は、過去の対局データを**学習**しておらず、**力まかせの探索をしていた**（1秒に約2億局面を評価）
+   - どちらかというと、計算速度の爆発的向上が寄与
 :::
+## {background-color="white" .center .break-slide}
 
-::: {.fragment}
-- 答えは**ノー**。中身は学習ではなく**力まかせの探索**（1秒に約2億局面を評価）
-- ルールが明確で閉じた世界なら、古典的なアプローチでも人間を超えられた — 1770年の「機械」がついに本物になった
+::: {.break-title}
+古典的AI
 :::
 
 
@@ -257,24 +267,23 @@ Deep Blue は、対局データから**学習**して強くなった？
   - エキスパートシステム
 
 
-## 古典的AI：やってみると問題が噴出
-
-- 知識の記述はどうするのが適当？
-- ルールは論理的推論だけだと不十分なのだがどうすればいい？
-- 誰がどこにどうやってすべての知識を入力するの？
-  - 文章化されている法律すら非常に困難であることが判明
+## 古典的AIの問題
 
 
-## 古典的AIの流れ
-
-| 時代 | 技術の中心 | 社会・製品のイメージ |
-|---|---|---|
-| 1950s-60s | 推論、探索、初期の対話システム | ELIZA |
-| 1970s-80s | エキスパートシステム | 医療診断支援、知識ベース |
-| 1980s | 第五世代コンピュータ | CAPTAINシステムなどの情報化構想 |
 
 
-## このチャットボット、いつのもの？
+### **記述の問題**
+- そもそも知識はどう記述するのが適切？
+  - ある名詞が指している内容はどこまで？ 
+  - 自転車の乗り方を十分記述するには？  
+
+### **網羅性の問題**
+- 誰がどこにどうやって必要な量と範囲の知識を入力するの？
+  - そもそも必要な量とはどこまで？
+
+
+
+## 1966年のチャットボット
 
 ::: {.fig-cite src="imgs/history/eliza.png" height="330px"}
 ::: {.cite}
@@ -282,26 +291,31 @@ Deep Blue は、対局データから**学習**して強くなった？
 :::
 :::
 
-::: {.fragment}
-- **1966年**の **ELIZA**（画面は再現実装）。精神科医のまねをする単純なルールの集まり
-- 相手の言葉をパターンで拾ってオウム返しするだけ — それでも当時の人は本気で身の上話を始めた（**イライザ効果**）
-- 「知的に見える」を作るのは、意外と簡単。「本当に分かっている」との差は何か？
+- **ELIZA**（画面は再現実装）は **単純なルールの集合**
+   - 精神科医の **模倣をする振る舞いを記述** 
+- 内容は相手の言葉をパターンで拾って **オウム返し** するだけ
+   - それでも当時の人は本気で身の上話を始めた（**イライザ効果**）
+- その場しのぎであれば **「知的に見える」を演出** することは意外と簡単
+
+
+## 演習：ELIZAを机上で作る {.badge-practice}
+
+会話ごとにルールを増やすチャットボットを演じてみる。
+
+1. 初期応答ルール
+  - もし相手の文に「〜がつらい」があれば「なぜ◯◯がつらいと思うのですか？」それ以外は「もう少し詳しく」と返答）
+2. 現在のルールでは対応できない文がでたら、if文で対応できる程度のルールを考えて追加
+3. そのまま大抵の患者に対してNターンまでなんとか持たせるルールの集合を作成
+
+
+::: {.takeaway}
+**このルール作り（量も内容も）が大変というのが古典AI最大の課題**
 :::
 
 
-## ELIZAごっこ {.badge-practice}
+## 世界初の「考えて動く」ロボット（1966-72）
 
-隣の人を相手に、ルール1個だけのチャットボットを自分で演じてみる。
-
-0. 応答ルールを1つ決める（例：相手の文に「〜がつらい」があれば「なぜ◯◯がつらいと思うのですか？」と返す。それ以外は「もう少し詳しく」）
-1. ルールだけを守って3往復、会話
-2. 「知的に見えた瞬間」と「ボロが出た瞬間」を1つずつメモ
-3. ボロを直すにはルールを**何個**足せばよさそうか、ペアで見積もり
-
-- 見積もりが「きりがない」に近づいたなら、それがこのあと話す**古典的AIの壁**の実感
-
-
-## 世界初の「考えて動く」ロボット
+### **シェーキー（Shakey）**
 
 :::: {.columns}
 
@@ -313,12 +327,15 @@ Deep Blue は、対局データから**学習**して強くなった？
 :::
 :::
 
+
+
+
 ::: {.column width="58%"}
-- **シェーキー（Shakey）** 1966-72年、SRI
 - カメラで部屋を観察し、**論理推論で行動計画**を立てて動く
 - 「箱を隣の部屋へ押していけ」→ 手順を自分で考える
 - ただし、一歩動くたびに**世界の記述を全部考え直す**必要があった
-- 計画に時間がかかり、ガタガタ震えながら止まって考え込む様子が名前の由来（shaky = 震える）
+- **計画に時間がかかり、ガタガタ震えながら止まって考え込む様子が名前の由来（shaky = 震える）**
+- LIFE誌が「世界初の電子人間」と紹介
 :::
 
 ::::
@@ -327,183 +344,349 @@ Deep Blue は、対局データから**学習**して強くなった？
 ## {background-color="white" .center .break-slide}
 
 ::: {.break-title}
-発展：フレーム問題を深掘る
+フレーム問題
 :::
 
 
-## フレーム問題
 
-### 必要なすべての知識の記述は困難
+## 行動が影響する範囲 {#frame-mccarthy}
 
-- ルールベースAIは、世界の状態をできるだけ明示的に書こうとした
-  - しかも、何か行動したら、一部の状態は変わってしまう
-- このとき、何が変わり、何が変わらないかを全部書かないといけない
-  - 全部は明らかに無理
-  - これが狭義の **フレーム問題**
-- 「変更のみ記述。変更がなければ維持する」の原則でいいのでは？？
-  - ダメ。変更が及ぶ範囲を決めなくてはダメなので
-
-
-## 「机を動かす」の影響はどこまで？
-
-::: {.callout-important title="質問"}
-ロボットに「机を動かす」を実行させる。位置が変わるのは**机だけ**、でいい？
-ほかに変わってしまうものを、30秒で3つ挙げよ。
-:::
-
-::: {.fragment}
-```{.d2 sketch="true" width="58%"}
-G: "さらに外へ…どこまで書けば「全部」？" {
-  style.fill: "#ffffff"
-  grid-columns: 2
-  w1: "コップの中の水は？" { style.fill: "#fdfefe" }
-  w2: "影で暗くなる本棚は？" { style.fill: "#fdfefe" }
-  D: "直接の影響" {
-    style.fill: "#fdebd0"
-    grid-columns: 2
-    d1: "机の上のコップ" { style.fill: "#ffffff" }
-    d2: "机の下の影" { style.fill: "#ffffff" }
-    d3: "ぶつかる椅子" { style.fill: "#ffffff" }
-    A: "机を動かす" { style.fill: "#f5b7b1" }
-  }
-  w3: "椅子の上の猫は？" { style.fill: "#fdfefe" }
-  w4: "紙に挟んだしおりは？" { style.fill: "#fdfefe" }
-}
-```
-
-- 影響は波紋のように広がり、書くべき「変化」と「不変」が無限に増えていく
-:::
-
-
-## 狭義のフレーム問題
-
-### 何が“変更”なのかを決める必要がある
-
-- 直接変わるものと、間接的に変わるものがある
-  - 机を動かすと、机の位置は変わる
-  - 机の上のコップの位置は？
-  - 机の下の影は？
-  - 机に置かれた紙は？
-  - 机がぶつかった椅子は？
-- 間接的な変化は連鎖する
-  - 電気のスイッチを押すと、スイッチの状態が変わる
-  - 部屋の明るさも変わる
-  - 人の見え方や行動可能性も変わるかもしれない
-
-
-## 例外条件を全部書けるか
-
-- 「ドアを開ける」と書いても、鍵がかかっていたら開かない
-- ドアが壊れていても開かない
-- 押すドアを引いても開かない
-- 誰かが反対側から押さえていても開かない
-- 1つの行動に、例外条件が際限なく付いてくる
-
-## M.ミンスキーのフレーム理論
-
-### 世界全部を見るのではなく、枠で切り取る
-
-:::: {.columns}
+:::: {.columns .columns-v-center}
 
 ::: {.column width="63%"}
-- 人間は、世界の全部を同時には考えない
-- よって、窓枠のように、いま必要な範囲だけを切り取って見ればいいのでは？
-- **例：**
-  - レストランなら「席」「注文」「会計」が関係ある
-  - 授業なら「教室」「先生」「学生」「課題」が関係ある
+- **マッカーシーとヘイズ**が1969年に提起
+- 出発点は、行動の前後を論理で記述する問題
+- 例：電話を持つ人が、電話帳で番号を調べる
+
+| 事実 | 調べる前 | 調べたあと |
+|---|---|---|
+| 相手の電話番号 | 知らない | 知っている |
+| 電話の所持 | 持っている | 持っている |
+:::
+
+::: {.column width="37%"}
+::: {.fig-cite src="imgs/history/mccarthy.jpg" height="300px"}
+::: {.cite}
+出典: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:John_McCarthy_(computer_scientist)_Stanford_2006_(272020300).jpg), null0 / Roland Dobbins, [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/)
+:::
+:::
+ジョン・マッカーシー
+:::
+
+::::
+
+::: {.callout-note title="人間には当然でも"}
+- 行動前の事実と「番号がわかる」という効果だけでは、行動後も電話を持っているとは論理的に導けない
+:::
+
+::: {.slide-source style="font-size: 0.75em;"}
+出典：John McCarthy & Patrick J. Hayes (1969), [Some Philosophical Problems from the Standpoint of Artificial Intelligence](https://www-formal.stanford.edu/jmc/mcchay69/mcchay69.html), §“The Frame Problem”
+:::
+
+
+## 「変わらないこと」を大量に書かずに済ませたい {#frame-axioms}
+
+- 「番号を調べても、電話の所持は変わらない」という規則が必要
+   - 「電話番号を調べる」という事実から「電話を所持している」ということは論理的推論で導出でない
+   - よって、人が**公理**として与える必要がある 
+   - この規則を **フレーム公理（frame axiom）**という
+- フレーム公理をあらゆるものすべて記述するのは手間
+- **解決へのアイデア**
+   - 「変わる事実を記述し、それ以外は維持する」
+   - ただし、**何が変わるかについての知識**は必要
+      - 机を動かすとき、机の上のコップも動くのか？
+
+
+::: {.callout-warning}
+## でも
+ある変化は別の変化を引き起こしてしまうのでは？
+:::
+
+
+::: {.slide-source style="font-size: 0.75em;"}
+出典：McCarthy & Hayes (1969), [“The Frame Problem”](https://www-formal.stanford.edu/jmc/mcchay69/node17.html)
+:::
+
+## 波及問題 {#frame-ramification}
+
+- ある変化が別の変化を引き起こし、影響がさらに広がる
+- 例：水の入ったコップがある机を動かしたときに、起こりうる連鎖
+
+```{.d2 sketch="true" width="95%"}
+direction: right
+table: "机を動かす" { style.fill: "#f5b7b1" }
+cup: "コップが倒れる" { style.fill: "#fdebd0" }
+water: "水がこぼれる" { style.fill: "#fdebd0" }
+power: "電源タップが濡れる" { style.fill: "#fdebd0" }
+table -> cup -> water -> power
+```
+
+::: {.callout-note title="間接的な影響をどう扱うか"}
+- 机の位置だけを書き換えても、その先の変化までは捉えられない
+- **波及問題（ramification problem）**：行動が引き起こす間接的な影響を、どう記述・推論するか
+:::
+
+- 関連する現象：**バタフライエフェクト（butterfly effect）**
+  - 天気などのカオス系では、初期状態の小さな違いが将来の大きな差につながる
+
+::: {.slide-source style="font-size: 0.75em;"}
+関連資料：[Ramification and causality](https://www.sciencedirect.com/science/article/pii/S0004370296000331)／[カオス系の初期状態への鋭敏な依存性](https://doi.org/10.1103/PhysRevLett.68.2863)（図は説明用の例）
+:::
+
+
+## フレーム：典型的な状況をひとまとまりで表す {#frame-minsky}
+
+:::: {.columns .columns-v-center}
+
+::: {.column width="63%"}
+- **ミンスキー（M.Minsky）**が1974年に提案
+- 記憶の中から「いまはこの状況だ」という**枠（frame）**をひとつ選び、**その状況だけに限定して考える**
+- 例：「誕生日会」なら、主役・招待客・贈り物とその関係をまとめておいて、それ以外は考慮しなくていい
+- 枠の中でわからないことは、**通常の想定で補う**
+- 想定と合わなければ、**別の枠に切り替える**
 :::
 
 ::: {.column width="37%"}
 ::: {.fig-cite src="imgs/history/minsky.jpg" height="300px"}
 ::: {.cite}
-出典: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Marvin_Minsky_at_OLPCb.jpg), Sethwoodworth (en.wikipedia), CC BY 3.0
+出典: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Marvin_Minsky_at_OLPCb.jpg), Sethwoodworth, [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 :::
 :::
-マービン・ミンスキー（1927-2016）
-:::
-
-::::
-
-::: {.callout-note title="シンボリックAIへの問い"}
-- 枠を使えば、考える範囲を絞ることはできる
-- しかし、結局、その枠をどう作り、どう選ぶのかは簡単ではない
-:::
-
-## シンボリックAIの限界
-
-### そもそも、定義やルールのきれいな記述が困難
-
-:::: {.columns}
-
-::: {.column width="55%"}
-::: {.fig-cite src="imgs/history/dogs.jpg" height="280px"}
-::: {.cite}
-出典: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Collage_of_Nine_Dogs.jpg), 各撮影者（リンク先参照）, CC BY-SA 3.0
-:::
-:::
-これが全部「犬」。では犬の定義は？
-:::
-
-::: {.column width="45%"}
-::: {.fig-cite src="imgs/history/platypus.jpg" height="280px"}
-::: {.cite}
-出典: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Wild_Platypus_4.jpg), Klaus, CC BY-SA 2.0
-:::
-:::
-卵を産む哺乳類、カモノハシ
+マービン・ミンスキー
 :::
 
 ::::
 
-- 例外や曖昧なものはどう線引きする？ルールで書ききれない
-- 行動のように時系列と影響を伴うものはもっと困難（ラプラスの悪魔）
 
-::: {.callout-note title="古典的AIの限界"}
-- 「知識をたくさん書けばよい」は実は実現困難であった
-- 完全記述・完全予測という発想自体がまずかった
+::: {.slide-source style="font-size: 0.75em;"}
+出典：Marvin Minsky (1974), [A Framework for Representing Knowledge](https://www.mit.edu/~dxh/marvin/web.media.mit.edu/~minsky/papers/Frames/frames.html), MIT-AI Memo 306
 :::
 
-## フレーム問題は現在も残る
 
-### 完全自動運転はフレーム問題に必ず直面する
+## フレーム問題（Frame Problem） {#frame-dennett}
 
-:::: {.columns}
+:::: {.columns .columns-v-center}
 
-::: {.column width="55%"}
-- 自動運転では、車の周りのすべてを同時に扱う必要はない
-- しかし、何を見て、何を無視してよいかの判断がとても難しい
-  - 道路標識、歩行者、工事、天気、緊急車両
-  - 落下物、予想外の動き、地域ごとの交通ルール
-  - 「ふつうなら関係ないもの」が急に重要になる場面
-- 限定された場所・条件では実用化が進んでいる
-- どこでも・どんな条件でも任せられる完全自動運転は別の難しさがある
+::: {.column width="73%"}
+- 哲学者 **デネット**が1984年に議論
+- **問題**：すべての可能性を検討せずに、いま必要な知識や、見落としてはいけない影響をどう選ぶか。
+   - 元来の問題から、現実の中で考え、行動するための問題へ
+   - 必要な背景知識、行動の影響、例外、考慮する範囲を扱う
 :::
 
-::: {.column width="45%"}
-::: {.fig-cite src="imgs/history/waymo.jpg" height="300px"}
+::: {.column width="27%"}
+::: {.fig-cite src="imgs/history/dennett.jpg" height="200px"}
+::: {.cite}
+出典: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Daniel_dennett_Oct2008_(portrait).JPG), Mathias Schindler（切り抜き: User-duck）, [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
+:::
+::: {style="text-align: center; font-size: 0.8em;"}
+ダニエル・デネット
+:::
+:::
+:::
+::::
+
+::: {.callout-note title="デネット曰く"}
+- **広い問題全体を「フレーム問題」と呼んで論じる**
+
+:::
+::: {.slide-source style="font-size: 0.75em;"}
+出典：Daniel Dennett (1984), [Cognitive Wheels: The Frame Problem of AI](https://www.cs.sfu.ca/~vaughan/teaching/415/papers/dennett-cognitivewheels.html), *Minds, Machines and Evolution* 所収
+:::
+
+
+## 行動が成功する条件を、全部書けるか {#frame-conditions}
+
+- デネットが取り上げた、マッカーシーの「ボートで川を渡る」例
+
+| 書き足す条件の例 | それでも残る問い |
+|---|---|
+| オールがある | 壊れていたら？ |
+| ボートに穴がない | ほかに渡れなくなる原因は？ |
+| 想定した危険を除く | まだ記述していない危険は？ |
+
+- 人間も「通常の状況なら」の条件を、すべて列挙してはいない
+
+::: {.callout-note title="必要な知識の記述"}
+- **現実に必要な条件・例外を、あらかじめ全部書けばよいとはいかない**
+:::
+
+::: {.slide-source style="font-size: 0.75em;"}
+出典：McCarthy, [Circumscription—A Form of Nonmonotonic Reasoning, §1](https://www-formal.stanford.edu/jmc/circumscription/node1.html)／Dennett, [Cognitive Wheels](https://www.cs.sfu.ca/~vaughan/teaching/415/papers/dennett-cognitivewheels.html)
+:::
+
+::: {.notes}
+McCarthy calls the difficulty of enumerating action preconditions the qualification problem. Dennett includes it in his discussion of the broader frame problem. The table paraphrases their boat examples; it is not a direct quotation.
+:::
+
+
+## 『心の社会』：例外を書き足すと記述が膨らむ {#frame-society-of-mind}
+
+:::: {.columns .columns-v-center}
+
+::: {.column width="63%"}
+- ミンスキーの **『心の社会』（1986年）**
+- 「鳥は飛ぶ」に、条件を書き足す
+  - 飛べない種類の鳥を除く
+  - 翼をけがした鳥を除く
+  - 鳥かごの中の鳥も除く
+- 例外をすべて織り込むと、ルールが扱いきれなくなる
+:::
+
+::: {.column width="37%"}
+::: {.fig-cite src="imgs/history/minsky.jpg" height="300px"}
+::: {.cite}
+出典: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Marvin_Minsky_at_OLPCb.jpg), Sethwoodworth, [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
+:::
+:::
+マービン・ミンスキー
+:::
+
+::::
+
+::: {.callout-note title="例外の扱い"}
+- ミンスキーは、典型的に成り立つルールと、個別の例外を分けて扱うことを提案
+:::
+
+::: {.slide-source style="font-size: 0.75em;"}
+出典：Minsky (1986), [The Society of Mind, §12.9 “The Exception Principle”](https://studylib.net/doc/27224422/society-of-mind---marvin-minsky), Simon & Schuster（英語本文）
+:::
+
+
+
+
+## 現代でもフレーム問題はある {#frame-driving}
+
+:::: {.columns .columns-v-center}
+
+::: {.column width="67%"}
+- **例えば自動運転**
+  - 「青信号なら進む」に条件にはさらなる条件が
+     - 横断中の人がいない
+     - 交差点の先が詰まっていない
+     - 警察官が停止を指示していない
+  - 信号が消灯している場合は？
+  - 雪で完全に隠れていて判然としない場合は？
+:::
+
+::: {.column width="33%"}
+::: {.fig-cite src="imgs/history/waymo.jpg" height="230px"}
 ::: {.cite}
 出典: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Waymo_Jaguar_I-Pace_in_San_Francisco_2023_dllu.jpg), Dllu, CC BY 4.0
 :::
 :::
-サンフランシスコを走る無人タクシー（Waymo）
+自動運転車の例：Waymo
 :::
+
 
 ::::
 
-::: {.callout-note title="AI史として見る"}
-- フレーム問題は、昔のシンボリックAIだけの話ではない
-- 現代のAIでも「どこまでの範囲を扱うべきか」は重要な問題
+::: {.takeaway}
+**結局、すべての状況の想定は困難**
 :::
+
+
+
+
+::: {.slide-source style="font-size: 0.75em;"}
+関連資料：Waymo, [Waymo’s Safety Methodologies and Safety Readiness](https://www.waymo.com/research/waymos-safety-methodologies-and-safety-readiness/)／[Collision Avoidance Testing](https://www.waymo.com/research/collision-avoidance-testing-of-the-waymo-automated/)
+:::
+
+::: {.notes}
+The traffic examples are illustrative, not reports of specific Waymo incidents. The connection to the broader frame problem is a conceptual comparison. Waymo evaluates risks within an operational design domain and tests scenarios. Its publications do not identify the frame problem as the sole cause of automated-driving challenges.
+:::
+
+
+## まれな重大事故への備え {#frame-driving-rare-events}
+
+- 想定できなかった状況への対処は、ルールに書き込みにくい
+- **まれな事例（rare events）**は、学習・検証に使う実例も集まりにくい
+- 起きる頻度が低くても、死亡事故につながる状況は見過ごせない
+- 未経験でも対応できる場合はあるが、**安全に対応できるかの検証**が必要
+
+::: {.callout-note title="フレーム問題に加わる難しさ"}
+- **条件をどう記述するか**に加え、**実例が乏しい状況をどう学習・検証するか**も課題
+:::
+
+- 対応例：シミュレーションで危険な状況をつくり、学習・検証する
+- 現実をどこまで再現できるかも、確認が必要
+
+::: {.slide-source style="font-size: 0.75em;"}
+技術資料：Waymo, [Collision Avoidance Testing](https://www.waymo.com/research/collision-avoidance-testing-of-the-waymo-automated/)／[The Waymo World Model](https://waymo.com/blog/2026/02/the-waymo-world-model-a-new-frontier-for-autonomous-driving-simulation/)
+:::
+
+
+## 【ここまでのまとめ】古典的AI≒シンボリックAI {#symbolic-ai-knowledge}
+
+- 古典的AIは知識を明示的に表している
+   - **シンボリックAI（symbolic AI）** と呼ばれる
+- シンボリックAIの２大要素
+   - 対象や関係を記号で表現
+   - 明示的な規則に従って推論
+- フレーム問題
+   - すべては記述できない
+
+::: {.callout-note title="でも、そもそもシンボルすら曖昧"}
+- 「犬」というシンボルを言葉で定義できない（記号接地問題）
+   - 犬を辞書で引くと、「哺乳類」「生き物」など他の記号でしか説明できない 
+- 「白いボール」の白ってどの色？（曖昧性）
+   - （表示できるかはさておき）白ってℝ色あるねん
+:::
+
+::: {.callout-note title="ハーナッド曰く"}
+> 「形だけを手がかりに操作される無意味な記号の意味を、別の無意味な記号以外の何かに接地できるのか」
+>
+> ── Stevan Harnad（1990）
+
+- 記号を辞書で引いても、出てくるのはまた別の記号
+   - 中国語を、中国語‐中国語辞書だけで覚えようとするのと同じ
+- **記号の意味はシステムの中になく、それを読む人間の頭の中にある**
+:::
+
+::: {.slide-source style="font-size: 0.75em;"}
+出典：Stevan Harnad (1990), [The Symbol Grounding Problem](https://www.cs.ox.ac.uk/activities/ieg/e-library/sources/harnad90_sgproblem.pdf), *Physica D* 42: 335-346
+:::
+
+
 
 
 ## {background-color="white" .center .break-slide}
 
 ::: {.break-title}
-授業内コアへ戻る：ルールから学習へ
+ルールから学習へ
+:::
+
+
+## 犬を見分ける基準をルールで書けるか {#dog-recognition-rules}
+
+:::: {.columns .columns-v-center}
+
+::: {.column width="43%"}
+::: {.fig-cite src="imgs/history/dogs.jpg" height="300px"}
+::: {.cite}
+出典: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Collage_of_Nine_Dogs.jpg), 各撮影者（リンク先参照）, CC BY-SA 3.0
+:::
+:::
+:::
+
+::: {.column width="57%"}
+- 画像を「犬」と判定するルールを考える
+  - 「脚が4本」「毛がある」だけなら、猫にも当てはまる
+  - 犬同士でも、毛色・体形・耳の形が違う
+  - 写る向きや隠れ方によって、見える特徴も変わる
+:::
+
+::::
+
+::: {.callout-note title="見分ける基準の記述"}
+- 人間が見分けられても、その基準をルールとして書くのは難しい
+- **「犬」「犬以外」の画像を例として与え、見分ける基準を学べないか**
 :::
 
 
 ## ルールを書く vs データから学ぶ
+
+- 2つの数値で位置を表した点を、赤と青に分ける例
 
 ```{python}
 #| echo: false
@@ -538,9 +721,9 @@ plt.tight_layout()
 plt.show()
 ```
 
-- 左：このデータに人間がルールを書いてみた場合 — どこに線を引いても**例外だらけ**
-- 右：同じデータから、機械がパターンを**学習**した場合
-- 知識を「書く」時代から、データに「合わせる」時代へ — これが歴史の転換点
+::: {.callout-note title="判定基準の作り方"}
+- **正解付きの例を与えて、判定の境界を学ぶ**
+:::
 
 
 ## データからパターンを学習する時代
@@ -892,12 +1075,38 @@ plt.show()
 
 ## まとめ
 
-- AIは、知的なタスクをコンピュータで扱うための技術・研究分野
-- 機械学習は、データからパターンを学ぶAIの代表的な方法
-- モデルは、入力から出力を計算する仕組み
-- 学習は、モデルのパラメータをデータに合わせて調整すること
-- 本当に大事なのは、未知のデータにも通用するかどうか
+- **古典的AI**：知識と規則を明示し、推論・探索で知的な処理を実現
+- **フレーム問題**：変化・不変や例外を扱い、何を考慮すべきかを判断する難しさ
+- **機械学習・深層学習**：判定基準や特徴をデータから学び、画像・音声などの認識が進展
+- **Transformer・LLM**：Attentionを使う構造と大規模な学習により、文章処理・生成が発展
 
-::: {.callout-note title="次に進む問い"}
-魚を重さだけで分類するには、どんなルールを作ればよいか？
+::: {.callout-note title="現実の中で判断・行動する難しさ"}
+- 手法が進歩しても、想定外の状況や、まれな重大事例への対応は課題
+- **何を前提にし、どの情報や変化に対応すべきか**
 :::
+
+
+
+
+## 演習：自動運転が判断に困る状況 {#driving-scenario-exercise .badge-practice}
+
+自動運転が誤った判断をしそうな状況を1つ以上考え、次の3点を説明してレポートせよ。
+
+1. **状況**：どこで、何が起きているか
+2. **判断の難しさ**：何を見落としたり、取り違えたりしそうか
+3. **対応の案**：判断に必要な情報や、安全に行動する方法
+
+::: {.callout-note title="考えるポイント"}
+- 現実に起こりうる場面を具体化し、判断が難しい理由を説明
+- **主要なLLMの回答にない具体例を挙げられると高評価**
+  - 比較した場合は、使ったLLM・質問・回答も提示
+:::
+
+<details>
+<summary>解答例</summary>
+
+- **状況**：横断歩道の手前に立つ人が、道路の向こうへ手を振っている
+- **判断の難しさ**：車に停止を求めているのか、向こう側の知人に挨拶しているのか、動作だけでは判断しにくい
+- **対応の案**：視線・体の向き・周囲の人の動きなども確認し、横断する可能性を考慮して行動
+
+</details>
