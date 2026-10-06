@@ -304,7 +304,7 @@ I.X2 -> O.P: "w₂"
 - [ロジスティック回帰の計算経路](logistic-regression.qmd#peek-logistic-structure){.peek}を、層・ニューロン・接続として描いた特殊で最小の構成
 
 
-## ロジスティック回帰では $g$ をロジスティック関数にする
+## 出力層の活性化関数をロジスティック関数にする
 
 ### 一般的な出力層の計算
 
@@ -314,7 +314,7 @@ u=v_1h_1+v_2h_2+c,
 a=g(u)
 $$
 
-### ロジスティック回帰の出力層の計算
+### このNNの出力層の計算
 
 $$
 z=w_1x_1+w_2x_2+b,
@@ -322,30 +322,9 @@ z=w_1x_1+w_2x_2+b,
 p=\sigma(z)=\frac{1}{1+e^{-z}}
 $$
 
-- [ロジスティック関数](logistic-regression.qmd#peek-logistic-function){.peek}が、出力層で使う活性化関数
-- $z$ を0から1のSalmon確率 $p$ へ変える
-
-
-## NNとして読み直しても数式は変わらない {#peek-one-layer-equivalence}
-
-### ロジスティック回帰
-
-$$
-z=w_1x_1+w_2x_2+b,
-\qquad
-p=\sigma(z)
-$$
-
-### 隠れ層なし・出力層にニューロン1個のNN
-
-$$
-z=w_1x_1+w_2x_2+b,
-\qquad
-p=\sigma(z)
-$$
-
-- 入力 $x_1,x_2$、重み $w_1,w_2$、バイアス $b$、出力 $p$ の役割も同じ
-- 違う式へ変えたのではなく、同じ計算をNNの構造と用語で読み直した
+- 活性化関数 $g$ の位置に、[前回のロジスティック関数](logistic-regression.qmd#peek-logistic-function){.peek} $\sigma$ を置き、$z$ を0から1のSalmon確率 $p$ へ変える
+- 隠れ層がないので、出力層は $h_1,h_2$ ではなく入力 $x_1,x_2$ を直接受け取る
+- 式は前回のロジスティック回帰と同じ。違う式へ変えたのではなく、同じ計算をNNの用語で読み直した
 
 
 ## {background-color="white" .center .break-slide}
@@ -355,88 +334,49 @@ NNの学習を実装する
 :::
 
 
-## NNを作り、学習させるまでの5つの仕事
+## 学習の4つの仕事を、それぞれ関数にする
 
-```{.d2 sketch="true" width="92%"}
-direction: right
-A: "構成\n接続とパラメータ" { style.fill: "#e1f5ff" }
-B: "予測\n確率を計算" { style.fill: "#fff4e1" }
-C: "採点\n正解と比較" { style.fill: "#f5b7b1" }
-D: "勾配\n動かす向きを調べる" { style.fill: "#fdebd0" }
-E: "更新\n値を動かす" { style.fill: "#d5f5e3" }
-A -> B -> C -> D -> E
-```
+- [前回のロジスティック回帰の学習](logistic-regression.qmd#peek-one-at-a-time){.peek}では、予測・採点・勾配・更新という4つの仕事を繰り返した
+- NNとして実装するとは、この計算を、図の丸と矢印に沿った**関数のあいだの値の受け渡し**として書くこと
 
-- NNの学習は、この5つを順番に行う
-- 前回と同じ魚の値を使い、数値が図のどこを進むかを追う
+| 仕事 | 作る関数 | 何をするか |
+|---|---|---|
+| 予測 | `forward` | 入力の値を、接続を通して出力 $p$ まで進める |
+| 採点 | `binary_cross_entropy` | 出力 $p$ を正解 $y$ と比べ、損失を1個出す |
+| 勾配 | `backward` | 損失の微分値を、接続を逆にたどって各パラメータへ届ける |
+| 更新 | `update` | 届いた微分値で、重みとバイアスを動かす |
 
-
-## 構成：NNを組み、パラメータを用意する
-
-```{.d2 sketch="true" width="92%"}
-direction: right
-A: "構成\n接続とパラメータ" { style.fill: "#e1f5ff"; style.stroke: "#e74c3c"; style.stroke-width: 5 }
-B: "予測\n確率を計算" { style.fill: "#eeeeee" }
-C: "採点\n正解と比較" { style.fill: "#eeeeee" }
-D: "勾配\n動かす向きを調べる" { style.fill: "#eeeeee" }
-E: "更新\n値を動かす" { style.fill: "#eeeeee" }
-A -> B -> C -> D -> E
-```
-
-- 入力ノード2個と出力層のニューロン1個をつなぎ、学習で動かす $w_1,w_2,b$ を用意する
-- 組むのは[さきほど読み直した、隠れ層なし・ニューロン1個のNN](#peek-one-layer-structure){.peek}。ロジスティック回帰と同じ計算になる
+- 関数を作る前に、ネットワークの構成と入力の魚を用意する
 
 
-## 構成：学習する値は $w_1,w_2,b$
+## 準備：ネットワークの構成を配列に写す
 
 ```{.d2 sketch="true" width="50%"}
 direction: right
 X1: "x₁" { shape: circle; style.fill: "#e1f5ff" }
 X2: "x₂" { shape: circle; style.fill: "#e1f5ff" }
-N: "z = w₁x₁ + w₂x₂ + b" { shape: circle; style.fill: "#fff4e1" }
+N: "z = w₁x₁ + w₂x₂ + b\np = σ(z)" { shape: circle; style.fill: "#fff4e1" }
 X1 -> N: "w₁"
 X2 -> N: "w₂"
 ```
 
-- NNを構成する：入力数・ニューロン数・接続を決め、必要なパラメータを用意すること
-- 2個の入力ノードから、出力層のニューロン1個へ接続するので、重みは2個
-- 出力層のニューロンが1個なので、バイアスも1個
-
-
-## 構成：NumPyで $w_1,w_2,b$ を用意する
-
 ```python
 import numpy as np
 
-# w[0] がw₁、w[1] がw₂
+# 接続2本の重み。w[0] がw₁、w[1] がw₂
 w = np.array([-0.2, 0.0])
 
 # 出力層のニューロン1個のバイアス
 b = 0.0
 ```
 
-- `w.shape == (2,)`：2本の接続の重み
-- `b`：出力層のニューロンのバイアス
-- `-0.2` と `0.0` は学習前の仮の値。学習によって変わる
+- 組むのは[さきほど読み直した、隠れ層なし・ニューロン1個のNN](#peek-one-layer-structure){.peek}
+- 接続が2本なので、重み `w` は長さ2の配列
+- ニューロンが1個なので、バイアス `b` は1個
+- `-0.2` と `0.0` は学習前の仮の値。学習で動かすのは、この3つの数
 
 
-## 予測：現在の $w,b$ で確率を計算する
-
-```{.d2 sketch="true" width="92%"}
-direction: right
-A: "構成 ✓\nw=(−0.2, 0)\nb=0" { style.fill: "#e1f5ff" }
-B: "予測\n確率を計算" { style.fill: "#fff4e1"; style.stroke: "#e74c3c"; style.stroke-width: 5 }
-C: "採点\n正解と比較" { style.fill: "#eeeeee" }
-D: "勾配\n動かす向きを調べる" { style.fill: "#eeeeee" }
-E: "更新\n値を動かす" { style.fill: "#eeeeee" }
-A -> B -> C -> D -> E
-```
-
-- 用意した $w,b$ のもとで、魚1匹のSalmon確率 $p$ を計算する
-- 式は[前回のロジスティック回帰の予測](logistic-regression.qmd#peek-logistic-structure){.peek}と同じ。数値が接続と層をどう通るかを1歩ずつ追う
-
-
-## 予測：前回と同じ魚のデータを入力する
+## 準備：前回と同じ魚のデータを入力に使う
 
 - [ロジスティック回帰で勾配を追った魚](logistic-regression.qmd#peek-parameter-gradients){.peek}と同じ入力と正解を使う
 
@@ -452,86 +392,29 @@ y = 1.0
 ```
 
 - $x_1=2$、$x_2=0.5$：この魚の2つの特徴量
-- $y=1$：この魚の正解ラベル。予測には使わず、後で予測を採点するときに使う
+- $y=1$：この魚の正解ラベル。予測には使わず、採点で使う
 
 
-## 予測：1本目の接続で $x_1$ を $w_1$ 倍する
+## 予測：入力の値が接続を通ってニューロンへ集まる
 
-```{.d2 sketch="true" width="64%"}
+```{.d2 sketch="true" width="92%"}
 direction: right
-X: "x₁ = 2" { shape: circle; style.fill: "#e1f5ff" }
-M: "重み w₁\n−0.2" { style.fill: "#fff4e1"; style.stroke-width: 4 }
-R: "−0.4" { shape: circle; style.fill: "#d5f5e3" }
-X -> M -> R
+X1: "x₁ = 2" { shape: circle; style.fill: "#e1f5ff" }
+X2: "x₂ = 0.5" { shape: circle; style.fill: "#e1f5ff" }
+Z: "重み付き和\nz = −0.4 + 0.0 + b\n= −0.4" { style.fill: "#fff4e1" }
+F: "活性化関数\nσ" { shape: hexagon; style.fill: "#fdebd0" }
+P: "p ≈ 0.4013" { shape: circle; style.fill: "#d5f5e3" }
+X1 -> Z: "×w₁ = ×(−0.2) → −0.4"
+X2 -> Z: "×w₂ = ×0.0 → 0.0"
+Z -> F
+F -> P
 ```
 
-$$
-x_1w_1=2\times(-0.2)=-0.4
-$$
-
-```python
-x1w1 = x[0] * w[0]
-```
-
-
-## 予測：2本目の接続で $x_2$ を $w_2$ 倍する
-
-```{.d2 sketch="true" width="64%"}
-direction: right
-X: "x₂ = 0.5" { shape: circle; style.fill: "#e1f5ff" }
-M: "重み w₂\n0.0" { style.fill: "#fff4e1"; style.stroke-width: 4 }
-R: "0.0" { shape: circle; style.fill: "#d5f5e3" }
-X -> M -> R
-```
-
-$$
-x_2w_2=0.5\times0.0=0.0
-$$
-
-```python
-x2w2 = x[1] * w[1]
-```
-
-
-## 予測：出力層で2つの値と $b$ を足す
-
-$$
-\begin{aligned}
-z
-&=x_1w_1+x_2w_2+b \\
-&=-0.4+0.0+0.0 \\
-&=-0.4
-\end{aligned}
-$$
-
-```python
-def linear(x, w, b):
-    return x @ w + b
-
-z = linear(x, w, b)
-```
-
-- `x @ w` は、2つの掛け算を足す内積
-- `linear` が実装したのは、出力層の計算の1段階目だけ
-
-
-## 予測：出力層で $z$ を確率 $p$ へ変える
-
-$$
-p=\sigma(-0.4)
-=\frac{1}{1+e^{0.4}}
-\approx0.4013
-$$
-
-```python
-def sigmoid(z):
-    return 1 / (1 + np.exp(-z))
-
-p = sigmoid(z)
-```
-
-- 数式ではロジスティック関数 $\sigma$、コードでは一般的な関数名 `sigmoid`
+- 各接続は、通る値に自分の重みを掛けてニューロンへ渡す
+- ニューロンは、届いた $-0.4$ と $0.0$ にバイアス $b=0$ を足して $z=-0.4$ を作る
+- 続けて $z$ を活性化関数 $\sigma$ に通し、Salmon確率 $p=\sigma(-0.4)\approx0.4013$ を出す
 - このNNは、この魚をSalmonである確率が約40%と予測した
+- 式は[前回の予測の計算](logistic-regression.qmd#peek-logistic-structure){.peek}と同じ。NNでは、同じ計算が図の上の値の受け渡しとして見える
 
 
 ## 予測：入力から出力までの計算をForwardと呼ぶ
@@ -545,13 +428,19 @@ X -> Z -> P: "数値が進む向き"
 ```
 
 - Forward（[forward pass]{.en}、順伝播）：入力から出力へ向かって、ネットワークの計算を順番に実行すること
-- 今回のForwardは、`linear` の後に `sigmoid` を実行する
+- 今回のForwardは、重み付き和 → 活性化関数の2段階
 - Forwardは学習方法ではない。現在の $w,b$ で予測を計算する処理
 
 
-## 予測：2段階をつないで `forward` を作る {#peek-one-fish-forward}
+## 予測：Forwardの2段階を関数にしてつなぐ {#peek-one-fish-forward}
 
 ```python
+def linear(x, w, b):
+    return x @ w + b
+
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
+
 def forward(x, w, b):
     z = linear(x, w, b)
     p = sigmoid(z)
@@ -565,41 +454,9 @@ z: -0.4
 p: 0.401312339887548
 ```
 
-- `z`：活性化関数へ入る直前の値
-- `p`：出力層から出たSalmon確率
-- 前の回で使った $p=0.4$ は、この出力を丸めた値として再現できた
-
-
-## 採点：予測 $p$ を正解 $y$ と比べる
-
-```{.d2 sketch="true" width="92%"}
-direction: right
-A: "構成 ✓\nw=(−0.2, 0)\nb=0" { style.fill: "#e1f5ff" }
-B: "予測 ✓\np=0.4013" { style.fill: "#fff4e1" }
-C: "採点\n正解と比較" { style.fill: "#f5b7b1"; style.stroke: "#e74c3c"; style.stroke-width: 5 }
-D: "勾配\n動かす向きを調べる" { style.fill: "#eeeeee" }
-E: "更新\n値を動かす" { style.fill: "#eeeeee" }
-A -> B -> C -> D -> E
-```
-
-- 予測 $p$ と正解 $y$ の違いを、1個の損失値にする
-- [前回、丸めた $p=0.4$ でこの魚を採点して $0.92$ を得た](logistic-regression.qmd#peek-loss-value){.peek}。同じ採点をコードにする
-
-
-## 採点：予測 $p$ だけでは、正しかったか分からない
-
-```{.d2 sketch="true" width="60%"}
-direction: right
-P: "NNの予測\np = 0.4013" { style.fill: "#d5f5e3" }
-Y: "この魚の正解\ny = 1（Salmon）" { style.fill: "#e1f5ff" }
-Q: "どれくらい\n間違っているか" { style.fill: "#f5b7b1" }
-P -> Q
-Y -> Q
-```
-
-- $p$ はNNが出したSalmon確率
-- $y$ は教師データにある正解ラベル
-- 学習するには、$p$ と $y$ を比較する採点方法が必要
+- `linear`：接続の掛け算と足し算。`x @ w` は $x_1w_1+x_2w_2$ を計算する内積
+- `sigmoid`：活性化関数。数式のロジスティック関数 $\sigma$ を、コードでは一般的な名前 `sigmoid` で書く
+- 前の回で使った $p=0.4$ は、この `p` を丸めた値
 
 
 ## 採点：損失関数は前回と同じ二値交差エントロピー {#peek-one-layer-loss}
@@ -612,11 +469,22 @@ $$
 $$
 
 - $\ell$：この魚の予測に対する損失（[loss]{.en}）
-- $y$：正解ラベル
-- $p$：NNのForwardで得たSalmon確率
+- この魚は $y=1$ なので、第1項だけが残る：
+
+$$
+\ell(1,0.4013)
+=-\log(0.4013)
+\approx0.913
+$$
+
+- 損失関数はネットワークの図には入らない。Forwardの出力 $p$ と正解 $y$ を受け取る、採点の関数
+
+::: {.callout-note}
+[前の回で $p=0.4$ と丸めて計算した $0.92$](logistic-regression.qmd#peek-loss-value){.peek}と同じ魚の、丸め前の損失
+:::
 
 
-## 採点：損失関数をNumPyで実装する
+## 採点：`binary_cross_entropy` として実装する
 
 ```python
 def binary_cross_entropy(y, p):
@@ -626,23 +494,7 @@ def binary_cross_entropy(y, p):
     return -(
         y * np.log(p) + (1 - y) * np.log(1 - p)
     )
-```
 
-- 関数の入力は、この魚の正解 `y` と予測 `p`
-- 関数の出力は、この魚の予測に対する損失 `loss`
-
-
-## 採点：この魚の損失は約 $0.913$
-
-- 正解は $y=1$ なので、二値交差エントロピーの第1項だけが残る
-
-$$
-\ell(1,0.4013)
-=-\log(0.4013)
-\approx0.913
-$$
-
-```python
 loss = binary_cross_entropy(y, p)
 ```
 
@@ -650,227 +502,88 @@ loss = binary_cross_entropy(y, p)
 loss: 0.9130152523999526
 ```
 
-::: {.callout-note}
-[前の回で $p=0.4$ と丸めて計算した $0.92$](logistic-regression.qmd#peek-loss-value){.peek}と同じ魚の損失
-:::
+- 関数の入力は、この魚の正解 `y` とForwardの出力 `p`
+- 関数の出力は、この魚の予測に対する損失 `loss`
 
 
-## 勾配：損失が下がる向きを調べる
+## 勾配：更新に使う3つの微分値は前回求めた
 
-```{.d2 sketch="true" width="92%"}
-direction: right
-A: "構成 ✓\nw=(−0.2, 0)\nb=0" { style.fill: "#e1f5ff" }
-B: "予測 ✓\np=0.4013" { style.fill: "#fff4e1" }
-C: "採点 ✓\nℓ=0.913" { style.fill: "#f5b7b1" }
-D: "勾配\n動かす向きを調べる" { style.fill: "#fdebd0"; style.stroke: "#e74c3c"; style.stroke-width: 5 }
-E: "更新\n値を動かす" { style.fill: "#eeeeee" }
-A -> B -> C -> D -> E
-```
-
-- $w_1,w_2,b$ をそれぞれどちらへ動かせば損失が下がるか、微分値で調べる
-- [前回、連鎖律で求めた3つの勾配](logistic-regression.qmd#peek-parameter-gradients){.peek}と同じ計算。今回は接続を逆向きにたどる順番で求める
-
-
-## 勾配：損失の値だけでは、重みをどちらへ動かすか分からない
-
-```{.d2 sketch="true" width="78%"}
-direction: right
-W: "現在のパラメータ\nw₁, w₂, b" { style.fill: "#fff4e1" }
-L: "現在の損失\nℓ = 0.913" { style.fill: "#f5b7b1" }
-Q: "w₁を増やす？\n減らす？" { style.fill: "#eeeeee" }
-W -> L -> Q
-```
-
-- $0.913$ は、現在の予測がどれくらい悪いかを表す
-- しかし、$w_1,w_2,b$ を増やすべきか減らすべきかは、この値だけでは決まらない
-- 各パラメータを少し変えたとき、損失がどちらへ変わるかを調べる
-
-
-## 勾配：現在のパラメータにおける損失関数の微分値を求める
-
-- 予測 $p$ は $w_1,w_2,b$ から計算されるため、損失関数 $\ell$ も $w_1,w_2,b$ によって変わる
-- 現在のパラメータは $w_1=-0.2,w_2=0,b=0$
-- この値の組において、損失関数を各パラメータについて偏微分する
+- 次の仕事は、$w_1,w_2,b$ をどちらへ動かせば損失が下がるかを、損失関数の偏微分値で調べること
+- 式は[前回、連鎖律で導いた結果](logistic-regression.qmd#peek-parameter-gradients){.peek}をそのまま使う：
 
 $$
-\frac{\partial\ell}{\partial w_1},
+\frac{\partial\ell}{\partial z}=p-y,
 \qquad
-\frac{\partial\ell}{\partial w_2},
+\frac{\partial\ell}{\partial w_j}=(p-y)\,x_j,
 \qquad
-\frac{\partial\ell}{\partial b}
+\frac{\partial\ell}{\partial b}=p-y
 $$
 
-- それぞれの微分値から、そのパラメータを増やしたときに損失が増えるか減るかが分かる
+- $p-y$ になる導出は、[前回のロジスティック関数と損失関数の微分](logistic-regression.qmd#peek-logistic-p-minus-y){.peek}にある
+- 更新式へ入れるのは、損失値 $0.913$ ではなくこの偏微分値
+- NNでは、この計算を接続を逆向きにたどる値の受け渡しとして行う
 
 
-## 勾配：3つの偏微分値をまとめて勾配と呼ぶ
+## 勾配：損失を $z$ で微分した値がニューロンへ届く
 
-$$
-\nabla_{w,b}\ell=
-\begin{bmatrix}
-\dfrac{\partial\ell}{\partial w_1}\\[4pt]
-\dfrac{\partial\ell}{\partial w_2}\\[4pt]
-\dfrac{\partial\ell}{\partial b}
-\end{bmatrix}
-$$
-
-- 勾配（[gradient]{.en}）：現在のパラメータの値において求めた、パラメータごとの偏微分値をまとめたもの
-
-
-## 勾配：更新に使うのは損失値そのものではなく偏微分値
-
-- 損失値 $\ell=0.913$：現在の予測がどの程度悪いかを表す
-- $\partial\ell/\partial w_1,\partial\ell/\partial w_2,\partial\ell/\partial b$：各パラメータをどちらへ動かすかを決める
-- 各微分値が正：そのパラメータを増やすと、損失関数の値は増える
-- 各微分値が負：そのパラメータを増やすと、損失関数の値は減る
-- [前回、損失値の $0.92$ そのものから勾配を求めたわけではないと注意した](logistic-regression.qmd#peek-parameter-gradients){.peek}
-
-::: {.takeaway}
-損失関数は偏微分値を決める。$0.913$ という損失値自体を、更新式へ直接代入するわけではない
-:::
-
-
-## 勾配：各パラメータについての微分値を連鎖律で求める
-
-```{.d2 sketch="true" width="84%"}
+```{.d2 sketch="true" width="72%"}
 direction: left
-L: "損失 ℓ" { style.fill: "#f5b7b1" }
-P: "確率 p" { style.fill: "#d5f5e3" }
-Z: "重み付き和 z" { style.fill: "#fff4e1" }
-WB: "パラメータ\nw₁, w₂, b" { style.fill: "#e1f5ff" }
-L -> P: "微分"
-P -> Z: "微分"
-Z -> WB: "微分"
+L: "損失\nℓ ≈ 0.913" { style.fill: "#f5b7b1" }
+DZ: "d_z = p − y\n= 0.4013 − 1\n≈ −0.5987" { style.fill: "#fff4e1"; style.stroke: "#e74c3c"; style.stroke-width: 5 }
+L -> DZ: "zで微分"
 ```
 
-- 予測では $x\rightarrow z\rightarrow p\rightarrow\ell$ と右へ計算した
-- 微分では $\ell\rightarrow p\rightarrow z\rightarrow w,b$ と逆向きに関係をつなぐ
+- 出発点は損失。ニューロンの $z$ には、微分値 $d_z=p-y\approx-0.5987$ が届く
+- $d_z$ はコードで使う変数名。$\partial\ell/\partial z$ の値を表す
+- $d_z$ が負なので、$z$ を増やす方向へ動かすと損失が下がる
+
+
+## 勾配：接続ごとに、届いた $d_z$ へForwardの入力を掛ける
+
+```{.d2 sketch="true" width="88%"}
+direction: left
+DZ: "d_z ≈ −0.5987" { style.fill: "#fff4e1" }
+W1: "d_w₁ = d_z × x₁\n= −0.5987 × 2\n≈ −1.1974" { style.fill: "#e1f5ff" }
+W2: "d_w₂ = d_z × x₂\n= −0.5987 × 0.5\n≈ −0.2993" { style.fill: "#e1f5ff" }
+B: "d_b = d_z × 1\n≈ −0.5987" { style.fill: "#e1f5ff" }
+DZ -> W1: "接続w₁を逆向きに通る"
+DZ -> W2: "接続w₂を逆向きに通る"
+DZ -> B
+```
+
+- 各接続は、届いた $d_z$ に「Forwardで自分を通った入力」を掛けて、自分の重みの微分値を作る
+- $w_1$ の接続をForwardで通ったのは $x_1=2$。よって $d_{w_1}=d_z\times x_1\approx-1.1974$
+- $z=w_1x_1+w_2x_2+b$ で $b$ は1倍で足されていたので、$d_b=d_z$
+- $d_{w_1},d_{w_2},d_b$ は、$\partial\ell/\partial w_1,\ \partial\ell/\partial w_2,\ \partial\ell/\partial b$ の値
+
+::: {.callout-note}
+[前回、丸めた $p=0.4$ から手計算した $-1.2,\ -0.3,\ -0.6$](logistic-regression.qmd#peek-parameter-gradients){.peek}の丸め前の値
+:::
 
 
 ## 勾配：この逆向きの計算をBackwardと呼ぶ
 
-- Backward（[backward pass]{.en}、逆伝播）：連鎖律を使い、損失関数を各パラメータで偏微分した値を求める計算
-- 誤差逆伝播法（[backpropagation]{.en}、BP）：ネットワークの接続を逆向きにたどり、各偏微分値を求める方法
+- Backward（[backward pass]{.en}、逆向きの計算）：出力側から連鎖律をたどり、各パラメータの勾配を求める工程
+- 誤差逆伝播法（[backpropagation]{.en}、BP）：ネットワークの接続を出力側から逆向きにたどることで、Backwardを行う方法
 
 ```text
 Forward  : x ──→ z ──→ p ──→ ℓ
 Backward :       d_w, d_b ←── d_z ←── ℓ
 ```
 
-- 今回はニューロン1個なので経路は短い
+- 今回のロジスティック回帰も、ニューロン1個のNNにおけるbackpropagationの最小例
 - 隠れ層が増えても、出力側で求めた微分値から順につないでいく
 
 
-## 勾配：最初に損失関数を $z$ で微分する
+## 勾配：3つの計算を `backward` にまとめる {#peek-one-layer-backward}
 
-- [ロジスティック関数と二値交差エントロピーを微分した結果](logistic-regression.qmd#peek-logistic-p-minus-y){.peek}は次の式だった
-
-$$
-d_z
-=\frac{\partial\ell}{\partial z}
-=p-y
-$$
-
-- $d_z$ はコードで使う変数名
-- 数式の $\partial\ell/\partial z$ と同じ値を表す
-
-
-## 勾配：この魚では $d_z\approx-0.5987$
-
-$$
-d_z=p-y
-=0.4013-1
-\approx-0.5987
-$$
-
-```python
-d_z = p - y
-```
-
-```text
-d_z: -0.598687660112452
-```
-
-- 負の値なので、$z$ を増やす方向へ動かすと損失が下がる
-- [前回、丸めた $p=0.4$ で手計算した $p-y=-0.6$](logistic-regression.qmd#peek-parameter-gradients){.peek} の丸め前の値
-
-
-## 勾配：$w_1$ に関する微分値は $d_z$ に $x_1$ を掛ける
-
-```{.d2 sketch="true" width="64%"}
-direction: right
-X: "x₁ = 2" { shape: circle; style.fill: "#e1f5ff" }
-W: "接続 w₁" { style.fill: "#fff4e1"; style.stroke-width: 4 }
-Z: "z" { shape: circle; style.fill: "#eeeeee" }
-X -> W -> Z
-```
-
-$$
-d_{w_1}
-=\frac{\partial\ell}{\partial w_1}
-=d_zx_1
-=-0.5987\times2
-\approx-1.1974
-$$
-
-
-## 勾配：$w_2$ に関する微分値は $d_z$ に $x_2$ を掛ける
-
-```{.d2 sketch="true" width="64%"}
-direction: right
-X: "x₂ = 0.5" { shape: circle; style.fill: "#e1f5ff" }
-W: "接続 w₂" { style.fill: "#fff4e1"; style.stroke-width: 4 }
-Z: "z" { shape: circle; style.fill: "#eeeeee" }
-X -> W -> Z
-```
-
-$$
-d_{w_2}
-=\frac{\partial\ell}{\partial w_2}
-=d_zx_2
-=-0.5987\times0.5
-\approx-0.2993
-$$
-
-
-## 勾配：$b$ に関する微分値は $d_z$ と同じ
-
-- $z=w_1x_1+w_2x_2+b$ では、$b$ はそのまま1倍されている
-
-$$
-d_b
-=\frac{\partial\ell}{\partial b}
-=d_z\times1
-=d_z
-\approx-0.5987
-$$
-
-```python
-d_b = d_z
-```
-
-
-## 勾配：2本の重みに関する微分値をNumPyでまとめる
+- 2本分の重みの微分値は、NumPyでまとめて計算できる：
 
 $$
 \begin{bmatrix}d_{w_1}\\d_{w_2}\end{bmatrix}
 =d_z
 \begin{bmatrix}x_1\\x_2\end{bmatrix}
 $$
-
-```python
-d_w = d_z * x
-```
-
-```text
-d_w: [-1.19737532 -0.29934383]
-```
-
-- `d_w[0]` が $w_1$ に関する微分値
-- `d_w[1]` が $w_2$ に関する微分値
-
-
-## 勾配：3つの計算を `backward` へまとめる {#peek-one-layer-backward}
 
 ```python
 def backward(x, y, p):
@@ -883,16 +596,7 @@ def backward(x, y, p):
     # ③ 損失関数をバイアスで偏微分した値
     d_b = d_z
     return d_w, d_b
-```
 
-- `backward` の入力：Forwardで使った `x`、正解 `y`、Forwardで得た `p`
-- `backward` の出力：更新に使う `d_w, d_b`
-- [前回書いた勾配の3行](logistic-regression.qmd#peek-gradient-code){.peek}を、そのまま関数の形にした
-
-
-## 勾配：`backward` が返した値を確認する {#peek-one-layer-gradient-map}
-
-```python
 d_w, d_b = backward(x, y, p)
 ```
 
@@ -901,34 +605,76 @@ d_w: [-1.19737532 -0.29934383]
 d_b: -0.598687660112452
 ```
 
-| 値 | 対応する微分値 | 更新するもの |
-|---|---|---|
-| `d_w[0]` | $\partial\ell/\partial w_1$ | 1本目の接続の $w_1$ |
-| `d_w[1]` | $\partial\ell/\partial w_2$ | 2本目の接続の $w_2$ |
-| `d_b` | $\partial\ell/\partial b$ | 出力層の $b$ |
-
-- [前回、同じ魚で手計算した $-1.2,\ -0.3,\ -0.6$](logistic-regression.qmd#peek-parameter-gradients){.peek} の丸め前の値が求まった
+- `backward` の入力：Forwardで使った `x`、正解 `y`、Forwardの出力 `p`
+- `backward` の出力：更新に使う `d_w, d_b`。`d_w[0]` が $w_1$、`d_w[1]` が $w_2$ の微分値
+- [前回書いた勾配の3行](logistic-regression.qmd#peek-gradient-code){.peek}を、そのまま関数の形にした
 
 
-## 更新：求めた勾配で $w,b$ を動かす
+## **演習** 1匹の魚でForwardとBackwardを実行する {.badge-practice}
 
-```{.d2 sketch="true" width="92%"}
-direction: right
-A: "構成 ✓\nw=(−0.2, 0)\nb=0" { style.fill: "#e1f5ff" }
-B: "予測 ✓\np=0.4013" { style.fill: "#fff4e1" }
-C: "採点 ✓\nℓ=0.913" { style.fill: "#f5b7b1" }
-D: "勾配 ✓\nd_w=(−1.1974, −0.2993)\nd_b=−0.5987" { style.fill: "#fdebd0" }
-E: "更新\n値を動かす" { style.fill: "#d5f5e3"; style.stroke: "#e74c3c"; style.stroke-width: 5 }
-A -> B -> C -> D -> E
+### 問題：スライドの数値を自分のコードで再現する
+
+ここまでに作った関数を1つのPythonファイルにまとめ、魚 $x=(2,\,0.5)$、$y=1$ でForwardとBackwardを実行せよ。
+
+0. `import numpy as np`、`x = np.array([2.0, 0.5])`、`y = 1.0`、`w = np.array([-0.2, 0.0])`、`b = 0.0` を用意
+1. `linear`・`sigmoid`・`forward`・`binary_cross_entropy`・`backward` の5つを実装
+2. `forward` で `z` と `p` を計算（両方表示）
+3. `binary_cross_entropy` で `loss` を計算（表示）
+4. `backward` で `d_w` と `d_b` を計算（両方表示）
+5. 表示した値を、スライドの $p\approx0.4013$、$\ell\approx0.913$、$d_w\approx(-1.1974,\,-0.2993)$、$d_b\approx-0.5987$ と照合
+
+
+## 演習の解答例
+
+```{python}
+#| echo: true
+#| eval: false
+#| code-fold: true
+#| code-summary: "解答例を見る"
+import numpy as np
+
+def linear(x, w, b):
+    return x @ w + b
+
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
+
+def forward(x, w, b):
+    z = linear(x, w, b)
+    p = sigmoid(z)
+    return z, p
+
+def binary_cross_entropy(y, p):
+    eps = 1e-10
+    p = np.clip(p, eps, 1 - eps)
+    return -(y * np.log(p) + (1 - y) * np.log(1 - p))
+
+def backward(x, y, p):
+    d_z = p - y
+    d_w = d_z * x
+    d_b = d_z
+    return d_w, d_b
+
+x = np.array([2.0, 0.5])
+y = 1.0
+w = np.array([-0.2, 0.0])
+b = 0.0
+
+z, p = forward(x, w, b)
+loss = binary_cross_entropy(y, p)
+d_w, d_b = backward(x, y, p)
+
+print(f"z: {z}")
+print(f"p: {p}")
+print(f"loss: {loss}")
+print("d_w:", d_w)
+print("d_b:", d_b)
 ```
 
-- 求めた $d_w,d_b$ で $w_1,w_2,b$ を動かす。更新式は前回の勾配降下法と同じ
-- 動かした後、もう一度予測して、損失が下がることを確かめる
 
+## 更新：勾配と逆向きに $w,b$ を動かす
 
-## 更新：勾配と逆向きにパラメータを動かす
-
-- [ロジスティック回帰で使った勾配降下法](logistic-regression.qmd#peek-one-at-a-time){.peek}と同じ更新
+- [前回の勾配降下法](logistic-regression.qmd#peek-one-at-a-time){.peek}と同じ更新式を使う：
 
 $$
 w_j\leftarrow w_j-\alpha d_{w_j},
@@ -936,11 +682,8 @@ w_j\leftarrow w_j-\alpha d_{w_j},
 b\leftarrow b-\alpha d_b
 $$
 
-- $\alpha$：学習率（[learning rate]{.en}）。1回に動かす大きさを決める
-- コードではlearning rateを略して `lr` と書く
-
-
-## 更新：この魚では負の勾配を引く
+- $\alpha$：学習率（[learning rate]{.en}）。1回に動かす大きさを決める。ここでは $\alpha=0.1$ とする
+- この魚では $d_{w_1}\approx-1.1974$ が負なので、$-\alpha d_{w_1}$ は正：
 
 $$
 w_1\leftarrow-0.2
@@ -948,27 +691,18 @@ w_1\leftarrow-0.2
 \approx-0.0803
 $$
 
-- $d_{w_1}$ は負なので、`- lr * d_w[0]` は正
-- その結果、$w_1$ は $-0.2$ から $-0.0803$ へ増える
 - 「勾配と逆向き」は、勾配を引く更新式が自動的に処理する
 
 
-## 更新：`update` として実装する
+## 更新：`update` を実装して1回動かす
 
 ```python
 def update(w, b, d_w, d_b, lr):
     w = w - lr * d_w
     b = b - lr * d_b
     return w, b
-```
 
-- `w` と `b` の両方を、同じ時点で求めた勾配で更新する
-- 更新後の値を返し、次の予測で使う
-
-
-## 更新：1回の実行で $w,b$ が変わる
-
-```python
+# 学習率αは、learning rateを略して lr と書く
 lr = 0.1
 w, b = update(w, b, d_w, d_b, lr)
 ```
@@ -981,8 +715,8 @@ w, b = update(w, b, d_w, d_b, lr)
 更新後 b: 0.0598687660112452
 ```
 
-- ネットワークの接続は同じ
-- 接続の重み $w_1,w_2$ と、出力層のバイアス $b$ が変わった
+- ネットワークの接続は変わらない。変わるのは、接続の重み $w_1,w_2$ と出力層のバイアス $b$ の値
+- 更新後の値は、次のForwardで使う
 
 
 ## 更新：新しい $w,b$ でもう一度予測する
@@ -1057,20 +791,25 @@ X -> H -> O -> P
 
 - NNは、計算するニューロンを重み付きの接続でつないだモデル
 - ロジスティック回帰は、隠れ層がなく、出力層にニューロンが1個のNN
-- Forwardは入力から予測、Backwardは損失からパラメータの勾配を計算
+- NNとして実装するとは、この計算を関数のあいだの値の受け渡しとして書くこと
+  - Forwardでは、入力の値が接続を通って出力へ進む
+  - Backwardでは、損失の微分値が同じ接続を逆向きに進む
 - Updateで重みとバイアスを動かすと、次のForwardと損失が変わる
 
 
 ## 練習問題
 
-### 問題：1回の学習ステップを自分で実装する
+### 問題：80匹の魚を1匹ずつ学習させる
 
-先ほどの魚 $x=(2,0.5)$、$y=1$ について、学習率 `lr = 0.05` で1回更新せよ。
+[前回、勾配の3行で学習させた80匹の魚](logistic-regression.qmd#peek-one-at-a-time){.peek}を、今回作った4つの関数で学習させよ。
 
-1. `forward` で更新前の `p` と `loss` を計算
-2. `backward` で `d_w, d_b` を計算
-3. `update` で `w, b` を更新
-4. 更新後の `p` と `loss` を表示
+0. [前回の魚データの定義](logistic-regression.qmd#peek-forward){.peek}をコピーし、`X_norm` と `y` を用意
+1. 今回作った `forward`・`binary_cross_entropy`・`backward`・`update`（と部品の `linear`・`sigmoid`）を用意
+2. `w = np.array([0.0, 0.0])`、`b = 0.0`、`lr = 0.5` で初期化（前回の学習と同じ値）
+3. 80匹を順に1匹ずつ学習（1匹ごとに `forward`、`backward`、`update` を実行）
+4. 学習前と、10匹学習するごとに、全魚の平均損失を表示（おおむね下がり続けることを確認）
+
+- 全魚の平均損失は、`binary_cross_entropy` で1匹ずつ損失を求めて平均する。更新には使わず、表示専用
 
 
 ## 問題の解答例
@@ -1082,12 +821,51 @@ X -> H -> O -> P
 #| code-summary: "解答例を見る"
 import numpy as np
 
+# 手順0：前回の魚データの定義（前回のスライドからコピー）
+salmon_weights     = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,
+                               1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,
+                               2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,
+                               1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652])
+salmon_brightness  = np.array([3.5, 5.8, 4.9, 4.4, 2.6, 2.6, 2.2, 5.5, 4.4, 4.8, 2.1,
+                               5.9, 5.3, 2.8, 2.7, 2.7, 3.2, 4.1, 3.7, 3.2, 4.4, 2.6,
+                               3.2, 3.5, 3.8, 5.1, 2.8, 4.1, 4.4, 2.2, 4.4, 2.7, 2.3,
+                               5.8, 5.9, 5.2, 3.2, 2.4, 4.7, 3.8])
+seabass_weights    = np.array([1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,
+                               1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,
+                               1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,
+                               1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531])
+seabass_brightness = np.array([5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8,
+                               8.9, 9.7, 9.5, 8.0, 9.6, 5.4, 6.0, 5.2, 6.6, 6.9, 6.4,
+                               9.1, 6.8, 6.4, 7.7, 5.7, 9.0, 5.4, 9.9, 8.9, 6.0, 5.0,
+                               9.1, 8.5, 8.6, 8.9, 5.4, 6.8, 5.6])
+
+X = np.column_stack([
+    np.concatenate([salmon_brightness, seabass_brightness]),
+    np.concatenate([salmon_weights,    seabass_weights])
+])
+y = np.array([1]*40 + [0]*40)   # 1=Salmon, 0=Sea bass
+
+# スケールを揃える（クラスタリング回の教訓）
+X_norm = (X - X.mean(axis=0)) / X.std(axis=0)
+
+# Salmon, Sea bass, Salmon, ... と交互に並べ替えておく
+order = np.empty(80, dtype=int)
+order[0::2] = np.arange(0, 40)
+order[1::2] = np.arange(40, 80)
+X_norm = X_norm[order]
+y      = y[order]
+
+# 手順1：今回作った関数
+def linear(x, w, b):
+    return x @ w + b
+
 def sigmoid(z):
     return 1 / (1 + np.exp(-z))
 
 def forward(x, w, b):
-    z = x @ w + b
-    return z, sigmoid(z)
+    z = linear(x, w, b)
+    p = sigmoid(z)
+    return z, p
 
 def binary_cross_entropy(y, p):
     eps = 1e-10
@@ -1101,23 +879,29 @@ def backward(x, y, p):
     return d_w, d_b
 
 def update(w, b, d_w, d_b, lr):
-    return w - lr * d_w, b - lr * d_b
+    w = w - lr * d_w
+    b = b - lr * d_b
+    return w, b
 
-x = np.array([2.0, 0.5])
-y = 1.0
-w = np.array([-0.2, 0.0])
+# 表示専用：全魚の損失を1匹ずつ求めて平均する（更新には使わない）
+def average_loss(X, y, w, b):
+    total = 0.0
+    for i in range(len(y)):
+        z, p = forward(X[i], w, b)
+        total += binary_cross_entropy(y[i], p)
+    return total / len(y)
+
+# 手順2：初期化
+w = np.array([0.0, 0.0])
 b = 0.0
-lr = 0.05
+lr = 0.5
 
-_, p_before = forward(x, w, b)
-loss_before = binary_cross_entropy(y, p_before)
-d_w, d_b = backward(x, y, p_before)
-w, b = update(w, b, d_w, d_b, lr)
-_, p_after = forward(x, w, b)
-loss_after = binary_cross_entropy(y, p_after)
-
-print(f"更新前 p={p_before:.4f}, loss={loss_before:.4f}")
-print(f"更新後 p={p_after:.4f}, loss={loss_after:.4f}")
-print("更新後 w:", w)
-print("更新後 b:", b)
+# 手順3・4：80匹を1匹ずつ学習し、10匹ごとに平均損失を表示
+print(f"学習前の平均損失: {average_loss(X_norm, y, w, b):.4f}")
+for i in range(80):
+    z, p = forward(X_norm[i], w, b)
+    d_w, d_b = backward(X_norm[i], y[i], p)
+    w, b = update(w, b, d_w, d_b, lr)
+    if (i + 1) in [10, 20, 30, 40, 50, 60, 70, 80]:
+        print(f"{i + 1}匹目までの平均損失: {average_loss(X_norm, y, w, b):.4f}")
 ```
