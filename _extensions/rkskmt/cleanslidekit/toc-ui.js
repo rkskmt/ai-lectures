@@ -35,9 +35,10 @@
 
     var STYLE = [
       // same translucent-circle style as the home/search buttons, stacked
-      // above the home button in the bottom-right corner
+      // above the home button in the bottom-right corner cluster (offsets
+      // listed in custom.css)
       '#toc-btn {',
-      '  position: fixed; bottom: 98px; right: 14px; z-index: 100;',
+      '  position: fixed; bottom: 138px; right: 14px; z-index: 100;',
       '  width: 34px; height: 34px; box-sizing: border-box; padding: 0;',
       '  display: flex; align-items: center; justify-content: center;',
       '  border: 2px solid rgba(0,0,0,0.25); border-radius: 50%;',
