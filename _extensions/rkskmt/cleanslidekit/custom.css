@@ -322,6 +322,24 @@ table td:first-child {
   margin: 0;
   line-height: 1.4;
 }
+/* Dark variant — `::: {.takeaway .dark}` fills the box with the frame's
+   near-black and flips the text to white, for a message that should weigh as
+   much as the `###` band. Opt-in: the plain frame stays the default so a
+   closing message normally reads apart from the solid heading. */
+.reveal .takeaway.dark {
+  background: #131516;
+  color: #fff;
+}
+/* Inline code and links bring their own blue/teal, which sinks into the
+   near-black: let them take the white. Code stays distinct by its bold
+   monospace face, links by an underline. */
+.reveal .takeaway.dark :not(pre) > code,
+.reveal .takeaway.dark a {
+  color: inherit;
+}
+.reveal .takeaway.dark a {
+  text-decoration: underline;
+}
 .tweak {
   width: fit-content;
   max-width: 96%;
@@ -470,13 +488,13 @@ table td:first-child {
 }
 /* Bottom-right corner cluster (top-right is badge-only). The slide nav
    (‹ n / N ›, 32px tall) takes the bottom row at bottom 14px; above it the
-   34px round buttons stack with 8px gaps: search 54px, Home 96px, slide
+   34px round buttons stack with 8px gaps: Home 54px, search 96px, slide
    list 138px (toc-ui.js). Change one offset and the rest must follow. */
 /* Home button: same translucent-circle style as the search button,
-   stacked directly above it. */
+   at the bottom of the stack, directly above the slide nav. */
 #home-btn {
   position: fixed;
-  bottom: 96px;
+  bottom: 54px;
   right: 14px;
   z-index: 100;
   width: 34px;
@@ -503,8 +521,8 @@ table td:first-child {
 }
 #home-btn svg { width: 18px; height: 18px; display: block; pointer-events: none; }
 /* Search button (created by search-ui.js at top:54px) moved to the bottom-right
-   cluster, directly above the slide nav. */
-#search-btn { top: auto !important; bottom: 54px !important; }
+   cluster, directly above the Home button. */
+#search-btn { top: auto !important; bottom: 96px !important; }
 /* Quarto's footer spans the viewport by default. Shrink-wrap the navigation so
    the invisible remainder cannot intercept controls on a scrolled slide.
    It sits in the bottom-right corner instead of bottom center: body text is
