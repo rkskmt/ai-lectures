@@ -43,6 +43,7 @@ Use Python as the vehicle, but frame concepts as broadly as possible. Where a co
 
 - `##` delimits slides (do not use `---`)
 - `_metadata.yaml` applies the `cleanslidekit-revealjs` format (+ `d2`/`lightbox` filters) to all `.qmd` files; theme, CSS, and UI JS ship from `_extensions/rkskmt/cleanslidekit/`
+- **Theme classes and their attributes are catalogued in `_extensions/rkskmt/cleanslidekit/_schema.yml`** (`.table-style`, `.table-compact`, `.fig`, `.peek`, badges, …, each with its attributes); the kit's snippets sit beside it in `_snippets.json`. Read the schema before proposing or writing layout markup instead of guessing class names. It ships inside the vendored theme, so it is current on every clone.
 - **Do not add frontmatter to `index.qmd`.** Quarto **merges** (not overwrites) `format` from `_metadata.yaml` and the file, so adding `format: html` causes it to render in both formats and trigger a `rename` error. Raw HTML (e.g. `<details>/<summary>`) is fine — it needs no frontmatter.
 - **Do not use `listing:` in `index.qmd` either.** Same reason — it requires `format: html`, which conflicts.
 - `render: ["*.qmd"]` in `_quarto.yml` prevents `.md` files (e.g. CLAUDE.md) from being rendered
