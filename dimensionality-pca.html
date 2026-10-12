@@ -264,18 +264,18 @@ rkskmt
 <h2>特徴量の数を増やすのが最強か？</h2>
 <div class="slide-body">
 <ul>
-<li><strong>重さだけ</strong>でサーモンを分類 → ある程度できた</li>
-<li><strong>輝度も追加</strong>して2次元で分類 → 精度が上がった</li>
+<li><strong>重さだけ</strong>でサーモンを分類すると、ある程度できた</li>
+<li><strong>輝度も追加</strong>して2次元で分類すると、精度が上がった</li>
 <li>ならば<strong>特徴量を増やし続ければ</strong>もっと精度が上がる？</li>
 </ul>
-<div title="今回の問い">
+<div title="今回の主題">
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>今回の問い</strong></p>
+<p><strong>今回の主題</strong></p>
 </div>
 <div class="callout-content">
 <p>特徴量（次元）を増やし続けると何が起きるか？</p>
@@ -342,7 +342,7 @@ rkskmt
 </div>
 </div>
 <div class="fragment">
-<div id="7a94ffa3" class="cell" data-execution_count="1">
+<div id="0e1f5101" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-3"><a></a><span class="im">import</span> japanize_matplotlib</span>
@@ -370,7 +370,7 @@ rkskmt
 20次元: いちばん近い点まで 1.195</code></pre>
 </div>
 </div>
-<div id="84d5604f" class="cell" data-execution_count="2">
+<div id="e73583ca" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -379,10 +379,24 @@ rkskmt
 </div>
 </div>
 </div>
+<div title="結果">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>結果</strong></p>
+</div>
+<div class="callout-content">
 <ul>
-<li>10次元で <strong>0.67</strong>、20次元では <strong>1.2</strong> — もはや「お隣さん」は存在しない</li>
+<li>10次元で <strong>0.70</strong>、20次元では <strong>1.2</strong>。もはや「お隣さん」は存在しない</li>
 <li>同じ100点なのに。なぜこんなことが起きるのか、2つの理由を見る</li>
 </ul>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 </section>
@@ -395,7 +409,7 @@ rkskmt
 </ul>
 <p><span class="math display">\[\left(\frac{1}{2}\right)^d \qquad
 \text{1次元: } 50\% \quad \text{3次元: } 12.5\% \quad \text{10次元: } 0.1\% \quad \text{20次元: } 100万分の1\]</span></p>
-<div id="70a537f9" class="cell" data-execution_count="3">
+<div id="88539107" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -404,10 +418,24 @@ rkskmt
 </div>
 </div>
 </div>
+<div title="要するに">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>要するに</strong></p>
+</div>
+<div class="callout-content">
 <ul>
-<li>ほぼすべての点が、<strong>どこかの軸では端っこ</strong> — つまり「角のあたり」に住むことになる</li>
+<li>ほぼすべての点が、<strong>どこかの軸では端っこ</strong>。つまり「角のあたり」に住むことになる</li>
 <li>しかも角の数は <span class="math inline">\(2^d\)</span> 個（20次元で約105万個）。<strong>データは100万個の角に散り散り</strong>になる</li>
 </ul>
+</div>
+</div>
+</div>
+</div>
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -427,11 +455,11 @@ rkskmt
 <h2>なぜ？　その2：「ご近所」を集めると世界を覆ってしまう</h2>
 <div class="slide-body">
 <ul>
-<li>k-NN の気持ちになって、周りの<strong>データの1%</strong>を「ご近所」として集めたい</li>
-<li>各軸を割合 <span class="math inline">\(r\)</span> だけ切り取った箱は、データの <span class="math inline">\(r^d\)</span> 割を含む → 1% 集めるには：</li>
+<li>「近い点」を頼りにする手法のつもりで、周りの<strong>データの1%</strong>を「ご近所」として集めたい</li>
+<li>各軸を割合 <span class="math inline">\(r\)</span> だけ切り取った箱は、データの <span class="math inline">\(r^d\)</span> 割を含む。1% 集めるには：</li>
 </ul>
 <p><span class="math display">\[r = 0.01^{1/d}\]</span></p>
-<div id="6c9c7c0b" class="cell" data-execution_count="4">
+<div id="d4dbdea7" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -440,10 +468,24 @@ rkskmt
 </div>
 </div>
 </div>
+<div title="要するに">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>要するに</strong></p>
+</div>
+<div class="callout-content">
 <ul>
 <li>10次元では、たった1%の「ご近所」を集めるのに<strong>各軸の63%</strong>を見渡す必要がある</li>
-<li>それはもう「近所」ではない — <strong>「近い」に頼る手法（k-NN など）が最初に壊れる</strong></li>
+<li>それはもう「近所」ではない。<strong>「近い」に頼る手法（k-means など）が最初に壊れる</strong></li>
 </ul>
+</div>
+</div>
+</div>
+</div>
 </div>
 </section>
 <section id="距離が意味をなさなくなる" class="slide level2">
@@ -453,7 +495,7 @@ rkskmt
 <li>k-means をはじめ、多くの手法は<strong>距離</strong>に依存している</li>
 <li>高次元では最近傍と最遠傍の距離差が消えていく</li>
 </ul>
-<div id="d05d963d" class="cell" data-execution_count="5">
+<div id="c4cce5fb" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a>np.random.seed(<span class="dv">42</span>)</span>
 <span id="cb3-2"><a></a>dims    <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">50</span>, <span class="dv">100</span>]</span>
 <span id="cb3-3"><a></a>cv_list <span class="op">=</span> []   <span class="co"># 変動係数 = std / mean</span></span>
@@ -501,7 +543,7 @@ rkskmt
 <ul>
 <li>同じサンプル数でも、次元が増えると空間が広くなりすぎる</li>
 </ul>
-<div id="16da0cf0" class="cell" data-execution_count="6">
+<div id="7fb31b81" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -519,7 +561,7 @@ rkskmt
 <p><strong>ノート</strong></p>
 </div>
 <div class="callout-content">
-<p>密度を保つには、次元数に対して<strong>指数的にサンプルを増やす</strong>必要がある。 10次元で十分な密度を確保するには、1次元の <span class="math inline">\(10^{10}\)</span> 倍のサンプルが必要という計算になる。</p>
+<p>密度を保つには、次元数に対して<strong>指数的にサンプルを増やす</strong>必要がある。 1次元で10点あれば足りた密度を10次元で保つには、<span class="math inline">\(10^{10}\)</span> 点が必要という計算になる。</p>
 </div>
 </div>
 </div>
@@ -565,8 +607,8 @@ rkskmt
 <div class="callout-content">
 <ol type="1">
 <li><strong>特徴量選択</strong>：重要な特徴量だけを残す</li>
-<li><strong>次元削減</strong>：情報を保ったまま次元を圧縮する（← 今回）</li>
-<li><strong>正則化（<span class="en">regularization</span>）</strong>：過学習を防ぐ（回帰問題で詳しく）</li>
+<li><strong>次元削減</strong>：情報を保ったまま次元を圧縮する</li>
+<li><strong>正則化（<span class="en">regularization</span>）</strong>：過学習を防ぐ（線形回帰の回で扱う）</li>
 </ol>
 </div>
 </div>
@@ -585,7 +627,7 @@ rkskmt
 <ul>
 <li>重さ・輝度で精度が上がった。気を良くして、80匹全部の<strong>体長</strong>も測った</li>
 </ul>
-<div id="2963dacb" class="cell" data-execution_count="7">
+<div id="9d5c0825" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>魚データの定義（クリックして展開）</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a></a>salmon_weights     <span class="op">=</span> np.array([<span class="dv">2149</span>, <span class="dv">1959</span>, <span class="dv">2194</span>, <span class="dv">2457</span>, <span class="dv">1930</span>, <span class="dv">1930</span>, <span class="dv">2474</span>, <span class="dv">2230</span>, <span class="dv">1859</span>, <span class="dv">2163</span>,</span>
@@ -605,16 +647,23 @@ rkskmt
 <span id="cb4-15"><a></a>                               <span class="fl">9.1</span>, <span class="fl">6.8</span>, <span class="fl">6.4</span>, <span class="fl">7.7</span>, <span class="fl">5.7</span>, <span class="fl">9.0</span>, <span class="fl">5.4</span>, <span class="fl">9.9</span>, <span class="fl">8.9</span>, <span class="fl">6.0</span>, <span class="fl">5.0</span>,</span>
 <span id="cb4-16"><a></a>                               <span class="fl">9.1</span>, <span class="fl">8.5</span>, <span class="fl">8.6</span>, <span class="fl">8.9</span>, <span class="fl">5.4</span>, <span class="fl">6.8</span>, <span class="fl">5.6</span>])</span>
 <span id="cb4-17"><a></a></span>
-<span id="cb4-18"><a></a>weights    <span class="op">=</span> np.concatenate([salmon_weights, seabass_weights])</span>
-<span id="cb4-19"><a></a>brightness <span class="op">=</span> np.concatenate([salmon_brightness, seabass_brightness])</span>
-<span id="cb4-20"><a></a>y          <span class="op">=</span> np.array([<span class="dv">1</span>]<span class="op">*</span><span class="dv">40</span> <span class="op">+</span> [<span class="dv">0</span>]<span class="op">*</span><span class="dv">40</span>)   <span class="co"># 1=Salmon, 0=Sea bass</span></span>
-<span id="cb4-21"><a></a></span>
-<span id="cb4-22"><a></a><span class="co"># 体長の測定値（cm）</span></span>
-<span id="cb4-23"><a></a>rng     <span class="op">=</span> np.random.default_rng(<span class="dv">42</span>)</span>
-<span id="cb4-24"><a></a>lengths <span class="op">=</span> np.<span class="bu">round</span>(np.cbrt(weights) <span class="op">*</span> <span class="fl">4.5</span> <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="fl">1.0</span>, <span class="bu">len</span>(weights)), <span class="dv">1</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb4-18"><a></a><span class="co"># 体長の測定値（cm）</span></span>
+<span id="cb4-19"><a></a>salmon_lengths     <span class="op">=</span> np.array([<span class="fl">58.4</span>, <span class="fl">55.3</span>, <span class="fl">59.2</span>, <span class="fl">61.7</span>, <span class="fl">54.1</span>, <span class="fl">54.7</span>, <span class="fl">61.0</span>, <span class="fl">58.5</span>, <span class="fl">55.3</span>, <span class="fl">57.3</span>,</span>
+<span id="cb4-20"><a></a>                               <span class="fl">56.2</span>, <span class="fl">56.1</span>, <span class="fl">57.4</span>, <span class="fl">51.8</span>, <span class="fl">51.8</span>, <span class="fl">54.2</span>, <span class="fl">54.0</span>, <span class="fl">56.6</span>, <span class="fl">54.9</span>, <span class="fl">52.3</span>,</span>
+<span id="cb4-21"><a></a>                               <span class="fl">56.8</span>, <span class="fl">55.1</span>, <span class="fl">58.5</span>, <span class="fl">58.6</span>, <span class="fl">55.2</span>, <span class="fl">55.2</span>, <span class="fl">59.4</span>, <span class="fl">57.8</span>, <span class="fl">55.5</span>, <span class="fl">57.5</span>,</span>
+<span id="cb4-22"><a></a>                               <span class="fl">57.3</span>, <span class="fl">54.7</span>, <span class="fl">56.0</span>, <span class="fl">51.3</span>, <span class="fl">53.1</span>, <span class="fl">56.1</span>, <span class="fl">53.9</span>, <span class="fl">55.8</span>, <span class="fl">53.4</span>, <span class="fl">53.8</span>])</span>
+<span id="cb4-23"><a></a>seabass_lengths    <span class="op">=</span> np.array([<span class="fl">54.2</span>, <span class="fl">50.0</span>, <span class="fl">50.7</span>, <span class="fl">51.0</span>, <span class="fl">55.4</span>, <span class="fl">51.5</span>, <span class="fl">55.1</span>, <span class="fl">58.8</span>, <span class="fl">57.2</span>, <span class="fl">51.2</span>,</span>
+<span id="cb4-24"><a></a>                               <span class="fl">51.8</span>, <span class="fl">54.7</span>, <span class="fl">45.0</span>, <span class="fl">49.3</span>, <span class="fl">53.7</span>, <span class="fl">51.6</span>, <span class="fl">58.1</span>, <span class="fl">52.0</span>, <span class="fl">48.1</span>, <span class="fl">50.5</span>,</span>
+<span id="cb4-25"><a></a>                               <span class="fl">52.9</span>, <span class="fl">50.5</span>, <span class="fl">51.7</span>, <span class="fl">48.5</span>, <span class="fl">50.8</span>, <span class="fl">52.5</span>, <span class="fl">48.2</span>, <span class="fl">51.8</span>, <span class="fl">50.8</span>, <span class="fl">50.5</span>,</span>
+<span id="cb4-26"><a></a>                               <span class="fl">48.7</span>, <span class="fl">54.2</span>, <span class="fl">50.5</span>, <span class="fl">49.3</span>, <span class="fl">53.4</span>, <span class="fl">49.1</span>, <span class="fl">51.5</span>, <span class="fl">46.6</span>, <span class="fl">48.7</span>, <span class="fl">51.6</span>])</span>
+<span id="cb4-27"><a></a></span>
+<span id="cb4-28"><a></a>weights    <span class="op">=</span> np.concatenate([salmon_weights, seabass_weights])</span>
+<span id="cb4-29"><a></a>brightness <span class="op">=</span> np.concatenate([salmon_brightness, seabass_brightness])</span>
+<span id="cb4-30"><a></a>lengths    <span class="op">=</span> np.concatenate([salmon_lengths, seabass_lengths])</span>
+<span id="cb4-31"><a></a>y          <span class="op">=</span> np.array([<span class="dv">1</span>]<span class="op">*</span><span class="dv">40</span> <span class="op">+</span> [<span class="dv">0</span>]<span class="op">*</span><span class="dv">40</span>)   <span class="co"># 1=Salmon, 0=Sea bass</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="c9535503" class="cell" data-execution_count="8">
+<div id="a7dc7eb2" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-stdout">
 <pre><code>体長（先頭5匹）: [58.4 55.3 59.2 61.7 54.1] cm
 体長の範囲: 45.0〜61.7 cm</code></pre>
@@ -640,7 +689,7 @@ rkskmt
 <section id="体長と重さを並べてみる" class="slide level2">
 <h2>体長と重さを並べてみる</h2>
 <div class="slide-body">
-<div id="c5406933" class="cell" data-execution_count="9">
+<div id="9048cd06" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">5.5</span>, <span class="fl">3.6</span>))</span>
 <span id="cb6-2"><a></a>plt.scatter(lengths, weights, alpha<span class="op">=</span><span class="fl">0.6</span>, s<span class="op">=</span><span class="dv">40</span>, c<span class="op">=</span><span class="st">"#5dade2"</span>, edgecolors<span class="op">=</span><span class="st">"gray"</span>)</span>
 <span id="cb6-3"><a></a>plt.xlabel(<span class="st">"体長 (cm)"</span>)<span class="op">;</span> plt.ylabel(<span class="st">"重さ (g)"</span>)</span>
@@ -660,24 +709,36 @@ rkskmt
 <pre><code>相関係数: 0.973</code></pre>
 </div>
 </div>
-<div class="fragment">
+<div class="fragment" title="ここまでで分かること">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ここまでで分かること</strong></p>
+</div>
+<div class="callout-content">
 <ul>
-<li>ほぼ<strong>一直線</strong>。長い魚は重い — あたりまえだった</li>
+<li>ほぼ<strong>一直線</strong>。長い魚は重い。あたりまえだった</li>
 <li>体長と重さは、<strong>ほぼ同じ情報を2回測っていた</strong></li>
 <li>この「実は重複している」を自動で見つけて畳む道具が <strong>PCA</strong></li>
 </ul>
 </div>
 </div>
+</div>
+</div>
+</div>
 </section>
-<section id="pca-の直感" class="slide level2">
-<h2>PCA の直感</h2>
+<section id="主成分分析pcaの直感" class="slide level2">
+<h2>主成分分析（PCA）の直感</h2>
 <div class="slide-body">
-<p><strong>Principal Component Analysis（主成分分析）</strong></p>
+<p><strong>主成分分析（<span class="en">Principal Component Analysis</span>、PCA）</strong></p>
 <ul>
 <li>斜めに細長い雲は、もとの2軸より「<strong>長い方向</strong>と<strong>細い方向</strong>」で見るほうが自然</li>
 <li>データの<strong>分散（<span class="en">variance</span>）が最大になる方向</strong>に新しい軸（主成分）を取る</li>
 </ul>
-<div id="900be51c" class="cell" data-execution_count="10">
+<div id="c6c89806" class="cell" data-execution_count="10">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -686,19 +747,33 @@ rkskmt
 </div>
 </div>
 </div>
+<div title="要するに">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>要するに</strong></p>
+</div>
+<div class="callout-content">
 <ul>
-<li>PC1 は体長と重さを合わせた「<strong>大きさ</strong>」の軸 — この方向だけで分散の約 99% を説明できる</li>
+<li>PC1 は体長と重さを合わせた「<strong>大きさ</strong>」の軸。この方向だけで分散の約 99% を説明できる</li>
 </ul>
 </div>
+</div>
+</div>
+</div>
+</div>
 </section>
-<section id="最小二乗法と-pca-足の下ろし方が違う" class="slide level2">
-<h2>最小二乗法と PCA — 「足」の下ろし方が違う</h2>
+<section id="最小二乗法と-pca足の下ろし方が違う" class="slide level2">
+<h2>最小二乗法と PCA：「足」の下ろし方が違う</h2>
 <div class="slide-body">
 <ul>
 <li>実はどちらも「<strong>足（誤差）の二乗和が最小になる直線</strong>」を探している</li>
 <li>違うのは<strong>足の向き</strong>だけ</li>
 </ul>
-<div id="1c6d6fcc" class="cell" data-execution_count="11">
+<div id="746d9f6a" class="cell" data-execution_count="11">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -708,8 +783,8 @@ rkskmt
 </div>
 </div>
 <ul>
-<li><strong>最小二乗法（<span class="en">least squares</span>）</strong>：仕事は「<span class="math inline">\(y\)</span> を当てる」→ 誤差は<strong>縦</strong>に測る（<a href="./linear-regression.html">線形回帰の回</a>で本格的に使う）</li>
-<li><strong>PCA</strong>：仕事は「データの形を要約する」→ 誤差は直線への<strong>最短距離（垂直の足）</strong>で測る</li>
+<li><strong>最小二乗法（<span class="en">least squares</span>）</strong>：仕事は「<span class="math inline">\(y\)</span> を当てる」ので、誤差は<strong>縦</strong>に測る（<a href="./linear-regression.html">線形回帰の回</a>で本格的に使う）</li>
+<li><strong>PCA</strong>：仕事は「データの形を要約する」ので、誤差は直線への<strong>最短距離（垂直の足）</strong>で測る</li>
 <li>足の向きが違うので、選ばれる直線も<strong>少し違う</strong>（回帰の傾き 0.97、PC1 の傾き 1.00）</li>
 </ul>
 <div title="「分散最大」と「垂直の足最小」は同じこと">
@@ -732,7 +807,7 @@ rkskmt
 <section id="section-2" class="slide level2 center break-slide" data-background-color="white">
 <h2></h2>
 <div class="break-title">
-<p>発展：なぜ固有ベクトルなのか</p>
+<p>なぜ固有ベクトルなのか</p>
 </div>
 </section>
 <section id="分散が最大の方向を式にする" class="slide level2">
@@ -778,7 +853,7 @@ rkskmt
 <li>行列 <span class="math inline">\(A\)</span> は、ベクトルを別のベクトルへ移す<strong>変換</strong>（回して・伸ばす機械）。次の <span class="math inline">\(A\)</span> で実験：</li>
 </ul>
 <p><span class="math display">\[A = \begin{pmatrix} 1.75 &amp; 1.25 \\ 1.25 &amp; 1.75 \end{pmatrix}\]</span></p>
-<div id="d0cece48" class="cell" data-execution_count="12">
+<div id="e6e74a40" class="cell" data-execution_count="12">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -787,8 +862,16 @@ rkskmt
 </div>
 </div>
 </div>
-<p>同じ変換を、名画にかけてみると：</p>
-<div id="2acb9127" class="cell" data-execution_count="13">
+<ul>
+<li>ほとんどの矢印は、変換されると<strong>回ってしまう</strong>（「ふつうの矢印」＝紺色）</li>
+<li>でも<strong>回らない方向が2本だけ</strong>ある（赤と橙）。向きはそのまま、<strong>伸び縮みするだけ</strong></li>
+</ul>
+</div>
+</section>
+<section id="同じ変換を名画にかける" class="slide level2">
+<h2>同じ変換を名画にかける</h2>
+<div class="slide-body">
+<div id="605bf2f5" class="cell" data-execution_count="13">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -797,11 +880,10 @@ rkskmt
 </div>
 </div>
 </div>
-<p>（絵：レオナルド・ダ・ヴィンチ《モナ・リザ》 — <a href="https://commons.wikimedia.org/wiki/File:Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg">Wikimedia Commons</a>、パブリックドメイン）</p>
+<p>（絵：レオナルド・ダ・ヴィンチ《モナ・リザ》、<a href="https://commons.wikimedia.org/wiki/File:Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg">Wikimedia Commons</a>、パブリックドメイン）</p>
 <ul>
-<li>ほとんどの矢印は、変換されると<strong>回ってしまう</strong>（「ふつうの矢印」＝紺色）</li>
-<li>でも<strong>回らない方向が2本だけ</strong>ある（赤と橙）— 向きはそのまま、<strong>伸び縮みするだけ</strong></li>
-<li>その方向が<strong>固有ベクトル（<span class="en">eigenvector</span>）</strong> <span class="math inline">\(\mathbf{v}\)</span>、伸び縮みの倍率が<strong>固有値（<span class="en">eigenvalue</span>）</strong> <span class="math inline">\(\lambda\)</span>：</li>
+<li>絵の中でも、赤と橙の矢印だけは向きが変わらない</li>
+<li>この方向が<strong>固有ベクトル（<span class="en">eigenvector</span>）</strong> <span class="math inline">\(\mathbf{v}\)</span>、伸び縮みの倍率が<strong>固有値（<span class="en">eigenvalue</span>）</strong> <span class="math inline">\(\lambda\)</span>：</li>
 </ul>
 <p><span class="math display">\[A \mathbf{v} = \lambda \mathbf{v} \qquad \text{（向きはそのまま、長さだけ } \lambda \text{ 倍）}\]</span></p>
 <div class="callout callout-note callout-titled callout-style-default">
@@ -822,12 +904,12 @@ rkskmt
 <section id="a-の正体回して伸ばして戻す" class="slide level2">
 <h2>A の正体：回して・伸ばして・戻す</h2>
 <div class="slide-body">
-<p>実は、この <span class="math inline">\(A\)</span> は、おなじみの<strong>回転行列</strong>と<strong>軸ごとの伸縮</strong>だけで組み立ててありました。</p>
+<p>実は、この <span class="math inline">\(A\)</span> は、おなじみの<strong>回転行列</strong>と<strong>軸ごとの伸縮</strong>だけで組み立ててある。</p>
 <p><span class="math display">\[A = R\, S\, R^{\mathsf T}, \qquad
 R = \begin{pmatrix} \cos 45^\circ &amp; -\sin 45^\circ \\ \sin 45^\circ &amp; \cos 45^\circ \end{pmatrix}, \qquad
 S = \begin{pmatrix} 3 &amp; 0 \\ 0 &amp; 0.5 \end{pmatrix}\]</span></p>
 <p>読み方は<strong>右から</strong>（ベクトルに近い順）。モナ・リザで1段ずつ：</p>
-<div id="9fbead92" class="cell" data-execution_count="14">
+<div id="910ba2e3" class="cell" data-execution_count="14">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -838,12 +920,12 @@ S = \begin{pmatrix} 3 &amp; 0 \\ 0 &amp; 0.5 \end{pmatrix}\]</span></p>
 </div>
 <ul>
 <li><strong>① <span class="math inline">\(R^{\mathsf T}\)</span></strong>：<span class="math inline">\(-45^\circ\)</span> 回して、「回らない方向」（赤・橙）を<strong>座標軸にそろえる</strong></li>
-<li><strong>② <span class="math inline">\(S\)</span></strong>：軸に沿って伸縮するだけ — ②の絵では赤い矢印が <span class="math inline">\(x\)</span> 軸の上に乗っている</li>
+<li><strong>② <span class="math inline">\(S\)</span></strong>：軸に沿って伸縮するだけ。②の絵では赤い矢印が <span class="math inline">\(x\)</span> 軸の上に乗っている</li>
 <li><strong>③ <span class="math inline">\(R\)</span></strong>：<span class="math inline">\(45^\circ\)</span> 回して、元の向きに戻す</li>
 <li>つまり「回らない方向」の正体は、<strong><span class="math inline">\(S\)</span> がただ伸縮するだけの軸を、<span class="math inline">\(R\)</span> が <span class="math inline">\(45^\circ\)</span> に向けた先</strong></li>
 <li><strong>固有ベクトル＝ <span class="math inline">\(R\)</span> の列</strong>（軸の向き先）、<strong>固有値＝ <span class="math inline">\(S\)</span> の対角成分</strong>（3 と 0.5）</li>
 </ul>
-<div id="ef7d01a1" class="cell" data-execution_count="15">
+<div id="e438a3ce" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a></a><span class="co"># 組み立てて確認：R S R^T がたしかに A になる</span></span>
 <span id="cb8-2"><a></a><span class="bu">print</span>(R_rot <span class="op">@</span> S_str <span class="op">@</span> R_rot.T)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -860,7 +942,7 @@ S = \begin{pmatrix} 3 &amp; 0 \\ 0 &amp; 0.5 \end{pmatrix}\]</span></p>
 <p><strong>ヒント</strong></p>
 </div>
 <div class="callout-content">
-<p>対称行列は<strong>かならず</strong>この「回転・伸縮・逆回転」の形に分解できる — これが<strong>固有値分解</strong>。 <code>np.linalg.eigh</code> が返してくるのは、この <span class="math inline">\(R\)</span>（固有ベクトル）と <span class="math inline">\(S\)</span> の対角成分（固有値）。</p>
+<p>対称行列は<strong>かならず</strong>この「回転・伸縮・逆回転」の形に分解できる。これが<strong>固有値分解</strong>。 <code>np.linalg.eigh</code> が返してくるのは、この <span class="math inline">\(R\)</span>（固有ベクトル）と <span class="math inline">\(S\)</span> の対角成分（固有値）。</p>
 </div>
 </div>
 </div>
@@ -876,7 +958,7 @@ S = \begin{pmatrix} 3 &amp; 0 \\ 0 &amp; 0.5 \end{pmatrix}\]</span></p>
 </ul>
 <p><span class="math display">\[C \mathbf{v} = \lambda \mathbf{v} \quad \text{（固有ベクトルの定義式そのもの！）}\]</span></p>
 <ul>
-<li>しかもそのときの分散は <span class="math inline">\(\mathbf{v}^{\mathsf T} C \mathbf{v} = \lambda \mathbf{v}^{\mathsf T} \mathbf{v} = \lambda\)</span> — <strong>固有値＝その方向の分散</strong></li>
+<li>しかもそのときの分散は <span class="math inline">\(\mathbf{v}^{\mathsf T} C \mathbf{v} = \lambda \mathbf{v}^{\mathsf T} \mathbf{v} = \lambda\)</span>。<strong>固有値＝その方向の分散</strong></li>
 </ul>
 <div class="callout callout-tip callout-titled callout-style-default">
 <div class="callout-body">
@@ -901,7 +983,7 @@ S = \begin{pmatrix} 3 &amp; 0 \\ 0 &amp; 0.5 \end{pmatrix}\]</span></p>
 <h2>総当たりで確かめる：全方向の分散を測る</h2>
 <div class="slide-body">
 <p>固有値分解を信じる前に、<strong>力ずく</strong>で確認してみる。方向 <span class="math inline">\(\mathbf{v}\)</span> を1度刻みで全部試す。</p>
-<div id="8e5d068c" class="cell" data-execution_count="16">
+<div id="4ab94832" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a></a>thetas <span class="op">=</span> np.radians(np.arange(<span class="dv">0</span>, <span class="dv">181</span>))</span>
 <span id="cb10-2"><a></a>proj_var <span class="op">=</span> np.array([</span>
 <span id="cb10-3"><a></a>    np.var(X_lw_sc <span class="op">@</span> np.array([np.cos(t), np.sin(t)]), ddof<span class="op">=</span><span class="dv">1</span>)</span>
@@ -917,7 +999,7 @@ S = \begin{pmatrix} 3 &amp; 0 \\ 0 &amp; 0.5 \end{pmatrix}\]</span></p>
 分散が最小の角度: 135°（分散 0.0275）</code></pre>
 </div>
 </div>
-<div id="88f6b74d" class="cell" data-execution_count="17">
+<div id="063ab3dc" class="cell" data-execution_count="17">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -926,18 +1008,32 @@ S = \begin{pmatrix} 3 &amp; 0 \\ 0 &amp; 0.5 \end{pmatrix}\]</span></p>
 </div>
 </div>
 </div>
+<div title="結果">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>結果</strong></p>
+</div>
+<div class="callout-content">
 <ul>
 <li>総当たりの最大値・最小値が、固有値 <span class="math inline">\(\lambda_1, \lambda_2\)</span> に<strong>ぴったり一致</strong></li>
 <li>山の位置（45°）が PC1 の向き、谷の位置（135°）が PC2 の向き</li>
 <li>この総当たりを<strong>一発の計算</strong>で済ませるのが固有値分解</li>
 </ul>
 </div>
+</div>
+</div>
+</div>
+</div>
 </section>
 <section id="numpy-で確かめる" class="slide level2">
 <h2>NumPy で確かめる</h2>
 <div class="slide-body">
 <p>スライドの式を<strong>そのまま</strong>コードにして、sklearn の答えと突き合わせる。</p>
-<div id="382aebb7" class="cell" data-execution_count="18">
+<div id="477ec3a4" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a></a><span class="co"># 1) 式のとおりに共分散行列を作る（専用関数は要らない）</span></span>
 <span id="cb12-2"><a></a>Xc <span class="op">=</span> X_lw_sc <span class="op">-</span> X_lw_sc.mean(axis<span class="op">=</span><span class="dv">0</span>)     <span class="co"># 中心化 X~</span></span>
 <span id="cb12-3"><a></a>C  <span class="op">=</span> Xc.T <span class="op">@</span> Xc <span class="op">/</span> (<span class="bu">len</span>(Xc) <span class="op">-</span> <span class="dv">1</span>)          <span class="co"># C = X~^T X~ / (n-1)</span></span>
@@ -964,21 +1060,35 @@ components_.T（sklearn）:
  [ 0.7071 -0.7071]]</code></pre>
 </div>
 </div>
+<div title="結果">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>結果</strong></p>
+</div>
+<div class="callout-content">
 <ul>
 <li>固有値は sklearn の <code>explained_variance_</code> と<strong>完全一致</strong></li>
-<li>ベクトルは列によって<strong>符号が逆</strong>になることがある — 軸の向きが180°逆なだけで、<strong>同じ軸</strong></li>
+<li>ベクトルは列によって<strong>符号が逆</strong>になることがある。軸の向きが180°逆なだけで、<strong>同じ軸</strong></li>
 </ul>
+</div>
+</div>
+</div>
+</div>
 <div class="callout callout-tip callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>実は sklearn の中身は SVD</strong></p>
+<p><strong>（参考）sklearn の中身は SVD</strong></p>
 </div>
 <div class="callout-content">
 <p>実務の PCA は、共分散行列を作らずに中心化したデータを <strong>SVD（特異値分解）</strong> に かけて同じ答えを出している（大きいデータで速く、数値的にも安定）。</p>
-<div id="f1abc23f" class="cell" data-execution_count="19">
+<div id="bd0535e2" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a></a>U, S, Vt <span class="op">=</span> np.linalg.svd(Xc)</span>
 <span id="cb14-2"><a></a><span class="bu">print</span>(<span class="st">"SVD から出した分散:"</span>, (S<span class="op">**</span><span class="dv">2</span> <span class="op">/</span> (<span class="bu">len</span>(Xc) <span class="op">-</span> <span class="dv">1</span>)).<span class="bu">round</span>(<span class="dv">4</span>))   <span class="co"># ↑の固有値と一致</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -1000,9 +1110,9 @@ components_.T（sklearn）:
 <h2>scikit-learn で PCA（魚は本当は何次元か）</h2>
 <div class="slide-body">
 <ul>
-<li>輝度・重さ・体長の<strong>3特徴量</strong>を PCA にかけてみる</li>
+<li>輝度・重さ・体長の<strong>3特徴量</strong>を PCA にかけ、各主成分の<strong>寄与率（<span class="en">explained variance ratio</span>）</strong>を見る</li>
 </ul>
-<div id="512cac07" class="cell" data-execution_count="20">
+<div id="06f2acc1" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a></a>X3 <span class="op">=</span> np.column_stack([brightness, weights, lengths])   <span class="co"># 3特徴量</span></span>
 <span id="cb16-2"><a></a></span>
 <span id="cb16-3"><a></a>X3_scaled <span class="op">=</span> StandardScaler().fit_transform(X3)   <span class="co"># スケールを揃えてから PCA</span></span>
@@ -1049,17 +1159,31 @@ components_.T（sklearn）:
 <div style="display:flex; justify-content:center;">
 <iframe src="iframes/pca_fish_3d.html" width="900" height="530" style="border:none;" onload="try{var d=this.contentDocument;if(d){d.documentElement.style.margin='0';d.documentElement.style.padding='0';d.body.style.margin='0';d.body.style.padding='0';}}catch(e){}"></iframe>
 </div>
+<div title="ここまでで分かること">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ここまでで分かること</strong></p>
+</div>
+<div class="callout-content">
 <ul>
-<li>3特徴量（輝度・重さ・体長）の実データを、そのまま3Dで。<span class="hl">ドラッグで回す</span></li>
+<li>3特徴量（輝度・重さ・体長）のデータを、そのまま3Dで。<span class="hl">ドラッグで回す</span></li>
 <li>ある角度では立体的な雲。回していくと、<strong>ぺったんこな板</strong>に見える瞬間がある</li>
-<li>板の厚み方向が PC3（寄与率1%未満）— 3本目の軸は最初から<strong>ほぼ空</strong>だった。「実質2次元」は比喩ではない</li>
+<li>板の厚み方向が PC3（寄与率1%未満）。3本目の軸は最初から<strong>ほぼ空</strong>だった。「実質2次元」は比喩ではない</li>
 </ul>
 </div>
+</div>
+</div>
+</div>
+</div>
 </section>
-<section id="次元に圧縮しても何も失わない" class="slide level2">
-<h2>2次元に圧縮しても何も失わない</h2>
+<section id="次元に圧縮しても分離は保たれる" class="slide level2">
+<h2>2次元に圧縮しても分離は保たれる</h2>
 <div class="slide-body">
-<div id="0d42f855" class="cell" data-execution_count="22">
+<div id="687d485c" class="cell" data-execution_count="22">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a></a>colors  <span class="op">=</span> [<span class="st">"#e74c3c"</span>, <span class="st">"#2980b9"</span>]</span>
 <span id="cb18-2"><a></a></span>
 <span id="cb18-3"><a></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">5.8</span>, <span class="fl">3.8</span>))</span>
@@ -1081,10 +1205,9 @@ components_.T（sklearn）:
 </div>
 </div>
 </div>
-<ul>
-<li>次元を1つ捨てたのに、2種類の魚は<strong>今までどおり分離できている</strong></li>
-<li>累積寄与率 99% — 捨てたのは「情報のない軸」だけ</li>
-</ul>
+<div class="takeaway">
+<p>次元を1つ捨てたのに、2種類の魚は<strong>今までどおり分離できている</strong>。累積寄与率 99%、捨てたのは「情報のない軸」だけ</p>
+</div>
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -1094,7 +1217,7 @@ components_.T（sklearn）:
 <p><strong>StandardScaler を使う理由</strong></p>
 </div>
 <div class="callout-content">
-<p>輝度（1〜10）・重さ（1000〜2500g）・体長（45〜62cm）はスケールが全く違う。 正規化しないと重さだけが主成分を支配してしまう（クラスタリング回のスケールの罠と同じ）。</p>
+<p>輝度（2〜10）・重さ（1100〜2500g）・体長（45〜62cm）はスケールが全く違う。 標準化しないと重さだけが主成分を支配してしまう（クラスタリング回のスケールの罠と同じ）。</p>
 </div>
 </div>
 </div>
@@ -1104,7 +1227,7 @@ components_.T（sklearn）:
 <h2>4次元データを2次元に圧縮（Iris）</h2>
 <div class="slide-body">
 <p>Fisher の Iris データセット：4特徴量（がく片長さ・幅、花弁長さ・幅）</p>
-<div id="d4dd9800" class="cell" data-execution_count="23">
+<div id="f9d60ca3" class="cell" data-execution_count="23">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> load_iris</span>
 <span id="cb19-2"><a></a></span>
 <span id="cb19-3"><a></a>iris   <span class="op">=</span> load_iris()</span>
@@ -1157,29 +1280,26 @@ components_.T（sklearn）:
 <section id="寄与率explained-variance-ratio" class="slide level2">
 <h2>寄与率（<span class="en">Explained Variance Ratio</span>）</h2>
 <div class="slide-body">
-<div id="8d26533f" class="cell" data-execution_count="24">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a></a>ratios     <span class="op">=</span> pca4.explained_variance_ratio_</span>
-<span id="cb20-2"><a></a>cumulative <span class="op">=</span> np.cumsum(ratios)</span>
+<div id="c2336677" class="cell" data-execution_count="24">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">5</span>, <span class="fl">3.5</span>))</span>
+<span id="cb20-2"><a></a>x_pos <span class="op">=</span> [<span class="st">"PC1"</span>, <span class="st">"PC2"</span>, <span class="st">"PC3"</span>, <span class="st">"PC4"</span>]</span>
 <span id="cb20-3"><a></a></span>
-<span id="cb20-4"><a></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">5</span>, <span class="fl">3.5</span>))</span>
-<span id="cb20-5"><a></a>x_pos <span class="op">=</span> [<span class="st">"PC1"</span>, <span class="st">"PC2"</span>, <span class="st">"PC3"</span>, <span class="st">"PC4"</span>]</span>
-<span id="cb20-6"><a></a></span>
-<span id="cb20-7"><a></a><span class="co"># 全4成分を改めて計算</span></span>
-<span id="cb20-8"><a></a>pca_full <span class="op">=</span> PCA(n_components<span class="op">=</span><span class="dv">4</span>).fit(X_iris)</span>
-<span id="cb20-9"><a></a>ratios_full <span class="op">=</span> pca_full.explained_variance_ratio_</span>
-<span id="cb20-10"><a></a>cum_full    <span class="op">=</span> np.cumsum(ratios_full)</span>
-<span id="cb20-11"><a></a></span>
-<span id="cb20-12"><a></a>ax.bar(x_pos, ratios_full, color<span class="op">=</span>[<span class="st">"#e74c3c"</span>, <span class="st">"#e67e22"</span>, <span class="st">"#bdc3c7"</span>, <span class="st">"#bdc3c7"</span>])</span>
-<span id="cb20-13"><a></a>ax.plot(x_pos, cum_full, <span class="st">"o-"</span>, color<span class="op">=</span><span class="st">"black"</span>, label<span class="op">=</span><span class="st">"累積寄与率"</span>)</span>
-<span id="cb20-14"><a></a><span class="cf">for</span> x, y <span class="kw">in</span> <span class="bu">zip</span>(x_pos, cum_full):</span>
-<span id="cb20-15"><a></a>    ax.text(x, y <span class="op">+</span> <span class="fl">0.02</span>, <span class="ss">f"</span><span class="sc">{</span>y<span class="sc">:.1%}</span><span class="ss">"</span>, ha<span class="op">=</span><span class="st">"center"</span>, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
-<span id="cb20-16"><a></a>ax.set_ylabel(<span class="st">"寄与率"</span>)</span>
-<span id="cb20-17"><a></a>ax.set_ylim(<span class="dv">0</span>, <span class="fl">1.15</span>)</span>
-<span id="cb20-18"><a></a>ax.legend(fontsize<span class="op">=</span><span class="dv">9</span>)</span>
-<span id="cb20-19"><a></a>ax.set_title(<span class="st">"Iris の主成分別寄与率"</span>)</span>
-<span id="cb20-20"><a></a>ax.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>, axis<span class="op">=</span><span class="st">"y"</span>)</span>
-<span id="cb20-21"><a></a>plt.tight_layout()</span>
-<span id="cb20-22"><a></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb20-4"><a></a><span class="co"># 全4成分を改めて計算</span></span>
+<span id="cb20-5"><a></a>pca_full <span class="op">=</span> PCA(n_components<span class="op">=</span><span class="dv">4</span>).fit(X_iris)</span>
+<span id="cb20-6"><a></a>ratios_full <span class="op">=</span> pca_full.explained_variance_ratio_</span>
+<span id="cb20-7"><a></a>cum_full    <span class="op">=</span> np.cumsum(ratios_full)</span>
+<span id="cb20-8"><a></a></span>
+<span id="cb20-9"><a></a>ax.bar(x_pos, ratios_full, color<span class="op">=</span>[<span class="st">"#e74c3c"</span>, <span class="st">"#e67e22"</span>, <span class="st">"#bdc3c7"</span>, <span class="st">"#bdc3c7"</span>])</span>
+<span id="cb20-10"><a></a>ax.plot(x_pos, cum_full, <span class="st">"o-"</span>, color<span class="op">=</span><span class="st">"black"</span>, label<span class="op">=</span><span class="st">"累積寄与率"</span>)</span>
+<span id="cb20-11"><a></a><span class="cf">for</span> pc, cum <span class="kw">in</span> <span class="bu">zip</span>(x_pos, cum_full):</span>
+<span id="cb20-12"><a></a>    ax.text(pc, cum <span class="op">+</span> <span class="fl">0.02</span>, <span class="ss">f"</span><span class="sc">{</span>cum<span class="sc">:.1%}</span><span class="ss">"</span>, ha<span class="op">=</span><span class="st">"center"</span>, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb20-13"><a></a>ax.set_ylabel(<span class="st">"寄与率"</span>)</span>
+<span id="cb20-14"><a></a>ax.set_ylim(<span class="dv">0</span>, <span class="fl">1.15</span>)</span>
+<span id="cb20-15"><a></a>ax.legend(fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb20-16"><a></a>ax.set_title(<span class="st">"Iris の主成分別寄与率"</span>)</span>
+<span id="cb20-17"><a></a>ax.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>, axis<span class="op">=</span><span class="st">"y"</span>)</span>
+<span id="cb20-18"><a></a>plt.tight_layout()</span>
+<span id="cb20-19"><a></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1203,8 +1323,8 @@ components_.T（sklearn）:
 </div>
 </div>
 </section>
-<section id="tweak-軸の中身を覗く" class="slide level2 badge-practice">
-<h2><strong>Tweak</strong> 軸の中身を覗く</h2>
+<section id="tweak-軸の中身を見る" class="slide level2 badge-practice">
+<h2><strong>Tweak</strong> 軸の中身を見る</h2>
 <div class="slide-body">
 <ul>
 <li><a href="#/peek-pca-fish" class="peek">魚3特徴量の PCA</a>のコードを<strong>書き換えて実行</strong></li>
@@ -1223,15 +1343,15 @@ components_.T（sklearn）:
 </thead>
 <tbody>
 <tr class="odd">
-<td>スケールを揃えず PCA</td>
+<td>スケールを揃えずに PCA せよ</td>
 <td><code>X3_scaled = StandardScaler().fit_transform(X3)</code> → <code>X3_scaled = X3</code></td>
 </tr>
 <tr class="even">
-<td>軸の「レシピ」を見る</td>
+<td>軸の「レシピ」を表示せよ</td>
 <td><code>print(pca.components_.round(2))</code> を足す</td>
 </tr>
 <tr class="odd">
-<td>Iris を3軸まで残す</td>
+<td>Iris を3軸まで残せ</td>
 <td>Iris のセルで <code>PCA(n_components=2)</code> → <code>3</code></td>
 </tr>
 </tbody>
@@ -1243,13 +1363,22 @@ components_.T（sklearn）:
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>ここで観察</strong></p>
+<p><strong>結果</strong></p>
 </div>
 <div class="callout-content">
 <ul>
-<li>スケールを揃えないと <strong>PC1 の寄与率が 100.0%</strong> になる — 目盛りの大きい「重さ（グラム）」の独裁。k-means の回と同じ病気がここでも出る</li>
-<li>レシピの1行目（PC1）は重さと体長を<strong>同じ重み（0.62）</strong>で足している — 「2つはほぼ同じ情報」を PCA が自力で見抜いた証拠。3行目（PC3）は重さ−体長の<strong>差分（0.71, −0.71）</strong>、だから空っぽ</li>
-<li>Iris の3軸目を足しても累積寄与率は 95.8% → <strong>99.5%</strong> — 2軸で十分の判断は変わらない</li>
+<li>スケールを揃えないと <strong>PC1 の寄与率が 100.0%</strong> になる
+<ul>
+<li>目盛りの大きい「重さ（グラム）」だけで軸が決まる。k-means の回のスケールの罠と同じ</li>
+</ul></li>
+<li>レシピの1行目（PC1）は重さと体長を<strong>同じ重み（0.62）</strong>で足している
+<ul>
+<li>「2つはほぼ同じ情報」を PCA が自力で見抜いた証拠。3行目（PC3）は重さ−体長の<strong>差分（0.71, −0.71）</strong>、だから空っぽ</li>
+</ul></li>
+<li>Iris の3軸目を足しても累積寄与率は 95.8% → <strong>99.5%</strong>
+<ul>
+<li>2軸で十分の判断は変わらない</li>
+</ul></li>
 </ul>
 </div>
 </div>
@@ -1270,7 +1399,7 @@ components_.T（sklearn）:
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a></a><span class="im">from</span> sklearn.decomposition <span class="im">import</span> PCA</span>
 <span id="cb21-2"><a></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
 <span id="cb21-3"><a></a></span>
-<span id="cb21-4"><a></a>X_scaled <span class="op">=</span> StandardScaler().fit_transform(X)   <span class="co"># スケール正規化</span></span>
+<span id="cb21-4"><a></a>X_scaled <span class="op">=</span> StandardScaler().fit_transform(X)   <span class="co"># 標準化（スケールを揃える）</span></span>
 <span id="cb21-5"><a></a>pca <span class="op">=</span> PCA(n_components<span class="op">=</span><span class="dv">2</span>)</span>
 <span id="cb21-6"><a></a>X_2d <span class="op">=</span> pca.fit_transform(X_scaled)             <span class="co"># 2次元に圧縮</span></span>
 <span id="cb21-7"><a></a></span>
@@ -1329,7 +1458,7 @@ components_.T（sklearn）:
 <section id="練習問題" class="slide level2 scrollable">
 <h2>練習問題</h2>
 <div class="slide-body">
-<p>問題1は<strong>手計算</strong>、問題2は<strong>Pythonコード</strong>で解け。</p>
+<p>問題1は<strong>手計算</strong>、問題2は<strong>Pythonコード</strong>で解け</p>
 <h3 id="問題1この4点本当は何次元">問題1：この4点、本当は何次元？</h3>
 <p>4点のデータ：<span class="math inline">\((2, 1)\)</span>、<span class="math inline">\((4, 2)\)</span>、<span class="math inline">\((6, 3)\)</span>、<span class="math inline">\((8, 4)\)</span>。</p>
 <ol type="1">
@@ -1347,13 +1476,13 @@ components_.T（sklearn）:
 <p><strong><span class="math inline">\(x\)</span> 方向</strong>：平均 <span class="math inline">\(5\)</span>、分散 <span class="math inline">\(= \dfrac{(-3)^2 + (-1)^2 + 1^2 + 3^2}{4} = \dfrac{20}{4} = 5\)</span></p>
 <p><strong><span class="math inline">\(y\)</span> 方向</strong>：平均 <span class="math inline">\(2.5\)</span>、分散 <span class="math inline">\(= \dfrac{2.25 + 0.25 + 0.25 + 2.25}{4} = 1.25\)</span></p>
 <p><strong>第1主成分</strong>：4点はすべて直線 <span class="math inline">\(y = x/2\)</span> の上に<strong>ぴったり</strong>乗っている。 分散最大の方向はこの直線の方向 <span class="math inline">\((2, 1)/\sqrt{5}\)</span>。</p>
-<p><strong>実質的な次元</strong>：直線上にあるので、直線に沿った1つの座標だけで4点を完全に表せる。 <strong>1次元に圧縮しても情報は何も失われない</strong> — 実質1次元。</p>
+<p><strong>実質的な次元</strong>：直線上にあるので、直線に沿った1つの座標だけで4点を完全に表せる。 <strong>1次元に圧縮しても情報は何も失われない</strong>。実質1次元。</p>
 </div>
 </section>
 <section id="問題2の解答例" class="slide level2">
 <h2>問題2の解答例</h2>
 <div class="slide-body">
-<div id="7c444a03" class="cell" data-execution_count="25">
+<div id="2cdf5f8a" class="cell" data-execution_count="25">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -1371,7 +1500,7 @@ components_.T（sklearn）:
 </div>
 </div>
 <ul>
-<li>寄与率は <span class="math inline">\([1.0,\; 0.0]\)</span> — <strong>第1主成分だけで100%</strong>。手計算の予想どおり実質1次元</li>
+<li>寄与率は <span class="math inline">\([1.0,\; 0.0]\)</span>。<strong>第1主成分だけで100%</strong>、手計算の予想どおり実質1次元</li>
 <li>第1主成分の方向も <span class="math inline">\((2, 1)/\sqrt{5} \approx (0.894, 0.447)\)</span>（符号は逆でも同じ方向）</li>
 <li>本編の「体長は重さの言い換えだった」のミニチュア版。<strong>軸の数と情報の次元は別物</strong></li>
 </ul>
