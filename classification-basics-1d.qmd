@@ -1,82 +1,19 @@
 ---
 title: "機械学習 Classification"
-subtitle: "最も単純な２クラス分類"
+subtitle: "２クラス分類"
 ---
 
 
 
-## このデータを分離する
-
-```{python}
-#| echo: false
-#| fig-align: center
-import numpy as np
-import matplotlib.pyplot as plt
-import japanize_matplotlib
-from sklearn.datasets import make_moons
-plt.rcParams["font.size"] = 11
-plt.rcParams["figure.dpi"] = 100
-
-X_moon, y_moon = make_moons(n_samples=200, noise=0.1, random_state=42)
-
-plt.figure(figsize=(5.5, 3.8))
-for cls, col, m in [(0, "#2980b9", "s"), (1, "#e74c3c", "o")]:
-    mask = y_moon == cls
-    plt.scatter(X_moon[mask, 0], X_moon[mask, 1], c=col, marker=m, s=25,
-                edgecolors="gray", lw=0.4)
-plt.xticks([]); plt.yticks([])
-plt.tight_layout()
-plt.show()
-```
-
-- 青と赤のデータを分離する**境界**を描きたい
-
-::: {.callout-important title="単純に考えると"}
-直線では分離不可能
-:::
-
-
-## 機械が自力で見つけた境界
-
-```{python}
-#| echo: false
-#| fig-align: center
-from sklearn.neural_network import MLPClassifier
-
-mlp = MLPClassifier(hidden_layer_sizes=(16,), activation="relu", solver="lbfgs",
-                    max_iter=5000, random_state=0).fit(X_moon, y_moon)
-
-xx, yy = np.meshgrid(np.linspace(X_moon[:, 0].min() - 0.4, X_moon[:, 0].max() + 0.4, 300),
-                     np.linspace(X_moon[:, 1].min() - 0.4, X_moon[:, 1].max() + 0.4, 300))
-Z = mlp.predict(np.c_[xx.ravel(), yy.ravel()]).reshape(xx.shape)
-
-plt.figure(figsize=(5.5, 3.8))
-plt.contourf(xx, yy, Z, alpha=0.25, levels=1, colors=["#5dade2", "#f5b7b1"])
-for cls, col, m in [(0, "#2980b9", "s"), (1, "#e74c3c", "o")]:
-    mask = y_moon == cls
-    plt.scatter(X_moon[mask, 0], X_moon[mask, 1], c=col, marker=m, s=25,
-                edgecolors="gray", lw=0.4)
-plt.xticks([]); plt.yticks([])
-plt.tight_layout()
-plt.show()
-```
-
-- 数式も規則も**誰も教えていない**。データを見せただけで、機械がこの境界を自力で見つけた
-
-::: {.callout-note title="この講義の約束"}
-最終回までに、この仕組みを**中身から全部**自分の手で組み立てる。
-ブラックボックスは残さない。
-:::
-
 ## 分類問題
 
-### 目標
+### 今回の目標
 - 分類問題(Data Classification)：データを分類するタスクを理解する
     - 2クラス分類
 - データ可視化
 - **決定境界（[decision boundary]{.en}）** の概念を学ぶ
 
-::: {.callout-note title="ここがポイント"}
+::: {.callout-note title="ポイント"}
 - 完全な分類は困難であることを知る
 - 境界決定のトレードオフとコスト
 :::
@@ -85,16 +22,18 @@ plt.show()
 ## 今回の問題
 
 
-### サケだけを選別せよ
+### サケとスズキが混ざったなかからサケだけを選別せよ
 
 ::: {.columns}
 ::: {.column width="60%" .column-center}
 
-- 魚はベルトコンベアで大量に流れてくる
-  - 時間をかけず選別したい
-- サケ以外の魚も混じっている
-  - 一旦、**サケ**（Salmon）か**スズキ**（Sea bass）か
-  - 分類項目を**クラス（[class]{.en}）**という
+- ２種類の魚がベルトコンベアで大量に流れてくるとする
+  - **サケ**（Salmon）
+  - **スズキ**（Sea bass）
+- これを自動的に瞬間的に識別したい
+- 分類対象の項目を**クラス（[class]{.en}）**という
+   - この場合は２クラス 
+
 :::
 ::: {.column width="40%"}
 ![](imgs/2026-02-04-12-03-25.jpg){fig-align="center" width="80%"}
@@ -102,8 +41,8 @@ plt.show()
 :::
 
 
-::: {.callout-note title="ここがポイント"}
-Salmon と Sea bass の**2クラス識別(2-class classification)**問題
+::: {.takeaway .center}
+Salmon と Sea bass の**2クラス分類(2-class classification)**問題
 :::
 
 
@@ -293,7 +232,7 @@ plt.show()
 
 ## 分類結果：4つのパターン
 
-境界線1800gで分類すると、4つのパターンが生まれる：
+### 境界線1800gで分類すると、4つのパターンが生まれる
 
 | 実際の魚 | 判定結果 | 略称 | 説明 |
 |----|----|------|--------|
@@ -395,38 +334,45 @@ plt.show()
 ```
 
 
-## 判定器の評価
+## 混同行列から評価指標（[Evaluation Metrics]{.en}）を計算する
+
+::: {.table-style widths="auto" first-col-rule="3px" col-rules="all" head-rule="3px" head-align="center" rule-color="#aaa"}
+| 指標 | 日本語 | 意味 | 計算式 |
+|-----|-------|-----------|:-------:|
+| **Accuracy** | 正解率 （or 精度）| 正しく判定できたデータの割合<br> SalmonとSalmonではないものの判定 | $\dfrac{TP + TN}{TP + FP + FN + TN}$ |
+| **Precision** | 適合率（or 精度） | **Salmonと判定**したら、<br>**本当にSalmonだった**割合 | $\dfrac{TP}{TP + FP}$ |
+| **Recall** | 再現率（or 感度） | **本当はSalmonだったデータ**のうち、<br>**見逃さず**Salmonと判定できた割合 | $\dfrac{TP}{TP + FN}$ |
+:::
+
+::: {.callout-warning title="「精度」は曖昧な用語"}
+Accuracy（正解率）を指す場合と、Precision（適合率）を指す場合がある。
+:::
+
+::: {.callout-note title="Accuracyだけではダメな理由"}
+クラス間の偏り（[class imbalance]{.en}）に影響されるため。例えば、100匹のうちSalmonが5匹なら、すべてを「Salmonではない」と判定するだけでAccuracyは95%になってしまう。
+:::
+
+## 境界線1800gの判定器を評価する
+
+- [境界線1800gの混同行列](#peek-cm-1800){.peek}の値を計算式に代入する
 
 ```{python}
 #| echo: true
-#| fig-align: center
-#| code-fold: true
-#| code-summary: "code"
 # Calculate metrics
 accuracy = (TP + TN) / (TP + TN + FP + FN)
 precision = TP / (TP + FP) if (TP + FP) > 0 else 0
 recall = TP / (TP + FN) if (TP + FN) > 0 else 0
 
-metrics = pd.DataFrame({
-    "指標": ["Accuracy", "Precision", "Recall"],
-    '値': [f"{accuracy:.3f}", f"{precision:.3f}", f"{recall:.3f}"],
-    "意味": [
-        "全体の正解率",
-        "Salmonと判定した中で実際にSalmonの割合",
-        "実際のSalmonをどれだけ検出できたか",
-    ]
-})
-
-print(metrics.to_string(index=False))
+print(f"Accuracy  = ({TP} + {TN}) / {TP + TN + FP + FN} = {accuracy:.3f}")
+print(f"Precision = {TP} / ({TP} + {FP}) = {precision:.3f}")
+print(f"Recall    = {TP} / ({TP} + {FN}) = {recall:.3f}")
 ```
 
-$$\text{Accuracy} = \frac{TP + TN}{\text{全体}} = \frac{\text{正しく分類できた数}}{\text{全データ数}}$$
-
-$$\text{Precision} = \frac{TP}{TP + FP} = \frac{\text{正しいSalmon判定}}{\text{Salmonと判定した全て}}$$
-
-$$\text{Recall} = \frac{TP}{TP + FN} = \frac{\text{検出できたSalmon}}{\text{実際のSalmon全て}}$$
-
 ## しきい値を変えると？
+```{python}
+thresholds = [1600, 1800, 2000]
+```
+
 
 ```{python}
 #| echo: true
