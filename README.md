@@ -21,6 +21,10 @@ conda activate ai
 - `QUARTO_PYTHON` 自動設定の activate フック
 - MathJax 2 のダウンロード（`libs/mathjax/`）
 
+Windows でも同じコマンドで動く（`conda` が使えるシェル — Miniforge Prompt、または `conda init powershell` 後の PowerShell — で実行）。Linux との違い：
+- `d2` は conda-forge ではなく公式リリースから環境内（`Library\bin`）に入れる。conda-forge のパッケージはライセンスファイルにシンボリックリンクを含み、開発者モードか管理者権限がないと conda が展開に失敗するため
+- `QUARTO_PYTHON` は activate フックではなく `conda env config vars` で設定する
+
 MathJax だけ再取得したい場合：
 
 ```bash
@@ -84,14 +88,14 @@ done
 
 ```
 _quarto.yml       サイト設定・resources
-_metadata.yaml    スライド共通設定（cleanslidekit-revealjs 形式・d2/lightbox フィルタ）
+_metadata.yaml    スライド共通設定（cleanslidekit-revealjs 形式・d2 フィルタ・Quarto 組み込みの lightbox）
 environment.yml   conda 環境定義
 index.qmd         トップページ（リンク一覧）
 *.qmd             各回のスライド
 imgs/             画像ファイル
 pdf/              配布用ハンドアウトPDF（生成物・gitignore、上記参照）
 doc/              執筆ガイド・トラブルシュート
-_extensions/      Quarto 拡張（cleanslidekit テーマ＝CSS/UI JS/Lua フィルタ同梱、d2、lightbox）
+_extensions/      Quarto 拡張（cleanslidekit テーマ＝CSS/UI JS/Lua フィルタ同梱、d2）
 ```
 
 Lua フィルタ（`hl.lua`・`cite-image.lua` 等）は cleanslidekit 拡張に同梱されている（ルート直下には置かない）。
