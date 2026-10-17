@@ -10,12 +10,12 @@ Quarto-based AI lecture website ("AI Lectures"). Slide decks for machine learnin
 - **Python 3** via Jupyter kernel for code cells
 - **MathJax** for math rendering
 - **D2** (quarto-d2) for diagrams
-- Extensions: `cleanslidekit`, `d2`, `lightbox` (all vendored)
+- Extensions: `cleanslidekit`, `d2` (both vendored). Click-to-zoom images use Quarto's built-in lightbox (`lightbox: auto`; built in since Quarto 1.4, so the old `quarto-ext/lightbox` extension is not needed)
 
 ## Structure
 
 - `_quarto.yml` — site config and resources
-- `_metadata.yaml` — shared slide format settings (`cleanslidekit-revealjs` format + `d2`/`lightbox` filters)
+- `_metadata.yaml` — shared slide format settings (`cleanslidekit-revealjs` format + `d2` filter + `lightbox: auto`)
 - `*.qmd` — lecture content files
 - `index.qmd` — top-level listing of lectures
 - `imgs/` — image assets
@@ -42,7 +42,7 @@ Use Python as the vehicle, but frame concepts as broadly as possible. Where a co
 ## Conventions
 
 - `##` delimits slides (do not use `---`)
-- `_metadata.yaml` applies the `cleanslidekit-revealjs` format (+ `d2`/`lightbox` filters) to all `.qmd` files; theme, CSS, and UI JS ship from `_extensions/rkskmt/cleanslidekit/`
+- `_metadata.yaml` applies the `cleanslidekit-revealjs` format (+ `d2` filter and `lightbox: auto`) to all `.qmd` files; theme, CSS, and UI JS ship from `_extensions/rkskmt/cleanslidekit/`
 - **Theme classes and their attributes are catalogued in `_extensions/rkskmt/cleanslidekit/_schema.yml`** (`.table-style`, `.table-compact`, `.fig`, `.peek`, badges, …, each with its attributes); the kit's snippets sit beside it in `_snippets.json`. Read the schema before proposing or writing layout markup instead of guessing class names. It ships inside the vendored theme, so it is current on every clone.
 - **Do not add frontmatter to `index.qmd`.** Quarto **merges** (not overwrites) `format` from `_metadata.yaml` and the file, so adding `format: html` causes it to render in both formats and trigger a `rename` error. Raw HTML (e.g. `<details>/<summary>`) is fine — it needs no frontmatter.
 - **Do not use `listing:` in `index.qmd` either.** Same reason — it requires `format: html`, which conflicts.
@@ -110,7 +110,7 @@ quarto render                # build to _site/
 
 ## Self-contained, reproducible builds
 
-Each repo must build from a **fresh clone** on any machine — students build it locally, and the author restores it on a new laptop — with nothing more than `conda env create -f environment.yml` + `quarto render`. Do **not** rely on globally-installed tools or on running `quarto add` after cloning.
+Each repo must build from a **fresh clone** on any machine — students build it locally, and the author restores it on a new laptop — with nothing more than `conda env create -f environment.yml` + `quarto render` (on Windows, `python setup.py` in place of `conda env create`: conda cannot extract the conda-forge `d2` package there without symlink privilege, so `setup.py` installs `d2` from its release). Do **not** rely on globally-installed tools or on running `quarto add` after cloning.
 
 - **Commit `_extensions/`** — Quarto extensions are vendored, not regenerated. Never gitignore `_extensions/`, or a fresh clone fails to build. (This bit us: a stray `_extensions/` line in `.gitignore` had been keeping the lightbox and d2 extensions out of git.)
 - **Declare every build-time tool in `environment.yml`** — e.g. the `d2` CLI (used by the quarto-d2 diagram filter) is a `conda-forge` dependency, not a global install.
