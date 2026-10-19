@@ -6,11 +6,11 @@
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="site_libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.8.27">
+  <meta name="generator" content="quarto-1.10.19">
 
   <meta name="author" content="rkskmt">
   <title>AI Lectures – 教師なし学習とクラスタリング</title>
@@ -20,10 +20,16 @@
   <link rel="stylesheet" href="site_libs/revealjs/dist/reset.css">
   <link rel="stylesheet" href="site_libs/revealjs/dist/reveal.css">
   <style>
-    code{white-space: pre-wrap;}
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
     ul.task-list{list-style: none;}
     ul.task-list li input[type="checkbox"] {
@@ -98,7 +104,7 @@
     code span.vs { color: #032f62; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-d3a26a7442888a116b43ccec6150e9c5.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-e69bca93ec9d1486cefcf16a785f5ce6.css">
   <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -254,7 +260,7 @@
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
 <div class="quarto-title-author-name">
-rkskmt 
+rkskmt
 </div>
 </div>
 </div>
@@ -328,39 +334,39 @@ rkskmt
 <li>80匹分の測定データ（輝度・重さ）は手元にある</li>
 <li>ただし<strong>どれが Salmon でどれが Sea bass かのラベルはない</strong>とする</li>
 </ul>
-<div id="6a64a73a" class="cell" data-execution_count="1">
+<div id="bfe1f784" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>魚データの定義（クリックして展開）</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-2"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb1-3"><a></a><span class="im">import</span> japanize_matplotlib</span>
-<span id="cb1-4"><a></a>plt.rcParams[<span class="st">"font.size"</span>] <span class="op">=</span> <span class="dv">11</span></span>
-<span id="cb1-5"><a></a>plt.rcParams[<span class="st">"figure.dpi"</span>] <span class="op">=</span> <span class="dv">100</span></span>
-<span id="cb1-6"><a></a></span>
-<span id="cb1-7"><a></a>salmon_weights     <span class="op">=</span> np.array([<span class="dv">2149</span>, <span class="dv">1959</span>, <span class="dv">2194</span>, <span class="dv">2457</span>, <span class="dv">1930</span>, <span class="dv">1930</span>, <span class="dv">2474</span>, <span class="dv">2230</span>, <span class="dv">1859</span>, <span class="dv">2163</span>,</span>
-<span id="cb1-8"><a></a>                               <span class="dv">1861</span>, <span class="dv">1860</span>, <span class="dv">2073</span>, <span class="dv">1426</span>, <span class="dv">1483</span>, <span class="dv">1831</span>, <span class="dv">1696</span>, <span class="dv">2094</span>, <span class="dv">1728</span>, <span class="dv">1576</span>,</span>
-<span id="cb1-9"><a></a>                               <span class="dv">2028</span>, <span class="dv">1903</span>, <span class="dv">2057</span>, <span class="dv">2229</span>, <span class="dv">1884</span>, <span class="dv">1884</span>, <span class="dv">2240</span>, <span class="dv">2081</span>, <span class="dv">1838</span>, <span class="dv">2037</span>,</span>
-<span id="cb1-10"><a></a>                               <span class="dv">1839</span>, <span class="dv">1838</span>, <span class="dv">1978</span>, <span class="dv">1554</span>, <span class="dv">1591</span>, <span class="dv">1820</span>, <span class="dv">1731</span>, <span class="dv">1992</span>, <span class="dv">1752</span>, <span class="dv">1652</span>])</span>
-<span id="cb1-11"><a></a>salmon_brightness  <span class="op">=</span> np.array([<span class="fl">3.5</span>, <span class="fl">5.8</span>, <span class="fl">4.9</span>, <span class="fl">4.4</span>, <span class="fl">2.6</span>, <span class="fl">2.6</span>, <span class="fl">2.2</span>, <span class="fl">5.5</span>, <span class="fl">4.4</span>, <span class="fl">4.8</span>, <span class="fl">2.1</span>,</span>
-<span id="cb1-12"><a></a>                               <span class="fl">5.9</span>, <span class="fl">5.3</span>, <span class="fl">2.8</span>, <span class="fl">2.7</span>, <span class="fl">2.7</span>, <span class="fl">3.2</span>, <span class="fl">4.1</span>, <span class="fl">3.7</span>, <span class="fl">3.2</span>, <span class="fl">4.4</span>, <span class="fl">2.6</span>,</span>
-<span id="cb1-13"><a></a>                               <span class="fl">3.2</span>, <span class="fl">3.5</span>, <span class="fl">3.8</span>, <span class="fl">5.1</span>, <span class="fl">2.8</span>, <span class="fl">4.1</span>, <span class="fl">4.4</span>, <span class="fl">2.2</span>, <span class="fl">4.4</span>, <span class="fl">2.7</span>, <span class="fl">2.3</span>,</span>
-<span id="cb1-14"><a></a>                               <span class="fl">5.8</span>, <span class="fl">5.9</span>, <span class="fl">5.2</span>, <span class="fl">3.2</span>, <span class="fl">2.4</span>, <span class="fl">4.7</span>, <span class="fl">3.8</span>])</span>
-<span id="cb1-15"><a></a>seabass_weights    <span class="op">=</span> np.array([<span class="dv">1677</span>, <span class="dv">1327</span>, <span class="dv">1486</span>, <span class="dv">1440</span>, <span class="dv">1857</span>, <span class="dv">1476</span>, <span class="dv">1749</span>, <span class="dv">2203</span>, <span class="dv">1979</span>, <span class="dv">1468</span>,</span>
-<span id="cb1-16"><a></a>                               <span class="dv">1496</span>, <span class="dv">1737</span>, <span class="dv">1099</span>, <span class="dv">1341</span>, <span class="dv">1748</span>, <span class="dv">1563</span>, <span class="dv">2181</span>, <span class="dv">1414</span>, <span class="dv">1286</span>, <span class="dv">1333</span>,</span>
-<span id="cb1-17"><a></a>                               <span class="dv">1787</span>, <span class="dv">1445</span>, <span class="dv">1505</span>, <span class="dv">1204</span>, <span class="dv">1381</span>, <span class="dv">1513</span>, <span class="dv">1259</span>, <span class="dv">1567</span>, <span class="dv">1370</span>, <span class="dv">1432</span>,</span>
-<span id="cb1-18"><a></a>                               <span class="dv">1370</span>, <span class="dv">1864</span>, <span class="dv">1488</span>, <span class="dv">1278</span>, <span class="dv">1657</span>, <span class="dv">1245</span>, <span class="dv">1533</span>, <span class="dv">1096</span>, <span class="dv">1223</span>, <span class="dv">1531</span>])</span>
-<span id="cb1-19"><a></a>seabass_brightness <span class="op">=</span> np.array([<span class="fl">5.6</span>, <span class="fl">7.5</span>, <span class="fl">5.2</span>, <span class="fl">9.5</span>, <span class="fl">6.3</span>, <span class="fl">8.3</span>, <span class="fl">6.6</span>, <span class="fl">7.6</span>, <span class="fl">7.7</span>, <span class="fl">5.9</span>, <span class="fl">9.8</span>,</span>
-<span id="cb1-20"><a></a>                               <span class="fl">8.9</span>, <span class="fl">9.7</span>, <span class="fl">9.5</span>, <span class="fl">8.0</span>, <span class="fl">9.6</span>, <span class="fl">5.4</span>, <span class="fl">6.0</span>, <span class="fl">5.2</span>, <span class="fl">6.6</span>, <span class="fl">6.9</span>, <span class="fl">6.4</span>,</span>
-<span id="cb1-21"><a></a>                               <span class="fl">9.1</span>, <span class="fl">6.8</span>, <span class="fl">6.4</span>, <span class="fl">7.7</span>, <span class="fl">5.7</span>, <span class="fl">9.0</span>, <span class="fl">5.4</span>, <span class="fl">9.9</span>, <span class="fl">8.9</span>, <span class="fl">6.0</span>, <span class="fl">5.0</span>,</span>
-<span id="cb1-22"><a></a>                               <span class="fl">9.1</span>, <span class="fl">8.5</span>, <span class="fl">8.6</span>, <span class="fl">8.9</span>, <span class="fl">5.4</span>, <span class="fl">6.8</span>, <span class="fl">5.6</span>])</span>
-<span id="cb1-23"><a></a></span>
-<span id="cb1-24"><a></a>X <span class="op">=</span> np.column_stack([</span>
-<span id="cb1-25"><a></a>    np.concatenate([salmon_brightness, seabass_brightness]),</span>
-<span id="cb1-26"><a></a>    np.concatenate([salmon_weights,    seabass_weights])</span>
-<span id="cb1-27"><a></a>])</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a aria-label="3"></a><span class="im">import</span> japanize_matplotlib</span>
+<span id="cb1-4"><a aria-label="4"></a>plt.rcParams[<span class="st">"font.size"</span>] <span class="op">=</span> <span class="dv">11</span></span>
+<span id="cb1-5"><a aria-label="5"></a>plt.rcParams[<span class="st">"figure.dpi"</span>] <span class="op">=</span> <span class="dv">100</span></span>
+<span id="cb1-6"><a aria-label="6"></a></span>
+<span id="cb1-7"><a aria-label="7"></a>salmon_weights     <span class="op">=</span> np.array([<span class="dv">2149</span>, <span class="dv">1959</span>, <span class="dv">2194</span>, <span class="dv">2457</span>, <span class="dv">1930</span>, <span class="dv">1930</span>, <span class="dv">2474</span>, <span class="dv">2230</span>, <span class="dv">1859</span>, <span class="dv">2163</span>,</span>
+<span id="cb1-8"><a aria-label="8"></a>                               <span class="dv">1861</span>, <span class="dv">1860</span>, <span class="dv">2073</span>, <span class="dv">1426</span>, <span class="dv">1483</span>, <span class="dv">1831</span>, <span class="dv">1696</span>, <span class="dv">2094</span>, <span class="dv">1728</span>, <span class="dv">1576</span>,</span>
+<span id="cb1-9"><a aria-label="9"></a>                               <span class="dv">2028</span>, <span class="dv">1903</span>, <span class="dv">2057</span>, <span class="dv">2229</span>, <span class="dv">1884</span>, <span class="dv">1884</span>, <span class="dv">2240</span>, <span class="dv">2081</span>, <span class="dv">1838</span>, <span class="dv">2037</span>,</span>
+<span id="cb1-10"><a aria-label="10"></a>                               <span class="dv">1839</span>, <span class="dv">1838</span>, <span class="dv">1978</span>, <span class="dv">1554</span>, <span class="dv">1591</span>, <span class="dv">1820</span>, <span class="dv">1731</span>, <span class="dv">1992</span>, <span class="dv">1752</span>, <span class="dv">1652</span>])</span>
+<span id="cb1-11"><a aria-label="11"></a>salmon_brightness  <span class="op">=</span> np.array([<span class="fl">3.5</span>, <span class="fl">5.8</span>, <span class="fl">4.9</span>, <span class="fl">4.4</span>, <span class="fl">2.6</span>, <span class="fl">2.6</span>, <span class="fl">2.2</span>, <span class="fl">5.5</span>, <span class="fl">4.4</span>, <span class="fl">4.8</span>, <span class="fl">2.1</span>,</span>
+<span id="cb1-12"><a aria-label="12"></a>                               <span class="fl">5.9</span>, <span class="fl">5.3</span>, <span class="fl">2.8</span>, <span class="fl">2.7</span>, <span class="fl">2.7</span>, <span class="fl">3.2</span>, <span class="fl">4.1</span>, <span class="fl">3.7</span>, <span class="fl">3.2</span>, <span class="fl">4.4</span>, <span class="fl">2.6</span>,</span>
+<span id="cb1-13"><a aria-label="13"></a>                               <span class="fl">3.2</span>, <span class="fl">3.5</span>, <span class="fl">3.8</span>, <span class="fl">5.1</span>, <span class="fl">2.8</span>, <span class="fl">4.1</span>, <span class="fl">4.4</span>, <span class="fl">2.2</span>, <span class="fl">4.4</span>, <span class="fl">2.7</span>, <span class="fl">2.3</span>,</span>
+<span id="cb1-14"><a aria-label="14"></a>                               <span class="fl">5.8</span>, <span class="fl">5.9</span>, <span class="fl">5.2</span>, <span class="fl">3.2</span>, <span class="fl">2.4</span>, <span class="fl">4.7</span>, <span class="fl">3.8</span>])</span>
+<span id="cb1-15"><a aria-label="15"></a>seabass_weights    <span class="op">=</span> np.array([<span class="dv">1677</span>, <span class="dv">1327</span>, <span class="dv">1486</span>, <span class="dv">1440</span>, <span class="dv">1857</span>, <span class="dv">1476</span>, <span class="dv">1749</span>, <span class="dv">2203</span>, <span class="dv">1979</span>, <span class="dv">1468</span>,</span>
+<span id="cb1-16"><a aria-label="16"></a>                               <span class="dv">1496</span>, <span class="dv">1737</span>, <span class="dv">1099</span>, <span class="dv">1341</span>, <span class="dv">1748</span>, <span class="dv">1563</span>, <span class="dv">2181</span>, <span class="dv">1414</span>, <span class="dv">1286</span>, <span class="dv">1333</span>,</span>
+<span id="cb1-17"><a aria-label="17"></a>                               <span class="dv">1787</span>, <span class="dv">1445</span>, <span class="dv">1505</span>, <span class="dv">1204</span>, <span class="dv">1381</span>, <span class="dv">1513</span>, <span class="dv">1259</span>, <span class="dv">1567</span>, <span class="dv">1370</span>, <span class="dv">1432</span>,</span>
+<span id="cb1-18"><a aria-label="18"></a>                               <span class="dv">1370</span>, <span class="dv">1864</span>, <span class="dv">1488</span>, <span class="dv">1278</span>, <span class="dv">1657</span>, <span class="dv">1245</span>, <span class="dv">1533</span>, <span class="dv">1096</span>, <span class="dv">1223</span>, <span class="dv">1531</span>])</span>
+<span id="cb1-19"><a aria-label="19"></a>seabass_brightness <span class="op">=</span> np.array([<span class="fl">5.6</span>, <span class="fl">7.5</span>, <span class="fl">5.2</span>, <span class="fl">9.5</span>, <span class="fl">6.3</span>, <span class="fl">8.3</span>, <span class="fl">6.6</span>, <span class="fl">7.6</span>, <span class="fl">7.7</span>, <span class="fl">5.9</span>, <span class="fl">9.8</span>,</span>
+<span id="cb1-20"><a aria-label="20"></a>                               <span class="fl">8.9</span>, <span class="fl">9.7</span>, <span class="fl">9.5</span>, <span class="fl">8.0</span>, <span class="fl">9.6</span>, <span class="fl">5.4</span>, <span class="fl">6.0</span>, <span class="fl">5.2</span>, <span class="fl">6.6</span>, <span class="fl">6.9</span>, <span class="fl">6.4</span>,</span>
+<span id="cb1-21"><a aria-label="21"></a>                               <span class="fl">9.1</span>, <span class="fl">6.8</span>, <span class="fl">6.4</span>, <span class="fl">7.7</span>, <span class="fl">5.7</span>, <span class="fl">9.0</span>, <span class="fl">5.4</span>, <span class="fl">9.9</span>, <span class="fl">8.9</span>, <span class="fl">6.0</span>, <span class="fl">5.0</span>,</span>
+<span id="cb1-22"><a aria-label="22"></a>                               <span class="fl">9.1</span>, <span class="fl">8.5</span>, <span class="fl">8.6</span>, <span class="fl">8.9</span>, <span class="fl">5.4</span>, <span class="fl">6.8</span>, <span class="fl">5.6</span>])</span>
+<span id="cb1-23"><a aria-label="23"></a></span>
+<span id="cb1-24"><a aria-label="24"></a>X <span class="op">=</span> np.column_stack([</span>
+<span id="cb1-25"><a aria-label="25"></a>    np.concatenate([salmon_brightness, seabass_brightness]),</span>
+<span id="cb1-26"><a aria-label="26"></a>    np.concatenate([salmon_weights,    seabass_weights])</span>
+<span id="cb1-27"><a aria-label="27"></a>])</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="37cda2ca" class="cell" data-execution_count="2">
+<div id="29bb2d39" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -441,18 +447,18 @@ rkskmt
 <section id="試行1-そのまま-k-means-にかける" class="slide level2">
 <h2>試行1: そのまま k-means にかける</h2>
 <div class="slide-body">
-<div id="08e71037" class="cell" data-execution_count="3">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> KMeans</span>
-<span id="cb2-2"><a></a></span>
-<span id="cb2-3"><a></a><span class="co"># ラベルを使わずに k=2 でクラスタリング</span></span>
-<span id="cb2-4"><a></a>km <span class="op">=</span> KMeans(n_clusters<span class="op">=</span><span class="dv">2</span>, random_state<span class="op">=</span><span class="dv">42</span>, n_init<span class="op">=</span><span class="dv">10</span>)</span>
-<span id="cb2-5"><a></a>km.fit(X)</span>
-<span id="cb2-6"><a></a>cluster_labels <span class="op">=</span> km.labels_</span>
-<span id="cb2-7"><a></a></span>
-<span id="cb2-8"><a></a><span class="bu">print</span>(<span class="st">"クラスタ割り当て（先頭10件）:"</span>, cluster_labels[:<span class="dv">10</span>])</span>
-<span id="cb2-9"><a></a><span class="bu">print</span>(<span class="st">"重心の座標（輝度, 重さ）:"</span>)</span>
-<span id="cb2-10"><a></a><span class="cf">for</span> i, c <span class="kw">in</span> <span class="bu">enumerate</span>(km.cluster_centers_):</span>
-<span id="cb2-11"><a></a>    <span class="bu">print</span>(<span class="ss">f"  クラスタ </span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">: 輝度=</span><span class="sc">{</span>c[<span class="dv">0</span>]<span class="sc">:.2f}</span><span class="ss">, 重さ=</span><span class="sc">{</span>c[<span class="dv">1</span>]<span class="sc">:.0f}</span><span class="ss">g"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="b47c2921" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> KMeans</span>
+<span id="cb2-2"><a aria-label="2"></a></span>
+<span id="cb2-3"><a aria-label="3"></a><span class="co"># ラベルを使わずに k=2 でクラスタリング</span></span>
+<span id="cb2-4"><a aria-label="4"></a>km <span class="op">=</span> KMeans(n_clusters<span class="op">=</span><span class="dv">2</span>, random_state<span class="op">=</span><span class="dv">42</span>, n_init<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb2-5"><a aria-label="5"></a>km.fit(X)</span>
+<span id="cb2-6"><a aria-label="6"></a>cluster_labels <span class="op">=</span> km.labels_</span>
+<span id="cb2-7"><a aria-label="7"></a></span>
+<span id="cb2-8"><a aria-label="8"></a><span class="bu">print</span>(<span class="st">"クラスタ割り当て（先頭10件）:"</span>, cluster_labels[:<span class="dv">10</span>])</span>
+<span id="cb2-9"><a aria-label="9"></a><span class="bu">print</span>(<span class="st">"重心の座標（輝度, 重さ）:"</span>)</span>
+<span id="cb2-10"><a aria-label="10"></a><span class="cf">for</span> i, c <span class="kw">in</span> <span class="bu">enumerate</span>(km.cluster_centers_):</span>
+<span id="cb2-11"><a aria-label="11"></a>    <span class="bu">print</span>(<span class="ss">f"  クラスタ </span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">: 輝度=</span><span class="sc">{</span>c[<span class="dv">0</span>]<span class="sc">:.2f}</span><span class="ss">, 重さ=</span><span class="sc">{</span>c[<span class="dv">1</span>]<span class="sc">:.0f}</span><span class="ss">g"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>クラスタ割り当て（先頭10件）: [0 0 0 0 0 0 0 0 0 0]
 重心の座標（輝度, 重さ）:
@@ -468,21 +474,21 @@ rkskmt
 <section id="試行1の結果" class="slide level2">
 <h2>試行1の結果</h2>
 <div class="slide-body">
-<div id="5b7e9368" class="cell" data-execution_count="4">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a></a>colors  <span class="op">=</span> [<span class="st">"#e74c3c"</span>, <span class="st">"#2980b9"</span>]</span>
-<span id="cb4-2"><a></a>markers <span class="op">=</span> [<span class="st">"o"</span>, <span class="st">"s"</span>]</span>
-<span id="cb4-3"><a></a></span>
-<span id="cb4-4"><a></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">5.8</span>, <span class="fl">3.6</span>))</span>
-<span id="cb4-5"><a></a><span class="cf">for</span> c <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>):</span>
-<span id="cb4-6"><a></a>    mask <span class="op">=</span> cluster_labels <span class="op">==</span> c</span>
-<span id="cb4-7"><a></a>    plt.scatter(X[mask, <span class="dv">0</span>], X[mask, <span class="dv">1</span>],</span>
-<span id="cb4-8"><a></a>                c<span class="op">=</span>colors[c], marker<span class="op">=</span>markers[c], s<span class="op">=</span><span class="dv">50</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, label<span class="op">=</span><span class="ss">f"クラスタ </span><span class="sc">{</span>c<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb4-9"><a></a><span class="cf">for</span> center <span class="kw">in</span> km.cluster_centers_:</span>
-<span id="cb4-10"><a></a>    plt.scatter(<span class="op">*</span>center, c<span class="op">=</span><span class="st">"black"</span>, s<span class="op">=</span><span class="dv">200</span>, marker<span class="op">=</span><span class="st">"*"</span>, zorder<span class="op">=</span><span class="dv">5</span>)</span>
-<span id="cb4-11"><a></a>plt.xlabel(<span class="st">"輝度"</span>)<span class="op">;</span> plt.ylabel(<span class="st">"重さ (g)"</span>)</span>
-<span id="cb4-12"><a></a>plt.legend()<span class="op">;</span> plt.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
-<span id="cb4-13"><a></a>plt.tight_layout()</span>
-<span id="cb4-14"><a></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="9f9e5a22" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a aria-label="1"></a>colors  <span class="op">=</span> [<span class="st">"#e74c3c"</span>, <span class="st">"#2980b9"</span>]</span>
+<span id="cb4-2"><a aria-label="2"></a>markers <span class="op">=</span> [<span class="st">"o"</span>, <span class="st">"s"</span>]</span>
+<span id="cb4-3"><a aria-label="3"></a></span>
+<span id="cb4-4"><a aria-label="4"></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">5.8</span>, <span class="fl">3.6</span>))</span>
+<span id="cb4-5"><a aria-label="5"></a><span class="cf">for</span> c <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>):</span>
+<span id="cb4-6"><a aria-label="6"></a>    mask <span class="op">=</span> cluster_labels <span class="op">==</span> c</span>
+<span id="cb4-7"><a aria-label="7"></a>    plt.scatter(X[mask, <span class="dv">0</span>], X[mask, <span class="dv">1</span>],</span>
+<span id="cb4-8"><a aria-label="8"></a>                c<span class="op">=</span>colors[c], marker<span class="op">=</span>markers[c], s<span class="op">=</span><span class="dv">50</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, label<span class="op">=</span><span class="ss">f"クラスタ </span><span class="sc">{</span>c<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb4-9"><a aria-label="9"></a><span class="cf">for</span> center <span class="kw">in</span> km.cluster_centers_:</span>
+<span id="cb4-10"><a aria-label="10"></a>    plt.scatter(<span class="op">*</span>center, c<span class="op">=</span><span class="st">"black"</span>, s<span class="op">=</span><span class="dv">200</span>, marker<span class="op">=</span><span class="st">"*"</span>, zorder<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb4-11"><a aria-label="11"></a>plt.xlabel(<span class="st">"輝度"</span>)<span class="op">;</span> plt.ylabel(<span class="st">"重さ (g)"</span>)</span>
+<span id="cb4-12"><a aria-label="12"></a>plt.legend()<span class="op">;</span> plt.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb4-13"><a aria-label="13"></a>plt.tight_layout()</span>
+<span id="cb4-14"><a aria-label="14"></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -544,24 +550,24 @@ rkskmt
 <section id="peek-scale" class="slide level2">
 <h2>試行2: スケールを揃えて再挑戦</h2>
 <div class="slide-body">
-<div id="c3dc1a6a" class="cell" data-execution_count="5">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
-<span id="cb5-2"><a></a></span>
-<span id="cb5-3"><a></a>X_scaled <span class="op">=</span> StandardScaler().fit_transform(X)   <span class="co"># 各特徴量を平均0・分散1に（標準化, standardization）</span></span>
-<span id="cb5-4"><a></a></span>
-<span id="cb5-5"><a></a>km2 <span class="op">=</span> KMeans(n_clusters<span class="op">=</span><span class="dv">2</span>, random_state<span class="op">=</span><span class="dv">42</span>, n_init<span class="op">=</span><span class="dv">10</span>)</span>
-<span id="cb5-6"><a></a>km2.fit(X_scaled)</span>
-<span id="cb5-7"><a></a>cluster_labels2 <span class="op">=</span> km2.labels_</span>
-<span id="cb5-8"><a></a></span>
-<span id="cb5-9"><a></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">5.8</span>, <span class="fl">3.6</span>))</span>
-<span id="cb5-10"><a></a><span class="cf">for</span> c <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>):</span>
-<span id="cb5-11"><a></a>    mask <span class="op">=</span> cluster_labels2 <span class="op">==</span> c</span>
-<span id="cb5-12"><a></a>    plt.scatter(X[mask, <span class="dv">0</span>], X[mask, <span class="dv">1</span>],</span>
-<span id="cb5-13"><a></a>                c<span class="op">=</span>colors[c], marker<span class="op">=</span>markers[c], s<span class="op">=</span><span class="dv">50</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, label<span class="op">=</span><span class="ss">f"クラスタ </span><span class="sc">{</span>c<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb5-14"><a></a>plt.xlabel(<span class="st">"輝度"</span>)<span class="op">;</span> plt.ylabel(<span class="st">"重さ (g)"</span>)</span>
-<span id="cb5-15"><a></a>plt.legend()<span class="op">;</span> plt.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
-<span id="cb5-16"><a></a>plt.tight_layout()</span>
-<span id="cb5-17"><a></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="6a2c41ce" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a aria-label="1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
+<span id="cb5-2"><a aria-label="2"></a></span>
+<span id="cb5-3"><a aria-label="3"></a>X_scaled <span class="op">=</span> StandardScaler().fit_transform(X)   <span class="co"># 各特徴量を平均0・分散1に（標準化, standardization）</span></span>
+<span id="cb5-4"><a aria-label="4"></a></span>
+<span id="cb5-5"><a aria-label="5"></a>km2 <span class="op">=</span> KMeans(n_clusters<span class="op">=</span><span class="dv">2</span>, random_state<span class="op">=</span><span class="dv">42</span>, n_init<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb5-6"><a aria-label="6"></a>km2.fit(X_scaled)</span>
+<span id="cb5-7"><a aria-label="7"></a>cluster_labels2 <span class="op">=</span> km2.labels_</span>
+<span id="cb5-8"><a aria-label="8"></a></span>
+<span id="cb5-9"><a aria-label="9"></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">5.8</span>, <span class="fl">3.6</span>))</span>
+<span id="cb5-10"><a aria-label="10"></a><span class="cf">for</span> c <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>):</span>
+<span id="cb5-11"><a aria-label="11"></a>    mask <span class="op">=</span> cluster_labels2 <span class="op">==</span> c</span>
+<span id="cb5-12"><a aria-label="12"></a>    plt.scatter(X[mask, <span class="dv">0</span>], X[mask, <span class="dv">1</span>],</span>
+<span id="cb5-13"><a aria-label="13"></a>                c<span class="op">=</span>colors[c], marker<span class="op">=</span>markers[c], s<span class="op">=</span><span class="dv">50</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, label<span class="op">=</span><span class="ss">f"クラスタ </span><span class="sc">{</span>c<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb5-14"><a aria-label="14"></a>plt.xlabel(<span class="st">"輝度"</span>)<span class="op">;</span> plt.ylabel(<span class="st">"重さ (g)"</span>)</span>
+<span id="cb5-15"><a aria-label="15"></a>plt.legend()<span class="op">;</span> plt.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb5-16"><a aria-label="16"></a>plt.tight_layout()</span>
+<span id="cb5-17"><a aria-label="17"></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -581,17 +587,17 @@ rkskmt
 <ul>
 <li>このデータの正体は、これまでの講義で使ってきた Salmon / Sea bass</li>
 </ul>
-<div id="a56cc7dc" class="cell" data-execution_count="6">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a></a>y_true <span class="op">=</span> np.array([<span class="dv">1</span>]<span class="op">*</span><span class="dv">40</span> <span class="op">+</span> [<span class="dv">0</span>]<span class="op">*</span><span class="dv">40</span>)   <span class="co"># 1=Salmon, 0=Sea bass（隠していた正解）</span></span>
-<span id="cb6-2"><a></a></span>
-<span id="cb6-3"><a></a>agree <span class="op">=</span> np.mean(cluster_labels2 <span class="op">==</span> y_true)</span>
-<span id="cb6-4"><a></a>agree <span class="op">=</span> <span class="bu">max</span>(agree, <span class="dv">1</span> <span class="op">-</span> agree)        <span class="co"># クラスタ番号 0/1 は任意なので向きを合わせる</span></span>
-<span id="cb6-5"><a></a><span class="bu">print</span>(<span class="ss">f"正解ラベルとの一致: </span><span class="sc">{</span>agree<span class="sc">:.1%}</span><span class="ss">（</span><span class="sc">{</span><span class="bu">int</span>(<span class="bu">round</span>(agree <span class="op">*</span> <span class="bu">len</span>(y_true)))<span class="sc">}</span><span class="ss">/80匹）"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="0b18aeee" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a aria-label="1"></a>y_true <span class="op">=</span> np.array([<span class="dv">1</span>]<span class="op">*</span><span class="dv">40</span> <span class="op">+</span> [<span class="dv">0</span>]<span class="op">*</span><span class="dv">40</span>)   <span class="co"># 1=Salmon, 0=Sea bass（隠していた正解）</span></span>
+<span id="cb6-2"><a aria-label="2"></a></span>
+<span id="cb6-3"><a aria-label="3"></a>agree <span class="op">=</span> np.mean(cluster_labels2 <span class="op">==</span> y_true)</span>
+<span id="cb6-4"><a aria-label="4"></a>agree <span class="op">=</span> <span class="bu">max</span>(agree, <span class="dv">1</span> <span class="op">-</span> agree)        <span class="co"># クラスタ番号 0/1 は任意なので向きを合わせる</span></span>
+<span id="cb6-5"><a aria-label="5"></a><span class="bu">print</span>(<span class="ss">f"正解ラベルとの一致: </span><span class="sc">{</span>agree<span class="sc">:.1%}</span><span class="ss">（</span><span class="sc">{</span><span class="bu">int</span>(<span class="bu">round</span>(agree <span class="op">*</span> <span class="bu">len</span>(y_true)))<span class="sc">}</span><span class="ss">/80匹）"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>正解ラベルとの一致: 92.5%（74/80匹）</code></pre>
 </div>
 </div>
-<div id="1b27c138" class="cell" data-execution_count="7">
+<div id="c08b363e" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -618,7 +624,7 @@ rkskmt
 <section id="k-means-の動き中で起きていたこと" class="slide level2">
 <h2>k-means の動き（中で起きていたこと）</h2>
 <div class="slide-body">
-<div id="0813dae0" class="cell" data-execution_count="8">
+<div id="17491277" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -654,7 +660,7 @@ rkskmt
 <li>「assign → update」は<strong>最初の重心の位置</strong>から始まる。そこは<strong>ランダム</strong>に選ばれる</li>
 <li>運の悪い初期値だと、おかしな所で落ち着く（下の左：青が2つの塊を飲み込んだ）</li>
 </ul>
-<div id="d740312f" class="cell" data-execution_count="9">
+<div id="078fc782" class="cell" data-execution_count="9">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -698,23 +704,23 @@ rkskmt
 <li>本当のラベルなしデータでは <strong>k 自体を決める必要がある</strong></li>
 <li><strong>エルボー法</strong>：k を変えながら「クラスタ内のまとまり度」を測る</li>
 </ul>
-<div id="b83be58d" class="cell" data-execution_count="10">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a></a>inertias <span class="op">=</span> []</span>
-<span id="cb8-2"><a></a>ks <span class="op">=</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">9</span>)</span>
-<span id="cb8-3"><a></a></span>
-<span id="cb8-4"><a></a><span class="cf">for</span> k <span class="kw">in</span> ks:</span>
-<span id="cb8-5"><a></a>    km_k <span class="op">=</span> KMeans(n_clusters<span class="op">=</span>k, random_state<span class="op">=</span><span class="dv">42</span>, n_init<span class="op">=</span><span class="dv">10</span>)</span>
-<span id="cb8-6"><a></a>    km_k.fit(X_scaled)</span>
-<span id="cb8-7"><a></a>    inertias.append(km_k.inertia_)   <span class="co"># クラスタ内二乗和</span></span>
-<span id="cb8-8"><a></a></span>
-<span id="cb8-9"><a></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">6</span>, <span class="fl">3.5</span>))</span>
-<span id="cb8-10"><a></a>plt.plot(<span class="bu">list</span>(ks), inertias, <span class="st">"o-"</span>, color<span class="op">=</span><span class="st">"#2980b9"</span>)</span>
-<span id="cb8-11"><a></a>plt.xlabel(<span class="st">"クラスタ数 k"</span>)</span>
-<span id="cb8-12"><a></a>plt.ylabel(<span class="st">"Inertia（クラスタ内二乗和）"</span>)</span>
-<span id="cb8-13"><a></a>plt.title(<span class="st">"エルボー法"</span>)</span>
-<span id="cb8-14"><a></a>plt.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.4</span>)</span>
-<span id="cb8-15"><a></a>plt.tight_layout()</span>
-<span id="cb8-16"><a></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="61122953" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a aria-label="1"></a>inertias <span class="op">=</span> []</span>
+<span id="cb8-2"><a aria-label="2"></a>ks <span class="op">=</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">9</span>)</span>
+<span id="cb8-3"><a aria-label="3"></a></span>
+<span id="cb8-4"><a aria-label="4"></a><span class="cf">for</span> k <span class="kw">in</span> ks:</span>
+<span id="cb8-5"><a aria-label="5"></a>    km_k <span class="op">=</span> KMeans(n_clusters<span class="op">=</span>k, random_state<span class="op">=</span><span class="dv">42</span>, n_init<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb8-6"><a aria-label="6"></a>    km_k.fit(X_scaled)</span>
+<span id="cb8-7"><a aria-label="7"></a>    inertias.append(km_k.inertia_)   <span class="co"># クラスタ内二乗和</span></span>
+<span id="cb8-8"><a aria-label="8"></a></span>
+<span id="cb8-9"><a aria-label="9"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">6</span>, <span class="fl">3.5</span>))</span>
+<span id="cb8-10"><a aria-label="10"></a>plt.plot(<span class="bu">list</span>(ks), inertias, <span class="st">"o-"</span>, color<span class="op">=</span><span class="st">"#2980b9"</span>)</span>
+<span id="cb8-11"><a aria-label="11"></a>plt.xlabel(<span class="st">"クラスタ数 k"</span>)</span>
+<span id="cb8-12"><a aria-label="12"></a>plt.ylabel(<span class="st">"Inertia（クラスタ内二乗和）"</span>)</span>
+<span id="cb8-13"><a aria-label="13"></a>plt.title(<span class="st">"エルボー法"</span>)</span>
+<span id="cb8-14"><a aria-label="14"></a>plt.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.4</span>)</span>
+<span id="cb8-15"><a aria-label="15"></a>plt.tight_layout()</span>
+<span id="cb8-16"><a aria-label="16"></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -803,7 +809,7 @@ rkskmt
 <section id="k-means-の限界" class="slide level2">
 <h2>k-means の限界</h2>
 <div class="slide-body">
-<div id="4baec66d" class="cell" data-execution_count="11">
+<div id="c99dfea7" class="cell" data-execution_count="11">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -839,15 +845,15 @@ rkskmt
 <li><strong>k-means</strong>：「assign → update → 繰り返し」だけで、魚80匹中74匹を正しく仕分けた</li>
 <li><strong>スケールの罠</strong>：距離を使う手法では、特徴量のスケールを揃えてから</li>
 </ul>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> KMeans</span>
-<span id="cb9-2"><a></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
-<span id="cb9-3"><a></a></span>
-<span id="cb9-4"><a></a>X_scaled <span class="op">=</span> StandardScaler().fit_transform(X)   <span class="co"># まずスケールを揃える</span></span>
-<span id="cb9-5"><a></a>km <span class="op">=</span> KMeans(n_clusters<span class="op">=</span><span class="dv">2</span>, random_state<span class="op">=</span><span class="dv">42</span>, n_init<span class="op">=</span><span class="dv">10</span>)</span>
-<span id="cb9-6"><a></a>km.fit(X_scaled)</span>
-<span id="cb9-7"><a></a>km.labels_          <span class="co"># クラスタ番号（各データ点）</span></span>
-<span id="cb9-8"><a></a>km.cluster_centers_ <span class="co"># 重心の座標</span></span>
-<span id="cb9-9"><a></a>km.inertia_         <span class="co"># クラスタ内二乗和（エルボー法に使う）</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a aria-label="1"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> KMeans</span>
+<span id="cb9-2"><a aria-label="2"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
+<span id="cb9-3"><a aria-label="3"></a></span>
+<span id="cb9-4"><a aria-label="4"></a>X_scaled <span class="op">=</span> StandardScaler().fit_transform(X)   <span class="co"># まずスケールを揃える</span></span>
+<span id="cb9-5"><a aria-label="5"></a>km <span class="op">=</span> KMeans(n_clusters<span class="op">=</span><span class="dv">2</span>, random_state<span class="op">=</span><span class="dv">42</span>, n_init<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb9-6"><a aria-label="6"></a>km.fit(X_scaled)</span>
+<span id="cb9-7"><a aria-label="7"></a>km.labels_          <span class="co"># クラスタ番号（各データ点）</span></span>
+<span id="cb9-8"><a aria-label="8"></a>km.cluster_centers_ <span class="co"># 重心の座標</span></span>
+<span id="cb9-9"><a aria-label="9"></a>km.inertia_         <span class="co"># クラスタ内二乗和（エルボー法に使う）</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <table class="caption-top">
 <thead>
 <tr class="header">
@@ -927,19 +933,19 @@ rkskmt
 <section id="問題2の解答例" class="slide level2">
 <h2>問題2の解答例</h2>
 <div class="slide-body">
-<div id="7e19fdcf" class="cell" data-execution_count="12">
+<div id="c93f806a" class="cell" data-execution_count="12">
 <details class="code-fold">
 <summary>解答例を見る</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb10-2"><a></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> KMeans</span>
-<span id="cb10-3"><a></a></span>
-<span id="cb10-4"><a></a>P <span class="op">=</span> np.array([[<span class="fl">0.0</span>, <span class="fl">0.0</span>], [<span class="fl">0.0</span>, <span class="fl">2.0</span>], [<span class="fl">4.0</span>, <span class="fl">0.0</span>], [<span class="fl">4.0</span>, <span class="fl">2.0</span>]])   <span class="co"># A, B, C, D</span></span>
-<span id="cb10-5"><a></a></span>
-<span id="cb10-6"><a></a>bad <span class="op">=</span> KMeans(n_clusters<span class="op">=</span><span class="dv">2</span>, init<span class="op">=</span>np.array([[<span class="fl">0.0</span>, <span class="fl">0.0</span>], [<span class="fl">0.0</span>, <span class="fl">2.0</span>]]), n_init<span class="op">=</span><span class="dv">1</span>).fit(P)</span>
-<span id="cb10-7"><a></a><span class="bu">print</span>(<span class="ss">f"悪い初期値: labels=</span><span class="sc">{</span>bad<span class="sc">.</span>labels_<span class="sc">}</span><span class="ss">, inertia=</span><span class="sc">{</span>bad<span class="sc">.</span>inertia_<span class="sc">:.1f}</span><span class="ss">"</span>)</span>
-<span id="cb10-8"><a></a></span>
-<span id="cb10-9"><a></a>good <span class="op">=</span> KMeans(n_clusters<span class="op">=</span><span class="dv">2</span>, n_init<span class="op">=</span><span class="dv">10</span>, random_state<span class="op">=</span><span class="dv">0</span>).fit(P)</span>
-<span id="cb10-10"><a></a><span class="bu">print</span>(<span class="ss">f"n_init=10 : labels=</span><span class="sc">{</span>good<span class="sc">.</span>labels_<span class="sc">}</span><span class="ss">, inertia=</span><span class="sc">{</span>good<span class="sc">.</span>inertia_<span class="sc">:.1f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb10-2"><a aria-label="2"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> KMeans</span>
+<span id="cb10-3"><a aria-label="3"></a></span>
+<span id="cb10-4"><a aria-label="4"></a>P <span class="op">=</span> np.array([[<span class="fl">0.0</span>, <span class="fl">0.0</span>], [<span class="fl">0.0</span>, <span class="fl">2.0</span>], [<span class="fl">4.0</span>, <span class="fl">0.0</span>], [<span class="fl">4.0</span>, <span class="fl">2.0</span>]])   <span class="co"># A, B, C, D</span></span>
+<span id="cb10-5"><a aria-label="5"></a></span>
+<span id="cb10-6"><a aria-label="6"></a>bad <span class="op">=</span> KMeans(n_clusters<span class="op">=</span><span class="dv">2</span>, init<span class="op">=</span>np.array([[<span class="fl">0.0</span>, <span class="fl">0.0</span>], [<span class="fl">0.0</span>, <span class="fl">2.0</span>]]), n_init<span class="op">=</span><span class="dv">1</span>).fit(P)</span>
+<span id="cb10-7"><a aria-label="7"></a><span class="bu">print</span>(<span class="ss">f"悪い初期値: labels=</span><span class="sc">{</span>bad<span class="sc">.</span>labels_<span class="sc">}</span><span class="ss">, inertia=</span><span class="sc">{</span>bad<span class="sc">.</span>inertia_<span class="sc">:.1f}</span><span class="ss">"</span>)</span>
+<span id="cb10-8"><a aria-label="8"></a></span>
+<span id="cb10-9"><a aria-label="9"></a>good <span class="op">=</span> KMeans(n_clusters<span class="op">=</span><span class="dv">2</span>, n_init<span class="op">=</span><span class="dv">10</span>, random_state<span class="op">=</span><span class="dv">0</span>).fit(P)</span>
+<span id="cb10-10"><a aria-label="10"></a><span class="bu">print</span>(<span class="ss">f"n_init=10 : labels=</span><span class="sc">{</span>good<span class="sc">.</span>labels_<span class="sc">}</span><span class="ss">, inertia=</span><span class="sc">{</span>good<span class="sc">.</span>inertia_<span class="sc">:.1f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>悪い初期値: labels=[0 1 0 1], inertia=16.0

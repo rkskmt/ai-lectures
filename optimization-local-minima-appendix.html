@@ -6,11 +6,11 @@
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="site_libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.8.27">
+  <meta name="generator" content="quarto-1.10.19">
 
   <meta name="author" content="rkskmt">
   <title>AI Lectures – ローカルミニマムの罠</title>
@@ -20,10 +20,16 @@
   <link rel="stylesheet" href="site_libs/revealjs/dist/reset.css">
   <link rel="stylesheet" href="site_libs/revealjs/dist/reveal.css">
   <style>
-    code{white-space: pre-wrap;}
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
     ul.task-list{list-style: none;}
     ul.task-list li input[type="checkbox"] {
@@ -98,7 +104,7 @@
     code span.vs { color: #032f62; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-d3a26a7442888a116b43ccec6150e9c5.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-e69bca93ec9d1486cefcf16a785f5ce6.css">
   <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -254,7 +260,7 @@
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
 <div class="quarto-title-author-name">
-rkskmt 
+rkskmt
 </div>
 </div>
 </div>
@@ -320,20 +326,20 @@ rkskmt
 <section id="pythonでの定義" class="slide level2">
 <h2>Pythonでの定義</h2>
 <div class="slide-body">
-<div id="c5c4f32f" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-2"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb1-3"><a></a><span class="im">import</span> japanize_matplotlib</span>
-<span id="cb1-4"><a></a></span>
-<span id="cb1-5"><a></a><span class="co"># 4次関数とその微分</span></span>
-<span id="cb1-6"><a></a><span class="kw">def</span> f_poly(x):</span>
-<span id="cb1-7"><a></a>    <span class="cf">return</span> <span class="fl">0.1</span><span class="op">*</span>x<span class="op">**</span><span class="dv">4</span> <span class="op">-</span> x<span class="op">**</span><span class="dv">3</span> <span class="op">+</span> <span class="dv">2</span><span class="op">*</span>x<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> <span class="dv">1</span></span>
-<span id="cb1-8"><a></a></span>
-<span id="cb1-9"><a></a><span class="kw">def</span> f_poly_prime(x):</span>
-<span id="cb1-10"><a></a>    <span class="cf">return</span> <span class="fl">0.4</span><span class="op">*</span>x<span class="op">**</span><span class="dv">3</span> <span class="op">-</span> <span class="dv">3</span><span class="op">*</span>x<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> <span class="dv">4</span><span class="op">*</span>x</span>
-<span id="cb1-11"><a></a></span>
-<span id="cb1-12"><a></a><span class="kw">def</span> f_poly_double_prime(x):</span>
-<span id="cb1-13"><a></a>    <span class="cf">return</span> <span class="fl">1.2</span><span class="op">*</span>x<span class="op">**</span><span class="dv">2</span> <span class="op">-</span> <span class="dv">6</span><span class="op">*</span>x <span class="op">+</span> <span class="dv">4</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="8e70c174" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a aria-label="3"></a><span class="im">import</span> japanize_matplotlib</span>
+<span id="cb1-4"><a aria-label="4"></a></span>
+<span id="cb1-5"><a aria-label="5"></a><span class="co"># 4次関数とその微分</span></span>
+<span id="cb1-6"><a aria-label="6"></a><span class="kw">def</span> f_poly(x):</span>
+<span id="cb1-7"><a aria-label="7"></a>    <span class="cf">return</span> <span class="fl">0.1</span><span class="op">*</span>x<span class="op">**</span><span class="dv">4</span> <span class="op">-</span> x<span class="op">**</span><span class="dv">3</span> <span class="op">+</span> <span class="dv">2</span><span class="op">*</span>x<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb1-8"><a aria-label="8"></a></span>
+<span id="cb1-9"><a aria-label="9"></a><span class="kw">def</span> f_poly_prime(x):</span>
+<span id="cb1-10"><a aria-label="10"></a>    <span class="cf">return</span> <span class="fl">0.4</span><span class="op">*</span>x<span class="op">**</span><span class="dv">3</span> <span class="op">-</span> <span class="dv">3</span><span class="op">*</span>x<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> <span class="dv">4</span><span class="op">*</span>x</span>
+<span id="cb1-11"><a aria-label="11"></a></span>
+<span id="cb1-12"><a aria-label="12"></a><span class="kw">def</span> f_poly_double_prime(x):</span>
+<span id="cb1-13"><a aria-label="13"></a>    <span class="cf">return</span> <span class="fl">1.2</span><span class="op">*</span>x<span class="op">**</span><span class="dv">2</span> <span class="op">-</span> <span class="dv">6</span><span class="op">*</span>x <span class="op">+</span> <span class="dv">4</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </section>
@@ -341,7 +347,7 @@ rkskmt
 <h2>まずグラフを描いてみよう</h2>
 <div class="slide-body">
 <p>どんな形の関数なのか、<strong>まず目で見る</strong>ことが大切です。</p>
-<div id="3e2a6e26" class="cell" data-execution_count="2">
+<div id="4ca146ce" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -383,18 +389,18 @@ rkskmt
 <p>本編の勾配降下法の更新式を、<strong>そのまま</strong>使います：</p>
 <p><span class="math display">\[x_{\text{new}} = x - \alpha \cdot f'(x)\]</span></p>
 <p>学習率は <span class="math inline">\(\alpha = 0.1\)</span> に固定。同じ式・同じ学習率で、<strong>スタート地点だけ変えて</strong>2回実験します。</p>
-<div id="bd091397" class="cell" data-execution_count="3">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a><span class="kw">def</span> gradient_descent(f, fp, x0, lr<span class="op">=</span><span class="fl">0.1</span>, tol<span class="op">=</span><span class="fl">1e-6</span>, max_iter<span class="op">=</span><span class="dv">10000</span>):</span>
-<span id="cb2-2"><a></a>    <span class="co">"""勾配降下法：収束した場所・そこでの f(x)・通り道を返す"""</span></span>
-<span id="cb2-3"><a></a>    x <span class="op">=</span> x0</span>
-<span id="cb2-4"><a></a>    history <span class="op">=</span> [x]</span>
-<span id="cb2-5"><a></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(max_iter):</span>
-<span id="cb2-6"><a></a>        grad <span class="op">=</span> fp(x)</span>
-<span id="cb2-7"><a></a>        <span class="cf">if</span> <span class="bu">abs</span>(grad) <span class="op">&lt;</span> tol:      <span class="co"># 傾きほぼゼロ → 収束</span></span>
-<span id="cb2-8"><a></a>            <span class="cf">break</span></span>
-<span id="cb2-9"><a></a>        x <span class="op">=</span> x <span class="op">-</span> lr <span class="op">*</span> grad     <span class="co"># Move a little against the gradient</span></span>
-<span id="cb2-10"><a></a>        history.append(x)</span>
-<span id="cb2-11"><a></a>    <span class="cf">return</span> x, f(x), history</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="f1b41e6e" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a><span class="kw">def</span> gradient_descent(f, fp, x0, lr<span class="op">=</span><span class="fl">0.1</span>, tol<span class="op">=</span><span class="fl">1e-6</span>, max_iter<span class="op">=</span><span class="dv">10000</span>):</span>
+<span id="cb2-2"><a aria-label="2"></a>    <span class="co">"""勾配降下法：収束した場所・そこでの f(x)・通り道を返す"""</span></span>
+<span id="cb2-3"><a aria-label="3"></a>    x <span class="op">=</span> x0</span>
+<span id="cb2-4"><a aria-label="4"></a>    history <span class="op">=</span> [x]</span>
+<span id="cb2-5"><a aria-label="5"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(max_iter):</span>
+<span id="cb2-6"><a aria-label="6"></a>        grad <span class="op">=</span> fp(x)</span>
+<span id="cb2-7"><a aria-label="7"></a>        <span class="cf">if</span> <span class="bu">abs</span>(grad) <span class="op">&lt;</span> tol:      <span class="co"># 傾きほぼゼロ → 収束</span></span>
+<span id="cb2-8"><a aria-label="8"></a>            <span class="cf">break</span></span>
+<span id="cb2-9"><a aria-label="9"></a>        x <span class="op">=</span> x <span class="op">-</span> lr <span class="op">*</span> grad     <span class="co"># Move a little against the gradient</span></span>
+<span id="cb2-10"><a aria-label="10"></a>        history.append(x)</span>
+<span id="cb2-11"><a aria-label="11"></a>    <span class="cf">return</span> x, f(x), history</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </section>
@@ -437,22 +443,22 @@ rkskmt
 </div>
 </div>
 <h3 id="pythonで確認">Pythonで確認</h3>
-<div id="1a25e93f" class="cell" data-execution_count="4">
+<div id="a2b007c8" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>コードを表示</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a><span class="co"># 実験1: x0 = 0.5 からスタート</span></span>
-<span id="cb3-2"><a></a>x0_local <span class="op">=</span> <span class="fl">0.5</span></span>
-<span id="cb3-3"><a></a>x_local_final, f_local_final, history_local <span class="op">=</span> gradient_descent(</span>
-<span id="cb3-4"><a></a>    f_poly, f_poly_prime, x0_local)</span>
-<span id="cb3-5"><a></a></span>
-<span id="cb3-6"><a></a><span class="bu">print</span>(<span class="st">"実験1: x0 = 0.5 からスタート"</span>)</span>
-<span id="cb3-7"><a></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">60</span>)</span>
-<span id="cb3-8"><a></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
-<span id="cb3-9"><a></a>    <span class="bu">print</span>(<span class="ss">f"反復 </span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">: x = </span><span class="sc">{</span>history_local[i]<span class="sc">:.4f}</span><span class="ss"> → </span><span class="sc">{</span>history_local[i<span class="op">+</span><span class="dv">1</span>]<span class="sc">:.4f}</span><span class="ss">"</span></span>
-<span id="cb3-10"><a></a>          <span class="ss">f"  (f' = </span><span class="sc">{</span>f_poly_prime(history_local[i])<span class="sc">:.4f}</span><span class="ss">)"</span>)</span>
-<span id="cb3-11"><a></a><span class="bu">print</span>(<span class="st">"  ...（あとは同じことの繰り返し）"</span>)</span>
-<span id="cb3-12"><a></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">★ 反復 </span><span class="sc">{</span><span class="bu">len</span>(history_local)<span class="op">-</span><span class="dv">1</span><span class="sc">}</span><span class="ss"> 回で収束: "</span></span>
-<span id="cb3-13"><a></a>      <span class="ss">f"x = </span><span class="sc">{</span>x_local_final<span class="sc">:.4f}</span><span class="ss">, f(x) = </span><span class="sc">{</span>f_local_final<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a aria-label="1"></a><span class="co"># 実験1: x0 = 0.5 からスタート</span></span>
+<span id="cb3-2"><a aria-label="2"></a>x0_local <span class="op">=</span> <span class="fl">0.5</span></span>
+<span id="cb3-3"><a aria-label="3"></a>x_local_final, f_local_final, history_local <span class="op">=</span> gradient_descent(</span>
+<span id="cb3-4"><a aria-label="4"></a>    f_poly, f_poly_prime, x0_local)</span>
+<span id="cb3-5"><a aria-label="5"></a></span>
+<span id="cb3-6"><a aria-label="6"></a><span class="bu">print</span>(<span class="st">"実験1: x0 = 0.5 からスタート"</span>)</span>
+<span id="cb3-7"><a aria-label="7"></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">60</span>)</span>
+<span id="cb3-8"><a aria-label="8"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb3-9"><a aria-label="9"></a>    <span class="bu">print</span>(<span class="ss">f"反復 </span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">: x = </span><span class="sc">{</span>history_local[i]<span class="sc">:.4f}</span><span class="ss"> → </span><span class="sc">{</span>history_local[i<span class="op">+</span><span class="dv">1</span>]<span class="sc">:.4f}</span><span class="ss">"</span></span>
+<span id="cb3-10"><a aria-label="10"></a>          <span class="ss">f"  (f' = </span><span class="sc">{</span>f_poly_prime(history_local[i])<span class="sc">:.4f}</span><span class="ss">)"</span>)</span>
+<span id="cb3-11"><a aria-label="11"></a><span class="bu">print</span>(<span class="st">"  ...（あとは同じことの繰り返し）"</span>)</span>
+<span id="cb3-12"><a aria-label="12"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">★ 反復 </span><span class="sc">{</span><span class="bu">len</span>(history_local)<span class="op">-</span><span class="dv">1</span><span class="sc">}</span><span class="ss"> 回で収束: "</span></span>
+<span id="cb3-13"><a aria-label="13"></a>      <span class="ss">f"x = </span><span class="sc">{</span>x_local_final<span class="sc">:.4f}</span><span class="ss">, f(x) = </span><span class="sc">{</span>f_local_final<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>実験1: x0 = 0.5 からスタート
@@ -507,21 +513,21 @@ rkskmt
 </div>
 </div>
 <h3 id="pythonで確認-1">Pythonで確認</h3>
-<div id="8d54c2f0" class="cell" data-execution_count="5">
+<div id="762dccbf" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>コードを表示</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a><span class="co"># 実験2: x0 = 5.5 からスタート</span></span>
-<span id="cb5-2"><a></a>x0_global <span class="op">=</span> <span class="fl">5.5</span></span>
-<span id="cb5-3"><a></a>x_global_final, f_global_final, history_global <span class="op">=</span> gradient_descent(</span>
-<span id="cb5-4"><a></a>    f_poly, f_poly_prime, x0_global)</span>
-<span id="cb5-5"><a></a></span>
-<span id="cb5-6"><a></a><span class="bu">print</span>(<span class="st">"実験2: x0 = 5.5 からスタート"</span>)</span>
-<span id="cb5-7"><a></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">60</span>)</span>
-<span id="cb5-8"><a></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
-<span id="cb5-9"><a></a>    <span class="bu">print</span>(<span class="ss">f"反復 </span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">: x = </span><span class="sc">{</span>history_global[i]<span class="sc">:.4f}</span><span class="ss"> → </span><span class="sc">{</span>history_global[i<span class="op">+</span><span class="dv">1</span>]<span class="sc">:.4f}</span><span class="ss">"</span></span>
-<span id="cb5-10"><a></a>          <span class="ss">f"  (f' = </span><span class="sc">{</span>f_poly_prime(history_global[i])<span class="sc">:.4f}</span><span class="ss">)"</span>)</span>
-<span id="cb5-11"><a></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">★ 反復 </span><span class="sc">{</span><span class="bu">len</span>(history_global)<span class="op">-</span><span class="dv">1</span><span class="sc">}</span><span class="ss"> 回で収束: "</span></span>
-<span id="cb5-12"><a></a>      <span class="ss">f"x = </span><span class="sc">{</span>x_global_final<span class="sc">:.4f}</span><span class="ss">, f(x) = </span><span class="sc">{</span>f_global_final<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a aria-label="1"></a><span class="co"># 実験2: x0 = 5.5 からスタート</span></span>
+<span id="cb5-2"><a aria-label="2"></a>x0_global <span class="op">=</span> <span class="fl">5.5</span></span>
+<span id="cb5-3"><a aria-label="3"></a>x_global_final, f_global_final, history_global <span class="op">=</span> gradient_descent(</span>
+<span id="cb5-4"><a aria-label="4"></a>    f_poly, f_poly_prime, x0_global)</span>
+<span id="cb5-5"><a aria-label="5"></a></span>
+<span id="cb5-6"><a aria-label="6"></a><span class="bu">print</span>(<span class="st">"実験2: x0 = 5.5 からスタート"</span>)</span>
+<span id="cb5-7"><a aria-label="7"></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">60</span>)</span>
+<span id="cb5-8"><a aria-label="8"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb5-9"><a aria-label="9"></a>    <span class="bu">print</span>(<span class="ss">f"反復 </span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">: x = </span><span class="sc">{</span>history_global[i]<span class="sc">:.4f}</span><span class="ss"> → </span><span class="sc">{</span>history_global[i<span class="op">+</span><span class="dv">1</span>]<span class="sc">:.4f}</span><span class="ss">"</span></span>
+<span id="cb5-10"><a aria-label="10"></a>          <span class="ss">f"  (f' = </span><span class="sc">{</span>f_poly_prime(history_global[i])<span class="sc">:.4f}</span><span class="ss">)"</span>)</span>
+<span id="cb5-11"><a aria-label="11"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">★ 反復 </span><span class="sc">{</span><span class="bu">len</span>(history_global)<span class="op">-</span><span class="dv">1</span><span class="sc">}</span><span class="ss"> 回で収束: "</span></span>
+<span id="cb5-12"><a aria-label="12"></a>      <span class="ss">f"x = </span><span class="sc">{</span>x_global_final<span class="sc">:.4f}</span><span class="ss">, f(x) = </span><span class="sc">{</span>f_global_final<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>実験2: x0 = 5.5 からスタート
@@ -538,7 +544,7 @@ rkskmt
 <section id="つの実験を並べてみよう" class="slide level2">
 <h2>2つの実験を並べてみよう</h2>
 <div class="slide-body">
-<div id="0b8a614a" class="cell" data-execution_count="6">
+<div id="2c21c14a" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -613,7 +619,7 @@ rkskmt
 <p>いま体験した現象には、ちゃんと名前がついています。</p>
 <p><strong>ローカルミニマム（局所的最小値, <span class="en">local minimum</span>）</strong>: 「その周辺では一番低い」けど、関数全体で見ると<strong>もっと低い場所がある</strong>点。 実験1で到達した<strong>左の谷（x = 0）</strong>がこれです。</p>
 <p><strong>グローバルミニマム（大域的最小値, <span class="en">global minimum</span>）</strong>: 関数全体で<strong>本当に一番低い</strong>点。 実験2で到達した<strong>右の谷（x ≈ 5.77）</strong>がこれです。</p>
-<div id="f905d482" class="cell" data-execution_count="7">
+<div id="eb9be1c4" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -664,16 +670,16 @@ rkskmt
 <section id="どの初期値がどの谷に落ちるのか" class="slide level2">
 <h2>どの初期値が、どの谷に落ちるのか</h2>
 <div class="slide-body">
-<div id="462151f4" class="cell" data-execution_count="8">
+<div id="2b0fa71f" class="cell" data-execution_count="8">
 <details class="code-fold">
 <summary>コードを表示</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a></a><span class="co"># 初期値を -1.5 から 7.5 まで細かく変えて、全部試す</span></span>
-<span id="cb7-2"><a></a>x0_dense_gd <span class="op">=</span> np.linspace(<span class="op">-</span><span class="fl">1.5</span>, <span class="fl">7.5</span>, <span class="dv">200</span>)</span>
-<span id="cb7-3"><a></a>gd_points <span class="op">=</span> np.array(</span>
-<span id="cb7-4"><a></a>    [gradient_descent(f_poly, f_poly_prime, x0)[<span class="dv">0</span>] <span class="cf">for</span> x0 <span class="kw">in</span> x0_dense_gd])</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a aria-label="1"></a><span class="co"># 初期値を -1.5 から 7.5 まで細かく変えて、全部試す</span></span>
+<span id="cb7-2"><a aria-label="2"></a>x0_dense_gd <span class="op">=</span> np.linspace(<span class="op">-</span><span class="fl">1.5</span>, <span class="fl">7.5</span>, <span class="dv">200</span>)</span>
+<span id="cb7-3"><a aria-label="3"></a>gd_points <span class="op">=</span> np.array(</span>
+<span id="cb7-4"><a aria-label="4"></a>    [gradient_descent(f_poly, f_poly_prime, x0)[<span class="dv">0</span>] <span class="cf">for</span> x0 <span class="kw">in</span> x0_dense_gd])</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="af0cf0fd" class="cell" data-execution_count="9">
+<div id="80199260" class="cell" data-execution_count="9">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -767,25 +773,25 @@ rkskmt
 </div>
 </div>
 <h3 id="つの結果を比較">3つの結果を比較</h3>
-<div id="d3c3f47b" class="cell" data-execution_count="11">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a></a><span class="co"># 3つの初期値から実行して比較</span></span>
-<span id="cb8-2"><a></a>starting_points <span class="op">=</span> [<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">6</span>]</span>
-<span id="cb8-3"><a></a></span>
-<span id="cb8-4"><a></a><span class="bu">print</span>(<span class="st">"初期値を変えて比較（勾配降下法）"</span>)</span>
-<span id="cb8-5"><a></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">60</span>)</span>
-<span id="cb8-6"><a></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'x0'</span><span class="sc">:&gt;4}</span><span class="ss">  →  </span><span class="sc">{</span><span class="st">'到着地点'</span><span class="sc">:&gt;8}</span><span class="ss">  →  </span><span class="sc">{</span><span class="st">'f(x)'</span><span class="sc">:&gt;8}</span><span class="ss">  →  どこの谷？"</span>)</span>
-<span id="cb8-7"><a></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">60</span>)</span>
-<span id="cb8-8"><a></a></span>
-<span id="cb8-9"><a></a>results_comparison <span class="op">=</span> []</span>
-<span id="cb8-10"><a></a><span class="cf">for</span> x0 <span class="kw">in</span> starting_points:</span>
-<span id="cb8-11"><a></a>    x_final, f_final, _ <span class="op">=</span> gradient_descent(f_poly, f_poly_prime, x0)</span>
-<span id="cb8-12"><a></a>    results_comparison.append((x0, x_final, f_final))</span>
-<span id="cb8-13"><a></a></span>
-<span id="cb8-14"><a></a>best_f <span class="op">=</span> <span class="bu">min</span>(r[<span class="dv">2</span>] <span class="cf">for</span> r <span class="kw">in</span> results_comparison)</span>
-<span id="cb8-15"><a></a><span class="cf">for</span> x0, xf, fx <span class="kw">in</span> results_comparison:</span>
-<span id="cb8-16"><a></a>    where <span class="op">=</span> <span class="st">"左の谷"</span> <span class="cf">if</span> xf <span class="op">&lt;</span> <span class="dv">3</span> <span class="cf">else</span> <span class="st">"右の谷"</span></span>
-<span id="cb8-17"><a></a>    marker <span class="op">=</span> <span class="st">" ← 最良！"</span> <span class="cf">if</span> fx <span class="op">==</span> best_f <span class="cf">else</span> <span class="st">""</span></span>
-<span id="cb8-18"><a></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>x0<span class="sc">:4.1f}</span><span class="ss">  →  </span><span class="sc">{</span>xf<span class="sc">:8.4f}</span><span class="ss">  →  </span><span class="sc">{</span>fx<span class="sc">:8.4f}</span><span class="ss">  →  </span><span class="sc">{</span>where<span class="sc">}{</span>marker<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="23a0af3a" class="cell" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a aria-label="1"></a><span class="co"># 3つの初期値から実行して比較</span></span>
+<span id="cb8-2"><a aria-label="2"></a>starting_points <span class="op">=</span> [<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">6</span>]</span>
+<span id="cb8-3"><a aria-label="3"></a></span>
+<span id="cb8-4"><a aria-label="4"></a><span class="bu">print</span>(<span class="st">"初期値を変えて比較（勾配降下法）"</span>)</span>
+<span id="cb8-5"><a aria-label="5"></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">60</span>)</span>
+<span id="cb8-6"><a aria-label="6"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'x0'</span><span class="sc">:&gt;4}</span><span class="ss">  →  </span><span class="sc">{</span><span class="st">'到着地点'</span><span class="sc">:&gt;8}</span><span class="ss">  →  </span><span class="sc">{</span><span class="st">'f(x)'</span><span class="sc">:&gt;8}</span><span class="ss">  →  どこの谷？"</span>)</span>
+<span id="cb8-7"><a aria-label="7"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">60</span>)</span>
+<span id="cb8-8"><a aria-label="8"></a></span>
+<span id="cb8-9"><a aria-label="9"></a>results_comparison <span class="op">=</span> []</span>
+<span id="cb8-10"><a aria-label="10"></a><span class="cf">for</span> x0 <span class="kw">in</span> starting_points:</span>
+<span id="cb8-11"><a aria-label="11"></a>    x_final, f_final, _ <span class="op">=</span> gradient_descent(f_poly, f_poly_prime, x0)</span>
+<span id="cb8-12"><a aria-label="12"></a>    results_comparison.append((x0, x_final, f_final))</span>
+<span id="cb8-13"><a aria-label="13"></a></span>
+<span id="cb8-14"><a aria-label="14"></a>best_f <span class="op">=</span> <span class="bu">min</span>(r[<span class="dv">2</span>] <span class="cf">for</span> r <span class="kw">in</span> results_comparison)</span>
+<span id="cb8-15"><a aria-label="15"></a><span class="cf">for</span> x0, xf, fx <span class="kw">in</span> results_comparison:</span>
+<span id="cb8-16"><a aria-label="16"></a>    where <span class="op">=</span> <span class="st">"左の谷"</span> <span class="cf">if</span> xf <span class="op">&lt;</span> <span class="dv">3</span> <span class="cf">else</span> <span class="st">"右の谷"</span></span>
+<span id="cb8-17"><a aria-label="17"></a>    marker <span class="op">=</span> <span class="st">" ← 最良！"</span> <span class="cf">if</span> fx <span class="op">==</span> best_f <span class="cf">else</span> <span class="st">""</span></span>
+<span id="cb8-18"><a aria-label="18"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>x0<span class="sc">:4.1f}</span><span class="ss">  →  </span><span class="sc">{</span>xf<span class="sc">:8.4f}</span><span class="ss">  →  </span><span class="sc">{</span>fx<span class="sc">:8.4f}</span><span class="ss">  →  </span><span class="sc">{</span>where<span class="sc">}{</span>marker<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>初期値を変えて比較（勾配降下法）
 ============================================================
@@ -821,32 +827,32 @@ rkskmt
 <div class="tab-content">
 <div id="tabset-4-1">
 <p>初期値を<strong>ランダムに</strong>選ぶ方法です。</p>
-<div id="91a64786" class="cell" data-execution_count="12">
+<div id="27e5b337" class="cell" data-execution_count="12">
 <details class="code-fold">
 <summary>コードを表示</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a></a><span class="co"># 20個のランダムな初期値から試す</span></span>
-<span id="cb10-2"><a></a>np.random.seed(<span class="dv">42</span>)</span>
-<span id="cb10-3"><a></a>n_trials <span class="op">=</span> <span class="dv">20</span></span>
-<span id="cb10-4"><a></a>results <span class="op">=</span> []</span>
-<span id="cb10-5"><a></a></span>
-<span id="cb10-6"><a></a><span class="bu">print</span>(<span class="st">"ランダムリスタート：20個の初期値から試す"</span>)</span>
-<span id="cb10-7"><a></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">60</span>)</span>
-<span id="cb10-8"><a></a></span>
-<span id="cb10-9"><a></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n_trials):</span>
-<span id="cb10-10"><a></a>    x0 <span class="op">=</span> np.random.uniform(<span class="op">-</span><span class="dv">1</span>, <span class="dv">7</span>)</span>
-<span id="cb10-11"><a></a>    x_final, f_final, _ <span class="op">=</span> gradient_descent(f_poly, f_poly_prime, x0)</span>
-<span id="cb10-12"><a></a>    results.append((x0, x_final, f_final))</span>
-<span id="cb10-13"><a></a></span>
-<span id="cb10-14"><a></a>    <span class="cf">if</span> i <span class="op">&lt;</span> <span class="dv">5</span>:</span>
-<span id="cb10-15"><a></a>        <span class="bu">print</span>(<span class="ss">f"試行 </span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">:2d}</span><span class="ss">: x0=</span><span class="sc">{</span>x0<span class="sc">:5.2f}</span><span class="ss"> → x=</span><span class="sc">{</span>x_final<span class="sc">:6.2f}</span><span class="ss">, f(x)=</span><span class="sc">{</span>f_final<span class="sc">:7.4f}</span><span class="ss">"</span>)</span>
-<span id="cb10-16"><a></a></span>
-<span id="cb10-17"><a></a><span class="bu">print</span>(<span class="ss">f"  ... (残り</span><span class="sc">{</span>n_trials<span class="op">-</span><span class="dv">5</span><span class="sc">}</span><span class="ss">個)"</span>)</span>
-<span id="cb10-18"><a></a></span>
-<span id="cb10-19"><a></a><span class="co"># 最良の結果を見つける</span></span>
-<span id="cb10-20"><a></a>results.sort(key<span class="op">=</span><span class="kw">lambda</span> r: r[<span class="dv">2</span>])</span>
-<span id="cb10-21"><a></a>best_x0, best_x, best_f <span class="op">=</span> results[<span class="dv">0</span>]</span>
-<span id="cb10-22"><a></a></span>
-<span id="cb10-23"><a></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">★ 最良の結果: x0=</span><span class="sc">{</span>best_x0<span class="sc">:.2f}</span><span class="ss"> → x=</span><span class="sc">{</span>best_x<span class="sc">:.4f}</span><span class="ss">, f(x)=</span><span class="sc">{</span>best_f<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a aria-label="1"></a><span class="co"># 20個のランダムな初期値から試す</span></span>
+<span id="cb10-2"><a aria-label="2"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb10-3"><a aria-label="3"></a>n_trials <span class="op">=</span> <span class="dv">20</span></span>
+<span id="cb10-4"><a aria-label="4"></a>results <span class="op">=</span> []</span>
+<span id="cb10-5"><a aria-label="5"></a></span>
+<span id="cb10-6"><a aria-label="6"></a><span class="bu">print</span>(<span class="st">"ランダムリスタート：20個の初期値から試す"</span>)</span>
+<span id="cb10-7"><a aria-label="7"></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">60</span>)</span>
+<span id="cb10-8"><a aria-label="8"></a></span>
+<span id="cb10-9"><a aria-label="9"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n_trials):</span>
+<span id="cb10-10"><a aria-label="10"></a>    x0 <span class="op">=</span> np.random.uniform(<span class="op">-</span><span class="dv">1</span>, <span class="dv">7</span>)</span>
+<span id="cb10-11"><a aria-label="11"></a>    x_final, f_final, _ <span class="op">=</span> gradient_descent(f_poly, f_poly_prime, x0)</span>
+<span id="cb10-12"><a aria-label="12"></a>    results.append((x0, x_final, f_final))</span>
+<span id="cb10-13"><a aria-label="13"></a></span>
+<span id="cb10-14"><a aria-label="14"></a>    <span class="cf">if</span> i <span class="op">&lt;</span> <span class="dv">5</span>:</span>
+<span id="cb10-15"><a aria-label="15"></a>        <span class="bu">print</span>(<span class="ss">f"試行 </span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">:2d}</span><span class="ss">: x0=</span><span class="sc">{</span>x0<span class="sc">:5.2f}</span><span class="ss"> → x=</span><span class="sc">{</span>x_final<span class="sc">:6.2f}</span><span class="ss">, f(x)=</span><span class="sc">{</span>f_final<span class="sc">:7.4f}</span><span class="ss">"</span>)</span>
+<span id="cb10-16"><a aria-label="16"></a></span>
+<span id="cb10-17"><a aria-label="17"></a><span class="bu">print</span>(<span class="ss">f"  ... (残り</span><span class="sc">{</span>n_trials<span class="op">-</span><span class="dv">5</span><span class="sc">}</span><span class="ss">個)"</span>)</span>
+<span id="cb10-18"><a aria-label="18"></a></span>
+<span id="cb10-19"><a aria-label="19"></a><span class="co"># 最良の結果を見つける</span></span>
+<span id="cb10-20"><a aria-label="20"></a>results.sort(key<span class="op">=</span><span class="kw">lambda</span> r: r[<span class="dv">2</span>])</span>
+<span id="cb10-21"><a aria-label="21"></a>best_x0, best_x, best_f <span class="op">=</span> results[<span class="dv">0</span>]</span>
+<span id="cb10-22"><a aria-label="22"></a></span>
+<span id="cb10-23"><a aria-label="23"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">★ 最良の結果: x0=</span><span class="sc">{</span>best_x0<span class="sc">:.2f}</span><span class="ss"> → x=</span><span class="sc">{</span>best_x<span class="sc">:.4f}</span><span class="ss">, f(x)=</span><span class="sc">{</span>best_f<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>ランダムリスタート：20個の初期値から試す
@@ -864,25 +870,25 @@ rkskmt
 </div>
 <div id="tabset-4-2">
 <p>ランダムではなく、<strong>等間隔に並べる</strong>方法もあります。</p>
-<div id="eefea1d7" class="cell" data-execution_count="13">
+<div id="100cfe66" class="cell" data-execution_count="13">
 <details class="code-fold">
 <summary>コードを表示</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a></a><span class="co"># 等間隔に15個の初期値を用意</span></span>
-<span id="cb12-2"><a></a>x0_candidates <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">1</span>, <span class="dv">7</span>, <span class="dv">15</span>)</span>
-<span id="cb12-3"><a></a>grid_results <span class="op">=</span> []</span>
-<span id="cb12-4"><a></a></span>
-<span id="cb12-5"><a></a><span class="bu">print</span>(<span class="st">"グリッドサーチ：等間隔の15個の初期値"</span>)</span>
-<span id="cb12-6"><a></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">55</span>)</span>
-<span id="cb12-7"><a></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'x0'</span><span class="sc">:&gt;5}</span><span class="ss">  →  </span><span class="sc">{</span><span class="st">'到着地点'</span><span class="sc">:&gt;8}</span><span class="ss">  →  </span><span class="sc">{</span><span class="st">'f(x)'</span><span class="sc">:&gt;8}</span><span class="ss">"</span>)</span>
-<span id="cb12-8"><a></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">55</span>)</span>
-<span id="cb12-9"><a></a></span>
-<span id="cb12-10"><a></a><span class="cf">for</span> x0 <span class="kw">in</span> x0_candidates:</span>
-<span id="cb12-11"><a></a>    x_final, f_final, _ <span class="op">=</span> gradient_descent(f_poly, f_poly_prime, x0)</span>
-<span id="cb12-12"><a></a>    grid_results.append((x0, x_final, f_final))</span>
-<span id="cb12-13"><a></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>x0<span class="sc">:5.2f}</span><span class="ss">  →  </span><span class="sc">{</span>x_final<span class="sc">:8.4f}</span><span class="ss">  →  </span><span class="sc">{</span>f_final<span class="sc">:8.4f}</span><span class="ss">"</span>)</span>
-<span id="cb12-14"><a></a></span>
-<span id="cb12-15"><a></a>best_grid <span class="op">=</span> <span class="bu">min</span>(grid_results, key<span class="op">=</span><span class="kw">lambda</span> r: r[<span class="dv">2</span>])</span>
-<span id="cb12-16"><a></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">★ 最良: x0=</span><span class="sc">{</span>best_grid[<span class="dv">0</span>]<span class="sc">:.2f}</span><span class="ss"> → x=</span><span class="sc">{</span>best_grid[<span class="dv">1</span>]<span class="sc">:.4f}</span><span class="ss">, f(x)=</span><span class="sc">{</span>best_grid[<span class="dv">2</span>]<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a aria-label="1"></a><span class="co"># 等間隔に15個の初期値を用意</span></span>
+<span id="cb12-2"><a aria-label="2"></a>x0_candidates <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">1</span>, <span class="dv">7</span>, <span class="dv">15</span>)</span>
+<span id="cb12-3"><a aria-label="3"></a>grid_results <span class="op">=</span> []</span>
+<span id="cb12-4"><a aria-label="4"></a></span>
+<span id="cb12-5"><a aria-label="5"></a><span class="bu">print</span>(<span class="st">"グリッドサーチ：等間隔の15個の初期値"</span>)</span>
+<span id="cb12-6"><a aria-label="6"></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">55</span>)</span>
+<span id="cb12-7"><a aria-label="7"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'x0'</span><span class="sc">:&gt;5}</span><span class="ss">  →  </span><span class="sc">{</span><span class="st">'到着地点'</span><span class="sc">:&gt;8}</span><span class="ss">  →  </span><span class="sc">{</span><span class="st">'f(x)'</span><span class="sc">:&gt;8}</span><span class="ss">"</span>)</span>
+<span id="cb12-8"><a aria-label="8"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">55</span>)</span>
+<span id="cb12-9"><a aria-label="9"></a></span>
+<span id="cb12-10"><a aria-label="10"></a><span class="cf">for</span> x0 <span class="kw">in</span> x0_candidates:</span>
+<span id="cb12-11"><a aria-label="11"></a>    x_final, f_final, _ <span class="op">=</span> gradient_descent(f_poly, f_poly_prime, x0)</span>
+<span id="cb12-12"><a aria-label="12"></a>    grid_results.append((x0, x_final, f_final))</span>
+<span id="cb12-13"><a aria-label="13"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>x0<span class="sc">:5.2f}</span><span class="ss">  →  </span><span class="sc">{</span>x_final<span class="sc">:8.4f}</span><span class="ss">  →  </span><span class="sc">{</span>f_final<span class="sc">:8.4f}</span><span class="ss">"</span>)</span>
+<span id="cb12-14"><a aria-label="14"></a></span>
+<span id="cb12-15"><a aria-label="15"></a>best_grid <span class="op">=</span> <span class="bu">min</span>(grid_results, key<span class="op">=</span><span class="kw">lambda</span> r: r[<span class="dv">2</span>])</span>
+<span id="cb12-16"><a aria-label="16"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">★ 最良: x0=</span><span class="sc">{</span>best_grid[<span class="dv">0</span>]<span class="sc">:.2f}</span><span class="ss"> → x=</span><span class="sc">{</span>best_grid[<span class="dv">1</span>]<span class="sc">:.4f}</span><span class="ss">, f(x)=</span><span class="sc">{</span>best_grid[<span class="dv">2</span>]<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>グリッドサーチ：等間隔の15個の初期値
@@ -908,7 +914,7 @@ rkskmt
 ★ 最良: x0=3.57 → x=5.7656, f(x)=-13.6726</code></pre>
 </div>
 </div>
-<div id="8a750ae4" class="cell" data-execution_count="14">
+<div id="cb0dc057" class="cell" data-execution_count="14">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1057,70 +1063,70 @@ rkskmt
 <h2>実装テンプレート</h2>
 <div class="slide-body">
 <p>上の4ステップをまとめたコードです。コピーして使えます。</p>
-<div id="e0a5f0b8" class="cell" data-execution_count="15">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a></a><span class="kw">def</span> robust_optimization(f, fp, fpp, x0_list, lr<span class="op">=</span><span class="fl">0.1</span>, max_iter<span class="op">=</span><span class="dv">10000</span>):</span>
-<span id="cb14-2"><a></a>    <span class="co">"""</span></span>
-<span id="cb14-3"><a></a><span class="co">    複数の初期値を使ったロバストな最適化（勾配降下法版）</span></span>
-<span id="cb14-4"><a></a></span>
-<span id="cb14-5"><a></a><span class="co">    Parameters:</span></span>
-<span id="cb14-6"><a></a><span class="co">    -----------</span></span>
-<span id="cb14-7"><a></a><span class="co">    f, fp, fpp : functions</span></span>
-<span id="cb14-8"><a></a><span class="co">        目的関数とその1次微分、2次微分（2次微分は谷の検品用）</span></span>
-<span id="cb14-9"><a></a><span class="co">    x0_list : list</span></span>
-<span id="cb14-10"><a></a><span class="co">        初期値のリスト</span></span>
-<span id="cb14-11"><a></a><span class="co">    lr : float</span></span>
-<span id="cb14-12"><a></a><span class="co">        学習率</span></span>
-<span id="cb14-13"><a></a><span class="co">    max_iter : int</span></span>
-<span id="cb14-14"><a></a><span class="co">        最大反復数</span></span>
-<span id="cb14-15"><a></a></span>
-<span id="cb14-16"><a></a><span class="co">    Returns:</span></span>
-<span id="cb14-17"><a></a><span class="co">    --------</span></span>
-<span id="cb14-18"><a></a><span class="co">    best_x : float</span></span>
-<span id="cb14-19"><a></a><span class="co">        見つかった最良解</span></span>
-<span id="cb14-20"><a></a><span class="co">    all_results : list</span></span>
-<span id="cb14-21"><a></a><span class="co">        比較用のすべての結果</span></span>
-<span id="cb14-22"><a></a><span class="co">    """</span></span>
-<span id="cb14-23"><a></a>    all_results <span class="op">=</span> []</span>
-<span id="cb14-24"><a></a></span>
-<span id="cb14-25"><a></a>    <span class="cf">for</span> x0 <span class="kw">in</span> x0_list:</span>
-<span id="cb14-26"><a></a>        x <span class="op">=</span> x0</span>
-<span id="cb14-27"><a></a></span>
-<span id="cb14-28"><a></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(max_iter):</span>
-<span id="cb14-29"><a></a>            grad <span class="op">=</span> fp(x)</span>
-<span id="cb14-30"><a></a>            <span class="cf">if</span> <span class="bu">abs</span>(grad) <span class="op">&lt;</span> <span class="fl">1e-6</span>:       <span class="co"># 傾きほぼゼロ → 収束</span></span>
-<span id="cb14-31"><a></a>                <span class="cf">break</span></span>
-<span id="cb14-32"><a></a>            x <span class="op">=</span> x <span class="op">-</span> lr <span class="op">*</span> grad       <span class="co"># Move a little against the gradient</span></span>
-<span id="cb14-33"><a></a></span>
-<span id="cb14-34"><a></a>        all_results.append({</span>
-<span id="cb14-35"><a></a>            <span class="st">"x0"</span>: x0,</span>
-<span id="cb14-36"><a></a>            <span class="st">"x_final"</span>: x,</span>
-<span id="cb14-37"><a></a>            <span class="st">"f_final"</span>: f(x),</span>
-<span id="cb14-38"><a></a>            <span class="st">"is_minimum"</span>: fpp(x) <span class="op">&gt;</span> <span class="dv">0</span>   <span class="co"># ステップ4：谷の検品</span></span>
-<span id="cb14-39"><a></a>        })</span>
-<span id="cb14-40"><a></a></span>
-<span id="cb14-41"><a></a>    <span class="co"># 谷（最小値）だけを残して、一番良いのを選ぶ</span></span>
-<span id="cb14-42"><a></a>    minima <span class="op">=</span> [r <span class="cf">for</span> r <span class="kw">in</span> all_results <span class="cf">if</span> r[<span class="st">"is_minimum"</span>]]</span>
-<span id="cb14-43"><a></a>    <span class="cf">if</span> minima:</span>
-<span id="cb14-44"><a></a>        best_result <span class="op">=</span> <span class="bu">min</span>(minima, key<span class="op">=</span><span class="kw">lambda</span> r: r[<span class="st">"f_final"</span>])</span>
-<span id="cb14-45"><a></a>    <span class="cf">else</span>:</span>
-<span id="cb14-46"><a></a>        best_result <span class="op">=</span> <span class="bu">min</span>(all_results, key<span class="op">=</span><span class="kw">lambda</span> r: r[<span class="st">"f_final"</span>])</span>
-<span id="cb14-47"><a></a></span>
-<span id="cb14-48"><a></a>    <span class="cf">return</span> best_result[<span class="st">"x_final"</span>], all_results</span>
-<span id="cb14-49"><a></a></span>
-<span id="cb14-50"><a></a><span class="co"># 使用例：5つの初期値から試す</span></span>
-<span id="cb14-51"><a></a>initial_values <span class="op">=</span> [<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">6</span>]</span>
-<span id="cb14-52"><a></a>best_x, all_results <span class="op">=</span> robust_optimization(f_poly, f_poly_prime, f_poly_double_prime,</span>
-<span id="cb14-53"><a></a>                                          initial_values)</span>
-<span id="cb14-54"><a></a></span>
-<span id="cb14-55"><a></a><span class="bu">print</span>(<span class="st">"すべての結果:"</span>)</span>
-<span id="cb14-56"><a></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'x0'</span><span class="sc">:&gt;4}</span><span class="ss">  →  </span><span class="sc">{</span><span class="st">'到着地点'</span><span class="sc">:&gt;8}</span><span class="ss">  →  </span><span class="sc">{</span><span class="st">'f(x)'</span><span class="sc">:&gt;8}</span><span class="ss">  →  </span><span class="sc">{</span><span class="st">'谷?'</span><span class="sc">:&gt;4}</span><span class="ss">"</span>)</span>
-<span id="cb14-57"><a></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">50</span>)</span>
-<span id="cb14-58"><a></a><span class="cf">for</span> r <span class="kw">in</span> all_results:</span>
-<span id="cb14-59"><a></a>    valley <span class="op">=</span> <span class="st">"はい"</span> <span class="cf">if</span> r[<span class="st">"is_minimum"</span>] <span class="cf">else</span> <span class="st">"いいえ"</span></span>
-<span id="cb14-60"><a></a>    marker <span class="op">=</span> <span class="st">" ← 最良！"</span> <span class="cf">if</span> r[<span class="st">"x_final"</span>] <span class="op">==</span> best_x <span class="cf">else</span> <span class="st">""</span></span>
-<span id="cb14-61"><a></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>r[<span class="st">'x0'</span>]<span class="sc">:4.1f}</span><span class="ss">  →  </span><span class="sc">{</span>r[<span class="st">'x_final'</span>]<span class="sc">:8.4f}</span><span class="ss">  →  </span><span class="sc">{</span>r[<span class="st">'f_final'</span>]<span class="sc">:8.4f}</span><span class="ss">  →  </span><span class="sc">{</span>valley<span class="sc">}{</span>marker<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb14-62"><a></a></span>
-<span id="cb14-63"><a></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">★ 最良解: x = </span><span class="sc">{</span>best_x<span class="sc">:.4f}</span><span class="ss">, f(x) = </span><span class="sc">{</span>f_poly(best_x)<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="234281c5" class="cell" data-execution_count="15">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a aria-label="1"></a><span class="kw">def</span> robust_optimization(f, fp, fpp, x0_list, lr<span class="op">=</span><span class="fl">0.1</span>, max_iter<span class="op">=</span><span class="dv">10000</span>):</span>
+<span id="cb14-2"><a aria-label="2"></a>    <span class="co">"""</span></span>
+<span id="cb14-3"><a aria-label="3"></a><span class="co">    複数の初期値を使ったロバストな最適化（勾配降下法版）</span></span>
+<span id="cb14-4"><a aria-label="4"></a></span>
+<span id="cb14-5"><a aria-label="5"></a><span class="co">    Parameters:</span></span>
+<span id="cb14-6"><a aria-label="6"></a><span class="co">    -----------</span></span>
+<span id="cb14-7"><a aria-label="7"></a><span class="co">    f, fp, fpp : functions</span></span>
+<span id="cb14-8"><a aria-label="8"></a><span class="co">        目的関数とその1次微分、2次微分（2次微分は谷の検品用）</span></span>
+<span id="cb14-9"><a aria-label="9"></a><span class="co">    x0_list : list</span></span>
+<span id="cb14-10"><a aria-label="10"></a><span class="co">        初期値のリスト</span></span>
+<span id="cb14-11"><a aria-label="11"></a><span class="co">    lr : float</span></span>
+<span id="cb14-12"><a aria-label="12"></a><span class="co">        学習率</span></span>
+<span id="cb14-13"><a aria-label="13"></a><span class="co">    max_iter : int</span></span>
+<span id="cb14-14"><a aria-label="14"></a><span class="co">        最大反復数</span></span>
+<span id="cb14-15"><a aria-label="15"></a></span>
+<span id="cb14-16"><a aria-label="16"></a><span class="co">    Returns:</span></span>
+<span id="cb14-17"><a aria-label="17"></a><span class="co">    --------</span></span>
+<span id="cb14-18"><a aria-label="18"></a><span class="co">    best_x : float</span></span>
+<span id="cb14-19"><a aria-label="19"></a><span class="co">        見つかった最良解</span></span>
+<span id="cb14-20"><a aria-label="20"></a><span class="co">    all_results : list</span></span>
+<span id="cb14-21"><a aria-label="21"></a><span class="co">        比較用のすべての結果</span></span>
+<span id="cb14-22"><a aria-label="22"></a><span class="co">    """</span></span>
+<span id="cb14-23"><a aria-label="23"></a>    all_results <span class="op">=</span> []</span>
+<span id="cb14-24"><a aria-label="24"></a></span>
+<span id="cb14-25"><a aria-label="25"></a>    <span class="cf">for</span> x0 <span class="kw">in</span> x0_list:</span>
+<span id="cb14-26"><a aria-label="26"></a>        x <span class="op">=</span> x0</span>
+<span id="cb14-27"><a aria-label="27"></a></span>
+<span id="cb14-28"><a aria-label="28"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(max_iter):</span>
+<span id="cb14-29"><a aria-label="29"></a>            grad <span class="op">=</span> fp(x)</span>
+<span id="cb14-30"><a aria-label="30"></a>            <span class="cf">if</span> <span class="bu">abs</span>(grad) <span class="op">&lt;</span> <span class="fl">1e-6</span>:       <span class="co"># 傾きほぼゼロ → 収束</span></span>
+<span id="cb14-31"><a aria-label="31"></a>                <span class="cf">break</span></span>
+<span id="cb14-32"><a aria-label="32"></a>            x <span class="op">=</span> x <span class="op">-</span> lr <span class="op">*</span> grad       <span class="co"># Move a little against the gradient</span></span>
+<span id="cb14-33"><a aria-label="33"></a></span>
+<span id="cb14-34"><a aria-label="34"></a>        all_results.append({</span>
+<span id="cb14-35"><a aria-label="35"></a>            <span class="st">"x0"</span>: x0,</span>
+<span id="cb14-36"><a aria-label="36"></a>            <span class="st">"x_final"</span>: x,</span>
+<span id="cb14-37"><a aria-label="37"></a>            <span class="st">"f_final"</span>: f(x),</span>
+<span id="cb14-38"><a aria-label="38"></a>            <span class="st">"is_minimum"</span>: fpp(x) <span class="op">&gt;</span> <span class="dv">0</span>   <span class="co"># ステップ4：谷の検品</span></span>
+<span id="cb14-39"><a aria-label="39"></a>        })</span>
+<span id="cb14-40"><a aria-label="40"></a></span>
+<span id="cb14-41"><a aria-label="41"></a>    <span class="co"># 谷（最小値）だけを残して、一番良いのを選ぶ</span></span>
+<span id="cb14-42"><a aria-label="42"></a>    minima <span class="op">=</span> [r <span class="cf">for</span> r <span class="kw">in</span> all_results <span class="cf">if</span> r[<span class="st">"is_minimum"</span>]]</span>
+<span id="cb14-43"><a aria-label="43"></a>    <span class="cf">if</span> minima:</span>
+<span id="cb14-44"><a aria-label="44"></a>        best_result <span class="op">=</span> <span class="bu">min</span>(minima, key<span class="op">=</span><span class="kw">lambda</span> r: r[<span class="st">"f_final"</span>])</span>
+<span id="cb14-45"><a aria-label="45"></a>    <span class="cf">else</span>:</span>
+<span id="cb14-46"><a aria-label="46"></a>        best_result <span class="op">=</span> <span class="bu">min</span>(all_results, key<span class="op">=</span><span class="kw">lambda</span> r: r[<span class="st">"f_final"</span>])</span>
+<span id="cb14-47"><a aria-label="47"></a></span>
+<span id="cb14-48"><a aria-label="48"></a>    <span class="cf">return</span> best_result[<span class="st">"x_final"</span>], all_results</span>
+<span id="cb14-49"><a aria-label="49"></a></span>
+<span id="cb14-50"><a aria-label="50"></a><span class="co"># 使用例：5つの初期値から試す</span></span>
+<span id="cb14-51"><a aria-label="51"></a>initial_values <span class="op">=</span> [<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">6</span>]</span>
+<span id="cb14-52"><a aria-label="52"></a>best_x, all_results <span class="op">=</span> robust_optimization(f_poly, f_poly_prime, f_poly_double_prime,</span>
+<span id="cb14-53"><a aria-label="53"></a>                                          initial_values)</span>
+<span id="cb14-54"><a aria-label="54"></a></span>
+<span id="cb14-55"><a aria-label="55"></a><span class="bu">print</span>(<span class="st">"すべての結果:"</span>)</span>
+<span id="cb14-56"><a aria-label="56"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'x0'</span><span class="sc">:&gt;4}</span><span class="ss">  →  </span><span class="sc">{</span><span class="st">'到着地点'</span><span class="sc">:&gt;8}</span><span class="ss">  →  </span><span class="sc">{</span><span class="st">'f(x)'</span><span class="sc">:&gt;8}</span><span class="ss">  →  </span><span class="sc">{</span><span class="st">'谷?'</span><span class="sc">:&gt;4}</span><span class="ss">"</span>)</span>
+<span id="cb14-57"><a aria-label="57"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">50</span>)</span>
+<span id="cb14-58"><a aria-label="58"></a><span class="cf">for</span> r <span class="kw">in</span> all_results:</span>
+<span id="cb14-59"><a aria-label="59"></a>    valley <span class="op">=</span> <span class="st">"はい"</span> <span class="cf">if</span> r[<span class="st">"is_minimum"</span>] <span class="cf">else</span> <span class="st">"いいえ"</span></span>
+<span id="cb14-60"><a aria-label="60"></a>    marker <span class="op">=</span> <span class="st">" ← 最良！"</span> <span class="cf">if</span> r[<span class="st">"x_final"</span>] <span class="op">==</span> best_x <span class="cf">else</span> <span class="st">""</span></span>
+<span id="cb14-61"><a aria-label="61"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>r[<span class="st">'x0'</span>]<span class="sc">:4.1f}</span><span class="ss">  →  </span><span class="sc">{</span>r[<span class="st">'x_final'</span>]<span class="sc">:8.4f}</span><span class="ss">  →  </span><span class="sc">{</span>r[<span class="st">'f_final'</span>]<span class="sc">:8.4f}</span><span class="ss">  →  </span><span class="sc">{</span>valley<span class="sc">}{</span>marker<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-62"><a aria-label="62"></a></span>
+<span id="cb14-63"><a aria-label="63"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">★ 最良解: x = </span><span class="sc">{</span>best_x<span class="sc">:.4f}</span><span class="ss">, f(x) = </span><span class="sc">{</span>f_poly(best_x)<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>すべての結果:
   x0  →      到着地点  →      f(x)  →    谷?
@@ -1148,26 +1154,26 @@ rkskmt
 <p><a href="./newton-method-appendix.html">Newton法（参考資料）</a>は、いまいる場所に放物線を当てはめて、<strong>その頂点へ一気にジャンプ</strong>する方法でした：</p>
 <p><span class="math display">\[x_{\text{new}} = x - \frac{f'(x)}{f''(x)}\]</span></p>
 <p>実験1・実験2と同じ初期値で、Newton法を走らせてみます。</p>
-<div id="8ab05e50" class="cell" data-execution_count="16">
+<div id="e6629e63" class="cell" data-execution_count="16">
 <details class="code-fold">
 <summary>コードを表示</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a></a><span class="kw">def</span> newton_naive(f, fp, fpp, x0, tol<span class="op">=</span><span class="fl">1e-6</span>, max_iter<span class="op">=</span><span class="dv">100</span>):</span>
-<span id="cb16-2"><a></a>    <span class="co">"""素のNewton法：収束点と反復回数を返す"""</span></span>
-<span id="cb16-3"><a></a>    x <span class="op">=</span> x0</span>
-<span id="cb16-4"><a></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(max_iter):</span>
-<span id="cb16-5"><a></a>        g <span class="op">=</span> fp(x)</span>
-<span id="cb16-6"><a></a>        <span class="cf">if</span> <span class="bu">abs</span>(g) <span class="op">&lt;</span> tol:</span>
-<span id="cb16-7"><a></a>            <span class="cf">return</span> x, f(x), i</span>
-<span id="cb16-8"><a></a>        x <span class="op">=</span> x <span class="op">-</span> g <span class="op">/</span> fpp(x)</span>
-<span id="cb16-9"><a></a>    <span class="cf">return</span> x, f(x), max_iter</span>
-<span id="cb16-10"><a></a></span>
-<span id="cb16-11"><a></a><span class="bu">print</span>(<span class="st">"素のNewton法 vs 勾配降下法（反復回数）"</span>)</span>
-<span id="cb16-12"><a></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">55</span>)</span>
-<span id="cb16-13"><a></a><span class="cf">for</span> x0 <span class="kw">in</span> [<span class="fl">0.5</span>, <span class="fl">5.5</span>]:</span>
-<span id="cb16-14"><a></a>    xn, fn, it_newton <span class="op">=</span> newton_naive(f_poly, f_poly_prime, f_poly_double_prime, x0)</span>
-<span id="cb16-15"><a></a>    _, _, hist_gd <span class="op">=</span> gradient_descent(f_poly, f_poly_prime, x0)</span>
-<span id="cb16-16"><a></a>    <span class="bu">print</span>(<span class="ss">f"x0 = </span><span class="sc">{</span>x0<span class="sc">}</span><span class="ss">: Newton法 </span><span class="sc">{</span>it_newton<span class="sc">:2d}</span><span class="ss"> 回 / 勾配降下法 </span><span class="sc">{</span><span class="bu">len</span>(hist_gd)<span class="op">-</span><span class="dv">1</span><span class="sc">:2d}</span><span class="ss"> 回"</span></span>
-<span id="cb16-17"><a></a>          <span class="ss">f"  →  x = </span><span class="sc">{</span>xn<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a aria-label="1"></a><span class="kw">def</span> newton_naive(f, fp, fpp, x0, tol<span class="op">=</span><span class="fl">1e-6</span>, max_iter<span class="op">=</span><span class="dv">100</span>):</span>
+<span id="cb16-2"><a aria-label="2"></a>    <span class="co">"""素のNewton法：収束点と反復回数を返す"""</span></span>
+<span id="cb16-3"><a aria-label="3"></a>    x <span class="op">=</span> x0</span>
+<span id="cb16-4"><a aria-label="4"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(max_iter):</span>
+<span id="cb16-5"><a aria-label="5"></a>        g <span class="op">=</span> fp(x)</span>
+<span id="cb16-6"><a aria-label="6"></a>        <span class="cf">if</span> <span class="bu">abs</span>(g) <span class="op">&lt;</span> tol:</span>
+<span id="cb16-7"><a aria-label="7"></a>            <span class="cf">return</span> x, f(x), i</span>
+<span id="cb16-8"><a aria-label="8"></a>        x <span class="op">=</span> x <span class="op">-</span> g <span class="op">/</span> fpp(x)</span>
+<span id="cb16-9"><a aria-label="9"></a>    <span class="cf">return</span> x, f(x), max_iter</span>
+<span id="cb16-10"><a aria-label="10"></a></span>
+<span id="cb16-11"><a aria-label="11"></a><span class="bu">print</span>(<span class="st">"素のNewton法 vs 勾配降下法（反復回数）"</span>)</span>
+<span id="cb16-12"><a aria-label="12"></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">55</span>)</span>
+<span id="cb16-13"><a aria-label="13"></a><span class="cf">for</span> x0 <span class="kw">in</span> [<span class="fl">0.5</span>, <span class="fl">5.5</span>]:</span>
+<span id="cb16-14"><a aria-label="14"></a>    xn, fn, it_newton <span class="op">=</span> newton_naive(f_poly, f_poly_prime, f_poly_double_prime, x0)</span>
+<span id="cb16-15"><a aria-label="15"></a>    _, _, hist_gd <span class="op">=</span> gradient_descent(f_poly, f_poly_prime, x0)</span>
+<span id="cb16-16"><a aria-label="16"></a>    <span class="bu">print</span>(<span class="ss">f"x0 = </span><span class="sc">{</span>x0<span class="sc">}</span><span class="ss">: Newton法 </span><span class="sc">{</span>it_newton<span class="sc">:2d}</span><span class="ss"> 回 / 勾配降下法 </span><span class="sc">{</span><span class="bu">len</span>(hist_gd)<span class="op">-</span><span class="dv">1</span><span class="sc">:2d}</span><span class="ss"> 回"</span></span>
+<span id="cb16-17"><a aria-label="17"></a>          <span class="ss">f"  →  x = </span><span class="sc">{</span>xn<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>素のNewton法 vs 勾配降下法（反復回数）
@@ -1189,7 +1195,7 @@ x0 = 5.5: Newton法  4 回 / 勾配降下法  6 回  →  x = 5.7656</code></pre
 <li>同じ更新式を回すと：<span class="math inline">\(1.5 \rightarrow 1.761 \rightarrow 1.735 \rightarrow\)</span> 停止（<span class="math inline">\(f' \approx 0\)</span>）</li>
 <li>左に下り坂があるのに、<strong>坂を登って丘のてっぺんで止まった</strong></li>
 </ul>
-<div id="a667ab4a" class="cell" data-execution_count="17">
+<div id="74af7468" class="cell" data-execution_count="17">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1235,37 +1241,37 @@ x0 = 5.5: Newton法  4 回 / 勾配降下法  6 回  →  x = 5.7656</code></pre
 <h2>Newton法の引力圏を可視化しよう</h2>
 <div class="slide-body">
 <p>勾配降下法では「丘のてっぺんを境にきれいな2分割」でした。Newton法ではどうなるでしょうか。</p>
-<div id="80680aa4" class="cell" data-execution_count="18">
+<div id="eb45efe7" class="cell" data-execution_count="18">
 <details class="code-fold">
 <summary>コードを表示</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a></a><span class="kw">def</span> newton_optimize(f, fp, fpp, x0, max_iter<span class="op">=</span><span class="dv">50</span>):</span>
-<span id="cb18-2"><a></a>    <span class="co">"""Newton法を実行して結果を返す"""</span></span>
-<span id="cb18-3"><a></a>    x <span class="op">=</span> x0</span>
-<span id="cb18-4"><a></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(max_iter):</span>
-<span id="cb18-5"><a></a>        grad <span class="op">=</span> fp(x)</span>
-<span id="cb18-6"><a></a>        hess <span class="op">=</span> fpp(x)</span>
-<span id="cb18-7"><a></a>        <span class="cf">if</span> <span class="bu">abs</span>(grad) <span class="op">&lt;</span> <span class="fl">1e-6</span>:</span>
-<span id="cb18-8"><a></a>            <span class="cf">return</span> x, f(x), <span class="va">True</span></span>
-<span id="cb18-9"><a></a>        <span class="cf">if</span> <span class="bu">abs</span>(hess) <span class="op">&lt;</span> <span class="fl">1e-10</span>:</span>
-<span id="cb18-10"><a></a>            <span class="cf">return</span> x, f(x), <span class="va">False</span></span>
-<span id="cb18-11"><a></a>        x <span class="op">=</span> x <span class="op">-</span> grad <span class="op">/</span> hess</span>
-<span id="cb18-12"><a></a>    <span class="cf">return</span> x, f(x), <span class="va">False</span></span>
-<span id="cb18-13"><a></a></span>
-<span id="cb18-14"><a></a><span class="co"># 初期値を -1.5 から 7.5 まで細かく変えて、全部試す</span></span>
-<span id="cb18-15"><a></a>x0_dense <span class="op">=</span> np.linspace(<span class="op">-</span><span class="fl">1.5</span>, <span class="fl">7.5</span>, <span class="dv">200</span>)</span>
-<span id="cb18-16"><a></a>convergence_points <span class="op">=</span> []</span>
-<span id="cb18-17"><a></a>convergence_values <span class="op">=</span> []</span>
-<span id="cb18-18"><a></a></span>
-<span id="cb18-19"><a></a><span class="cf">for</span> x0 <span class="kw">in</span> x0_dense:</span>
-<span id="cb18-20"><a></a>    x_final, f_final, _ <span class="op">=</span> newton_optimize(f_poly, f_poly_prime, f_poly_double_prime, x0)</span>
-<span id="cb18-21"><a></a>    convergence_points.append(x_final)</span>
-<span id="cb18-22"><a></a>    convergence_values.append(f_final)</span>
-<span id="cb18-23"><a></a></span>
-<span id="cb18-24"><a></a>convergence_points <span class="op">=</span> np.array(convergence_points)</span>
-<span id="cb18-25"><a></a>convergence_values <span class="op">=</span> np.array(convergence_values)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a aria-label="1"></a><span class="kw">def</span> newton_optimize(f, fp, fpp, x0, max_iter<span class="op">=</span><span class="dv">50</span>):</span>
+<span id="cb18-2"><a aria-label="2"></a>    <span class="co">"""Newton法を実行して結果を返す"""</span></span>
+<span id="cb18-3"><a aria-label="3"></a>    x <span class="op">=</span> x0</span>
+<span id="cb18-4"><a aria-label="4"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(max_iter):</span>
+<span id="cb18-5"><a aria-label="5"></a>        grad <span class="op">=</span> fp(x)</span>
+<span id="cb18-6"><a aria-label="6"></a>        hess <span class="op">=</span> fpp(x)</span>
+<span id="cb18-7"><a aria-label="7"></a>        <span class="cf">if</span> <span class="bu">abs</span>(grad) <span class="op">&lt;</span> <span class="fl">1e-6</span>:</span>
+<span id="cb18-8"><a aria-label="8"></a>            <span class="cf">return</span> x, f(x), <span class="va">True</span></span>
+<span id="cb18-9"><a aria-label="9"></a>        <span class="cf">if</span> <span class="bu">abs</span>(hess) <span class="op">&lt;</span> <span class="fl">1e-10</span>:</span>
+<span id="cb18-10"><a aria-label="10"></a>            <span class="cf">return</span> x, f(x), <span class="va">False</span></span>
+<span id="cb18-11"><a aria-label="11"></a>        x <span class="op">=</span> x <span class="op">-</span> grad <span class="op">/</span> hess</span>
+<span id="cb18-12"><a aria-label="12"></a>    <span class="cf">return</span> x, f(x), <span class="va">False</span></span>
+<span id="cb18-13"><a aria-label="13"></a></span>
+<span id="cb18-14"><a aria-label="14"></a><span class="co"># 初期値を -1.5 から 7.5 まで細かく変えて、全部試す</span></span>
+<span id="cb18-15"><a aria-label="15"></a>x0_dense <span class="op">=</span> np.linspace(<span class="op">-</span><span class="fl">1.5</span>, <span class="fl">7.5</span>, <span class="dv">200</span>)</span>
+<span id="cb18-16"><a aria-label="16"></a>convergence_points <span class="op">=</span> []</span>
+<span id="cb18-17"><a aria-label="17"></a>convergence_values <span class="op">=</span> []</span>
+<span id="cb18-18"><a aria-label="18"></a></span>
+<span id="cb18-19"><a aria-label="19"></a><span class="cf">for</span> x0 <span class="kw">in</span> x0_dense:</span>
+<span id="cb18-20"><a aria-label="20"></a>    x_final, f_final, _ <span class="op">=</span> newton_optimize(f_poly, f_poly_prime, f_poly_double_prime, x0)</span>
+<span id="cb18-21"><a aria-label="21"></a>    convergence_points.append(x_final)</span>
+<span id="cb18-22"><a aria-label="22"></a>    convergence_values.append(f_final)</span>
+<span id="cb18-23"><a aria-label="23"></a></span>
+<span id="cb18-24"><a aria-label="24"></a>convergence_points <span class="op">=</span> np.array(convergence_points)</span>
+<span id="cb18-25"><a aria-label="25"></a>convergence_values <span class="op">=</span> np.array(convergence_values)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="15b5ac83" class="cell" data-execution_count="19">
+<div id="f9d75ccf" class="cell" data-execution_count="19">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1307,7 +1313,7 @@ x0 = 5.5: Newton法  4 回 / 勾配降下法  6 回  →  x = 5.7656</code></pre
 <h2>なぜ「すぐ手前の帯」が左へ飛ぶのか</h2>
 <div class="slide-body">
 <p>x0 = 4.0 から始めたときの<strong>最初の1歩</strong>を解剖してみます。</p>
-<div id="42d1ff15" class="cell" data-execution_count="20">
+<div id="ad2b0263" class="cell" data-execution_count="20">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1398,28 +1404,28 @@ x0 = 5.5: Newton法  4 回 / 勾配降下法  6 回  →  x = 5.7656</code></pre
 <section id="修理版newton法検査12入り" class="slide level2">
 <h2>修理版Newton法（検査1・2入り）</h2>
 <div class="slide-body">
-<div id="4b3ce383" class="cell" data-execution_count="21">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a></a><span class="kw">def</span> newton_safe(f, fp, fpp, x0, max_iter<span class="op">=</span><span class="dv">100</span>):</span>
-<span id="cb19-2"><a></a>    <span class="co">"""Newton法＋検査1（降下方向）＋検査2（実測バックトラッキング）"""</span></span>
-<span id="cb19-3"><a></a>    x <span class="op">=</span> x0</span>
-<span id="cb19-4"><a></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(max_iter):</span>
-<span id="cb19-5"><a></a>        g <span class="op">=</span> fp(x)</span>
-<span id="cb19-6"><a></a>        <span class="cf">if</span> <span class="bu">abs</span>(g) <span class="op">&lt;</span> <span class="fl">1e-8</span>:                  <span class="co"># 傾きほぼゼロ → 停止</span></span>
-<span id="cb19-7"><a></a>            <span class="cf">break</span></span>
-<span id="cb19-8"><a></a>        h <span class="op">=</span> fpp(x)</span>
-<span id="cb19-9"><a></a>        d <span class="op">=</span> <span class="op">-</span>g <span class="op">/</span> h <span class="cf">if</span> h <span class="op">!=</span> <span class="dv">0</span> <span class="cf">else</span> <span class="op">-</span>g       <span class="co"># Newton法の「提案」</span></span>
-<span id="cb19-10"><a></a>        <span class="cf">if</span> g <span class="op">*</span> d <span class="op">&gt;=</span> <span class="dv">0</span>:                     <span class="co"># 検査1：登りなら却下して</span></span>
-<span id="cb19-11"><a></a>            d <span class="op">=</span> <span class="op">-</span>g                         <span class="co">#   最急降下に差し替え</span></span>
-<span id="cb19-12"><a></a>        step_size <span class="op">=</span> <span class="fl">1.0</span></span>
-<span id="cb19-13"><a></a>        <span class="cf">while</span> f(x <span class="op">+</span> step_size <span class="op">*</span> d) <span class="op">&gt;</span> f(x) <span class="op">-</span> <span class="fl">1e-4</span> <span class="op">*</span> step_size <span class="op">*</span> <span class="bu">abs</span>(g <span class="op">*</span> d):</span>
-<span id="cb19-14"><a></a>            step_size <span class="op">/=</span> <span class="dv">2</span>                 <span class="co"># Halve the step until the value decreases</span></span>
-<span id="cb19-15"><a></a>        x <span class="op">=</span> x <span class="op">+</span> step_size <span class="op">*</span> d</span>
-<span id="cb19-16"><a></a>    <span class="cf">return</span> x, f(x)</span>
-<span id="cb19-17"><a></a></span>
-<span id="cb19-18"><a></a><span class="co"># 故障していた2つの初期値で試運転</span></span>
-<span id="cb19-19"><a></a><span class="cf">for</span> x0 <span class="kw">in</span> [<span class="fl">1.5</span>, <span class="fl">4.0</span>]:</span>
-<span id="cb19-20"><a></a>    x_fin, f_fin <span class="op">=</span> newton_safe(f_poly, f_poly_prime, f_poly_double_prime, x0)</span>
-<span id="cb19-21"><a></a>    <span class="bu">print</span>(<span class="ss">f"x0 = </span><span class="sc">{</span>x0<span class="sc">}</span><span class="ss"> → x = </span><span class="sc">{</span>x_fin<span class="sc">:.4f}</span><span class="ss">, f(x) = </span><span class="sc">{</span>f_fin<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="9954494d" class="cell" data-execution_count="21">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a aria-label="1"></a><span class="kw">def</span> newton_safe(f, fp, fpp, x0, max_iter<span class="op">=</span><span class="dv">100</span>):</span>
+<span id="cb19-2"><a aria-label="2"></a>    <span class="co">"""Newton法＋検査1（降下方向）＋検査2（実測バックトラッキング）"""</span></span>
+<span id="cb19-3"><a aria-label="3"></a>    x <span class="op">=</span> x0</span>
+<span id="cb19-4"><a aria-label="4"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(max_iter):</span>
+<span id="cb19-5"><a aria-label="5"></a>        g <span class="op">=</span> fp(x)</span>
+<span id="cb19-6"><a aria-label="6"></a>        <span class="cf">if</span> <span class="bu">abs</span>(g) <span class="op">&lt;</span> <span class="fl">1e-8</span>:                  <span class="co"># 傾きほぼゼロ → 停止</span></span>
+<span id="cb19-7"><a aria-label="7"></a>            <span class="cf">break</span></span>
+<span id="cb19-8"><a aria-label="8"></a>        h <span class="op">=</span> fpp(x)</span>
+<span id="cb19-9"><a aria-label="9"></a>        d <span class="op">=</span> <span class="op">-</span>g <span class="op">/</span> h <span class="cf">if</span> h <span class="op">!=</span> <span class="dv">0</span> <span class="cf">else</span> <span class="op">-</span>g       <span class="co"># Newton法の「提案」</span></span>
+<span id="cb19-10"><a aria-label="10"></a>        <span class="cf">if</span> g <span class="op">*</span> d <span class="op">&gt;=</span> <span class="dv">0</span>:                     <span class="co"># 検査1：登りなら却下して</span></span>
+<span id="cb19-11"><a aria-label="11"></a>            d <span class="op">=</span> <span class="op">-</span>g                         <span class="co">#   最急降下に差し替え</span></span>
+<span id="cb19-12"><a aria-label="12"></a>        step_size <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb19-13"><a aria-label="13"></a>        <span class="cf">while</span> f(x <span class="op">+</span> step_size <span class="op">*</span> d) <span class="op">&gt;</span> f(x) <span class="op">-</span> <span class="fl">1e-4</span> <span class="op">*</span> step_size <span class="op">*</span> <span class="bu">abs</span>(g <span class="op">*</span> d):</span>
+<span id="cb19-14"><a aria-label="14"></a>            step_size <span class="op">/=</span> <span class="dv">2</span>                 <span class="co"># Halve the step until the value decreases</span></span>
+<span id="cb19-15"><a aria-label="15"></a>        x <span class="op">=</span> x <span class="op">+</span> step_size <span class="op">*</span> d</span>
+<span id="cb19-16"><a aria-label="16"></a>    <span class="cf">return</span> x, f(x)</span>
+<span id="cb19-17"><a aria-label="17"></a></span>
+<span id="cb19-18"><a aria-label="18"></a><span class="co"># 故障していた2つの初期値で試運転</span></span>
+<span id="cb19-19"><a aria-label="19"></a><span class="cf">for</span> x0 <span class="kw">in</span> [<span class="fl">1.5</span>, <span class="fl">4.0</span>]:</span>
+<span id="cb19-20"><a aria-label="20"></a>    x_fin, f_fin <span class="op">=</span> newton_safe(f_poly, f_poly_prime, f_poly_double_prime, x0)</span>
+<span id="cb19-21"><a aria-label="21"></a>    <span class="bu">print</span>(<span class="ss">f"x0 = </span><span class="sc">{</span>x0<span class="sc">}</span><span class="ss"> → x = </span><span class="sc">{</span>x_fin<span class="sc">:.4f}</span><span class="ss">, f(x) = </span><span class="sc">{</span>f_fin<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>x0 = 1.5 → x = -0.0000, f(x) = 1.0000
 x0 = 4.0 → x = 5.7656, f(x) = -13.6726</code></pre>
@@ -1434,7 +1440,7 @@ x0 = 4.0 → x = 5.7656, f(x) = -13.6726</code></pre>
 <section id="修理後の引力圏" class="slide level2">
 <h2>修理後の引力圏</h2>
 <div class="slide-body">
-<div id="c754aed3" class="cell" data-execution_count="22">
+<div id="3869d832" class="cell" data-execution_count="22">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1566,46 +1572,46 @@ x0 = 4.0 → x = 5.7656, f(x) = -13.6726</code></pre>
 <h2>問題1の解答例</h2>
 <div class="slide-body">
 <p><strong>導関数（手計算）:</strong> <span class="math display">\[g'(x) = 4x^3 - 16x + 3\]</span></p>
-<div id="21f3f631" class="cell" data-execution_count="23">
+<div id="f54a1354" class="cell" data-execution_count="23">
 <details class="code-fold">
 <summary>解答例を見る</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb21-2"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb21-3"><a></a><span class="im">import</span> japanize_matplotlib</span>
-<span id="cb21-4"><a></a></span>
-<span id="cb21-5"><a></a><span class="kw">def</span> g(x):</span>
-<span id="cb21-6"><a></a>    <span class="cf">return</span> x<span class="op">**</span><span class="dv">4</span> <span class="op">-</span> <span class="dv">8</span><span class="op">*</span>x<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> <span class="dv">3</span><span class="op">*</span>x</span>
-<span id="cb21-7"><a></a></span>
-<span id="cb21-8"><a></a><span class="kw">def</span> g_prime(x):</span>
-<span id="cb21-9"><a></a>    <span class="cf">return</span> <span class="dv">4</span><span class="op">*</span>x<span class="op">**</span><span class="dv">3</span> <span class="op">-</span> <span class="dv">16</span><span class="op">*</span>x <span class="op">+</span> <span class="dv">3</span></span>
-<span id="cb21-10"><a></a></span>
-<span id="cb21-11"><a></a><span class="co"># 1. グラフを描いて谷の数を確認</span></span>
-<span id="cb21-12"><a></a>xs <span class="op">=</span> np.linspace(<span class="op">-</span><span class="fl">3.5</span>, <span class="fl">3.5</span>, <span class="dv">300</span>)</span>
-<span id="cb21-13"><a></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="fl">3.2</span>))</span>
-<span id="cb21-14"><a></a>plt.plot(xs, g(xs), <span class="st">"b-"</span>, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb21-15"><a></a>plt.xlabel(<span class="st">"x"</span>)</span>
-<span id="cb21-16"><a></a>plt.ylabel(<span class="st">"g(x)"</span>)</span>
-<span id="cb21-17"><a></a>plt.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
-<span id="cb21-18"><a></a>plt.tight_layout()</span>
-<span id="cb21-19"><a></a>plt.show()</span>
-<span id="cb21-20"><a></a></span>
-<span id="cb21-21"><a></a><span class="co"># 3. 3つの初期値から勾配降下法</span></span>
-<span id="cb21-22"><a></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'x0'</span><span class="sc">:&gt;4}</span><span class="ss">  →  </span><span class="sc">{</span><span class="st">'到着地点'</span><span class="sc">:&gt;8}</span><span class="ss">  →  </span><span class="sc">{</span><span class="st">'g(x)'</span><span class="sc">:&gt;8}</span><span class="ss">"</span>)</span>
-<span id="cb21-23"><a></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">40</span>)</span>
-<span id="cb21-24"><a></a>results <span class="op">=</span> []</span>
-<span id="cb21-25"><a></a><span class="cf">for</span> x0 <span class="kw">in</span> [<span class="op">-</span><span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">3</span>]:</span>
-<span id="cb21-26"><a></a>    x <span class="op">=</span> x0</span>
-<span id="cb21-27"><a></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10000</span>):</span>
-<span id="cb21-28"><a></a>        grad <span class="op">=</span> g_prime(x)</span>
-<span id="cb21-29"><a></a>        <span class="cf">if</span> <span class="bu">abs</span>(grad) <span class="op">&lt;</span> <span class="fl">1e-6</span>:</span>
-<span id="cb21-30"><a></a>            <span class="cf">break</span></span>
-<span id="cb21-31"><a></a>        x <span class="op">=</span> x <span class="op">-</span> <span class="fl">0.01</span> <span class="op">*</span> grad</span>
-<span id="cb21-32"><a></a>    results.append((x0, x, g(x)))</span>
-<span id="cb21-33"><a></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>x0<span class="sc">:4.1f}</span><span class="ss">  →  </span><span class="sc">{</span>x<span class="sc">:8.4f}</span><span class="ss">  →  </span><span class="sc">{</span>g(x)<span class="sc">:8.4f}</span><span class="ss">"</span>)</span>
-<span id="cb21-34"><a></a></span>
-<span id="cb21-35"><a></a><span class="co"># 4. g(x) が最小のものを採用</span></span>
-<span id="cb21-36"><a></a>best <span class="op">=</span> <span class="bu">min</span>(results, key<span class="op">=</span><span class="kw">lambda</span> r: r[<span class="dv">2</span>])</span>
-<span id="cb21-37"><a></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">★ グローバルミニマム: x = </span><span class="sc">{</span>best[<span class="dv">1</span>]<span class="sc">:.4f}</span><span class="ss">, g(x) = </span><span class="sc">{</span>best[<span class="dv">2</span>]<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb21-2"><a aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb21-3"><a aria-label="3"></a><span class="im">import</span> japanize_matplotlib</span>
+<span id="cb21-4"><a aria-label="4"></a></span>
+<span id="cb21-5"><a aria-label="5"></a><span class="kw">def</span> g(x):</span>
+<span id="cb21-6"><a aria-label="6"></a>    <span class="cf">return</span> x<span class="op">**</span><span class="dv">4</span> <span class="op">-</span> <span class="dv">8</span><span class="op">*</span>x<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> <span class="dv">3</span><span class="op">*</span>x</span>
+<span id="cb21-7"><a aria-label="7"></a></span>
+<span id="cb21-8"><a aria-label="8"></a><span class="kw">def</span> g_prime(x):</span>
+<span id="cb21-9"><a aria-label="9"></a>    <span class="cf">return</span> <span class="dv">4</span><span class="op">*</span>x<span class="op">**</span><span class="dv">3</span> <span class="op">-</span> <span class="dv">16</span><span class="op">*</span>x <span class="op">+</span> <span class="dv">3</span></span>
+<span id="cb21-10"><a aria-label="10"></a></span>
+<span id="cb21-11"><a aria-label="11"></a><span class="co"># 1. グラフを描いて谷の数を確認</span></span>
+<span id="cb21-12"><a aria-label="12"></a>xs <span class="op">=</span> np.linspace(<span class="op">-</span><span class="fl">3.5</span>, <span class="fl">3.5</span>, <span class="dv">300</span>)</span>
+<span id="cb21-13"><a aria-label="13"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="fl">3.2</span>))</span>
+<span id="cb21-14"><a aria-label="14"></a>plt.plot(xs, g(xs), <span class="st">"b-"</span>, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb21-15"><a aria-label="15"></a>plt.xlabel(<span class="st">"x"</span>)</span>
+<span id="cb21-16"><a aria-label="16"></a>plt.ylabel(<span class="st">"g(x)"</span>)</span>
+<span id="cb21-17"><a aria-label="17"></a>plt.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb21-18"><a aria-label="18"></a>plt.tight_layout()</span>
+<span id="cb21-19"><a aria-label="19"></a>plt.show()</span>
+<span id="cb21-20"><a aria-label="20"></a></span>
+<span id="cb21-21"><a aria-label="21"></a><span class="co"># 3. 3つの初期値から勾配降下法</span></span>
+<span id="cb21-22"><a aria-label="22"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'x0'</span><span class="sc">:&gt;4}</span><span class="ss">  →  </span><span class="sc">{</span><span class="st">'到着地点'</span><span class="sc">:&gt;8}</span><span class="ss">  →  </span><span class="sc">{</span><span class="st">'g(x)'</span><span class="sc">:&gt;8}</span><span class="ss">"</span>)</span>
+<span id="cb21-23"><a aria-label="23"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">40</span>)</span>
+<span id="cb21-24"><a aria-label="24"></a>results <span class="op">=</span> []</span>
+<span id="cb21-25"><a aria-label="25"></a><span class="cf">for</span> x0 <span class="kw">in</span> [<span class="op">-</span><span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">3</span>]:</span>
+<span id="cb21-26"><a aria-label="26"></a>    x <span class="op">=</span> x0</span>
+<span id="cb21-27"><a aria-label="27"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10000</span>):</span>
+<span id="cb21-28"><a aria-label="28"></a>        grad <span class="op">=</span> g_prime(x)</span>
+<span id="cb21-29"><a aria-label="29"></a>        <span class="cf">if</span> <span class="bu">abs</span>(grad) <span class="op">&lt;</span> <span class="fl">1e-6</span>:</span>
+<span id="cb21-30"><a aria-label="30"></a>            <span class="cf">break</span></span>
+<span id="cb21-31"><a aria-label="31"></a>        x <span class="op">=</span> x <span class="op">-</span> <span class="fl">0.01</span> <span class="op">*</span> grad</span>
+<span id="cb21-32"><a aria-label="32"></a>    results.append((x0, x, g(x)))</span>
+<span id="cb21-33"><a aria-label="33"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>x0<span class="sc">:4.1f}</span><span class="ss">  →  </span><span class="sc">{</span>x<span class="sc">:8.4f}</span><span class="ss">  →  </span><span class="sc">{</span>g(x)<span class="sc">:8.4f}</span><span class="ss">"</span>)</span>
+<span id="cb21-34"><a aria-label="34"></a></span>
+<span id="cb21-35"><a aria-label="35"></a><span class="co"># 4. g(x) が最小のものを採用</span></span>
+<span id="cb21-36"><a aria-label="36"></a>best <span class="op">=</span> <span class="bu">min</span>(results, key<span class="op">=</span><span class="kw">lambda</span> r: r[<span class="dv">2</span>])</span>
+<span id="cb21-37"><a aria-label="37"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">★ グローバルミニマム: x = </span><span class="sc">{</span>best[<span class="dv">1</span>]<span class="sc">:.4f}</span><span class="ss">, g(x) = </span><span class="sc">{</span>best[<span class="dv">2</span>]<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>

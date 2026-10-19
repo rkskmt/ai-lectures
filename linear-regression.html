@@ -6,11 +6,11 @@
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="site_libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.8.27">
+  <meta name="generator" content="quarto-1.10.19">
 
   <meta name="author" content="rkskmt">
   <title>AI Lectures – 線形回帰と正則化</title>
@@ -20,10 +20,16 @@
   <link rel="stylesheet" href="site_libs/revealjs/dist/reset.css">
   <link rel="stylesheet" href="site_libs/revealjs/dist/reveal.css">
   <style>
-    code{white-space: pre-wrap;}
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
     ul.task-list{list-style: none;}
     ul.task-list li input[type="checkbox"] {
@@ -98,7 +104,7 @@
     code span.vs { color: #032f62; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-d3a26a7442888a116b43ccec6150e9c5.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-e69bca93ec9d1486cefcf16a785f5ce6.css">
   <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -254,7 +260,7 @@
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
 <div class="quarto-title-author-name">
-rkskmt 
+rkskmt
 </div>
 </div>
 </div>
@@ -377,32 +383,32 @@ rkskmt
 <li>次元削減の回で測った<strong>体長</strong>を使う</li>
 <li>体長を測るだけで重さが分かれば、<strong>秤に乗せる手間が省ける</strong></li>
 </ul>
-<div id="d23f7c8d" class="cell" data-execution_count="1">
+<div id="69c42940" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>魚データの定義（クリックして展開）</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-2"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb1-3"><a></a><span class="im">import</span> japanize_matplotlib</span>
-<span id="cb1-4"><a></a>plt.rcParams[<span class="st">"font.size"</span>] <span class="op">=</span> <span class="dv">11</span></span>
-<span id="cb1-5"><a></a>plt.rcParams[<span class="st">"figure.dpi"</span>] <span class="op">=</span> <span class="dv">100</span></span>
-<span id="cb1-6"><a></a></span>
-<span id="cb1-7"><a></a>salmon_weights     <span class="op">=</span> np.array([<span class="dv">2149</span>, <span class="dv">1959</span>, <span class="dv">2194</span>, <span class="dv">2457</span>, <span class="dv">1930</span>, <span class="dv">1930</span>, <span class="dv">2474</span>, <span class="dv">2230</span>, <span class="dv">1859</span>, <span class="dv">2163</span>,</span>
-<span id="cb1-8"><a></a>                               <span class="dv">1861</span>, <span class="dv">1860</span>, <span class="dv">2073</span>, <span class="dv">1426</span>, <span class="dv">1483</span>, <span class="dv">1831</span>, <span class="dv">1696</span>, <span class="dv">2094</span>, <span class="dv">1728</span>, <span class="dv">1576</span>,</span>
-<span id="cb1-9"><a></a>                               <span class="dv">2028</span>, <span class="dv">1903</span>, <span class="dv">2057</span>, <span class="dv">2229</span>, <span class="dv">1884</span>, <span class="dv">1884</span>, <span class="dv">2240</span>, <span class="dv">2081</span>, <span class="dv">1838</span>, <span class="dv">2037</span>,</span>
-<span id="cb1-10"><a></a>                               <span class="dv">1839</span>, <span class="dv">1838</span>, <span class="dv">1978</span>, <span class="dv">1554</span>, <span class="dv">1591</span>, <span class="dv">1820</span>, <span class="dv">1731</span>, <span class="dv">1992</span>, <span class="dv">1752</span>, <span class="dv">1652</span>])</span>
-<span id="cb1-11"><a></a>seabass_weights    <span class="op">=</span> np.array([<span class="dv">1677</span>, <span class="dv">1327</span>, <span class="dv">1486</span>, <span class="dv">1440</span>, <span class="dv">1857</span>, <span class="dv">1476</span>, <span class="dv">1749</span>, <span class="dv">2203</span>, <span class="dv">1979</span>, <span class="dv">1468</span>,</span>
-<span id="cb1-12"><a></a>                               <span class="dv">1496</span>, <span class="dv">1737</span>, <span class="dv">1099</span>, <span class="dv">1341</span>, <span class="dv">1748</span>, <span class="dv">1563</span>, <span class="dv">2181</span>, <span class="dv">1414</span>, <span class="dv">1286</span>, <span class="dv">1333</span>,</span>
-<span id="cb1-13"><a></a>                               <span class="dv">1787</span>, <span class="dv">1445</span>, <span class="dv">1505</span>, <span class="dv">1204</span>, <span class="dv">1381</span>, <span class="dv">1513</span>, <span class="dv">1259</span>, <span class="dv">1567</span>, <span class="dv">1370</span>, <span class="dv">1432</span>,</span>
-<span id="cb1-14"><a></a>                               <span class="dv">1370</span>, <span class="dv">1864</span>, <span class="dv">1488</span>, <span class="dv">1278</span>, <span class="dv">1657</span>, <span class="dv">1245</span>, <span class="dv">1533</span>, <span class="dv">1096</span>, <span class="dv">1223</span>, <span class="dv">1531</span>])</span>
-<span id="cb1-15"><a></a></span>
-<span id="cb1-16"><a></a>weights <span class="op">=</span> np.concatenate([salmon_weights, seabass_weights]).astype(<span class="bu">float</span>)</span>
-<span id="cb1-17"><a></a></span>
-<span id="cb1-18"><a></a><span class="co"># 体長の測定値（cm）— 次元削減の回と同じ</span></span>
-<span id="cb1-19"><a></a>rng     <span class="op">=</span> np.random.default_rng(<span class="dv">42</span>)</span>
-<span id="cb1-20"><a></a>lengths <span class="op">=</span> np.<span class="bu">round</span>(np.cbrt(weights) <span class="op">*</span> <span class="fl">4.5</span> <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="fl">1.0</span>, <span class="bu">len</span>(weights)), <span class="dv">1</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a aria-label="3"></a><span class="im">import</span> japanize_matplotlib</span>
+<span id="cb1-4"><a aria-label="4"></a>plt.rcParams[<span class="st">"font.size"</span>] <span class="op">=</span> <span class="dv">11</span></span>
+<span id="cb1-5"><a aria-label="5"></a>plt.rcParams[<span class="st">"figure.dpi"</span>] <span class="op">=</span> <span class="dv">100</span></span>
+<span id="cb1-6"><a aria-label="6"></a></span>
+<span id="cb1-7"><a aria-label="7"></a>salmon_weights     <span class="op">=</span> np.array([<span class="dv">2149</span>, <span class="dv">1959</span>, <span class="dv">2194</span>, <span class="dv">2457</span>, <span class="dv">1930</span>, <span class="dv">1930</span>, <span class="dv">2474</span>, <span class="dv">2230</span>, <span class="dv">1859</span>, <span class="dv">2163</span>,</span>
+<span id="cb1-8"><a aria-label="8"></a>                               <span class="dv">1861</span>, <span class="dv">1860</span>, <span class="dv">2073</span>, <span class="dv">1426</span>, <span class="dv">1483</span>, <span class="dv">1831</span>, <span class="dv">1696</span>, <span class="dv">2094</span>, <span class="dv">1728</span>, <span class="dv">1576</span>,</span>
+<span id="cb1-9"><a aria-label="9"></a>                               <span class="dv">2028</span>, <span class="dv">1903</span>, <span class="dv">2057</span>, <span class="dv">2229</span>, <span class="dv">1884</span>, <span class="dv">1884</span>, <span class="dv">2240</span>, <span class="dv">2081</span>, <span class="dv">1838</span>, <span class="dv">2037</span>,</span>
+<span id="cb1-10"><a aria-label="10"></a>                               <span class="dv">1839</span>, <span class="dv">1838</span>, <span class="dv">1978</span>, <span class="dv">1554</span>, <span class="dv">1591</span>, <span class="dv">1820</span>, <span class="dv">1731</span>, <span class="dv">1992</span>, <span class="dv">1752</span>, <span class="dv">1652</span>])</span>
+<span id="cb1-11"><a aria-label="11"></a>seabass_weights    <span class="op">=</span> np.array([<span class="dv">1677</span>, <span class="dv">1327</span>, <span class="dv">1486</span>, <span class="dv">1440</span>, <span class="dv">1857</span>, <span class="dv">1476</span>, <span class="dv">1749</span>, <span class="dv">2203</span>, <span class="dv">1979</span>, <span class="dv">1468</span>,</span>
+<span id="cb1-12"><a aria-label="12"></a>                               <span class="dv">1496</span>, <span class="dv">1737</span>, <span class="dv">1099</span>, <span class="dv">1341</span>, <span class="dv">1748</span>, <span class="dv">1563</span>, <span class="dv">2181</span>, <span class="dv">1414</span>, <span class="dv">1286</span>, <span class="dv">1333</span>,</span>
+<span id="cb1-13"><a aria-label="13"></a>                               <span class="dv">1787</span>, <span class="dv">1445</span>, <span class="dv">1505</span>, <span class="dv">1204</span>, <span class="dv">1381</span>, <span class="dv">1513</span>, <span class="dv">1259</span>, <span class="dv">1567</span>, <span class="dv">1370</span>, <span class="dv">1432</span>,</span>
+<span id="cb1-14"><a aria-label="14"></a>                               <span class="dv">1370</span>, <span class="dv">1864</span>, <span class="dv">1488</span>, <span class="dv">1278</span>, <span class="dv">1657</span>, <span class="dv">1245</span>, <span class="dv">1533</span>, <span class="dv">1096</span>, <span class="dv">1223</span>, <span class="dv">1531</span>])</span>
+<span id="cb1-15"><a aria-label="15"></a></span>
+<span id="cb1-16"><a aria-label="16"></a>weights <span class="op">=</span> np.concatenate([salmon_weights, seabass_weights]).astype(<span class="bu">float</span>)</span>
+<span id="cb1-17"><a aria-label="17"></a></span>
+<span id="cb1-18"><a aria-label="18"></a><span class="co"># 体長の測定値（cm）— 次元削減の回と同じ</span></span>
+<span id="cb1-19"><a aria-label="19"></a>rng     <span class="op">=</span> np.random.default_rng(<span class="dv">42</span>)</span>
+<span id="cb1-20"><a aria-label="20"></a>lengths <span class="op">=</span> np.<span class="bu">round</span>(np.cbrt(weights) <span class="op">*</span> <span class="fl">4.5</span> <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="fl">1.0</span>, <span class="bu">len</span>(weights)), <span class="dv">1</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="5e3de7ad" class="cell" data-execution_count="2">
+<div id="503a8db6" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -487,21 +493,21 @@ rkskmt
 <ul>
 <li>スケールを揃えてから（<a href="./clustering-kmeans.html#peek-scale" class="peek">クラスタリングの回の教訓</a>。学習率を1つで済ませるため）</li>
 </ul>
-<div id="e5d9fcd9" class="cell" data-execution_count="3">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a>x <span class="op">=</span> (lengths <span class="op">-</span> lengths.mean()) <span class="op">/</span> lengths.std()   <span class="co"># 標準化した体長</span></span>
-<span id="cb2-2"><a></a>t <span class="op">=</span> (weights <span class="op">-</span> weights.mean()) <span class="op">/</span> weights.std()   <span class="co"># 標準化した重さ</span></span>
-<span id="cb2-3"><a></a></span>
-<span id="cb2-4"><a></a>a, b <span class="op">=</span> <span class="fl">0.0</span>, <span class="fl">0.0</span>   <span class="co"># 直線はゼロからスタート</span></span>
-<span id="cb2-5"><a></a>lr <span class="op">=</span> <span class="fl">0.1</span>          <span class="co"># Learning rate alpha in the equation</span></span>
-<span id="cb2-6"><a></a></span>
-<span id="cb2-7"><a></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">101</span>):</span>
-<span id="cb2-8"><a></a>    pred   <span class="op">=</span> a <span class="op">*</span> x <span class="op">+</span> b</span>
-<span id="cb2-9"><a></a>    grad_a <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> np.mean((pred <span class="op">-</span> t) <span class="op">*</span> x)</span>
-<span id="cb2-10"><a></a>    grad_b <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> np.mean(pred <span class="op">-</span> t)</span>
-<span id="cb2-11"><a></a>    a <span class="op">-=</span> lr <span class="op">*</span> grad_a</span>
-<span id="cb2-12"><a></a>    b <span class="op">-=</span> lr <span class="op">*</span> grad_b</span>
-<span id="cb2-13"><a></a>    <span class="cf">if</span> i <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">10</span>, <span class="dv">50</span>, <span class="dv">100</span>):</span>
-<span id="cb2-14"><a></a>        <span class="bu">print</span>(<span class="ss">f"更新 </span><span class="sc">{</span>i<span class="sc">:3d}</span><span class="ss">回 | a=</span><span class="sc">{</span>a<span class="sc">:.4f}</span><span class="ss"> b=</span><span class="sc">{</span>b<span class="sc">:.4f}</span><span class="ss"> | MSE=</span><span class="sc">{</span>np<span class="sc">.</span>mean((a<span class="op">*</span>x<span class="op">+</span>b <span class="op">-</span> t)<span class="op">**</span><span class="dv">2</span>)<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="c7e7fe62" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a>x <span class="op">=</span> (lengths <span class="op">-</span> lengths.mean()) <span class="op">/</span> lengths.std()   <span class="co"># 標準化した体長</span></span>
+<span id="cb2-2"><a aria-label="2"></a>t <span class="op">=</span> (weights <span class="op">-</span> weights.mean()) <span class="op">/</span> weights.std()   <span class="co"># 標準化した重さ</span></span>
+<span id="cb2-3"><a aria-label="3"></a></span>
+<span id="cb2-4"><a aria-label="4"></a>a, b <span class="op">=</span> <span class="fl">0.0</span>, <span class="fl">0.0</span>   <span class="co"># 直線はゼロからスタート</span></span>
+<span id="cb2-5"><a aria-label="5"></a>lr <span class="op">=</span> <span class="fl">0.1</span>          <span class="co"># Learning rate alpha in the equation</span></span>
+<span id="cb2-6"><a aria-label="6"></a></span>
+<span id="cb2-7"><a aria-label="7"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">101</span>):</span>
+<span id="cb2-8"><a aria-label="8"></a>    pred   <span class="op">=</span> a <span class="op">*</span> x <span class="op">+</span> b</span>
+<span id="cb2-9"><a aria-label="9"></a>    grad_a <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> np.mean((pred <span class="op">-</span> t) <span class="op">*</span> x)</span>
+<span id="cb2-10"><a aria-label="10"></a>    grad_b <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> np.mean(pred <span class="op">-</span> t)</span>
+<span id="cb2-11"><a aria-label="11"></a>    a <span class="op">-=</span> lr <span class="op">*</span> grad_a</span>
+<span id="cb2-12"><a aria-label="12"></a>    b <span class="op">-=</span> lr <span class="op">*</span> grad_b</span>
+<span id="cb2-13"><a aria-label="13"></a>    <span class="cf">if</span> i <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">10</span>, <span class="dv">50</span>, <span class="dv">100</span>):</span>
+<span id="cb2-14"><a aria-label="14"></a>        <span class="bu">print</span>(<span class="ss">f"更新 </span><span class="sc">{</span>i<span class="sc">:3d}</span><span class="ss">回 | a=</span><span class="sc">{</span>a<span class="sc">:.4f}</span><span class="ss"> b=</span><span class="sc">{</span>b<span class="sc">:.4f}</span><span class="ss"> | MSE=</span><span class="sc">{</span>np<span class="sc">.</span>mean((a<span class="op">*</span>x<span class="op">+</span>b <span class="op">-</span> t)<span class="op">**</span><span class="dv">2</span>)<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>更新   1回 | a=0.1946 b=0.0000 | MSE=0.6593
 更新   3回 | a=0.4747 b=0.0000 | MSE=0.3017
@@ -566,7 +572,7 @@ rkskmt
 <section id="直線が合っていく様子" class="slide level2">
 <h2>直線が合っていく様子</h2>
 <div class="slide-body">
-<div id="555d798a" class="cell" data-execution_count="4">
+<div id="4eb6141c" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -618,12 +624,12 @@ rkskmt
 <section id="答え合わせsklearn-と比べる" class="slide level2">
 <h2>答え合わせ：sklearn と比べる</h2>
 <div class="slide-body">
-<div id="ee3c611e" class="cell" data-execution_count="5">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
-<span id="cb4-2"><a></a></span>
-<span id="cb4-3"><a></a>reg <span class="op">=</span> LinearRegression().fit(x.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), t)</span>
-<span id="cb4-4"><a></a><span class="bu">print</span>(<span class="ss">f"自作の勾配降下: a=</span><span class="sc">{</span>a<span class="sc">:.4f}</span><span class="ss">, b=</span><span class="sc">{</span>b<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb4-5"><a></a><span class="bu">print</span>(<span class="ss">f"sklearn の fit: a=</span><span class="sc">{</span>reg<span class="sc">.</span>coef_[<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss">, b=</span><span class="sc">{</span>reg<span class="sc">.</span>intercept_<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="12b16564" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a aria-label="1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
+<span id="cb4-2"><a aria-label="2"></a></span>
+<span id="cb4-3"><a aria-label="3"></a>reg <span class="op">=</span> LinearRegression().fit(x.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), t)</span>
+<span id="cb4-4"><a aria-label="4"></a><span class="bu">print</span>(<span class="ss">f"自作の勾配降下: a=</span><span class="sc">{</span>a<span class="sc">:.4f}</span><span class="ss">, b=</span><span class="sc">{</span>b<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb4-5"><a aria-label="5"></a><span class="bu">print</span>(<span class="ss">f"sklearn の fit: a=</span><span class="sc">{</span>reg<span class="sc">.</span>coef_[<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss">, b=</span><span class="sc">{</span>reg<span class="sc">.</span>intercept_<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>自作の勾配降下: a=0.9728, b=0.0000
 sklearn の fit: a=0.9728, b=0.0000</code></pre>
@@ -685,34 +691,34 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <section id="次数を上げてみる" class="slide level2">
 <h2>次数を上げてみる</h2>
 <div class="slide-body">
-<div id="d1996a26" class="cell" data-execution_count="6">
+<div id="d259ce00" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
-<span id="cb6-2"><a></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> PolynomialFeatures, StandardScaler</span>
-<span id="cb6-3"><a></a><span class="im">from</span> sklearn.pipeline <span class="im">import</span> make_pipeline</span>
-<span id="cb6-4"><a></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_squared_error</span>
-<span id="cb6-5"><a></a></span>
-<span id="cb6-6"><a></a>idx <span class="op">=</span> np.random.default_rng(<span class="dv">2</span>).choice(<span class="dv">80</span>, <span class="dv">15</span>, replace<span class="op">=</span><span class="va">False</span>)   <span class="co"># 新しい仕入れ先の15匹</span></span>
-<span id="cb6-7"><a></a>xs, ts <span class="op">=</span> lengths[idx], weights[idx]</span>
-<span id="cb6-8"><a></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(</span>
-<span id="cb6-9"><a></a>    xs.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), ts, test_size<span class="op">=</span><span class="dv">5</span>, random_state<span class="op">=</span><span class="dv">2</span></span>
-<span id="cb6-10"><a></a>)</span>
-<span id="cb6-11"><a></a></span>
-<span id="cb6-12"><a></a>grid <span class="op">=</span> np.linspace(xs.<span class="bu">min</span>() <span class="op">-</span> <span class="fl">0.5</span>, xs.<span class="bu">max</span>() <span class="op">+</span> <span class="fl">0.5</span>, <span class="dv">300</span>).reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)</span>
-<span id="cb6-13"><a></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="fl">3.6</span>))</span>
-<span id="cb6-14"><a></a><span class="cf">for</span> ax, deg <span class="kw">in</span> <span class="bu">zip</span>(axes, [<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">9</span>]):</span>
-<span id="cb6-15"><a></a>    model <span class="op">=</span> make_pipeline(PolynomialFeatures(deg), StandardScaler(), LinearRegression())</span>
-<span id="cb6-16"><a></a>    model.fit(X_train, y_train)</span>
-<span id="cb6-17"><a></a>    ax.scatter(X_train, y_train, c<span class="op">=</span><span class="st">"#2980b9"</span>, s<span class="op">=</span><span class="dv">45</span>, label<span class="op">=</span><span class="st">"訓練"</span>)</span>
-<span id="cb6-18"><a></a>    ax.scatter(X_test, y_test, c<span class="op">=</span><span class="st">"#e74c3c"</span>, marker<span class="op">=</span><span class="st">"s"</span>, s<span class="op">=</span><span class="dv">45</span>, label<span class="op">=</span><span class="st">"テスト"</span>)</span>
-<span id="cb6-19"><a></a>    ax.plot(grid, model.predict(grid), <span class="st">"k-"</span>, lw<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb6-20"><a></a>    ax.set_ylim(<span class="dv">800</span>, <span class="dv">2900</span>)</span>
-<span id="cb6-21"><a></a>    ax.set_title(<span class="ss">f"次数 </span><span class="sc">{</span>deg<span class="sc">}</span><span class="ss">"</span>, fontsize<span class="op">=</span><span class="dv">11</span>)</span>
-<span id="cb6-22"><a></a>    ax.set_xlabel(<span class="st">"体長 (cm)"</span>)</span>
-<span id="cb6-23"><a></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">"重さ (g)"</span>)<span class="op">;</span> axes[<span class="dv">0</span>].legend(fontsize<span class="op">=</span><span class="dv">8</span>)</span>
-<span id="cb6-24"><a></a>plt.tight_layout()</span>
-<span id="cb6-25"><a></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a aria-label="1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
+<span id="cb6-2"><a aria-label="2"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> PolynomialFeatures, StandardScaler</span>
+<span id="cb6-3"><a aria-label="3"></a><span class="im">from</span> sklearn.pipeline <span class="im">import</span> make_pipeline</span>
+<span id="cb6-4"><a aria-label="4"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_squared_error</span>
+<span id="cb6-5"><a aria-label="5"></a></span>
+<span id="cb6-6"><a aria-label="6"></a>idx <span class="op">=</span> np.random.default_rng(<span class="dv">2</span>).choice(<span class="dv">80</span>, <span class="dv">15</span>, replace<span class="op">=</span><span class="va">False</span>)   <span class="co"># 新しい仕入れ先の15匹</span></span>
+<span id="cb6-7"><a aria-label="7"></a>xs, ts <span class="op">=</span> lengths[idx], weights[idx]</span>
+<span id="cb6-8"><a aria-label="8"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(</span>
+<span id="cb6-9"><a aria-label="9"></a>    xs.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), ts, test_size<span class="op">=</span><span class="dv">5</span>, random_state<span class="op">=</span><span class="dv">2</span></span>
+<span id="cb6-10"><a aria-label="10"></a>)</span>
+<span id="cb6-11"><a aria-label="11"></a></span>
+<span id="cb6-12"><a aria-label="12"></a>grid <span class="op">=</span> np.linspace(xs.<span class="bu">min</span>() <span class="op">-</span> <span class="fl">0.5</span>, xs.<span class="bu">max</span>() <span class="op">+</span> <span class="fl">0.5</span>, <span class="dv">300</span>).reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb6-13"><a aria-label="13"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="fl">3.6</span>))</span>
+<span id="cb6-14"><a aria-label="14"></a><span class="cf">for</span> ax, deg <span class="kw">in</span> <span class="bu">zip</span>(axes, [<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">9</span>]):</span>
+<span id="cb6-15"><a aria-label="15"></a>    model <span class="op">=</span> make_pipeline(PolynomialFeatures(deg), StandardScaler(), LinearRegression())</span>
+<span id="cb6-16"><a aria-label="16"></a>    model.fit(X_train, y_train)</span>
+<span id="cb6-17"><a aria-label="17"></a>    ax.scatter(X_train, y_train, c<span class="op">=</span><span class="st">"#2980b9"</span>, s<span class="op">=</span><span class="dv">45</span>, label<span class="op">=</span><span class="st">"訓練"</span>)</span>
+<span id="cb6-18"><a aria-label="18"></a>    ax.scatter(X_test, y_test, c<span class="op">=</span><span class="st">"#e74c3c"</span>, marker<span class="op">=</span><span class="st">"s"</span>, s<span class="op">=</span><span class="dv">45</span>, label<span class="op">=</span><span class="st">"テスト"</span>)</span>
+<span id="cb6-19"><a aria-label="19"></a>    ax.plot(grid, model.predict(grid), <span class="st">"k-"</span>, lw<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb6-20"><a aria-label="20"></a>    ax.set_ylim(<span class="dv">800</span>, <span class="dv">2900</span>)</span>
+<span id="cb6-21"><a aria-label="21"></a>    ax.set_title(<span class="ss">f"次数 </span><span class="sc">{</span>deg<span class="sc">}</span><span class="ss">"</span>, fontsize<span class="op">=</span><span class="dv">11</span>)</span>
+<span id="cb6-22"><a aria-label="22"></a>    ax.set_xlabel(<span class="st">"体長 (cm)"</span>)</span>
+<span id="cb6-23"><a aria-label="23"></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">"重さ (g)"</span>)<span class="op">;</span> axes[<span class="dv">0</span>].legend(fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb6-24"><a aria-label="24"></a>plt.tight_layout()</span>
+<span id="cb6-25"><a aria-label="25"></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
@@ -730,22 +736,22 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <section id="数字で見るまた会ったな過学習" class="slide level2">
 <h2>数字で見る：また会ったな、過学習</h2>
 <div class="slide-body">
-<div id="2d177520" class="cell" data-execution_count="7">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a></a>degrees <span class="op">=</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">10</span>)</span>
-<span id="cb7-2"><a></a>train_mse, test_mse <span class="op">=</span> [], []</span>
-<span id="cb7-3"><a></a><span class="cf">for</span> deg <span class="kw">in</span> degrees:</span>
-<span id="cb7-4"><a></a>    model <span class="op">=</span> make_pipeline(PolynomialFeatures(deg), StandardScaler(), LinearRegression())</span>
-<span id="cb7-5"><a></a>    model.fit(X_train, y_train)</span>
-<span id="cb7-6"><a></a>    train_mse.append(mean_squared_error(y_train, model.predict(X_train)))</span>
-<span id="cb7-7"><a></a>    test_mse.append(mean_squared_error(y_test, model.predict(X_test)))</span>
-<span id="cb7-8"><a></a></span>
-<span id="cb7-9"><a></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">6.5</span>, <span class="fl">3.6</span>))</span>
-<span id="cb7-10"><a></a>plt.semilogy(degrees, train_mse, <span class="st">"o-"</span>, color<span class="op">=</span><span class="st">"#2980b9"</span>, label<span class="op">=</span><span class="st">"訓練MSE"</span>)</span>
-<span id="cb7-11"><a></a>plt.semilogy(degrees, test_mse,  <span class="st">"s-"</span>, color<span class="op">=</span><span class="st">"#e74c3c"</span>, label<span class="op">=</span><span class="st">"テストMSE"</span>)</span>
-<span id="cb7-12"><a></a>plt.xlabel(<span class="st">"多項式の次数"</span>)<span class="op">;</span> plt.ylabel(<span class="st">"MSE（対数目盛）"</span>)</span>
-<span id="cb7-13"><a></a>plt.legend()<span class="op">;</span> plt.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.4</span>)</span>
-<span id="cb7-14"><a></a>plt.tight_layout()</span>
-<span id="cb7-15"><a></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="6caec9f0" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a aria-label="1"></a>degrees <span class="op">=</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">10</span>)</span>
+<span id="cb7-2"><a aria-label="2"></a>train_mse, test_mse <span class="op">=</span> [], []</span>
+<span id="cb7-3"><a aria-label="3"></a><span class="cf">for</span> deg <span class="kw">in</span> degrees:</span>
+<span id="cb7-4"><a aria-label="4"></a>    model <span class="op">=</span> make_pipeline(PolynomialFeatures(deg), StandardScaler(), LinearRegression())</span>
+<span id="cb7-5"><a aria-label="5"></a>    model.fit(X_train, y_train)</span>
+<span id="cb7-6"><a aria-label="6"></a>    train_mse.append(mean_squared_error(y_train, model.predict(X_train)))</span>
+<span id="cb7-7"><a aria-label="7"></a>    test_mse.append(mean_squared_error(y_test, model.predict(X_test)))</span>
+<span id="cb7-8"><a aria-label="8"></a></span>
+<span id="cb7-9"><a aria-label="9"></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">6.5</span>, <span class="fl">3.6</span>))</span>
+<span id="cb7-10"><a aria-label="10"></a>plt.semilogy(degrees, train_mse, <span class="st">"o-"</span>, color<span class="op">=</span><span class="st">"#2980b9"</span>, label<span class="op">=</span><span class="st">"訓練MSE"</span>)</span>
+<span id="cb7-11"><a aria-label="11"></a>plt.semilogy(degrees, test_mse,  <span class="st">"s-"</span>, color<span class="op">=</span><span class="st">"#e74c3c"</span>, label<span class="op">=</span><span class="st">"テストMSE"</span>)</span>
+<span id="cb7-12"><a aria-label="12"></a>plt.xlabel(<span class="st">"多項式の次数"</span>)<span class="op">;</span> plt.ylabel(<span class="st">"MSE（対数目盛）"</span>)</span>
+<span id="cb7-13"><a aria-label="13"></a>plt.legend()<span class="op">;</span> plt.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.4</span>)</span>
+<span id="cb7-14"><a aria-label="14"></a>plt.tight_layout()</span>
+<span id="cb7-15"><a aria-label="15"></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -767,10 +773,10 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <ul>
 <li>暴れている曲線の正体は、<strong>巨大な係数</strong></li>
 </ul>
-<div id="d288b5f9" class="cell" data-execution_count="8">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a></a>plain <span class="op">=</span> make_pipeline(PolynomialFeatures(<span class="dv">9</span>), StandardScaler(), LinearRegression())</span>
-<span id="cb8-2"><a></a>plain.fit(X_train, y_train)</span>
-<span id="cb8-3"><a></a><span class="bu">print</span>(<span class="st">"次数9の係数の最大絶対値:"</span>, <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">abs</span>(plain[<span class="op">-</span><span class="dv">1</span>].coef_)<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="71023ca8" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a aria-label="1"></a>plain <span class="op">=</span> make_pipeline(PolynomialFeatures(<span class="dv">9</span>), StandardScaler(), LinearRegression())</span>
+<span id="cb8-2"><a aria-label="2"></a>plain.fit(X_train, y_train)</span>
+<span id="cb8-3"><a aria-label="3"></a><span class="bu">print</span>(<span class="st">"次数9の係数の最大絶対値:"</span>, <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">abs</span>(plain[<span class="op">-</span><span class="dv">1</span>].coef_)<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>次数9の係数の最大絶対値: 204,382</code></pre>
 </div>
@@ -793,30 +799,30 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <li>sklearn には任せない。冒頭で自作した勾配降下法に、<strong>罰金の項を足すだけ</strong></li>
 <li>罰金 <span class="math inline">\(\lambda \sum w^2\)</span> の微分は <span class="math inline">\(2\lambda w\)</span>。各係数の勾配に足せばよい</li>
 </ul>
-<div id="3d430ec3" class="cell" data-execution_count="9">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a></a><span class="co"># 特徴量 x, x², …, x⁹ も自分で作る（列が x^1 〜 x^9 の配列）</span></span>
-<span id="cb10-2"><a></a>P_train <span class="op">=</span> X_train <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)          <span class="co"># 形 (10, 9)</span></span>
-<span id="cb10-3"><a></a>P_test  <span class="op">=</span> X_test  <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)</span>
-<span id="cb10-4"><a></a>mu, sd  <span class="op">=</span> P_train.mean(axis<span class="op">=</span><span class="dv">0</span>), P_train.std(axis<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb10-5"><a></a>P_train <span class="op">=</span> (P_train <span class="op">-</span> mu) <span class="op">/</span> sd                  <span class="co"># スケールを揃える（いつもの）</span></span>
-<span id="cb10-6"><a></a>P_test  <span class="op">=</span> (P_test  <span class="op">-</span> mu) <span class="op">/</span> sd</span>
-<span id="cb10-7"><a></a>t_mean, t_std <span class="op">=</span> y_train.mean(), y_train.std()</span>
-<span id="cb10-8"><a></a>tt <span class="op">=</span> (y_train <span class="op">-</span> t_mean) <span class="op">/</span> t_std                <span class="co"># 重さも標準化</span></span>
-<span id="cb10-9"><a></a></span>
-<span id="cb10-10"><a></a>lam  <span class="op">=</span> <span class="fl">0.1</span>        <span class="co"># 罰金の強さ λ</span></span>
-<span id="cb10-11"><a></a>w, b <span class="op">=</span> np.zeros(<span class="dv">9</span>), <span class="fl">0.0</span></span>
-<span id="cb10-12"><a></a>lr   <span class="op">=</span> <span class="fl">0.01</span></span>
-<span id="cb10-13"><a></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10_000</span>):</span>
-<span id="cb10-14"><a></a>    pred   <span class="op">=</span> P_train <span class="op">@</span> w <span class="op">+</span> b</span>
-<span id="cb10-15"><a></a>    grad_w <span class="op">=</span> np.array([<span class="dv">2</span> <span class="op">*</span> np.mean((pred <span class="op">-</span> tt) <span class="op">*</span> P_train[:, d]) <span class="cf">for</span> d <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">9</span>)]) <span class="op">\</span></span>
-<span id="cb10-16"><a></a>             <span class="op">+</span> <span class="dv">2</span> <span class="op">*</span> lam <span class="op">*</span> w                     <span class="co"># ← MSEの勾配 ＋ 罰金の勾配</span></span>
-<span id="cb10-17"><a></a>    grad_b <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> np.mean(pred <span class="op">-</span> tt)</span>
-<span id="cb10-18"><a></a>    w <span class="op">-=</span> lr <span class="op">*</span> grad_w</span>
-<span id="cb10-19"><a></a>    b <span class="op">-=</span> lr <span class="op">*</span> grad_b</span>
-<span id="cb10-20"><a></a></span>
-<span id="cb10-21"><a></a>test_pred <span class="op">=</span> (P_test <span class="op">@</span> w <span class="op">+</span> b) <span class="op">*</span> t_std <span class="op">+</span> t_mean  <span class="co"># 元の単位（g）に戻す</span></span>
-<span id="cb10-22"><a></a><span class="bu">print</span>(<span class="st">"係数の最大絶対値:"</span>, <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">abs</span>(w <span class="op">*</span> t_std)<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss">"</span>)</span>
-<span id="cb10-23"><a></a><span class="bu">print</span>(<span class="st">"テストMSE:"</span>, <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span>mean((test_pred <span class="op">-</span> y_test) <span class="op">**</span> <span class="dv">2</span>)<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="379d6d68" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a aria-label="1"></a><span class="co"># 特徴量 x, x², …, x⁹ も自分で作る（列が x^1 〜 x^9 の配列）</span></span>
+<span id="cb10-2"><a aria-label="2"></a>P_train <span class="op">=</span> X_train <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)          <span class="co"># 形 (10, 9)</span></span>
+<span id="cb10-3"><a aria-label="3"></a>P_test  <span class="op">=</span> X_test  <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)</span>
+<span id="cb10-4"><a aria-label="4"></a>mu, sd  <span class="op">=</span> P_train.mean(axis<span class="op">=</span><span class="dv">0</span>), P_train.std(axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb10-5"><a aria-label="5"></a>P_train <span class="op">=</span> (P_train <span class="op">-</span> mu) <span class="op">/</span> sd                  <span class="co"># スケールを揃える（いつもの）</span></span>
+<span id="cb10-6"><a aria-label="6"></a>P_test  <span class="op">=</span> (P_test  <span class="op">-</span> mu) <span class="op">/</span> sd</span>
+<span id="cb10-7"><a aria-label="7"></a>t_mean, t_std <span class="op">=</span> y_train.mean(), y_train.std()</span>
+<span id="cb10-8"><a aria-label="8"></a>tt <span class="op">=</span> (y_train <span class="op">-</span> t_mean) <span class="op">/</span> t_std                <span class="co"># 重さも標準化</span></span>
+<span id="cb10-9"><a aria-label="9"></a></span>
+<span id="cb10-10"><a aria-label="10"></a>lam  <span class="op">=</span> <span class="fl">0.1</span>        <span class="co"># 罰金の強さ λ</span></span>
+<span id="cb10-11"><a aria-label="11"></a>w, b <span class="op">=</span> np.zeros(<span class="dv">9</span>), <span class="fl">0.0</span></span>
+<span id="cb10-12"><a aria-label="12"></a>lr   <span class="op">=</span> <span class="fl">0.01</span></span>
+<span id="cb10-13"><a aria-label="13"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10_000</span>):</span>
+<span id="cb10-14"><a aria-label="14"></a>    pred   <span class="op">=</span> P_train <span class="op">@</span> w <span class="op">+</span> b</span>
+<span id="cb10-15"><a aria-label="15"></a>    grad_w <span class="op">=</span> np.array([<span class="dv">2</span> <span class="op">*</span> np.mean((pred <span class="op">-</span> tt) <span class="op">*</span> P_train[:, d]) <span class="cf">for</span> d <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">9</span>)]) <span class="op">\</span></span>
+<span id="cb10-16"><a aria-label="16"></a>             <span class="op">+</span> <span class="dv">2</span> <span class="op">*</span> lam <span class="op">*</span> w                     <span class="co"># ← MSEの勾配 ＋ 罰金の勾配</span></span>
+<span id="cb10-17"><a aria-label="17"></a>    grad_b <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> np.mean(pred <span class="op">-</span> tt)</span>
+<span id="cb10-18"><a aria-label="18"></a>    w <span class="op">-=</span> lr <span class="op">*</span> grad_w</span>
+<span id="cb10-19"><a aria-label="19"></a>    b <span class="op">-=</span> lr <span class="op">*</span> grad_b</span>
+<span id="cb10-20"><a aria-label="20"></a></span>
+<span id="cb10-21"><a aria-label="21"></a>test_pred <span class="op">=</span> (P_test <span class="op">@</span> w <span class="op">+</span> b) <span class="op">*</span> t_std <span class="op">+</span> t_mean  <span class="co"># 元の単位（g）に戻す</span></span>
+<span id="cb10-22"><a aria-label="22"></a><span class="bu">print</span>(<span class="st">"係数の最大絶対値:"</span>, <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">abs</span>(w <span class="op">*</span> t_std)<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss">"</span>)</span>
+<span id="cb10-23"><a aria-label="23"></a><span class="bu">print</span>(<span class="st">"テストMSE:"</span>, <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span>mean((test_pred <span class="op">-</span> y_test) <span class="op">**</span> <span class="dv">2</span>)<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>係数の最大絶対値: 74
 テストMSE: 3,427</code></pre>
@@ -831,27 +837,27 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <section id="罰金ありなしを見比べる" class="slide level2">
 <h2>罰金あり・なしを見比べる</h2>
 <div class="slide-body">
-<div id="869cdc59" class="cell" data-execution_count="10">
+<div id="f3913781" class="cell" data-execution_count="10">
 <details class="code-fold">
 <summary>描画コード</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a></a>P_grid    <span class="op">=</span> ((grid <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)) <span class="op">-</span> mu) <span class="op">/</span> sd</span>
-<span id="cb12-2"><a></a>own_curve <span class="op">=</span> (P_grid <span class="op">@</span> w <span class="op">+</span> b) <span class="op">*</span> t_std <span class="op">+</span> t_mean</span>
-<span id="cb12-3"><a></a></span>
-<span id="cb12-4"><a></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="fl">9.5</span>, <span class="fl">3.6</span>))</span>
-<span id="cb12-5"><a></a><span class="cf">for</span> ax, curve, name, mse <span class="kw">in</span> [</span>
-<span id="cb12-6"><a></a>        (axes[<span class="dv">0</span>], plain.predict(grid), <span class="st">"次数9（正則化なし）"</span>,</span>
-<span id="cb12-7"><a></a>         mean_squared_error(y_test, plain.predict(X_test))),</span>
-<span id="cb12-8"><a></a>        (axes[<span class="dv">1</span>], own_curve, <span class="st">"次数9 + 正則化（自作の勾配降下法）"</span>,</span>
-<span id="cb12-9"><a></a>         np.mean((test_pred <span class="op">-</span> y_test) <span class="op">**</span> <span class="dv">2</span>))]:</span>
-<span id="cb12-10"><a></a>    ax.scatter(X_train, y_train, c<span class="op">=</span><span class="st">"#2980b9"</span>, s<span class="op">=</span><span class="dv">45</span>)</span>
-<span id="cb12-11"><a></a>    ax.scatter(X_test, y_test, c<span class="op">=</span><span class="st">"#e74c3c"</span>, marker<span class="op">=</span><span class="st">"s"</span>, s<span class="op">=</span><span class="dv">45</span>)</span>
-<span id="cb12-12"><a></a>    ax.plot(grid, curve, <span class="st">"k-"</span>, lw<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb12-13"><a></a>    ax.set_ylim(<span class="dv">800</span>, <span class="dv">2900</span>)</span>
-<span id="cb12-14"><a></a>    ax.set_title(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">　テストMSE </span><span class="sc">{</span>mse<span class="sc">:,.0f}</span><span class="ss">"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
-<span id="cb12-15"><a></a>    ax.set_xlabel(<span class="st">"体長 (cm)"</span>)</span>
-<span id="cb12-16"><a></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">"重さ (g)"</span>)</span>
-<span id="cb12-17"><a></a>plt.tight_layout()</span>
-<span id="cb12-18"><a></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a aria-label="1"></a>P_grid    <span class="op">=</span> ((grid <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)) <span class="op">-</span> mu) <span class="op">/</span> sd</span>
+<span id="cb12-2"><a aria-label="2"></a>own_curve <span class="op">=</span> (P_grid <span class="op">@</span> w <span class="op">+</span> b) <span class="op">*</span> t_std <span class="op">+</span> t_mean</span>
+<span id="cb12-3"><a aria-label="3"></a></span>
+<span id="cb12-4"><a aria-label="4"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="fl">9.5</span>, <span class="fl">3.6</span>))</span>
+<span id="cb12-5"><a aria-label="5"></a><span class="cf">for</span> ax, curve, name, mse <span class="kw">in</span> [</span>
+<span id="cb12-6"><a aria-label="6"></a>        (axes[<span class="dv">0</span>], plain.predict(grid), <span class="st">"次数9（正則化なし）"</span>,</span>
+<span id="cb12-7"><a aria-label="7"></a>         mean_squared_error(y_test, plain.predict(X_test))),</span>
+<span id="cb12-8"><a aria-label="8"></a>        (axes[<span class="dv">1</span>], own_curve, <span class="st">"次数9 + 正則化（自作の勾配降下法）"</span>,</span>
+<span id="cb12-9"><a aria-label="9"></a>         np.mean((test_pred <span class="op">-</span> y_test) <span class="op">**</span> <span class="dv">2</span>))]:</span>
+<span id="cb12-10"><a aria-label="10"></a>    ax.scatter(X_train, y_train, c<span class="op">=</span><span class="st">"#2980b9"</span>, s<span class="op">=</span><span class="dv">45</span>)</span>
+<span id="cb12-11"><a aria-label="11"></a>    ax.scatter(X_test, y_test, c<span class="op">=</span><span class="st">"#e74c3c"</span>, marker<span class="op">=</span><span class="st">"s"</span>, s<span class="op">=</span><span class="dv">45</span>)</span>
+<span id="cb12-12"><a aria-label="12"></a>    ax.plot(grid, curve, <span class="st">"k-"</span>, lw<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb12-13"><a aria-label="13"></a>    ax.set_ylim(<span class="dv">800</span>, <span class="dv">2900</span>)</span>
+<span id="cb12-14"><a aria-label="14"></a>    ax.set_title(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">　テストMSE </span><span class="sc">{</span>mse<span class="sc">:,.0f}</span><span class="ss">"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb12-15"><a aria-label="15"></a>    ax.set_xlabel(<span class="st">"体長 (cm)"</span>)</span>
+<span id="cb12-16"><a aria-label="16"></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">"重さ (g)"</span>)</span>
+<span id="cb12-17"><a aria-label="17"></a>plt.tight_layout()</span>
+<span id="cb12-18"><a aria-label="18"></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
@@ -1011,28 +1017,28 @@ a = 0.2 + 0.16 = 0.36\]</span></p>
 </div>
 </div>
 <h3 id="コードで確認">コードで確認</h3>
-<div id="c55f19fb" class="cell" data-execution_count="11">
+<div id="fe37d150" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>解答例を見る</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb13-2"><a></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
-<span id="cb13-3"><a></a></span>
-<span id="cb13-4"><a></a>x <span class="op">=</span> np.array([<span class="op">-</span><span class="fl">1.0</span>, <span class="fl">1.0</span>])</span>
-<span id="cb13-5"><a></a>t <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">2.0</span>])</span>
-<span id="cb13-6"><a></a></span>
-<span id="cb13-7"><a></a>a, b <span class="op">=</span> <span class="fl">0.0</span>, <span class="fl">0.0</span></span>
-<span id="cb13-8"><a></a>lr <span class="op">=</span> <span class="fl">0.1</span></span>
-<span id="cb13-9"><a></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">101</span>):</span>
-<span id="cb13-10"><a></a>    pred   <span class="op">=</span> a <span class="op">*</span> x <span class="op">+</span> b</span>
-<span id="cb13-11"><a></a>    grad_a <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> np.mean((pred <span class="op">-</span> t) <span class="op">*</span> x)</span>
-<span id="cb13-12"><a></a>    grad_b <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> np.mean(pred <span class="op">-</span> t)</span>
-<span id="cb13-13"><a></a>    a <span class="op">-=</span> lr <span class="op">*</span> grad_a</span>
-<span id="cb13-14"><a></a>    b <span class="op">-=</span> lr <span class="op">*</span> grad_b</span>
-<span id="cb13-15"><a></a>    <span class="cf">if</span> i <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">100</span>):</span>
-<span id="cb13-16"><a></a>        <span class="bu">print</span>(<span class="ss">f"更新 </span><span class="sc">{</span>i<span class="sc">:3d}</span><span class="ss">回 | a=</span><span class="sc">{</span>a<span class="sc">:.4f}</span><span class="ss"> b=</span><span class="sc">{</span>b<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb13-17"><a></a></span>
-<span id="cb13-18"><a></a>reg <span class="op">=</span> LinearRegression().fit(x.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), t)</span>
-<span id="cb13-19"><a></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">sklearn の fit: a=</span><span class="sc">{</span>reg<span class="sc">.</span>coef_[<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss">, b=</span><span class="sc">{</span>reg<span class="sc">.</span>intercept_<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb13-2"><a aria-label="2"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
+<span id="cb13-3"><a aria-label="3"></a></span>
+<span id="cb13-4"><a aria-label="4"></a>x <span class="op">=</span> np.array([<span class="op">-</span><span class="fl">1.0</span>, <span class="fl">1.0</span>])</span>
+<span id="cb13-5"><a aria-label="5"></a>t <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">2.0</span>])</span>
+<span id="cb13-6"><a aria-label="6"></a></span>
+<span id="cb13-7"><a aria-label="7"></a>a, b <span class="op">=</span> <span class="fl">0.0</span>, <span class="fl">0.0</span></span>
+<span id="cb13-8"><a aria-label="8"></a>lr <span class="op">=</span> <span class="fl">0.1</span></span>
+<span id="cb13-9"><a aria-label="9"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">101</span>):</span>
+<span id="cb13-10"><a aria-label="10"></a>    pred   <span class="op">=</span> a <span class="op">*</span> x <span class="op">+</span> b</span>
+<span id="cb13-11"><a aria-label="11"></a>    grad_a <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> np.mean((pred <span class="op">-</span> t) <span class="op">*</span> x)</span>
+<span id="cb13-12"><a aria-label="12"></a>    grad_b <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> np.mean(pred <span class="op">-</span> t)</span>
+<span id="cb13-13"><a aria-label="13"></a>    a <span class="op">-=</span> lr <span class="op">*</span> grad_a</span>
+<span id="cb13-14"><a aria-label="14"></a>    b <span class="op">-=</span> lr <span class="op">*</span> grad_b</span>
+<span id="cb13-15"><a aria-label="15"></a>    <span class="cf">if</span> i <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">100</span>):</span>
+<span id="cb13-16"><a aria-label="16"></a>        <span class="bu">print</span>(<span class="ss">f"更新 </span><span class="sc">{</span>i<span class="sc">:3d}</span><span class="ss">回 | a=</span><span class="sc">{</span>a<span class="sc">:.4f}</span><span class="ss"> b=</span><span class="sc">{</span>b<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb13-17"><a aria-label="17"></a></span>
+<span id="cb13-18"><a aria-label="18"></a>reg <span class="op">=</span> LinearRegression().fit(x.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), t)</span>
+<span id="cb13-19"><a aria-label="19"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">sklearn の fit: a=</span><span class="sc">{</span>reg<span class="sc">.</span>coef_[<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss">, b=</span><span class="sc">{</span>reg<span class="sc">.</span>intercept_<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>更新   1回 | a=0.2000 b=0.2000

@@ -1460,35 +1460,35 @@
     "href": "classification-2d-boundaries.html#次元での分類",
     "title": "2次元の特徴量で分類",
     "section": "2次元での分類",
-    "text": "2次元での分類\n\n\n今回の目標\n\n\n2つの特徴量（feature）を使った分類\n決定境界を手動の直線で引く\n決定境界を決定木で決める\n決定境界を可視化する\n\n\n\n\n\n\n\n\nポイント\n\n\n\n1次元（重さのみ）から2次元（重さ+輝度）への拡張\n決定境界は手でも、アルゴリズムでも決められる"
+    "text": "2次元での分類\n\n\n今回の目標\n\n\n2つの特徴量（feature）を使った分類\n決定境界を決定木で定める\n決定境界の可視化\n\n\n\n\n\n\n\n\nポイント\n\n\n\n1次元（重さ）から2次元（重さ+輝度）への拡張\n決定境界はアルゴリズムで決定"
   },
   {
     "objectID": "classification-2d-boundaries.html#前回の復習",
     "href": "classification-2d-boundaries.html#前回の復習",
     "title": "2次元の特徴量で分類",
     "section": "前回の復習",
-    "text": "前回の復習\n\n\n1次元での分類\n\n\n重さだけで Salmon vs Sea bass を分類\nしきい値（threshold）を手動で設定\nTP/FP/TN/FN、Precision/Recall を学習\n\n\n\n\n\n\n\nノート\n\n\n問題点: 最適なしきい値は、ケースによって異なる（コスト計算などで決定）"
+    "text": "前回の復習\n\n\n1次元での分類\n\n\n重さだけで Salmon vs Sea bass を分類\n閾値（threshold）を手動で設定\nTP / FP / TN / FN\nPrecision / Recall\n最適な閾値はケースによって異なる\n\nコスト計算などで決定"
   },
   {
-    "objectID": "classification-2d-boundaries.html#今回のアプローチ",
-    "href": "classification-2d-boundaries.html#今回のアプローチ",
+    "objectID": "classification-2d-boundaries.html#重さに加えてもう1つ特徴量を追加する",
+    "href": "classification-2d-boundaries.html#重さに加えてもう1つ特徴量を追加する",
     "title": "2次元の特徴量で分類",
-    "section": "今回のアプローチ",
-    "text": "今回のアプローチ\n\n\nもう1つ特徴量を追加する\n\n\nベルトコンベアに輝度センサ（人感ライトみたいな簡単なやつ）を搭載して、輝度（明るさ） も取れたとしよう\n\n重さや輝度のような測定値を特徴量という\n\n前回の体重と合わせて2つの特徴量を使えば、もっと正確に分類できるはず？\n\n\n\n\n\n前回\n今回\n\n\n\n\n特徴量\n体重（1次元）\n体重 + 輝度（2次元）\n\n\n境界\nしきい値\n？？"
+    "section": "重さに加えて、もう1つ特徴量を追加する",
+    "text": "重さに加えて、もう1つ特徴量を追加する\n\n\nベルトコンベアのどこかに輝度センサ（人感ライトみたいな簡単なやつ）を設置して、通過する魚１匹ずつの 輝度（明るさ） も取れたとする\n\n重さや輝度のような測定値を特徴量（feature）という\n\n前回の体重と合わせて2つの特徴量を使えば、もっと正確に分類できるはず？\n\n\n\n\n\n前回\n今回\n\n\n\n\n特徴量\n体重（1次元）\n体重 + 輝度（2次元）\n\n\n境界\nしきい値\n？？"
   },
   {
-    "objectID": "classification-2d-boundaries.html#対象データ",
-    "href": "classification-2d-boundaries.html#対象データ",
+    "objectID": "classification-2d-boundaries.html#新たなデータ２次元",
+    "href": "classification-2d-boundaries.html#新たなデータ２次元",
     "title": "2次元の特徴量で分類",
-    "section": "対象データ",
-    "text": "対象データ\n\n新しく輝度のデータを追加した（各40匹）。\n\n# Salmon（40匹）の重さ (g)\nsalmon_weights = [2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,\n                  1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,\n                  2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,\n                  1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652]\n\n# Salmon（40匹）の輝度（暗め: 2.1-5.9）\nsalmon_brightness = [3.5, 5.8, 4.9, 4.4, 2.6, 2.6, 2.2, 5.5, 4.4, 4.8, 2.1, \n                     5.9, 5.3, 2.8, 2.7, 2.7, 3.2, 4.1, 3.7, 3.2, 4.4, 2.6, \n                     3.2, 3.5, 3.8, 5.1, 2.8, 4.1, 4.4, 2.2, 4.4, 2.7, 2.3, \n                     5.8, 5.9, 5.2, 3.2, 2.4, 4.7, 3.8]\n\n# Sea bass（40匹）の重さ (g)\nseabass_weights = [1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,\n                   1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,\n                   1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,\n                   1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531]\n\n# Sea bass（40匹）の輝度（明るめ: 5.0-9.9）\nseabass_brightness = [5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8, \n                       8.9, 9.7, 9.5, 8.0, 9.6, 5.4, 6.0, 5.2, 6.6, 6.9, 6.4, \n                       9.1, 6.8, 6.4, 7.7, 5.7, 9.0, 5.4, 9.9, 8.9, 6.0, 5.0, \n                       9.1, 8.5, 8.6, 8.9, 5.4, 6.8, 5.6]"
+    "section": "新たなデータ（２次元）",
+    "text": "新たなデータ（２次元）\n\n新しく輝度のデータを追加した（各40匹）。\n\n# Salmon（40匹）の重さ (g)\nsalmon_weights = [2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,\n                  1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,\n                  2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,\n                  1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652]\n\n# Salmon（40匹）の輝度（暗め: 2.1-5.9）\nsalmon_brightness = [3.5, 5.8, 4.9, 4.4, 2.6, 2.6, 2.2, 5.5, 4.4, 4.8, 2.1, \n                     5.9, 5.3, 2.8, 2.7, 2.7, 3.2, 4.1, 3.7, 3.2, 4.4, 2.6, \n                     3.2, 3.5, 3.8, 5.1, 2.8, 4.1, 4.4, 2.2, 4.4, 2.7, 2.3, \n                     5.8, 5.9, 5.2, 3.2, 2.4, 4.7, 3.8]\n\n# Sea bass（40匹）の重さ (g)\nseabass_weights = [1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,\n                   1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,\n                   1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,\n                   1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531]\n\n# Sea bass（40匹）の輝度（明るめ: 5.0-9.9）\nseabass_brightness = [5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8, \n                       8.9, 9.7, 9.5, 8.0, 9.6, 5.4, 6.0, 5.2, 6.6, 6.9, 6.4, \n                       9.1, 6.8, 6.4, 7.7, 5.7, 9.0, 5.4, 9.9, 8.9, 6.0, 5.0, \n                       9.1, 8.5, 8.6, 8.9, 5.4, 6.8, 5.6]"
   },
   {
     "objectID": "classification-2d-boundaries.html#準備",
     "href": "classification-2d-boundaries.html#準備",
     "title": "2次元の特徴量で分類",
     "section": "準備",
-    "text": "準備\n\nライブラリをインポートし、データを numpy 配列にまとめる。\n\n# Setup\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\nimport pandas as pd\n\n# Matplotlib settings\nplt.rcParams[\"font.size\"] = 11\nplt.rcParams[\"figure.dpi\"] = 100\n\n# numpy配列にキャスト\nsalmon_weights = np.array(salmon_weights)\nsalmon_brightness = np.array(salmon_brightness)\nseabass_weights = np.array(seabass_weights)\nseabass_brightness = np.array(seabass_brightness)\n\n# 特徴量行列およびラベルの作成\nX = np.vstack([\n    np.column_stack([salmon_brightness, salmon_weights]),\n    np.column_stack([seabass_brightness, seabass_weights])\n])\ny = np.array([1]*40 + [0]*40)  # 1=Salmon, 0=Sea bass"
+    "text": "準備\n\nデータを numpy 配列にまとめる。\n\nimport numpy as np\n\n# numpy配列にキャスト\nsalmon_weights = np.array(salmon_weights)\nsalmon_brightness = np.array(salmon_brightness)\nseabass_weights = np.array(seabass_weights)\nseabass_brightness = np.array(seabass_brightness)"
   },
   {
     "objectID": "classification-2d-boundaries.html#section",
@@ -1502,21 +1502,21 @@
     "href": "classification-2d-boundaries.html#peek-diagonal",
     "title": "2次元の特徴量で分類",
     "section": "輝度×重さの散布図",
-    "text": "輝度×重さの散布図\n\n\n\ncode\nplt.figure(figsize=(10, 7))\n\nplt.scatter(salmon_brightness, salmon_weights, \n           c=\"black\", marker=\"o\", s=100, alpha=0.7, label=\"Salmon\", edgecolors=\"black\")\nplt.scatter(seabass_brightness, seabass_weights, \n           c=\"red\", marker=\"s\", s=100, alpha=0.7, label=\"Sea bass\", edgecolors=\"darkred\")\n\nplt.xlabel(\"Lightness\", fontsize=14, fontweight=\"bold\")\nplt.ylabel(\"Weight (g)\", fontsize=14, fontweight=\"bold\")\nplt.title(\"2D Feature Space: Lightness vs Weight\", fontsize=16, fontweight=\"bold\")\nplt.legend(fontsize=13, loc=\"upper left\")\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nここまでで分かること\n\n\n\nSalmon（黒丸）は左側（暗い）に集中\nSea bass（赤四角）は右側（明るい）に集中\nしかし5〜6あたりで少し重なっている\n\n斜めの直線で分けられそうに見える\nまずは縦軸に平行な直線（輝度のしきい値）で切ってみる"
+    "text": "輝度×重さの散布図\n\n\n\n（参考）描画コード\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\n\nplt.figure(figsize=(10, 7))\n\nplt.scatter(salmon_brightness, salmon_weights, \n           c=\"black\", marker=\"o\", s=100, alpha=0.7, label=\"Salmon\", edgecolors=\"black\")\nplt.scatter(seabass_brightness, seabass_weights, \n           c=\"red\", marker=\"s\", s=100, alpha=0.7, label=\"Sea bass\", edgecolors=\"darkred\")\n\nplt.xlabel(\"Lightness\", fontsize=14, fontweight=\"bold\")\nplt.ylabel(\"Weight (g)\", fontsize=14, fontweight=\"bold\")\nplt.title(\"2D Feature Space: Lightness vs Weight\", fontsize=16, fontweight=\"bold\")\nplt.legend(fontsize=13, loc=\"upper left\")\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nここまでで分かること\n\n\n\nSalmon（黒丸）は左側（暗い）に集中\nSea bass（赤四角）は右側（明るい）に集中\nしかし5〜6あたりで少し重なっている\n\n斜めの直線で分けられそうに見える\nまずは縦軸に平行な直線（輝度のしきい値）で切ってみる"
   },
   {
     "objectID": "classification-2d-boundaries.html#peek-handline",
     "href": "classification-2d-boundaries.html#peek-handline",
     "title": "2次元の特徴量で分類",
-    "section": "縦軸に平行な直線で切ってみる",
-    "text": "縦軸に平行な直線で切ってみる\n\nグラフを見て、適当な閾値を設定して左右に分割する。\n\nどこに引けば一番うまく分けられそうか\n完璧には分けられないので、誤分類がどのくらい出るかを数える\n\n\n\ncode\nplt.figure(figsize=(10, 7))\n\nplt.scatter(salmon_brightness, salmon_weights, \n           c=\"black\", marker=\"o\", s=100, alpha=0.7, label=\"Salmon\", edgecolors=\"black\")\nplt.scatter(seabass_brightness, seabass_weights, \n           c=\"red\", marker=\"s\", s=100, alpha=0.7, label=\"Sea bass\", edgecolors=\"darkred\")\n\n# 手動で引いた直線の例（適当に設定）\n# 例: 輝度=5.5あたりで垂直に分ける\nlightness_threshold = 5.5\nplt.axvline(x=lightness_threshold, color=\"blue\", linestyle=\"--\", linewidth=2.5, \n           label=f\"decision boundary (Lightness = {lightness_threshold})\")\n\nplt.xlabel(\"Lightness\", fontsize=14, fontweight=\"bold\")\nplt.ylabel(\"Weight (g)\", fontsize=14, fontweight=\"bold\")\nplt.title(\"Manual Decision Boundary\", fontsize=16, fontweight=\"bold\")\nplt.legend(fontsize=13, loc=\"upper left\")\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()"
+    "section": "輝度だけで分類",
+    "text": "輝度だけで分類\n\n\nグラフ上で適当な閾値を設定して左右に分割\n\n\n# 目で見て決めた閾値。輝度がこれより小さければ Salmon\nlightness_threshold = 5.5\n\n\n\n（参考）描画コード\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\n\nplt.figure(figsize=(10, 7))\n\nplt.scatter(salmon_brightness, salmon_weights,\n           c=\"black\", marker=\"o\", s=100, alpha=0.7, label=\"Salmon\", edgecolors=\"black\")\nplt.scatter(seabass_brightness, seabass_weights,\n           c=\"red\", marker=\"s\", s=100, alpha=0.7, label=\"Sea bass\", edgecolors=\"darkred\")\n\nplt.axvline(x=lightness_threshold, color=\"blue\", linestyle=\"--\", linewidth=2.5, \n           label=f\"decision boundary (Lightness = {lightness_threshold})\")\n\nplt.xlabel(\"Lightness\", fontsize=14, fontweight=\"bold\")\nplt.ylabel(\"Weight (g)\", fontsize=14, fontweight=\"bold\")\nplt.title(\"Manual Decision Boundary\", fontsize=16, fontweight=\"bold\")\nplt.legend(fontsize=13, loc=\"upper left\")\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\nどこに引けば一番うまく分けられそうか\n完璧には分けられないので、誤分類がどのくらい出るかを数える"
   },
   {
-    "objectID": "classification-2d-boundaries.html#この縦線の性能は",
-    "href": "classification-2d-boundaries.html#この縦線の性能は",
+    "objectID": "classification-2d-boundaries.html#この閾値の性能は",
+    "href": "classification-2d-boundaries.html#この閾値の性能は",
     "title": "2次元の特徴量で分類",
-    "section": "この縦線の性能は？",
-    "text": "この縦線の性能は？\n\n\n判定ルール：\n\n輝度 &lt; 5.5 → Salmon\n5.5 以上 → Sea bass （Salmon を陽性とする）\n\n線からはみ出した点を数えた混同行列（各クラス40匹）\n\n線の右側の黒丸： 見逃した Salmon（FN）\n線の左側の赤四角：Salmon 扱いした Sea bass（FP）\n残りが TP と TN\n\n\n\n\n\n\n予測Salmon\n予測Sea bass\n\n\n\n\n実際Salmon\nTP = 35\nFN = 5\n\n\n実際Sea bass\nFP = 6\nTN = 34"
+    "section": "この閾値の性能は？",
+    "text": "この閾値の性能は？\n\n\n判定ルール：\n\n輝度 &lt; 5.5 → Salmon\n5.5 以上 → Sea bass （Salmon を陽性とする）\n\n線からはみ出した点を数えた混同行列が以下\n\n線の右側の黒丸： 見逃した Salmon（FN）\n線の左側の赤四角：Salmon 扱いした Sea bass（FP）\n残りが TP と TN\n\n\n\n\n\n\n予測Salmon\n予測Sea bass\n\n\n\n\n実際Salmon\nTP = 35\nFN = 5\n\n\n実際Sea bass\nFP = 6\nTN = 34"
   },
   {
     "objectID": "classification-2d-boundaries.html#性能評価",
@@ -1537,7 +1537,7 @@
     "href": "classification-2d-boundaries.html#決定木decision-tree",
     "title": "2次元の特徴量で分類",
     "section": "決定木（Decision Tree）",
-    "text": "決定木（Decision Tree）\n\n\n決定木とは\n\n\n条件分岐を木のような樹形図で表し、データの分類や予測を行う機械学習・データ分析の手法\n要するに「多段のif文でいい感じに切り分ける」\n「いい感じ」の基準が必要になる"
+    "text": "決定木（Decision Tree）\n\n\n条件分岐繰り返すことによる分類・予測手法\n\n木のように枝分かれするので決定木\n要するに「多段のif文でいい感じに切り分ける」\n\n「いい感じ」の基準が必要になる"
   },
   {
     "objectID": "classification-2d-boundaries.html#分割の良さを測る尺度ジニ不純度",
@@ -1547,11 +1547,18 @@
     "text": "分割の良さを測る尺度：ジニ不純度\n\n\n上手く切り分けられているかどうかの基準\n\nジニ不純度（Gini impurity）\n\\[\\text{Gini} = 1 - (p_{\\text{Salmon}}^2 + p_{\\text{Sea bass}}^2)\\]\n\nGini = 0: 完全に1クラスだけ（純粋）\nGini = 0.5: 50:50で混ざってる（不純）\n\n\n\n\n\n\n\n例\n\n\n\nデータ10個：Salmon 10個、Sea bass 0個 → Gini = 1 - (1² + 0²) = 0\nデータ10個：Salmon 5個、Sea bass 5個 → Gini = 1 - (0.5² + 0.5²) = 0.5\nデータ10個：Salmon 8個、Sea bass 2個 → Gini = 1 - (0.8² + 0.2²) = 0.32"
   },
   {
-    "objectID": "classification-2d-boundaries.html#ジニ不純度を計算してみる",
-    "href": "classification-2d-boundaries.html#ジニ不純度を計算してみる",
+    "objectID": "classification-2d-boundaries.html#peek-gini-hand",
+    "href": "classification-2d-boundaries.html#peek-gini-hand",
     "title": "2次元の特徴量で分類",
-    "section": "ジニ不純度を計算してみる",
-    "text": "ジニ不純度を計算してみる\n\n\ndef gini_impurity(labels):\n    \"\"\"ジニ不純度を計算\"\"\"\n    if len(labels) == 0:\n        return 0\n    p_salmon = sum(labels) / len(labels)  # 1=Salmon, 0=Sea bass\n    p_seabass = 1 - p_salmon\n    return 1 - (p_salmon**2 + p_seabass**2)\n\n# 全データのジニ不純度\ninitial_gini = gini_impurity(y)\nprint(f\"初期状態（分割前）のジニ不純度: {initial_gini:.3f}\")\nprint(f\"Salmon: {sum(y)}個\")\nprint(f\"Sea bass: {len(y)-sum(y)}個\")\n\n初期状態（分割前）のジニ不純度: 0.500\nSalmon: 40個\nSea bass: 40個"
+    "section": "手で引いた縦線のジニ不純度",
+    "text": "手で引いた縦線のジニ不純度\n\n\n縦線の左右それぞれに Salmon と Sea bass が何匹いるかは、性能評価で数えた TP, FP, FN, TN そのもの\n\n左側（輝度 &lt; 閾値）：Salmon が TP 匹、Sea bass が FP 匹\n右側：Salmon が FN 匹、Sea bass が TN 匹\n\n左右それぞれのジニ不純度を匹数で重み付けして平均したもの（加重平均）が、この切り方の不純度。小さいほどよく分かれている\n\n\ndef gini(n_salmon, n_seabass):\n    \"\"\"ジニ不純度。n_salmon, n_seabass はその領域にいる匹数\"\"\"\n    n = n_salmon + n_seabass\n    if n == 0:\n        return 0\n    p_salmon = n_salmon / n\n    p_seabass = n_seabass / n\n    return 1 - (p_salmon**2 + p_seabass**2)\n\nprint(f\"分割前（Salmon 40, Sea bass 40）: Gini={gini(40, 40):.3f}\")\n\n# 縦線の左右それぞれに、Salmon と Sea bass が何匹いるか\nleft_salmon = np.sum(salmon_brightness &lt; lightness_threshold)\nleft_seabass = np.sum(seabass_brightness &lt; lightness_threshold)\nright_salmon = np.sum(salmon_brightness &gt;= lightness_threshold)\nright_seabass = np.sum(seabass_brightness &gt;= lightness_threshold)\n\ngini_left = gini(left_salmon, left_seabass)\ngini_right = gini(right_salmon, right_seabass)\n\n# 左右のジニ不純度を匹数で重み付けして平均\nn_left = left_salmon + left_seabass\nn_right = right_salmon + right_seabass\nweighted_gini = (n_left * gini_left + n_right * gini_right) / (n_left + n_right)\n\nprint(f\"threshold={lightness_threshold}\")\nprint(f\"  left : Salmon {left_salmon:&gt;2}, Sea bass {left_seabass:&gt;2}, Gini={gini_left:.3f}\")\nprint(f\"  right: Salmon {right_salmon:&gt;2}, Sea bass {right_seabass:&gt;2}, Gini={gini_right:.3f}\")\nprint(f\"  weighted Gini = {weighted_gini:.3f}\")\n\n分割前（Salmon 40, Sea bass 40）: Gini=0.500\nthreshold=5.5\n  left : Salmon 35, Sea bass  6, Gini=0.250\n  right: Salmon  5, Sea bass 34, Gini=0.224\n  weighted Gini = 0.237"
+  },
+  {
+    "objectID": "classification-2d-boundaries.html#tweak-閾値を変えてジニ不純度を比べる",
+    "href": "classification-2d-boundaries.html#tweak-閾値を変えてジニ不純度を比べる",
+    "title": "2次元の特徴量で分類",
+    "section": "Tweak 閾値を変えてジニ不純度を比べる",
+    "text": "Tweak 閾値を変えてジニ不純度を比べる\n\n\n縦線の閾値を書き換えて、ジニ不純度のセルまで続けて実行\n\n\n\n\n\n\n\n\n\nやりたいこと\nコード\n\n\n\n\n目で引いた線より良い線を探せ\nlightness_threshold = 5.5 → 5.0、4.8 など（weighted Gini が小さいほど良い）\n\n\n線を端に寄せたら？\nlightness_threshold = 5.5 → 2.0\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n5.5 では 0.237。5.0 にすると 0.167 まで下がる（左側が Salmon 32匹だけの純粋な領域になる）\n2.0 では全員が右側に入り、分割前と同じ 0.5。切っていないのと同じ"
   },
   {
     "objectID": "classification-2d-boundaries.html#最良の閾値はどこ",
@@ -1561,18 +1568,18 @@
     "text": "最良の閾値はどこ？\n\n\n総当たり：候補をすべて試す\n\n\n候補の閾値をすべて試して、分割後の左右の加重平均ジニ不純度を比べる\n\n最小のものを採用する\n\n特徴量は2つあるが、まずは輝度だけでジニ不純度を最小化してみる\n\n\n\n\n\n\n\n\n閾値の候補は「データの値」だけで十分\n\n\nデータとデータの間なら、どこで切っても分かれ方は同じ。\n例：データが [2.1, 3.5, 5.8] のとき（輝度 &lt; 閾値 で左右に分ける）\n\n2.1 と 3.5 の間のどこで切っても、閾値 3.5 と同じ分かれ方\n3.5 と 5.8 の間のどこで切っても、閾値 5.8 と同じ分かれ方\n\n→ 試すべき候補は、データの値そのものだけ"
   },
   {
-    "objectID": "classification-2d-boundaries.html#いくつかの閾値を試してみる",
-    "href": "classification-2d-boundaries.html#いくつかの閾値を試してみる",
+    "objectID": "classification-2d-boundaries.html#総当たりで最良の閾値を探す",
+    "href": "classification-2d-boundaries.html#総当たりで最良の閾値を探す",
     "title": "2次元の特徴量で分類",
-    "section": "いくつかの閾値を試してみる",
-    "text": "いくつかの閾値を試してみる\n\n\n# 輝度でいくつかの閾値を試す\ntest_thresholds = [3.0, 4.0, 5.0, 6.0, 7.0]\nresults = []\n\nfor threshold in test_thresholds:\n    # 分割\n    left_mask = X[:, 0] &lt; threshold # 輝度\n    right_mask = ~left_mask\n    \n    if sum(left_mask) == 0 or sum(right_mask) == 0:\n        continue\n    \n    # 左右のジニ不純度\n    gini_left = gini_impurity(y[left_mask])\n    gini_right = gini_impurity(y[right_mask])\n    \n    # 加重平均\n    n_left = sum(left_mask)\n    n_right = sum(right_mask)\n    weighted_gini = (n_left * gini_left + n_right * gini_right) / len(y)\n    \n    results.append({\n        \"threshold\": f\"{threshold:.1f}\",\n        \"left\": f\"{sum(y[left_mask])}/{n_left}\",\n        \"right\": f\"{sum(y[right_mask])}/{n_right}\",\n        \"Gini_left\": f\"{gini_left:.3f}\",\n        \"Gini_right\": f\"{gini_right:.3f}\",\n        \"Gini_weighted\": f\"{weighted_gini:.3f}\"\n    })\n\nresults_df = pd.DataFrame(results)\nprint(\"いくつかの閾値でのジニ不純度:\")\nprint(results_df.to_string(index=False))\nprint(\"\\n→ Gini_weighted（加重平均）が最小の閾値を選ぶ\")\n\nいくつかの閾値でのジニ不純度:\nthreshold  left right Gini_left Gini_right Gini_weighted\n      3.0 13/13 27/67     0.000      0.481         0.403\n      4.0 22/22 18/58     0.000      0.428         0.310\n      5.0 32/32  8/48     0.000      0.278         0.167\n      6.0 40/50  0/30     0.320      0.000         0.200\n      7.0 40/60  0/20     0.444      0.000         0.333\n\n→ Gini_weighted（加重平均）が最小の閾値を選ぶ\n\n\n\n\n\n\n\n\nヒント\n\n\n実際は、データに現れる輝度の値を全部試して（同じ値は1回）、最小を見つける。"
+    "section": "総当たりで最良の閾値を探す",
+    "text": "総当たりで最良の閾値を探す\n\n\nさっきの計算を「閾値を渡すと加重平均ジニ不純度を返す関数」にまとめ、候補を全部試す\n\n\ndef weighted_gini_at(threshold):\n    \"\"\"輝度 threshold で左右に切ったときの加重平均ジニ不純度\"\"\"\n    left_salmon = np.sum(salmon_brightness &lt; threshold)\n    left_seabass = np.sum(seabass_brightness &lt; threshold)\n    right_salmon = np.sum(salmon_brightness &gt;= threshold)\n    right_seabass = np.sum(seabass_brightness &gt;= threshold)\n    n_left = left_salmon + left_seabass\n    n_right = right_salmon + right_seabass\n    return (n_left * gini(left_salmon, left_seabass)\n            + n_right * gini(right_salmon, right_seabass)) / (n_left + n_right)\n\n# 候補：データに現れる輝度の値を全部（2つの配列をつなげ、重複を除いて昇順に）\ncandidates = np.unique(list(salmon_brightness) + list(seabass_brightness))\nprint(f\"候補の数: {len(candidates)}\")\n\nbest_threshold = None\nbest_gini = 1.0\nfor threshold in candidates:\n    g = weighted_gini_at(threshold)\n    if g &lt; best_gini:\n        best_threshold = threshold\n        best_gini = g\nprint(f\"最良の閾値: {best_threshold:.2f}（weighted Gini {best_gini:.3f}）\")\n\n候補の数: 47\n最良の閾値: 5.00（weighted Gini 0.167）"
   },
   {
-    "objectID": "classification-2d-boundaries.html#結果",
-    "href": "classification-2d-boundaries.html#結果",
+    "objectID": "classification-2d-boundaries.html#結果-1",
+    "href": "classification-2d-boundaries.html#結果-1",
     "title": "2次元の特徴量で分類",
     "section": "結果",
-    "text": "結果\n\n\n\ncode\n# データに現れる輝度の値（重複を除く）を全部、閾値候補として総当たり\nthresholds, ginis = [], []\nfor threshold in np.unique(X[:, 0]):\n    left_mask  = X[:, 0] &lt; threshold\n    right_mask = ~left_mask\n    if sum(left_mask) == 0 or sum(right_mask) == 0:\n        continue\n    g = (sum(left_mask)  * gini_impurity(y[left_mask]) +\n         sum(right_mask) * gini_impurity(y[right_mask])) / len(y)\n    thresholds.append(threshold)\n    ginis.append(g)\n\nbest_i = int(np.argmin(ginis))\nplt.figure(figsize=(7, 4))\nplt.plot(thresholds, ginis, \"o-\", color=\"#2980b9\", markersize=4)\nplt.scatter([thresholds[best_i]], [ginis[best_i]], color=\"#e74c3c\", s=120,\n            zorder=3, label=f\"best: {thresholds[best_i]:.2f}\")\nplt.xlabel(\"閾値（輝度）\")\nplt.ylabel(\"加重平均ジニ不純度\")\nplt.legend()\nplt.grid(True, alpha=0.4)\nplt.tight_layout()\nplt.show()\n\nprint(f\"最良の閾値: {thresholds[best_i]:.2f}（加重平均ジニ不純度 {ginis[best_i]:.3f}）\")\n\n\n\n\n\n\n\n\n\n最良の閾値: 5.00（加重平均ジニ不純度 0.167）\n\n\n\n\n\n\n\n\n結果\n\n\n\n最良は輝度 5.00（加重平均ジニ不純度 0.167）。目で引いた 5.5 より少し左\n5.00 の縦線での誤分類は 8匹（正答率 90.0%）。5.5 の 11匹（86.3%）より3匹良い"
+    "text": "結果\n\n\n\n（参考）総当たりと描画のコード\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\n\n# 候補ごとの加重平均ジニ不純度を折れ線にする\nginis = [weighted_gini_at(t) for t in candidates]\nbest_i = int(np.argmin(ginis))\nplt.figure(figsize=(7, 4))\nplt.plot(candidates, ginis, \"o-\", color=\"#2980b9\", markersize=4)\nplt.scatter([candidates[best_i]], [ginis[best_i]], color=\"#e74c3c\", s=120,\n            zorder=3, label=f\"best: {candidates[best_i]:.2f}\")\nplt.xlabel(\"閾値（輝度）\")\nplt.ylabel(\"加重平均ジニ不純度\")\nplt.legend()\nplt.grid(True, alpha=0.4)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n最良は輝度 5.00（加重平均ジニ不純度 0.167）。目で引いた 5.5 より少し左\n5.00 の縦線での誤分類は 8匹（正答率 90.0%）。5.5 の 11匹（86.3%）より3匹良い"
   },
   {
     "objectID": "classification-2d-boundaries.html#決定木のアルゴリズム縦横交互",
@@ -1582,11 +1589,25 @@
     "text": "決定木のアルゴリズム（縦横交互）\n\n自作版は簡単のため、使う特徴量を輝度→重さの交互に固定する（縦・横の分割を重ねて、階段状の境界を作る）。\n\n全データを対象に、データに現れる輝度の値を全部、閾値候補として総当たりし、加重平均ジニ不純度が最小の閾値で左右に分割\nできた左右それぞれの領域のデータだけで、こんどは重さの閾値を同じ方法で探して分割\n決めた深さで打ち切り。各領域は、その中の多数派クラスで判定する"
   },
   {
-    "objectID": "classification-2d-boundaries.html#自作決定木最良の分割を探す関数",
-    "href": "classification-2d-boundaries.html#自作決定木最良の分割を探す関数",
+    "objectID": "classification-2d-boundaries.html#分けた領域のデータをまとめて持ち運ぶ",
+    "href": "classification-2d-boundaries.html#分けた領域のデータをまとめて持ち運ぶ",
     "title": "2次元の特徴量で分類",
-    "section": "自作決定木：最良の分割を探す関数",
-    "text": "自作決定木：最良の分割を探す関数\n\n\n「いくつかの閾値を試してみる」の総当たりを、特徴量を指定できる関数にまとめる\n\n\ndef find_best_split_for_feature(X, y, feature_idx):\n    \"\"\"指定した特徴量で最良の分割点を見つける\"\"\"\n    best_gini = float(\"inf\")\n    best_threshold = None\n    best_left_mask = None\n    \n    # この特徴量のユニークな値を試す\n    values = np.unique(X[:, feature_idx])\n    \n    for threshold in values:\n        # 分割\n        left_mask = X[:, feature_idx] &lt; threshold\n        right_mask = ~left_mask\n        \n        # 左右が空でないことを確認\n        if sum(left_mask) == 0 or sum(right_mask) == 0:\n            continue\n        \n        # 左右のジニ不純度\n        gini_left = gini_impurity(y[left_mask])\n        gini_right = gini_impurity(y[right_mask])\n        \n        # 加重平均\n        n_left = sum(left_mask)\n        n_right = sum(right_mask)\n        weighted_gini = (n_left * gini_left + n_right * gini_right) / len(y)\n        \n        if weighted_gini &lt; best_gini:\n            best_gini = weighted_gini\n            best_threshold = threshold\n            best_left_mask = left_mask\n    \n    return best_threshold, best_gini, best_left_mask\n\n# 1回目の分割: 輝度（feature 0）\nfeature_names = [\"Lightness\", \"Weight\"]\nsplit1_feature = 0  # Lightness\nsplit1_threshold, split1_gini, split1_left_mask = find_best_split_for_feature(X, y, split1_feature)\n\nprint(f\"1回目の分割:\")\nprint(f\"  特徴量: {feature_names[split1_feature]}\")\nprint(f\"  閾値: {split1_threshold:.2f}\")\nprint(f\"  ジニ不純度: {split1_gini:.3f}\")\nprint(f\"  左側: {sum(split1_left_mask)}個, 右側: {sum(~split1_left_mask)}個\")\n\n1回目の分割:\n  特徴量: Lightness\n  閾値: 5.00\n  ジニ不純度: 0.167\n  左側: 32個, 右側: 48個"
+    "section": "分けた領域のデータをまとめて持ち運ぶ",
+    "text": "分けた領域のデータをまとめて持ち運ぶ\n\n\n2回目は「1回目で左側に残った魚だけ」を対象に、重さの閾値を探す\n\n左側に残ったのは、輝度・重さ・種類がそろった魚の集まり\n\nいまの4本の配列のままだと、分けるたびに4本を別々に絞り込むことになる\nそこで、1匹を [輝度, 重さ] の1行にした行列 X と、行ごとの種類 y にまとめる\n\n左側の魚だけを、特徴量も種類もいっしょに取り出せる（次のセルで確かめる）\n「どの特徴量で切るか」は列番号で選べる（列0 = 輝度、列1 = 重さ）\n特徴量を列に並べたこの行列を特徴量行列（feature matrix）という\n\n\n\n\n\n行\nX[:, 0] 輝度\nX[:, 1] 重さ\ny\n\n\n\n\n0\n3.5\n2149\n1\n\n\n⋮\n⋮\n⋮\n⋮\n\n\n39\n3.8\n1652\n1\n\n\n40\n5.6\n1677\n0\n\n\n⋮\n⋮\n⋮\n⋮\n\n\n79\n5.6\n1531\n0"
+  },
+  {
+    "objectID": "classification-2d-boundaries.html#特徴量行列の作成",
+    "href": "classification-2d-boundaries.html#特徴量行列の作成",
+    "title": "2次元の特徴量で分類",
+    "section": "特徴量行列の作成",
+    "text": "特徴量行列の作成\n\n\n# 1匹を [輝度, 重さ] の1行にして、Salmon 40行のあとに Sea bass 40行を並べる\nrows = []\nfor b, w in zip(salmon_brightness, salmon_weights):\n    rows.append([b, w])\nfor b, w in zip(seabass_brightness, seabass_weights):\n    rows.append([b, w])\nX = np.array(rows)                 # 80行 2列\ny = np.array([1]*40 + [0]*40)      # X と同じ行順。1=Salmon, 0=Sea bass\n\nprint(X.shape, y.shape)\nprint(X[:3])                       # 先頭3匹の [輝度, 重さ]\n\n# 1回目の分割（輝度 &lt; 5.0）で左側に入る魚を、X と y から取り出す\nleft_mask = X[:, 0] &lt; best_threshold   # 80匹それぞれの True/False。列0 = 輝度で判定\nprint(left_mask[:5])                   # 先頭5匹（Salmon）。True なら左側\n\nX_left = X[left_mask]                  # True の行だけ残す → 左側の魚の [輝度, 重さ]\ny_left = y[left_mask]                  # 同じ行のラベル。X と y は行順が同じ\nprint(X_left.shape, y_left.shape)      # 左側は32匹\n\n# 左側の Salmon と Sea bass の匹数。総当たりで出た「左側は Salmon 32匹だけ」と一致\nprint(np.sum(y_left == 1), np.sum(y_left == 0))\n\n(80, 2) (80,)\n[[   3.5 2149. ]\n [   5.8 1959. ]\n [   4.9 2194. ]]\n[ True False  True  True  True]\n(32, 2) (32,)\n32 0"
+  },
+  {
+    "objectID": "classification-2d-boundaries.html#決定木最良の分割を探索",
+    "href": "classification-2d-boundaries.html#決定木最良の分割を探索",
+    "title": "2次元の特徴量で分類",
+    "section": "決定木：最良の分割を探索",
+    "text": "決定木：最良の分割を探索\n\n\nweighted_gini_at を、X の列番号で特徴量を指定できる形に書き直す。ついでに最良の閾値も返す\n\n\ndef find_best_split_for_feature(X, y, feature_idx):\n    \"\"\"指定した特徴量で最良の分割点を見つける\"\"\"\n    best_gini = float(\"inf\")\n    best_threshold = None\n    best_left_mask = None\n    \n    # この特徴量のユニークな値を試す\n    values = np.unique(X[:, feature_idx])\n    \n    for threshold in values:\n        # 分割\n        left_mask = X[:, feature_idx] &lt; threshold\n        right_mask = ~left_mask\n        \n        # 左右が空でないことを確認\n        if sum(left_mask) == 0 or sum(right_mask) == 0:\n            continue\n        \n        # 左右のジニ不純度（y が 1 の行 = Salmon、0 の行 = Sea bass）\n        gini_left = gini(np.sum(y[left_mask] == 1), np.sum(y[left_mask] == 0))\n        gini_right = gini(np.sum(y[right_mask] == 1), np.sum(y[right_mask] == 0))\n\n        # 加重平均\n        n_left = sum(left_mask)\n        n_right = sum(right_mask)\n        weighted_gini = (n_left * gini_left + n_right * gini_right) / len(y)\n        \n        if weighted_gini &lt; best_gini:\n            best_gini = weighted_gini\n            best_threshold = threshold\n            best_left_mask = left_mask\n    \n    return best_threshold, best_gini, best_left_mask\n\n# 1回目の分割: 輝度（feature 0）\nfeature_names = [\"Lightness\", \"Weight\"]\nsplit1_feature = 0  # Lightness\nsplit1_threshold, split1_gini, split1_left_mask = find_best_split_for_feature(X, y, split1_feature)\n\nprint(f\"1回目の分割:\")\nprint(f\"  特徴量: {feature_names[split1_feature]}\")\nprint(f\"  閾値: {split1_threshold:.2f}\")\nprint(f\"  ジニ不純度: {split1_gini:.3f}\")\nprint(f\"  左側: {sum(split1_left_mask)}個, 右側: {sum(~split1_left_mask)}個\")\n\n1回目の分割:\n  特徴量: Lightness\n  閾値: 5.00\n  ジニ不純度: 0.167\n  左側: 32個, 右側: 48個"
   },
   {
     "objectID": "classification-2d-boundaries.html#可視化1回目の分割",
@@ -1621,21 +1642,21 @@
     "href": "classification-2d-boundaries.html#section-2",
     "title": "2次元の特徴量で分類",
     "section": "",
-    "text": "ライブラリで決定木"
+    "text": "scikit-learnの決定木"
   },
   {
-    "objectID": "classification-2d-boundaries.html#scikit-learnの決定木と比較",
-    "href": "classification-2d-boundaries.html#scikit-learnの決定木と比較",
+    "objectID": "classification-2d-boundaries.html#scikit-learnの決定木",
+    "href": "classification-2d-boundaries.html#scikit-learnの決定木",
     "title": "2次元の特徴量で分類",
-    "section": "scikit-learnの決定木と比較",
-    "text": "scikit-learnの決定木と比較\n\n\n\n\n\n\n\n\n\n\n自作の決定木\nscikit-learn の決定木\n\n\n\n\n深さ\n2\n3（1段深くしてみる）\n\n\n分割に使う特徴量\n輝度→重さ、交互で固定\n毎回、最良の特徴量を自動選択\n\n\nできる境界\n粗い階段\nより細かい階段\n\n\n\n\nfrom sklearn.tree import DecisionTreeClassifier\nfrom sklearn.metrics import accuracy_score, precision_score, recall_score\n\n# 決定木モデル（深さ3まで）\ntree_model = DecisionTreeClassifier(max_depth=3, random_state=42)\ntree_model.fit(X, y)\n\n# 予測\ny_pred_tree = tree_model.predict(X)\n\n# 評価\naccuracy_tree = accuracy_score(y, y_pred_tree)\nprecision_tree = precision_score(y, y_pred_tree)\nrecall_tree = recall_score(y, y_pred_tree)\n\nprint(f\"決定木の性能:\")\nprint(f\"  Accuracy:  {accuracy_tree:.3f}\")\nprint(f\"  Precision: {precision_tree:.3f}\")\nprint(f\"  Recall:    {recall_tree:.3f}\")\n\n決定木の性能:\n  Accuracy:  0.975\n  Precision: 0.952\n  Recall:    1.000"
+    "section": "scikit-learnの決定木",
+    "text": "scikit-learnの決定木\n\n\n\n\n\n\n\n\n\n\n自作の決定木\nscikit-learn の決定木\n\n\n\n\n深さ\n2\n3（1段深くしてみる）\n\n\n分割に使う特徴量\n輝度→重さ、交互で固定\n毎回、最良の特徴量を自動選択\n\n\nできる境界\n粗い階段\nより細かい階段\n\n\n\n\nfrom sklearn.tree import DecisionTreeClassifier\nfrom sklearn.metrics import accuracy_score, precision_score, recall_score\n\n# 決定木モデル（深さ3まで）\ntree_model = DecisionTreeClassifier(max_depth=3, random_state=42)\ntree_model.fit(X, y)\n\n# 予測\ny_pred_tree = tree_model.predict(X)\n\n# 評価\naccuracy_tree = accuracy_score(y, y_pred_tree)\nprecision_tree = precision_score(y, y_pred_tree)\nrecall_tree = recall_score(y, y_pred_tree)\n\nprint(f\"決定木の性能:\")\nprint(f\"  Accuracy:  {accuracy_tree:.3f}\")\nprint(f\"  Precision: {precision_tree:.3f}\")\nprint(f\"  Recall:    {recall_tree:.3f}\")\n\n決定木の性能:\n  Accuracy:  0.975\n  Precision: 0.952\n  Recall:    1.000"
   },
   {
     "objectID": "classification-2d-boundaries.html#決定木の混同行列",
     "href": "classification-2d-boundaries.html#決定木の混同行列",
     "title": "2次元の特徴量で分類",
     "section": "決定木の混同行列",
-    "text": "決定木の混同行列\n\n\n\ncode\n# 決定木（深さ3）の混同行列\nfrom sklearn.metrics import confusion_matrix\ncm = confusion_matrix(y, y_pred_tree)\n\nTP = cm[1, 1]  # Salmon correctly classified as Salmon\nTN = cm[0, 0]  # Sea bass correctly classified as Sea bass\nFP = cm[0, 1]  # Sea bass incorrectly classified as Salmon\nFN = cm[1, 0]  # Salmon incorrectly classified as Sea bass\n\nimport matplotlib.patches as mpatches\n\nfig, ax = plt.subplots(figsize=(9, 7))\n\n# Confusion matrix data\ncm_data = np.array([[TP, FP], [FN, TN]])\n\n# Color map: 緑=正解、ピンク=誤り\ncolors = np.array([[\"#90EE90\", \"#FFB6C6\"], [\"#FFB6C6\", \"#90EE90\"]])\n\n# Draw cells\nfor i in range(2):\n    for j in range(2):\n        ax.add_patch(mpatches.Rectangle((j, 1-i), 1, 1,\n                                        facecolor=colors[i, j],\n                                        edgecolor=\"black\", linewidth=2.5))\n        ax.text(j + 0.5, 1.5 - i, str(cm_data[i, j]),\n               ha=\"center\", va=\"center\", fontsize=48, fontweight=\"bold\")\n\n        # Add label\n        if i == 0 and j == 0:\n            label = \"TP\"\n        elif i == 0 and j == 1:\n            label = \"FP\"\n        elif i == 1 and j == 0:\n            label = \"FN\"\n        else:\n            label = \"TN\"\n        ax.text(j + 0.5, 1.15 - i, label,\n               ha=\"center\", va=\"center\", fontsize=16, style=\"italic\", color=\"gray\")\n\n# Set labels\nax.set_xlim(0, 2)\nax.set_ylim(0, 2)\nax.set_xticks([0.5, 1.5])\nax.set_yticks([0.5, 1.5])\nax.set_xticklabels([\"Actual: Salmon\", \"Actual: Sea bass\"], fontsize=13, fontweight=\"bold\")\nax.set_yticklabels([\"Predict: Sea bass\", \"Predict: Salmon\"], fontsize=13, fontweight=\"bold\")\nax.set_aspect(\"equal\")\nax.tick_params(length=0)\nax.set_title(\"Confusion Matrix (Decision Tree)\",\n            fontsize=16, fontweight=\"bold\", pad=20)\n\nplt.tight_layout()\nplt.show()\n\nprint(f\"\\nTP={TP}, FP={FP}, FN={FN}, TN={TN}\")\n\n\n\n\n\n\n\n\n\n\nTP=40, FP=2, FN=0, TN=38"
+    "text": "決定木の混同行列\n\n\n\n（参考）描画コード\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\n\n# 決定木（深さ3）の混同行列\nfrom sklearn.metrics import confusion_matrix\ncm = confusion_matrix(y, y_pred_tree)\n\nTP = cm[1, 1]  # Salmon correctly classified as Salmon\nTN = cm[0, 0]  # Sea bass correctly classified as Sea bass\nFP = cm[0, 1]  # Sea bass incorrectly classified as Salmon\nFN = cm[1, 0]  # Salmon incorrectly classified as Sea bass\n\nimport matplotlib.patches as mpatches\n\nfig, ax = plt.subplots(figsize=(9, 7))\n\n# Confusion matrix data\ncm_data = np.array([[TP, FP], [FN, TN]])\n\n# Color map: 緑=正解、ピンク=誤り\ncolors = np.array([[\"#90EE90\", \"#FFB6C6\"], [\"#FFB6C6\", \"#90EE90\"]])\n\n# Draw cells\nfor i in range(2):\n    for j in range(2):\n        ax.add_patch(mpatches.Rectangle((j, 1-i), 1, 1,\n                                        facecolor=colors[i, j],\n                                        edgecolor=\"black\", linewidth=2.5))\n        ax.text(j + 0.5, 1.5 - i, str(cm_data[i, j]),\n               ha=\"center\", va=\"center\", fontsize=48, fontweight=\"bold\")\n\n        # Add label\n        if i == 0 and j == 0:\n            label = \"TP\"\n        elif i == 0 and j == 1:\n            label = \"FP\"\n        elif i == 1 and j == 0:\n            label = \"FN\"\n        else:\n            label = \"TN\"\n        ax.text(j + 0.5, 1.15 - i, label,\n               ha=\"center\", va=\"center\", fontsize=16, style=\"italic\", color=\"gray\")\n\n# Set labels\nax.set_xlim(0, 2)\nax.set_ylim(0, 2)\nax.set_xticks([0.5, 1.5])\nax.set_yticks([0.5, 1.5])\nax.set_xticklabels([\"Actual: Salmon\", \"Actual: Sea bass\"], fontsize=13, fontweight=\"bold\")\nax.set_yticklabels([\"Predict: Sea bass\", \"Predict: Salmon\"], fontsize=13, fontweight=\"bold\")\nax.set_aspect(\"equal\")\nax.tick_params(length=0)\nax.set_title(\"Confusion Matrix (Decision Tree)\",\n            fontsize=16, fontweight=\"bold\", pad=20)\n\nplt.tight_layout()\nplt.show()\n\nprint(f\"\\nTP={TP}, FP={FP}, FN={FN}, TN={TN}\")\n\n\n\n\n\n\n\n\n\n\nTP=40, FP=2, FN=0, TN=38"
   },
   {
     "objectID": "classification-2d-boundaries.html#決定境界の可視化決定木",
@@ -1673,25 +1694,18 @@
     "text": "深さ無制限の境界を見てみる\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nここまでで分かること\n\n\n\n無制限の木には、数匹を救うためだけの細長い回廊（飛び地）ができている\n実際に学習されたルールを読むと「輝度が 5.35〜5.70 でも、重さが 2205g を超えるなら Salmon」のような異様に具体的な条項が入っている"
   },
   {
-    "objectID": "classification-2d-boundaries.html#学習に使ったデータでの満点は信用できない",
-    "href": "classification-2d-boundaries.html#学習に使ったデータでの満点は信用できない",
+    "objectID": "classification-2d-boundaries.html#tweak-木の深さを変える",
+    "href": "classification-2d-boundaries.html#tweak-木の深さを変える",
     "title": "2次元の特徴量で分類",
-    "section": "学習に使ったデータでの満点は信用できない",
-    "text": "学習に使ったデータでの満点は信用できない\n\n\n採点に使ったのは、学習に使った80匹\n過去問を丸暗記すれば、過去問のテストは満点になる\n「まだ見ぬ魚」にも通用するかはわからない\n\nおそらくダメ（飛び地は無理がある）\n\n\n\n精度は、どのデータで採点したかで意味が変わる"
-  },
-  {
-    "objectID": "classification-2d-boundaries.html#tweak-線と木を少し変える",
-    "href": "classification-2d-boundaries.html#tweak-線と木を少し変える",
-    "title": "2次元の特徴量で分類",
-    "section": "Tweak 線と木を少し変える",
-    "text": "Tweak 線と木を少し変える\n\n\n手で引いた縦線と深さの実験のコードを書き換えて実行（続きのセルも実行）\n\n\n\n\n\n\n\n\n\nやりたいこと\nコード\n\n\n\n\n自分の縦線でよりよい閾値をさがせ\nlightness_threshold = 5.5 → 4.8 など（図の誤分類を数える）\n\n\n木を浅くせよ\nfor depth in [1, 3, None] → [2, 3, None]\n\n\n満点が出る深さはどこ？\n[1, 3, None] → [3, 4, 5, 6]\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n縦線 4.8 は誤分類 10匹（正答率 87.5%）\n\nスライドの 5.5（11匹、86.3%）より1匹少ない。さらに少ない線はあるか？\n\n深さ3では 97.5%。深さ6で初めて100% に届く\n\n満点までに増えた3段の if が何をしているかは、深さ無制限の境界の図に現れている"
+    "section": "Tweak 木の深さを変える",
+    "text": "Tweak 木の深さを変える\n\n\n深さの実験のコードを書き換えて実行（続きのセルも実行）\n\n\n\n\n\nやりたいこと\nコード\n\n\n\n\n木を浅くせよ\nfor depth in [1, 3, None] → [2, 3, None]\n\n\n満点が出る深さはどこ？\n[1, 3, None] → [3, 4, 5, 6]\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n深さ3では 97.5%。深さ6で初めて100% に届く\n\n満点までに増えた3段の if が何をしているかは、深さ無制限の境界の図に現れている"
   },
   {
     "objectID": "classification-2d-boundaries.html#まとめ",
     "href": "classification-2d-boundaries.html#まとめ",
     "title": "2次元の特徴量で分類",
     "section": "まとめ",
-    "text": "まとめ\n\n\n\n\n\n\n\n重要なポイント\n\n\n\n2次元にすることで分類精度が向上\n\n重さ + 輝度の組み合わせで、より正確に分類\n\n決定境界は手でも、アルゴリズムでも決められる\n\n手動の直線：目で見て引く\n決定木：ジニ不純度で自動最適化\n\n手法によって決定境界が異なる\n\n手動: 縦線（しきい値の2次元版）\n決定木: 階段状（軸に平行）\n\nトレードオフを理解する\n\nシンプル vs 複雑\n解釈しやすさ vs 性能\n満点に見えても信用できない場合がある（深さ無制限の決定木）"
+    "text": "まとめ\n\n\n\n\n\n\n\n重要なポイント\n\n\n\n2次元にすることで分類精度が向上\n\n重さ + 輝度の組み合わせで、より正確に分類\n\n決定境界は手でも、アルゴリズムでも決められる\n\n手動の直線：目で見て引く\n決定木：ジニ不純度で自動最適化\n\n手法によって決定境界が異なる\n\n手動: 縦線（しきい値の2次元版）\n決定木: 階段状（軸に平行）\n\nトレードオフを理解する\n\nシンプル vs 複雑\n解釈しやすさ vs 性能\n深さ無制限で満点が出たが、採点したのは学習に使った80匹。本物かは次回"
   },
   {
     "objectID": "classification-2d-boundaries.html#練習問題",
@@ -2041,14 +2055,14 @@
     "href": "classification-basics-1d.html#準備",
     "title": "機械学習 Classification",
     "section": "準備",
-    "text": "準備\n\npandas, numpy, matplotlib, scikit-learn をインストールする。\npip install pandas numpy matplotlib scikit-learn\n続けて、以下を実行\n\n# Setup\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\nimport pandas as pd\n\n# Matplotlib settings\nplt.rcParams[\"font.size\"] = 11\nplt.rcParams[\"figure.dpi\"] = 100\n\nsalmon_weights = np.array(salmon_weights)\nseabass_weights = np.array(seabass_weights)"
+    "text": "準備\n\npandas, numpy, matplotlib, scikit-learn をインストールする。\npip install pandas numpy matplotlib scikit-learn\n続けて、以下を実行\n\nimport numpy as np\n\n# numpy配列にキャスト\nsalmon_weights = np.array(salmon_weights)\nseabass_weights = np.array(seabass_weights)"
   },
   {
     "objectID": "classification-basics-1d.html#まずはヒストグラム",
     "href": "classification-basics-1d.html#まずはヒストグラム",
     "title": "機械学習 Classification",
     "section": "まずはヒストグラム",
-    "text": "まずはヒストグラム\n\n\n\ncode\nplt.figure(figsize=(10, 6))\nbins = range(1000, 2600, 100)\n\nplt.hist(salmon_weights, bins=bins, histtype=\"step\", \n         edgecolor=\"black\", linewidth=2, label=\"Salmon\")\nplt.hist(seabass_weights, bins=bins, histtype=\"step\", \n         edgecolor=\"red\", linewidth=2, label=\"Sea bass\")\n\nplt.xlabel(\"Weight (g)\", fontsize=14)\nplt.ylabel(\"Count\", fontsize=14)\nplt.title(\"Distribution of Fish Weight\", fontsize=16, fontweight=\"bold\")\nplt.legend(fontsize=13)\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()"
+    "text": "まずはヒストグラム\n\n\n\n（参考）描画コード\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\n\nplt.figure(figsize=(10, 6))\nbins = range(1000, 2600, 100)\n\nplt.hist(salmon_weights, bins=bins, histtype=\"step\", \n         edgecolor=\"black\", linewidth=2, label=\"Salmon\")\nplt.hist(seabass_weights, bins=bins, histtype=\"step\", \n         edgecolor=\"red\", linewidth=2, label=\"Sea bass\")\n\nplt.xlabel(\"Weight (g)\", fontsize=14)\nplt.ylabel(\"Count\", fontsize=14)\nplt.title(\"Distribution of Fish Weight\", fontsize=16, fontweight=\"bold\")\nplt.legend(fontsize=13)\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()"
   },
   {
     "objectID": "classification-basics-1d.html#統計値を見る",
@@ -2089,8 +2103,15 @@
     "objectID": "classification-basics-1d.html#peek-cm-1800",
     "href": "classification-basics-1d.html#peek-cm-1800",
     "title": "機械学習 Classification",
+    "section": "境界線1800gで4つのパターンを数える",
+    "text": "境界線1800gで4つのパターンを数える\n\n\nseabass_weights &gt;= threshold は、40匹それぞれの判定を True / False で並べた配列\nnp.sum は True を 1、False を 0 として足すので、条件を満たした匹数になる\n\n\nthreshold = 1800\n\nprint(seabass_weights[:5] &gt;= threshold)   # 先頭5匹の判定\n\nTP = np.sum(salmon_weights &gt;= threshold)   # Salmon を正しく Salmon と判定\nFN = np.sum(salmon_weights &lt; threshold)    # Salmon を見逃し\nTN = np.sum(seabass_weights &lt; threshold)   # Sea bass を正しく Sea bass と判定\nFP = np.sum(seabass_weights &gt;= threshold)  # Sea bass を誤って Salmon と判定\nprint(f\"TP={TP}, FN={FN}, FP={FP}, TN={TN}\")\n\n[False False False False  True]\nTP=15, FN=5, FP=4, TN=16"
+  },
+  {
+    "objectID": "classification-basics-1d.html#混同行列confusion-matrix",
+    "href": "classification-basics-1d.html#混同行列confusion-matrix",
+    "title": "機械学習 Classification",
     "section": "混同行列（Confusion Matrix）",
-    "text": "混同行列（Confusion Matrix）\n\n\n\ncode\nthreshold = 1800\n\n# Calculate confusion matrix\nTP = sum(1 for weight in salmon_weights if weight &gt;= threshold)\nFN = sum(1 for weight in salmon_weights if weight &lt; threshold)\nTN = sum(1 for weight in seabass_weights if weight &lt; threshold)\nFP = sum(1 for weight in seabass_weights if weight &gt;= threshold)\n\nimport matplotlib.patches as mpatches\n\nfig, ax = plt.subplots(figsize=(9, 7))\n\n# Confusion matrix data\ncm_data = np.array([[TP, FP], [FN, TN]])\n\n# Color map: 緑=正解、ピンク=誤り\ncolors = np.array([[\"#90EE90\", \"#FFB6C6\"], [\"#FFB6C6\", \"#90EE90\"]])\n\n# Draw cells\nfor i in range(2):\n    for j in range(2):\n        ax.add_patch(mpatches.Rectangle((j, 1-i), 1, 1, \n                                        facecolor=colors[i, j], \n                                        edgecolor=\"black\", linewidth=2.5))\n        ax.text(j + 0.5, 1.5 - i, str(cm_data[i, j]), \n               ha=\"center\", va=\"center\", fontsize=48, fontweight=\"bold\")\n        \n        # Add label\n        if i == 0 and j == 0:\n            label = \"TP\"\n        elif i == 0 and j == 1:\n            label = \"FP\"\n        elif i == 1 and j == 0:\n            label = \"FN\"\n        else:\n            label = \"TN\"\n        ax.text(j + 0.5, 1.15 - i, label, \n               ha=\"center\", va=\"center\", fontsize=16, style=\"italic\", color=\"gray\")\n\n# Set labels\nax.set_xlim(0, 2)\nax.set_ylim(0, 2)\nax.set_xticks([0.5, 1.5])\nax.set_yticks([0.5, 1.5])\nax.set_xticklabels([\"Actual: Salmon\", \"Actual: Sea bass\"], fontsize=13, fontweight=\"bold\")\nax.set_yticklabels([\"Predict: Sea bass\", \"Predict: Salmon\"], fontsize=13, fontweight=\"bold\")\nax.set_aspect(\"equal\")\nax.tick_params(length=0)\nax.set_title(f\"Confusion Matrix (Threshold = {threshold}g)\", \n            fontsize=16, fontweight=\"bold\", pad=20)\n\nplt.tight_layout()\nplt.show()"
+    "text": "混同行列（Confusion Matrix）\n\n\n\n（参考）描画コード\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\nimport matplotlib.patches as mpatches\n\nfig, ax = plt.subplots(figsize=(9, 7))\n\n# Confusion matrix data\ncm_data = np.array([[TP, FP], [FN, TN]])\n\n# Color map: 緑=正解、ピンク=誤り\ncolors = np.array([[\"#90EE90\", \"#FFB6C6\"], [\"#FFB6C6\", \"#90EE90\"]])\n\n# Draw cells\nfor i in range(2):\n    for j in range(2):\n        ax.add_patch(mpatches.Rectangle((j, 1-i), 1, 1, \n                                        facecolor=colors[i, j], \n                                        edgecolor=\"black\", linewidth=2.5))\n        ax.text(j + 0.5, 1.5 - i, str(cm_data[i, j]), \n               ha=\"center\", va=\"center\", fontsize=48, fontweight=\"bold\")\n        \n        # Add label\n        if i == 0 and j == 0:\n            label = \"TP\"\n        elif i == 0 and j == 1:\n            label = \"FP\"\n        elif i == 1 and j == 0:\n            label = \"FN\"\n        else:\n            label = \"TN\"\n        ax.text(j + 0.5, 1.15 - i, label, \n               ha=\"center\", va=\"center\", fontsize=16, style=\"italic\", color=\"gray\")\n\n# Set labels\nax.set_xlim(0, 2)\nax.set_ylim(0, 2)\nax.set_xticks([0.5, 1.5])\nax.set_yticks([0.5, 1.5])\nax.set_xticklabels([\"Actual: Salmon\", \"Actual: Sea bass\"], fontsize=13, fontweight=\"bold\")\nax.set_yticklabels([\"Predict: Sea bass\", \"Predict: Salmon\"], fontsize=13, fontweight=\"bold\")\nax.set_aspect(\"equal\")\nax.tick_params(length=0)\nax.set_title(f\"Confusion Matrix (Threshold = {threshold}g)\", \n            fontsize=16, fontweight=\"bold\", pad=20)\n\nplt.tight_layout()\nplt.show()"
   },
   {
     "objectID": "classification-basics-1d.html#混同行列から評価指標evaluation-metricsを計算する",
@@ -2118,7 +2139,7 @@
     "href": "classification-basics-1d.html#しきい値の比較1600g-vs-2000g",
     "title": "機械学習 Classification",
     "section": "しきい値の比較（1600g vs 2000g）",
-    "text": "しきい値の比較（1600g vs 2000g）\n\n\n\n\n\n\n\n\n\n\n\n\n\nFP=8\nFN=3\nPrecision: 68.0% (低い)\n\nRecall: 85.0% (高い)\n\n\n\n\n\n\n\n\n\n\n\n\nFP=2\nFN=12\nPrecision: 80.0% (高い)\n\nRecall: 40.0% (低い)"
+    "text": "しきい値の比較（1600g vs 2000g）\n\n\n\n\n\n\n\n\n\n\n\n\n\nFP=np.int64(8)\nFN=np.int64(3)\nPrecision: 68.0% (低い)\n\nRecall: 85.0% (高い)\n\n\n\n\n\n\n\n\n\n\n\n\nFP=np.int64(2)\nFN=np.int64(12)\nPrecision: 80.0% (高い)\n\nRecall: 40.0% (低い)"
   },
   {
     "objectID": "classification-basics-1d.html#どの指標を重視すべきか",
@@ -2132,14 +2153,14 @@
     "href": "classification-basics-1d.html#peek-cost",
     "title": "機械学習 Classification",
     "section": "コストを考慮した最適化",
-    "text": "コストを考慮した最適化\n\n\n誤分類のコストが異なる場合は総コストを最小化する閾値にすべき\n\n\\[\n\\begin{aligned}\n&\\text{argmin}(\\text{総コスト}) = N(\\text{FP}) \\times \\text{Cost}(\\text{FP}) + N(\\text{FN}) \\times \\text{Cost}(\\text{FN})\\\\\n&\\quad \\small{N(x): x\\text{の個数},\\; \\text{Cost}(x): x\\text{ 1個あたりのコスト}}\n\\end{aligned}\n\\]\n\n\ncode\n# 例：Sea bass混入のクレーム対応コストが高い場合\nC_FP = 10000  # Sea bass混入のクレーム対応コスト（円/匹）\nC_FN = 500    # Salmon再選別コスト（円/匹）\n\ncost_results = []\nfor threshold in [1600, 1800, 2000]:\n    TP = sum(1 for weight in salmon_weights if weight &gt;= threshold)\n    FN = sum(1 for weight in salmon_weights if weight &lt; threshold)\n    TN = sum(1 for weight in seabass_weights if weight &lt; threshold)\n    FP = sum(1 for weight in seabass_weights if weight &gt;= threshold)\n    \n    total_cost = FP * C_FP + FN * C_FN\n    cost_results.append({\n        \"threshold\": f\"{threshold}g\",\n        \"FP\": FP,\n        \"FN\": FN,\n        \"cost\": total_cost\n    })\ncost_df = pd.DataFrame(cost_results)\n\nbest_threshold = cost_df.loc[cost_df[\"cost\"].idxmin(), \"threshold\"]\ncost_df[\"cost\"] = cost_df[\"cost\"].map(\"¥{:,}\".format)\nprint(cost_df.to_string(index=False))\nprint(f\"min cost: {best_threshold}\")\n\n\nthreshold  FP  FN    cost\n    1600g   8   3 ¥81,500\n    1800g   4   5 ¥42,500\n    2000g   2  12 ¥26,000\nmin cost: 2000g\n\n\nこのコスト関数での最適なしきい値: 2000g（総コスト最小）"
+    "text": "コストを考慮した最適化\n\n\n誤分類のコストが異なる場合は総コストを最小化する閾値にすべき\n\n\\[\n\\begin{aligned}\n&\\text{argmin}(\\text{総コスト}) = N(\\text{FP}) \\times \\text{Cost}(\\text{FP}) + N(\\text{FN}) \\times \\text{Cost}(\\text{FN})\\\\\n&\\quad \\small{N(x): x\\text{の個数},\\; \\text{Cost}(x): x\\text{ 1個あたりのコスト}}\n\\end{aligned}\n\\]\n\n\ncode\n# 例：Sea bass混入のクレーム対応コストが高い場合\nC_FP = 10000  # Sea bass混入のクレーム対応コスト（円/匹）\nC_FN = 500    # Salmon再選別コスト（円/匹）\n\nthresholds = [1600, 1800, 2000]\ncosts = []\nfor threshold in thresholds:\n    FN = np.sum(salmon_weights &lt; threshold)    # Salmon を見逃し\n    FP = np.sum(seabass_weights &gt;= threshold)  # Sea bass を誤って Salmon と判定\n    total_cost = FP * C_FP + FN * C_FN\n    costs.append(total_cost)\n    print(f\"{threshold}g: FP={FP:&gt;2}, FN={FN:&gt;2}, cost=¥{total_cost:,}\")\n\nbest_threshold = thresholds[costs.index(min(costs))]\nprint(f\"min cost: {best_threshold}g\")\n\n\n1600g: FP= 8, FN= 3, cost=¥81,500\n1800g: FP= 4, FN= 5, cost=¥42,500\n2000g: FP= 2, FN=12, cost=¥26,000\nmin cost: 2000g\n\n\nこのコスト関数での最適なしきい値: 2000g（総コスト最小）"
   },
   {
     "objectID": "classification-basics-1d.html#tweak-しきい値を変更",
     "href": "classification-basics-1d.html#tweak-しきい値を変更",
     "title": "機械学習 Classification",
     "section": "Tweak しきい値を変更",
-    "text": "Tweak しきい値を変更\n\n\n混同行列のコードの threshold と、コスト最適化のコードを書き換えて実行（指標のセルまで続けて実行）\n\n\n\n\n\nやりたいこと\nコード\n\n\n\n\n全部 Salmon と言い張る\nthreshold = 1000\n\n\n全部 Sea bass と言い張る\nthreshold = 2500\n\n\n再選別のほうが高くつく世界\nC_FP = 500、C_FN = 10000\n\n\n\n\n\n\n\n\n\n\nヒント\n\n\n\nthreshold = 1000 で Recall は 100% になる\n\n全部 Salmon と言えばタダで手に入る数字\nそのとき Precision は 50%でAccuracy も 50%\n\n単独の指標は当てにならない\n\n\nコストを入れ替えると、最適しきい値が 2000g から 1600g に反転する"
+    "text": "Tweak しきい値を変更\n\n\n4つのパターンを数えるコードの threshold と、コスト最適化のコードを書き換えて実行（指標のセルまで続けて実行）\n\n\n\n\n\nやりたいこと\nコード\n\n\n\n\n全部 Salmon と言い張る\nthreshold = 1000\n\n\n全部 Sea bass と言い張る\nthreshold = 2500\n\n\n再選別のほうが高くつく世界\nC_FP = 500、C_FN = 10000\n\n\n\n\n\n\n\n\n\n\nヒント\n\n\n\nthreshold = 1000 で Recall は 100% になる\n\n全部 Salmon と言えばタダで手に入る数字\nそのとき Precision は 50%でAccuracy も 50%\n\n単独の指標は当てにならない\n\n\nコストを入れ替えると、最適しきい値が 2000g から 1600g に反転する"
   },
   {
     "objectID": "classification-basics-1d.html#重さだけで分類した結論",

@@ -6,11 +6,11 @@
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="site_libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.8.27">
+  <meta name="generator" content="quarto-1.10.19">
 
   <meta name="author" content="rkskmt">
   <title>AI Lectures – Newton法</title>
@@ -20,10 +20,16 @@
   <link rel="stylesheet" href="site_libs/revealjs/dist/reset.css">
   <link rel="stylesheet" href="site_libs/revealjs/dist/reveal.css">
   <style>
-    code{white-space: pre-wrap;}
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
     ul.task-list{list-style: none;}
     ul.task-list li input[type="checkbox"] {
@@ -98,7 +104,7 @@
     code span.vs { color: #032f62; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-d3a26a7442888a116b43ccec6150e9c5.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-e69bca93ec9d1486cefcf16a785f5ce6.css">
   <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -254,7 +260,7 @@
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
 <div class="quarto-title-author-name">
-rkskmt 
+rkskmt
 </div>
 </div>
 </div>
@@ -268,25 +274,25 @@ rkskmt
 <li>勾配降下法の弱点（学習率の手動調整・収束の遅さ）を、<strong>2次微分</strong>で解決する手法</li>
 <li>ディープラーニングでは使われないが、<code>scikit-learn</code> のロジスティック回帰などの中で現役</li>
 </ul>
-<div id="22ea75e3" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-2"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb1-3"><a></a><span class="im">import</span> japanize_matplotlib</span>
-<span id="cb1-4"><a></a></span>
-<span id="cb1-5"><a></a>plt.rcParams[<span class="st">"font.size"</span>] <span class="op">=</span> <span class="dv">11</span></span>
-<span id="cb1-6"><a></a>plt.rcParams[<span class="st">"figure.dpi"</span>] <span class="op">=</span> <span class="dv">100</span></span>
-<span id="cb1-7"><a></a></span>
-<span id="cb1-8"><a></a><span class="kw">def</span> f(x):</span>
-<span id="cb1-9"><a></a>    <span class="co">"""目的関数 f(x) = x^2 - 4x + 3"""</span></span>
-<span id="cb1-10"><a></a>    <span class="cf">return</span> x<span class="op">**</span><span class="dv">2</span> <span class="op">-</span> <span class="dv">4</span><span class="op">*</span>x <span class="op">+</span> <span class="dv">3</span></span>
-<span id="cb1-11"><a></a></span>
-<span id="cb1-12"><a></a><span class="kw">def</span> f_prime(x):</span>
-<span id="cb1-13"><a></a>    <span class="co">"""1次微分 f'(x) = 2x - 4"""</span></span>
-<span id="cb1-14"><a></a>    <span class="cf">return</span> <span class="dv">2</span><span class="op">*</span>x <span class="op">-</span> <span class="dv">4</span></span>
-<span id="cb1-15"><a></a></span>
-<span id="cb1-16"><a></a><span class="kw">def</span> f_double_prime(x):</span>
-<span id="cb1-17"><a></a>    <span class="co">"""2次微分 f''(x) = 2"""</span></span>
-<span id="cb1-18"><a></a>    <span class="cf">return</span> <span class="dv">2</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="cfecdfa8" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a aria-label="3"></a><span class="im">import</span> japanize_matplotlib</span>
+<span id="cb1-4"><a aria-label="4"></a></span>
+<span id="cb1-5"><a aria-label="5"></a>plt.rcParams[<span class="st">"font.size"</span>] <span class="op">=</span> <span class="dv">11</span></span>
+<span id="cb1-6"><a aria-label="6"></a>plt.rcParams[<span class="st">"figure.dpi"</span>] <span class="op">=</span> <span class="dv">100</span></span>
+<span id="cb1-7"><a aria-label="7"></a></span>
+<span id="cb1-8"><a aria-label="8"></a><span class="kw">def</span> f(x):</span>
+<span id="cb1-9"><a aria-label="9"></a>    <span class="co">"""目的関数 f(x) = x^2 - 4x + 3"""</span></span>
+<span id="cb1-10"><a aria-label="10"></a>    <span class="cf">return</span> x<span class="op">**</span><span class="dv">2</span> <span class="op">-</span> <span class="dv">4</span><span class="op">*</span>x <span class="op">+</span> <span class="dv">3</span></span>
+<span id="cb1-11"><a aria-label="11"></a></span>
+<span id="cb1-12"><a aria-label="12"></a><span class="kw">def</span> f_prime(x):</span>
+<span id="cb1-13"><a aria-label="13"></a>    <span class="co">"""1次微分 f'(x) = 2x - 4"""</span></span>
+<span id="cb1-14"><a aria-label="14"></a>    <span class="cf">return</span> <span class="dv">2</span><span class="op">*</span>x <span class="op">-</span> <span class="dv">4</span></span>
+<span id="cb1-15"><a aria-label="15"></a></span>
+<span id="cb1-16"><a aria-label="16"></a><span class="kw">def</span> f_double_prime(x):</span>
+<span id="cb1-17"><a aria-label="17"></a>    <span class="co">"""2次微分 f''(x) = 2"""</span></span>
+<span id="cb1-18"><a aria-label="18"></a>    <span class="cf">return</span> <span class="dv">2</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </section>
@@ -474,46 +480,46 @@ rkskmt
 <section id="newton法python実装" class="slide level2">
 <h2>Newton法：Python実装</h2>
 <div class="slide-body">
-<div id="6868257e" class="cell" data-execution_count="2">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a><span class="co"># 初期値</span></span>
-<span id="cb2-2"><a></a>x <span class="op">=</span> <span class="fl">0.0</span></span>
-<span id="cb2-3"><a></a></span>
-<span id="cb2-4"><a></a><span class="bu">print</span>(<span class="st">"Newton法で最小値を求める"</span>)</span>
-<span id="cb2-5"><a></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">60</span>)</span>
-<span id="cb2-6"><a></a></span>
-<span id="cb2-7"><a></a><span class="cf">for</span> iteration <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">6</span>):</span>
-<span id="cb2-8"><a></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">--- 反復 </span><span class="sc">{</span>iteration<span class="sc">}</span><span class="ss"> ---"</span>)</span>
-<span id="cb2-9"><a></a>    <span class="bu">print</span>(<span class="ss">f"現在の x = </span><span class="sc">{</span>x<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb2-10"><a></a></span>
-<span id="cb2-11"><a></a>    <span class="co"># 関数値</span></span>
-<span id="cb2-12"><a></a>    fx <span class="op">=</span> f(x)</span>
-<span id="cb2-13"><a></a>    <span class="bu">print</span>(<span class="ss">f"f(x) = </span><span class="sc">{</span>fx<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb2-14"><a></a></span>
-<span id="cb2-15"><a></a>    <span class="co"># 1次微分（勾配）</span></span>
-<span id="cb2-16"><a></a>    fp <span class="op">=</span> f_prime(x)</span>
-<span id="cb2-17"><a></a>    <span class="bu">print</span>(<span class="ss">f"f'(x) = </span><span class="sc">{</span>fp<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb2-18"><a></a></span>
-<span id="cb2-19"><a></a>    <span class="co"># 2次微分（曲率）</span></span>
-<span id="cb2-20"><a></a>    fpp <span class="op">=</span> f_double_prime(x)</span>
-<span id="cb2-21"><a></a>    <span class="bu">print</span>(<span class="ss">f"f''(x) = </span><span class="sc">{</span>fpp<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb2-22"><a></a></span>
-<span id="cb2-23"><a></a>    <span class="co"># Newton法の更新</span></span>
-<span id="cb2-24"><a></a>    step <span class="op">=</span> fp <span class="op">/</span> fpp</span>
-<span id="cb2-25"><a></a>    x_new <span class="op">=</span> x <span class="op">-</span> step</span>
-<span id="cb2-26"><a></a></span>
-<span id="cb2-27"><a></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">更新:"</span>)</span>
-<span id="cb2-28"><a></a>    <span class="bu">print</span>(<span class="ss">f"  ステップ幅 = f'(x)/f''(x) = </span><span class="sc">{</span>fp<span class="sc">:.4f}</span><span class="ss">/</span><span class="sc">{</span>fpp<span class="sc">:.4f}</span><span class="ss"> = </span><span class="sc">{</span>step<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb2-29"><a></a>    <span class="bu">print</span>(<span class="ss">f"  x_new = </span><span class="sc">{</span>x<span class="sc">:.4f}</span><span class="ss"> - </span><span class="sc">{</span>step<span class="sc">:.4f}</span><span class="ss"> = </span><span class="sc">{</span>x_new<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb2-30"><a></a></span>
-<span id="cb2-31"><a></a>    x <span class="op">=</span> x_new</span>
-<span id="cb2-32"><a></a></span>
-<span id="cb2-33"><a></a>    <span class="co"># 収束チェック</span></span>
-<span id="cb2-34"><a></a>    <span class="cf">if</span> <span class="bu">abs</span>(fp) <span class="op">&lt;</span> <span class="fl">0.0001</span>:</span>
-<span id="cb2-35"><a></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">★ 収束！ f'(x) ≈ 0"</span>)</span>
-<span id="cb2-36"><a></a>        <span class="cf">break</span></span>
-<span id="cb2-37"><a></a></span>
-<span id="cb2-38"><a></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">"</span> <span class="op">+</span> <span class="st">"="</span> <span class="op">*</span> <span class="dv">60</span>)</span>
-<span id="cb2-39"><a></a><span class="bu">print</span>(<span class="ss">f"最終結果: x = </span><span class="sc">{</span>x<span class="sc">:.4f}</span><span class="ss">, f(x) = </span><span class="sc">{</span>f(x)<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="6be82474" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a><span class="co"># 初期値</span></span>
+<span id="cb2-2"><a aria-label="2"></a>x <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb2-3"><a aria-label="3"></a></span>
+<span id="cb2-4"><a aria-label="4"></a><span class="bu">print</span>(<span class="st">"Newton法で最小値を求める"</span>)</span>
+<span id="cb2-5"><a aria-label="5"></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">60</span>)</span>
+<span id="cb2-6"><a aria-label="6"></a></span>
+<span id="cb2-7"><a aria-label="7"></a><span class="cf">for</span> iteration <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">6</span>):</span>
+<span id="cb2-8"><a aria-label="8"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">--- 反復 </span><span class="sc">{</span>iteration<span class="sc">}</span><span class="ss"> ---"</span>)</span>
+<span id="cb2-9"><a aria-label="9"></a>    <span class="bu">print</span>(<span class="ss">f"現在の x = </span><span class="sc">{</span>x<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb2-10"><a aria-label="10"></a></span>
+<span id="cb2-11"><a aria-label="11"></a>    <span class="co"># 関数値</span></span>
+<span id="cb2-12"><a aria-label="12"></a>    fx <span class="op">=</span> f(x)</span>
+<span id="cb2-13"><a aria-label="13"></a>    <span class="bu">print</span>(<span class="ss">f"f(x) = </span><span class="sc">{</span>fx<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb2-14"><a aria-label="14"></a></span>
+<span id="cb2-15"><a aria-label="15"></a>    <span class="co"># 1次微分（勾配）</span></span>
+<span id="cb2-16"><a aria-label="16"></a>    fp <span class="op">=</span> f_prime(x)</span>
+<span id="cb2-17"><a aria-label="17"></a>    <span class="bu">print</span>(<span class="ss">f"f'(x) = </span><span class="sc">{</span>fp<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb2-18"><a aria-label="18"></a></span>
+<span id="cb2-19"><a aria-label="19"></a>    <span class="co"># 2次微分（曲率）</span></span>
+<span id="cb2-20"><a aria-label="20"></a>    fpp <span class="op">=</span> f_double_prime(x)</span>
+<span id="cb2-21"><a aria-label="21"></a>    <span class="bu">print</span>(<span class="ss">f"f''(x) = </span><span class="sc">{</span>fpp<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb2-22"><a aria-label="22"></a></span>
+<span id="cb2-23"><a aria-label="23"></a>    <span class="co"># Newton法の更新</span></span>
+<span id="cb2-24"><a aria-label="24"></a>    step <span class="op">=</span> fp <span class="op">/</span> fpp</span>
+<span id="cb2-25"><a aria-label="25"></a>    x_new <span class="op">=</span> x <span class="op">-</span> step</span>
+<span id="cb2-26"><a aria-label="26"></a></span>
+<span id="cb2-27"><a aria-label="27"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">更新:"</span>)</span>
+<span id="cb2-28"><a aria-label="28"></a>    <span class="bu">print</span>(<span class="ss">f"  ステップ幅 = f'(x)/f''(x) = </span><span class="sc">{</span>fp<span class="sc">:.4f}</span><span class="ss">/</span><span class="sc">{</span>fpp<span class="sc">:.4f}</span><span class="ss"> = </span><span class="sc">{</span>step<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb2-29"><a aria-label="29"></a>    <span class="bu">print</span>(<span class="ss">f"  x_new = </span><span class="sc">{</span>x<span class="sc">:.4f}</span><span class="ss"> - </span><span class="sc">{</span>step<span class="sc">:.4f}</span><span class="ss"> = </span><span class="sc">{</span>x_new<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb2-30"><a aria-label="30"></a></span>
+<span id="cb2-31"><a aria-label="31"></a>    x <span class="op">=</span> x_new</span>
+<span id="cb2-32"><a aria-label="32"></a></span>
+<span id="cb2-33"><a aria-label="33"></a>    <span class="co"># 収束チェック</span></span>
+<span id="cb2-34"><a aria-label="34"></a>    <span class="cf">if</span> <span class="bu">abs</span>(fp) <span class="op">&lt;</span> <span class="fl">0.0001</span>:</span>
+<span id="cb2-35"><a aria-label="35"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">★ 収束！ f'(x) ≈ 0"</span>)</span>
+<span id="cb2-36"><a aria-label="36"></a>        <span class="cf">break</span></span>
+<span id="cb2-37"><a aria-label="37"></a></span>
+<span id="cb2-38"><a aria-label="38"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">"</span> <span class="op">+</span> <span class="st">"="</span> <span class="op">*</span> <span class="dv">60</span>)</span>
+<span id="cb2-39"><a aria-label="39"></a><span class="bu">print</span>(<span class="ss">f"最終結果: x = </span><span class="sc">{</span>x<span class="sc">:.4f}</span><span class="ss">, f(x) = </span><span class="sc">{</span>f(x)<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Newton法で最小値を求める
 ============================================================
@@ -575,7 +581,7 @@ f''(x) = 2.0000
 <section id="可視化で比較" class="slide level2">
 <h2>可視化で比較</h2>
 <div class="slide-body">
-<div id="94f4e573" class="cell" data-execution_count="3">
+<div id="4bc7a613" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -671,7 +677,7 @@ f''(x) = 2.0000
 <div id="視覚的説明" class="slide-body-heading">
 視覚的説明
 </div>
-<div id="86244bfc" class="cell" data-execution_count="4">
+<div id="f24c6780" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>

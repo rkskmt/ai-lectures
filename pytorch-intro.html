@@ -6,11 +6,11 @@
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="site_libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.8.27">
+  <meta name="generator" content="quarto-1.10.19">
 
   <meta name="author" content="rkskmt">
   <title>AI Lectures – PyTorch入門</title>
@@ -20,10 +20,16 @@
   <link rel="stylesheet" href="site_libs/revealjs/dist/reset.css">
   <link rel="stylesheet" href="site_libs/revealjs/dist/reveal.css">
   <style>
-    code{white-space: pre-wrap;}
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
     ul.task-list{list-style: none;}
     ul.task-list li input[type="checkbox"] {
@@ -98,7 +104,7 @@
     code span.vs { color: #032f62; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-d3a26a7442888a116b43ccec6150e9c5.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-e69bca93ec9d1486cefcf16a785f5ce6.css">
   <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -254,7 +260,7 @@
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
 <div class="quarto-title-author-name">
-rkskmt 
+rkskmt
 </div>
 </div>
 </div>
@@ -362,13 +368,13 @@ rkskmt
 <section id="tensornumpy-配列の親戚" class="slide level2">
 <h2>tensor：NumPy 配列の親戚</h2>
 <div class="slide-body">
-<div id="fcedebd9" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> torch</span>
-<span id="cb1-2"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-3"><a></a></span>
-<span id="cb1-4"><a></a>t <span class="op">=</span> torch.tensor([<span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>])</span>
-<span id="cb1-5"><a></a><span class="bu">print</span>(t <span class="op">*</span> <span class="dv">2</span>)          <span class="co"># 演算は NumPy とほぼ同じ感覚</span></span>
-<span id="cb1-6"><a></a><span class="bu">print</span>(t.numpy())      <span class="co"># NumPy 配列との相互変換も簡単</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="ec68b564" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
+<span id="cb1-2"><a aria-label="2"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a aria-label="3"></a></span>
+<span id="cb1-4"><a aria-label="4"></a>t <span class="op">=</span> torch.tensor([<span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>])</span>
+<span id="cb1-5"><a aria-label="5"></a><span class="bu">print</span>(t <span class="op">*</span> <span class="dv">2</span>)          <span class="co"># 演算は NumPy とほぼ同じ感覚</span></span>
+<span id="cb1-6"><a aria-label="6"></a><span class="bu">print</span>(t.numpy())      <span class="co"># NumPy 配列との相互変換も簡単</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>tensor([2., 4., 6.])
 [1. 2. 3.]</code></pre>
@@ -382,13 +388,13 @@ rkskmt
 <section id="tensor-は形型置き場所を持つ" class="slide level2">
 <h2>tensor は形・型・置き場所を持つ</h2>
 <div class="slide-body">
-<div id="4198c2fe" class="cell" data-execution_count="2">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a><span class="im">import</span> torch</span>
-<span id="cb3-2"><a></a></span>
-<span id="cb3-3"><a></a>x <span class="op">=</span> torch.tensor([[<span class="fl">1.0</span>, <span class="fl">2.0</span>], [<span class="fl">3.0</span>, <span class="fl">4.0</span>]], dtype<span class="op">=</span>torch.float32)</span>
-<span id="cb3-4"><a></a><span class="bu">print</span>(<span class="st">"shape :"</span>, x.shape)</span>
-<span id="cb3-5"><a></a><span class="bu">print</span>(<span class="st">"dtype :"</span>, x.dtype)</span>
-<span id="cb3-6"><a></a><span class="bu">print</span>(<span class="st">"device:"</span>, x.device)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="f1be9362" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
+<span id="cb3-2"><a aria-label="2"></a></span>
+<span id="cb3-3"><a aria-label="3"></a>x <span class="op">=</span> torch.tensor([[<span class="fl">1.0</span>, <span class="fl">2.0</span>], [<span class="fl">3.0</span>, <span class="fl">4.0</span>]], dtype<span class="op">=</span>torch.float32)</span>
+<span id="cb3-4"><a aria-label="4"></a><span class="bu">print</span>(<span class="st">"shape :"</span>, x.shape)</span>
+<span id="cb3-5"><a aria-label="5"></a><span class="bu">print</span>(<span class="st">"dtype :"</span>, x.dtype)</span>
+<span id="cb3-6"><a aria-label="6"></a><span class="bu">print</span>(<span class="st">"device:"</span>, x.device)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>shape : torch.Size([2, 2])
 dtype : torch.float32
@@ -433,13 +439,13 @@ device: cpu</code></pre>
 <ul>
 <li>まず<strong>いちばん小さな例</strong>で挙動を見る。<span class="math inline">\(y = x^2\)</span> の <span class="math inline">\(x = 3\)</span> での微分は、高校の答えなら <span class="math inline">\(2x = 6\)</span></li>
 </ul>
-<div id="64dccec7" class="cell" data-execution_count="3">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a><span class="im">import</span> torch</span>
-<span id="cb5-2"><a></a></span>
-<span id="cb5-3"><a></a>x <span class="op">=</span> torch.tensor(<span class="fl">3.0</span>, requires_grad<span class="op">=</span><span class="va">True</span>)   <span class="co"># 「勾配を追跡せよ」の印</span></span>
-<span id="cb5-4"><a></a>y <span class="op">=</span> x <span class="op">**</span> <span class="dv">2</span></span>
-<span id="cb5-5"><a></a>y.backward()                                <span class="co"># ← 微分はこの1行</span></span>
-<span id="cb5-6"><a></a><span class="bu">print</span>(x.grad)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="a1f7173b" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
+<span id="cb5-2"><a aria-label="2"></a></span>
+<span id="cb5-3"><a aria-label="3"></a>x <span class="op">=</span> torch.tensor(<span class="fl">3.0</span>, requires_grad<span class="op">=</span><span class="va">True</span>)   <span class="co"># 「勾配を追跡せよ」の印</span></span>
+<span id="cb5-4"><a aria-label="4"></a>y <span class="op">=</span> x <span class="op">**</span> <span class="dv">2</span></span>
+<span id="cb5-5"><a aria-label="5"></a>y.backward()                                <span class="co"># ← 微分はこの1行</span></span>
+<span id="cb5-6"><a aria-label="6"></a><span class="bu">print</span>(x.grad)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>tensor(6.)</code></pre>
 </div>
@@ -481,26 +487,26 @@ device: cpu</code></pre>
 <ul>
 <li>バックプロパゲーションの回と<strong>まったく同じ</strong>ネットワーク・同じ数値を流す</li>
 </ul>
-<div id="67ad3b57" class="cell" data-execution_count="4">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a></a>w <span class="op">=</span> torch.tensor([<span class="fl">0.3</span>, <span class="op">-</span><span class="fl">0.2</span>], requires_grad<span class="op">=</span><span class="va">True</span>)   <span class="co"># w1, w2</span></span>
-<span id="cb7-2"><a></a>b <span class="op">=</span> torch.tensor(<span class="fl">0.1</span>,  requires_grad<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb7-3"><a></a>v <span class="op">=</span> torch.tensor(<span class="fl">0.5</span>,  requires_grad<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb7-4"><a></a>c <span class="op">=</span> torch.tensor(<span class="op">-</span><span class="fl">0.1</span>, requires_grad<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb7-5"><a></a>x <span class="op">=</span> torch.tensor([<span class="fl">1.0</span>, <span class="fl">0.5</span>])                        <span class="co"># 入力（正解 y=1）</span></span>
-<span id="cb7-6"><a></a></span>
-<span id="cb7-7"><a></a>z <span class="op">=</span> w <span class="op">@</span> x <span class="op">+</span> b          <span class="co"># 線形変換</span></span>
-<span id="cb7-8"><a></a>h <span class="op">=</span> torch.relu(z)      <span class="co"># ReLU</span></span>
-<span id="cb7-9"><a></a>u <span class="op">=</span> v <span class="op">*</span> h <span class="op">+</span> c          <span class="co"># 出力層</span></span>
-<span id="cb7-10"><a></a>p <span class="op">=</span> torch.sigmoid(u)   <span class="co"># シグモイド</span></span>
-<span id="cb7-11"><a></a>L <span class="op">=</span> <span class="op">-</span>torch.log(p)      <span class="co"># 交差エントロピー（正解1）</span></span>
-<span id="cb7-12"><a></a></span>
-<span id="cb7-13"><a></a>L.backward()           <span class="co"># ← 復路はこの1行</span></span>
-<span id="cb7-14"><a></a></span>
-<span id="cb7-15"><a></a><span class="bu">print</span>(<span class="ss">f"L = </span><span class="sc">{</span>L<span class="sc">.</span>item()<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb7-16"><a></a><span class="bu">print</span>(<span class="ss">f"∂L/∂w = </span><span class="sc">{</span>w<span class="sc">.</span>grad<span class="sc">.</span>numpy()<span class="sc">.</span><span class="bu">round</span>(<span class="dv">4</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb7-17"><a></a><span class="bu">print</span>(<span class="ss">f"∂L/∂b = </span><span class="sc">{</span>b<span class="sc">.</span>grad<span class="sc">.</span>item()<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb7-18"><a></a><span class="bu">print</span>(<span class="ss">f"∂L/∂v = </span><span class="sc">{</span>v<span class="sc">.</span>grad<span class="sc">.</span>item()<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb7-19"><a></a><span class="bu">print</span>(<span class="ss">f"∂L/∂c = </span><span class="sc">{</span>c<span class="sc">.</span>grad<span class="sc">.</span>item()<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="e78f6032" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a aria-label="1"></a>w <span class="op">=</span> torch.tensor([<span class="fl">0.3</span>, <span class="op">-</span><span class="fl">0.2</span>], requires_grad<span class="op">=</span><span class="va">True</span>)   <span class="co"># w1, w2</span></span>
+<span id="cb7-2"><a aria-label="2"></a>b <span class="op">=</span> torch.tensor(<span class="fl">0.1</span>,  requires_grad<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-3"><a aria-label="3"></a>v <span class="op">=</span> torch.tensor(<span class="fl">0.5</span>,  requires_grad<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-4"><a aria-label="4"></a>c <span class="op">=</span> torch.tensor(<span class="op">-</span><span class="fl">0.1</span>, requires_grad<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-5"><a aria-label="5"></a>x <span class="op">=</span> torch.tensor([<span class="fl">1.0</span>, <span class="fl">0.5</span>])                        <span class="co"># 入力（正解 y=1）</span></span>
+<span id="cb7-6"><a aria-label="6"></a></span>
+<span id="cb7-7"><a aria-label="7"></a>z <span class="op">=</span> w <span class="op">@</span> x <span class="op">+</span> b          <span class="co"># 線形変換</span></span>
+<span id="cb7-8"><a aria-label="8"></a>h <span class="op">=</span> torch.relu(z)      <span class="co"># ReLU</span></span>
+<span id="cb7-9"><a aria-label="9"></a>u <span class="op">=</span> v <span class="op">*</span> h <span class="op">+</span> c          <span class="co"># 出力層</span></span>
+<span id="cb7-10"><a aria-label="10"></a>p <span class="op">=</span> torch.sigmoid(u)   <span class="co"># シグモイド</span></span>
+<span id="cb7-11"><a aria-label="11"></a>L <span class="op">=</span> <span class="op">-</span>torch.log(p)      <span class="co"># 交差エントロピー（正解1）</span></span>
+<span id="cb7-12"><a aria-label="12"></a></span>
+<span id="cb7-13"><a aria-label="13"></a>L.backward()           <span class="co"># ← 復路はこの1行</span></span>
+<span id="cb7-14"><a aria-label="14"></a></span>
+<span id="cb7-15"><a aria-label="15"></a><span class="bu">print</span>(<span class="ss">f"L = </span><span class="sc">{</span>L<span class="sc">.</span>item()<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb7-16"><a aria-label="16"></a><span class="bu">print</span>(<span class="ss">f"∂L/∂w = </span><span class="sc">{</span>w<span class="sc">.</span>grad<span class="sc">.</span>numpy()<span class="sc">.</span><span class="bu">round</span>(<span class="dv">4</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb7-17"><a aria-label="17"></a><span class="bu">print</span>(<span class="ss">f"∂L/∂b = </span><span class="sc">{</span>b<span class="sc">.</span>grad<span class="sc">.</span>item()<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb7-18"><a aria-label="18"></a><span class="bu">print</span>(<span class="ss">f"∂L/∂v = </span><span class="sc">{</span>v<span class="sc">.</span>grad<span class="sc">.</span>item()<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb7-19"><a aria-label="19"></a><span class="bu">print</span>(<span class="ss">f"∂L/∂c = </span><span class="sc">{</span>c<span class="sc">.</span>grad<span class="sc">.</span>item()<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>L = 0.6685
 ∂L/∂w = [-0.2438 -0.1219]
@@ -596,16 +602,16 @@ device: cpu</code></pre>
 </ul>
 <p><span class="math display">\[u \xrightarrow{\;\sigma\;} p
 \xrightarrow{\;\text{交差エントロピー}\;} L\]</span></p>
-<div id="4aaaa0df" class="cell" data-execution_count="5">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a></a><span class="im">import</span> torch</span>
-<span id="cb9-2"><a></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
-<span id="cb9-3"><a></a></span>
-<span id="cb9-4"><a></a>logits <span class="op">=</span> torch.tensor([<span class="op">-</span><span class="fl">2.0</span>, <span class="fl">0.0</span>, <span class="fl">2.0</span>])</span>
-<span id="cb9-5"><a></a>targets <span class="op">=</span> torch.tensor([<span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="fl">1.0</span>])</span>
-<span id="cb9-6"><a></a>loss_each <span class="op">=</span> nn.BCEWithLogitsLoss(reduction<span class="op">=</span><span class="st">"none"</span>)</span>
-<span id="cb9-7"><a></a></span>
-<span id="cb9-8"><a></a><span class="bu">print</span>(<span class="st">"確率:"</span>, torch.sigmoid(logits))</span>
-<span id="cb9-9"><a></a><span class="bu">print</span>(<span class="st">"損失:"</span>, loss_each(logits, targets))</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="50643068" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
+<span id="cb9-2"><a aria-label="2"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
+<span id="cb9-3"><a aria-label="3"></a></span>
+<span id="cb9-4"><a aria-label="4"></a>logits <span class="op">=</span> torch.tensor([<span class="op">-</span><span class="fl">2.0</span>, <span class="fl">0.0</span>, <span class="fl">2.0</span>])</span>
+<span id="cb9-5"><a aria-label="5"></a>targets <span class="op">=</span> torch.tensor([<span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="fl">1.0</span>])</span>
+<span id="cb9-6"><a aria-label="6"></a>loss_each <span class="op">=</span> nn.BCEWithLogitsLoss(reduction<span class="op">=</span><span class="st">"none"</span>)</span>
+<span id="cb9-7"><a aria-label="7"></a></span>
+<span id="cb9-8"><a aria-label="8"></a><span class="bu">print</span>(<span class="st">"確率:"</span>, torch.sigmoid(logits))</span>
+<span id="cb9-9"><a aria-label="9"></a><span class="bu">print</span>(<span class="st">"損失:"</span>, loss_each(logits, targets))</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>確率: tensor([0.1192, 0.5000, 0.8808])
 損失: tensor([0.1269, 0.6931, 0.1269])</code></pre>
@@ -621,8 +627,8 @@ device: cpu</code></pre>
 <h2>なぜ確率ではなくlogitを直接渡すのか</h2>
 <div class="slide-body">
 <p>数式上は、次の2通りは同じ：</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb11-1"><a></a>u → sigmoid → BCELoss</span>
-<span id="cb11-2"><a></a>u ─────────→ BCEWithLogitsLoss</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb11-1"><a aria-label="1"></a>u → sigmoid → BCELoss</span>
+<span id="cb11-2"><a aria-label="2"></a>u ─────────→ BCEWithLogitsLoss</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <ul>
 <li><span class="math inline">\(|u|\)</span> が大きいと、シグモイドの結果は計算機上で0や1へ極端に近づく</li>
 <li>その後に <code>log(p)</code> や <code>log(1-p)</code> を計算すると、丸め誤差や <code>log(0)</code> が起きやすい</li>
@@ -646,15 +652,15 @@ device: cpu</code></pre>
 <section id="nn部品には全部見覚えがある" class="slide level2">
 <h2>nn：部品には全部、見覚えがある</h2>
 <div class="slide-body">
-<div id="b1d6003f" class="cell" data-execution_count="6">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
-<span id="cb12-2"><a></a></span>
-<span id="cb12-3"><a></a>model <span class="op">=</span> nn.Sequential(</span>
-<span id="cb12-4"><a></a>    nn.Linear(<span class="dv">2</span>, <span class="dv">16</span>),   <span class="co"># 線形変換 X @ W1 + b1（パラメータは自動で用意・初期化）</span></span>
-<span id="cb12-5"><a></a>    nn.ReLU(),          <span class="co"># 折る</span></span>
-<span id="cb12-6"><a></a>    nn.Linear(<span class="dv">16</span>, <span class="dv">1</span>),   <span class="co"># 出力層 H @ w2 + c2</span></span>
-<span id="cb12-7"><a></a>)</span>
-<span id="cb12-8"><a></a><span class="bu">print</span>(model)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="87da20c9" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a aria-label="1"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
+<span id="cb12-2"><a aria-label="2"></a></span>
+<span id="cb12-3"><a aria-label="3"></a>model <span class="op">=</span> nn.Sequential(</span>
+<span id="cb12-4"><a aria-label="4"></a>    nn.Linear(<span class="dv">2</span>, <span class="dv">16</span>),   <span class="co"># 線形変換 X @ W1 + b1（パラメータは自動で用意・初期化）</span></span>
+<span id="cb12-5"><a aria-label="5"></a>    nn.ReLU(),          <span class="co"># 折る</span></span>
+<span id="cb12-6"><a aria-label="6"></a>    nn.Linear(<span class="dv">16</span>, <span class="dv">1</span>),   <span class="co"># 出力層 H @ w2 + c2</span></span>
+<span id="cb12-7"><a aria-label="7"></a>)</span>
+<span id="cb12-8"><a aria-label="8"></a><span class="bu">print</span>(model)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Sequential(
   (0): Linear(in_features=2, out_features=16, bias=True)
@@ -711,12 +717,12 @@ device: cpu</code></pre>
 <li><code>nn.ReLU</code> には学習する数字がないので、登録パラメータはない</li>
 <li><code>nn.Sequential</code> は、入れた順に部品を呼び出す1つのモデル</li>
 </ul>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a></a><span class="cf">for</span> name, parameter <span class="kw">in</span> model.named_parameters():</span>
-<span id="cb14-2"><a></a>    <span class="bu">print</span>(name, parameter.shape)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb15-1"><a></a>0.weight  torch.Size([16, 2])</span>
-<span id="cb15-2"><a></a>0.bias    torch.Size([16])</span>
-<span id="cb15-3"><a></a>2.weight  torch.Size([1, 16])</span>
-<span id="cb15-4"><a></a>2.bias    torch.Size([1])</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a aria-label="1"></a><span class="cf">for</span> name, parameter <span class="kw">in</span> model.named_parameters():</span>
+<span id="cb14-2"><a aria-label="2"></a>    <span class="bu">print</span>(name, parameter.shape)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb15-1"><a aria-label="1"></a>0.weight  torch.Size([16, 2])</span>
+<span id="cb15-2"><a aria-label="2"></a>0.bias    torch.Size([16])</span>
+<span id="cb15-3"><a aria-label="3"></a>2.weight  torch.Size([1, 16])</span>
+<span id="cb15-4"><a aria-label="4"></a>2.bias    torch.Size([1])</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -738,18 +744,18 @@ device: cpu</code></pre>
 <ul>
 <li>部品を1個だけ取り出して、素性を確認する</li>
 </ul>
-<div id="9255418e" class="cell" data-execution_count="7">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a></a><span class="im">import</span> torch</span>
-<span id="cb16-2"><a></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
-<span id="cb16-3"><a></a></span>
-<span id="cb16-4"><a></a>torch.manual_seed(<span class="dv">0</span>)</span>
-<span id="cb16-5"><a></a>lin <span class="op">=</span> nn.Linear(<span class="dv">2</span>, <span class="dv">3</span>)          <span class="co"># 2次元 → 3個の変換</span></span>
-<span id="cb16-6"><a></a><span class="bu">print</span>(lin.weight)              <span class="co"># W（3行2列） ランダム初期化済み</span></span>
-<span id="cb16-7"><a></a><span class="bu">print</span>(lin.bias)                <span class="co"># b（3個）</span></span>
-<span id="cb16-8"><a></a></span>
-<span id="cb16-9"><a></a>x <span class="op">=</span> torch.tensor([[<span class="fl">1.0</span>, <span class="fl">2.0</span>]])</span>
-<span id="cb16-10"><a></a><span class="bu">print</span>(lin(x))                  <span class="co"># Linear に通す</span></span>
-<span id="cb16-11"><a></a><span class="bu">print</span>(x <span class="op">@</span> lin.weight.T <span class="op">+</span> lin.bias)   <span class="co"># 自分で計算しても、同じ</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="2345567c" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
+<span id="cb16-2"><a aria-label="2"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
+<span id="cb16-3"><a aria-label="3"></a></span>
+<span id="cb16-4"><a aria-label="4"></a>torch.manual_seed(<span class="dv">0</span>)</span>
+<span id="cb16-5"><a aria-label="5"></a>lin <span class="op">=</span> nn.Linear(<span class="dv">2</span>, <span class="dv">3</span>)          <span class="co"># 2次元 → 3個の変換</span></span>
+<span id="cb16-6"><a aria-label="6"></a><span class="bu">print</span>(lin.weight)              <span class="co"># W（3行2列） ランダム初期化済み</span></span>
+<span id="cb16-7"><a aria-label="7"></a><span class="bu">print</span>(lin.bias)                <span class="co"># b（3個）</span></span>
+<span id="cb16-8"><a aria-label="8"></a></span>
+<span id="cb16-9"><a aria-label="9"></a>x <span class="op">=</span> torch.tensor([[<span class="fl">1.0</span>, <span class="fl">2.0</span>]])</span>
+<span id="cb16-10"><a aria-label="10"></a><span class="bu">print</span>(lin(x))                  <span class="co"># Linear に通す</span></span>
+<span id="cb16-11"><a aria-label="11"></a><span class="bu">print</span>(x <span class="op">@</span> lin.weight.T <span class="op">+</span> lin.bias)   <span class="co"># 自分で計算しても、同じ</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Parameter containing:
 tensor([[-0.0053,  0.3793],
@@ -770,12 +776,12 @@ tensor([[ 0.7393, -1.0621,  0.0441]], grad_fn=&lt;AddBackward0&gt;)</code></pre>
 <section id="このモデルの学習対象は65個" class="slide level2">
 <h2>このモデルの学習対象は65個</h2>
 <div class="slide-body">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb18-1"><a></a>Linear(2 → 16) : 2×16 個の重み + 16 個のバイアス = 48</span>
-<span id="cb18-2"><a></a>Linear(16 → 1) : 16×1 個の重み +  1 個のバイアス = 17</span>
-<span id="cb18-3"><a></a>----------------------------------------------------------</span>
-<span id="cb18-4"><a></a>合計                                                  65</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb18-1"><a aria-label="1"></a>Linear(2 → 16) : 2×16 個の重み + 16 個のバイアス = 48</span>
+<span id="cb18-2"><a aria-label="2"></a>Linear(16 → 1) : 16×1 個の重み +  1 個のバイアス = 17</span>
+<span id="cb18-3"><a aria-label="3"></a>----------------------------------------------------------</span>
+<span id="cb18-4"><a aria-label="4"></a>合計                                                  65</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Pythonでも確認できる：</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a></a><span class="bu">sum</span>(p.numel() <span class="cf">for</span> p <span class="kw">in</span> model.parameters())  <span class="co"># 65</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a aria-label="1"></a><span class="bu">sum</span>(p.numel() <span class="cf">for</span> p <span class="kw">in</span> model.parameters())  <span class="co"># 65</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <ul>
 <li><code>model.parameters()</code> は、この65個をまとめてoptimizerへ渡す</li>
 <li>ネットワークを組み替えると、登録される数も自動で変わる</li>
@@ -785,18 +791,18 @@ tensor([[ 0.7393, -1.0621,  0.0441]], grad_fn=&lt;AddBackward0&gt;)</code></pre>
 <section id="optimizer.step-が勾配降下の1歩" class="slide level2">
 <h2><code>optimizer.step()</code> が勾配降下の1歩</h2>
 <div class="slide-body">
-<div id="e86e0f1d" class="cell" data-execution_count="8">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a></a><span class="im">import</span> torch</span>
-<span id="cb20-2"><a></a></span>
-<span id="cb20-3"><a></a>theta <span class="op">=</span> torch.tensor(<span class="fl">2.0</span>, requires_grad<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb20-4"><a></a>optimizer_demo <span class="op">=</span> torch.optim.SGD([theta], lr<span class="op">=</span><span class="fl">0.1</span>)</span>
-<span id="cb20-5"><a></a></span>
-<span id="cb20-6"><a></a>loss <span class="op">=</span> theta <span class="op">**</span> <span class="dv">2</span></span>
-<span id="cb20-7"><a></a>loss.backward()</span>
-<span id="cb20-8"><a></a><span class="bu">print</span>(<span class="st">"勾配:"</span>, theta.grad)       <span class="co"># 2θ = 4</span></span>
-<span id="cb20-9"><a></a></span>
-<span id="cb20-10"><a></a>optimizer_demo.step()</span>
-<span id="cb20-11"><a></a><span class="bu">print</span>(<span class="st">"更新後:"</span>, theta)          <span class="co"># 2 − 0.1 × 4 = 1.6</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="be12d9ea" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
+<span id="cb20-2"><a aria-label="2"></a></span>
+<span id="cb20-3"><a aria-label="3"></a>theta <span class="op">=</span> torch.tensor(<span class="fl">2.0</span>, requires_grad<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb20-4"><a aria-label="4"></a>optimizer_demo <span class="op">=</span> torch.optim.SGD([theta], lr<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb20-5"><a aria-label="5"></a></span>
+<span id="cb20-6"><a aria-label="6"></a>loss <span class="op">=</span> theta <span class="op">**</span> <span class="dv">2</span></span>
+<span id="cb20-7"><a aria-label="7"></a>loss.backward()</span>
+<span id="cb20-8"><a aria-label="8"></a><span class="bu">print</span>(<span class="st">"勾配:"</span>, theta.grad)       <span class="co"># 2θ = 4</span></span>
+<span id="cb20-9"><a aria-label="9"></a></span>
+<span id="cb20-10"><a aria-label="10"></a>optimizer_demo.step()</span>
+<span id="cb20-11"><a aria-label="11"></a><span class="bu">print</span>(<span class="st">"更新後:"</span>, theta)          <span class="co"># 2 − 0.1 × 4 = 1.6</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>勾配: tensor(4.)
 更新後: tensor(1.6000, requires_grad=True)</code></pre>
@@ -813,7 +819,7 @@ tensor([[ 0.7393, -1.0621,  0.0441]], grad_fn=&lt;AddBackward0&gt;)</code></pre>
 <section id="optimizerはパラメータへの参照を持つ" class="slide level2">
 <h2>optimizerはパラメータへの参照を持つ</h2>
 <div class="slide-body">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a></a>optimizer <span class="op">=</span> torch.optim.SGD(model.parameters(), lr<span class="op">=</span><span class="fl">0.5</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a aria-label="1"></a>optimizer <span class="op">=</span> torch.optim.SGD(model.parameters(), lr<span class="op">=</span><span class="fl">0.5</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <ul>
 <li><code>model.parameters()</code>：更新対象をoptimizerへ渡す</li>
 <li><code>lr=0.5</code>：学習率 <span class="math inline">\(\alpha\)</span></li>
@@ -853,31 +859,31 @@ tensor([[ 0.7393, -1.0621,  0.0441]], grad_fn=&lt;AddBackward0&gt;)</code></pre>
 <section id="peek-train-loop" class="slide level2">
 <h2>学習ループ：3拍子</h2>
 <div class="slide-body">
-<div id="2b01449e" class="cell" data-execution_count="9">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> make_moons</span>
-<span id="cb23-2"><a></a></span>
-<span id="cb23-3"><a></a>X, y <span class="op">=</span> make_moons(n_samples<span class="op">=</span><span class="dv">200</span>, noise<span class="op">=</span><span class="fl">0.1</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
-<span id="cb23-4"><a></a>X_t <span class="op">=</span> torch.tensor(X, dtype<span class="op">=</span>torch.float32)</span>
-<span id="cb23-5"><a></a>y_t <span class="op">=</span> torch.tensor(y, dtype<span class="op">=</span>torch.float32).unsqueeze(<span class="dv">1</span>)   <span class="co"># (200,) → (200,1)</span></span>
-<span id="cb23-6"><a></a></span>
-<span id="cb23-7"><a></a>torch.manual_seed(<span class="dv">0</span>)</span>
-<span id="cb23-8"><a></a>model <span class="op">=</span> nn.Sequential(nn.Linear(<span class="dv">2</span>, <span class="dv">16</span>), nn.ReLU(), nn.Linear(<span class="dv">16</span>, <span class="dv">1</span>))</span>
-<span id="cb23-9"><a></a>loss_fn   <span class="op">=</span> nn.BCEWithLogitsLoss()</span>
-<span id="cb23-10"><a></a>optimizer <span class="op">=</span> torch.optim.SGD(model.parameters(), lr<span class="op">=</span><span class="fl">0.5</span>)</span>
-<span id="cb23-11"><a></a></span>
-<span id="cb23-12"><a></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">4001</span>):</span>
-<span id="cb23-13"><a></a>    optimizer.zero_grad()        <span class="co"># ① 前回の勾配をリセット</span></span>
-<span id="cb23-14"><a></a>    logits <span class="op">=</span> model(X_t)</span>
-<span id="cb23-15"><a></a>    loss <span class="op">=</span> loss_fn(logits, y_t)</span>
-<span id="cb23-16"><a></a>    loss.backward()              <span class="co"># ② backprop（自動）</span></span>
-<span id="cb23-17"><a></a>    optimizer.step()             <span class="co"># ③ 勾配降下で1歩</span></span>
-<span id="cb23-18"><a></a></span>
-<span id="cb23-19"><a></a>    <span class="cf">if</span> i <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">100</span>, <span class="dv">500</span>, <span class="dv">2000</span>, <span class="dv">4000</span>):</span>
-<span id="cb23-20"><a></a>        <span class="cf">with</span> torch.no_grad():</span>
-<span id="cb23-21"><a></a>            logits_log <span class="op">=</span> model(X_t)</span>
-<span id="cb23-22"><a></a>            loss_log <span class="op">=</span> loss_fn(logits_log, y_t)</span>
-<span id="cb23-23"><a></a>            acc <span class="op">=</span> ((torch.sigmoid(logits_log) <span class="op">&gt;=</span> <span class="fl">0.5</span>).<span class="bu">float</span>() <span class="op">==</span> y_t).<span class="bu">float</span>().mean()</span>
-<span id="cb23-24"><a></a>        <span class="bu">print</span>(<span class="ss">f"更新 </span><span class="sc">{</span>i<span class="sc">:5d}</span><span class="ss">回 | Loss: </span><span class="sc">{</span>loss_log<span class="sc">.</span>item()<span class="sc">:.4f}</span><span class="ss"> | 正答率: </span><span class="sc">{</span>acc<span class="sc">.</span>item()<span class="sc">:.1%}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="4b465e15" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a aria-label="1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> make_moons</span>
+<span id="cb23-2"><a aria-label="2"></a></span>
+<span id="cb23-3"><a aria-label="3"></a>X, y <span class="op">=</span> make_moons(n_samples<span class="op">=</span><span class="dv">200</span>, noise<span class="op">=</span><span class="fl">0.1</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb23-4"><a aria-label="4"></a>X_t <span class="op">=</span> torch.tensor(X, dtype<span class="op">=</span>torch.float32)</span>
+<span id="cb23-5"><a aria-label="5"></a>y_t <span class="op">=</span> torch.tensor(y, dtype<span class="op">=</span>torch.float32).unsqueeze(<span class="dv">1</span>)   <span class="co"># (200,) → (200,1)</span></span>
+<span id="cb23-6"><a aria-label="6"></a></span>
+<span id="cb23-7"><a aria-label="7"></a>torch.manual_seed(<span class="dv">0</span>)</span>
+<span id="cb23-8"><a aria-label="8"></a>model <span class="op">=</span> nn.Sequential(nn.Linear(<span class="dv">2</span>, <span class="dv">16</span>), nn.ReLU(), nn.Linear(<span class="dv">16</span>, <span class="dv">1</span>))</span>
+<span id="cb23-9"><a aria-label="9"></a>loss_fn   <span class="op">=</span> nn.BCEWithLogitsLoss()</span>
+<span id="cb23-10"><a aria-label="10"></a>optimizer <span class="op">=</span> torch.optim.SGD(model.parameters(), lr<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb23-11"><a aria-label="11"></a></span>
+<span id="cb23-12"><a aria-label="12"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">4001</span>):</span>
+<span id="cb23-13"><a aria-label="13"></a>    optimizer.zero_grad()        <span class="co"># ① 前回の勾配をリセット</span></span>
+<span id="cb23-14"><a aria-label="14"></a>    logits <span class="op">=</span> model(X_t)</span>
+<span id="cb23-15"><a aria-label="15"></a>    loss <span class="op">=</span> loss_fn(logits, y_t)</span>
+<span id="cb23-16"><a aria-label="16"></a>    loss.backward()              <span class="co"># ② backprop（自動）</span></span>
+<span id="cb23-17"><a aria-label="17"></a>    optimizer.step()             <span class="co"># ③ 勾配降下で1歩</span></span>
+<span id="cb23-18"><a aria-label="18"></a></span>
+<span id="cb23-19"><a aria-label="19"></a>    <span class="cf">if</span> i <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">100</span>, <span class="dv">500</span>, <span class="dv">2000</span>, <span class="dv">4000</span>):</span>
+<span id="cb23-20"><a aria-label="20"></a>        <span class="cf">with</span> torch.no_grad():</span>
+<span id="cb23-21"><a aria-label="21"></a>            logits_log <span class="op">=</span> model(X_t)</span>
+<span id="cb23-22"><a aria-label="22"></a>            loss_log <span class="op">=</span> loss_fn(logits_log, y_t)</span>
+<span id="cb23-23"><a aria-label="23"></a>            acc <span class="op">=</span> ((torch.sigmoid(logits_log) <span class="op">&gt;=</span> <span class="fl">0.5</span>).<span class="bu">float</span>() <span class="op">==</span> y_t).<span class="bu">float</span>().mean()</span>
+<span id="cb23-24"><a aria-label="24"></a>        <span class="bu">print</span>(<span class="ss">f"更新 </span><span class="sc">{</span>i<span class="sc">:5d}</span><span class="ss">回 | Loss: </span><span class="sc">{</span>loss_log<span class="sc">.</span>item()<span class="sc">:.4f}</span><span class="ss"> | 正答率: </span><span class="sc">{</span>acc<span class="sc">.</span>item()<span class="sc">:.1%}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>更新     1回 | Loss: 0.6516 | 正答率: 84.5%
 更新   100回 | Loss: 0.2647 | 正答率: 85.5%
@@ -920,7 +926,7 @@ tensor([[ 0.7393, -1.0621,  0.0441]], grad_fn=&lt;AddBackward0&gt;)</code></pre>
 </tr>
 </tbody>
 </table>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a></a>y_t <span class="op">=</span> torch.tensor(y, dtype<span class="op">=</span>torch.float32).unsqueeze(<span class="dv">1</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a aria-label="1"></a>y_t <span class="op">=</span> torch.tensor(y, dtype<span class="op">=</span>torch.float32).unsqueeze(<span class="dv">1</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <ul>
 <li>元の <code>y</code> は <code>(200,)</code>。<code>unsqueeze(1)</code> で列を1本追加する</li>
 <li><code>BCEWithLogitsLoss</code> へ渡す <code>logits</code> と <code>y_t</code> は同じ形にする</li>
@@ -959,21 +965,21 @@ tensor([[ 0.7393, -1.0621,  0.0441]], grad_fn=&lt;AddBackward0&gt;)</code></pre>
 </div>
 </div>
 </div>
-<div id="68e847a0" class="cell" data-execution_count="10">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a></a><span class="im">import</span> torch</span>
-<span id="cb26-2"><a></a></span>
-<span id="cb26-3"><a></a>theta <span class="op">=</span> torch.tensor(<span class="fl">2.0</span>, requires_grad<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb26-4"><a></a>opt <span class="op">=</span> torch.optim.SGD([theta], lr<span class="op">=</span><span class="fl">0.1</span>)</span>
-<span id="cb26-5"><a></a></span>
-<span id="cb26-6"><a></a>loss <span class="op">=</span> theta <span class="op">**</span> <span class="dv">2</span></span>
-<span id="cb26-7"><a></a>loss.backward()</span>
-<span id="cb26-8"><a></a><span class="bu">print</span>(theta.grad)    <span class="co"># dL/dθ = 2θ = 4</span></span>
-<span id="cb26-9"><a></a>opt.step()</span>
-<span id="cb26-10"><a></a><span class="bu">print</span>(theta)         <span class="co"># 2 − 0.1 × 4 = 1.6（step は勾配降下そのもの）</span></span>
-<span id="cb26-11"><a></a></span>
-<span id="cb26-12"><a></a>loss <span class="op">=</span> theta <span class="op">**</span> <span class="dv">2</span>    <span class="co"># zero_grad しないで、もう1周</span></span>
-<span id="cb26-13"><a></a>loss.backward()</span>
-<span id="cb26-14"><a></a><span class="bu">print</span>(theta.grad)    <span class="co"># 2θ = 3.2 のはず……が？</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="9395fbed" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
+<span id="cb26-2"><a aria-label="2"></a></span>
+<span id="cb26-3"><a aria-label="3"></a>theta <span class="op">=</span> torch.tensor(<span class="fl">2.0</span>, requires_grad<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb26-4"><a aria-label="4"></a>opt <span class="op">=</span> torch.optim.SGD([theta], lr<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb26-5"><a aria-label="5"></a></span>
+<span id="cb26-6"><a aria-label="6"></a>loss <span class="op">=</span> theta <span class="op">**</span> <span class="dv">2</span></span>
+<span id="cb26-7"><a aria-label="7"></a>loss.backward()</span>
+<span id="cb26-8"><a aria-label="8"></a><span class="bu">print</span>(theta.grad)    <span class="co"># dL/dθ = 2θ = 4</span></span>
+<span id="cb26-9"><a aria-label="9"></a>opt.step()</span>
+<span id="cb26-10"><a aria-label="10"></a><span class="bu">print</span>(theta)         <span class="co"># 2 − 0.1 × 4 = 1.6（step は勾配降下そのもの）</span></span>
+<span id="cb26-11"><a aria-label="11"></a></span>
+<span id="cb26-12"><a aria-label="12"></a>loss <span class="op">=</span> theta <span class="op">**</span> <span class="dv">2</span>    <span class="co"># zero_grad しないで、もう1周</span></span>
+<span id="cb26-13"><a aria-label="13"></a>loss.backward()</span>
+<span id="cb26-14"><a aria-label="14"></a><span class="bu">print</span>(theta.grad)    <span class="co"># 2θ = 3.2 のはず……が？</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>tensor(4.)
 tensor(1.6000, requires_grad=True)
@@ -989,29 +995,29 @@ tensor(7.2000)</code></pre>
 <section id="境界も同じものが出る" class="slide level2">
 <h2>境界も同じものが出る</h2>
 <div class="slide-body">
-<div id="fb1c8958" class="cell" data-execution_count="11">
+<div id="e53b32d1" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>描画コード</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb28-2"><a></a><span class="im">import</span> japanize_matplotlib</span>
-<span id="cb28-3"><a></a>plt.rcParams[<span class="st">"font.size"</span>] <span class="op">=</span> <span class="dv">11</span></span>
-<span id="cb28-4"><a></a>plt.rcParams[<span class="st">"figure.dpi"</span>] <span class="op">=</span> <span class="dv">100</span></span>
-<span id="cb28-5"><a></a></span>
-<span id="cb28-6"><a></a>xx, yy <span class="op">=</span> np.meshgrid(np.linspace(X[:, <span class="dv">0</span>].<span class="bu">min</span>() <span class="op">-</span> <span class="fl">0.4</span>, X[:, <span class="dv">0</span>].<span class="bu">max</span>() <span class="op">+</span> <span class="fl">0.4</span>, <span class="dv">300</span>),</span>
-<span id="cb28-7"><a></a>                     np.linspace(X[:, <span class="dv">1</span>].<span class="bu">min</span>() <span class="op">-</span> <span class="fl">0.4</span>, X[:, <span class="dv">1</span>].<span class="bu">max</span>() <span class="op">+</span> <span class="fl">0.4</span>, <span class="dv">300</span>))</span>
-<span id="cb28-8"><a></a>grid <span class="op">=</span> torch.tensor(np.c_[xx.ravel(), yy.ravel()], dtype<span class="op">=</span>torch.float32)</span>
-<span id="cb28-9"><a></a></span>
-<span id="cb28-10"><a></a><span class="cf">with</span> torch.no_grad():                       <span class="co"># 推論だけなので履歴の記録は不要</span></span>
-<span id="cb28-11"><a></a>    Zb <span class="op">=</span> (torch.sigmoid(model(grid)) <span class="op">&gt;=</span> <span class="fl">0.5</span>).numpy().reshape(xx.shape)</span>
-<span id="cb28-12"><a></a></span>
-<span id="cb28-13"><a></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">5.5</span>, <span class="fl">3.8</span>))</span>
-<span id="cb28-14"><a></a>plt.contourf(xx, yy, Zb, alpha<span class="op">=</span><span class="fl">0.25</span>, levels<span class="op">=</span><span class="dv">1</span>, colors<span class="op">=</span>[<span class="st">"#5dade2"</span>, <span class="st">"#f5b7b1"</span>])</span>
-<span id="cb28-15"><a></a><span class="cf">for</span> cls, col, m <span class="kw">in</span> [(<span class="dv">0</span>, <span class="st">"#2980b9"</span>, <span class="st">"s"</span>), (<span class="dv">1</span>, <span class="st">"#e74c3c"</span>, <span class="st">"o"</span>)]:</span>
-<span id="cb28-16"><a></a>    mask <span class="op">=</span> y <span class="op">==</span> cls</span>
-<span id="cb28-17"><a></a>    plt.scatter(X[mask, <span class="dv">0</span>], X[mask, <span class="dv">1</span>], c<span class="op">=</span>col, marker<span class="op">=</span>m, s<span class="op">=</span><span class="dv">25</span>, edgecolors<span class="op">=</span><span class="st">"gray"</span>, lw<span class="op">=</span><span class="fl">0.4</span>)</span>
-<span id="cb28-18"><a></a>plt.xticks([])<span class="op">;</span> plt.yticks([])</span>
-<span id="cb28-19"><a></a>plt.tight_layout()</span>
-<span id="cb28-20"><a></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a aria-label="1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb28-2"><a aria-label="2"></a><span class="im">import</span> japanize_matplotlib</span>
+<span id="cb28-3"><a aria-label="3"></a>plt.rcParams[<span class="st">"font.size"</span>] <span class="op">=</span> <span class="dv">11</span></span>
+<span id="cb28-4"><a aria-label="4"></a>plt.rcParams[<span class="st">"figure.dpi"</span>] <span class="op">=</span> <span class="dv">100</span></span>
+<span id="cb28-5"><a aria-label="5"></a></span>
+<span id="cb28-6"><a aria-label="6"></a>xx, yy <span class="op">=</span> np.meshgrid(np.linspace(X[:, <span class="dv">0</span>].<span class="bu">min</span>() <span class="op">-</span> <span class="fl">0.4</span>, X[:, <span class="dv">0</span>].<span class="bu">max</span>() <span class="op">+</span> <span class="fl">0.4</span>, <span class="dv">300</span>),</span>
+<span id="cb28-7"><a aria-label="7"></a>                     np.linspace(X[:, <span class="dv">1</span>].<span class="bu">min</span>() <span class="op">-</span> <span class="fl">0.4</span>, X[:, <span class="dv">1</span>].<span class="bu">max</span>() <span class="op">+</span> <span class="fl">0.4</span>, <span class="dv">300</span>))</span>
+<span id="cb28-8"><a aria-label="8"></a>grid <span class="op">=</span> torch.tensor(np.c_[xx.ravel(), yy.ravel()], dtype<span class="op">=</span>torch.float32)</span>
+<span id="cb28-9"><a aria-label="9"></a></span>
+<span id="cb28-10"><a aria-label="10"></a><span class="cf">with</span> torch.no_grad():                       <span class="co"># 推論だけなので履歴の記録は不要</span></span>
+<span id="cb28-11"><a aria-label="11"></a>    Zb <span class="op">=</span> (torch.sigmoid(model(grid)) <span class="op">&gt;=</span> <span class="fl">0.5</span>).numpy().reshape(xx.shape)</span>
+<span id="cb28-12"><a aria-label="12"></a></span>
+<span id="cb28-13"><a aria-label="13"></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">5.5</span>, <span class="fl">3.8</span>))</span>
+<span id="cb28-14"><a aria-label="14"></a>plt.contourf(xx, yy, Zb, alpha<span class="op">=</span><span class="fl">0.25</span>, levels<span class="op">=</span><span class="dv">1</span>, colors<span class="op">=</span>[<span class="st">"#5dade2"</span>, <span class="st">"#f5b7b1"</span>])</span>
+<span id="cb28-15"><a aria-label="15"></a><span class="cf">for</span> cls, col, m <span class="kw">in</span> [(<span class="dv">0</span>, <span class="st">"#2980b9"</span>, <span class="st">"s"</span>), (<span class="dv">1</span>, <span class="st">"#e74c3c"</span>, <span class="st">"o"</span>)]:</span>
+<span id="cb28-16"><a aria-label="16"></a>    mask <span class="op">=</span> y <span class="op">==</span> cls</span>
+<span id="cb28-17"><a aria-label="17"></a>    plt.scatter(X[mask, <span class="dv">0</span>], X[mask, <span class="dv">1</span>], c<span class="op">=</span>col, marker<span class="op">=</span>m, s<span class="op">=</span><span class="dv">25</span>, edgecolors<span class="op">=</span><span class="st">"gray"</span>, lw<span class="op">=</span><span class="fl">0.4</span>)</span>
+<span id="cb28-18"><a aria-label="18"></a>plt.xticks([])<span class="op">;</span> plt.yticks([])</span>
+<span id="cb28-19"><a aria-label="19"></a>plt.tight_layout()</span>
+<span id="cb28-20"><a aria-label="20"></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
@@ -1031,10 +1037,10 @@ tensor(7.2000)</code></pre>
 <h2>推論では計算グラフを作らない</h2>
 <div class="slide-body">
 <p>学習後に予測するだけなら、復路は不要：</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a></a>model.<span class="bu">eval</span>()</span>
-<span id="cb29-2"><a></a><span class="cf">with</span> torch.no_grad():</span>
-<span id="cb29-3"><a></a>    logits <span class="op">=</span> model(grid)</span>
-<span id="cb29-4"><a></a>    probabilities <span class="op">=</span> torch.sigmoid(logits)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a aria-label="1"></a>model.<span class="bu">eval</span>()</span>
+<span id="cb29-2"><a aria-label="2"></a><span class="cf">with</span> torch.no_grad():</span>
+<span id="cb29-3"><a aria-label="3"></a>    logits <span class="op">=</span> model(grid)</span>
+<span id="cb29-4"><a aria-label="4"></a>    probabilities <span class="op">=</span> torch.sigmoid(logits)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <table class="caption-top">
 <thead>
 <tr class="header">
@@ -1180,31 +1186,31 @@ tensor(7.2000)</code></pre>
 <section id="解答例" class="slide level2">
 <h2>解答例</h2>
 <div class="slide-body">
-<div id="20efcafd" class="cell" data-execution_count="12">
+<div id="4487c2da" class="cell" data-execution_count="12">
 <details class="code-fold">
 <summary>解答例を見る</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a></a><span class="im">import</span> torch</span>
-<span id="cb30-2"><a></a></span>
-<span id="cb30-3"><a></a><span class="kw">def</span> hand_check(x1, x2):</span>
-<span id="cb30-4"><a></a>    w <span class="op">=</span> torch.tensor([<span class="fl">0.4</span>, <span class="fl">0.3</span>], requires_grad<span class="op">=</span><span class="va">True</span>)   <span class="co"># w1, w2</span></span>
-<span id="cb30-5"><a></a>    b <span class="op">=</span> torch.tensor(<span class="op">-</span><span class="fl">0.1</span>, requires_grad<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb30-6"><a></a>    v <span class="op">=</span> torch.tensor(<span class="op">-</span><span class="fl">0.5</span>, requires_grad<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb30-7"><a></a>    c <span class="op">=</span> torch.tensor(<span class="fl">0.2</span>,  requires_grad<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb30-8"><a></a>    x <span class="op">=</span> torch.tensor([x1, x2])</span>
-<span id="cb30-9"><a></a></span>
-<span id="cb30-10"><a></a>    z <span class="op">=</span> w <span class="op">@</span> x <span class="op">+</span> b</span>
-<span id="cb30-11"><a></a>    h <span class="op">=</span> torch.relu(z)</span>
-<span id="cb30-12"><a></a>    u <span class="op">=</span> v <span class="op">*</span> h <span class="op">+</span> c</span>
-<span id="cb30-13"><a></a>    p <span class="op">=</span> torch.sigmoid(u)</span>
-<span id="cb30-14"><a></a>    L <span class="op">=</span> <span class="op">-</span>torch.log(<span class="dv">1</span> <span class="op">-</span> p)     <span class="co"># 正解 y=0</span></span>
-<span id="cb30-15"><a></a>    L.backward()</span>
-<span id="cb30-16"><a></a></span>
-<span id="cb30-17"><a></a>    <span class="bu">print</span>(<span class="ss">f"x = (</span><span class="sc">{</span>x1<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>x2<span class="sc">}</span><span class="ss">) | L = </span><span class="sc">{</span>L<span class="sc">.</span>item()<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb30-18"><a></a>    <span class="bu">print</span>(<span class="ss">f"  ∂L/∂w = </span><span class="sc">{</span>w<span class="sc">.</span>grad<span class="sc">.</span>numpy()<span class="sc">.</span><span class="bu">round</span>(<span class="dv">4</span>)<span class="sc">}</span><span class="ss">, ∂L/∂b = </span><span class="sc">{</span>b<span class="sc">.</span>grad<span class="sc">.</span>item()<span class="sc">:.4f}</span><span class="ss">, "</span></span>
-<span id="cb30-19"><a></a>          <span class="ss">f"∂L/∂v = </span><span class="sc">{</span>v<span class="sc">.</span>grad<span class="sc">.</span>item()<span class="sc">:.4f}</span><span class="ss">, ∂L/∂c = </span><span class="sc">{</span>c<span class="sc">.</span>grad<span class="sc">.</span>item()<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb30-20"><a></a></span>
-<span id="cb30-21"><a></a>hand_check(<span class="fl">0.5</span>, <span class="fl">1.0</span>)    <span class="co"># 問題1：手計算 (-0.125, -0.25), -0.25, 0.2, 0.5 と一致するはず</span></span>
-<span id="cb30-22"><a></a>hand_check(<span class="op">-</span><span class="fl">1.0</span>, <span class="fl">0.5</span>)   <span class="co"># Problem 2: gradients for w, b, and v should be zero</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
+<span id="cb30-2"><a aria-label="2"></a></span>
+<span id="cb30-3"><a aria-label="3"></a><span class="kw">def</span> hand_check(x1, x2):</span>
+<span id="cb30-4"><a aria-label="4"></a>    w <span class="op">=</span> torch.tensor([<span class="fl">0.4</span>, <span class="fl">0.3</span>], requires_grad<span class="op">=</span><span class="va">True</span>)   <span class="co"># w1, w2</span></span>
+<span id="cb30-5"><a aria-label="5"></a>    b <span class="op">=</span> torch.tensor(<span class="op">-</span><span class="fl">0.1</span>, requires_grad<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb30-6"><a aria-label="6"></a>    v <span class="op">=</span> torch.tensor(<span class="op">-</span><span class="fl">0.5</span>, requires_grad<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb30-7"><a aria-label="7"></a>    c <span class="op">=</span> torch.tensor(<span class="fl">0.2</span>,  requires_grad<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb30-8"><a aria-label="8"></a>    x <span class="op">=</span> torch.tensor([x1, x2])</span>
+<span id="cb30-9"><a aria-label="9"></a></span>
+<span id="cb30-10"><a aria-label="10"></a>    z <span class="op">=</span> w <span class="op">@</span> x <span class="op">+</span> b</span>
+<span id="cb30-11"><a aria-label="11"></a>    h <span class="op">=</span> torch.relu(z)</span>
+<span id="cb30-12"><a aria-label="12"></a>    u <span class="op">=</span> v <span class="op">*</span> h <span class="op">+</span> c</span>
+<span id="cb30-13"><a aria-label="13"></a>    p <span class="op">=</span> torch.sigmoid(u)</span>
+<span id="cb30-14"><a aria-label="14"></a>    L <span class="op">=</span> <span class="op">-</span>torch.log(<span class="dv">1</span> <span class="op">-</span> p)     <span class="co"># 正解 y=0</span></span>
+<span id="cb30-15"><a aria-label="15"></a>    L.backward()</span>
+<span id="cb30-16"><a aria-label="16"></a></span>
+<span id="cb30-17"><a aria-label="17"></a>    <span class="bu">print</span>(<span class="ss">f"x = (</span><span class="sc">{</span>x1<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>x2<span class="sc">}</span><span class="ss">) | L = </span><span class="sc">{</span>L<span class="sc">.</span>item()<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb30-18"><a aria-label="18"></a>    <span class="bu">print</span>(<span class="ss">f"  ∂L/∂w = </span><span class="sc">{</span>w<span class="sc">.</span>grad<span class="sc">.</span>numpy()<span class="sc">.</span><span class="bu">round</span>(<span class="dv">4</span>)<span class="sc">}</span><span class="ss">, ∂L/∂b = </span><span class="sc">{</span>b<span class="sc">.</span>grad<span class="sc">.</span>item()<span class="sc">:.4f}</span><span class="ss">, "</span></span>
+<span id="cb30-19"><a aria-label="19"></a>          <span class="ss">f"∂L/∂v = </span><span class="sc">{</span>v<span class="sc">.</span>grad<span class="sc">.</span>item()<span class="sc">:.4f}</span><span class="ss">, ∂L/∂c = </span><span class="sc">{</span>c<span class="sc">.</span>grad<span class="sc">.</span>item()<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb30-20"><a aria-label="20"></a></span>
+<span id="cb30-21"><a aria-label="21"></a>hand_check(<span class="fl">0.5</span>, <span class="fl">1.0</span>)    <span class="co"># 問題1：手計算 (-0.125, -0.25), -0.25, 0.2, 0.5 と一致するはず</span></span>
+<span id="cb30-22"><a aria-label="22"></a>hand_check(<span class="op">-</span><span class="fl">1.0</span>, <span class="fl">0.5</span>)   <span class="co"># Problem 2: gradients for w, b, and v should be zero</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>x = (0.5, 1.0) | L = 0.6931

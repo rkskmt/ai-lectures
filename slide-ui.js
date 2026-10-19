@@ -89,7 +89,12 @@
         var el = document.getElementById('nav-counter');
         if (!el || !window.Reveal) return;
         var slides = Array.from(document.querySelectorAll('.reveal .slides section:not(.stack)'));
-        var idx = slides.findIndex(function(s) { return s.classList.contains('present'); });
+        // Ask Reveal for the current slide instead of scanning for `.present`:
+        // in scroll view (reveal.js switches to it below 435px, i.e. on
+        // phones) the slide shown at activation keeps a stale `.present`
+        // while the scrolled-to slide gets its own, so the first `.present`
+        // found is always the opening slide and the counter sticks at 1.
+        var idx = slides.indexOf(Reveal.getCurrentSlide());
         el.textContent = (idx + 1) + ' / ' + slides.length;
         var prev = document.getElementById('nav-prev');
         var next = document.getElementById('nav-next');
@@ -137,6 +142,12 @@
       var now = Date.now();
       if (now - lastNavAt < 250) return;
       lastNavAt = now;
+      // Explicit press feedback: with the tap handled on touchend (and its
+      // default prevented) the button never reaches :active on phones, and
+      // the scroll-view transition is a slow smooth scroll, so without this
+      // a tap looks like it did nothing.
+      btn.classList.add('nav-pressed');
+      setTimeout(function() { btn.classList.remove('nav-pressed'); }, 220);
       initCounter();
       if (btn.id === 'nav-prev') {
         if (isFirstSlide()) {

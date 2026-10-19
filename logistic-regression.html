@@ -6,11 +6,11 @@
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="site_libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.8.27">
+  <meta name="generator" content="quarto-1.10.19">
 
   <meta name="author" content="rkskmt">
   <title>AI Lectures – ロジスティック回帰</title>
@@ -20,10 +20,16 @@
   <link rel="stylesheet" href="site_libs/revealjs/dist/reset.css">
   <link rel="stylesheet" href="site_libs/revealjs/dist/reveal.css">
   <style>
-    code{white-space: pre-wrap;}
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
     ul.task-list{list-style: none;}
     ul.task-list li input[type="checkbox"] {
@@ -98,7 +104,7 @@
     code span.vs { color: #032f62; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-d3a26a7442888a116b43ccec6150e9c5.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-e69bca93ec9d1486cefcf16a785f5ce6.css">
   <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -254,7 +260,7 @@
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
 <div class="quarto-title-author-name">
-rkskmt 
+rkskmt
 </div>
 </div>
 </div>
@@ -291,7 +297,7 @@ rkskmt
 <section id="分類問題で出てきた閾値の縦線" class="slide level2">
 <h2>分類問題で出てきた閾値の縦線</h2>
 <div class="slide-body">
-<div id="2b8ae452" class="cell fig-medium" data-execution_count="1">
+<div id="1058e30d" class="cell fig-medium" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -309,7 +315,7 @@ rkskmt
 <section id="このような直線を求めたい" class="slide level2">
 <h2>このような直線を求めたい</h2>
 <div class="slide-body">
-<div id="e49ddece" class="cell fig-medium" data-execution_count="2">
+<div id="7a2f358e" class="cell fig-medium" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -340,7 +346,7 @@ rkskmt
 <section id="注意決定境界は回帰直線ではない" class="slide level2">
 <h2>【注意】決定境界は回帰直線ではない</h2>
 <div class="slide-body">
-<div id="73152c57" class="cell" data-execution_count="3">
+<div id="4e269d06" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -443,7 +449,7 @@ rkskmt
 <li><span class="math inline">\(z\)</span> の<strong>符号</strong>が「線の上か下か」を表現</li>
 <li><span class="math inline">\(z\)</span> の<strong>大きさ</strong>が「線からの遠さ」を表現</li>
 </ul>
-<div id="4f22652d" class="cell fig-small" data-execution_count="4">
+<div id="0e4298bc" class="cell fig-small" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -480,7 +486,7 @@ rkskmt
 </ul>
 <p><span class="math display">\[p = \sigma(w_1 x_1 + w_2 x_2 + b)
 = \frac{1}{1 + e^{-(w_1 x_1 + w_2 x_2 + b)}}\]</span></p>
-<div id="2875c4e5" class="cell" data-execution_count="5">
+<div id="52f0f451" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -705,7 +711,7 @@ rkskmt
 <section id="peek-neglog" class="slide level2">
 <h2>−log の形：外すほど急に効く</h2>
 <div class="slide-body">
-<div id="9408e6c4" class="cell" data-execution_count="6">
+<div id="7dc73473" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -821,9 +827,9 @@ b \leftarrow b-\alpha(p-y)\]</span></p>
 <h2>1匹分の勾配をコードに置き換える</h2>
 <div class="slide-body">
 <p>数式の各部分へ、そのまま変数名を付ける：</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a>delta <span class="op">=</span> p <span class="op">-</span> y</span>
-<span id="cb1-2"><a></a>d_w <span class="op">=</span> delta <span class="op">*</span> x</span>
-<span id="cb1-3"><a></a>d_b <span class="op">=</span> delta</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a>delta <span class="op">=</span> p <span class="op">-</span> y</span>
+<span id="cb1-2"><a aria-label="2"></a>d_w <span class="op">=</span> delta <span class="op">*</span> x</span>
+<span id="cb1-3"><a aria-label="3"></a>d_b <span class="op">=</span> delta</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <table class="caption-top">
 <colgroup>
 <col style="width: 33%">
@@ -873,62 +879,62 @@ b \leftarrow b-\alpha(p-y)\]</span></p>
 <section id="peek-forward" class="slide level2">
 <h2>実装：必要な関数は4つだけ</h2>
 <div class="slide-body">
-<div id="ffbf3229" class="cell" data-execution_count="7">
+<div id="4fe64bf8" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>魚データの定義（クリックして展開）</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb2-2"><a></a></span>
-<span id="cb2-3"><a></a>salmon_weights     <span class="op">=</span> np.array([<span class="dv">2149</span>, <span class="dv">1959</span>, <span class="dv">2194</span>, <span class="dv">2457</span>, <span class="dv">1930</span>, <span class="dv">1930</span>, <span class="dv">2474</span>, <span class="dv">2230</span>, <span class="dv">1859</span>, <span class="dv">2163</span>,</span>
-<span id="cb2-4"><a></a>                               <span class="dv">1861</span>, <span class="dv">1860</span>, <span class="dv">2073</span>, <span class="dv">1426</span>, <span class="dv">1483</span>, <span class="dv">1831</span>, <span class="dv">1696</span>, <span class="dv">2094</span>, <span class="dv">1728</span>, <span class="dv">1576</span>,</span>
-<span id="cb2-5"><a></a>                               <span class="dv">2028</span>, <span class="dv">1903</span>, <span class="dv">2057</span>, <span class="dv">2229</span>, <span class="dv">1884</span>, <span class="dv">1884</span>, <span class="dv">2240</span>, <span class="dv">2081</span>, <span class="dv">1838</span>, <span class="dv">2037</span>,</span>
-<span id="cb2-6"><a></a>                               <span class="dv">1839</span>, <span class="dv">1838</span>, <span class="dv">1978</span>, <span class="dv">1554</span>, <span class="dv">1591</span>, <span class="dv">1820</span>, <span class="dv">1731</span>, <span class="dv">1992</span>, <span class="dv">1752</span>, <span class="dv">1652</span>])</span>
-<span id="cb2-7"><a></a>salmon_brightness  <span class="op">=</span> np.array([<span class="fl">3.5</span>, <span class="fl">5.8</span>, <span class="fl">4.9</span>, <span class="fl">4.4</span>, <span class="fl">2.6</span>, <span class="fl">2.6</span>, <span class="fl">2.2</span>, <span class="fl">5.5</span>, <span class="fl">4.4</span>, <span class="fl">4.8</span>, <span class="fl">2.1</span>,</span>
-<span id="cb2-8"><a></a>                               <span class="fl">5.9</span>, <span class="fl">5.3</span>, <span class="fl">2.8</span>, <span class="fl">2.7</span>, <span class="fl">2.7</span>, <span class="fl">3.2</span>, <span class="fl">4.1</span>, <span class="fl">3.7</span>, <span class="fl">3.2</span>, <span class="fl">4.4</span>, <span class="fl">2.6</span>,</span>
-<span id="cb2-9"><a></a>                               <span class="fl">3.2</span>, <span class="fl">3.5</span>, <span class="fl">3.8</span>, <span class="fl">5.1</span>, <span class="fl">2.8</span>, <span class="fl">4.1</span>, <span class="fl">4.4</span>, <span class="fl">2.2</span>, <span class="fl">4.4</span>, <span class="fl">2.7</span>, <span class="fl">2.3</span>,</span>
-<span id="cb2-10"><a></a>                               <span class="fl">5.8</span>, <span class="fl">5.9</span>, <span class="fl">5.2</span>, <span class="fl">3.2</span>, <span class="fl">2.4</span>, <span class="fl">4.7</span>, <span class="fl">3.8</span>])</span>
-<span id="cb2-11"><a></a>seabass_weights    <span class="op">=</span> np.array([<span class="dv">1677</span>, <span class="dv">1327</span>, <span class="dv">1486</span>, <span class="dv">1440</span>, <span class="dv">1857</span>, <span class="dv">1476</span>, <span class="dv">1749</span>, <span class="dv">2203</span>, <span class="dv">1979</span>, <span class="dv">1468</span>,</span>
-<span id="cb2-12"><a></a>                               <span class="dv">1496</span>, <span class="dv">1737</span>, <span class="dv">1099</span>, <span class="dv">1341</span>, <span class="dv">1748</span>, <span class="dv">1563</span>, <span class="dv">2181</span>, <span class="dv">1414</span>, <span class="dv">1286</span>, <span class="dv">1333</span>,</span>
-<span id="cb2-13"><a></a>                               <span class="dv">1787</span>, <span class="dv">1445</span>, <span class="dv">1505</span>, <span class="dv">1204</span>, <span class="dv">1381</span>, <span class="dv">1513</span>, <span class="dv">1259</span>, <span class="dv">1567</span>, <span class="dv">1370</span>, <span class="dv">1432</span>,</span>
-<span id="cb2-14"><a></a>                               <span class="dv">1370</span>, <span class="dv">1864</span>, <span class="dv">1488</span>, <span class="dv">1278</span>, <span class="dv">1657</span>, <span class="dv">1245</span>, <span class="dv">1533</span>, <span class="dv">1096</span>, <span class="dv">1223</span>, <span class="dv">1531</span>])</span>
-<span id="cb2-15"><a></a>seabass_brightness <span class="op">=</span> np.array([<span class="fl">5.6</span>, <span class="fl">7.5</span>, <span class="fl">5.2</span>, <span class="fl">9.5</span>, <span class="fl">6.3</span>, <span class="fl">8.3</span>, <span class="fl">6.6</span>, <span class="fl">7.6</span>, <span class="fl">7.7</span>, <span class="fl">5.9</span>, <span class="fl">9.8</span>,</span>
-<span id="cb2-16"><a></a>                               <span class="fl">8.9</span>, <span class="fl">9.7</span>, <span class="fl">9.5</span>, <span class="fl">8.0</span>, <span class="fl">9.6</span>, <span class="fl">5.4</span>, <span class="fl">6.0</span>, <span class="fl">5.2</span>, <span class="fl">6.6</span>, <span class="fl">6.9</span>, <span class="fl">6.4</span>,</span>
-<span id="cb2-17"><a></a>                               <span class="fl">9.1</span>, <span class="fl">6.8</span>, <span class="fl">6.4</span>, <span class="fl">7.7</span>, <span class="fl">5.7</span>, <span class="fl">9.0</span>, <span class="fl">5.4</span>, <span class="fl">9.9</span>, <span class="fl">8.9</span>, <span class="fl">6.0</span>, <span class="fl">5.0</span>,</span>
-<span id="cb2-18"><a></a>                               <span class="fl">9.1</span>, <span class="fl">8.5</span>, <span class="fl">8.6</span>, <span class="fl">8.9</span>, <span class="fl">5.4</span>, <span class="fl">6.8</span>, <span class="fl">5.6</span>])</span>
-<span id="cb2-19"><a></a></span>
-<span id="cb2-20"><a></a>X <span class="op">=</span> np.column_stack([</span>
-<span id="cb2-21"><a></a>    np.concatenate([salmon_brightness, seabass_brightness]),</span>
-<span id="cb2-22"><a></a>    np.concatenate([salmon_weights,    seabass_weights])</span>
-<span id="cb2-23"><a></a>])</span>
-<span id="cb2-24"><a></a>y <span class="op">=</span> np.array([<span class="dv">1</span>]<span class="op">*</span><span class="dv">40</span> <span class="op">+</span> [<span class="dv">0</span>]<span class="op">*</span><span class="dv">40</span>)   <span class="co"># 1=Salmon, 0=Sea bass</span></span>
-<span id="cb2-25"><a></a></span>
-<span id="cb2-26"><a></a><span class="co"># スケールを揃える（クラスタリング回の教訓）</span></span>
-<span id="cb2-27"><a></a>X_norm <span class="op">=</span> (X <span class="op">-</span> X.mean(axis<span class="op">=</span><span class="dv">0</span>)) <span class="op">/</span> X.std(axis<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb2-28"><a></a></span>
-<span id="cb2-29"><a></a><span class="co"># Salmon, Sea bass, Salmon, ... と交互に並べ替えておく</span></span>
-<span id="cb2-30"><a></a>order <span class="op">=</span> np.empty(<span class="dv">80</span>, dtype<span class="op">=</span><span class="bu">int</span>)</span>
-<span id="cb2-31"><a></a>order[<span class="dv">0</span>::<span class="dv">2</span>] <span class="op">=</span> np.arange(<span class="dv">0</span>, <span class="dv">40</span>)</span>
-<span id="cb2-32"><a></a>order[<span class="dv">1</span>::<span class="dv">2</span>] <span class="op">=</span> np.arange(<span class="dv">40</span>, <span class="dv">80</span>)</span>
-<span id="cb2-33"><a></a>X_norm <span class="op">=</span> X_norm[order]</span>
-<span id="cb2-34"><a></a>y      <span class="op">=</span> y[order]</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-2"><a aria-label="2"></a></span>
+<span id="cb2-3"><a aria-label="3"></a>salmon_weights     <span class="op">=</span> np.array([<span class="dv">2149</span>, <span class="dv">1959</span>, <span class="dv">2194</span>, <span class="dv">2457</span>, <span class="dv">1930</span>, <span class="dv">1930</span>, <span class="dv">2474</span>, <span class="dv">2230</span>, <span class="dv">1859</span>, <span class="dv">2163</span>,</span>
+<span id="cb2-4"><a aria-label="4"></a>                               <span class="dv">1861</span>, <span class="dv">1860</span>, <span class="dv">2073</span>, <span class="dv">1426</span>, <span class="dv">1483</span>, <span class="dv">1831</span>, <span class="dv">1696</span>, <span class="dv">2094</span>, <span class="dv">1728</span>, <span class="dv">1576</span>,</span>
+<span id="cb2-5"><a aria-label="5"></a>                               <span class="dv">2028</span>, <span class="dv">1903</span>, <span class="dv">2057</span>, <span class="dv">2229</span>, <span class="dv">1884</span>, <span class="dv">1884</span>, <span class="dv">2240</span>, <span class="dv">2081</span>, <span class="dv">1838</span>, <span class="dv">2037</span>,</span>
+<span id="cb2-6"><a aria-label="6"></a>                               <span class="dv">1839</span>, <span class="dv">1838</span>, <span class="dv">1978</span>, <span class="dv">1554</span>, <span class="dv">1591</span>, <span class="dv">1820</span>, <span class="dv">1731</span>, <span class="dv">1992</span>, <span class="dv">1752</span>, <span class="dv">1652</span>])</span>
+<span id="cb2-7"><a aria-label="7"></a>salmon_brightness  <span class="op">=</span> np.array([<span class="fl">3.5</span>, <span class="fl">5.8</span>, <span class="fl">4.9</span>, <span class="fl">4.4</span>, <span class="fl">2.6</span>, <span class="fl">2.6</span>, <span class="fl">2.2</span>, <span class="fl">5.5</span>, <span class="fl">4.4</span>, <span class="fl">4.8</span>, <span class="fl">2.1</span>,</span>
+<span id="cb2-8"><a aria-label="8"></a>                               <span class="fl">5.9</span>, <span class="fl">5.3</span>, <span class="fl">2.8</span>, <span class="fl">2.7</span>, <span class="fl">2.7</span>, <span class="fl">3.2</span>, <span class="fl">4.1</span>, <span class="fl">3.7</span>, <span class="fl">3.2</span>, <span class="fl">4.4</span>, <span class="fl">2.6</span>,</span>
+<span id="cb2-9"><a aria-label="9"></a>                               <span class="fl">3.2</span>, <span class="fl">3.5</span>, <span class="fl">3.8</span>, <span class="fl">5.1</span>, <span class="fl">2.8</span>, <span class="fl">4.1</span>, <span class="fl">4.4</span>, <span class="fl">2.2</span>, <span class="fl">4.4</span>, <span class="fl">2.7</span>, <span class="fl">2.3</span>,</span>
+<span id="cb2-10"><a aria-label="10"></a>                               <span class="fl">5.8</span>, <span class="fl">5.9</span>, <span class="fl">5.2</span>, <span class="fl">3.2</span>, <span class="fl">2.4</span>, <span class="fl">4.7</span>, <span class="fl">3.8</span>])</span>
+<span id="cb2-11"><a aria-label="11"></a>seabass_weights    <span class="op">=</span> np.array([<span class="dv">1677</span>, <span class="dv">1327</span>, <span class="dv">1486</span>, <span class="dv">1440</span>, <span class="dv">1857</span>, <span class="dv">1476</span>, <span class="dv">1749</span>, <span class="dv">2203</span>, <span class="dv">1979</span>, <span class="dv">1468</span>,</span>
+<span id="cb2-12"><a aria-label="12"></a>                               <span class="dv">1496</span>, <span class="dv">1737</span>, <span class="dv">1099</span>, <span class="dv">1341</span>, <span class="dv">1748</span>, <span class="dv">1563</span>, <span class="dv">2181</span>, <span class="dv">1414</span>, <span class="dv">1286</span>, <span class="dv">1333</span>,</span>
+<span id="cb2-13"><a aria-label="13"></a>                               <span class="dv">1787</span>, <span class="dv">1445</span>, <span class="dv">1505</span>, <span class="dv">1204</span>, <span class="dv">1381</span>, <span class="dv">1513</span>, <span class="dv">1259</span>, <span class="dv">1567</span>, <span class="dv">1370</span>, <span class="dv">1432</span>,</span>
+<span id="cb2-14"><a aria-label="14"></a>                               <span class="dv">1370</span>, <span class="dv">1864</span>, <span class="dv">1488</span>, <span class="dv">1278</span>, <span class="dv">1657</span>, <span class="dv">1245</span>, <span class="dv">1533</span>, <span class="dv">1096</span>, <span class="dv">1223</span>, <span class="dv">1531</span>])</span>
+<span id="cb2-15"><a aria-label="15"></a>seabass_brightness <span class="op">=</span> np.array([<span class="fl">5.6</span>, <span class="fl">7.5</span>, <span class="fl">5.2</span>, <span class="fl">9.5</span>, <span class="fl">6.3</span>, <span class="fl">8.3</span>, <span class="fl">6.6</span>, <span class="fl">7.6</span>, <span class="fl">7.7</span>, <span class="fl">5.9</span>, <span class="fl">9.8</span>,</span>
+<span id="cb2-16"><a aria-label="16"></a>                               <span class="fl">8.9</span>, <span class="fl">9.7</span>, <span class="fl">9.5</span>, <span class="fl">8.0</span>, <span class="fl">9.6</span>, <span class="fl">5.4</span>, <span class="fl">6.0</span>, <span class="fl">5.2</span>, <span class="fl">6.6</span>, <span class="fl">6.9</span>, <span class="fl">6.4</span>,</span>
+<span id="cb2-17"><a aria-label="17"></a>                               <span class="fl">9.1</span>, <span class="fl">6.8</span>, <span class="fl">6.4</span>, <span class="fl">7.7</span>, <span class="fl">5.7</span>, <span class="fl">9.0</span>, <span class="fl">5.4</span>, <span class="fl">9.9</span>, <span class="fl">8.9</span>, <span class="fl">6.0</span>, <span class="fl">5.0</span>,</span>
+<span id="cb2-18"><a aria-label="18"></a>                               <span class="fl">9.1</span>, <span class="fl">8.5</span>, <span class="fl">8.6</span>, <span class="fl">8.9</span>, <span class="fl">5.4</span>, <span class="fl">6.8</span>, <span class="fl">5.6</span>])</span>
+<span id="cb2-19"><a aria-label="19"></a></span>
+<span id="cb2-20"><a aria-label="20"></a>X <span class="op">=</span> np.column_stack([</span>
+<span id="cb2-21"><a aria-label="21"></a>    np.concatenate([salmon_brightness, seabass_brightness]),</span>
+<span id="cb2-22"><a aria-label="22"></a>    np.concatenate([salmon_weights,    seabass_weights])</span>
+<span id="cb2-23"><a aria-label="23"></a>])</span>
+<span id="cb2-24"><a aria-label="24"></a>y <span class="op">=</span> np.array([<span class="dv">1</span>]<span class="op">*</span><span class="dv">40</span> <span class="op">+</span> [<span class="dv">0</span>]<span class="op">*</span><span class="dv">40</span>)   <span class="co"># 1=Salmon, 0=Sea bass</span></span>
+<span id="cb2-25"><a aria-label="25"></a></span>
+<span id="cb2-26"><a aria-label="26"></a><span class="co"># スケールを揃える（クラスタリング回の教訓）</span></span>
+<span id="cb2-27"><a aria-label="27"></a>X_norm <span class="op">=</span> (X <span class="op">-</span> X.mean(axis<span class="op">=</span><span class="dv">0</span>)) <span class="op">/</span> X.std(axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb2-28"><a aria-label="28"></a></span>
+<span id="cb2-29"><a aria-label="29"></a><span class="co"># Salmon, Sea bass, Salmon, ... と交互に並べ替えておく</span></span>
+<span id="cb2-30"><a aria-label="30"></a>order <span class="op">=</span> np.empty(<span class="dv">80</span>, dtype<span class="op">=</span><span class="bu">int</span>)</span>
+<span id="cb2-31"><a aria-label="31"></a>order[<span class="dv">0</span>::<span class="dv">2</span>] <span class="op">=</span> np.arange(<span class="dv">0</span>, <span class="dv">40</span>)</span>
+<span id="cb2-32"><a aria-label="32"></a>order[<span class="dv">1</span>::<span class="dv">2</span>] <span class="op">=</span> np.arange(<span class="dv">40</span>, <span class="dv">80</span>)</span>
+<span id="cb2-33"><a aria-label="33"></a>X_norm <span class="op">=</span> X_norm[order]</span>
+<span id="cb2-34"><a aria-label="34"></a>y      <span class="op">=</span> y[order]</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="6bfc7674" class="cell" data-execution_count="8">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a><span class="kw">def</span> sigmoid(z):</span>
-<span id="cb3-2"><a></a>    <span class="cf">return</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>z))</span>
-<span id="cb3-3"><a></a></span>
-<span id="cb3-4"><a></a><span class="kw">def</span> forward(X, w, b):</span>
-<span id="cb3-5"><a></a>    <span class="co">"""線形結合＋バイアス → シグモイド"""</span></span>
-<span id="cb3-6"><a></a>    <span class="cf">return</span> sigmoid(X <span class="op">@</span> w <span class="op">+</span> b)</span>
-<span id="cb3-7"><a></a></span>
-<span id="cb3-8"><a></a><span class="kw">def</span> loss_fn(y_true, p):</span>
-<span id="cb3-9"><a></a>    <span class="co">"""全魚の二値交差エントロピーを平均する"""</span></span>
-<span id="cb3-10"><a></a>    eps <span class="op">=</span> <span class="fl">1e-10</span></span>
-<span id="cb3-11"><a></a>    <span class="co"># log(0) は計算できないため、確率が厳密な 0 / 1 にならないようにする</span></span>
-<span id="cb3-12"><a></a>    p <span class="op">=</span> np.clip(p, eps, <span class="dv">1</span> <span class="op">-</span> eps)</span>
-<span id="cb3-13"><a></a>    <span class="cf">return</span> <span class="op">-</span>np.mean(y_true <span class="op">*</span> np.log(p) <span class="op">+</span> (<span class="dv">1</span> <span class="op">-</span> y_true) <span class="op">*</span> np.log(<span class="dv">1</span> <span class="op">-</span> p))</span>
-<span id="cb3-14"><a></a></span>
-<span id="cb3-15"><a></a><span class="kw">def</span> accuracy(y_true, p):</span>
-<span id="cb3-16"><a></a>    <span class="cf">return</span> np.mean((p <span class="op">&gt;=</span> <span class="fl">0.5</span>) <span class="op">==</span> y_true)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="fb898542" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a aria-label="1"></a><span class="kw">def</span> sigmoid(z):</span>
+<span id="cb3-2"><a aria-label="2"></a>    <span class="cf">return</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>z))</span>
+<span id="cb3-3"><a aria-label="3"></a></span>
+<span id="cb3-4"><a aria-label="4"></a><span class="kw">def</span> forward(X, w, b):</span>
+<span id="cb3-5"><a aria-label="5"></a>    <span class="co">"""線形結合＋バイアス → シグモイド"""</span></span>
+<span id="cb3-6"><a aria-label="6"></a>    <span class="cf">return</span> sigmoid(X <span class="op">@</span> w <span class="op">+</span> b)</span>
+<span id="cb3-7"><a aria-label="7"></a></span>
+<span id="cb3-8"><a aria-label="8"></a><span class="kw">def</span> loss_fn(y_true, p):</span>
+<span id="cb3-9"><a aria-label="9"></a>    <span class="co">"""全魚の二値交差エントロピーを平均する"""</span></span>
+<span id="cb3-10"><a aria-label="10"></a>    eps <span class="op">=</span> <span class="fl">1e-10</span></span>
+<span id="cb3-11"><a aria-label="11"></a>    <span class="co"># log(0) は計算できないため、確率が厳密な 0 / 1 にならないようにする</span></span>
+<span id="cb3-12"><a aria-label="12"></a>    p <span class="op">=</span> np.clip(p, eps, <span class="dv">1</span> <span class="op">-</span> eps)</span>
+<span id="cb3-13"><a aria-label="13"></a>    <span class="cf">return</span> <span class="op">-</span>np.mean(y_true <span class="op">*</span> np.log(p) <span class="op">+</span> (<span class="dv">1</span> <span class="op">-</span> y_true) <span class="op">*</span> np.log(<span class="dv">1</span> <span class="op">-</span> p))</span>
+<span id="cb3-14"><a aria-label="14"></a></span>
+<span id="cb3-15"><a aria-label="15"></a><span class="kw">def</span> accuracy(y_true, p):</span>
+<span id="cb3-16"><a aria-label="16"></a>    <span class="cf">return</span> np.mean((p <span class="op">&gt;=</span> <span class="fl">0.5</span>) <span class="op">==</span> y_true)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </section>
@@ -976,25 +982,25 @@ b \leftarrow b-\alpha(p-y)\]</span></p>
 </ul></li>
 <li>1匹見るたびにパラメータが少し動く</li>
 </ul>
-<div id="a2ae26f0" class="cell" data-execution_count="9">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a></a>w <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">0.0</span>])   <span class="co"># Weights start at zero</span></span>
-<span id="cb4-2"><a></a>b  <span class="op">=</span> <span class="fl">0.0</span></span>
-<span id="cb4-3"><a></a>lr <span class="op">=</span> <span class="fl">0.5</span>                       <span class="co"># 学習率</span></span>
-<span id="cb4-4"><a></a></span>
-<span id="cb4-5"><a></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>):</span>
-<span id="cb4-6"><a></a>    xi, yi <span class="op">=</span> X_norm[i], y[i]</span>
-<span id="cb4-7"><a></a>    <span class="co"># この1匹の損失 ℓ の勾配で、パラメータを更新する</span></span>
-<span id="cb4-8"><a></a>    p_i   <span class="op">=</span> sigmoid(xi <span class="op">@</span> w <span class="op">+</span> b)   <span class="co"># Forward：1匹だけ予測</span></span>
-<span id="cb4-9"><a></a>    delta <span class="op">=</span> p_i <span class="op">-</span> yi</span>
-<span id="cb4-10"><a></a>    d_w <span class="op">=</span> delta <span class="op">*</span> xi</span>
-<span id="cb4-11"><a></a>    d_b <span class="op">=</span> delta</span>
-<span id="cb4-12"><a></a>    w <span class="op">=</span> w <span class="op">-</span> lr <span class="op">*</span> d_w</span>
-<span id="cb4-13"><a></a>    b     <span class="op">=</span> b  <span class="op">-</span> lr <span class="op">*</span> d_b</span>
-<span id="cb4-14"><a></a></span>
-<span id="cb4-15"><a></a>    <span class="co"># 全魚の Loss と正答率は、学習の様子を表示するためだけに計算する</span></span>
-<span id="cb4-16"><a></a>    p_all <span class="op">=</span> forward(X_norm, w, b)</span>
-<span id="cb4-17"><a></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">匹目 | Loss: </span><span class="sc">{</span>loss_fn(y, p_all)<span class="sc">:.4f}</span><span class="ss"> | 正答率: </span><span class="sc">{</span>accuracy(y, p_all)<span class="sc">:.1%}</span><span class="ss"> "</span></span>
-<span id="cb4-18"><a></a>          <span class="ss">f"| w=[</span><span class="sc">{</span>w[<span class="dv">0</span>]<span class="sc">:6.3f}</span><span class="ss">, </span><span class="sc">{</span>w[<span class="dv">1</span>]<span class="sc">:6.3f}</span><span class="ss">] | b=</span><span class="sc">{</span>b<span class="sc">:6.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="9e161561" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a aria-label="1"></a>w <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">0.0</span>])   <span class="co"># Weights start at zero</span></span>
+<span id="cb4-2"><a aria-label="2"></a>b  <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb4-3"><a aria-label="3"></a>lr <span class="op">=</span> <span class="fl">0.5</span>                       <span class="co"># 学習率</span></span>
+<span id="cb4-4"><a aria-label="4"></a></span>
+<span id="cb4-5"><a aria-label="5"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>):</span>
+<span id="cb4-6"><a aria-label="6"></a>    xi, yi <span class="op">=</span> X_norm[i], y[i]</span>
+<span id="cb4-7"><a aria-label="7"></a>    <span class="co"># この1匹の損失 ℓ の勾配で、パラメータを更新する</span></span>
+<span id="cb4-8"><a aria-label="8"></a>    p_i   <span class="op">=</span> sigmoid(xi <span class="op">@</span> w <span class="op">+</span> b)   <span class="co"># Forward：1匹だけ予測</span></span>
+<span id="cb4-9"><a aria-label="9"></a>    delta <span class="op">=</span> p_i <span class="op">-</span> yi</span>
+<span id="cb4-10"><a aria-label="10"></a>    d_w <span class="op">=</span> delta <span class="op">*</span> xi</span>
+<span id="cb4-11"><a aria-label="11"></a>    d_b <span class="op">=</span> delta</span>
+<span id="cb4-12"><a aria-label="12"></a>    w <span class="op">=</span> w <span class="op">-</span> lr <span class="op">*</span> d_w</span>
+<span id="cb4-13"><a aria-label="13"></a>    b     <span class="op">=</span> b  <span class="op">-</span> lr <span class="op">*</span> d_b</span>
+<span id="cb4-14"><a aria-label="14"></a></span>
+<span id="cb4-15"><a aria-label="15"></a>    <span class="co"># 全魚の Loss と正答率は、学習の様子を表示するためだけに計算する</span></span>
+<span id="cb4-16"><a aria-label="16"></a>    p_all <span class="op">=</span> forward(X_norm, w, b)</span>
+<span id="cb4-17"><a aria-label="17"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">匹目 | Loss: </span><span class="sc">{</span>loss_fn(y, p_all)<span class="sc">:.4f}</span><span class="ss"> | 正答率: </span><span class="sc">{</span>accuracy(y, p_all)<span class="sc">:.1%}</span><span class="ss"> "</span></span>
+<span id="cb4-18"><a aria-label="18"></a>          <span class="ss">f"| w=[</span><span class="sc">{</span>w[<span class="dv">0</span>]<span class="sc">:6.3f}</span><span class="ss">, </span><span class="sc">{</span>w[<span class="dv">1</span>]<span class="sc">:6.3f}</span><span class="ss">] | b=</span><span class="sc">{</span>b<span class="sc">:6.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>1匹目 | Loss: 0.5326 | 正答率: 85.0% | w=[-0.233,  0.335] | b= 0.250
 2匹目 | Loss: 0.5179 | 正答率: 90.0% | w=[-0.233,  0.371] | b=-0.026
@@ -1034,7 +1040,7 @@ b \leftarrow b-\alpha(p-y)\]</span></p>
 <section id="境界が動く様子を見る" class="slide level2">
 <h2>境界が動く様子を見る</h2>
 <div class="slide-body">
-<div id="e8b60c47" class="cell" data-execution_count="10">
+<div id="94725026" class="cell" data-execution_count="10">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1420,19 +1426,19 @@ b \leftarrow b-\alpha(p-y)\]</span></p>
 </div>
 </div>
 <h3 id="コードで確認">コードで確認</h3>
-<div id="93a6facf" class="cell" data-execution_count="11">
+<div id="cb52c6f2" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>解答例を見る</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a></a>funcs <span class="op">=</span> {</span>
-<span id="cb6-2"><a></a>    <span class="st">"(a) 5x"</span>:     <span class="kw">lambda</span> x: <span class="dv">5</span> <span class="op">*</span> x,</span>
-<span id="cb6-3"><a></a>    <span class="st">"(b) 3x + 2"</span>: <span class="kw">lambda</span> x: <span class="dv">3</span> <span class="op">*</span> x <span class="op">+</span> <span class="dv">2</span>,</span>
-<span id="cb6-4"><a></a>    <span class="st">"(c) x^2"</span>:    <span class="kw">lambda</span> x: x <span class="op">**</span> <span class="dv">2</span>,</span>
-<span id="cb6-5"><a></a>}</span>
-<span id="cb6-6"><a></a><span class="cf">for</span> name, f <span class="kw">in</span> funcs.items():</span>
-<span id="cb6-7"><a></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">:12s}</span><span class="ss"> f(0)=</span><span class="sc">{</span>f(<span class="dv">0</span>)<span class="sc">:3d}</span><span class="ss"> | f(1+2)=</span><span class="sc">{</span>f(<span class="dv">3</span>)<span class="sc">:3d}</span><span class="ss"> vs f(1)+f(2)=</span><span class="sc">{</span>f(<span class="dv">1</span>) <span class="op">+</span> f(<span class="dv">2</span>)<span class="sc">:3d}</span><span class="ss">"</span>)</span>
-<span id="cb6-8"><a></a></span>
-<span id="cb6-9"><a></a>g <span class="op">=</span> <span class="kw">lambda</span> x1, x2: <span class="dv">2</span> <span class="op">*</span> x1 <span class="op">-</span> x2</span>
-<span id="cb6-10"><a></a><span class="bu">print</span>(<span class="ss">f"(d) 2x1-x2   f(0,0)=</span><span class="sc">{</span>g(<span class="dv">0</span>, <span class="dv">0</span>)<span class="sc">}</span><span class="ss"> | f(1+3, 2+1)=</span><span class="sc">{</span>g(<span class="dv">4</span>, <span class="dv">3</span>)<span class="sc">}</span><span class="ss"> vs f(1,2)+f(3,1)=</span><span class="sc">{</span>g(<span class="dv">1</span>, <span class="dv">2</span>) <span class="op">+</span> g(<span class="dv">3</span>, <span class="dv">1</span>)<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a aria-label="1"></a>funcs <span class="op">=</span> {</span>
+<span id="cb6-2"><a aria-label="2"></a>    <span class="st">"(a) 5x"</span>:     <span class="kw">lambda</span> x: <span class="dv">5</span> <span class="op">*</span> x,</span>
+<span id="cb6-3"><a aria-label="3"></a>    <span class="st">"(b) 3x + 2"</span>: <span class="kw">lambda</span> x: <span class="dv">3</span> <span class="op">*</span> x <span class="op">+</span> <span class="dv">2</span>,</span>
+<span id="cb6-4"><a aria-label="4"></a>    <span class="st">"(c) x^2"</span>:    <span class="kw">lambda</span> x: x <span class="op">**</span> <span class="dv">2</span>,</span>
+<span id="cb6-5"><a aria-label="5"></a>}</span>
+<span id="cb6-6"><a aria-label="6"></a><span class="cf">for</span> name, f <span class="kw">in</span> funcs.items():</span>
+<span id="cb6-7"><a aria-label="7"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">:12s}</span><span class="ss"> f(0)=</span><span class="sc">{</span>f(<span class="dv">0</span>)<span class="sc">:3d}</span><span class="ss"> | f(1+2)=</span><span class="sc">{</span>f(<span class="dv">3</span>)<span class="sc">:3d}</span><span class="ss"> vs f(1)+f(2)=</span><span class="sc">{</span>f(<span class="dv">1</span>) <span class="op">+</span> f(<span class="dv">2</span>)<span class="sc">:3d}</span><span class="ss">"</span>)</span>
+<span id="cb6-8"><a aria-label="8"></a></span>
+<span id="cb6-9"><a aria-label="9"></a>g <span class="op">=</span> <span class="kw">lambda</span> x1, x2: <span class="dv">2</span> <span class="op">*</span> x1 <span class="op">-</span> x2</span>
+<span id="cb6-10"><a aria-label="10"></a><span class="bu">print</span>(<span class="ss">f"(d) 2x1-x2   f(0,0)=</span><span class="sc">{</span>g(<span class="dv">0</span>, <span class="dv">0</span>)<span class="sc">}</span><span class="ss"> | f(1+3, 2+1)=</span><span class="sc">{</span>g(<span class="dv">4</span>, <span class="dv">3</span>)<span class="sc">}</span><span class="ss"> vs f(1,2)+f(3,1)=</span><span class="sc">{</span>g(<span class="dv">1</span>, <span class="dv">2</span>) <span class="op">+</span> g(<span class="dv">3</span>, <span class="dv">1</span>)<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>(a) 5x       f(0)=  0 | f(1+2)= 15 vs f(1)+f(2)= 15
@@ -1467,28 +1473,28 @@ b \leftarrow b-\alpha(p-y)\]</span></p>
 </div>
 </div>
 <h3 id="コードで確認-1">コードで確認</h3>
-<div id="48dd9913" class="cell" data-execution_count="12">
+<div id="c7180687" class="cell" data-execution_count="12">
 <details class="code-fold">
 <summary>解答例を見る</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb8-2"><a></a></span>
-<span id="cb8-3"><a></a><span class="kw">def</span> sigmoid(z):</span>
-<span id="cb8-4"><a></a>    <span class="cf">return</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>z))</span>
-<span id="cb8-5"><a></a></span>
-<span id="cb8-6"><a></a>w <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">0.0</span>])</span>
-<span id="cb8-7"><a></a>b  <span class="op">=</span> <span class="fl">0.0</span></span>
-<span id="cb8-8"><a></a>lr <span class="op">=</span> <span class="fl">0.5</span></span>
-<span id="cb8-9"><a></a></span>
-<span id="cb8-10"><a></a>fishes <span class="op">=</span> [(np.array([<span class="fl">2.0</span>, <span class="fl">1.0</span>]), <span class="dv">1</span>),    <span class="co"># Salmon</span></span>
-<span id="cb8-11"><a></a>          (np.array([<span class="op">-</span><span class="fl">1.0</span>, <span class="fl">1.0</span>]), <span class="dv">0</span>)]   <span class="co"># Sea bass</span></span>
-<span id="cb8-12"><a></a></span>
-<span id="cb8-13"><a></a><span class="cf">for</span> i, (xi, yi) <span class="kw">in</span> <span class="bu">enumerate</span>(fishes, <span class="dv">1</span>):</span>
-<span id="cb8-14"><a></a>    z     <span class="op">=</span> xi <span class="op">@</span> w <span class="op">+</span> b</span>
-<span id="cb8-15"><a></a>    p     <span class="op">=</span> sigmoid(z)</span>
-<span id="cb8-16"><a></a>    delta <span class="op">=</span> p <span class="op">-</span> yi</span>
-<span id="cb8-17"><a></a>    w <span class="op">=</span> w <span class="op">-</span> lr <span class="op">*</span> delta <span class="op">*</span> xi</span>
-<span id="cb8-18"><a></a>    b     <span class="op">=</span> b <span class="op">-</span> lr <span class="op">*</span> delta</span>
-<span id="cb8-19"><a></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">匹目: z=</span><span class="sc">{</span>z<span class="sc">:.2f}</span><span class="ss">, p=</span><span class="sc">{</span>p<span class="sc">:.2f}</span><span class="ss">, δ=</span><span class="sc">{</span>delta<span class="sc">:+.2f}</span><span class="ss"> → w=</span><span class="sc">{</span>w<span class="sc">}</span><span class="ss">, b=</span><span class="sc">{</span>b<span class="sc">:.2f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb8-2"><a aria-label="2"></a></span>
+<span id="cb8-3"><a aria-label="3"></a><span class="kw">def</span> sigmoid(z):</span>
+<span id="cb8-4"><a aria-label="4"></a>    <span class="cf">return</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>z))</span>
+<span id="cb8-5"><a aria-label="5"></a></span>
+<span id="cb8-6"><a aria-label="6"></a>w <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">0.0</span>])</span>
+<span id="cb8-7"><a aria-label="7"></a>b  <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb8-8"><a aria-label="8"></a>lr <span class="op">=</span> <span class="fl">0.5</span></span>
+<span id="cb8-9"><a aria-label="9"></a></span>
+<span id="cb8-10"><a aria-label="10"></a>fishes <span class="op">=</span> [(np.array([<span class="fl">2.0</span>, <span class="fl">1.0</span>]), <span class="dv">1</span>),    <span class="co"># Salmon</span></span>
+<span id="cb8-11"><a aria-label="11"></a>          (np.array([<span class="op">-</span><span class="fl">1.0</span>, <span class="fl">1.0</span>]), <span class="dv">0</span>)]   <span class="co"># Sea bass</span></span>
+<span id="cb8-12"><a aria-label="12"></a></span>
+<span id="cb8-13"><a aria-label="13"></a><span class="cf">for</span> i, (xi, yi) <span class="kw">in</span> <span class="bu">enumerate</span>(fishes, <span class="dv">1</span>):</span>
+<span id="cb8-14"><a aria-label="14"></a>    z     <span class="op">=</span> xi <span class="op">@</span> w <span class="op">+</span> b</span>
+<span id="cb8-15"><a aria-label="15"></a>    p     <span class="op">=</span> sigmoid(z)</span>
+<span id="cb8-16"><a aria-label="16"></a>    delta <span class="op">=</span> p <span class="op">-</span> yi</span>
+<span id="cb8-17"><a aria-label="17"></a>    w <span class="op">=</span> w <span class="op">-</span> lr <span class="op">*</span> delta <span class="op">*</span> xi</span>
+<span id="cb8-18"><a aria-label="18"></a>    b     <span class="op">=</span> b <span class="op">-</span> lr <span class="op">*</span> delta</span>
+<span id="cb8-19"><a aria-label="19"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">匹目: z=</span><span class="sc">{</span>z<span class="sc">:.2f}</span><span class="ss">, p=</span><span class="sc">{</span>p<span class="sc">:.2f}</span><span class="ss">, δ=</span><span class="sc">{</span>delta<span class="sc">:+.2f}</span><span class="ss"> → w=</span><span class="sc">{</span>w<span class="sc">}</span><span class="ss">, b=</span><span class="sc">{</span>b<span class="sc">:.2f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>1匹目: z=0.00, p=0.50, δ=-0.50 → w=[0.5  0.25], b=0.25
@@ -1509,7 +1515,7 @@ b \leftarrow b-\alpha(p-y)\]</span></p>
 <li><span class="math inline">\(\log a=1\)</span> になる特別な底が <span class="math inline">\(e\approx2.718\)</span>：</li>
 </ul>
 <p><span class="math display">\[\frac{d}{dx}e^x=e^x\]</span></p>
-<div id="50a1fee6" class="cell fig-small" data-execution_count="13">
+<div id="d19d3f3a" class="cell fig-small" data-execution_count="13">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>

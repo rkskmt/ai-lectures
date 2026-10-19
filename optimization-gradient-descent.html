@@ -6,11 +6,11 @@
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="site_libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.8.27">
+  <meta name="generator" content="quarto-1.10.19">
 
   <meta name="author" content="rkskmt">
   <title>AI Lectures – 最適化と勾配降下法</title>
@@ -20,10 +20,16 @@
   <link rel="stylesheet" href="site_libs/revealjs/dist/reset.css">
   <link rel="stylesheet" href="site_libs/revealjs/dist/reveal.css">
   <style>
-    code{white-space: pre-wrap;}
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
     ul.task-list{list-style: none;}
     ul.task-list li input[type="checkbox"] {
@@ -98,7 +104,7 @@
     code span.vs { color: #032f62; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-d3a26a7442888a116b43ccec6150e9c5.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-e69bca93ec9d1486cefcf16a785f5ce6.css">
   <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -254,7 +260,7 @@
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
 <div class="quarto-title-author-name">
-rkskmt 
+rkskmt
 </div>
 </div>
 </div>
@@ -311,9 +317,9 @@ rkskmt
 <li>しかし、中身は謎のまま</li>
 </ul></li>
 </ul>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a>DecisionTreeClassifier(max_depth<span class="op">=</span><span class="dv">3</span>).fit(X, y)   <span class="co"># 決定木で分類</span></span>
-<span id="cb1-2"><a></a>KMeans(n_clusters<span class="op">=</span><span class="dv">3</span>).fit(X)                     <span class="co"># クラスタリング</span></span>
-<span id="cb1-3"><a></a>PCA(n_components<span class="op">=</span><span class="dv">2</span>).fit(X)                      <span class="co"># 次元削減</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a>DecisionTreeClassifier(max_depth<span class="op">=</span><span class="dv">3</span>).fit(X, y)   <span class="co"># 決定木で分類</span></span>
+<span id="cb1-2"><a aria-label="2"></a>KMeans(n_clusters<span class="op">=</span><span class="dv">3</span>).fit(X)                     <span class="co"># クラスタリング</span></span>
+<span id="cb1-3"><a aria-label="3"></a>PCA(n_components<span class="op">=</span><span class="dv">2</span>).fit(X)                      <span class="co"># 次元削減</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -372,7 +378,7 @@ rkskmt
 </ul></li>
 </ul></li>
 </ul>
-<div id="0ceb1ee3" class="cell" data-execution_count="1">
+<div id="d813037e" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -460,7 +466,7 @@ rkskmt
 <section id="パラメータの可視化例" class="slide level2">
 <h2>パラメータの可視化例</h2>
 <div class="slide-body">
-<div id="4de55ed8" class="cell" data-execution_count="2">
+<div id="b5cad20f" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -616,7 +622,7 @@ rkskmt
 <li>傾きが<strong>負</strong> ＝ この場所では、右へ少し動くと <span class="math inline">\(f(x)\)</span> が下がる（下り坂は右）</li>
 <li>谷底に近づくには、傾きの<strong>逆方向</strong>（傾きが負なら右）へ少し進めばよい</li>
 </ul>
-<div id="a1b28dc5" class="cell fig-small" data-execution_count="3">
+<div id="5fcd409c" class="cell fig-small" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -743,7 +749,7 @@ rkskmt
 </div>
 </div>
 </div>
-<div id="9c9b66a5" class="cell" data-execution_count="5">
+<div id="b102a815" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -775,7 +781,7 @@ rkskmt
 </div>
 </div>
 </div>
-<div id="e25ce405" class="cell" data-execution_count="6">
+<div id="7db875eb" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -802,7 +808,7 @@ rkskmt
 <p><span class="math display">\[f'(1.68) = 2 \times 1.68 - 4 = 3.36 - 4 = -0.64\]</span></p>
 <h4 id="更新">更新</h4>
 <p><span class="math display">\[x_{\text{new}} = 1.68 - 0.3 \times (-0.64) = 1.68 + 0.192 = 1.872\]</span></p>
-<div id="3392d729" class="cell" data-execution_count="7">
+<div id="e92de082" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -819,7 +825,7 @@ rkskmt
 <p><span class="math display">\[f'(1.872) = 2 \times 1.872 - 4 = 3.744 - 4 = -0.256\]</span></p>
 <h4 id="更新-1">更新</h4>
 <p><span class="math display">\[x_{\text{new}} = 1.872 - 0.3 \times (-0.256) = 1.872 + 0.0768 = 1.9488\]</span></p>
-<div id="7b1c9c1f" class="cell" data-execution_count="8">
+<div id="7d65917f" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -878,7 +884,7 @@ rkskmt
 </tr>
 </tbody>
 </table>
-<div id="7df5de4d" class="cell" data-execution_count="9">
+<div id="bead573a" class="cell" data-execution_count="9">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -911,29 +917,29 @@ rkskmt
 <ul>
 <li>手計算で使った更新式を、そのまま <code>for</code> 文で繰り返す</li>
 </ul>
-<div id="0fa32185" class="cell" data-execution_count="10">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a><span class="kw">def</span> f(x):</span>
-<span id="cb2-2"><a></a>    <span class="cf">return</span> x<span class="op">**</span><span class="dv">2</span> <span class="op">-</span> <span class="dv">4</span><span class="op">*</span>x <span class="op">+</span> <span class="dv">3</span></span>
-<span id="cb2-3"><a></a></span>
-<span id="cb2-4"><a></a><span class="kw">def</span> f_prime(x):</span>
-<span id="cb2-5"><a></a>    <span class="cf">return</span> <span class="dv">2</span><span class="op">*</span>x <span class="op">-</span> <span class="dv">4</span></span>
-<span id="cb2-6"><a></a></span>
-<span id="cb2-7"><a></a>x <span class="op">=</span> <span class="fl">0.0</span></span>
-<span id="cb2-8"><a></a>lr <span class="op">=</span> <span class="fl">0.3</span></span>
-<span id="cb2-9"><a></a>max_iter <span class="op">=</span> <span class="dv">10</span></span>
-<span id="cb2-10"><a></a>tolerance <span class="op">=</span> <span class="fl">0.01</span></span>
-<span id="cb2-11"><a></a></span>
-<span id="cb2-12"><a></a><span class="cf">for</span> iteration <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, max_iter <span class="op">+</span> <span class="dv">1</span>):</span>
-<span id="cb2-13"><a></a>    gradient <span class="op">=</span> f_prime(x)</span>
-<span id="cb2-14"><a></a>    x <span class="op">=</span> x <span class="op">-</span> lr <span class="op">*</span> gradient</span>
-<span id="cb2-15"><a></a>    <span class="bu">print</span>(<span class="ss">f"反復</span><span class="sc">{</span>iteration<span class="sc">}</span><span class="ss">: x = </span><span class="sc">{</span>x<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb2-16"><a></a></span>
-<span id="cb2-17"><a></a>    <span class="cf">if</span> <span class="bu">abs</span>(f_prime(x)) <span class="op">&lt;</span> tolerance:</span>
-<span id="cb2-18"><a></a>        <span class="bu">print</span>(<span class="st">"ほぼ収束（|f'(x)| &lt; 0.01）"</span>)</span>
-<span id="cb2-19"><a></a>        <span class="cf">break</span></span>
-<span id="cb2-20"><a></a></span>
-<span id="cb2-21"><a></a><span class="bu">print</span>(<span class="ss">f"最終 x = </span><span class="sc">{</span>x<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb2-22"><a></a><span class="bu">print</span>(<span class="ss">f"最終 f(x) = </span><span class="sc">{</span>f(x)<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="c424a3f5" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a><span class="kw">def</span> f(x):</span>
+<span id="cb2-2"><a aria-label="2"></a>    <span class="cf">return</span> x<span class="op">**</span><span class="dv">2</span> <span class="op">-</span> <span class="dv">4</span><span class="op">*</span>x <span class="op">+</span> <span class="dv">3</span></span>
+<span id="cb2-3"><a aria-label="3"></a></span>
+<span id="cb2-4"><a aria-label="4"></a><span class="kw">def</span> f_prime(x):</span>
+<span id="cb2-5"><a aria-label="5"></a>    <span class="cf">return</span> <span class="dv">2</span><span class="op">*</span>x <span class="op">-</span> <span class="dv">4</span></span>
+<span id="cb2-6"><a aria-label="6"></a></span>
+<span id="cb2-7"><a aria-label="7"></a>x <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb2-8"><a aria-label="8"></a>lr <span class="op">=</span> <span class="fl">0.3</span></span>
+<span id="cb2-9"><a aria-label="9"></a>max_iter <span class="op">=</span> <span class="dv">10</span></span>
+<span id="cb2-10"><a aria-label="10"></a>tolerance <span class="op">=</span> <span class="fl">0.01</span></span>
+<span id="cb2-11"><a aria-label="11"></a></span>
+<span id="cb2-12"><a aria-label="12"></a><span class="cf">for</span> iteration <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, max_iter <span class="op">+</span> <span class="dv">1</span>):</span>
+<span id="cb2-13"><a aria-label="13"></a>    gradient <span class="op">=</span> f_prime(x)</span>
+<span id="cb2-14"><a aria-label="14"></a>    x <span class="op">=</span> x <span class="op">-</span> lr <span class="op">*</span> gradient</span>
+<span id="cb2-15"><a aria-label="15"></a>    <span class="bu">print</span>(<span class="ss">f"反復</span><span class="sc">{</span>iteration<span class="sc">}</span><span class="ss">: x = </span><span class="sc">{</span>x<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb2-16"><a aria-label="16"></a></span>
+<span id="cb2-17"><a aria-label="17"></a>    <span class="cf">if</span> <span class="bu">abs</span>(f_prime(x)) <span class="op">&lt;</span> tolerance:</span>
+<span id="cb2-18"><a aria-label="18"></a>        <span class="bu">print</span>(<span class="st">"ほぼ収束（|f'(x)| &lt; 0.01）"</span>)</span>
+<span id="cb2-19"><a aria-label="19"></a>        <span class="cf">break</span></span>
+<span id="cb2-20"><a aria-label="20"></a></span>
+<span id="cb2-21"><a aria-label="21"></a><span class="bu">print</span>(<span class="ss">f"最終 x = </span><span class="sc">{</span>x<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb2-22"><a aria-label="22"></a><span class="bu">print</span>(<span class="ss">f"最終 f(x) = </span><span class="sc">{</span>f(x)<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>反復1: x = 1.2000
 反復2: x = 1.6800
@@ -952,7 +958,7 @@ rkskmt
 <section id="学習率で挙動が変わる" class="slide level2">
 <h2>学習率で挙動が変わる</h2>
 <div class="slide-body">
-<div id="02acc00f" class="cell fig-medium" data-execution_count="11">
+<div id="340f3929" class="cell fig-medium" data-execution_count="11">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1156,7 +1162,7 @@ f(w_1,w_2)=w_1^2+3w_2^2,
 </div>
 </div>
 </div>
-<div id="53859cc1" class="cell" data-execution_count="13">
+<div id="f9c82269" class="cell" data-execution_count="13">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>

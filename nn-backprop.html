@@ -6,11 +6,11 @@
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="site_libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.8.27">
+  <meta name="generator" content="quarto-1.10.19">
 
   <meta name="author" content="rkskmt">
   <title>AI Lectures – バックプロパゲーション</title>
@@ -20,10 +20,16 @@
   <link rel="stylesheet" href="site_libs/revealjs/dist/reset.css">
   <link rel="stylesheet" href="site_libs/revealjs/dist/reveal.css">
   <style>
-    code{white-space: pre-wrap;}
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
     ul.task-list{list-style: none;}
     ul.task-list li input[type="checkbox"] {
@@ -98,7 +104,7 @@
     code span.vs { color: #032f62; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-d3a26a7442888a116b43ccec6150e9c5.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-e69bca93ec9d1486cefcf16a785f5ce6.css">
   <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -254,7 +260,7 @@
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
 <div class="quarto-title-author-name">
-rkskmt 
+rkskmt
 </div>
 </div>
 </div>
@@ -802,13 +808,13 @@ rkskmt
 <li>その後、5個をまとめて更新する</li>
 <li><span class="math inline">\(w_1\)</span> を先に更新し、その新しい値で <span class="math inline">\(w_2\)</span> の勾配を計算し直すわけではない</li>
 </ul>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb1-1"><a></a>更新前の θ</span>
-<span id="cb1-2"><a></a>   ↓ forward</span>
-<span id="cb1-3"><a></a>同じ θ で計算した ℓ</span>
-<span id="cb1-4"><a></a>   ↓ backward</span>
-<span id="cb1-5"><a></a>同じ時点の勾配 ∇ℓ</span>
-<span id="cb1-6"><a></a>   ↓ θ ← θ − α∇ℓ</span>
-<span id="cb1-7"><a></a>更新後の θ</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb1-1"><a aria-label="1"></a>更新前の θ</span>
+<span id="cb1-2"><a aria-label="2"></a>   ↓ forward</span>
+<span id="cb1-3"><a aria-label="3"></a>同じ θ で計算した ℓ</span>
+<span id="cb1-4"><a aria-label="4"></a>   ↓ backward</span>
+<span id="cb1-5"><a aria-label="5"></a>同じ時点の勾配 ∇ℓ</span>
+<span id="cb1-6"><a aria-label="6"></a>   ↓ θ ← θ − α∇ℓ</span>
+<span id="cb1-7"><a aria-label="7"></a>更新後の θ</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -827,40 +833,40 @@ rkskmt
 <section id="匹分のbackwardをnumpyで実装する" class="slide level2">
 <h2>1匹分のBackwardをNumPyで実装する</h2>
 <div class="slide-body">
-<div id="3bbd3752" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb2-2"><a></a></span>
-<span id="cb2-3"><a></a><span class="kw">def</span> sigmoid(u):</span>
-<span id="cb2-4"><a></a>    <span class="cf">return</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>u))</span>
-<span id="cb2-5"><a></a></span>
-<span id="cb2-6"><a></a><span class="kw">def</span> forward(x, w, b, v, c):</span>
-<span id="cb2-7"><a></a>    z <span class="op">=</span> x <span class="op">@</span> w <span class="op">+</span> b</span>
-<span id="cb2-8"><a></a>    h <span class="op">=</span> np.maximum(<span class="dv">0</span>, z)</span>
-<span id="cb2-9"><a></a>    u <span class="op">=</span> h <span class="op">*</span> v <span class="op">+</span> c</span>
-<span id="cb2-10"><a></a>    p <span class="op">=</span> sigmoid(u)</span>
-<span id="cb2-11"><a></a>    <span class="cf">return</span> z, h, u, p</span>
-<span id="cb2-12"><a></a></span>
-<span id="cb2-13"><a></a><span class="kw">def</span> backward(x, y, z, h, p, v):</span>
-<span id="cb2-14"><a></a>    delta_out <span class="op">=</span> p <span class="op">-</span> y</span>
-<span id="cb2-15"><a></a>    grad_v <span class="op">=</span> delta_out <span class="op">*</span> h</span>
-<span id="cb2-16"><a></a>    grad_c <span class="op">=</span> delta_out</span>
-<span id="cb2-17"><a></a>    delta_mid <span class="op">=</span> delta_out <span class="op">*</span> v <span class="op">*</span> (z <span class="op">&gt;</span> <span class="dv">0</span>)</span>
-<span id="cb2-18"><a></a>    grad_w <span class="op">=</span> delta_mid <span class="op">*</span> x</span>
-<span id="cb2-19"><a></a>    grad_b <span class="op">=</span> delta_mid</span>
-<span id="cb2-20"><a></a>    <span class="cf">return</span> grad_w, grad_b, grad_v, grad_c</span>
-<span id="cb2-21"><a></a></span>
-<span id="cb2-22"><a></a>x <span class="op">=</span> np.array([<span class="fl">1.0</span>, <span class="fl">0.5</span>])</span>
-<span id="cb2-23"><a></a>y <span class="op">=</span> <span class="fl">1.0</span></span>
-<span id="cb2-24"><a></a>w <span class="op">=</span> np.array([<span class="fl">0.3</span>, <span class="op">-</span><span class="fl">0.2</span>])</span>
-<span id="cb2-25"><a></a>b, v, c <span class="op">=</span> <span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="op">-</span><span class="fl">0.1</span></span>
-<span id="cb2-26"><a></a></span>
-<span id="cb2-27"><a></a>z, h, u, p <span class="op">=</span> forward(x, w, b, v, c)</span>
-<span id="cb2-28"><a></a>grad_w, grad_b, grad_v, grad_c <span class="op">=</span> backward(x, y, z, h, p, v)</span>
-<span id="cb2-29"><a></a></span>
-<span id="cb2-30"><a></a><span class="bu">print</span>(<span class="st">"grad_w:"</span>, grad_w.<span class="bu">round</span>(<span class="dv">4</span>))</span>
-<span id="cb2-31"><a></a><span class="bu">print</span>(<span class="ss">f"grad_b: </span><span class="sc">{</span>grad_b<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb2-32"><a></a><span class="bu">print</span>(<span class="ss">f"grad_v: </span><span class="sc">{</span>grad_v<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb2-33"><a></a><span class="bu">print</span>(<span class="ss">f"grad_c: </span><span class="sc">{</span>grad_c<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="4f737d08" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-2"><a aria-label="2"></a></span>
+<span id="cb2-3"><a aria-label="3"></a><span class="kw">def</span> sigmoid(u):</span>
+<span id="cb2-4"><a aria-label="4"></a>    <span class="cf">return</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>u))</span>
+<span id="cb2-5"><a aria-label="5"></a></span>
+<span id="cb2-6"><a aria-label="6"></a><span class="kw">def</span> forward(x, w, b, v, c):</span>
+<span id="cb2-7"><a aria-label="7"></a>    z <span class="op">=</span> x <span class="op">@</span> w <span class="op">+</span> b</span>
+<span id="cb2-8"><a aria-label="8"></a>    h <span class="op">=</span> np.maximum(<span class="dv">0</span>, z)</span>
+<span id="cb2-9"><a aria-label="9"></a>    u <span class="op">=</span> h <span class="op">*</span> v <span class="op">+</span> c</span>
+<span id="cb2-10"><a aria-label="10"></a>    p <span class="op">=</span> sigmoid(u)</span>
+<span id="cb2-11"><a aria-label="11"></a>    <span class="cf">return</span> z, h, u, p</span>
+<span id="cb2-12"><a aria-label="12"></a></span>
+<span id="cb2-13"><a aria-label="13"></a><span class="kw">def</span> backward(x, y, z, h, p, v):</span>
+<span id="cb2-14"><a aria-label="14"></a>    delta_out <span class="op">=</span> p <span class="op">-</span> y</span>
+<span id="cb2-15"><a aria-label="15"></a>    grad_v <span class="op">=</span> delta_out <span class="op">*</span> h</span>
+<span id="cb2-16"><a aria-label="16"></a>    grad_c <span class="op">=</span> delta_out</span>
+<span id="cb2-17"><a aria-label="17"></a>    delta_mid <span class="op">=</span> delta_out <span class="op">*</span> v <span class="op">*</span> (z <span class="op">&gt;</span> <span class="dv">0</span>)</span>
+<span id="cb2-18"><a aria-label="18"></a>    grad_w <span class="op">=</span> delta_mid <span class="op">*</span> x</span>
+<span id="cb2-19"><a aria-label="19"></a>    grad_b <span class="op">=</span> delta_mid</span>
+<span id="cb2-20"><a aria-label="20"></a>    <span class="cf">return</span> grad_w, grad_b, grad_v, grad_c</span>
+<span id="cb2-21"><a aria-label="21"></a></span>
+<span id="cb2-22"><a aria-label="22"></a>x <span class="op">=</span> np.array([<span class="fl">1.0</span>, <span class="fl">0.5</span>])</span>
+<span id="cb2-23"><a aria-label="23"></a>y <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb2-24"><a aria-label="24"></a>w <span class="op">=</span> np.array([<span class="fl">0.3</span>, <span class="op">-</span><span class="fl">0.2</span>])</span>
+<span id="cb2-25"><a aria-label="25"></a>b, v, c <span class="op">=</span> <span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="op">-</span><span class="fl">0.1</span></span>
+<span id="cb2-26"><a aria-label="26"></a></span>
+<span id="cb2-27"><a aria-label="27"></a>z, h, u, p <span class="op">=</span> forward(x, w, b, v, c)</span>
+<span id="cb2-28"><a aria-label="28"></a>grad_w, grad_b, grad_v, grad_c <span class="op">=</span> backward(x, y, z, h, p, v)</span>
+<span id="cb2-29"><a aria-label="29"></a></span>
+<span id="cb2-30"><a aria-label="30"></a><span class="bu">print</span>(<span class="st">"grad_w:"</span>, grad_w.<span class="bu">round</span>(<span class="dv">4</span>))</span>
+<span id="cb2-31"><a aria-label="31"></a><span class="bu">print</span>(<span class="ss">f"grad_b: </span><span class="sc">{</span>grad_b<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb2-32"><a aria-label="32"></a><span class="bu">print</span>(<span class="ss">f"grad_v: </span><span class="sc">{</span>grad_v<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb2-33"><a aria-label="33"></a><span class="bu">print</span>(<span class="ss">f"grad_c: </span><span class="sc">{</span>grad_c<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>grad_w: [-0.2438 -0.1219]
 grad_b: -0.2438
@@ -881,28 +887,28 @@ grad_c: -0.4875</code></pre>
 <ul>
 <li>微分の定義 <span class="math inline">\(\dfrac{\ell(\theta + \varepsilon) - \ell(\theta)}{\varepsilon}\)</span> で、手計算を検算できる（<strong>数値微分</strong>）</li>
 </ul>
-<div id="160ad70f" class="cell" data-execution_count="2">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb4-2"><a></a></span>
-<span id="cb4-3"><a></a>x1, x2, y <span class="op">=</span> <span class="fl">1.0</span>, <span class="fl">0.5</span>, <span class="fl">1.0</span></span>
-<span id="cb4-4"><a></a></span>
-<span id="cb4-5"><a></a><span class="kw">def</span> loss(w1, w2, b, v, c):</span>
-<span id="cb4-6"><a></a>    z <span class="op">=</span> w1<span class="op">*</span>x1 <span class="op">+</span> w2<span class="op">*</span>x2 <span class="op">+</span> b</span>
-<span id="cb4-7"><a></a>    h <span class="op">=</span> <span class="bu">max</span>(<span class="fl">0.0</span>, z)</span>
-<span id="cb4-8"><a></a>    u <span class="op">=</span> v<span class="op">*</span>h <span class="op">+</span> c</span>
-<span id="cb4-9"><a></a>    p <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>u))</span>
-<span id="cb4-10"><a></a>    <span class="cf">return</span> <span class="op">-</span>np.log(p)</span>
-<span id="cb4-11"><a></a></span>
-<span id="cb4-12"><a></a>params <span class="op">=</span> <span class="bu">dict</span>(w1<span class="op">=</span><span class="fl">0.3</span>, w2<span class="op">=-</span><span class="fl">0.2</span>, b<span class="op">=</span><span class="fl">0.1</span>, v<span class="op">=</span><span class="fl">0.5</span>, c<span class="op">=-</span><span class="fl">0.1</span>)</span>
-<span id="cb4-13"><a></a>base <span class="op">=</span> loss(<span class="op">**</span>params)</span>
-<span id="cb4-14"><a></a><span class="bu">print</span>(<span class="ss">f"ell = </span><span class="sc">{</span>base<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb4-15"><a></a></span>
-<span id="cb4-16"><a></a>eps <span class="op">=</span> <span class="fl">1e-6</span></span>
-<span id="cb4-17"><a></a><span class="cf">for</span> name <span class="kw">in</span> params:</span>
-<span id="cb4-18"><a></a>    shifted <span class="op">=</span> <span class="bu">dict</span>(params)</span>
-<span id="cb4-19"><a></a>    shifted[name] <span class="op">+=</span> eps</span>
-<span id="cb4-20"><a></a>    grad <span class="op">=</span> (loss(<span class="op">**</span>shifted) <span class="op">-</span> base) <span class="op">/</span> eps</span>
-<span id="cb4-21"><a></a>    <span class="bu">print</span>(<span class="ss">f"dell/d</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss"> = </span><span class="sc">{</span>grad<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="7798b505" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb4-2"><a aria-label="2"></a></span>
+<span id="cb4-3"><a aria-label="3"></a>x1, x2, y <span class="op">=</span> <span class="fl">1.0</span>, <span class="fl">0.5</span>, <span class="fl">1.0</span></span>
+<span id="cb4-4"><a aria-label="4"></a></span>
+<span id="cb4-5"><a aria-label="5"></a><span class="kw">def</span> loss(w1, w2, b, v, c):</span>
+<span id="cb4-6"><a aria-label="6"></a>    z <span class="op">=</span> w1<span class="op">*</span>x1 <span class="op">+</span> w2<span class="op">*</span>x2 <span class="op">+</span> b</span>
+<span id="cb4-7"><a aria-label="7"></a>    h <span class="op">=</span> <span class="bu">max</span>(<span class="fl">0.0</span>, z)</span>
+<span id="cb4-8"><a aria-label="8"></a>    u <span class="op">=</span> v<span class="op">*</span>h <span class="op">+</span> c</span>
+<span id="cb4-9"><a aria-label="9"></a>    p <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>u))</span>
+<span id="cb4-10"><a aria-label="10"></a>    <span class="cf">return</span> <span class="op">-</span>np.log(p)</span>
+<span id="cb4-11"><a aria-label="11"></a></span>
+<span id="cb4-12"><a aria-label="12"></a>params <span class="op">=</span> <span class="bu">dict</span>(w1<span class="op">=</span><span class="fl">0.3</span>, w2<span class="op">=-</span><span class="fl">0.2</span>, b<span class="op">=</span><span class="fl">0.1</span>, v<span class="op">=</span><span class="fl">0.5</span>, c<span class="op">=-</span><span class="fl">0.1</span>)</span>
+<span id="cb4-13"><a aria-label="13"></a>base <span class="op">=</span> loss(<span class="op">**</span>params)</span>
+<span id="cb4-14"><a aria-label="14"></a><span class="bu">print</span>(<span class="ss">f"ell = </span><span class="sc">{</span>base<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb4-15"><a aria-label="15"></a></span>
+<span id="cb4-16"><a aria-label="16"></a>eps <span class="op">=</span> <span class="fl">1e-6</span></span>
+<span id="cb4-17"><a aria-label="17"></a><span class="cf">for</span> name <span class="kw">in</span> params:</span>
+<span id="cb4-18"><a aria-label="18"></a>    shifted <span class="op">=</span> <span class="bu">dict</span>(params)</span>
+<span id="cb4-19"><a aria-label="19"></a>    shifted[name] <span class="op">+=</span> eps</span>
+<span id="cb4-20"><a aria-label="20"></a>    grad <span class="op">=</span> (loss(<span class="op">**</span>shifted) <span class="op">-</span> base) <span class="op">/</span> eps</span>
+<span id="cb4-21"><a aria-label="21"></a>    <span class="bu">print</span>(<span class="ss">f"dell/d</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss"> = </span><span class="sc">{</span>grad<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>ell = 0.6685
 dell/dw1 = -0.2438
@@ -1039,34 +1045,34 @@ dell/dc = -0.4875</code></pre>
 <section id="peek-matrix-backward" class="slide level2">
 <h2>2層NNのBackwardをNumPyで実装する</h2>
 <div class="slide-body">
-<div id="e7efd22a" class="cell" data-execution_count="3">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb6-2"><a></a></span>
-<span id="cb6-3"><a></a><span class="kw">def</span> backward(X, y, Z1, H, P, W2):</span>
-<span id="cb6-4"><a></a>    dZ2 <span class="op">=</span> (P <span class="op">-</span> y) <span class="op">/</span> <span class="bu">len</span>(X)</span>
-<span id="cb6-5"><a></a>    dW2 <span class="op">=</span> H.T <span class="op">@</span> dZ2</span>
-<span id="cb6-6"><a></a>    db2 <span class="op">=</span> np.<span class="bu">sum</span>(dZ2, axis<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb6-7"><a></a></span>
-<span id="cb6-8"><a></a>    dH <span class="op">=</span> dZ2 <span class="op">@</span> W2.T</span>
-<span id="cb6-9"><a></a>    dZ1 <span class="op">=</span> dH <span class="op">*</span> (Z1 <span class="op">&gt;</span> <span class="dv">0</span>)</span>
-<span id="cb6-10"><a></a>    dW1 <span class="op">=</span> X.T <span class="op">@</span> dZ1</span>
-<span id="cb6-11"><a></a>    db1 <span class="op">=</span> np.<span class="bu">sum</span>(dZ1, axis<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb6-12"><a></a>    <span class="cf">return</span> dW1, db1, dW2, db2</span>
-<span id="cb6-13"><a></a></span>
-<span id="cb6-14"><a></a>X <span class="op">=</span> np.array([[<span class="fl">1.0</span>, <span class="fl">0.5</span>], [<span class="fl">0.0</span>, <span class="fl">1.0</span>], [<span class="fl">2.0</span>, <span class="fl">1.0</span>]])</span>
-<span id="cb6-15"><a></a>y <span class="op">=</span> np.array([[<span class="fl">1.0</span>], [<span class="fl">0.0</span>], [<span class="fl">1.0</span>]])</span>
-<span id="cb6-16"><a></a></span>
-<span id="cb6-17"><a></a><span class="co"># 前回のforwardで保存した値（同じ3匹・同じパラメータ）</span></span>
-<span id="cb6-18"><a></a>Z1 <span class="op">=</span> np.array([[<span class="fl">0.3</span>, <span class="op">-</span><span class="fl">0.1</span>], [<span class="op">-</span><span class="fl">0.1</span>, <span class="fl">0.6</span>], [<span class="fl">0.5</span>, <span class="op">-</span><span class="fl">0.2</span>]])</span>
-<span id="cb6-19"><a></a>H <span class="op">=</span> np.maximum(<span class="dv">0</span>, Z1)</span>
-<span id="cb6-20"><a></a>Z2 <span class="op">=</span> np.array([[<span class="fl">0.05</span>], [<span class="op">-</span><span class="fl">0.28</span>], [<span class="fl">0.15</span>]])</span>
-<span id="cb6-21"><a></a>P <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>Z2))</span>
-<span id="cb6-22"><a></a>W2 <span class="op">=</span> np.array([[<span class="fl">0.5</span>], [<span class="op">-</span><span class="fl">0.3</span>]])</span>
-<span id="cb6-23"><a></a></span>
-<span id="cb6-24"><a></a>dW1, db1, dW2, db2 <span class="op">=</span> backward(X, y, Z1, H, P, W2)</span>
-<span id="cb6-25"><a></a><span class="bu">print</span>(<span class="st">"P:"</span>, P.ravel().<span class="bu">round</span>(<span class="dv">4</span>))</span>
-<span id="cb6-26"><a></a><span class="bu">print</span>(<span class="st">"dW1:"</span>, dW1.shape, <span class="st">" db1:"</span>, db1.shape)</span>
-<span id="cb6-27"><a></a><span class="bu">print</span>(<span class="st">"dW2:"</span>, dW2.shape, <span class="st">" db2:"</span>, db2.shape)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="c0c6f6be" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb6-2"><a aria-label="2"></a></span>
+<span id="cb6-3"><a aria-label="3"></a><span class="kw">def</span> backward(X, y, Z1, H, P, W2):</span>
+<span id="cb6-4"><a aria-label="4"></a>    dZ2 <span class="op">=</span> (P <span class="op">-</span> y) <span class="op">/</span> <span class="bu">len</span>(X)</span>
+<span id="cb6-5"><a aria-label="5"></a>    dW2 <span class="op">=</span> H.T <span class="op">@</span> dZ2</span>
+<span id="cb6-6"><a aria-label="6"></a>    db2 <span class="op">=</span> np.<span class="bu">sum</span>(dZ2, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb6-7"><a aria-label="7"></a></span>
+<span id="cb6-8"><a aria-label="8"></a>    dH <span class="op">=</span> dZ2 <span class="op">@</span> W2.T</span>
+<span id="cb6-9"><a aria-label="9"></a>    dZ1 <span class="op">=</span> dH <span class="op">*</span> (Z1 <span class="op">&gt;</span> <span class="dv">0</span>)</span>
+<span id="cb6-10"><a aria-label="10"></a>    dW1 <span class="op">=</span> X.T <span class="op">@</span> dZ1</span>
+<span id="cb6-11"><a aria-label="11"></a>    db1 <span class="op">=</span> np.<span class="bu">sum</span>(dZ1, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb6-12"><a aria-label="12"></a>    <span class="cf">return</span> dW1, db1, dW2, db2</span>
+<span id="cb6-13"><a aria-label="13"></a></span>
+<span id="cb6-14"><a aria-label="14"></a>X <span class="op">=</span> np.array([[<span class="fl">1.0</span>, <span class="fl">0.5</span>], [<span class="fl">0.0</span>, <span class="fl">1.0</span>], [<span class="fl">2.0</span>, <span class="fl">1.0</span>]])</span>
+<span id="cb6-15"><a aria-label="15"></a>y <span class="op">=</span> np.array([[<span class="fl">1.0</span>], [<span class="fl">0.0</span>], [<span class="fl">1.0</span>]])</span>
+<span id="cb6-16"><a aria-label="16"></a></span>
+<span id="cb6-17"><a aria-label="17"></a><span class="co"># 前回のforwardで保存した値（同じ3匹・同じパラメータ）</span></span>
+<span id="cb6-18"><a aria-label="18"></a>Z1 <span class="op">=</span> np.array([[<span class="fl">0.3</span>, <span class="op">-</span><span class="fl">0.1</span>], [<span class="op">-</span><span class="fl">0.1</span>, <span class="fl">0.6</span>], [<span class="fl">0.5</span>, <span class="op">-</span><span class="fl">0.2</span>]])</span>
+<span id="cb6-19"><a aria-label="19"></a>H <span class="op">=</span> np.maximum(<span class="dv">0</span>, Z1)</span>
+<span id="cb6-20"><a aria-label="20"></a>Z2 <span class="op">=</span> np.array([[<span class="fl">0.05</span>], [<span class="op">-</span><span class="fl">0.28</span>], [<span class="fl">0.15</span>]])</span>
+<span id="cb6-21"><a aria-label="21"></a>P <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>Z2))</span>
+<span id="cb6-22"><a aria-label="22"></a>W2 <span class="op">=</span> np.array([[<span class="fl">0.5</span>], [<span class="op">-</span><span class="fl">0.3</span>]])</span>
+<span id="cb6-23"><a aria-label="23"></a></span>
+<span id="cb6-24"><a aria-label="24"></a>dW1, db1, dW2, db2 <span class="op">=</span> backward(X, y, Z1, H, P, W2)</span>
+<span id="cb6-25"><a aria-label="25"></a><span class="bu">print</span>(<span class="st">"P:"</span>, P.ravel().<span class="bu">round</span>(<span class="dv">4</span>))</span>
+<span id="cb6-26"><a aria-label="26"></a><span class="bu">print</span>(<span class="st">"dW1:"</span>, dW1.shape, <span class="st">" db1:"</span>, db1.shape)</span>
+<span id="cb6-27"><a aria-label="27"></a><span class="bu">print</span>(<span class="st">"dW2:"</span>, dW2.shape, <span class="st">" db2:"</span>, db2.shape)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>P: [0.5125 0.4305 0.5374]
 dW1: (2, 2)  db1: (2,)
@@ -1145,69 +1151,69 @@ dW2: (2, 1)  db2: (1,)</code></pre>
 <li>変わるのは、<code>forward</code> と <code>backward</code> の中に層が1つ増えたことだけ</li>
 <li>下の <code>for</code> 1周が<a href="#/peek-epoch" class="peek">1 epoch</a>であり、全200件から求めた勾配で1回更新する</li>
 </ul>
-<div id="a3559201" class="cell" data-execution_count="4">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb8-2"><a></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> make_moons</span>
-<span id="cb8-3"><a></a></span>
-<span id="cb8-4"><a></a>X, labels <span class="op">=</span> make_moons(n_samples<span class="op">=</span><span class="dv">200</span>, noise<span class="op">=</span><span class="fl">0.1</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
-<span id="cb8-5"><a></a>y <span class="op">=</span> labels.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>).astype(<span class="bu">float</span>)</span>
-<span id="cb8-6"><a></a></span>
-<span id="cb8-7"><a></a><span class="kw">def</span> sigmoid(Z):</span>
-<span id="cb8-8"><a></a>    <span class="cf">return</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>Z))</span>
-<span id="cb8-9"><a></a></span>
-<span id="cb8-10"><a></a><span class="kw">def</span> forward(X, W1, b1, W2, b2):</span>
-<span id="cb8-11"><a></a>    Z1 <span class="op">=</span> X <span class="op">@</span> W1 <span class="op">+</span> b1</span>
-<span id="cb8-12"><a></a>    H <span class="op">=</span> np.maximum(<span class="dv">0</span>, Z1)</span>
-<span id="cb8-13"><a></a>    Z2 <span class="op">=</span> H <span class="op">@</span> W2 <span class="op">+</span> b2</span>
-<span id="cb8-14"><a></a>    P <span class="op">=</span> sigmoid(Z2)</span>
-<span id="cb8-15"><a></a>    <span class="cf">return</span> Z1, H, Z2, P</span>
-<span id="cb8-16"><a></a></span>
-<span id="cb8-17"><a></a><span class="kw">def</span> binary_cross_entropy(y, P):</span>
-<span id="cb8-18"><a></a>    P <span class="op">=</span> np.clip(P, <span class="fl">1e-12</span>, <span class="dv">1</span> <span class="op">-</span> <span class="fl">1e-12</span>)</span>
-<span id="cb8-19"><a></a>    <span class="cf">return</span> <span class="op">-</span>np.mean(y <span class="op">*</span> np.log(P) <span class="op">+</span> (<span class="dv">1</span> <span class="op">-</span> y) <span class="op">*</span> np.log(<span class="dv">1</span> <span class="op">-</span> P))</span>
-<span id="cb8-20"><a></a></span>
-<span id="cb8-21"><a></a><span class="kw">def</span> backward(X, y, Z1, H, P, W2):</span>
-<span id="cb8-22"><a></a>    dZ2 <span class="op">=</span> (P <span class="op">-</span> y) <span class="op">/</span> <span class="bu">len</span>(X)</span>
-<span id="cb8-23"><a></a>    dW2 <span class="op">=</span> H.T <span class="op">@</span> dZ2</span>
-<span id="cb8-24"><a></a>    db2 <span class="op">=</span> np.<span class="bu">sum</span>(dZ2, axis<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb8-25"><a></a>    dH <span class="op">=</span> dZ2 <span class="op">@</span> W2.T</span>
-<span id="cb8-26"><a></a>    dZ1 <span class="op">=</span> dH <span class="op">*</span> (Z1 <span class="op">&gt;</span> <span class="dv">0</span>)</span>
-<span id="cb8-27"><a></a>    dW1 <span class="op">=</span> X.T <span class="op">@</span> dZ1</span>
-<span id="cb8-28"><a></a>    db1 <span class="op">=</span> np.<span class="bu">sum</span>(dZ1, axis<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb8-29"><a></a>    <span class="cf">return</span> dW1, db1, dW2, db2</span>
-<span id="cb8-30"><a></a></span>
-<span id="cb8-31"><a></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">0</span>)</span>
-<span id="cb8-32"><a></a><span class="co"># 0. Construct：入力2個 → 隠れニューロン16個 → 出力1個</span></span>
-<span id="cb8-33"><a></a>W1 <span class="op">=</span> rng.normal(<span class="dv">0</span>, <span class="fl">1.0</span>, (<span class="dv">2</span>, <span class="dv">16</span>))   <span class="co"># (入力数, 隠れ層の幅)</span></span>
-<span id="cb8-34"><a></a>b1 <span class="op">=</span> np.zeros(<span class="dv">16</span>)                   <span class="co"># (隠れ層の幅,)</span></span>
-<span id="cb8-35"><a></a>W2 <span class="op">=</span> rng.normal(<span class="dv">0</span>, <span class="fl">1.0</span>, (<span class="dv">16</span>, <span class="dv">1</span>))   <span class="co"># (隠れ層の幅, 出力数)</span></span>
-<span id="cb8-36"><a></a>b2 <span class="op">=</span> np.zeros(<span class="dv">1</span>)                    <span class="co"># (出力数,)</span></span>
-<span id="cb8-37"><a></a>lr <span class="op">=</span> <span class="fl">0.5</span></span>
-<span id="cb8-38"><a></a>initial_loss <span class="op">=</span> <span class="va">None</span></span>
-<span id="cb8-39"><a></a></span>
-<span id="cb8-40"><a></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">4000</span>):</span>
-<span id="cb8-41"><a></a>    <span class="co"># 1. Forward：予測し、復路で使う途中の値を保存</span></span>
-<span id="cb8-42"><a></a>    Z1, H, Z2, P <span class="op">=</span> forward(X, W1, b1, W2, b2)</span>
-<span id="cb8-43"><a></a></span>
-<span id="cb8-44"><a></a>    <span class="co"># 2. Loss：学習の進み具合を測る（この数値を更新式へは入れない）</span></span>
-<span id="cb8-45"><a></a>    loss <span class="op">=</span> binary_cross_entropy(y, P)</span>
-<span id="cb8-46"><a></a>    <span class="cf">if</span> initial_loss <span class="kw">is</span> <span class="va">None</span>:</span>
-<span id="cb8-47"><a></a>        initial_loss <span class="op">=</span> loss</span>
-<span id="cb8-48"><a></a></span>
-<span id="cb8-49"><a></a>    <span class="co"># 3. Backward：その損失の各パラメータに対する勾配を計算</span></span>
-<span id="cb8-50"><a></a>    dW1, db1, dW2, db2 <span class="op">=</span> backward(X, y, Z1, H, P, W2)</span>
-<span id="cb8-51"><a></a></span>
-<span id="cb8-52"><a></a>    <span class="co"># 4. Update：同じ時点で求めた全勾配を使ってまとめて更新</span></span>
-<span id="cb8-53"><a></a>    W1 <span class="op">=</span> W1 <span class="op">-</span> lr <span class="op">*</span> dW1</span>
-<span id="cb8-54"><a></a>    b1 <span class="op">=</span> b1 <span class="op">-</span> lr <span class="op">*</span> db1</span>
-<span id="cb8-55"><a></a>    W2 <span class="op">=</span> W2 <span class="op">-</span> lr <span class="op">*</span> dW2</span>
-<span id="cb8-56"><a></a>    b2 <span class="op">=</span> b2 <span class="op">-</span> lr <span class="op">*</span> db2</span>
-<span id="cb8-57"><a></a></span>
-<span id="cb8-58"><a></a>Z1, H, Z2, P <span class="op">=</span> forward(X, W1, b1, W2, b2)</span>
-<span id="cb8-59"><a></a>final_loss <span class="op">=</span> binary_cross_entropy(y, P)</span>
-<span id="cb8-60"><a></a>accuracy <span class="op">=</span> np.mean((P <span class="op">&gt;=</span> <span class="fl">0.5</span>) <span class="op">==</span> y)</span>
-<span id="cb8-61"><a></a><span class="bu">print</span>(<span class="ss">f"Loss: </span><span class="sc">{</span>initial_loss<span class="sc">:.4f}</span><span class="ss"> -&gt; </span><span class="sc">{</span>final_loss<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb8-62"><a></a><span class="bu">print</span>(<span class="ss">f"Accuracy: </span><span class="sc">{</span>accuracy<span class="sc">:.1%}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="f095d659" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb8-2"><a aria-label="2"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> make_moons</span>
+<span id="cb8-3"><a aria-label="3"></a></span>
+<span id="cb8-4"><a aria-label="4"></a>X, labels <span class="op">=</span> make_moons(n_samples<span class="op">=</span><span class="dv">200</span>, noise<span class="op">=</span><span class="fl">0.1</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb8-5"><a aria-label="5"></a>y <span class="op">=</span> labels.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>).astype(<span class="bu">float</span>)</span>
+<span id="cb8-6"><a aria-label="6"></a></span>
+<span id="cb8-7"><a aria-label="7"></a><span class="kw">def</span> sigmoid(Z):</span>
+<span id="cb8-8"><a aria-label="8"></a>    <span class="cf">return</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>Z))</span>
+<span id="cb8-9"><a aria-label="9"></a></span>
+<span id="cb8-10"><a aria-label="10"></a><span class="kw">def</span> forward(X, W1, b1, W2, b2):</span>
+<span id="cb8-11"><a aria-label="11"></a>    Z1 <span class="op">=</span> X <span class="op">@</span> W1 <span class="op">+</span> b1</span>
+<span id="cb8-12"><a aria-label="12"></a>    H <span class="op">=</span> np.maximum(<span class="dv">0</span>, Z1)</span>
+<span id="cb8-13"><a aria-label="13"></a>    Z2 <span class="op">=</span> H <span class="op">@</span> W2 <span class="op">+</span> b2</span>
+<span id="cb8-14"><a aria-label="14"></a>    P <span class="op">=</span> sigmoid(Z2)</span>
+<span id="cb8-15"><a aria-label="15"></a>    <span class="cf">return</span> Z1, H, Z2, P</span>
+<span id="cb8-16"><a aria-label="16"></a></span>
+<span id="cb8-17"><a aria-label="17"></a><span class="kw">def</span> binary_cross_entropy(y, P):</span>
+<span id="cb8-18"><a aria-label="18"></a>    P <span class="op">=</span> np.clip(P, <span class="fl">1e-12</span>, <span class="dv">1</span> <span class="op">-</span> <span class="fl">1e-12</span>)</span>
+<span id="cb8-19"><a aria-label="19"></a>    <span class="cf">return</span> <span class="op">-</span>np.mean(y <span class="op">*</span> np.log(P) <span class="op">+</span> (<span class="dv">1</span> <span class="op">-</span> y) <span class="op">*</span> np.log(<span class="dv">1</span> <span class="op">-</span> P))</span>
+<span id="cb8-20"><a aria-label="20"></a></span>
+<span id="cb8-21"><a aria-label="21"></a><span class="kw">def</span> backward(X, y, Z1, H, P, W2):</span>
+<span id="cb8-22"><a aria-label="22"></a>    dZ2 <span class="op">=</span> (P <span class="op">-</span> y) <span class="op">/</span> <span class="bu">len</span>(X)</span>
+<span id="cb8-23"><a aria-label="23"></a>    dW2 <span class="op">=</span> H.T <span class="op">@</span> dZ2</span>
+<span id="cb8-24"><a aria-label="24"></a>    db2 <span class="op">=</span> np.<span class="bu">sum</span>(dZ2, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb8-25"><a aria-label="25"></a>    dH <span class="op">=</span> dZ2 <span class="op">@</span> W2.T</span>
+<span id="cb8-26"><a aria-label="26"></a>    dZ1 <span class="op">=</span> dH <span class="op">*</span> (Z1 <span class="op">&gt;</span> <span class="dv">0</span>)</span>
+<span id="cb8-27"><a aria-label="27"></a>    dW1 <span class="op">=</span> X.T <span class="op">@</span> dZ1</span>
+<span id="cb8-28"><a aria-label="28"></a>    db1 <span class="op">=</span> np.<span class="bu">sum</span>(dZ1, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb8-29"><a aria-label="29"></a>    <span class="cf">return</span> dW1, db1, dW2, db2</span>
+<span id="cb8-30"><a aria-label="30"></a></span>
+<span id="cb8-31"><a aria-label="31"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">0</span>)</span>
+<span id="cb8-32"><a aria-label="32"></a><span class="co"># 0. Construct：入力2個 → 隠れニューロン16個 → 出力1個</span></span>
+<span id="cb8-33"><a aria-label="33"></a>W1 <span class="op">=</span> rng.normal(<span class="dv">0</span>, <span class="fl">1.0</span>, (<span class="dv">2</span>, <span class="dv">16</span>))   <span class="co"># (入力数, 隠れ層の幅)</span></span>
+<span id="cb8-34"><a aria-label="34"></a>b1 <span class="op">=</span> np.zeros(<span class="dv">16</span>)                   <span class="co"># (隠れ層の幅,)</span></span>
+<span id="cb8-35"><a aria-label="35"></a>W2 <span class="op">=</span> rng.normal(<span class="dv">0</span>, <span class="fl">1.0</span>, (<span class="dv">16</span>, <span class="dv">1</span>))   <span class="co"># (隠れ層の幅, 出力数)</span></span>
+<span id="cb8-36"><a aria-label="36"></a>b2 <span class="op">=</span> np.zeros(<span class="dv">1</span>)                    <span class="co"># (出力数,)</span></span>
+<span id="cb8-37"><a aria-label="37"></a>lr <span class="op">=</span> <span class="fl">0.5</span></span>
+<span id="cb8-38"><a aria-label="38"></a>initial_loss <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb8-39"><a aria-label="39"></a></span>
+<span id="cb8-40"><a aria-label="40"></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">4000</span>):</span>
+<span id="cb8-41"><a aria-label="41"></a>    <span class="co"># 1. Forward：予測し、復路で使う途中の値を保存</span></span>
+<span id="cb8-42"><a aria-label="42"></a>    Z1, H, Z2, P <span class="op">=</span> forward(X, W1, b1, W2, b2)</span>
+<span id="cb8-43"><a aria-label="43"></a></span>
+<span id="cb8-44"><a aria-label="44"></a>    <span class="co"># 2. Loss：学習の進み具合を測る（この数値を更新式へは入れない）</span></span>
+<span id="cb8-45"><a aria-label="45"></a>    loss <span class="op">=</span> binary_cross_entropy(y, P)</span>
+<span id="cb8-46"><a aria-label="46"></a>    <span class="cf">if</span> initial_loss <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb8-47"><a aria-label="47"></a>        initial_loss <span class="op">=</span> loss</span>
+<span id="cb8-48"><a aria-label="48"></a></span>
+<span id="cb8-49"><a aria-label="49"></a>    <span class="co"># 3. Backward：その損失の各パラメータに対する勾配を計算</span></span>
+<span id="cb8-50"><a aria-label="50"></a>    dW1, db1, dW2, db2 <span class="op">=</span> backward(X, y, Z1, H, P, W2)</span>
+<span id="cb8-51"><a aria-label="51"></a></span>
+<span id="cb8-52"><a aria-label="52"></a>    <span class="co"># 4. Update：同じ時点で求めた全勾配を使ってまとめて更新</span></span>
+<span id="cb8-53"><a aria-label="53"></a>    W1 <span class="op">=</span> W1 <span class="op">-</span> lr <span class="op">*</span> dW1</span>
+<span id="cb8-54"><a aria-label="54"></a>    b1 <span class="op">=</span> b1 <span class="op">-</span> lr <span class="op">*</span> db1</span>
+<span id="cb8-55"><a aria-label="55"></a>    W2 <span class="op">=</span> W2 <span class="op">-</span> lr <span class="op">*</span> dW2</span>
+<span id="cb8-56"><a aria-label="56"></a>    b2 <span class="op">=</span> b2 <span class="op">-</span> lr <span class="op">*</span> db2</span>
+<span id="cb8-57"><a aria-label="57"></a></span>
+<span id="cb8-58"><a aria-label="58"></a>Z1, H, Z2, P <span class="op">=</span> forward(X, W1, b1, W2, b2)</span>
+<span id="cb8-59"><a aria-label="59"></a>final_loss <span class="op">=</span> binary_cross_entropy(y, P)</span>
+<span id="cb8-60"><a aria-label="60"></a>accuracy <span class="op">=</span> np.mean((P <span class="op">&gt;=</span> <span class="fl">0.5</span>) <span class="op">==</span> y)</span>
+<span id="cb8-61"><a aria-label="61"></a><span class="bu">print</span>(<span class="ss">f"Loss: </span><span class="sc">{</span>initial_loss<span class="sc">:.4f}</span><span class="ss"> -&gt; </span><span class="sc">{</span>final_loss<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb8-62"><a aria-label="62"></a><span class="bu">print</span>(<span class="ss">f"Accuracy: </span><span class="sc">{</span>accuracy<span class="sc">:.1%}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Loss: 1.0894 -&gt; 0.0023
 Accuracy: 100.0%</code></pre>
@@ -1224,7 +1230,7 @@ Accuracy: 100.0%</code></pre>
 <section id="学習したnnの決定境界" class="slide level2">
 <h2>学習したNNの決定境界</h2>
 <div class="slide-body">
-<div id="f7417723" class="cell fig-medium" data-execution_count="5">
+<div id="ae35658c" class="cell fig-medium" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1285,7 +1291,7 @@ Accuracy: 100.0%</code></pre>
 <li>中間層に ReLU が選ばれる大きな理由</li>
 </ul></li>
 </ul>
-<div id="a82cd4ea" class="cell" data-execution_count="6">
+<div id="e7b0ba39" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1412,30 +1418,30 @@ Accuracy: 100.0%</code></pre>
 <li><span class="math inline">\(v\)</span> が負なので、中間層へ戻る <span class="math inline">\(\delta\)</span> は符号が反転する。重みが復路の向きと大きさも決める。</li>
 </ul>
 <h3 id="数値微分で検算">数値微分で検算</h3>
-<div id="fa3e9b6b" class="cell" data-execution_count="7">
+<div id="bad187fc" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>解答例を見る</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb10-2"><a></a></span>
-<span id="cb10-3"><a></a>x1, x2, y <span class="op">=</span> <span class="fl">0.5</span>, <span class="fl">1.0</span>, <span class="fl">0.0</span></span>
-<span id="cb10-4"><a></a></span>
-<span id="cb10-5"><a></a><span class="kw">def</span> loss(w1, w2, b, v, c):</span>
-<span id="cb10-6"><a></a>    z <span class="op">=</span> w1<span class="op">*</span>x1 <span class="op">+</span> w2<span class="op">*</span>x2 <span class="op">+</span> b</span>
-<span id="cb10-7"><a></a>    h <span class="op">=</span> <span class="bu">max</span>(<span class="fl">0.0</span>, z)</span>
-<span id="cb10-8"><a></a>    u <span class="op">=</span> v<span class="op">*</span>h <span class="op">+</span> c</span>
-<span id="cb10-9"><a></a>    p <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>u))</span>
-<span id="cb10-10"><a></a>    <span class="cf">return</span> <span class="op">-</span>np.log(<span class="dv">1</span> <span class="op">-</span> p)   <span class="co"># 正解が y=0 のとき</span></span>
-<span id="cb10-11"><a></a></span>
-<span id="cb10-12"><a></a>params <span class="op">=</span> <span class="bu">dict</span>(w1<span class="op">=</span><span class="fl">0.4</span>, w2<span class="op">=</span><span class="fl">0.3</span>, b<span class="op">=-</span><span class="fl">0.1</span>, v<span class="op">=-</span><span class="fl">0.5</span>, c<span class="op">=</span><span class="fl">0.2</span>)</span>
-<span id="cb10-13"><a></a>base <span class="op">=</span> loss(<span class="op">**</span>params)</span>
-<span id="cb10-14"><a></a><span class="bu">print</span>(<span class="ss">f"ell = </span><span class="sc">{</span>base<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb10-15"><a></a></span>
-<span id="cb10-16"><a></a>eps <span class="op">=</span> <span class="fl">1e-6</span></span>
-<span id="cb10-17"><a></a><span class="cf">for</span> name <span class="kw">in</span> params:</span>
-<span id="cb10-18"><a></a>    shifted <span class="op">=</span> <span class="bu">dict</span>(params)</span>
-<span id="cb10-19"><a></a>    shifted[name] <span class="op">+=</span> eps</span>
-<span id="cb10-20"><a></a>    grad <span class="op">=</span> (loss(<span class="op">**</span>shifted) <span class="op">-</span> base) <span class="op">/</span> eps</span>
-<span id="cb10-21"><a></a>    <span class="bu">print</span>(<span class="ss">f"dell/d</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss"> = </span><span class="sc">{</span>grad<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb10-2"><a aria-label="2"></a></span>
+<span id="cb10-3"><a aria-label="3"></a>x1, x2, y <span class="op">=</span> <span class="fl">0.5</span>, <span class="fl">1.0</span>, <span class="fl">0.0</span></span>
+<span id="cb10-4"><a aria-label="4"></a></span>
+<span id="cb10-5"><a aria-label="5"></a><span class="kw">def</span> loss(w1, w2, b, v, c):</span>
+<span id="cb10-6"><a aria-label="6"></a>    z <span class="op">=</span> w1<span class="op">*</span>x1 <span class="op">+</span> w2<span class="op">*</span>x2 <span class="op">+</span> b</span>
+<span id="cb10-7"><a aria-label="7"></a>    h <span class="op">=</span> <span class="bu">max</span>(<span class="fl">0.0</span>, z)</span>
+<span id="cb10-8"><a aria-label="8"></a>    u <span class="op">=</span> v<span class="op">*</span>h <span class="op">+</span> c</span>
+<span id="cb10-9"><a aria-label="9"></a>    p <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>u))</span>
+<span id="cb10-10"><a aria-label="10"></a>    <span class="cf">return</span> <span class="op">-</span>np.log(<span class="dv">1</span> <span class="op">-</span> p)   <span class="co"># 正解が y=0 のとき</span></span>
+<span id="cb10-11"><a aria-label="11"></a></span>
+<span id="cb10-12"><a aria-label="12"></a>params <span class="op">=</span> <span class="bu">dict</span>(w1<span class="op">=</span><span class="fl">0.4</span>, w2<span class="op">=</span><span class="fl">0.3</span>, b<span class="op">=-</span><span class="fl">0.1</span>, v<span class="op">=-</span><span class="fl">0.5</span>, c<span class="op">=</span><span class="fl">0.2</span>)</span>
+<span id="cb10-13"><a aria-label="13"></a>base <span class="op">=</span> loss(<span class="op">**</span>params)</span>
+<span id="cb10-14"><a aria-label="14"></a><span class="bu">print</span>(<span class="ss">f"ell = </span><span class="sc">{</span>base<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb10-15"><a aria-label="15"></a></span>
+<span id="cb10-16"><a aria-label="16"></a>eps <span class="op">=</span> <span class="fl">1e-6</span></span>
+<span id="cb10-17"><a aria-label="17"></a><span class="cf">for</span> name <span class="kw">in</span> params:</span>
+<span id="cb10-18"><a aria-label="18"></a>    shifted <span class="op">=</span> <span class="bu">dict</span>(params)</span>
+<span id="cb10-19"><a aria-label="19"></a>    shifted[name] <span class="op">+=</span> eps</span>
+<span id="cb10-20"><a aria-label="20"></a>    grad <span class="op">=</span> (loss(<span class="op">**</span>shifted) <span class="op">-</span> base) <span class="op">/</span> eps</span>
+<span id="cb10-21"><a aria-label="21"></a>    <span class="bu">print</span>(<span class="ss">f"dell/d</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss"> = </span><span class="sc">{</span>grad<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>ell = 0.6931
