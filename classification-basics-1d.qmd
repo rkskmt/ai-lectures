@@ -42,7 +42,7 @@ subtitle: "２クラス分類"
 
 
 ::: {.takeaway .center}
-Salmon と Sea bass の**2クラス分類(2-class classification)**問題
+Salmon と Sea bass の**2クラス分類問題(2-class classification)**
 :::
 
 
@@ -122,24 +122,25 @@ pip install pandas numpy matplotlib scikit-learn
 続けて、以下を実行
 
 ```{python}
-
 #| echo: true
-#| code-fold: false
-#| code-summary: "全体を表示"
 
-# Setup
 import numpy as np
+
+# numpy配列にキャスト
+salmon_weights = np.array(salmon_weights)
+seabass_weights = np.array(seabass_weights)
+```
+
+```{python}
+#| echo: false
+
+# Author-side setup: figures and tables in this deck are shown, not written by students
 import matplotlib.pyplot as plt
 import japanize_matplotlib
 import pandas as pd
 
-# Matplotlib settings
 plt.rcParams["font.size"] = 11
 plt.rcParams["figure.dpi"] = 100
-
-salmon_weights = np.array(salmon_weights)
-seabass_weights = np.array(seabass_weights)
-
 ```
 
 
@@ -149,9 +150,12 @@ seabass_weights = np.array(seabass_weights)
 
 ```{python}
 #| echo: true
-#| fig-align: center
 #| code-fold: true
-#| code-summary: "code"
+#| code-summary: "（参考）描画コード"
+#| fig-align: center
+import matplotlib.pyplot as plt
+import japanize_matplotlib
+
 plt.figure(figsize=(10, 6))
 bins = range(1000, 2600, 100)
 
@@ -271,21 +275,34 @@ N -> FN: はずれ
 
 
 
-## 混同行列（[Confusion Matrix]{.en}） {#peek-cm-1800}
+## 境界線1800gで4つのパターンを数える {#peek-cm-1800}
+
+- `seabass_weights >= threshold` は、40匹それぞれの判定を True / False で並べた配列
+- `np.sum` は True を 1、False を 0 として足すので、条件を満たした**匹数**になる
 
 ```{python}
 #| echo: true
-#| fig-align: center
-#| code-fold: true
-#| code-summary: "code"
 threshold = 1800
 
-# Calculate confusion matrix
-TP = sum(1 for weight in salmon_weights if weight >= threshold)
-FN = sum(1 for weight in salmon_weights if weight < threshold)
-TN = sum(1 for weight in seabass_weights if weight < threshold)
-FP = sum(1 for weight in seabass_weights if weight >= threshold)
+print(seabass_weights[:5] >= threshold)   # 先頭5匹の判定
 
+TP = np.sum(salmon_weights >= threshold)   # Salmon を正しく Salmon と判定
+FN = np.sum(salmon_weights < threshold)    # Salmon を見逃し
+TN = np.sum(seabass_weights < threshold)   # Sea bass を正しく Sea bass と判定
+FP = np.sum(seabass_weights >= threshold)  # Sea bass を誤って Salmon と判定
+print(f"TP={TP}, FN={FN}, FP={FP}, TN={TN}")
+```
+
+
+## 混同行列（[Confusion Matrix]{.en}）
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "（参考）描画コード"
+#| fig-align: center
+import matplotlib.pyplot as plt
+import japanize_matplotlib
 import matplotlib.patches as mpatches
 
 fig, ax = plt.subplots(figsize=(9, 7))
@@ -369,32 +386,31 @@ print(f"Recall    = {TP} / ({TP} + {FN}) = {recall:.3f}")
 ```
 
 ## しきい値を変えると？
-```{python}
+
+```python
 thresholds = [1600, 1800, 2000]
 ```
 
 
 ```{python}
-#| echo: true
+#| echo: false
 #| fig-align: center
-#| code-fold: true
-#| code-summary: "code"
 #| output: true
 thresholds = [1600, 1800, 2000]
 results = []
 
 for threshold in thresholds:
-    TP = sum(1 for weight in salmon_weights if weight >= threshold)
-    FN = sum(1 for weight in salmon_weights if weight < threshold)
-    TN = sum(1 for weight in seabass_weights if weight < threshold)
-    FP = sum(1 for weight in seabass_weights if weight >= threshold)
-    
+    TP = np.sum(salmon_weights >= threshold)
+    FN = np.sum(salmon_weights < threshold)
+    TN = np.sum(seabass_weights < threshold)
+    FP = np.sum(seabass_weights >= threshold)
+
     accuracy = (TP + TN) / (TP + TN + FP + FN)
     precision = TP / (TP + FP) if (TP + FP) > 0 else 0
     recall = TP / (TP + FN) if (TP + FN) > 0 else 0
     
     results.append({
-        '境界線': f"{threshold}g",
+        "threshold": f"{threshold}g",
         "TP": TP,
         "FP": FP,
         "FN": FN,
@@ -416,8 +432,10 @@ print(df.to_string(index=False))
   - Salmon判定の信頼性は高いが、Salmonを見逃す（FN増）
 :::
 
-**Precision と Recall は トレードオフの関係**
 
+::: {.takeaway}
+**Precision と Recall は トレードオフの関係**
+:::
 
 
 ## しきい値の比較（1600g vs 2000g）
@@ -448,10 +466,10 @@ plt.tight_layout()
 plt.show()
 
 # Calculate metrics
-TP = sum(1 for weight in salmon_weights if weight >= threshold)
-FN = sum(1 for weight in salmon_weights if weight < threshold)
-TN = sum(1 for weight in seabass_weights if weight < threshold)
-FP = sum(1 for weight in seabass_weights if weight >= threshold)
+TP = np.sum(salmon_weights >= threshold)
+FN = np.sum(salmon_weights < threshold)
+TN = np.sum(seabass_weights < threshold)
+FP = np.sum(seabass_weights >= threshold)
 precision = TP / (TP + FP) if (TP + FP) > 0 else 0
 recall = TP / (TP + FN) if (TP + FN) > 0 else 0
 ```
@@ -487,10 +505,10 @@ plt.tight_layout()
 plt.show()
 
 # Calculate metrics
-TP = sum(1 for weight in salmon_weights if weight >= threshold)
-FN = sum(1 for weight in salmon_weights if weight < threshold)
-TN = sum(1 for weight in seabass_weights if weight < threshold)
-FP = sum(1 for weight in seabass_weights if weight >= threshold)
+TP = np.sum(salmon_weights >= threshold)
+FN = np.sum(salmon_weights < threshold)
+TN = np.sum(seabass_weights < threshold)
+FP = np.sum(seabass_weights >= threshold)
 precision = TP / (TP + FP) if (TP + FP) > 0 else 0
 recall = TP / (TP + FN) if (TP + FN) > 0 else 0
 ```
@@ -508,17 +526,23 @@ recall = TP / (TP + FN) if (TP + FN) > 0 else 0
 
 ### ケース1: 高級レストラン向け出荷
 - **Precision重視**（FPを避ける）
-- Sea bassの混入を最小化。混入絶対許さないマン
-- → 高めの閾値（2000g）
+- 高めの閾値（2000g）
+- Sea bassの混入を最小化
+   - 混入絶対許さないマン
+
 
 ### ケース2: 缶詰工場（Salmon専用ライン）
 - **Recall重視**（FNを避ける）
-- Salmonの取りこぼしを最小化。シャケ全部入れるマン
-- → 低めの閾値（1600g）
+- 低めの閾値（1600g）
+- Salmonの取りこぼしを最小化
+   - シャケなら余すことなく全部入れるマン。混入は知らね。
 
 ## コストを考慮した最適化 {#peek-cost}
 
-誤分類のコストが異なる場合、総コストを最小化するしきい値を選べる。
+
+::: {.takeaway}
+誤分類のコストが異なる場合は総コストを最小化する閾値にすべき
+:::
 $$
 \begin{aligned}
 &\text{argmin}(\text{総コスト}) = N(\text{FP}) \times \text{Cost}(\text{FP}) + N(\text{FN}) \times \text{Cost}(\text{FN})\\
@@ -535,32 +559,24 @@ $$
 C_FP = 10000  # Sea bass混入のクレーム対応コスト（円/匹）
 C_FN = 500    # Salmon再選別コスト（円/匹）
 
-cost_results = []
-for threshold in [1600, 1800, 2000]:
-    TP = sum(1 for weight in salmon_weights if weight >= threshold)
-    FN = sum(1 for weight in salmon_weights if weight < threshold)
-    TN = sum(1 for weight in seabass_weights if weight < threshold)
-    FP = sum(1 for weight in seabass_weights if weight >= threshold)
-    
+thresholds = [1600, 1800, 2000]
+costs = []
+for threshold in thresholds:
+    FN = np.sum(salmon_weights < threshold)    # Salmon を見逃し
+    FP = np.sum(seabass_weights >= threshold)  # Sea bass を誤って Salmon と判定
     total_cost = FP * C_FP + FN * C_FN
-    cost_results.append({
-        '境界線': f"{threshold}g",
-        "FP": FP,
-        "FN": FN,
-        '総コスト': f"¥{total_cost:,}"
-    })
-cost_df = pd.DataFrame(cost_results)
+    costs.append(total_cost)
+    print(f"{threshold}g: FP={FP:>2}, FN={FN:>2}, cost=¥{total_cost:,}")
 
-min_idx = cost_df.index[cost_df["総コスト"].str.replace("¥", "").str.replace(",", "").astype(int).idxmin()]
-cost_df.loc[min_idx, "境界線"] = "★ " + cost_df.loc[min_idx, "境界線"]
-print(cost_df.to_string(index=False))
+best_threshold = thresholds[costs.index(min(costs))]
+print(f"min cost: {best_threshold}g")
 ```
 
 **このコスト関数での最適なしきい値**: 2000g（総コスト最小）
 
-## **Tweak** しきい値を振り回す {.badge-practice}
+## **Tweak** しきい値を変更 {.badge-practice}
 
-- [混同行列のコード](#peek-cm-1800){.peek}の `threshold` と、[コスト最適化のコード](#peek-cost){.peek}を**書き換えて実行**（指標のセルまで続けて実行）
+- [4つのパターンを数えるコード](#peek-cm-1800){.peek}の `threshold` と、[コスト最適化のコード](#peek-cost){.peek}を**書き換えて実行**（指標のセルまで続けて実行）
 
 ::: {.tweak}
 | やりたいこと | コード |
@@ -571,10 +587,11 @@ print(cost_df.to_string(index=False))
 :::
 
 ::: {.callout-tip}
-## ここで観察
-
-- `threshold = 1000` で **Recall は 100%** になる — 全部 Salmon と言えばタダで手に入る数字（そのとき Precision は 50%、Accuracy も 50%）。==単独の指標は当てにならない==
-- コストを入れ替えると、最適しきい値が **2000g から 1600g に反転**する — 「境界線は方針の選択」が数字で見える
+- `threshold = 1000` で **Recall は 100%** になる
+   - 全部 Salmon と言えばタダで手に入る数字
+   - そのとき Precision は 50%でAccuracy も 50%
+      - ==単独の指標は当てにならない==
+- コストを入れ替えると、最適しきい値が **2000g から 1600g に反転**する 
 :::
 
 
@@ -597,24 +614,23 @@ print(cost_df.to_string(index=False))
 
 ## 練習問題
 
-下記のデータ（それぞれ20匹ずつ追加した）について、以下の0〜4を実行して分類器をつくれ。
+下記の新データ（それぞれ20匹ずつ追加した）について、以下の1〜4を実行して分類器をつくれ
 
 ```{python}
 #| echo: true
 salmon_weights = [2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,
                   1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,
-                  2028, 1903, 2057, 1629, 1884, 1884, 2240, 2081, 1838, 2037,
-                  1839, 1738, 1978, 1754, 1991, 1720, 1731, 1992, 1752, 1652]
+                  2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,
+                  1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652]
 seabass_weights = [1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,
-                   2015, 1528, 1612, 1183, 1436, 1625, 1261, 1701, 1420, 1509,
-                   1387, 1345, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,
+                   1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,
+                   1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,
                    1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531]
 
 ```
 
-## 以下をレポートで提出
 
-0. まず何をするべきかを考えて実行せよ。
+0. まず何をするべきかを考えよ
 
 1. 閾値を1800gにした場合の TP, FP, FN, TN を計算せよ
 
@@ -624,7 +640,7 @@ seabass_weights = [1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,
 
 4. $C_{FP}=5000$円、$C_{FN}=1000$円としたとき、総コストを最小にするしきい値を求めよ
 
-## 問0の答え
+## 問0の答え（可視化）
 
 ```{python}
 #| echo: false
