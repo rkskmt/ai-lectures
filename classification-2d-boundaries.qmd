@@ -251,7 +251,7 @@ Sea bass を陽性と数える場合も、同じ手順で数え直すだけ。
 
 ## 決定木（[Decision Tree]{.en}）
 
-- 条件分岐繰り返すことによる分類・予測手法
+- 条件分岐を繰り返すことによる分類・予測手法
   - 木のように枝分かれするので決定**木**
   - 要するに「多段のif文でいい感じに切り分ける」
      - 「いい感じ」の基準が必要になる
@@ -281,7 +281,8 @@ $$\text{Gini} = 1 - (p_{\text{Salmon}}^2 + p_{\text{Sea bass}}^2)$$
 - 縦線の左右それぞれに Salmon と Sea bass が何匹いるかは、性能評価で数えた TP, FP, FN, TN そのもの
    - 左側（輝度 < 閾値）：Salmon が TP 匹、Sea bass が FP 匹
    - 右側：Salmon が FN 匹、Sea bass が TN 匹
-- 左右それぞれのジニ不純度を匹数で重み付けして平均したもの（**加重平均**）が、この切り方の不純度。小さいほどよく分かれている
+- 左右それぞれのジニ不純度を匹数で重み付けして平均したもの（**加重平均**）が、この切り方の不純度
+   - 小さいほどよく分かれている
 
 ```{python}
 #| echo: true
@@ -332,39 +333,39 @@ print(f"  weighted Gini = {weighted_gini:.3f}")
 ::: {.callout-tip}
 ## 結果
 
-- 5.5 では 0.237。5.0 にすると **0.167** まで下がる（左側が Salmon 32匹だけの純粋な領域になる）
-- 2.0 では全員が右側に入り、分割前と同じ **0.5**。切っていないのと同じ
+- 5.5 では 0.237
+   - 5.0 にすると **0.167** まで下がる（左側が Salmon 32匹だけの純粋な領域になる）
+- 2.0 では全員が右側に入り、分割前と同じ **0.5**
+   - 切っていないのと同じ
 :::
 
 
-## 最良の閾値はどこ？
+## 最適化：ジニ不純度が最小になる閾値を探索
 
-### 総当たり：候補をすべて試す
+### 【戦略】総当たりで候補をすべて試す
 
-- 候補の閾値を**すべて試して**、分割後の**左右の加重平均ジニ不純度**を比べる
-   - 最小のものを採用する
-- 特徴量は2つあるが、まずは**輝度だけ**でジニ不純度を最小化してみる
+- 閾値の候補ごとに、**ジニ不純度**を計算する
+   - 分割すると、2つジニ不純度がでるので加重平均したものをその閾値候補の値とする
+   - 閾値間で比較し、最小のものを採用する
 
-::: {.callout-note title="閾値の候補は「データの値」だけで十分"}
-データとデータの**間**なら、どこで切っても分かれ方は同じ。
+$$\text{Gini}_{\text{加重平均}} = \frac{n_{\text{左}}}{n_{\text{左}} + n_{\text{右}}}\,\text{Gini}_{\text{左}} + \frac{n_{\text{右}}}{n_{\text{左}} + n_{\text{右}}}\,\text{Gini}_{\text{右}}$$
 
-例：データが [2.1, 3.5, 5.8] のとき（`輝度 < 閾値` で左右に分ける）
-
-- 2.1 と 3.5 の間のどこで切っても、**閾値 3.5** と同じ分かれ方
-- 3.5 と 5.8 の間のどこで切っても、**閾値 5.8** と同じ分かれ方
-
-→ 試すべき候補は、**データの値そのもの**だけ
+::: {.caption-note}
+$n_{\text{左}}, n_{\text{右}}$ は閾値で分けた左右それぞれの匹数（多い側の不純度が重く効く）
 :::
 
-## 総当たりで最良の閾値を探す
 
-- さっきの計算を「閾値を渡すと加重平均ジニ不純度を返す関数」にまとめ、候補を全部試す
+## 輝度に対する閾値の最適解を探索するコード
+
+::: {.takeaway}
+方針：輝度の範囲（2〜10）を **0.5 刻み**で並べ、for 文で全部試す
+:::
 
 ```{python}
 #| echo: true
 
-def weighted_gini_at(threshold):
-    """輝度 threshold で左右に切ったときの加重平均ジニ不純度"""
+# 輝度をthreshold で左右に分割したジニ不純度の加重平均
+def weighted_gini_at(threshold): 
     left_salmon = np.sum(salmon_brightness < threshold)
     left_seabass = np.sum(seabass_brightness < threshold)
     right_salmon = np.sum(salmon_brightness >= threshold)
@@ -373,6 +374,84 @@ def weighted_gini_at(threshold):
     n_right = right_salmon + right_seabass
     return (n_left * gini(left_salmon, left_seabass)
             + n_right * gini(right_salmon, right_seabass)) / (n_left + n_right)
+
+# 候補：2.0 から 10.0 の手前まで 0.5 刻み
+candidates = np.arange(2.0, 10.0, 0.5)
+print(f"候補の数: {len(candidates)}")
+
+best_threshold = None
+best_gini = 1.0
+for threshold in candidates:
+    g = weighted_gini_at(threshold)
+    if g < best_gini:
+        best_threshold = threshold
+        best_gini = g
+print(f"最適な閾値: {best_threshold:.2f}（weighted Gini {best_gini:.3f}）")
+```
+
+::: {.callout-tip}
+## 結果
+
+- 最適は **5.0**（加重平均ジニ不純度 0.167）
+   - Tweak で見つけた値と同じ
+- ただし試したのは 0.5 刻みの 16 個だけ
+   - 4.5 と 5.0 の間に、もっと良い閾値があるかもしれない
+   - 刻みを 0.1、0.01 と細かくすれば見つかる？ どこまで細かくすれば十分なのか
+:::
+
+
+## 0.5刻みでの探索は十分精細か？
+
+
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "（参考）描画コード"
+#| fig-align: center
+#| classes: fig-small
+
+import matplotlib.pyplot as plt
+import japanize_matplotlib
+
+fine = np.arange(2.0, 10.0, 0.01)
+fine_ginis = [weighted_gini_at(t) for t in fine]
+data_values = np.unique(list(salmon_brightness) + list(seabass_brightness))
+
+plt.figure(figsize=(7, 3.6))
+plt.plot(fine, fine_ginis, color="#2980b9", linewidth=1.5, label="0.01 刻み")
+plt.plot(data_values, np.full(len(data_values), 0.12), "|", color="black",
+         markersize=10, label="データに現れる輝度の値")
+plt.xlabel("閾値（輝度）")
+plt.ylabel("加重平均ジニ不純度")
+plt.legend(loc="upper center")
+plt.grid(True, alpha=0.4)
+plt.tight_layout()
+plt.show()
+```
+::: {.takeaway}
+0.01 刻み（800 個）に変更した
+:::
+
+::: {.callout-note}
+- 横軸の下の短い縦線は、データに現れる輝度の値
+- データ間はどこに設定しても、不純度は不変
+:::
+
+
+## 探索は、データの値だけで実行すべき
+
+- 例：データが [2.1, 3.5, 5.8] のとき（`輝度 < 閾値` で左右に分ける）
+   - 2.1 と 3.5 の間のどこで切っても、**閾値 3.5** と同じ分かれ方
+   - 3.5 と 5.8 の間のどこで切っても、**閾値 5.8** と同じ分かれ方
+- よって、**データの値**だけを探索すればいい
+   - 刻み幅を決める必要がなく、見落としもない
+
+
+## 最適な探索をするコード
+
+```{python}
+#| echo: true
 
 # 候補：データに現れる輝度の値を全部（2つの配列をつなげ、重複を除いて昇順に）
 candidates = np.unique(list(salmon_brightness) + list(seabass_brightness))
@@ -385,11 +464,11 @@ for threshold in candidates:
     if g < best_gini:
         best_threshold = threshold
         best_gini = g
-print(f"最良の閾値: {best_threshold:.2f}（weighted Gini {best_gini:.3f}）")
+print(f"最適な閾値: {best_threshold:.2f}（weighted Gini {best_gini:.3f}）")
 ```
 
 
-## 結果
+## 少ない探索で最適解を発見
 
 ```{python}
 #| echo: true
@@ -418,40 +497,44 @@ plt.show()
 ::: {.callout-tip}
 ## 結果
 
-- 最良は**輝度 5.00**（加重平均ジニ不純度 0.167）。目で引いた 5.5 より少し左
-- 5.00 の縦線での誤分類は **8匹**（正答率 90.0%）。5.5 の 11匹（86.3%）より3匹良い
+- 最適は**輝度 5.00**（加重平均ジニ不純度 0.167）
+   - 目で引いた 5.5 より少し左
+- 5.00 の縦線での誤分類は **8匹**（正答率 90.0%）
+   - 5.5 の 11匹（86.3%）より3匹良い
 :::
 
 
-## 決定木のアルゴリズム（縦横交互）
+## 決定木のアルゴリズム（縦横交互バージョン）
 
-自作版は簡単のため、使う特徴量を**輝度→重さの交互**に固定する（縦・横の分割を重ねて、階段状の境界を作る）。
 
-1. **全データ**を対象に、データに現れる輝度の値を全部、閾値候補として総当たりし、**加重平均ジニ不純度が最小**の閾値で左右に分割
-2. できた左右**それぞれの領域のデータだけ**で、こんどは重さの閾値を同じ方法で探して分割
-3. 決めた深さで打ち切り。**各領域は、その中の多数派クラスで判定**する
+::: {.takeaway .dark}
+**この分割を、輝度と重さに対して適切に適用したのが決定木**
+:::
+
+1. まず輝度に対して最適な閾値で分割
+2. できた左右それぞれに対して重さで分割（ここまでで4分割）
+3. これを繰り返して決めた深さで打ち切る
+4. **各領域は、その中の多数派クラスとする**
 
 ```{.d2 sketch="true" width="82%"}
 direction: right
-C: "いまの領域のデータだけで\n閾値候補を総当たり" { style.fill: "#e1f5ff" }
-G: "加重平均ジニ不純度が\n最小の閾値で2分割" { style.fill: "#fff4e1" }
-R: "できた各領域で\n特徴量を替えて繰り返し" { style.fill: "#fff4e1" }
-E: "深さ上限に達したら終了\n各領域は多数派クラスで判定" { style.fill: "#d5f5e3" }
-C -> G -> R
-R -> C: 領域ごとに {style.stroke-dash: 3}
-R -> E
+S1: "1. 輝度の最適な閾値で\n左右に分割" { style.fill: "#e1f5ff" }
+S2: "2. 左右それぞれを\n重さの最適な閾値で分割" { style.fill: "#fff4e1" }
+S3: "3. 決めた深さまで\n繰り返し" { style.fill: "#fff4e1" }
+S4: "4. 各領域は\n多数派クラスとする" { style.fill: "#d5f5e3" }
+S1 -> S2 -> S3 -> S4
+S3 -> S1: 輝度→重さ→輝度→… {style.stroke-dash: 3}
 ```
 
 
-## 分けた領域のデータをまとめて持ち運ぶ
+## 【準備】データをまとめてラベル付きにする（特徴量行列）
 
 - 2回目は「1回目で左側に残った魚だけ」を対象に、重さの閾値を探す
    - 左側に残ったのは、輝度・重さ・種類がそろった魚の集まり
 - いまの4本の配列のままだと、分けるたびに4本を別々に絞り込むことになる
-- そこで、1匹を `[輝度, 重さ]` の1行にした行列 `X` と、行ごとの種類 `y` にまとめる
+- そこで、1匹を `[輝度, 重さ]` の配列 `X` と、ラベル `y` にまとめる
    - 左側の魚だけを、特徴量も種類もいっしょに取り出せる（次のセルで確かめる）
-   - 「どの特徴量で切るか」は列番号で選べる（列0 = 輝度、列1 = 重さ）
-   - 特徴量を列に並べたこの行列を**特徴量行列（[feature matrix]{.en}）**という
+   - 「どの特徴量で切るか」は列番号で選べる（`X[:, 0]` = 輝度、`X[:, 1]` = 重さ）
 
 | 行 | `X[:, 0]` 輝度 | `X[:, 1]` 重さ | `y` |
 |:--:|:--:|:--:|:--:|
@@ -461,6 +544,12 @@ R -> E
 | 40 | 5.6 | 1677 | 0 |
 | ⋮ | ⋮ | ⋮ | ⋮ |
 | 79 | 5.6 | 1531 | 0 |
+
+
+::: {.takeaway .dark}
+**この行列を特徴量行列（[feature matrix]{.en}）という**
+:::
+
 
 
 ## 特徴量行列の作成
@@ -493,15 +582,16 @@ print(np.sum(y_left == 1), np.sum(y_left == 0))
 ```
 
 
-## 決定木：最良の分割を探索
+## 決定木：最適な分割を探索
 
-- `weighted_gini_at` を、`X` の列番号で特徴量を指定できる形に書き直す。ついでに最良の閾値も返す
+- `weighted_gini_at` を、`X` の列番号で特徴量を指定できる形に書き直す
+- ついでに最適な閾値も返す
 
 ```{python}
 #| echo: true
 
 def find_best_split_for_feature(X, y, feature_idx):
-    """指定した特徴量で最良の分割点を見つける"""
+    """指定した特徴量で最適な分割点を見つける"""
     best_gini = float("inf")
     best_threshold = None
     best_left_mask = None
@@ -547,7 +637,7 @@ print(f"  左側: {sum(split1_left_mask)}個, 右側: {sum(~split1_left_mask)}�
 ```
 
 
-## 可視化：1回目の分割
+## 1回目の分割の可視化
 
 ```{python}
 #| echo: false
@@ -576,7 +666,7 @@ plt.show()
 
 ## 2回目の分割（重さで分ける）
 
-左側と右側をそれぞれ**重さで分割**する。
+左側と右側をそれぞれ**重さで分割**
 
 ```{python}
 #| echo: true
@@ -603,7 +693,7 @@ print(f"  ジニ不純度: {split2_right_gini:.3f}")
 ```
 
 
-## 可視化：2回目の分割
+## 2回目の分割結果
 
 ```{python}
 #| echo: false
@@ -642,7 +732,7 @@ plt.show()
 
 ## 階段状の境界の性能
 
-階段状の境界線で分類した結果を評価する。
+階段状の境界線で分類した結果を評価
 
 ```{python}
 #| echo: true
@@ -693,7 +783,7 @@ scikit-learnの決定木
 |  | 自作の決定木 | scikit-learn の決定木 |
 |---|---|---|
 | 深さ | 2 | 3（1段深くしてみる） |
-| 分割に使う特徴量 | 輝度→重さ、交互で固定 | 毎回、最良の特徴量を自動選択 |
+| 分割に使う特徴量 | 輝度→重さ、交互で固定 | 毎回、最適な特徴量を自動選択 |
 | できる境界 | 粗い階段 | より細かい階段 |
 
 ```{python}
@@ -791,7 +881,7 @@ print(f"\nTP={TP}, FP={FP}, FN={FN}, TN={TN}")
 ```
 
 
-## 決定境界の可視化（決定木）
+## scikit-learn版の決定境界
 
 ```{python}
 #| echo: false
@@ -839,14 +929,14 @@ plot_decision_boundary(tree_model, X, y,
 :::
 
 
-## 手動 vs 決定木
+## 独自版 vs scikit-learn版
 
 |  | 手動の直線 | 決定木 |
-|---|---|---|
+|---|-------|-------|
 | 境界の決め方 | 目で見て引く（データを眺める過程が入る） | ジニ不純度で自動最適化 |
 | 説明のしやすさ | 単純で、理由を説明しやすい | if-then ルールとして読める |
 | 特徴量が3つ以上 | 目で見えなくなる | そのまま扱える |
-| 弱点 | 最適の保証がない・自動化できない | 過学習（[overfitting]{.en}）しやすい・境界は階段状のみ |
+| 弱点 | 最適の保証がない<br>自動化できない | 過学習（[overfitting]{.en}）しやすい<br>境界は階段状のみ |
 
 
 ## 性能比較表
@@ -867,13 +957,14 @@ print(f"| 決定木（深さ3） | {accuracy_tree:.3f} | {precision_tree:.3f} | 
 ```
 
 ::: {.takeaway}
-どちらが「正解」ではなく、**データと目的に応じて選ぶ**
+普段は、**scikit-learn の決定木**（自動で最適化でき、特徴量が3つ以上でもそのまま扱える）を使用すればよい。ただし。。。
 :::
 
 
-## 決定木の深さを変えると？ {#peek-depth}
+## 決定木の深さをどんどん深くする {#peek-depth}
 
-- 深さ＝ if-then ルールの段数。深いほど複雑な境界が作れる
+- 深さ＝ if-then ルールの段数
+   - 深いほど複雑な境界が作れる
 - 深さ 1・3・無制限で学習し、同じデータで採点してみる
 
 ```{python}
@@ -888,13 +979,13 @@ for depth in [1, 3, None]:
     print(f"max_depth={str(depth):<4}: Accuracy = {acc:.3f}")
 ```
 
-::: {.callout-important title="質問"}
-深さ無制限なら、ついに**正答率 100%**。
-これは「最強のモデルが完成した」ということでいい？
+::: {.callout-important title="疑問"}
+- 深さ無制限なら、ついに**正答率 100%**
+- これが「最強のモデル」といえる？
 :::
 
 
-## 深さ無制限の境界を見てみる {#peek-overfit-boundary}
+## 正答率 100% の歪さ {#peek-overfit-boundary}
 
 ```{python}
 #| echo: false
@@ -922,10 +1013,8 @@ plt.tight_layout()
 plt.show()
 ```
 
-::: {.callout-note title="ここまでで分かること"}
-- 無制限の木には、数匹を救うためだけの**細長い回廊（飛び地）**ができている
-- 実際に学習されたルールを読むと「輝度が 5.35〜5.70 でも、重さが **2205g を超えるなら** Salmon」のような**異様に具体的な条項**が入っている
-:::
+- 数匹を救うためだけの**細長い回廊（飛び地）**ができている
+- 実際に学習されたルールを読むと「輝度が 5.35〜5.70 でも、重さが **2205g を超えるなら** Salmon」のような**異様に具体的な条件**が入っている
 
 
 ## **Tweak** 木の深さを変える {.badge-practice}
