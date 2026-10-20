@@ -833,7 +833,7 @@ rkskmt
 <section id="匹分のbackwardをnumpyで実装する" class="slide level2">
 <h2>1匹分のBackwardをNumPyで実装する</h2>
 <div class="slide-body">
-<div id="4f737d08" class="cell" data-execution_count="1">
+<div id="5f4008fb" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb2-2"><a aria-label="2"></a></span>
 <span id="cb2-3"><a aria-label="3"></a><span class="kw">def</span> sigmoid(u):</span>
@@ -887,7 +887,7 @@ grad_c: -0.4875</code></pre>
 <ul>
 <li>微分の定義 <span class="math inline">\(\dfrac{\ell(\theta + \varepsilon) - \ell(\theta)}{\varepsilon}\)</span> で、手計算を検算できる（<strong>数値微分</strong>）</li>
 </ul>
-<div id="7798b505" class="cell" data-execution_count="2">
+<div id="1879d76d" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb4-2"><a aria-label="2"></a></span>
 <span id="cb4-3"><a aria-label="3"></a>x1, x2, y <span class="op">=</span> <span class="fl">1.0</span>, <span class="fl">0.5</span>, <span class="fl">1.0</span></span>
@@ -1045,7 +1045,7 @@ dell/dc = -0.4875</code></pre>
 <section id="peek-matrix-backward" class="slide level2">
 <h2>2層NNのBackwardをNumPyで実装する</h2>
 <div class="slide-body">
-<div id="c0c6f6be" class="cell" data-execution_count="3">
+<div id="1deead75" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb6-2"><a aria-label="2"></a></span>
 <span id="cb6-3"><a aria-label="3"></a><span class="kw">def</span> backward(X, y, Z1, H, P, W2):</span>
@@ -1151,7 +1151,7 @@ dW2: (2, 1)  db2: (1,)</code></pre>
 <li>変わるのは、<code>forward</code> と <code>backward</code> の中に層が1つ増えたことだけ</li>
 <li>下の <code>for</code> 1周が<a href="#/peek-epoch" class="peek">1 epoch</a>であり、全200件から求めた勾配で1回更新する</li>
 </ul>
-<div id="f095d659" class="cell" data-execution_count="4">
+<div id="9ae8f902" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb8-2"><a aria-label="2"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> make_moons</span>
 <span id="cb8-3"><a aria-label="3"></a></span>
@@ -1230,7 +1230,7 @@ Accuracy: 100.0%</code></pre>
 <section id="学習したnnの決定境界" class="slide level2">
 <h2>学習したNNの決定境界</h2>
 <div class="slide-body">
-<div id="ae35658c" class="cell fig-medium" data-execution_count="5">
+<div id="23fd1b64" class="cell fig-medium" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1291,7 +1291,7 @@ Accuracy: 100.0%</code></pre>
 <li>中間層に ReLU が選ばれる大きな理由</li>
 </ul></li>
 </ul>
-<div id="e7b0ba39" class="cell" data-execution_count="6">
+<div id="094202e9" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1418,7 +1418,7 @@ Accuracy: 100.0%</code></pre>
 <li><span class="math inline">\(v\)</span> が負なので、中間層へ戻る <span class="math inline">\(\delta\)</span> は符号が反転する。重みが復路の向きと大きさも決める。</li>
 </ul>
 <h3 id="数値微分で検算">数値微分で検算</h3>
-<div id="bad187fc" class="cell" data-execution_count="7">
+<div id="420bc455" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
