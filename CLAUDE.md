@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+This repository is public. Keep this file and `doc/` to rules and their technical reasons; leave out dates, history, who decided, and anything specific to one author's machine or tools.
+
 ## Project Overview
 
 Quarto-based AI lecture website ("AI Lectures"). Slide decks for machine learning topics, written in Japanese.
@@ -24,7 +26,7 @@ Quarto-based AI lecture website ("AI Lectures"). Slide decks for machine learnin
 ## Language
 
 - Content is written in **Japanese**
-- Code comments, commit messages, and Claude's reasoning should be in **English**
+- Code comments and commit messages are in **English**
 - **English/Japanese mix in slides — intentional, not a defect:**
   - Explanatory prose, annotations, and callouts: **Japanese**. Japanese data/column names stay Japanese where natural. The exception is printed tables, which are ASCII-only (see Conventions).
   - **Key technical terms get English alongside Japanese at first appearance** (e.g. 過学習（overfitting）, 固有値（eigenvalue）). This is a feature — students must learn the English. When auditing, **add the English where a term first appears without it** (this is worth a dedicated inspection pass).
@@ -47,7 +49,7 @@ Use Python as the vehicle, but frame concepts as broadly as possible. Where a co
 - **Do not add frontmatter to `index.qmd`.** Quarto **merges** (not overwrites) `format` from `_metadata.yaml` and the file, so adding `format: html` causes it to render in both formats and trigger a `rename` error. Raw HTML (e.g. `<details>/<summary>`) is fine — it needs no frontmatter.
 - **Do not use `listing:` in `index.qmd` either.** Same reason — it requires `format: html`, which conflicts.
 - `render: ["*.qmd"]` in `_quarto.yml` prevents `.md` files (e.g. CLAUDE.md) from being rendered
-- **When adding a new `.qmd`, add it to `index.qmd`.** It is the site's only navigation: every page renders as revealjs slides, so the Quarto website navbar is never displayed — do not maintain a `navbar` in `_quarto.yml` (verified 2026-06: no navbar element appears in any built page).
+- **When adding a new `.qmd`, add it to `index.qmd`.** It is the site's only navigation: every page renders as revealjs slides, so the Quarto website navbar is never displayed — do not maintain a `navbar` in `_quarto.yml`.
 - **`search-ui.js` provides site-wide full-text search**: a 検索 button + modal on every deck (shipped by the cleanslidekit extension) and the inline box on `index.qmd` (`#search-input`/`#search-results`). It reads Quarto's generated `search.json` and deep-links to slides via `#/slide-id` — no per-lecture maintenance.
 - **Never add numbers to slide section headers or `index.qmd` link text.** Numbered slides (e.g. `## １. ...`) and numbered links (e.g. `第N回`) break on reorder — every insert or swap requires renaming every entry after it. Use plain titles only (e.g. `## 汎化性能を測る`, `[過学習と汎化](classification-evaluation.qmd)`).
 - Use Quarto callouts (`.callout-note`) for key concepts
@@ -56,7 +58,7 @@ Use Python as the vehicle, but frame concepts as broadly as possible. Where a co
    - **Steps**: a numbered list in **体言止め** — drop trailing する/出す (`columns で列名を確認`, `平均を比較`). Setup (data download) is **step 0** so the whole list aligns.
    - **Required outputs are explicit**: state them in parentheses (`（差分値も表示）`) instead of leaving what to print implicit.
    - Do NOT cram instructions into bullets or arrow chains (`まず予想 → 何度ちがう？ → 自分で書く`), and don't spoon-feed what students can discover with a taught tool.
-- **Every sentence on a slide must be written for the student — author-side circumstances are never slide content.** Litmus test: *does the student gain anything from reading this line?* Banned categories (each has been found and scrubbed in a real audit of the sibling IP3200 repo):
+- **Every sentence on a slide must be written for the student — author-side circumstances are never slide content.** Litmus test: *does the student gain anything from reading this line?* Banned categories:
    - **Authoring/build decisions**: 「（この節だけでも実行できるよう、読み込みから用意）」「本スライドは `"directory"` を使っている — 教室のWi-Fiが切れても動くように」
    - **Curriculum decisions** — especially naming untaught material only to exclude it: 「`.plot.bar()` は今回は使わない」「だから3Dはこの回で扱った」
    - **Lecture-structure narration / pedagogical-effect claims**: 「今回は「◯◯」の回」「〜が体感できる」 "this builds intuition for △△"
@@ -70,35 +72,35 @@ Use Python as the vehicle, but frame concepts as broadly as possible. Where a co
 - **Any data file a code cell reads must have a download link in the slide body.** Students run the copied code on their own machine, so a bare `pd.read_csv("data/foo.csv")` / `np.loadtxt("data/foo.csv")` fails unless they can obtain `foo.csv`. Put `[foo.csv](data/foo.csv)` in the slide text and tell them to place it in their `data/` folder. Never show runnable student code that reads a data file without a download link for that file. (Exception: hidden `echo: false` figure cells may read committed CSVs without a link — students use the live/download code shown in the `code-fold` block instead.)
 - **Never fabricate figure data.** A chart presented as the result of a dataset, API, or training run must be computed from that real data — no `np.linspace` + noise stand-ins. For network sources, fetch once, commit the CSV under `data/`, load it in a hidden cell, and show the real acquisition code in a `code-fold`. Interpretation bullets must describe features actually present in the data — verify every number/claim against the file before writing it.
 - **Do not use notebook-only display style** such as a bare `df`, `df.head()`, `df.shape`, `series`, or expression as the final line when the goal is to show output. Use `print(...)` for textual/tabular output (e.g. `print(df.head())`, `print(df.shape)`). Use plotting calls like `plt.show()` when the goal is a figure.
-- **Printed tables are ASCII-only.** Any output whose columns are lined up with spaces (`print(df)`, `df.to_string()`, hand-formatted f-string rows) uses half-width ASCII for column names, row labels and cell values, and no marker symbols such as `★`. Cause (measured 2026-10-12): the slide's code font draws a half-width character at 0.55em but a full-width one at 1em, and pandas pads by character count, so one full-width character shifts every column after it. The shift appears both on the slide and in the student's terminal. `¥` is half-width and fine. Japanese goes in standalone lines outside the aligned rows (a title line, a summary line such as `min cost: …`).
+- **Printed tables are ASCII-only.** Any output whose columns are lined up with spaces (`print(df)`, `df.to_string()`, hand-formatted f-string rows) uses half-width ASCII for column names, row labels and cell values, and no marker symbols such as `★`. Cause: the slide's code font draws a half-width character at 0.55em but a full-width one at 1em, and pandas pads by character count, so one full-width character shifts every column after it. The shift appears both on the slide and in the student's terminal. `¥` is half-width and fine. Japanese goes in standalone lines outside the aligned rows (a title line, a summary line such as `min cost: …`).
 - For large tables or arrays, show only a small, intentional preview such as `print(df.head())`; do not dump all rows unless the full output is pedagogically necessary (a 20-row dump buries the point).
-- **One slide = one idea.** Split a slide at its conceptual seam when it carries two ideas, never because of its height. **Vertical overflow is fine**: slides scroll, and a figure, output or callout below the 720px fold is not a defect. Do not measure, check or report slide overflow in audits or reviews (author decision, 2026-10-25).
+- **One slide = one idea.** Split a slide at its conceptual seam when it carries two ideas, never because of its height. **Vertical overflow is fine**: slides scroll, and a figure, output or callout below the 720px fold is not a defect. Do not measure, check or report slide overflow in audits or reviews.
 - **String literals in student-visible code use double quotes** (`"数学I"`, `{"User-Agent": "..."}`). Inside f-string braces keep single quotes for Python <3.12 compatibility (`f"{d['title']}"`); genuine Python repr output shows singles — leave real output as-is.
-- **Figure/image sizing: `#| out-width` and pixel `width` attributes do NOT work.** The theme's `.reveal img { width: auto; height: auto }` (custom.css) overrides HTML width/height attributes, so Quarto's `out-width` silently renders at natural size (verified 2026-08-15). Shrink figures with `#| classes: fig-small` (max-height 300px) / `fig-medium` (400px) on the cell, or wrap in `::: {.fig width="60%"}` — figscale.lua moves a *percentage* width onto the img as an inline style, which does win over the theme CSS.
+- **Figure/image sizing: `#| out-width` and pixel `width` attributes do NOT work.** The theme's `.reveal img { width: auto; height: auto }` (custom.css) overrides HTML width/height attributes, so Quarto's `out-width` silently renders at natural size. Shrink figures with `#| classes: fig-small` (max-height 300px) / `fig-medium` (400px) on the cell, or wrap in `::: {.fig width="60%"}` — figscale.lua moves a *percentage* width onto the img as an inline style, which does win over the theme CSS.
 - **Highlight marker (`==text==`):** `hl.lua` filter turns `==text==` into a highlighted span (white text + cyan outline). Since cleanslidekit v1.4.0 phrases with spaces work too (`==a b==`); a literal `a == b` or an unclosed `==` stays untouched. `[a b]{.hl}` also still works.
 - **MathJax `\vec{}` height fix:** `\vec{a}` and `\vec{b}` render at different heights because `b` has an ascender. Use `\vec{\vphantom{b}a}` to match the arrow height of shorter letters to `b`.
-- **LaTeX backslash-loss check (recurring bug, fixed 2026-08-16):** Slide math has repeatedly lost its backslashes (`\alpha`→`alpha`, `,\qquad`→`,qquad`, `\dfrac`→`dfrac`), always clustered within one slide: that slide's text once passed through an escape-eating write path. Prevention: write `.qmd` content only via the Write/Edit tools (never shell heredoc/echo/redirection), and after touching any math run
+- **LaTeX backslash-loss check:** slide math loses its backslashes (`\alpha`→`alpha`, `\dfrac`→`dfrac`) when the text passes through a write path that interprets escapes, such as a shell heredoc. After touching any math run
   `grep -nE '(^|[^\\a-zA-Z])(dfrac|qquad|quad|underbrace|mathbf|mathrm|leftarrow|infty|therefore)([^a-zA-Z]|$)' *.qmd`
   (these commands never appear in prose/code, so any hit is a broken formula). Greek letters (`alpha` etc.) cannot be grepped globally because matplotlib code uses `alpha=`. For those, eyeball the `$...$` spans and the rendered slide.
 
 ## Deck-writing policies
 
-Established 2026-07 (imported from the llm-course revise); apply to every deck:
+Apply to every deck:
 
 - **Do not ration slides.** One concept may use the full 動機（問いかけ）→ 実験/図 → 組み立て → 観察 sequence; "one slide = one idea" works toward **more** slides, not fewer (typical deck: 18–25).
 - **Figures, code, and interactivity are investments that lower explanation cost** — when in doubt, add them. In particular: (1) every function that appears as a formula also gets its **curve** (sigmoid, ReLU, softmax, −log, …); (2) every network gets a **D2 structure diagram** (no code-only or math-only component definitions); (3) interactive versions (explorer, plotly) beat static images.
-- **Write the procedure as plain, readable code instead of introducing a library function for it** (author decision, 2026-10-27). A short loop that students can read (split → fit and score k times → average) teaches more than an explanation, and "here is a function, let's call it" turns students into keypunchers. When the procedure is only slicing, a loop and a mean, write it by hand; the library function (`train_test_split`, `cross_val_score`, …) goes in a (参考) slide at the end.
-- **A figure must show what happens at a glance.** Flow/sequence diagrams of the steps (box → arrow → box) mostly add nothing; prefer a picture of the thing itself (e.g. the 8:2 bar of train vs test) (author decision, 2026-10-27).
+- **Write procedures as readable code, not library calls.** Library functions (`train_test_split`, `cross_val_score`, …) go in a (参考) slide.
+- **A figure must show what happens at a glance.** No step-by-step flow diagrams.
 - **New torch APIs get a minimal behavior demo at first use** (`tensor` ops, `backward()`, `nn.Linear`, …) before they appear inside a model.
 - **Numbers must have provenance**: assertive numbers and observation callouts may only come from **[doc/measured-log.md](doc/measured-log.md)** — measure with `tools/` first, log it, then write the slide.
-- Interactive assets: the self-built NN explorer (`explorer/index.html`) runs on real weights trained for this course; pick the view via URL hash (`#view=boundary` moons NN with clickable hidden-unit fold lines + epoch slider; `#view=draw` MNIST canvas with the real preprocessing; `#view=weights` first-layer weight gallery) and embed per-deck as an iframe. TensorFlow Playground can be iframed (verified 2026-07). Plotly figures use the IP3200/llm pattern: `fig.write_html("iframes/…", include_plotlyjs="directory")` + `::: {.plotly-iframe src=…}`; `iframes/` is regenerated by hidden cells at render (gitignored + registered as resources).
+- Interactive assets: the self-built NN explorer (`explorer/index.html`) runs on real weights trained for this course; pick the view via URL hash (`#view=boundary` moons NN with clickable hidden-unit fold lines + epoch slider; `#view=draw` MNIST canvas with the real preprocessing; `#view=weights` first-layer weight gallery) and embed per-deck as an iframe. TensorFlow Playground can be iframed. Plotly figures: `fig.write_html("iframes/…", include_plotlyjs="directory")` + `::: {.plotly-iframe src=…}`; `iframes/` is regenerated by hidden cells at render (gitignored + registered as resources).
 
 ## Error Handling
 
 - **No `getattr`** — use direct attribute access (`obj.attr`).
 - **Never swallow failures.** Wrong type, missing value, missing package, or unexpected state must raise an error, not be hidden by `try/except`, `continue`, `pass`, a silent fallback/default, or `.get()` when the key must exist.
 - Prefer an immediate crash with a stack trace. It points directly at the source of the problem; a swallowed failure lets corrupted state propagate and usually surfaces later as a harder-to-debug bug.
-- If a lecture needs a dependency, add it to this project's `environment.yml` and make sure the actual `ai` Conda environment is updated too. Do not add fallback code for a missing dependency, and do not install packages only into a parent or unrelated environment.
+- If a lecture needs a dependency, add it to `environment.yml`. Do not add fallback code for a missing dependency.
 
 ## Build
 
@@ -109,13 +111,11 @@ quarto render                # build to _site/
 
 **Heavy render:** `mnist-project.qmd` downloads MNIST (~12MB, cached in gitignored `data/`) and trains an MLP for 3 epochs on CPU — expect a few minutes for that file. `nn-backprop.qmd` and `pytorch-intro.qmd` each train for a few seconds.
 
-**After editing any `.qmd`, render the changed files before finishing** (`quarto render <file>.qmd`, with the `ai` conda env active) so `_site/` matches the source — the user reviews changes through qmd_editor, whose preview shows the rendered output; a stale `_site/` hides the edits. Do not run `quarto preview` or publish yourself — the user owns those. (Rule revised 2026-08-15; previously "never render".)
-
 ## Self-contained, reproducible builds
 
-Each repo must build from a **fresh clone** on any machine — students build it locally, and the author restores it on a new laptop — with nothing more than `conda env create -f environment.yml` + `quarto render` (on Windows, `python setup.py` in place of `conda env create`: conda cannot extract the conda-forge `d2` package there without symlink privilege, so `setup.py` installs `d2` from its release). Do **not** rely on globally-installed tools or on running `quarto add` after cloning.
+Each repo must build from a **fresh clone** on any machine with nothing more than `conda env create -f environment.yml` + `quarto render` (on Windows, `python setup.py` in place of `conda env create`: conda cannot extract the conda-forge `d2` package there without symlink privilege, so `setup.py` installs `d2` from its release). Do **not** rely on globally-installed tools or on running `quarto add` after cloning.
 
-- **Commit `_extensions/`** — Quarto extensions are vendored, not regenerated. Never gitignore `_extensions/`, or a fresh clone fails to build. (This bit us: a stray `_extensions/` line in `.gitignore` had been keeping the lightbox and d2 extensions out of git.)
+- **Commit `_extensions/`** — Quarto extensions are vendored, not regenerated. Never gitignore `_extensions/`, or a fresh clone fails to build.
 - **Declare every build-time tool in `environment.yml`** — e.g. the `d2` CLI (used by the quarto-d2 diagram filter) is a `conda-forge` dependency, not a global install.
 
 ## Style or functionality changes
@@ -138,10 +138,12 @@ document.addEventListener('keydown', function(e) {
 ## Deploy
 
 ```bash
-quarto publish gh-pages
+quarto publish gh-pages --id gh-pages --no-render --no-prompt
 ```
 
 https://rkskmt.github.io/ai-lectures/
+
+- Render only the changed decks; never re-render the whole site to deploy.
 
 ## Reference Docs
 

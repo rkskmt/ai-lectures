@@ -53,7 +53,7 @@ tools/preview-style classification-basics-1d.qmd
 
 ```bash
 quarto render            # _site/ に出力
-quarto publish gh-pages  # GitHub Pages へデプロイ
+quarto publish gh-pages --id gh-pages --no-render  # 今ある _site/ を GitHub Pages へデプロイ
 ```
 
 ## 配布用PDF（ハンドアウト・著者向け）
