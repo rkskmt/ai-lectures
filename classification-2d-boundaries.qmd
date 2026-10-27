@@ -251,10 +251,13 @@ Sea bass を陽性と数える場合も、同じ手順で数え直すだけ。
 
 ## 決定木（[Decision Tree]{.en}）
 
-- 条件分岐を繰り返すことによる分類・予測手法
-  - 木のように枝分かれするので決定**木**
-  - 要するに「多段のif文でいい感じに切り分ける」
-     - 「いい感じ」の基準が必要になる
+- **条件分岐を繰り返す**ことによる分類・予測手法
+  - 木のように枝分かれするので**決定木**
+  - 要するに「**多段のif文でいい感じに切り分ける**」
+
+::: {.takeaway .dark}
+**「いい感じ」の基準はどう考えればいいのか**
+:::
 
 
 ## 分割の良さを測る尺度：ジニ不純度
@@ -263,8 +266,11 @@ Sea bass を陽性と数える場合も、同じ手順で数え直すだけ。
 
 **ジニ不純度（[Gini impurity]{.en}）**
 
-$$\text{Gini} = 1 - (p_{\text{Salmon}}^2 + p_{\text{Sea bass}}^2)$$
+$$\text{Gini} = 1 - (p_{\text{salmon}}^2 + p_{\text{sea bass}}^2)$$
 
+- $p_{\text{salmon}}$：データ全体に対するSalmonの割合
+   - データを１選択したときのSalmonである確率（なので$p$）
+- $p_{\text{seabass}}$：データ全体に対するSea bassの割合
 - **Gini = 0**: 完全に1クラスだけ（純粋）
 - **Gini = 0.5**: 50:50で混ざってる（不純）
 
@@ -276,9 +282,9 @@ $$\text{Gini} = 1 - (p_{\text{Salmon}}^2 + p_{\text{Sea bass}}^2)$$
 :::
 
 
-## 手で引いた縦線のジニ不純度 {#peek-gini-hand}
+## 実際の計算方法 {#peek-gini-hand}
 
-- 縦線の左右それぞれに Salmon と Sea bass が何匹いるかは、性能評価で数えた TP, FP, FN, TN そのもの
+- 縦線の左右それぞれに Salmon と Sea bass 数はTP, FP, FN, TN
    - 左側（輝度 < 閾値）：Salmon が TP 匹、Sea bass が FP 匹
    - 右側：Salmon が FN 匹、Sea bass が TN 匹
 - 左右それぞれのジニ不純度を匹数で重み付けして平均したもの（**加重平均**）が、この切り方の不純度
@@ -321,7 +327,77 @@ print(f"  weighted Gini = {weighted_gini:.3f}")
 
 ## **Tweak** 閾値を変えてジニ不純度を比べる {.badge-practice}
 
-- [縦線の閾値](#peek-handline){.peek}を書き換えて、[ジニ不純度のセル](#peek-gini-hand){.peek}まで続けて実行
+```{python}
+#| echo: true
+#| output: false
+#| code-fold: true
+#| code-summary: "土台のコード"
+
+import numpy as np
+
+# Salmon（40匹）の重さ (g)
+salmon_weights = [2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,
+                  1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,
+                  2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,
+                  1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652]
+
+# Salmon（40匹）の輝度（暗め: 2.1-5.9）
+salmon_brightness = [3.5, 5.8, 4.9, 4.4, 2.6, 2.6, 2.2, 5.5, 4.4, 4.8, 2.1,
+                     5.9, 5.3, 2.8, 2.7, 2.7, 3.2, 4.1, 3.7, 3.2, 4.4, 2.6,
+                     3.2, 3.5, 3.8, 5.1, 2.8, 4.1, 4.4, 2.2, 4.4, 2.7, 2.3,
+                     5.8, 5.9, 5.2, 3.2, 2.4, 4.7, 3.8]
+
+# Sea bass（40匹）の重さ (g)
+seabass_weights = [1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,
+                   1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,
+                   1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,
+                   1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531]
+
+# Sea bass（40匹）の輝度（明るめ: 5.0-9.9）
+seabass_brightness = [5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8,
+                       8.9, 9.7, 9.5, 8.0, 9.6, 5.4, 6.0, 5.2, 6.6, 6.9, 6.4,
+                       9.1, 6.8, 6.4, 7.7, 5.7, 9.0, 5.4, 9.9, 8.9, 6.0, 5.0,
+                       9.1, 8.5, 8.6, 8.9, 5.4, 6.8, 5.6]
+
+# numpy配列にキャスト
+salmon_weights = np.array(salmon_weights)
+salmon_brightness = np.array(salmon_brightness)
+seabass_weights = np.array(seabass_weights)
+seabass_brightness = np.array(seabass_brightness)
+
+# 目で見て決めた閾値。輝度がこれより小さければ Salmon
+lightness_threshold = 5.5
+
+def gini(n_salmon, n_seabass):
+    """ジニ不純度。n_salmon, n_seabass はその領域にいる匹数"""
+    n = n_salmon + n_seabass
+    if n == 0:
+        return 0
+    p_salmon = n_salmon / n
+    p_seabass = n_seabass / n
+    return 1 - (p_salmon**2 + p_seabass**2)
+
+# 縦線の左右それぞれに、Salmon と Sea bass が何匹いるか
+left_salmon = np.sum(salmon_brightness < lightness_threshold)
+left_seabass = np.sum(seabass_brightness < lightness_threshold)
+right_salmon = np.sum(salmon_brightness >= lightness_threshold)
+right_seabass = np.sum(seabass_brightness >= lightness_threshold)
+
+gini_left = gini(left_salmon, left_seabass)
+gini_right = gini(right_salmon, right_seabass)
+
+# 左右のジニ不純度を匹数で重み付けして平均
+n_left = left_salmon + left_seabass
+n_right = right_salmon + right_seabass
+weighted_gini = (n_left * gini_left + n_right * gini_right) / (n_left + n_right)
+
+print(f"threshold={lightness_threshold}")
+print(f"  left : Salmon {left_salmon:>2}, Sea bass {left_seabass:>2}, Gini={gini_left:.3f}")
+print(f"  right: Salmon {right_salmon:>2}, Sea bass {right_seabass:>2}, Gini={gini_right:.3f}")
+print(f"  weighted Gini = {weighted_gini:.3f}")
+```
+
+- 「土台コード」の`lightness_threshold` を書き換えて実行
 
 ::: {.tweak}
 | やりたいこと | コード |
@@ -516,27 +592,52 @@ plt.show()
 3. これを繰り返して決めた深さで打ち切る
 4. **各領域は、その中の多数派クラスとする**
 
-```{.d2 sketch="true" width="82%"}
-direction: right
-S1: "1. 輝度の最適な閾値で\n左右に分割" { style.fill: "#e1f5ff" }
-S2: "2. 左右それぞれを\n重さの最適な閾値で分割" { style.fill: "#fff4e1" }
-S3: "3. 決めた深さまで\n繰り返し" { style.fill: "#fff4e1" }
-S4: "4. 各領域は\n多数派クラスとする" { style.fill: "#d5f5e3" }
-S1 -> S2 -> S3 -> S4
-S3 -> S1: 輝度→重さ→輝度→… {style.stroke-dash: 3}
+```{.d2 sketch="true" width="55%"}
+# 2x2 grid instead of a 4-in-a-row chain: the row layout was 1523x175,
+# so at slide width the labels shrank to ~9px. With only grid-columns set,
+# d2 fills column by column (verified with d2 0.7.1), so the order
+# C1, C2, C4, C3 places the flow 1 (top-left) -> 2 (bottom-left)
+# -> 3 (bottom-right) -> 4 (top-right).
+#
+# Workaround: d2 has no setting to keep an arrow end away from its box
+# (grid edges are straight border-to-border lines, so the diagonal back
+# edge sat on the box corners). Each box is wrapped in a transparent
+# container and the edges connect the containers, whose fixed 30px
+# padding becomes the visible gap. The box font is raised so the text
+# keeps its size despite the padding; the loop label lives in box 3
+# because an edge label would cover the shortened diagonal.
+grid-columns: 2
+vertical-gap: 50
+horizontal-gap: 30
+classes: {
+  pad: { label: ""; style.stroke: transparent; style.fill: transparent }
+  box: { style.font-size: 26 }
+}
+C1.class: pad
+C1.S1: "1. 輝度の最適な閾値で\n左右に分割" { class: box; style.fill: "#e1f5ff" }
+C2.class: pad
+C2.S2: "2. 左右それぞれを\n重さの最適な閾値で分割" { class: box; style.fill: "#fff4e1" }
+C4.class: pad
+C4.S4: "4. 各領域は\n多数派クラスとする" { class: box; style.fill: "#d5f5e3" }
+C3.class: pad
+C3.S3: "3. 決めた深さまで繰り返し\n（輝度→重さ→輝度→…）" { class: box; style.fill: "#fff4e1" }
+C1 -> C2 -> C3 -> C4
+C3 -> C1: {style.stroke-dash: 3}
 ```
 
 
 ## 【準備】データをまとめてラベル付きにする（特徴量行列）
 
-- 2回目は「1回目で左側に残った魚だけ」を対象に、重さの閾値を探す
-   - 左側に残ったのは、輝度・重さ・種類がそろった魚の集まり
-- いまの4本の配列のままだと、分けるたびに4本を別々に絞り込むことになる
-- そこで、1匹を `[輝度, 重さ]` の配列 `X` と、ラベル `y` にまとめる
-   - 左側の魚だけを、特徴量も種類もいっしょに取り出せる（次のセルで確かめる）
-   - 「どの特徴量で切るか」は列番号で選べる（`X[:, 0]` = 輝度、`X[:, 1]` = 重さ）
+- scikit-learn（Python の機械学習ライブラリ）は、データを `X` と `y` の2つに分けて受け取る
+   - `X`：1匹分の特徴量の組 `[輝度, 重さ]` を、魚の順に並べたもの
+   - `y`：ラベル（1 = Salmon、0 = Sea bass）を、同じ魚の順に並べたもの
+   - どちらも i 番目が i 匹目
+- 自作の決定木も、この `X` と `y` で書く
 
-| 行 | `X[:, 0]` 輝度 | `X[:, 1]` 重さ | `y` |
+
+## `X` と `y` を表にすると
+
+| i | `X[i]` の輝度 | `X[i]` の重さ | `y[i]` |
 |:--:|:--:|:--:|:--:|
 | 0 | 3.5 | 2149 | 1 |
 | ⋮ | ⋮ | ⋮ | ⋮ |
@@ -545,11 +646,13 @@ S3 -> S1: 輝度→重さ→輝度→… {style.stroke-dash: 3}
 | ⋮ | ⋮ | ⋮ | ⋮ |
 | 79 | 5.6 | 1531 | 0 |
 
-
-::: {.takeaway .dark}
-**この行列を特徴量行列（[feature matrix]{.en}）という**
+::: {.caption-note}
+表にすると、`X` は1行 = 1匹、1列 = 1特徴量の形
 :::
 
+::: {.takeaway .dark}
+**`X` を特徴量行列（[feature matrix]{.en}）という**
+:::
 
 
 ## 特徴量行列の作成
@@ -557,17 +660,46 @@ S3 -> S1: 輝度→重さ→輝度→… {style.stroke-dash: 3}
 ```{python}
 #| echo: true
 
-# 1匹を [輝度, 重さ] の1行にして、Salmon 40行のあとに Sea bass 40行を並べる
+# i 匹目の [輝度, 重さ] を1組にして、Salmon 40組のあとに Sea bass 40組を並べる
 rows = []
-for b, w in zip(salmon_brightness, salmon_weights):
-    rows.append([b, w])
-for b, w in zip(seabass_brightness, seabass_weights):
-    rows.append([b, w])
-X = np.array(rows)                 # 80行 2列
-y = np.array([1]*40 + [0]*40)      # X と同じ行順。1=Salmon, 0=Sea bass
+for i in range(40):
+    rows.append([salmon_brightness[i], salmon_weights[i]])
+for i in range(40):
+    rows.append([seabass_brightness[i], seabass_weights[i]])
+X = np.array(rows)                 # 80組。表にすると80行2列
+y = np.array([1]*40 + [0]*40)      # X と同じ魚の順。1=Salmon, 0=Sea bass
 
-print(X.shape, y.shape)
-print(X[:3])                       # 先頭3匹の [輝度, 重さ]
+print(X.shape, y.shape)            # (80, 2) は80行2列、(80,) は80個
+print(X[:3])                       # 先頭3匹の [輝度, 重さ]。1組が1行ずつ表示される
+```
+
+
+## 特徴量行列から値を取り出してみるテスト
+
+- `X[行, 列]` の形で、行（何匹目か）と列（どの特徴量か）を指定する
+- `:` は「全部」の意味（`X[:3]` の `:3` から、始めと終わりを省いた形）
+   - `X[:, 0]`：全部の魚の輝度
+   - `X[:, 1]`：全部の魚の重さ
+
+```{python}
+#| echo: true
+
+print(X[0])          # 列を省略 → 0匹目の [輝度, 重さ]
+print(X[0, 0])       # 0匹目の輝度
+print(X[:5, 0])      # 先頭5匹の輝度
+print(len(X[:, 0]))  # 全部の魚の輝度 → 80個
+```
+
+
+## 条件で `X` と `y` を絞り込むテスト
+
+- `X` と `y` は インデックスが対応している
+   - boolの結果を保存して使いまわすだけで両方の必要な部分を取得可能
+      - 下記では`mask`がそれ
+   
+   
+```{python}
+#| echo: true
 
 # 1回目の分割（輝度 < 5.0）で左側に入る魚を、X と y から取り出す
 left_mask = X[:, 0] < best_threshold   # 80匹それぞれの True/False。列0 = 輝度で判定
@@ -793,7 +925,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
 # 決定木モデル（深さ3まで）
-tree_model = DecisionTreeClassifier(max_depth=3, random_state=42)
+tree_model = DecisionTreeClassifier(max_depth=3)
 tree_model.fit(X, y)
 
 # 予測
@@ -973,7 +1105,7 @@ print(f"| 決定木（深さ3） | {accuracy_tree:.3f} | {precision_tree:.3f} | 
 #| code-summary: "code"
 
 for depth in [1, 3, None]:
-    model = DecisionTreeClassifier(max_depth=depth, random_state=42)
+    model = DecisionTreeClassifier(max_depth=depth)
     model.fit(X, y)
     acc = accuracy_score(y, model.predict(X))
     print(f"max_depth={str(depth):<4}: Accuracy = {acc:.3f}")
@@ -995,7 +1127,7 @@ xx_g, yy_g = np.meshgrid(np.arange(X[:, 0].min() - 1, X[:, 0].max() + 1, 0.05),
 
 fig, axes = plt.subplots(1, 3, figsize=(13, 4))
 for ax, depth in zip(axes, [1, 3, None]):
-    m = DecisionTreeClassifier(max_depth=depth, random_state=42).fit(X, y)
+    m = DecisionTreeClassifier(max_depth=depth).fit(X, y)
     Z = m.predict(np.c_[xx_g.ravel(), yy_g.ravel()]).reshape(xx_g.shape)
     ax.contourf(xx_g, yy_g, Z, alpha=0.3, levels=1, colors=["lightcoral", "lightblue"])
     ax.contour(xx_g, yy_g, Z, levels=[0.5], colors="blue", linewidths=2)
@@ -1060,51 +1192,6 @@ plt.show()
 :::
 
 
-## 練習問題
-
-本編の80匹のデータ `X`, `y` について、以下の1〜4を実行して境界を比較せよ
-
-1. 散布図を見て自分で輝度の閾値を1つ決め、その縦線での TP, FP, FN, TN を計算せよ（Accuracy も表示）
-
-2. `DecisionTreeClassifier` を深さ 1, 2, 3, 4, 5 で学習し、それぞれの Accuracy, Precision, Recall を表示せよ
-
-3. 2.の結果から、どの深さを選ぶかを理由とともに答えよ
-
-4. 1.の縦線と 2.の決定木を比較し、1次元（重さだけ）のときと比べて何が改善したかを述べよ
-
-
-## 解答例
-
-```{python}
-#| echo: true
-#| code-fold: true
-#| code-summary: "解答例を見る"
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score, precision_score, recall_score
-
-# 1. 自分の縦線（例：輝度 5.0）
-t = 5.0
-y_pred = (X[:, 0] < t).astype(int)    # 1=Salmon, 0=Sea bass
-TP = np.sum((y == 1) & (y_pred == 1))
-TN = np.sum((y == 0) & (y_pred == 0))
-FP = np.sum((y == 0) & (y_pred == 1))
-FN = np.sum((y == 1) & (y_pred == 0))
-print(f"threshold={t}: TP={TP}, FP={FP}, FN={FN}, TN={TN}, Accuracy={(TP + TN) / len(y):.3f}")
-
-# 2. 深さ 1〜5 の決定木
-for depth in [1, 2, 3, 4, 5]:
-    model = DecisionTreeClassifier(max_depth=depth, random_state=42).fit(X, y)
-    p = model.predict(X)
-    print(f"max_depth={depth}: Accuracy={accuracy_score(y, p):.3f}, "
-          f"Precision={precision_score(y, p):.3f}, Recall={recall_score(y, p):.3f}")
-```
-
-- 3.：深くするほど同じデータでの精度は上がる。ただし採点に使ったのが学習データなので、深いほど良いとは言えない
-   - どの深さが本当に良いかは、学習に使っていないデータで採点しないと決められない
-- 4.：縦線は輝度だけを使う。決定木は重さも使って階段状に切るので、誤分類が減る
-   - 1次元（重さだけ）より精度が上がった
-
-
 ## 次回
 
 - 深さ無制限の決定木は、学習に使った同じデータで採点して満点だった
@@ -1112,3 +1199,169 @@ for depth in [1, 2, 3, 4, 5]:
    - この現象には名前がある：**過学習（[overfitting]{.en}）**
 - 散布図で見えた**斜めの直線**はまだ引けていない
    - 直線を数式で最適化する道具は、線形回帰・ロジスティック回帰の回で扱う
+
+
+## 練習問題
+
+### 問題：花弁の大きさから、アヤメの品種を見分ける
+
+- アヤメ（[Iris]{.en}）の仲間の **versicolor** と **virginica** は、どちらも北米に自生する、見た目の似た2品種
+   - 定着した和名はなく、日本語では versicolor を「ブルーフラッグ」（英名 blue flag のカタカナ）、virginica を「バージニカ」と呼ぶことが多い
+- 2品種計100本の花について、**花弁**（[petal]{.en}）の長さと幅（cm）を測ったデータがある
+   - アヤメの花は、外側に垂れる大きな3枚が**がく**（[sepal]{.en}）、内側の3枚が花弁
+- **花弁の長さと幅から、品種を見分けたい**
+
+:::: {.columns}
+::: {.column width="50%"}
+::: {.fig-cite src="imgs/iris-versicolor.jpg" height="250px"}
+::: {.cite}
+versicolor（ブルーフラッグ）　出典: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Iris_versicolor_3.jpg), Dlanglois, CC BY-SA 3.0
+:::
+:::
+:::
+
+::: {.column width="50%"}
+::: {.fig-cite src="imgs/iris-virginica.jpg" height="250px"}
+::: {.cite}
+virginica（バージニカ）　出典: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Iris_virginica.jpg), Frank Mayfield, CC BY-SA 2.0
+:::
+:::
+:::
+::::
+
+
+## 練習問題：前提（データと関数）
+
+次のコードをコピーして実行してから、課題1〜3に取り組む
+
+```{python}
+#| echo: true
+
+import numpy as np
+from sklearn.datasets import load_iris
+
+# データ：versicolor と virginica の100本
+iris = load_iris()             # アヤメ150本。0〜49行目 setosa、50〜99行目 versicolor、100〜149行目 virginica
+X = iris.data[50:, 2:]         # 50行目以降の100本の、列2・3（花弁の長さ・幅 cm）
+y = np.array([1]*50 + [0]*50)  # X と同じ花の順。1=versicolor, 0=virginica
+
+def gini(n_1, n_0):
+    """ジニ不純度。n_1, n_0 はその領域にある versicolor（1）と virginica（0）の本数"""
+    n = n_1 + n_0
+    if n == 0:
+        return 0
+    return 1 - ((n_1 / n)**2 + (n_0 / n)**2)
+
+def weighted_gini_at(x, y, threshold):
+    """x < threshold を左、それ以外を右に分けたときの、左右のジニ不純度の加重平均"""
+    left = x < threshold
+    n_left = np.sum(left)
+    n_right = np.sum(~left)
+    gini_left = gini(np.sum(y[left] == 1), np.sum(y[left] == 0))
+    gini_right = gini(np.sum(y[~left] == 1), np.sum(y[~left] == 0))
+    return (n_left * gini_left + n_right * gini_right) / len(y)
+```
+
+
+## 課題1：花弁の長さだけ、幅だけで分ける
+
+花弁の長さだけ・幅だけのそれぞれについて、加重平均ジニ不純度が最小になる閾値を求め、その閾値で分けたときの指標を表示せよ（閾値、加重平均ジニ不純度、TP・FP・FN・TN、Accuracy、Precision、Recall）
+
+1. 閾値の候補の用意（その特徴量に現れる値すべて。本編と同じく `np.unique`。長さは `X[:, 0]`、幅は `X[:, 1]`）
+2. 候補ごとの加重平均ジニ不純度の計算（`weighted_gini_at` を使う）
+3. 最小となる閾値で、`x < 閾値` を versicolor（陽性）、それ以外を virginica と予測したときの指標の計算
+
+
+## 課題2：scikit-learn の決定木で分ける
+
+花弁の長さと幅の両方を使い、`DecisionTreeClassifier(max_depth=N)` で学習して、Accuracy、Precision、Recall を表示せよ（N は自分で決める）
+
+- 指標は本編と同じく `accuracy_score`、`precision_score`、`recall_score` で計算する
+
+
+## 課題3：決定境界を描く
+
+課題2のモデルの決定境界を、次の関数 `plot_boundary(model, X, y)` で描け
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "決定境界を描く関数（コピーして使う）"
+
+import matplotlib.pyplot as plt
+import japanize_matplotlib
+
+def plot_boundary(model, X, y):
+    """model の決定境界と、100本の花を描く"""
+    # 図の範囲を細かい格子に区切り、格子点すべてを model で予測する
+    xx, yy = np.meshgrid(np.arange(X[:, 0].min() - 0.5, X[:, 0].max() + 0.5, 0.02),
+                         np.arange(X[:, 1].min() - 0.2, X[:, 1].max() + 0.2, 0.01))
+    Z = model.predict(np.c_[xx.ravel(), yy.ravel()]).reshape(xx.shape)
+
+    # 予測が virginica（0）の領域を赤、versicolor（1）の領域を青で塗る
+    plt.figure(figsize=(7, 5))
+    plt.contourf(xx, yy, Z, alpha=0.3, levels=1, colors=["lightcoral", "lightblue"])
+    plt.scatter(X[y == 1, 0], X[y == 1, 1], c="blue", marker="o", label="versicolor")
+    plt.scatter(X[y == 0, 0], X[y == 0, 1], c="red", marker="s", label="virginica")
+    plt.xlabel("花弁の長さ (cm)")
+    plt.ylabel("花弁の幅 (cm)")
+    plt.legend()
+    plt.show()
+```
+
+
+## 解答例（課題1）
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "解答例を見る"
+
+# 前提のコードは実行済みとする
+names = ["花弁の長さ", "花弁の幅"]
+
+for f in [0, 1]:
+    x = X[:, f]
+    best_threshold = None
+    best_gini = 1.0
+    for threshold in np.unique(x):
+        g = weighted_gini_at(x, y, threshold)
+        if g < best_gini:
+            best_threshold = threshold
+            best_gini = g
+
+    # x < 閾値 を versicolor（陽性）と予測したときの指標
+    pred_1 = x < best_threshold
+    TP = np.sum(y[pred_1] == 1)    # versicolor を正しく versicolor と予測
+    FP = np.sum(y[pred_1] == 0)    # virginica を誤って versicolor と予測
+    FN = np.sum(y[~pred_1] == 1)   # versicolor を見逃し
+    TN = np.sum(y[~pred_1] == 0)   # virginica を正しく virginica と予測
+    accuracy = (TP + TN) / len(y)
+    precision = TP / (TP + FP)
+    recall = TP / (TP + FN)
+    print(f"{names[f]} < {best_threshold}: 加重平均ジニ不純度 {best_gini:.3f}")
+    print(f"  TP={TP}, FP={FP}, FN={FN}, TN={TN}")
+    print(f"  Accuracy {accuracy:.3f}, Precision {precision:.3f}, Recall {recall:.3f}")
+```
+
+
+## 解答例（課題2・3）
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "解答例を見る"
+#| classes: fig-medium
+
+# 前提のコードと課題3の関数は実行済みとする
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score, precision_score, recall_score
+
+N = 2
+model = DecisionTreeClassifier(max_depth=N).fit(X, y)
+y_pred = model.predict(X)
+print(f"深さ{N}: Accuracy {accuracy_score(y, y_pred):.3f}, "
+      f"Precision {precision_score(y, y_pred):.3f}, Recall {recall_score(y, y_pred):.3f}")
+
+plot_boundary(model, X, y)
+```
