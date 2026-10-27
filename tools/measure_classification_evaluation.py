@@ -122,6 +122,131 @@ def main():
     cv_r10 = [cross_val_score(tree(d), X_tr, y_tr, cv=10, scoring="recall").mean() for d in depths]
     print(f"   best depth by CV Recall (cv=10): {depths[int(np.argmax(cv_r10))]}  means {np.round(cv_r10, 3)}")
 
+    manual_kfold_claims(X, y)
+
+
+def kfold_scores(depth, X, y, k, seed):
+    """The deck's hand-written k-fold: rows already in random order, group = position % k.
+
+    Returns per-group (precision, recall) arrays and the number of groups whose
+    Precision or Recall was undefined (no predicted / no true Salmon)."""
+    group = np.arange(len(y)) % k
+    ps, rs, undefined = [], [], 0
+    for i in range(k):
+        m = DecisionTreeClassifier(max_depth=depth, random_state=seed)
+        m.fit(X[group != i], y[group != i])
+        pred, true = m.predict(X[group == i]), y[group == i]
+        if np.sum(pred == 1) == 0 or np.sum(true == 1) == 0:
+            undefined += 1
+            continue
+        p, r = pr(true, pred)
+        ps.append(p)
+        rs.append(r)
+    return np.array(ps), np.array(rs), undefined
+
+
+def spread(a):
+    q = np.percentile(a, [0, 5, 50, 95, 100])
+    return f"min {q[0]:.3f}  5% {q[1]:.3f}  med {q[2]:.3f}  95% {q[3]:.3f}  max {q[4]:.3f}"
+
+
+def manual_kfold_claims(X, y, trials=1000):
+    """Claims for the hand-written k-fold slides. Shuffles and tree seeds vary per
+    trial (the deck uses neither a shuffle seed nor a tree seed)."""
+    print(f"\n[J] hand-written k-fold on all 120, unlimited tree, {trials} random shuffles")
+    mean5_p, mean5_r, hold_p, hold_r = [], [], [], []
+    wider_std, wider_range, undef = 0, 0, {5: 0, 10: 0}
+    salmon10 = []
+    for t in range(trials):
+        rng = np.random.default_rng(t)
+        idx = rng.permutation(len(y))
+        Xs, ys = X[idx], y[idx]
+        p5, r5, u5 = kfold_scores(None, Xs, ys, 5, t)
+        p10, r10, u10 = kfold_scores(None, Xs, ys, 10, t)
+        undef[5] += u5
+        undef[10] += u10
+        mean5_p.append(p5.mean())
+        mean5_r.append(r5.mean())
+        wider_std += (r10.std() > r5.std()) and (p10.std() > p5.std())
+        wider_range += (np.ptp(r10) > np.ptp(r5)) and (np.ptp(p10) > np.ptp(p5))
+        group10 = np.arange(len(y)) % 10
+        salmon10 += [int(np.sum(ys[group10 == i] == 1)) for i in range(10)]
+        # single 96/24 hold-out on the same shuffle, for the "less luck-dependent" claim
+        m = DecisionTreeClassifier(random_state=t).fit(Xs[:96], ys[:96])
+        hp, hr = pr(ys[96:], m.predict(Xs[96:]))
+        hold_p.append(hp)
+        hold_r.append(hr)
+    print(f"   5-fold mean P : {spread(mean5_p)}  sd {np.std(mean5_p):.3f}")
+    print(f"   5-fold mean R : {spread(mean5_r)}  sd {np.std(mean5_r):.3f}")
+    print(f"   hold-out P    : {spread(hold_p)}  sd {np.std(hold_p):.3f}")
+    print(f"   hold-out R    : {spread(hold_r)}  sd {np.std(hold_r):.3f}")
+    print(f"   k=10 per-group sd > k=5 (both P and R): {wider_std / trials:.1%}")
+    print(f"   k=10 per-group max-min > k=5 (both P and R): {wider_range / trials:.1%}")
+    print(f"   Salmon per k=10 group: {spread(salmon10)}")
+    print(f"   undefined groups: k=5 {undef[5]} of {5 * trials}, k=10 {undef[10]} of {10 * trials}")
+
+    print(f"\n[K] depth chosen by hand-written 5-fold inside the training 96, {trials} random splits")
+    differ, best_p_count, undef96 = 0, {}, 0
+    for t in range(trials):
+        rng = np.random.default_rng(t)
+        idx = rng.permutation(len(y))
+        Xtr, ytr = X[idx][:96], y[idx][:96]
+        cv_p, cv_r = [], []
+        for d in range(1, 11):
+            p, r, u = kfold_scores(d, Xtr, ytr, 5, t)
+            undef96 += u
+            cv_p.append(p.mean())
+            cv_r.append(r.mean())
+        bp, br = int(np.argmax(cv_p)) + 1, int(np.argmax(cv_r)) + 1
+        differ += bp != br
+        best_p_count[bp] = best_p_count.get(bp, 0) + 1
+    print(f"   Precision-chosen depth != Recall-chosen depth: {differ / trials:.1%}")
+    print(f"   Precision-chosen depth counts: {dict(sorted(best_p_count.items()))}")
+    print(f"   undefined groups: {undef96} of {5 * 10 * trials}")
+
+    print(f"\n[L] cross-validation inside the training 96 (validation data), unlimited tree, {trials} random splits")
+    mean5_p, mean5_r, hold_p, hold_r, sal_val, sal10 = [], [], [], [], [], []
+    wider_std, wider_range, undef, hold_undef = 0, 0, {5: 0, 10: 0}, 0
+    for t in range(trials):
+        rng = np.random.default_rng(t)
+        idx = rng.permutation(len(y))
+        Xtr, ytr = X[idx][:96], y[idx][:96]
+        p5, r5, u5 = kfold_scores(None, Xtr, ytr, 5, t)
+        p10, r10, u10 = kfold_scores(None, Xtr, ytr, 10, t)
+        undef[5] += u5
+        undef[10] += u10
+        mean5_p.append(p5.mean())
+        mean5_r.append(r5.mean())
+        wider_std += (r10.std() > r5.std()) and (p10.std() > p5.std())
+        wider_range += (np.ptp(r10) > np.ptp(r5)) and (np.ptp(p10) > np.ptp(p5))
+        g10 = np.arange(96) % 10
+        sal10 += [int(np.sum(ytr[g10 == i] == 1)) for i in range(10)]
+        # one 76 / 20 split of the training data, as on the "1回分けるだけでは揺れる" slide
+        inner = rng.permutation(96)
+        Xf, yf, Xv, yv = Xtr[inner][:76], ytr[inner][:76], Xtr[inner][76:], ytr[inner][76:]
+        sal_val.append(int(np.sum(yv == 1)))
+        pred = DecisionTreeClassifier(random_state=t).fit(Xf, yf).predict(Xv)
+        if np.sum(pred == 1) == 0 or np.sum(yv == 1) == 0:
+            hold_undef += 1
+            continue
+        hp, hr = pr(yv, pred)
+        hold_p.append(hp)
+        hold_r.append(hr)
+    print(f"   5-fold mean P : {spread(mean5_p)}  sd {np.std(mean5_p):.3f}")
+    print(f"   5-fold mean R : {spread(mean5_r)}  sd {np.std(mean5_r):.3f}")
+    print(f"   76/20 split P : {spread(hold_p)}  sd {np.std(hold_p):.3f}")
+    print(f"   76/20 split R : {spread(hold_r)}  sd {np.std(hold_r):.3f}")
+    print(f"   Salmon in the 20 validation fish: {spread(sal_val)}  mean {np.mean(sal_val):.2f}")
+    print(f"   one missed Salmon at the median count moves Recall by 1/{int(np.median(sal_val))}"
+          f" = {1 / np.median(sal_val):.3f}")
+    print(f"   k=10 per-group sd > k=5 (both P and R): {wider_std / trials:.1%}")
+    print(f"   k=10 per-group max-min > k=5 (both P and R): {wider_range / trials:.1%}")
+    print(f"   group sizes k=5: {sorted(set(np.bincount(np.arange(96) % 5)))}"
+          f"  k=10: {sorted(set(np.bincount(np.arange(96) % 10)))}")
+    print(f"   Salmon per k=10 group: {spread(sal10)}")
+    print(f"   undefined groups: k=5 {undef[5]} of {5 * trials}, k=10 {undef[10]} of {10 * trials},"
+          f" 76/20 split {hold_undef} of {trials}")
+
 
 if __name__ == "__main__":
     main()
