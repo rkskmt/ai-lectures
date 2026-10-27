@@ -9,7 +9,8 @@ subtitle: "モデルの「本当の実力」を測る"
 
 - 重さ + 輝度の **2特徴量** で Salmon / Sea bass を分類
 - 手動の直線と決定木で決定境界を学習した
-- **深さ無制限の決定木は正答率 100%**。ただし採点は**学習に使った同じデータ**
+- **深さ無制限の決定木は80匹全部を正しく分類**（Precision も Recall も 100%）
+   - ただし採点は**学習に使った同じデータ**
 - 境界には、数匹のためだけの**飛び地**ができていた
 
 ::: {.callout-note title="今回の主題"}
@@ -20,17 +21,16 @@ subtitle: "モデルの「本当の実力」を測る"
 ## 何が問題か
 
 - モデルは、学習データの特徴を見てパラメータを調整する
-- その同じデータで採点すると、精度は**高めに出やすい**
-- 知りたいのは「学習データへの精度」ではない
+- その同じデータで採点すると、成績は**高めに出やすい**
+- 知りたいのは「学習データでの成績」ではない
 - 知りたいのは「実際に分類したいデータ（今後の魚）で同様の性能か」
 
-::: {.callout-warning title="学習データで採点する危険性"}
-- 学習に使ったデータでの精度は、モデルの実力を楽観的に見積もる可能性がある
-- 新しい魚にも通用するかは、学習に使っていないデータで測るしかない
+::: {.callout-warning title="要するに"}
+新しい魚にも通用するかは、学習に使っていないデータで測るしかない
 :::
 
 
-## 汎化（[generalization]{.en}）
+## 汎化（[Generalization]{.en}）
 
 - 人間のテスト勉強で考える
 
@@ -41,7 +41,7 @@ subtitle: "モデルの「本当の実力」を測る"
 
 - 機械学習でもケアが必要
 
-::: {.callout-note title="汎化（generalization）とは"}
+::: {.callout-note title="汎化とは"}
 - モデルが**学習していないデータ**にも通用する能力のこと
 :::
 
@@ -77,12 +77,18 @@ plt.show()
 ```
 
 - **訓練データ**：モデルに見せて学習させる
-- **テストデータ**：学習後に**一度だけ**使い「本当の精度」を測る
+- **テストデータ**：学習後に**一度だけ**使い「本当の実力」を測る
 
-::: {.callout-warning title="テストデータの鉄則"}
-- テストデータを確認してからモデルを調整しない
-- 「見たことのない問題」を模擬するために残しておく
-:::
+
+## テストデータの鉄則 {#peek-test-data-rule .badge-important}
+
+> **テストデータを確認してからモデルを調整しない**
+
+- **調整**：閾値や木の深さなどを変えて、成績を上げようとすること
+- テストデータは「見たことのない問題」を模擬するために残しておく
+   - 学習と調整がすべて終わってから、**一度だけ**採点に使う
+- テスト勉強にたとえると、今年の問題を先に見てから対策するのと同じ
+   - 点は上がるが、新しい問題を解く実力を測ったことにはならない
 
 
 ## データの準備：魚を増やす
@@ -123,19 +129,27 @@ seabass_brightness = np.array([5.4, 6.6, 6.0, 7.5, 4.9, 7.7, 6.9, 5.0, 8.9, 8.3,
                                3.5, 5.6, 5.4, 5.4, 7.7, 9.5, 4.7, 4.7, 9.9, 5.4, 5.3, 9.5,
                                8.5, 6.0, 8.0, 5.7, 6.0, 8.6, 7.6, 6.8, 9.8, 9.0, 9.6, 8.9])
 
-X = np.column_stack([
-    np.concatenate([salmon_brightness, seabass_brightness]),
-    np.concatenate([salmon_weights,    seabass_weights])
-])
-y = np.array([1]*60 + [0]*60)   # 1=Salmon, 0=Sea bass
+# i 匹目の [輝度, 重さ] を1組にして、Salmon 60組のあとに Sea bass 60組を並べる
+rows = []
+for i in range(60):
+    rows.append([salmon_brightness[i], salmon_weights[i]])
+for i in range(60):
+    rows.append([seabass_brightness[i], seabass_weights[i]])
+X = np.array(rows)                 # 120組。表にすると120行2列
+y = np.array([1]*60 + [0]*60)      # X と同じ魚の順。1=Salmon, 0=Sea bass
 ```
 
 
 ## まずデータを眺める
 
 ```{python}
-#| echo: false
+#| echo: true
+#| code-fold: true
+#| code-summary: "（参考）描画コード"
 #| fig-align: center
+import matplotlib.pyplot as plt
+import japanize_matplotlib
+
 plt.figure(figsize=(7, 4.2))
 plt.scatter(salmon_brightness, salmon_weights, c="black", marker="o",
             s=40, alpha=0.7, label="Salmon")
@@ -154,7 +168,7 @@ plt.show()
 :::
 
 ::: {.callout-important title="質問"}
-このデータで「正答率 100%」を出すモデルがあったら、それは本当に優れたモデルか？
+このデータで「Precision も Recall も 100%」を出すモデルがあったら、それは本当に優れたモデルか？
 :::
 
 
@@ -162,18 +176,21 @@ plt.show()
 
 - モデルは前回と同じ**深さ無制限の決定木**
 - まずは全データで学習し、同じ全データで評価する
-- これは「学習済みデータへの精度」を測っている
+- これは「学習済みデータでの成績」を測っている
+- 成績は前回と同じ **Precision** と **Recall**（どちらも Salmon について計算）
 
 ```{python}
 #| echo: true
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import precision_score, recall_score
 
-same_data_model = DecisionTreeClassifier(max_depth=None, random_state=42)
+same_data_model = DecisionTreeClassifier(max_depth=None)
 same_data_model.fit(X, y)
 
-same_data_acc = accuracy_score(y, same_data_model.predict(X))
-print(f"全データで学習 → 同じ全データで評価: {same_data_acc:.3f}")
+y_pred_same = same_data_model.predict(X)
+print("全データで学習 → 同じ全データで評価")
+print(f"  Precision: {precision_score(y, y_pred_same):.3f}")
+print(f"  Recall:    {recall_score(y, y_pred_same):.3f}")
 ```
 
 ::: {.callout-note}
@@ -183,9 +200,31 @@ print(f"全データで学習 → 同じ全データで評価: {same_data_acc:.3
 :::
 
 
-## ホールドアウト法（[hold-out]{.en}） {#peek-holdout}
+## どうやって分ける？
+
+- `X` と `y` は、Salmon 60匹のあとに Sea bass 60匹の順に並んでいる
+- 先頭の8割（96匹）を訓練データ、残りの2割（24匹）をテストデータにすると
+
+```{python}
+#| echo: true
+
+y_train_head = y[:96]   # 先頭96匹を訓練データに
+y_test_tail = y[96:]    # 残り24匹をテストデータに
+
+print(y_test_tail)      # テストデータのラベル（1=Salmon, 0=Sea bass）
+print(f"訓練データ: Salmon {np.sum(y_train_head == 1)} 匹, Sea bass {np.sum(y_train_head == 0)} 匹")
+```
+
+::: {.callout-note title="ここまでで分かること"}
+- テストデータが **Sea bass だけ**になり、Salmon を当てられるかは測れない
+- 並び順に左右されないよう、**ランダムに選んだ一部**をテスト用に取っておく
+:::
+
+
+## ホールドアウト法（[Hold-Out]{.en}） {#peek-holdout}
 
 - データの一部を、最初から**学習用**と**評価用**に分割
+   - 評価用の一部を、学習に使わず取っておく（hold out）ことからこう呼ぶ
    - 最初に試す評価方法としてよく使う
 
 ```{.d2 sketch="true" width="82%"}
@@ -202,23 +241,35 @@ F -> S: 学習済みモデル
 TE -> S: 初見の問題 {style.stroke-dash: 3}
 ```
 
+
+## ランダムに並べ替えてから分ける {#peek-split}
+
+- まずデータをランダムに並べ替える
+- 次に[「どうやって分ける？」](#どうやって分ける){.peek}と同様にスライスする
+
 ```{python}
 #| echo: true
-from sklearn.model_selection import train_test_split
+idx = np.arange(len(y))              # 0〜119 の配列
+print(idx[:10])
+np.random.shuffle(idx)               # ランダムに並べ替え（idx そのものが書き換わる）
+print(idx[:10])
 
-# 8:2 に分割（test_size=0.2 で20%をテストに）
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_shuffled = X[idx]                  # データを idx の順に並べ替え
+y_shuffled = y[idx]                  # y も同じ順なので、特徴量とラベルの組は崩れない
 
-print(f"全データ {len(X)} 匹")
+n_train = 96                         # 訓練に回す匹数（全体の8割）
+X_train, y_train = X_shuffled[:n_train], y_shuffled[:n_train]   # 先頭96匹を訓練データに
+X_test,  y_test  = X_shuffled[n_train:], y_shuffled[n_train:]   # 残り24匹をテストデータに
+
 print(f"訓練データ {len(X_train)} 匹")
 print(f"テストデータ {len(X_test)} 匹")
+print(f"テストデータの内訳: Salmon {np.sum(y_test == 1)} 匹, Sea bass {np.sum(y_test == 0)} 匹")
 ```
 
-::: {.callout-tip title="random_state とは"}
-- 分割はランダムなので毎回変わる
-- `random_state=42` のように数値を固定すると再現できる
+::: {.callout-note title="結果"}
+- 先頭で切っても、テストデータには Salmon と Sea bass の両方が入る
+- もう一度実行すると並べ替えが変わり、内訳も変わる
+   - このスライドの数字と、自分で実行した数字は一致しない
 :::
 
 
@@ -227,53 +278,72 @@ print(f"テストデータ {len(X_test)} 匹")
 - 前回の[深さ無制限の木](classification-2d-boundaries.qmd#peek-overfit-boundary){.peek}を訓練データだけで学習し、テストデータで採点する
 
 ::: {.callout-important title="質問"}
-訓練データで満点の木は、初見の24匹のうち何匹当てられるか？
+訓練データで満点の木は、初見の24匹でも満点を取れるか？
 :::
 
 ```{python}
 #| echo: true
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import precision_score, recall_score
 
-deep_tree = DecisionTreeClassifier(max_depth=None, random_state=42)
+deep_tree = DecisionTreeClassifier(max_depth=None)
 deep_tree.fit(X_train, y_train)         # 訓練データだけで学習
 
-train_acc = accuracy_score(y_train, deep_tree.predict(X_train))
-test_acc  = accuracy_score(y_test,  deep_tree.predict(X_test))
+pred_train = deep_tree.predict(X_train)
+pred_test  = deep_tree.predict(X_test)
 
-print(f"訓練データ精度: {train_acc:.3f}  ← 学習済みデータへの精度（楽観的）")
-print(f"テストデータ精度: {test_acc:.3f}  ← 本当の精度")
+print("訓練データ（学習済みデータでの成績。楽観的）")
+print(f"  Precision: {precision_score(y_train, pred_train):.3f}  Recall: {recall_score(y_train, pred_train):.3f}")
+print("テストデータ（新しい魚での成績）")
+print(f"  Precision: {precision_score(y_test, pred_test):.3f}  Recall: {recall_score(y_test, pred_test):.3f}")
 ```
 
 ::: {.fragment}
-- 訓練では**満点**。ところが新しい魚では**4割近く間違える**
+- 訓練では**満点**なのに、新しい魚では満点にならない
 - 満点の正体は実力ではなく**暗記**だった
 :::
 
-::: {.callout-tip title="2つの精度を比べる"}
-- **訓練精度 ≈ テスト精度**：うまく汎化できている
-- **訓練精度 >> テスト精度**：過学習（[overfitting]{.en}）の疑い（暗記している）。今回は明白にこれ
+::: {.callout-tip title="訓練とテストの成績を比べる"}
+- **訓練 ≈ テスト**：うまく汎化できている
+- **訓練 >> テスト**：過学習（[overfitting]{.en}）の疑い（暗記している）
+   - 今回の木は、訓練が満点でテストはそれより低いのでこちら
 :::
 
 
 ## 混同行列（テストデータだけ）
 
+- テストの Precision と Recall の中身を、4つのパターン（TP・FN・FP・TN）で見る
+
 ```{python}
 #| echo: true
 #| fig-align: center
+import matplotlib.pyplot as plt
+import japanize_matplotlib
 from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
 
-cm = confusion_matrix(y_test, deep_tree.predict(X_test))
-disp = ConfusionMatrixDisplay(confusion_matrix=cm,
-                              display_labels=["Sea bass (0)", "Salmon (1)"])
+# 行＝正解、列＝予測。labels=[1, 0] で Salmon を先頭にする
+cm = confusion_matrix(y_test, deep_tree.predict(X_test), labels=[1, 0])
+disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["Salmon", "Sea bass"])
 disp.plot(colorbar=False, cmap="Blues")
-plt.title("Confusion Matrix（テストデータ）")
+
+# 各セルに TP / FN / FP / TN の名前を書き込む（数字と同じ基準で、濃いセルだけ白文字）
+cell_names = {(0, 0): "TP", (0, 1): "FN", (1, 0): "FP", (1, 1): "TN"}
+for (i, j), name in cell_names.items():
+    color = "white" if cm[i, j] > (cm.max() + cm.min()) / 2 else "black"
+    disp.ax_.text(j, i - 0.3, name, ha="center", va="center", fontsize=13, color=color)
+
+disp.ax_.set_xlabel("予測")
+disp.ax_.set_ylabel("正解")
+plt.title("混同行列（テストデータ24匹）")
 plt.tight_layout()
 plt.show()
 ```
 
 ::: {.callout-note title="ここまでで分かること"}
-- Sea bass 11匹のうち5匹、Salmon 13匹のうち4匹を外している
-- 間違いは片方のクラスに偏っていない。境界の形そのものが新しい魚に合っていない
+- 上の行（正解 Salmon）から Recall = TP / (TP + FN)、左の列（Salmon と予測）から Precision = TP / (TP + FP)
+   - セルの数で計算すると、前のスライドの Precision・Recall と一致する
+- 間違いは、FN と FP の両方に出ることが多い
+   - 境界の形そのものが新しい魚に合っていない
 :::
 
 
@@ -296,7 +366,7 @@ xx_g, yy_g = np.meshgrid(np.arange(X[:, 0].min() - 1, X[:, 0].max() + 1, 0.05),
 
 fig, axes = plt.subplots(1, 3, figsize=(13, 4))
 for ax, depth in zip(axes, [3, 6, None]):
-    m = DecisionTreeClassifier(max_depth=depth, random_state=42).fit(X_train, y_train)
+    m = DecisionTreeClassifier(max_depth=depth).fit(X_train, y_train)
     Z = m.predict(np.c_[xx_g.ravel(), yy_g.ravel()]).reshape(xx_g.shape)
     ax.contourf(xx_g, yy_g, Z, alpha=0.3, levels=1, colors=["lightcoral", "lightblue"])
     ax.contour(xx_g, yy_g, Z, levels=[0.5], colors="blue", linewidths=1.5)
@@ -304,10 +374,11 @@ for ax, depth in zip(axes, [3, 6, None]):
                c="black", marker="o", s=25, alpha=0.7, label="Salmon")
     ax.scatter(X_train[y_train == 0, 0], X_train[y_train == 0, 1],
                c="red", marker="s", s=25, alpha=0.7, label="Sea bass")
-    tr_a = accuracy_score(y_train, m.predict(X_train))
-    te_a = accuracy_score(y_test,  m.predict(X_test))
+    pred_train, pred_test = m.predict(X_train), m.predict(X_test)
+    tr_p, tr_r = precision_score(y_train, pred_train), recall_score(y_train, pred_train)
+    te_p, te_r = precision_score(y_test, pred_test), recall_score(y_test, pred_test)
     label = "無制限" if depth is None else f"深さ{depth}"
-    ax.set_title(f"{label}　訓練 {tr_a:.0%} / テスト {te_a:.0%}", fontsize=11)
+    ax.set_title(f"{label}\n訓練 P {tr_p:.2f} R {tr_r:.2f}　テスト P {te_p:.2f} R {te_r:.2f}", fontsize=10)
     ax.set_xlabel("輝度")
 axes[0].set_ylabel("重さ (g)")
 axes[0].legend(fontsize=8, loc="upper right")
@@ -317,11 +388,11 @@ plt.show()
 
 
 ::: {.callout-note title="要するに"}
-- 分割を増やすほど、入り混じりゾーンに**細い回廊や飛び地**が増えていく
-- 無制限の木は、微妙な1匹1匹を救うために**境界をめちゃくちゃに曲げて**訓練データ満点を達成している
+- 木を深くするほど（if の段数が増えるほど）、入り混じりゾーンに**細い回廊や飛び地**が増えていく
+- 無制限の木は、微妙な1匹1匹を救うために**境界を細かく曲げて**訓練データ満点を達成している
 :::
 
-## 境界に、新しい魚を流し込む
+## 無制限の木の境界にテストデータを重ねる
 
 ```{python}
 #| echo: false
@@ -349,51 +420,55 @@ plt.show()
 
 
 ::: {.callout-note title="要するに"}
-- 回廊や飛び地は、**訓練データの特定の数匹**のためのオーダーメイド
-- 新しい魚はその意図どおりには並ばない。誤分類（オレンジ）は入り混じりゾーンに集中
+- 回廊や飛び地は、**訓練データの特定の数匹**に合わせて作られた形
+- 新しい魚はその形どおりには並ばない
+   - 誤分類（オレンジの丸）は入り混じりゾーンに集中
 - 無理に暗記した部分は**次に来る魚には通用しない**
 :::
 
 
-## 深さを変えた場合の精度の違い
+## 深さを変えた場合の Precision と Recall
 
 ```{python}
 #| echo: true
 #| fig-align: center
-depths   = list(range(1, 13))
-train_accs, test_accs = [], []
+depths = list(range(1, 13))
+train_p, train_r, test_p, test_r = [], [], [], []
 
 for d in depths:
-    m = DecisionTreeClassifier(max_depth=d, random_state=42).fit(X_train, y_train)
-    train_accs.append(accuracy_score(y_train, m.predict(X_train)))
-    test_accs.append(accuracy_score(y_test,  m.predict(X_test)))
+    m = DecisionTreeClassifier(max_depth=d).fit(X_train, y_train)
+    pred_train, pred_test = m.predict(X_train), m.predict(X_test)
+    train_p.append(precision_score(y_train, pred_train))
+    train_r.append(recall_score(y_train, pred_train))
+    test_p.append(precision_score(y_test, pred_test))
+    test_r.append(recall_score(y_test, pred_test))
 
-plt.figure(figsize=(6.5, 3.6))
-plt.plot(depths, train_accs, "o-", color="#2980b9", label="訓練データ精度")
-plt.plot(depths, test_accs,  "s-", color="#e74c3c", label="テストデータ精度")
-plt.xlabel("決定木の深さ"); plt.ylabel("正答率")
-plt.ylim(0.5, 1.05)
-plt.legend(); plt.grid(True, alpha=0.4)
+fig, axes = plt.subplots(1, 2, figsize=(11, 3.8), sharey=True)
+for ax, name, tr, te in zip(axes, ["Precision", "Recall"], [train_p, train_r], [test_p, test_r]):
+    ax.plot(depths, tr, "o-", color="#2980b9", label="訓練データ")
+    ax.plot(depths, te, "s-", color="#e74c3c", label="テストデータ")
+    ax.set_title(name); ax.set_xlabel("決定木の深さ"); ax.grid(True, alpha=0.4)
+axes[0].set_ylabel("成績"); axes[0].legend()
 plt.tight_layout()
 plt.show()
 ```
 
 
 ::: {.callout-note title="This is 過学習"}
-- 訓練精度は深くするほど上がり続け、やがて 100% に到達する
-- テスト精度は**深さ2〜4がピーク**。それ以上深くすると**むしろ下がる**
-- 深さ5以降、訓練精度だけが伸びて2本の線の**差（ギャップ）**が広がる。暗記が進んでいるサイン
+- 訓練の成績は、深くするほど 1.000 に近づく
+- テストの成績は満点に届かず、深い木ほど2本の線の**差（ギャップ）**が広がる
+   - 暗記が進んでいるサイン
 :::
 
 
 ## 過学習（[Overfitting]{.en}）
 
 - 訓練データの細部（たまたまの並び・ノイズ）まで覚え込み、**新しいデータで性能が落ちる**こと
-- 数字での証拠は**訓練精度とテスト精度のギャップ**
+- 数字での証拠は**訓練とテストの成績のギャップ**
 - 図での証拠は**数匹のためだけの回廊・飛び地**だらけの決定境界
 - モデルが複雑なほど（深い木・多すぎるパラメータ）起きやすい
 
-| 状態 | 訓練精度 | テスト精度 |
+| 状態 | 訓練データでの成績 | テストデータでの成績 |
 |---|---|---|
 | 未学習（[underfitting]{.en}） | 低い | 低い |
 | ちょうど良い | 高い | 高い |
@@ -402,7 +477,7 @@ plt.show()
 ::: {.callout-tip title="対策"}
 - モデルの複雑さを抑える（決定木なら**深さを制限**）
 - データを増やす
-- テスト精度を安定して測る：**交差検証（[cross-validation]{.en}）**
+- 過学習していることを検知する道具：**交差検証（[cross-validation]{.en}）**
 :::
 
 
@@ -415,20 +490,24 @@ plt.show()
 
 ## ホールドアウト法の問題点
 
-- `train_test_split` は**ランダムに分割**する
-- どのデータがテスト側に入るかで、精度が変わる
+- ホールドアウト法は**ランダムに分割**する
+- どのデータがテスト側に入るかで、成績が変わる
 
 ```{python}
 #| echo: true
-tree = DecisionTreeClassifier(max_depth=None, random_state=42)
-for seed in range(5):
-    Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=seed)
-    acc = accuracy_score(yte, tree.fit(Xtr, ytr).predict(Xte))
-    print(f"seed={seed}  テスト精度: {acc:.3f}")
+tree = DecisionTreeClassifier(max_depth=None)
+idx = np.arange(len(y))
+for i in range(5):
+    np.random.shuffle(idx)                # 毎回ちがう並べ替えで分割し直す
+    Xtr, ytr = X[idx][:96], y[idx][:96]   # 先頭96匹を訓練に
+    Xte, yte = X[idx][96:], y[idx][96:]   # 残り24匹をテストに
+    pred = tree.fit(Xtr, ytr).predict(Xte)   # fit の戻り値は学習済みモデルなので、続けて predict できる
+    print(f"split {i + 1}  Precision: {precision_score(yte, pred):.3f}  Recall: {recall_score(yte, pred):.3f}")
 ```
 
 ::: {.callout-warning title="データが少ないほど揺れが大きい"}
-- テストデータが24匹の場合、1匹の誤分類で精度が約 4% 変わる
+- テストデータは24匹で、そのうち Salmon は12匹前後
+   - Salmon 1匹の見逃しで Recall が約 8% 変わる
 - 1回だけの分割結果を、強く信じすぎない
 :::
 
@@ -437,7 +516,7 @@ for seed in range(5):
 
 - データを **k 個のグループ（[fold]{.en}）**に分割する
 - k 回繰り返す：1つをテスト、残りを訓練に使う
-- k 個の精度の**平均**を最終スコアとする
+- k 個の成績の**平均**を最終スコアとする
 
 ```{python}
 #| echo: false
@@ -475,65 +554,181 @@ plt.show()
 ```
 
 
-## `cross_val_score` で交差検証（Cross-Validation） {#peek-cv}
+## fold は Salmon と Sea bass の比率を揃えて作る
+
+- 全データは Salmon 60匹のあとに Sea bass 60匹の順に並んでいる（[「どうやって分ける？」](#どうやって分ける){.peek}で見た並び）
+- 先頭から順に5等分すると、Salmon だけの fold や Sea bass だけの fold ができてしまう
+- `cross_val_score` は分類では**層化 k-fold（[stratified k-fold]{.en}）**を使い、各 fold の Salmon と Sea bass の比率を全体と同じにする
+
+```{python}
+#| echo: true
+from sklearn.model_selection import KFold, StratifiedKFold
+
+print("KFold: 先頭から順に5等分")
+for i, (train_idx, test_idx) in enumerate(KFold(n_splits=5).split(X, y)):
+    print(f"  fold {i + 1}: test Salmon {np.sum(y[test_idx] == 1):2d}, Sea bass {np.sum(y[test_idx] == 0):2d}")
+
+print("StratifiedKFold: 比率を揃えて5等分（cross_val_score が分類で使う方法）")
+for i, (train_idx, test_idx) in enumerate(StratifiedKFold(n_splits=5).split(X, y)):
+    print(f"  fold {i + 1}: test Salmon {np.sum(y[test_idx] == 1):2d}, Sea bass {np.sum(y[test_idx] == 0):2d}")
+```
+
+::: {.callout-note title="要するに"}
+- 先頭から切る KFold では、fold 1・2 のテストが Salmon だけ、fold 4・5 が Sea bass だけになる
+   - 片方の種しかいないテストでは、Precision や Recall がまともに測れない
+- 層化 k-fold なら、どの fold もテストは Salmon 12匹・Sea bass 12匹
+   - 「どうやって分ける？」で見た並び順の問題は、交差検証では起きない
+:::
+
+
+## `cross_val_score` で交差検証（[Cross-Validation]{.en}） {#peek-cv}
 
 ```{python}
 #| echo: true
 from sklearn.model_selection import cross_val_score
 
-scores = cross_val_score(
-    DecisionTreeClassifier(max_depth=None, random_state=42), X, y, cv=5   # cv=5 で 5-fold
-)
+deep_tree_cv = DecisionTreeClassifier(max_depth=None)
 
-print("各 fold の精度:", scores.round(3))
-print(f"平均精度: {scores.mean():.3f}  ±  {scores.std():.3f}")
+# cv=5 で 5-fold。scoring で測る指標を選ぶ
+recalls    = cross_val_score(deep_tree_cv, X, y, cv=5, scoring="recall")
+precisions = cross_val_score(deep_tree_cv, X, y, cv=5, scoring="precision")
+
+print("各 fold の Recall:   ", recalls.round(3))
+print("各 fold の Precision:", precisions.round(3))
+print(f"平均 Recall:    {recalls.mean():.3f}  (fold ごとのばらつき ±{recalls.std():.3f})")
+print(f"平均 Precision: {precisions.mean():.3f}  (fold ごとのばらつき ±{precisions.std():.3f})")
 ```
 
 ::: {.callout-note title="結果"}
-- 平均 **0.60 ± 0.10**
-- 「満点の木の本当の実力は6割そこそこ」であると、ようやく言える
+- 平均しても、満点の木の成績は満点よりずっと低い
+- 5回の平均なので、1回の分割よりも偶然に左右されにくい
 :::
 
 ::: {.callout-tip title="`cross_val_score` の引数"}
 - 第1引数：モデル（`fit` 前でOK。内部で k 回 fit してくれる）
 - `cv=k`：k-fold の k を指定（よく使うのは 5 か 10）
-- 返り値は k 個の精度の配列 → `.mean()` / `.std()` で集計
+- `scoring="recall"`：測る指標の名前（`"precision"` も同様）
+- 返り値は k 個の成績の配列 → `.mean()` で平均、`.std()` でばらつき（標準偏差）
 :::
 
 
-## **Tweak** 分割を変えて精度の揺れを見る {.badge-practice}
+## 深さを選ぶのに、テストデータは使えない
 
-- [ホールドアウトのコード](#peek-holdout){.peek}と[交差検証のコード](#peek-cv){.peek}を**書き換えて実行**（続きのセルも実行）
+- 深さの曲線では、テストの成績が最も高い深さを読み取れる
+- その深さを「採用」すると、テストデータを見てモデルを調整したことになる
+   - [テストデータの鉄則](#peek-test-data-rule){.peek}に反する
+- 何が起きるか
+   - 24匹でたまたま良かった深さを選んだだけかもしれない
+   - 選んだ木をそのテストデータで採点しても、もう「初見の問題」の成績ではない
+   - テストデータは、深さを選ぶ材料として使った時点で「見たことのある問題」になる
+
+::: {.callout-important title="重要ポイント"}
+- 深さなど、モデルの選択に使う材料は**訓練データの中**から作る
+- テストデータは、選び終えたあとに**一度だけ**使う
+:::
+
+
+## 訓練データの中で交差検証して深さを選ぶ
+
+```{.d2 sketch="true" width="90%"}
+direction: right
+A: "全データ\n120匹" { style.fill: "#e1f5ff" }
+TR: "訓練データ 96匹" { style.fill: "#aed6f1" }
+TE: "テストデータ 24匹" { style.fill: "#f5b7b1" }
+CV: "深さ 1〜10 それぞれを\n5-fold 交差検証" { shape: hexagon; style.fill: "#fff4e1" }
+B: "最良の深さ" { style.fill: "#d5f5e3" }
+F: "その深さで\n訓練データ全体を fit" { shape: hexagon; style.fill: "#fff4e1" }
+S: "採点（一度だけ）" { style.fill: "#d5f5e3" }
+A -> TR: 8割
+A -> TE: 2割
+TR -> CV
+CV -> B: 平均 Precision が最大
+B -> F
+F -> S: 学習済みモデル
+TE -> S: 初見の問題 {style.stroke-dash: 3}
+```
+
+- 選ぶ指標は用途で決める（[1次元の回：レストラン向けは Precision、缶詰工場向けは Recall](classification-basics-1d.qmd#peek-which-metric){.peek}）
+- ここでは高級レストラン向け（Sea bass の混入を避けたい）として、**Precision** で選ぶ
+
+```{python}
+#| echo: true
+sel_depths = list(range(1, 11))
+cv_precisions = []
+for d in sel_depths:
+    tree = DecisionTreeClassifier(max_depth=d)
+    # 訓練データだけで 5-fold 交差検証し、平均 Precision を記録する
+    cv_precisions.append(cross_val_score(tree, X_train, y_train, cv=5, scoring="precision").mean())
+
+best_depth = sel_depths[int(np.argmax(cv_precisions))]   # 最大値の位置（0始まり）を深さ（1始まり）に直す
+print(f"平均 Precision が最大の深さ: {best_depth}")
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
+plt.figure(figsize=(6.5, 3.4))
+plt.plot(sel_depths, cv_precisions, "o-", color="#2980b9", label="訓練データ内の 5-fold 平均 Precision")
+plt.scatter([best_depth], [max(cv_precisions)], s=220, facecolors="none", edgecolors="orange",
+            linewidths=2.5, label=f"最大：深さ {best_depth}")
+plt.xlabel("決定木の深さ"); plt.ylabel("平均 Precision")
+plt.xticks(sel_depths)
+plt.legend(); plt.grid(True, alpha=0.4)
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+#| echo: true
+# 選んだ深さで、訓練データ全体を学習し直す
+best_tree = DecisionTreeClassifier(max_depth=best_depth).fit(X_train, y_train)
+pred_test = best_tree.predict(X_test)   # テストデータを使うのはここだけ
+print(f"深さ{best_depth}の木をテストデータで一度だけ採点: Precision {precision_score(y_test, pred_test):.3f}  Recall {recall_score(y_test, pred_test):.3f}")
+```
+
+::: {.callout-note title="結果"}
+- 深さは、訓練データ内の交差検証だけで決まった
+- テストデータは、この最後の採点以外に一度も使っていない
+:::
+
+
+## **Tweak** 分割を変えて成績の揺れを見る {.badge-practice}
+
+- [ホールドアウトのコード](#peek-split){.peek}と[交差検証のコード](#peek-cv){.peek}を**書き換えて実行**（続きのセルも実行）
 
 ::: {.tweak}
 | やりたいこと | コード |
 |--|--|
-| 分割の乱数を変えよ | `random_state=42` → `4` |
-| テストに半分回せ | `test_size=0.2` → `0.5` |
+| 分割をやり直せ | 書き換えずにもう一度実行 |
+| テストに半分回せ | `n_train = 96` → `60` |
 | 10-fold にせよ | `cv=5` → `cv=10` |
 :::
 
 ::: {.callout-tip}
 ## チェックポイント
 
-- `random_state=4` だとテスト精度 **79.2%**（42 では 62.5%）
-   - ==同じモデルなのに17ポイント上振れ==。1回の分割の数字には偶然が乗っている。だから交差検証
-- `test_size=0.5` は訓練が60匹に減り、テスト精度 66.7%
-   - 訓練とテストの**取り分のトレードオフ**
-- `cv=10` は平均 0.67 ± 0.14（cv=5 では 0.60 ± 0.10）
-   - 1 fold が12匹しかなく、魚1匹の重みが大きい。fold は細かくすればいいものでもない
+- 実行し直すたびに、テストの Precision と Recall が変わる
+   - ==同じモデルなのに、分割だけで成績が変わる==
+   - 1回の分割の数字には偶然が乗っているので、交差検証で平均を取る
+- `n_train = 60` は訓練が60匹に減る
+   - テストの魚が増えるぶん、学習に使える魚が減る（訓練とテストの**取り分のトレードオフ**）
+- `cv=10` は、fold ごとのばらつき（±）が cv=5 より大きい
+   - 1 fold のテストが12匹（Salmon 6匹）しかなく、魚1匹の重みが大きい
+   - fold は細かくすればいいものでもない
 :::
 
 
 ## まとめ
 
-- 訓練データで評価した精度は**楽観的**。満点はむしろまずい
+- 訓練データで評価した成績は**楽観的**
+  - 満点はむしろ過学習の疑い
 - **過学習**：訓練データを暗記して、新しいデータで性能が落ちること
-  - 証拠は**訓練精度とテスト精度のギャップ**（深さ無制限の決定木：100% vs 63%）
+  - 証拠は**訓練とテストの成績のギャップ**（深さ無制限の決定木は、訓練では満点でもテストでは満点にならない）
   - 決定境界で見ると、数匹のためだけの**回廊・飛び地**として現れる
 - **汎化**：未知データへの対応能力を測ることが本来の目的
-- **`train_test_split`**：手軽だが分割次第で精度が揺れる
-- **k-fold 交差検証**：k 回の平均で安定した評価が得られる（満点の木の実力は、平均すると6割だった）
+- **ホールドアウト法**：手軽だが分割次第で成績が揺れる
+- **k-fold 交差検証**：k 回の平均で安定した評価が得られる
+- **深さなどの選択**：訓練データの中の交差検証で選び、テストデータは最後に一度だけ使う
 
 | 手法 | 特徴 |
 |---|---|
@@ -554,16 +749,17 @@ print(f"平均精度: {scores.mean():.3f}  ±  {scores.std():.3f}")
 新しい魚20匹（Salmon 10・Sea bass 10）で、モデルAを試したら：
 Salmon は10匹中8匹を正しく Salmon と判定、Sea bass は10匹中9匹を正しく Sea bass と判定した。
 
-1. モデルAの混同行列を書け
-2. モデルAの正答率を求めよ
-3. モデルBは**訓練データで100%**、この20匹では**70%**だった。工場に納品するならどちらか、理由とともに答えよ
+1. モデルAの混同行列を書け（各セルに TP・FN・FP・TN の名前も書く）
+2. モデルAの Precision と Recall を求めよ
+3. モデルBは**訓練データで Precision・Recall ともに 100%**、この20匹では**ともに 70%**だった。高級レストランに納品するならどちらか、理由とともに答えよ
 
-### 問題2：ちょうど良い深さを交差検証で選ぶ
+### 問題2：Recall で深さを選び直す
 
-本編の魚データ `X, y` を使って：
+缶詰工場向け（Salmon の取りこぼしを避けたい）として、本編の訓練データ `X_train, y_train` とテストデータ `X_test, y_test` を使い、深さを **Recall** で選び直せ：
 
-1. 深さ 1〜10 の決定木それぞれについて、5-fold 交差検証の平均精度を求めよ
-2. 平均精度が最大になる深さを選べ（訓練精度は見ない）
+1. 深さ 1〜10 の決定木それぞれについて、訓練データでの 5-fold 交差検証の平均 Recall を求めよ（深さごとに表示）
+2. 平均 Recall が最大の深さで訓練データ全体を学習し、テストデータで一度だけ Precision と Recall を求めよ
+3. 本編で Precision を使って選んだ深さと比べよ（両方の深さを表示）
 
 
 ## 問題1の解答例
@@ -572,13 +768,13 @@ Salmon は10匹中8匹を正しく Salmon と判定、Sea bass は10匹中9匹�
 
 | | Salmon と予測 | Sea bass と予測 |
 |---|---|---|
-| 正解 Salmon | 8 | 2 |
-| 正解 Sea bass | 1 | 9 |
+| 正解 Salmon | 8（TP） | 2（FN） |
+| 正解 Sea bass | 1（FP） | 9（TN） |
 
-**正答率:** $(8 + 9) / 20 = 85\%$
+**Precision:** TP / (TP + FP) = 8 / 9 ≈ 0.89　　**Recall:** TP / (TP + FN) = 8 / 10 = 0.80
 
 **選ぶのはモデルA。** モデルBの「訓練100%・新データ70%」は典型的な**過学習のギャップ**。
-性能は**見たことのないデータへの正答率（汎化性能）**で比べる。訓練の成績は当てにならない。
+性能は**見たことのないデータでの成績（汎化性能）**で比べる。訓練の成績は当てにならない。
 
 
 ## 問題2の解答例
@@ -587,19 +783,47 @@ Salmon は10匹中8匹を正しく Salmon と判定、Sea bass は10匹中9匹�
 #| echo: true
 #| code-fold: true
 #| code-summary: "解答例を見る"
+import numpy as np
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import cross_val_score
+from sklearn.metrics import precision_score, recall_score
 
-mean_scores = []
-for depth in range(1, 11):
-    tree = DecisionTreeClassifier(max_depth=depth, random_state=0)
-    scores = cross_val_score(tree, X, y, cv=5)
-    mean_scores.append(scores.mean())
-    print(f"深さ {depth:2d}: 平均精度 {scores.mean():.3f}")
+def choose_depth(scoring):
+    """訓練データの 5-fold 交差検証で、平均スコアが最大の深さを返す"""
+    depths = list(range(1, 11))
+    means = []
+    for depth in depths:
+        tree = DecisionTreeClassifier(max_depth=depth)
+        means.append(cross_val_score(tree, X_train, y_train, cv=5, scoring=scoring).mean())
+        print(f"  depth {depth:2d}: mean {scoring} {means[-1]:.3f}")
+    return depths[int(np.argmax(means))]     # 最大値の位置（0始まり）を深さ（1始まり）に直す
 
-best_depth = int(np.argmax(mean_scores)) + 1
-print(f"\nbest depth: {best_depth}")
+for scoring in ["recall", "precision"]:
+    print(f"[{scoring} で選ぶ]")
+    best_depth = choose_depth(scoring)
+    best_tree = DecisionTreeClassifier(max_depth=best_depth).fit(X_train, y_train)
+    pred_test = best_tree.predict(X_test)
+    print(f"  best depth: {best_depth}  ->  test Precision {precision_score(y_test, pred_test):.3f}"
+          f"  Recall {recall_score(y_test, pred_test):.3f}\n")
 ```
 
-- 深くするほど良くなるわけではない。平均精度は途中で**頭打ちか下り坂**になる
-- 訓練精度で選んだら深さ10一択（そして過学習）。**複雑さは、見ていないデータに選ばせる**
+- Recall で選んだ深さと Precision で選んだ深さは、違うことが多い
+   - 選ぶ指標が変わると選ばれる深さも変わるので、どの指標で選ぶかは用途で決める
+- どちらの場合も、テストデータは最後の採点以外に使っていない
+
+
+## （参考）`train_test_split` で分割する
+
+- scikit-learn の `train_test_split` は、本編の並べ替えと切り分けを1回の呼び出しで行う
+   - `test_size=0.2`：テストに回す割合
+   - 返り値は4つ：`X_train, X_test, y_train, y_test` の順
+
+```{python}
+#| echo: true
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+print(f"訓練データ {len(X_train)} 匹")
+print(f"テストデータ {len(X_test)} 匹: Salmon {np.sum(y_test == 1)} 匹, Sea bass {np.sum(y_test == 0)} 匹")
+```
