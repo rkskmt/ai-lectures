@@ -383,7 +383,7 @@ rkskmt
 <li>次元削減の回で測った<strong>体長</strong>を使う</li>
 <li>体長を測るだけで重さが分かれば、<strong>秤に乗せる手間が省ける</strong></li>
 </ul>
-<div id="58a702ae" class="cell" data-execution_count="1">
+<div id="5255853f" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>魚データの定義（クリックして展開）</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -408,11 +408,11 @@ rkskmt
 <span id="cb1-20"><a aria-label="20"></a>lengths <span class="op">=</span> np.<span class="bu">round</span>(np.cbrt(weights) <span class="op">*</span> <span class="fl">4.5</span> <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="fl">1.0</span>, <span class="bu">len</span>(weights)), <span class="dv">1</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="df18eddd" class="cell" data-execution_count="2">
+<div id="8ce72af7" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="linear-regression_files/figure-revealjs/cell-3-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img data-src="linear-regression_files/figure-revealjs/cell-3-output-1.png" class="quarto-figure quarto-figure-center" width="542" height="326"></a></p>
+<p><a href="linear-regression_files/figure-revealjs/cell-3-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img data-src="linear-regression_files/figure-revealjs/cell-3-output-1.png" class="quarto-figure quarto-figure-center" width="536" height="327"></a></p>
 </figure>
 </div>
 </div>
@@ -432,6 +432,7 @@ rkskmt
 <p><span class="math display">\[L(a, b) = \frac{1}{N} \sum_{i} \left( \underbrace{a x_i + b}_{\text{予測}} - \underbrace{t_i}_{\text{実際}} \right)^2\]</span></p>
 <ul>
 <li><strong>MSE（<span class="en"><strong>Mean Squared Error</strong></span> / 平均二乗誤差）</strong>と呼ぶ</li>
+<li><a href="./clustering-kmeans.html#peek-sse" class="peek">クラスタリングの回の SSE</a> と同じ発想で、誤差を 2 乗して集めたものを点の数で割った平均</li>
 <li>全魚のズレを1本のベクトルと見ると、MSE はその<strong>ノルム（<span class="en">norm</span>・ベクトルの長さ）</strong>の2乗を <span class="math inline">\(N\)</span> で割ったもの</li>
 </ul>
 <div title="損失関数は MSE だけではない">
@@ -493,7 +494,7 @@ rkskmt
 <ul>
 <li>スケールを揃えてから（<a href="./clustering-kmeans.html#peek-scale" class="peek">クラスタリングの回の教訓</a>。学習率を1つで済ませるため）</li>
 </ul>
-<div id="8dcbd4ed" class="cell" data-execution_count="3">
+<div id="d4e7f188" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a>x <span class="op">=</span> (lengths <span class="op">-</span> lengths.mean()) <span class="op">/</span> lengths.std()   <span class="co"># 標準化した体長</span></span>
 <span id="cb2-2"><a aria-label="2"></a>t <span class="op">=</span> (weights <span class="op">-</span> weights.mean()) <span class="op">/</span> weights.std()   <span class="co"># 標準化した重さ</span></span>
 <span id="cb2-3"><a aria-label="3"></a></span>
@@ -551,6 +552,7 @@ rkskmt
 </tbody>
 </table>
 </div>
+<div title="ここで観察">
 <div class="callout callout-tip callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -568,11 +570,12 @@ rkskmt
 </div>
 </div>
 </div>
+</div>
 </section>
 <section id="直線が合っていく様子" class="slide level2">
 <h2>直線が合っていく様子</h2>
 <div class="slide-body">
-<div id="b41f4974" class="cell" data-execution_count="4">
+<div id="42aa162a" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -624,7 +627,7 @@ rkskmt
 <section id="答え合わせsklearn-と比べる" class="slide level2">
 <h2>答え合わせ：sklearn と比べる</h2>
 <div class="slide-body">
-<div id="9db1fe57" class="cell" data-execution_count="5">
+<div id="52bff94c" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a aria-label="1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
 <span id="cb4-2"><a aria-label="2"></a></span>
 <span id="cb4-3"><a aria-label="3"></a>reg <span class="op">=</span> LinearRegression().fit(x.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), t)</span>
@@ -691,7 +694,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <section id="次数を上げてみる" class="slide level2">
 <h2>次数を上げてみる</h2>
 <div class="slide-body">
-<div id="b488397a" class="cell" data-execution_count="6">
+<div id="b14759de" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a aria-label="1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
@@ -723,7 +726,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure>
-<p><a href="linear-regression_files/figure-revealjs/cell-7-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img data-src="linear-regression_files/figure-revealjs/cell-7-output-1.png" width="1191" height="346"></a></p>
+<p><a href="linear-regression_files/figure-revealjs/cell-7-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img data-src="linear-regression_files/figure-revealjs/cell-7-output-1.png" width="1186" height="347"></a></p>
 </figure>
 </div>
 </div>
@@ -736,7 +739,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <section id="数字で見るまた会ったな過学習" class="slide level2">
 <h2>数字で見る：また会ったな、過学習</h2>
 <div class="slide-body">
-<div id="4cb7922b" class="cell" data-execution_count="7">
+<div id="3ccf218c" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a aria-label="1"></a>degrees <span class="op">=</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">10</span>)</span>
 <span id="cb7-2"><a aria-label="2"></a>train_mse, test_mse <span class="op">=</span> [], []</span>
 <span id="cb7-3"><a aria-label="3"></a><span class="cf">for</span> deg <span class="kw">in</span> degrees:</span>
@@ -755,7 +758,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="linear-regression_files/figure-revealjs/cell-8-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img data-src="linear-regression_files/figure-revealjs/cell-8-output-1.png" class="quarto-figure quarto-figure-center" width="637" height="347"></a></p>
+<p><a href="linear-regression_files/figure-revealjs/cell-8-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img data-src="linear-regression_files/figure-revealjs/cell-8-output-1.png" class="quarto-figure quarto-figure-center" width="636" height="347"></a></p>
 </figure>
 </div>
 </div>
@@ -773,7 +776,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <ul>
 <li>暴れている曲線の正体は、<strong>巨大な係数</strong></li>
 </ul>
-<div id="b8c004d2" class="cell" data-execution_count="8">
+<div id="c8520802" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a aria-label="1"></a>plain <span class="op">=</span> make_pipeline(PolynomialFeatures(<span class="dv">9</span>), StandardScaler(), LinearRegression())</span>
 <span id="cb8-2"><a aria-label="2"></a>plain.fit(X_train, y_train)</span>
 <span id="cb8-3"><a aria-label="3"></a><span class="bu">print</span>(<span class="st">"次数9の係数の最大絶対値:"</span>, <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">abs</span>(plain[<span class="op">-</span><span class="dv">1</span>].coef_)<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
@@ -799,7 +802,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <li>sklearn には任せない。冒頭で自作した勾配降下法に、<strong>罰金の項を足すだけ</strong></li>
 <li>罰金 <span class="math inline">\(\lambda \sum w^2\)</span> の微分は <span class="math inline">\(2\lambda w\)</span>。各係数の勾配に足せばよい</li>
 </ul>
-<div id="fa8491c6" class="cell" data-execution_count="9">
+<div id="e80210dd" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a aria-label="1"></a><span class="co"># 特徴量 x, x², …, x⁹ も自分で作る（列が x^1 〜 x^9 の配列）</span></span>
 <span id="cb10-2"><a aria-label="2"></a>P_train <span class="op">=</span> X_train <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)          <span class="co"># 形 (10, 9)</span></span>
 <span id="cb10-3"><a aria-label="3"></a>P_test  <span class="op">=</span> X_test  <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)</span>
@@ -837,7 +840,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <section id="罰金ありなしを見比べる" class="slide level2">
 <h2>罰金あり・なしを見比べる</h2>
 <div class="slide-body">
-<div id="1f48735b" class="cell" data-execution_count="10">
+<div id="72f4eb26" class="cell" data-execution_count="10">
 <details class="code-fold">
 <summary>描画コード</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a aria-label="1"></a>P_grid    <span class="op">=</span> ((grid <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)) <span class="op">-</span> mu) <span class="op">/</span> sd</span>
@@ -862,7 +865,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure>
-<p><a href="linear-regression_files/figure-revealjs/cell-11-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img data-src="linear-regression_files/figure-revealjs/cell-11-output-1.png" width="941" height="346"></a></p>
+<p><a href="linear-regression_files/figure-revealjs/cell-11-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img data-src="linear-regression_files/figure-revealjs/cell-11-output-1.png" width="936" height="348"></a></p>
 </figure>
 </div>
 </div>
@@ -929,6 +932,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 </tbody>
 </table>
 </div>
+<div title="ここで観察">
 <div class="callout callout-tip callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -947,6 +951,393 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 </div>
 </div>
 </div>
+</div>
+</section>
+<section id="section-1" class="slide level2 center break-slide" data-background-color="white">
+<h2></h2>
+<div class="break-title">
+<p>外れ値と RANSAC</p>
+</div>
+</section>
+<section id="伝票に打ち間違いが2枚あった" class="slide level2">
+<h2>伝票に打ち間違いが2枚あった</h2>
+<div class="slide-body">
+<ul>
+<li>魚市場の伝票（1匹につき1枚、体長と重さ）80 枚のうち 2 枚で、重さの欄に 0 が1つ多く打たれていた</li>
+<li>間違っていたのは、いちばん大きい 2 匹（2,457 g → 24,570 g、2,474 g → 24,740 g）</li>
+<li>この 80 枚で直線を fit し直す</li>
+</ul>
+<div id="b6f40cc9" class="cell" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a aria-label="1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
+<span id="cb13-2"><a aria-label="2"></a></span>
+<span id="cb13-3"><a aria-label="3"></a>bad <span class="op">=</span> [<span class="dv">3</span>, <span class="dv">6</span>]                                       <span class="co"># 打ち間違えた2枚（いちばん大きい2匹）</span></span>
+<span id="cb13-4"><a aria-label="4"></a>weights_typo <span class="op">=</span> weights.copy()</span>
+<span id="cb13-5"><a aria-label="5"></a>weights_typo[bad] <span class="op">*=</span> <span class="dv">10</span>                            <span class="co"># 0 が1つ多い ＝ 10倍</span></span>
+<span id="cb13-6"><a aria-label="6"></a></span>
+<span id="cb13-7"><a aria-label="7"></a>reg_ok   <span class="op">=</span> LinearRegression().fit(lengths.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), weights)        <span class="co"># 正しい80枚</span></span>
+<span id="cb13-8"><a aria-label="8"></a>reg_typo <span class="op">=</span> LinearRegression().fit(lengths.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), weights_typo)   <span class="co"># 2枚が間違った80枚</span></span>
+<span id="cb13-9"><a aria-label="9"></a><span class="bu">print</span>(<span class="ss">f"正しい80枚で fit  : 体長 1cm あたり </span><span class="sc">{</span>reg_ok<span class="sc">.</span>coef_[<span class="dv">0</span>]<span class="sc">:.1f}</span><span class="ss"> g"</span>)</span>
+<span id="cb13-10"><a aria-label="10"></a><span class="bu">print</span>(<span class="ss">f"2枚が間違った80枚 : 体長 1cm あたり </span><span class="sc">{</span>reg_typo<span class="sc">.</span>coef_[<span class="dv">0</span>]<span class="sc">:.1f}</span><span class="ss"> g"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>正しい80枚で fit  : 体長 1cm あたり 91.0 g
+2枚が間違った80枚 : 体長 1cm あたり 451.2 g</code></pre>
+</div>
+</div>
+<div id="3da13fb3" class="cell" data-execution_count="12">
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="linear-regression_files/figure-revealjs/cell-13-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img data-src="linear-regression_files/figure-revealjs/cell-13-output-1.png" class="quarto-figure quarto-figure-center" width="1036" height="367"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<div title="結果">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>結果</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>たった 2 枚で、傾きは 91 g/cm から 451 g/cm になった</li>
+<li>直線は魚の群れから離れた
+<ul>
+<li>45 cm の魚の予測は −1,660 g（マイナスの重さ）</li>
+<li>62 cm の魚の予測は 6,010 g（実際は 2,400 g 台）</li>
+</ul></li>
+<li>間違った 2 枚が、正しい 78 枚の予測を全部壊している</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="二乗で測ると2枚のズレが78枚を圧倒する" class="slide level2">
+<h2>二乗で測ると、2枚のズレが78枚を圧倒する</h2>
+<div class="slide-body">
+<ul>
+<li>MSE は「ズレの二乗」の平均なので、ズレが 100 倍なら損失への寄与は 10,000 倍</li>
+<li>正しい 80 枚の直線からの、各伝票のズレを比べる</li>
+</ul>
+<div id="5d4740e6" class="cell" data-execution_count="13">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a aria-label="1"></a>pred_ok <span class="op">=</span> reg_ok.predict(lengths.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>))        <span class="co"># 正しい80枚の直線による予測</span></span>
+<span id="cb15-2"><a aria-label="2"></a>error   <span class="op">=</span> weights_typo <span class="op">-</span> pred_ok                        <span class="co"># 各伝票のズレ（g）</span></span>
+<span id="cb15-3"><a aria-label="3"></a>ok      <span class="op">=</span> np.ones(<span class="dv">80</span>, dtype<span class="op">=</span><span class="bu">bool</span>)</span>
+<span id="cb15-4"><a aria-label="4"></a>ok[bad] <span class="op">=</span> <span class="va">False</span>                                         <span class="co"># 正しい78枚だけ True</span></span>
+<span id="cb15-5"><a aria-label="5"></a><span class="bu">print</span>(<span class="ss">f"正しい78枚のズレ  : 最大 </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">abs</span>(error[ok])<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.0f}</span><span class="ss"> g / 二乗の合計 </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">sum</span>(error[ok]<span class="op">**</span><span class="dv">2</span>)<span class="sc">:,.0f}</span><span class="ss">"</span>)</span>
+<span id="cb15-6"><a aria-label="6"></a><span class="bu">print</span>(<span class="ss">f"打ち間違い2枚のズレ: 最小 </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">abs</span>(error[bad])<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.0f}</span><span class="ss"> g / 二乗の合計 </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">sum</span>(error[bad]<span class="op">**</span><span class="dv">2</span>)<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>正しい78枚のズレ  : 最大 206 g / 二乗の合計 432,045
+打ち間違い2枚のズレ: 最小 22125 g / 二乗の合計 989,425,380</code></pre>
+</div>
+</div>
+<div title="要するに">
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>要するに</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>2 枚の二乗和は 78 枚の 2,290 倍</li>
+<li>MSE を下げるには、正しい 78 枚を全部見捨ててでも、この 2 枚に直線を寄せたほうが「得」になる</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div title="外れ値（outlier）">
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>外れ値（outlier）</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>他の記録から大きく離れた記録（ここでは打ち間違いの 2 枚）</li>
+<li>最小二乗法は二乗で測るので、少数の外れ値に直線が引っ張られる</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="対策賛同者が最多の直線を探すransac" class="slide level2 scrollable">
+<h2>対策：賛同者が最多の直線を探す（RANSAC）</h2>
+<div class="slide-body">
+<ul>
+<li>全部の伝票に合わせるのをやめ、<strong>多くの伝票が賛同する直線</strong>を探す</li>
+<li>直線は 2 点で決まるので、2 枚の伝票から直線を引き、その直線の近くにある伝票を数える</li>
+<li>手順：
+<ol type="1">
+<li>伝票から 2 枚をランダムに選ぶ</li>
+<li>その 2 点を通る直線を引く</li>
+<li>直線から 300 g 以内にある伝票（<strong>賛同者</strong>、インライア、<span class="en">inlier</span>）を数える</li>
+<li>1〜3 を 200 回繰り返し、賛同者が最多だった直線を残す</li>
+<li>その賛同者だけで最小二乗法をやり直す</li>
+</ol></li>
+<li>この手法を <strong>RANSAC（<span class="en"><strong>Random Sample Consensus</strong></span> / ランダムに選んだ標本の合意）</strong> と呼ぶ</li>
+</ul>
+<div class="caption-note">
+<p>300 g の根拠：正しい伝票のズレは最大 206 g だった（前のスライド）。それより少し広くとる</p>
+</div>
+</div>
+</section>
+<section id="回の試行を図で見る" class="slide level2">
+<h2>1回の試行を図で見る</h2>
+<div class="slide-body">
+<div id="9dcf2a2c" class="cell" data-execution_count="14">
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="linear-regression_files/figure-revealjs/cell-15-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img data-src="linear-regression_files/figure-revealjs/cell-15-output-1.png" class="quarto-figure quarto-figure-center" width="986" height="377"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="caption-note">
+<p>帯の幅が ±300 g。賛同者の数がその直線の点数。外れ値を引いた回は点数が低く、自然に捨てられる</p>
+</div>
+</div>
+</section>
+<section id="peek-ransac-code" class="slide level2">
+<h2>RANSAC を実装する</h2>
+<div class="slide-body">
+<div id="6aaba802" class="cell" data-execution_count="15">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a aria-label="1"></a><span class="kw">def</span> ransac_line(x, t, threshold, n_trials<span class="op">=</span><span class="dv">200</span>):</span>
+<span id="cb17-2"><a aria-label="2"></a>    best_count <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb17-3"><a aria-label="3"></a>    <span class="cf">for</span> trial <span class="kw">in</span> <span class="bu">range</span>(n_trials):</span>
+<span id="cb17-4"><a aria-label="4"></a>        i, j <span class="op">=</span> np.random.choice(<span class="bu">len</span>(x), <span class="dv">2</span>, replace<span class="op">=</span><span class="va">False</span>)      <span class="co"># 手順1：2枚をランダムに選ぶ</span></span>
+<span id="cb17-5"><a aria-label="5"></a>        <span class="cf">if</span> x[i] <span class="op">==</span> x[j]:                                        <span class="co"># 体長が同じ2枚では直線が引けないので、この回は飛ばす</span></span>
+<span id="cb17-6"><a aria-label="6"></a>            <span class="cf">continue</span></span>
+<span id="cb17-7"><a aria-label="7"></a>        a <span class="op">=</span> (t[j] <span class="op">-</span> t[i]) <span class="op">/</span> (x[j] <span class="op">-</span> x[i])                       <span class="co"># 手順2：2点を通る直線 t = a x + b</span></span>
+<span id="cb17-8"><a aria-label="8"></a>        b <span class="op">=</span> t[i] <span class="op">-</span> a <span class="op">*</span> x[i]</span>
+<span id="cb17-9"><a aria-label="9"></a>        inliers <span class="op">=</span> np.<span class="bu">abs</span>(a <span class="op">*</span> x <span class="op">+</span> b <span class="op">-</span> t) <span class="op">&lt;</span> threshold             <span class="co"># 手順3：直線から threshold 以内なら True（賛同者）</span></span>
+<span id="cb17-10"><a aria-label="10"></a>        <span class="cf">if</span> inliers.<span class="bu">sum</span>() <span class="op">&gt;</span> best_count:                          <span class="co"># 手順4：賛同者が最多の直線を覚えておく</span></span>
+<span id="cb17-11"><a aria-label="11"></a>            best_count, best_inliers <span class="op">=</span> inliers.<span class="bu">sum</span>(), inliers</span>
+<span id="cb17-12"><a aria-label="12"></a>    reg <span class="op">=</span> LinearRegression().fit(x[best_inliers].reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), t[best_inliers])   <span class="co"># 手順5：賛同者だけで fit し直す</span></span>
+<span id="cb17-13"><a aria-label="13"></a>    <span class="cf">return</span> reg.coef_[<span class="dv">0</span>], reg.intercept_, best_inliers</span>
+<span id="cb17-14"><a aria-label="14"></a></span>
+<span id="cb17-15"><a aria-label="15"></a>a_r, b_r, inliers <span class="op">=</span> ransac_line(lengths, weights_typo, threshold<span class="op">=</span><span class="dv">300</span>)</span>
+<span id="cb17-16"><a aria-label="16"></a><span class="bu">print</span>(<span class="ss">f"賛同者 </span><span class="sc">{</span>inliers<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss"> 枚、除外 </span><span class="sc">{</span>(<span class="op">~</span>inliers)<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss"> 枚"</span>)</span>
+<span id="cb17-17"><a aria-label="17"></a><span class="bu">print</span>(<span class="ss">f"RANSAC の直線: 体長 1cm あたり </span><span class="sc">{</span>a_r<span class="sc">:.1f}</span><span class="ss"> g"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>賛同者 78 枚、除外 2 枚
+RANSAC の直線: 体長 1cm あたり 90.0 g</code></pre>
+</div>
+</div>
+<div id="ba7c63ab" class="cell" data-execution_count="16">
+<details class="code-fold">
+<summary>描画コード</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a aria-label="1"></a>grid_cm <span class="op">=</span> np.linspace(<span class="dv">44</span>, <span class="dv">63</span>, <span class="dv">50</span>)</span>
+<span id="cb19-2"><a aria-label="2"></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">6.5</span>, <span class="fl">3.6</span>))</span>
+<span id="cb19-3"><a aria-label="3"></a>plt.scatter(lengths[inliers], weights_typo[inliers], s<span class="op">=</span><span class="dv">36</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, c<span class="op">=</span><span class="st">"#2980b9"</span>, label<span class="op">=</span><span class="ss">f"賛同者（</span><span class="sc">{</span>inliers<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">枚）"</span>)</span>
+<span id="cb19-4"><a aria-label="4"></a>plt.scatter(lengths[<span class="op">~</span>inliers], weights_typo[<span class="op">~</span>inliers], s<span class="op">=</span><span class="dv">70</span>, c<span class="op">=</span><span class="st">"#e74c3c"</span>, marker<span class="op">=</span><span class="st">"x"</span>, label<span class="op">=</span><span class="ss">f"除外（</span><span class="sc">{</span>(<span class="op">~</span>inliers)<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">枚、図の外）"</span>)</span>
+<span id="cb19-5"><a aria-label="5"></a>plt.plot(grid_cm, reg_typo.predict(grid_cm.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)), <span class="st">"--"</span>, color<span class="op">=</span><span class="st">"#e74c3c"</span>, lw<span class="op">=</span><span class="fl">1.5</span>, label<span class="op">=</span><span class="st">"最小二乗法（80枚全部）"</span>)</span>
+<span id="cb19-6"><a aria-label="6"></a>plt.plot(grid_cm, a_r <span class="op">*</span> grid_cm <span class="op">+</span> b_r, <span class="st">"-"</span>, color<span class="op">=</span><span class="st">"#2980b9"</span>, lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">"RANSAC"</span>)</span>
+<span id="cb19-7"><a aria-label="7"></a>plt.ylim(<span class="op">-</span><span class="dv">2500</span>, <span class="dv">6500</span>)                                   <span class="co"># 除外した2枚（24,000 g 台）は図の外</span></span>
+<span id="cb19-8"><a aria-label="8"></a>plt.axhline(<span class="dv">0</span>, color<span class="op">=</span><span class="st">"black"</span>, lw<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb19-9"><a aria-label="9"></a>plt.xlabel(<span class="st">"体長 (cm)"</span>)<span class="op">;</span> plt.ylabel(<span class="st">"重さ (g)"</span>)</span>
+<span id="cb19-10"><a aria-label="10"></a>plt.legend(fontsize<span class="op">=</span><span class="dv">8</span>)<span class="op">;</span> plt.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb19-11"><a aria-label="11"></a>plt.tight_layout()</span>
+<span id="cb19-12"><a aria-label="12"></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><a href="linear-regression_files/figure-revealjs/cell-17-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img data-src="linear-regression_files/figure-revealjs/cell-17-output-1.png" width="636" height="347"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<div title="結果">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>結果</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>除外された 2 枚は、ちょうど打ち間違いの 2 枚</li>
+<li>RANSAC の直線は、正しい 78 枚だけで fit した直線（90.0 g/cm）と一致する</li>
+<li>最小二乗法は全部の伝票への妥協点を探すが、RANSAC は多数派に賛同されない伝票を無視する</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="参考何回試せば十分か" class="slide level2">
+<h2>（参考）何回試せば十分か</h2>
+<div class="slide-body">
+<ul>
+<li>2 枚とも正しい伝票を引く確率は <span class="math inline">\(w^2\)</span>（<span class="math inline">\(w\)</span> は正しい伝票の割合）
+<ul>
+<li>今回は <span class="math inline">\(w = 78/80\)</span> なので <span class="math inline">\(w^2 \approx 0.95\)</span></li>
+</ul></li>
+<li><span class="math inline">\(N\)</span> 回すべて外す確率は <span class="math inline">\((1 - w^2)^N\)</span>
+<ul>
+<li><span class="math inline">\(N = 3\)</span> で 0.01 % なので、正しい 2 枚を引くだけなら数回で足りる</li>
+</ul></li>
+<li>ただし正しい 2 枚を引いても、その 2 枚のばらつきで直線が少し傾き、賛同者を取りこぼすことがある
+<ul>
+<li>回数は多めにとる（今回は 200 回）</li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="tweak-しきい値と回数を変える" class="slide level2 badge-practice">
+<h2><strong>Tweak</strong> しきい値と回数を変える</h2>
+<div class="slide-body">
+<ul>
+<li><a href="#/peek-ransac-code" class="peek">さっきのコード</a> の引数を<strong>書き換えて実行</strong>（描画コードまで続けて実行すると図で確認できる）</li>
+<li><code>bad</code> を変える行は、伝票のセルから実行し直す</li>
+</ul>
+<div class="tweak">
+<table class="caption-top">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>やりたいこと</th>
+<th>コード</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>基準を厳しくせよ</td>
+<td><code>threshold=300</code> → <code>threshold=50</code></td>
+</tr>
+<tr class="even">
+<td>打ち間違いを端から真ん中へ移せ</td>
+<td><code>bad = [3, 6]</code> → <code>bad = [54, 39]</code>（体長 53.7 cm と 53.8 cm の魚）</td>
+</tr>
+<tr class="odd">
+<td>3回だけで決めよ</td>
+<td><code>threshold=300)</code> → <code>threshold=300, n_trials=3)</code>。何度か実行せよ</td>
+</tr>
+<tr class="even">
+<td>打ち間違いを20枚にせよ</td>
+<td><code>bad = [3, 6]</code> → <code>bad = list(range(0, 80, 4))</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div title="チェックポイント">
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>チェックポイント</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li><code>50</code>：賛同者が 37〜39 枚に減り、傾きは実行ごとに 86〜100 g/cm とぶれる
+<ul>
+<li>正しい伝票の半分を外れ値扱いしている</li>
+<li>基準は正しい記録のばらつき（最大 206 g）より広くとる</li>
+</ul></li>
+<li>真ん中の 2 枚：最小二乗法の傾きは 92 g/cm とほぼ変わらず、直線全体が 380 g ほど持ち上がる
+<ul>
+<li>端の外れ値は傾きを、真ん中の外れ値は高さを動かす（てこの原理）</li>
+<li>RANSAC はどちらでも 2 枚を除外する</li>
+</ul></li>
+<li><code>n_trials=3</code>：4回に1回は賛同者を取りこぼし、傾きが大きくぶれる（−86〜113 g/cm）
+<ul>
+<li>10 回なら 99 %、200 回ならほぼ毎回 78 枚そろう</li>
+</ul></li>
+<li>打ち間違い 20 枚：最小二乗法の傾きは 398 g/cm、RANSAC は 92 g/cm
+<ul>
+<li>外れ値が多数派にならない限り、RANSAC は壊れない</li>
+</ul></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="参考scikit-learn-では" class="slide level2">
+<h2>（参考）scikit-learn では</h2>
+<div class="slide-body">
+<ul>
+<li>今日書いた <code>ransac_line</code> は、ライブラリでは <code>RANSACRegressor</code> に入っている</li>
+</ul>
+<div id="b3beb838" class="cell" data-execution_count="17">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a aria-label="1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> RANSACRegressor</span>
+<span id="cb20-2"><a aria-label="2"></a></span>
+<span id="cb20-3"><a aria-label="3"></a>ransac <span class="op">=</span> RANSACRegressor(LinearRegression(), residual_threshold<span class="op">=</span><span class="dv">300</span>, random_state<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb20-4"><a aria-label="4"></a>ransac.fit(lengths.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), weights_typo)</span>
+<span id="cb20-5"><a aria-label="5"></a></span>
+<span id="cb20-6"><a aria-label="6"></a><span class="bu">print</span>(<span class="ss">f"賛同者 </span><span class="sc">{</span>ransac<span class="sc">.</span>inlier_mask_<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss"> 枚"</span>)</span>
+<span id="cb20-7"><a aria-label="7"></a><span class="bu">print</span>(<span class="ss">f"体長 1cm あたり </span><span class="sc">{</span>ransac<span class="sc">.</span>estimator_<span class="sc">.</span>coef_[<span class="dv">0</span>]<span class="sc">:.1f}</span><span class="ss"> g"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>賛同者 78 枚
+体長 1cm あたり 90.0 g</code></pre>
+</div>
+</div>
+<table class="caption-top">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>今日書いたもの</th>
+<th>scikit-learn</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>ransac_line(x, t, threshold=300)</code></td>
+<td><code>RANSACRegressor(LinearRegression(), residual_threshold=300).fit(X, t)</code></td>
+</tr>
+<tr class="even">
+<td><code>inliers</code></td>
+<td><code>ransac.inlier_mask_</code></td>
+</tr>
+<tr class="odd">
+<td><code>a_r</code>, <code>b_r</code></td>
+<td><code>ransac.estimator_.coef_[0]</code>, <code>ransac.estimator_.intercept_</code></td>
+</tr>
+</tbody>
+</table>
+<div title="（参考）RANSAC の出番">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>（参考）RANSAC の出番</strong></p>
+</div>
+<div class="callout-content">
+<p>直線に限らず、平面・円・2枚の写真の対応関係など「少数の点で決まるモデル」なら同じ手順で使える。画像処理では、写真どうしの対応点から変換を推定するとき（パノラマ合成など）の定番</p>
+</div>
+</div>
+</div>
+</div>
+</div>
 </section>
 <section id="まとめ" class="slide level2">
 <h2>まとめ</h2>
@@ -957,6 +1348,10 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <li><strong>多項式回帰</strong>：特徴量に <span class="math inline">\(x^2, x^3, \ldots\)</span> を足せば道具は線形回帰のまま</li>
 <li><strong>過学習は回帰でも起きる</strong>：次数を上げると訓練誤差↓・テスト誤差爆発</li>
 <li><strong>正則化（<span class="en">regularization</span>）</strong>：大きい係数に罰金 → 暴れる曲線を手なずける</li>
+<li><strong>外れ値（<span class="en">outlier</span>）</strong>：二乗で測る最小二乗法は、少数の外れ値に引っ張られる
+<ul>
+<li><strong>RANSAC</strong>：ランダムな 2 点の直線を何度も引き、賛同者が最多の直線を採る</li>
+</ul></li>
 </ul>
 <div title="次回予告">
 <div class="callout callout-note callout-titled callout-style-default">
@@ -975,18 +1370,28 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 </div>
 </div>
 </section>
-<section id="練習問題" class="slide level2 scrollable">
-<h2>練習問題</h2>
+<section id="問題1魚2匹だけの世界で-fit-する" class="slide level2 scrollable">
+<h2>問題1：魚2匹だけの世界で fit する</h2>
 <div class="slide-body">
-<p>以下の問題を<strong>手計算</strong>と<strong>Pythonコード</strong>の両方で解け。</p>
-<h3 id="問題1魚2匹だけの世界で-fit-する">問題1：魚2匹だけの世界で fit する</h3>
-<p>データは2点だけ：<span class="math inline">\((x_1, t_1) = (-1, 0)\)</span>、<span class="math inline">\((x_2, t_2) = (1, 2)\)</span>。 直線 <span class="math inline">\(ax + b\)</span> を勾配降下法で fit する。初期値 <span class="math inline">\(a = 0, b = 0\)</span>、学習率 <span class="math inline">\(\alpha = 0.1\)</span>。</p>
+<p>データは2点だけ：<span class="math inline">\((x_1, t_1) = (-1, 0)\)</span>、<span class="math inline">\((x_2, t_2) = (1, 2)\)</span>。 直線 <span class="math inline">\(ax + b\)</span> を勾配降下法で fit する。初期値 <span class="math inline">\(a = 0, b = 0\)</span>、学習率 <span class="math inline">\(\alpha = 0.1\)</span>。<strong>手計算</strong>と<strong>Pythonコード</strong>の両方で解け。</p>
 <ol type="1">
 <li>勾配の式に代入して、<span class="math inline">\(\dfrac{\partial L}{\partial a}\)</span> と <span class="math inline">\(\dfrac{\partial L}{\partial b}\)</span> を求めよ</li>
 <li>更新を3回、手計算で示せ</li>
 <li>同じ更新をコードで100回繰り返し、<code>sklearn</code> の答えと比較せよ</li>
 </ol>
 <p>ヒント：2点を通る直線は <span class="math inline">\(y = x + 1\)</span>。つまり答えは <span class="math inline">\(a = 1, b = 1\)</span> になるはず。</p>
+</div>
+</section>
+<section id="問題2ransac-を手で1周回す" class="slide level2 scrollable">
+<h2>問題2：RANSAC を手で1周回す</h2>
+<div class="slide-body">
+<p>5 点：<span class="math inline">\(A(0, 0)\)</span>、<span class="math inline">\(B(1, 1)\)</span>、<span class="math inline">\(C(2, 2)\)</span>、<span class="math inline">\(D(3, 3)\)</span>、<span class="math inline">\(E(2, 8)\)</span>。しきい値は 0.5。1〜3 は<strong>手計算</strong>、4 は<strong>Pythonコード</strong>で解け。</p>
+<ol type="1">
+<li><span class="math inline">\(A\)</span> と <span class="math inline">\(B\)</span> を通る直線を求め、直線からのズレが 0.5 未満の点（賛同者）を数えよ</li>
+<li><span class="math inline">\(A\)</span> と <span class="math inline">\(E\)</span> を通る直線で同じことをせよ</li>
+<li>RANSAC が最終的に選ぶ直線と、その賛同者を答えよ</li>
+<li>Python：問題1のコードで 5 点に勾配降下法の直線を fit し（学習率 0.1、100 回）、本編の <code>ransac_line</code> の直線と比較せよ（傾きと切片を表示）</li>
+</ol>
 </div>
 </section>
 <section id="問題1の解答例" class="slide level2">
@@ -1017,28 +1422,28 @@ a = 0.2 + 0.16 = 0.36\]</span></p>
 </div>
 </div>
 <h3 id="コードで確認">コードで確認</h3>
-<div id="18428043" class="cell" data-execution_count="11">
+<div id="36da53c5" class="cell" data-execution_count="18">
 <details class="code-fold">
 <summary>解答例を見る</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb13-2"><a aria-label="2"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
-<span id="cb13-3"><a aria-label="3"></a></span>
-<span id="cb13-4"><a aria-label="4"></a>x <span class="op">=</span> np.array([<span class="op">-</span><span class="fl">1.0</span>, <span class="fl">1.0</span>])</span>
-<span id="cb13-5"><a aria-label="5"></a>t <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">2.0</span>])</span>
-<span id="cb13-6"><a aria-label="6"></a></span>
-<span id="cb13-7"><a aria-label="7"></a>a, b <span class="op">=</span> <span class="fl">0.0</span>, <span class="fl">0.0</span></span>
-<span id="cb13-8"><a aria-label="8"></a>lr <span class="op">=</span> <span class="fl">0.1</span></span>
-<span id="cb13-9"><a aria-label="9"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">101</span>):</span>
-<span id="cb13-10"><a aria-label="10"></a>    pred   <span class="op">=</span> a <span class="op">*</span> x <span class="op">+</span> b</span>
-<span id="cb13-11"><a aria-label="11"></a>    grad_a <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> np.mean((pred <span class="op">-</span> t) <span class="op">*</span> x)</span>
-<span id="cb13-12"><a aria-label="12"></a>    grad_b <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> np.mean(pred <span class="op">-</span> t)</span>
-<span id="cb13-13"><a aria-label="13"></a>    a <span class="op">-=</span> lr <span class="op">*</span> grad_a</span>
-<span id="cb13-14"><a aria-label="14"></a>    b <span class="op">-=</span> lr <span class="op">*</span> grad_b</span>
-<span id="cb13-15"><a aria-label="15"></a>    <span class="cf">if</span> i <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">100</span>):</span>
-<span id="cb13-16"><a aria-label="16"></a>        <span class="bu">print</span>(<span class="ss">f"更新 </span><span class="sc">{</span>i<span class="sc">:3d}</span><span class="ss">回 | a=</span><span class="sc">{</span>a<span class="sc">:.4f}</span><span class="ss"> b=</span><span class="sc">{</span>b<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb13-17"><a aria-label="17"></a></span>
-<span id="cb13-18"><a aria-label="18"></a>reg <span class="op">=</span> LinearRegression().fit(x.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), t)</span>
-<span id="cb13-19"><a aria-label="19"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">sklearn の fit: a=</span><span class="sc">{</span>reg<span class="sc">.</span>coef_[<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss">, b=</span><span class="sc">{</span>reg<span class="sc">.</span>intercept_<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb22-2"><a aria-label="2"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
+<span id="cb22-3"><a aria-label="3"></a></span>
+<span id="cb22-4"><a aria-label="4"></a>x <span class="op">=</span> np.array([<span class="op">-</span><span class="fl">1.0</span>, <span class="fl">1.0</span>])</span>
+<span id="cb22-5"><a aria-label="5"></a>t <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">2.0</span>])</span>
+<span id="cb22-6"><a aria-label="6"></a></span>
+<span id="cb22-7"><a aria-label="7"></a>a, b <span class="op">=</span> <span class="fl">0.0</span>, <span class="fl">0.0</span></span>
+<span id="cb22-8"><a aria-label="8"></a>lr <span class="op">=</span> <span class="fl">0.1</span></span>
+<span id="cb22-9"><a aria-label="9"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">101</span>):</span>
+<span id="cb22-10"><a aria-label="10"></a>    pred   <span class="op">=</span> a <span class="op">*</span> x <span class="op">+</span> b</span>
+<span id="cb22-11"><a aria-label="11"></a>    grad_a <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> np.mean((pred <span class="op">-</span> t) <span class="op">*</span> x)</span>
+<span id="cb22-12"><a aria-label="12"></a>    grad_b <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> np.mean(pred <span class="op">-</span> t)</span>
+<span id="cb22-13"><a aria-label="13"></a>    a <span class="op">-=</span> lr <span class="op">*</span> grad_a</span>
+<span id="cb22-14"><a aria-label="14"></a>    b <span class="op">-=</span> lr <span class="op">*</span> grad_b</span>
+<span id="cb22-15"><a aria-label="15"></a>    <span class="cf">if</span> i <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">100</span>):</span>
+<span id="cb22-16"><a aria-label="16"></a>        <span class="bu">print</span>(<span class="ss">f"更新 </span><span class="sc">{</span>i<span class="sc">:3d}</span><span class="ss">回 | a=</span><span class="sc">{</span>a<span class="sc">:.4f}</span><span class="ss"> b=</span><span class="sc">{</span>b<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb22-17"><a aria-label="17"></a></span>
+<span id="cb22-18"><a aria-label="18"></a>reg <span class="op">=</span> LinearRegression().fit(x.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), t)</span>
+<span id="cb22-19"><a aria-label="19"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">sklearn の fit: a=</span><span class="sc">{</span>reg<span class="sc">.</span>coef_[<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss">, b=</span><span class="sc">{</span>reg<span class="sc">.</span>intercept_<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>更新   1回 | a=0.2000 b=0.2000
@@ -1050,6 +1455,56 @@ sklearn の fit: a=1.0000, b=1.0000</code></pre>
 </div>
 </div>
 <p>手計算の3回（0.2 → 0.36 → 0.488）とコードの出力が一致し、100回で <span class="math inline">\(a = b = 1\)</span>（<code>sklearn</code> と同じ）に収束する。</p>
+</div>
+</section>
+<section id="問題2の解答例" class="slide level2">
+<h2>問題2の解答例</h2>
+<div class="slide-body">
+<ul>
+<li><span class="math inline">\(A\)</span>、<span class="math inline">\(B\)</span> を通る直線は <span class="math inline">\(t = x\)</span>
+<ul>
+<li><span class="math inline">\(C\)</span>、<span class="math inline">\(D\)</span> のズレは 0、<span class="math inline">\(E\)</span> のズレは <span class="math inline">\(|8 - 2| = 6\)</span></li>
+<li>賛同者は <span class="math inline">\(A, B, C, D\)</span> の 4 点</li>
+</ul></li>
+<li><span class="math inline">\(A\)</span>、<span class="math inline">\(E\)</span> を通る直線は <span class="math inline">\(t = 4x\)</span>
+<ul>
+<li><span class="math inline">\(B\)</span> のズレは <span class="math inline">\(|1 - 4| = 3\)</span>、<span class="math inline">\(C\)</span> は <span class="math inline">\(|2 - 8| = 6\)</span>、<span class="math inline">\(D\)</span> は <span class="math inline">\(|3 - 12| = 9\)</span></li>
+<li>賛同者は <span class="math inline">\(A, E\)</span> の 2 点</li>
+</ul></li>
+<li>賛同者が最多（4 点）なのは <span class="math inline">\(t = x\)</span>
+<ul>
+<li>賛同者 <span class="math inline">\(A, B, C, D\)</span> だけで最小二乗法をやり直しても、4 点が一直線上なので <span class="math inline">\(t = x\)</span> のまま</li>
+</ul></li>
+<li>勾配降下法で 5 点すべてに fit すると <span class="math inline">\(a \approx 1.46\)</span>、<span class="math inline">\(b \approx 0.46\)</span>
+<ul>
+<li><span class="math inline">\(E\)</span> の 1 点に引っ張られ、傾きが 1.46 倍になった</li>
+</ul></li>
+</ul>
+<div id="b93659f4" class="cell" data-execution_count="19">
+<details class="code-fold">
+<summary>解答例を見る</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb24-2"><a aria-label="2"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
+<span id="cb24-3"><a aria-label="3"></a></span>
+<span id="cb24-4"><a aria-label="4"></a>P_x <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>, <span class="fl">2.0</span>])   <span class="co"># A, B, C, D, E の x</span></span>
+<span id="cb24-5"><a aria-label="5"></a>P_t <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>, <span class="fl">8.0</span>])   <span class="co"># A, B, C, D, E の t</span></span>
+<span id="cb24-6"><a aria-label="6"></a></span>
+<span id="cb24-7"><a aria-label="7"></a>a, b <span class="op">=</span> <span class="fl">0.0</span>, <span class="fl">0.0</span></span>
+<span id="cb24-8"><a aria-label="8"></a>lr <span class="op">=</span> <span class="fl">0.1</span></span>
+<span id="cb24-9"><a aria-label="9"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">100</span>):</span>
+<span id="cb24-10"><a aria-label="10"></a>    pred <span class="op">=</span> a <span class="op">*</span> P_x <span class="op">+</span> b</span>
+<span id="cb24-11"><a aria-label="11"></a>    a <span class="op">-=</span> lr <span class="op">*</span> <span class="dv">2</span> <span class="op">*</span> np.mean((pred <span class="op">-</span> P_t) <span class="op">*</span> P_x)</span>
+<span id="cb24-12"><a aria-label="12"></a>    b <span class="op">-=</span> lr <span class="op">*</span> <span class="dv">2</span> <span class="op">*</span> np.mean(pred <span class="op">-</span> P_t)</span>
+<span id="cb24-13"><a aria-label="13"></a><span class="bu">print</span>(<span class="ss">f"勾配降下法（5点すべて）: a=</span><span class="sc">{</span>a<span class="sc">:.2f}</span><span class="ss">, b=</span><span class="sc">{</span>b<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb24-14"><a aria-label="14"></a></span>
+<span id="cb24-15"><a aria-label="15"></a>a_r, b_r, inliers <span class="op">=</span> ransac_line(P_x, P_t, threshold<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb24-16"><a aria-label="16"></a><span class="bu">print</span>(<span class="ss">f"RANSAC: a=</span><span class="sc">{</span>a_r<span class="sc">:.2f}</span><span class="ss">, b=</span><span class="sc">{</span>b_r<span class="sc">:.2f}</span><span class="ss">, 賛同者=</span><span class="sc">{</span>inliers<span class="sc">.</span>astype(<span class="bu">int</span>)<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>勾配降下法（5点すべて）: a=1.46, b=0.46
+RANSAC: a=1.00, b=0.00, 賛同者=[1 1 1 1 0]</code></pre>
+</div>
+</div>
 
 
 <div id="3ade8a4a-fb1d-4a6c-8409-ac45482d5fc9" class="hidden">

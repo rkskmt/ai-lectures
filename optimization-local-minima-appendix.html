@@ -277,6 +277,7 @@ rkskmt
 <div class="slide-body">
 <p>本編では <span class="math inline">\(f(x) = x^2 - 4x + 3\)</span> という<strong>2次関数</strong>で勾配降下法を学びました。</p>
 <p>この関数は<strong>谷が1つだけ</strong>のシンプルな形でした。 どこから始めても、必ず同じ最小値 <span class="math inline">\(x = 2\)</span> にたどり着きました。</p>
+<div title="本編の結論">
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -291,6 +292,7 @@ rkskmt
 <li>学習率が適切なら、谷の底にたどり着く</li>
 <li>スタート地点を変えても、<strong>たどり着く場所は同じ</strong>だった</li>
 </ul>
+</div>
 </div>
 </div>
 </div>
@@ -326,7 +328,7 @@ rkskmt
 <section id="pythonでの定義" class="slide level2">
 <h2>Pythonでの定義</h2>
 <div class="slide-body">
-<div id="05219832" class="cell" data-execution_count="1">
+<div id="ccb03a45" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-3"><a aria-label="3"></a><span class="im">import</span> japanize_matplotlib</span>
@@ -347,15 +349,16 @@ rkskmt
 <h2>まずグラフを描いてみよう</h2>
 <div class="slide-body">
 <p>どんな形の関数なのか、<strong>まず目で見る</strong>ことが大切です。</p>
-<div id="89cd8e9f" class="cell" data-execution_count="2">
+<div id="214e29f6" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="optimization-local-minima-appendix_files/figure-revealjs/cell-3-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img data-src="optimization-local-minima-appendix_files/figure-revealjs/cell-3-output-1.png" class="quarto-figure quarto-figure-center" width="1144" height="470"></a></p>
+<p><a href="optimization-local-minima-appendix_files/figure-revealjs/cell-3-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img data-src="optimization-local-minima-appendix_files/figure-revealjs/cell-3-output-1.png" class="quarto-figure quarto-figure-center" width="1142" height="470"></a></p>
 </figure>
 </div>
 </div>
 </div>
+<div title="グラフを観察しよう">
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -376,6 +379,7 @@ rkskmt
 </div>
 </div>
 </div>
+</div>
 </section>
 <section id="section-2" class="slide level2 center break-slide" data-background-color="white">
 <h2></h2>
@@ -389,7 +393,7 @@ rkskmt
 <p>本編の勾配降下法の更新式を、<strong>そのまま</strong>使います：</p>
 <p><span class="math display">\[x_{\text{new}} = x - \alpha \cdot f'(x)\]</span></p>
 <p>学習率は <span class="math inline">\(\alpha = 0.1\)</span> に固定。同じ式・同じ学習率で、<strong>スタート地点だけ変えて</strong>2回実験します。</p>
-<div id="f1083598" class="cell" data-execution_count="3">
+<div id="bdff2fcf" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a><span class="kw">def</span> gradient_descent(f, fp, x0, lr<span class="op">=</span><span class="fl">0.1</span>, tol<span class="op">=</span><span class="fl">1e-6</span>, max_iter<span class="op">=</span><span class="dv">10000</span>):</span>
 <span id="cb2-2"><a aria-label="2"></a>    <span class="co">"""勾配降下法：収束した場所・そこでの f(x)・通り道を返す"""</span></span>
 <span id="cb2-3"><a aria-label="3"></a>    x <span class="op">=</span> x0</span>
@@ -429,6 +433,7 @@ rkskmt
 </div>
 </div>
 </div>
+<div title="実験1の結果">
 <div class="callout callout-important callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -442,8 +447,9 @@ rkskmt
 </div>
 </div>
 </div>
+</div>
 <h3 id="pythonで確認">Pythonで確認</h3>
-<div id="3098e505" class="cell" data-execution_count="4">
+<div id="3510fac0" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a aria-label="1"></a><span class="co"># 実験1: x0 = 0.5 からスタート</span></span>
@@ -498,6 +504,7 @@ rkskmt
 </div>
 </div>
 </div>
+<div title="実験2の結果">
 <div class="callout callout-important callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -512,8 +519,9 @@ rkskmt
 </div>
 </div>
 </div>
+</div>
 <h3 id="pythonで確認-1">Pythonで確認</h3>
-<div id="2e01a57d" class="cell" data-execution_count="5">
+<div id="e2e2b1fa" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a aria-label="1"></a><span class="co"># 実験2: x0 = 5.5 からスタート</span></span>
@@ -544,15 +552,16 @@ rkskmt
 <section id="つの実験を並べてみよう" class="slide level2">
 <h2>2つの実験を並べてみよう</h2>
 <div class="slide-body">
-<div id="1b48b6bb" class="cell" data-execution_count="6">
+<div id="18bed5d7" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="optimization-local-minima-appendix_files/figure-revealjs/cell-7-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img data-src="optimization-local-minima-appendix_files/figure-revealjs/cell-7-output-1.png" class="quarto-figure quarto-figure-center" width="1144" height="566"></a></p>
+<p><a href="optimization-local-minima-appendix_files/figure-revealjs/cell-7-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img data-src="optimization-local-minima-appendix_files/figure-revealjs/cell-7-output-1.png" class="quarto-figure quarto-figure-center" width="1142" height="566"></a></p>
 </figure>
 </div>
 </div>
 </div>
+<div title="たどり着いた谷が違う">
 <div class="callout callout-warning callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -606,6 +615,7 @@ rkskmt
 </div>
 </div>
 </div>
+</div>
 </section>
 <section id="section-3" class="slide level2 center break-slide" data-background-color="white">
 <h2></h2>
@@ -619,15 +629,16 @@ rkskmt
 <p>いま体験した現象には、ちゃんと名前がついています。</p>
 <p><strong>ローカルミニマム（局所的最小値, <span class="en">local minimum</span>）</strong>: 「その周辺では一番低い」けど、関数全体で見ると<strong>もっと低い場所がある</strong>点。 実験1で到達した<strong>左の谷（x = 0）</strong>がこれです。</p>
 <p><strong>グローバルミニマム（大域的最小値, <span class="en">global minimum</span>）</strong>: 関数全体で<strong>本当に一番低い</strong>点。 実験2で到達した<strong>右の谷（x ≈ 5.77）</strong>がこれです。</p>
-<div id="bb6c312b" class="cell" data-execution_count="7">
+<div id="4ca8a960" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="optimization-local-minima-appendix_files/figure-revealjs/cell-8-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img data-src="optimization-local-minima-appendix_files/figure-revealjs/cell-8-output-1.png" class="quarto-figure quarto-figure-center" width="1144" height="566"></a></p>
+<p><a href="optimization-local-minima-appendix_files/figure-revealjs/cell-8-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img data-src="optimization-local-minima-appendix_files/figure-revealjs/cell-8-output-1.png" class="quarto-figure quarto-figure-center" width="1142" height="566"></a></p>
 </figure>
 </div>
 </div>
 </div>
+<div title="たとえ話：山の中で一番低い場所を探す">
 <div class="callout callout-tip callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -644,6 +655,7 @@ rkskmt
 <li>目隠しをしているので、<strong>今いる谷が一番深いかどうかわからない！</strong></li>
 </ul>
 <p>Newton法も勾配降下法も、この「目隠し」と同じ状況です。</p>
+</div>
 </div>
 </div>
 </div>
@@ -670,7 +682,7 @@ rkskmt
 <section id="どの初期値がどの谷に落ちるのか" class="slide level2">
 <h2>どの初期値が、どの谷に落ちるのか</h2>
 <div class="slide-body">
-<div id="1252142f" class="cell" data-execution_count="8">
+<div id="b9309f6a" class="cell" data-execution_count="8">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a aria-label="1"></a><span class="co"># 初期値を -1.5 から 7.5 まで細かく変えて、全部試す</span></span>
@@ -679,11 +691,11 @@ rkskmt
 <span id="cb7-4"><a aria-label="4"></a>    [gradient_descent(f_poly, f_poly_prime, x0)[<span class="dv">0</span>] <span class="cf">for</span> x0 <span class="kw">in</span> x0_dense_gd])</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="01718a12" class="cell" data-execution_count="9">
+<div id="4f227240" class="cell" data-execution_count="9">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="optimization-local-minima-appendix_files/figure-revealjs/cell-10-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img data-src="optimization-local-minima-appendix_files/figure-revealjs/cell-10-output-1.png" class="quarto-figure quarto-figure-center" width="1143" height="758"></a></p>
+<p><a href="optimization-local-minima-appendix_files/figure-revealjs/cell-10-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img data-src="optimization-local-minima-appendix_files/figure-revealjs/cell-10-output-1.png" class="quarto-figure quarto-figure-center" width="1142" height="757"></a></p>
 </figure>
 </div>
 </div>
@@ -695,6 +707,7 @@ rkskmt
 <li>点は2つの高さのどちらかに張り付く — 行き先は<strong>左の谷（赤）か右の谷（緑）</strong>の2択</li>
 <li>背景の色の帯から出発すると、同じ色の谷に吸い込まれる。上下のグラフは横軸が揃えてある</li>
 </ul>
+<div title="引力圏（[Basin of Attraction]{.en}）とは">
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -710,6 +723,7 @@ rkskmt
 <li>地図としては素直。でも裏を返せば、<strong>答えはスタート地点を選んだ瞬間に決まっている</strong></li>
 <li>どっちの谷が深いかは、降りてみるまでわからない — <strong>1回の実行を信用してはいけない</strong>理由がこれ</li>
 </ul>
+</div>
 </div>
 </div>
 </div>
@@ -773,7 +787,7 @@ rkskmt
 </div>
 </div>
 <h3 id="つの結果を比較">3つの結果を比較</h3>
-<div id="850bde35" class="cell" data-execution_count="11">
+<div id="d185166f" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a aria-label="1"></a><span class="co"># 3つの初期値から実行して比較</span></span>
 <span id="cb8-2"><a aria-label="2"></a>starting_points <span class="op">=</span> [<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">6</span>]</span>
 <span id="cb8-3"><a aria-label="3"></a></span>
@@ -802,6 +816,7 @@ rkskmt
  6.0  →    5.7656  →  -13.6726  →  右の谷 ← 最良！</code></pre>
 </div>
 </div>
+<div title="ポイント">
 <div class="callout callout-important callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -817,6 +832,7 @@ rkskmt
 </div>
 </div>
 </div>
+</div>
 </section>
 <section id="方法2方法3たくさんの初期値を自動で試す" class="slide level2">
 <h2>方法2・方法3：たくさんの初期値を自動で試す</h2>
@@ -827,7 +843,7 @@ rkskmt
 <div class="tab-content">
 <div id="tabset-4-1">
 <p>初期値を<strong>ランダムに</strong>選ぶ方法です。</p>
-<div id="d84dd15c" class="cell" data-execution_count="12">
+<div id="37594b1c" class="cell" data-execution_count="12">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a aria-label="1"></a><span class="co"># 20個のランダムな初期値から試す</span></span>
@@ -870,7 +886,7 @@ rkskmt
 </div>
 <div id="tabset-4-2">
 <p>ランダムではなく、<strong>等間隔に並べる</strong>方法もあります。</p>
-<div id="29369680" class="cell" data-execution_count="13">
+<div id="ea3de60a" class="cell" data-execution_count="13">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a aria-label="1"></a><span class="co"># 等間隔に15個の初期値を用意</span></span>
@@ -914,11 +930,11 @@ rkskmt
 ★ 最良: x0=3.57 → x=5.7656, f(x)=-13.6726</code></pre>
 </div>
 </div>
-<div id="11d8cece" class="cell" data-execution_count="14">
+<div id="68fd9715" class="cell" data-execution_count="14">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="optimization-local-minima-appendix_files/figure-revealjs/cell-15-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img data-src="optimization-local-minima-appendix_files/figure-revealjs/cell-15-output-1.png" class="quarto-figure quarto-figure-center" width="1335" height="470"></a></p>
+<p><a href="optimization-local-minima-appendix_files/figure-revealjs/cell-15-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img data-src="optimization-local-minima-appendix_files/figure-revealjs/cell-15-output-1.png" class="quarto-figure quarto-figure-center" width="1333" height="469"></a></p>
 </figure>
 </div>
 </div>
@@ -926,6 +942,7 @@ rkskmt
 </div>
 </div>
 </div>
+<div title="ランダムリスタート vs グリッドサーチ">
 <div class="callout callout-tip callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -970,27 +987,30 @@ rkskmt
 </div>
 </div>
 </div>
+</div>
 </section>
 <section id="この作戦実はもう使っている" class="slide level2">
 <h2>この作戦、実はもう使っている</h2>
 <div class="slide-body">
+<div title="k-means の `kmeans_best(X, k, n_init=10)` の正体">
 <div class="callout callout-tip callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>k-means の <code>n_init=10</code> の正体</strong></p>
+<p><strong>k-means の <code>kmeans_best(X, k, n_init=10)</code> の正体</strong></p>
 </div>
 <div class="callout-content">
-<p>クラスタリングの回で、k-means が<strong>クラスタ中心の初期値</strong>しだいで変な分け方に落ち着くのを見ました。 あのとき出てきた <code>KMeans(..., n_init=10)</code> は「初期値を変えて10回学習し、inertia が最小の結果を採用」— つまり<strong>ランダムリスタート</strong>そのものです。</p>
+<p>クラスタリングの回で、k-means が<strong>クラスタ中心の初期値</strong>しだいで変な分け方に落ち着くのを見ました。 あのとき書いた <code>kmeans_best(X, k, n_init=10)</code> は「初期値を変えて10回回し、SSE が最小の結果を採用」— つまり<strong>ランダムリスタート</strong>そのものです。</p>
 </div>
 </div>
 </div>
-<p>「初期値を変えて何回も試し、一番良いのを選ぶ」— この作戦の一族をまとめて<strong>マルチスタート（<span class="en">multi-start</span>）</strong>と呼びます。</p>
+</div>
+<p>「初期値を変えて何回も試し、一番良いのを選ぶ」。初期値の用意のしかた（手動・ランダム・グリッド）が違っても、考え方は同じです（最適化の分野ではまとめて <span class="en">multi-start</span> と呼ぶこともあります）。</p>
 <ul>
-<li>k-means の <code>n_init</code> はマルチスタート</li>
-<li>ニューラルネットワークで「乱数シードを変えて学習し直す」のもマルチスタート</li>
+<li>k-means の <code>kmeans_best</code> はランダムリスタート</li>
+<li>ニューラルネットワークで「乱数シードを変えて学習し直す」のもランダムリスタート</li>
 <li>名前は違っても、やっていることは今日の「方法1〜3」と同じ</li>
 </ul>
 </div>
@@ -1005,6 +1025,7 @@ rkskmt
 <h2>最適化の4ステップ</h2>
 <div class="slide-body">
 <p>最適化問題に取り組むときは、以下の手順を守りましょう。</p>
+<div title="ステップ1：関数を可視化する">
 <div class="callout callout-important callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -1018,6 +1039,8 @@ rkskmt
 </div>
 </div>
 </div>
+</div>
+<div title="ステップ2：複数の初期値を用意する">
 <div class="callout callout-important callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -1031,6 +1054,8 @@ rkskmt
 </div>
 </div>
 </div>
+</div>
+<div title="ステップ3：全部実行して、結果を比較する">
 <div class="callout callout-important callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -1044,6 +1069,8 @@ rkskmt
 </div>
 </div>
 </div>
+</div>
+<div title="ステップ4：2次微分で確認する">
 <div class="callout callout-important callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -1058,12 +1085,13 @@ rkskmt
 </div>
 </div>
 </div>
+</div>
 </section>
 <section id="実装テンプレート" class="slide level2">
 <h2>実装テンプレート</h2>
 <div class="slide-body">
 <p>上の4ステップをまとめたコードです。コピーして使えます。</p>
-<div id="6b4d0c88" class="cell" data-execution_count="15">
+<div id="a48a1c76" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a aria-label="1"></a><span class="kw">def</span> robust_optimization(f, fp, fpp, x0_list, lr<span class="op">=</span><span class="fl">0.1</span>, max_iter<span class="op">=</span><span class="dv">10000</span>):</span>
 <span id="cb14-2"><a aria-label="2"></a>    <span class="co">"""</span></span>
 <span id="cb14-3"><a aria-label="3"></a><span class="co">    複数の初期値を使ったロバストな最適化（勾配降下法版）</span></span>
@@ -1154,7 +1182,7 @@ rkskmt
 <p><a href="./newton-method-appendix.html">Newton法（参考資料）</a>は、いまいる場所に放物線を当てはめて、<strong>その頂点へ一気にジャンプ</strong>する方法でした：</p>
 <p><span class="math display">\[x_{\text{new}} = x - \frac{f'(x)}{f''(x)}\]</span></p>
 <p>実験1・実験2と同じ初期値で、Newton法を走らせてみます。</p>
-<div id="5e0c1c7c" class="cell" data-execution_count="16">
+<div id="72e75ad4" class="cell" data-execution_count="16">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a aria-label="1"></a><span class="kw">def</span> newton_naive(f, fp, fpp, x0, tol<span class="op">=</span><span class="fl">1e-6</span>, max_iter<span class="op">=</span><span class="dv">100</span>):</span>
@@ -1195,11 +1223,11 @@ x0 = 5.5: Newton法  4 回 / 勾配降下法  6 回  →  x = 5.7656</code></pre
 <li>同じ更新式を回すと：<span class="math inline">\(1.5 \rightarrow 1.761 \rightarrow 1.735 \rightarrow\)</span> 停止（<span class="math inline">\(f' \approx 0\)</span>）</li>
 <li>左に下り坂があるのに、<strong>坂を登って丘のてっぺんで止まった</strong></li>
 </ul>
-<div id="23b035fa" class="cell" data-execution_count="17">
+<div id="2a7f3265" class="cell" data-execution_count="17">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="optimization-local-minima-appendix_files/figure-revealjs/cell-18-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img data-src="optimization-local-minima-appendix_files/figure-revealjs/cell-18-output-1.png" class="quarto-figure quarto-figure-center" width="1048" height="336"></a></p>
+<p><a href="optimization-local-minima-appendix_files/figure-revealjs/cell-18-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img data-src="optimization-local-minima-appendix_files/figure-revealjs/cell-18-output-1.png" class="quarto-figure quarto-figure-center" width="1046" height="336"></a></p>
 </figure>
 </div>
 </div>
@@ -1211,6 +1239,7 @@ x0 = 5.5: Newton法  4 回 / 勾配降下法  6 回  →  x = 5.7656</code></pre
 <li>Newton法が探しているのは「<span class="math inline">\(f' = 0\)</span> の点」だけ。そこが山か谷かは<strong>見ていない</strong></li>
 <li>停止条件（<span class="math inline">\(|f'|\)</span> がほぼゼロ）は山頂でも満たされる → <strong>山で本当に止まる</strong></li>
 </ul>
+<div title="$f''$ チェックは「止まった後の検品」">
 <div class="callout callout-tip callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -1221,6 +1250,7 @@ x0 = 5.5: Newton法  4 回 / 勾配降下法  6 回  →  x = 5.7656</code></pre
 </div>
 <div class="callout-content">
 <p>収束したら <span class="math inline">\(f''(x)\)</span> を確認：<strong>正なら谷、負なら山 — 山なら結果を捨てる</strong>。 山か谷かの区別は<strong>できる</strong>が、それは止まってからの話。 走っている最中のNewton法には、登りを避けるブレーキがついていない。 （実は後付けできる — 引力圏とカタパルトを見たあとで「修理」する）</p>
+</div>
 </div>
 </div>
 </div>
@@ -1241,7 +1271,7 @@ x0 = 5.5: Newton法  4 回 / 勾配降下法  6 回  →  x = 5.7656</code></pre
 <h2>Newton法の引力圏を可視化しよう</h2>
 <div class="slide-body">
 <p>勾配降下法では「丘のてっぺんを境にきれいな2分割」でした。Newton法ではどうなるでしょうか。</p>
-<div id="d1076737" class="cell" data-execution_count="18">
+<div id="338a7eee" class="cell" data-execution_count="18">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a aria-label="1"></a><span class="kw">def</span> newton_optimize(f, fp, fpp, x0, max_iter<span class="op">=</span><span class="dv">50</span>):</span>
@@ -1271,11 +1301,11 @@ x0 = 5.5: Newton法  4 回 / 勾配降下法  6 回  →  x = 5.7656</code></pre
 <span id="cb18-25"><a aria-label="25"></a>convergence_values <span class="op">=</span> np.array(convergence_values)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="788d0064" class="cell" data-execution_count="19">
+<div id="04fabecb" class="cell" data-execution_count="19">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="optimization-local-minima-appendix_files/figure-revealjs/cell-20-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img data-src="optimization-local-minima-appendix_files/figure-revealjs/cell-20-output-1.png" class="quarto-figure quarto-figure-center" width="1143" height="854"></a></p>
+<p><a href="optimization-local-minima-appendix_files/figure-revealjs/cell-20-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img data-src="optimization-local-minima-appendix_files/figure-revealjs/cell-20-output-1.png" class="quarto-figure quarto-figure-center" width="1142" height="853"></a></p>
 </figure>
 </div>
 </div>
@@ -1288,6 +1318,7 @@ x0 = 5.5: Newton法  4 回 / 勾配降下法  6 回  →  x = 5.7656</code></pre
 <li>背景の色の帯が<strong>引力圏</strong>：同じ色の帯から出発すると、同じ場所に吸い込まれる</li>
 <li>上下のグラフは横軸が揃えてある — 上の山谷と下の帯を見比べられる</li>
 </ul>
+<div title="Newton法の引力圏は、素直じゃない">
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -1308,16 +1339,17 @@ x0 = 5.5: Newton法  4 回 / 勾配降下法  6 回  →  x = 5.7656</code></pre
 </div>
 </div>
 </div>
+</div>
 </section>
 <section id="なぜすぐ手前の帯が左へ飛ぶのか" class="slide level2">
 <h2>なぜ「すぐ手前の帯」が左へ飛ぶのか</h2>
 <div class="slide-body">
 <p>x0 = 4.0 から始めたときの<strong>最初の1歩</strong>を解剖してみます。</p>
-<div id="a64279d4" class="cell" data-execution_count="20">
+<div id="2336e43f" class="cell" data-execution_count="20">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="optimization-local-minima-appendix_files/figure-revealjs/cell-21-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img data-src="optimization-local-minima-appendix_files/figure-revealjs/cell-21-output-1.png" class="quarto-figure quarto-figure-center" width="1041" height="490"></a></p>
+<p><a href="optimization-local-minima-appendix_files/figure-revealjs/cell-21-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img data-src="optimization-local-minima-appendix_files/figure-revealjs/cell-21-output-1.png" class="quarto-figure quarto-figure-center" width="1041" height="488"></a></p>
 </figure>
 </div>
 </div>
@@ -1404,7 +1436,7 @@ x0 = 5.5: Newton法  4 回 / 勾配降下法  6 回  →  x = 5.7656</code></pre
 <section id="修理版newton法検査12入り" class="slide level2">
 <h2>修理版Newton法（検査1・2入り）</h2>
 <div class="slide-body">
-<div id="e4b605af" class="cell" data-execution_count="21">
+<div id="fa7bb73c" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a aria-label="1"></a><span class="kw">def</span> newton_safe(f, fp, fpp, x0, max_iter<span class="op">=</span><span class="dv">100</span>):</span>
 <span id="cb19-2"><a aria-label="2"></a>    <span class="co">"""Newton法＋検査1（降下方向）＋検査2（実測バックトラッキング）"""</span></span>
 <span id="cb19-3"><a aria-label="3"></a>    x <span class="op">=</span> x0</span>
@@ -1440,11 +1472,11 @@ x0 = 4.0 → x = 5.7656, f(x) = -13.6726</code></pre>
 <section id="修理後の引力圏" class="slide level2">
 <h2>修理後の引力圏</h2>
 <div class="slide-body">
-<div id="def16194" class="cell" data-execution_count="22">
+<div id="a3bcfb08" class="cell" data-execution_count="22">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="optimization-local-minima-appendix_files/figure-revealjs/cell-23-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img data-src="optimization-local-minima-appendix_files/figure-revealjs/cell-23-output-1.png" class="quarto-figure quarto-figure-center" width="1143" height="758"></a></p>
+<p><a href="optimization-local-minima-appendix_files/figure-revealjs/cell-23-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img data-src="optimization-local-minima-appendix_files/figure-revealjs/cell-23-output-1.png" class="quarto-figure quarto-figure-center" width="1142" height="757"></a></p>
 </figure>
 </div>
 </div>
@@ -1490,7 +1522,7 @@ x0 = 4.0 → x = 5.7656, f(x) = -13.6726</code></pre>
 <li><strong>山頂で止まる・反対側へ吹っ飛ぶ</strong>は、検査1・2で直せる — ライブラリは標準装備済み</li>
 <li>でも修理後も、行き先は相変わらず<strong>2つ</strong>ある — どの谷に落ちるかは初期値しだいのまま</li>
 <li>これはNewton法の故障ではなく、<strong>目隠しで坂を下ること自体の限界</strong>（目の前の谷しか見えない）</li>
-<li>だから、マルチスタート（方法1〜3）は<strong>どんな手法を使っても必須</strong></li>
+<li>だから、複数の初期値から試す作戦（方法1〜3）は<strong>どんな手法を使っても必須</strong></li>
 </ul>
 </div>
 </section>
@@ -1523,21 +1555,22 @@ x0 = 4.0 → x = 5.7656, f(x) = -13.6726</code></pre>
 <li>ローカルミニマム = 周辺では一番低いが、全体では最低ではない</li>
 <li>グローバルミニマム = 全体で本当に一番低い点</li>
 </ul></li>
-<li><strong>対策はマルチスタート：複数の初期値から試して、一番良い結果を選ぶ</strong>
+<li><strong>対策は「複数の初期値から試して、一番良い結果を選ぶ」</strong>
 <ul>
 <li>ランダムリスタートやグリッドサーチで初期値を用意する</li>
-<li>k-means の <code>n_init=10</code> はこの作戦そのもの</li>
+<li>k-means の <code>kmeans_best(X, k, n_init=10)</code> はこの作戦そのもの</li>
 <li>2次微分の確認（<span class="math inline">\(f'' &gt; 0\)</span> なら谷）は保険として常に入れる</li>
 </ul></li>
 <li><strong>発展：Newton法は速いが、「山頂停止」「カタパルト」という事故も起こす</strong>
 <ul>
 <li>検査1（下り向きか）・検査2（実測で下がったか）で事故は直せる — ライブラリは修理済み</li>
-<li>それでも「どの谷か」の2択は残る — マルチスタートに代わりはない</li>
+<li>それでも「どの谷か」の2択は残る：初期値を変えて試す以外に手はない</li>
 </ul></li>
 </ol>
 </div>
 </div>
 </div>
+<div title="この話、ニューラルネットワークの本番でまた会う">
 <div class="callout callout-tip callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -1552,12 +1585,13 @@ x0 = 4.0 → x = 5.7656, f(x) = -13.6726</code></pre>
 </div>
 </div>
 </div>
+</div>
 </section>
 <section id="練習問題" class="slide level2 scrollable">
 <h2>練習問題</h2>
 <div class="slide-body">
 <p>以下の問題をPythonコードで解け（導関数だけ手計算）。</p>
-<h3 id="問題1新しい地形でマルチスタート">問題1：新しい地形でマルチスタート</h3>
+<h3 id="問題1新しい地形で複数の初期値から試す">問題1：新しい地形で複数の初期値から試す</h3>
 <p>関数 <span class="math inline">\(g(x) = x^4 - 8x^2 + 3x\)</span> について：</p>
 <ol type="1">
 <li><span class="math inline">\(-3.5 \leq x \leq 3.5\)</span> の範囲でグラフを描き、谷の数を確認せよ</li>
@@ -1572,7 +1606,7 @@ x0 = 4.0 → x = 5.7656, f(x) = -13.6726</code></pre>
 <h2>問題1の解答例</h2>
 <div class="slide-body">
 <p><strong>導関数（手計算）:</strong> <span class="math display">\[g'(x) = 4x^3 - 16x + 3\]</span></p>
-<div id="a8044c0d" class="cell" data-execution_count="23">
+<div id="126412a8" class="cell" data-execution_count="23">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -1616,7 +1650,7 @@ x0 = 4.0 → x = 5.7656, f(x) = -13.6726</code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure>
-<p><a href="optimization-local-minima-appendix_files/figure-revealjs/cell-24-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10"><img data-src="optimization-local-minima-appendix_files/figure-revealjs/cell-24-output-1.png" width="760" height="298"></a></p>
+<p><a href="optimization-local-minima-appendix_files/figure-revealjs/cell-24-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10"><img data-src="optimization-local-minima-appendix_files/figure-revealjs/cell-24-output-1.png" width="758" height="297"></a></p>
 </figure>
 </div>
 </div>
