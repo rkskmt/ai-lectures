@@ -7,27 +7,26 @@ subtitle: "fit() の実態"
 
 | 前回まで | 今回から |
 |---|---|
-| `fit()` を使って境界・重心・主成分を見つけた | [`fit()` の中身を自分で作る]{.hl} |
+| 境界・重心・主成分を、手法ごとの探し方で見つけた | [多くの手法で使える探し方を作る]{.hl} |
 | 学習後のモデルを観察した | 数字が学習される途中を追う |
 
 ::: {.callout-important title="前半のテーマ"}
 損失が小さくなる数字を、機械はどうやって見つけているのか？
 :::
 
-## `fit()` の謎
+## `fit()` がやっていたこと
 
-- 今までscikitを使用した学習はいつも `fit()` の1行に頼ってきた
-  - しかし、中身は謎のまま
+- scikit-learn での学習は、いつも `fit()` の1行だった
+   - その1行の中で起きていることは、各回で確かめてきた
 
 ```python
-DecisionTreeClassifier(max_depth=3).fit(X, y)   # 決定木で分類
-KMeans(n_clusters=3).fit(X)                     # クラスタリング
-PCA(n_components=2).fit(X)                      # 次元削減
+DecisionTreeClassifier(max_depth=3).fit(X, y)   # 決定木：ジニ不純度が最小になる閾値を探す
+KMeans(n_clusters=3).fit(X)                     # k-means：SSE が最小になる重心を探す
+PCA(n_components=2).fit(X)                      # PCA：分散が最大になる方向を探す
 ```
 
 
-::: {.callout-note}
-## scikitの設計
+::: {.callout-note title="scikitの設計"}
 `fit()` で学習を完了させる
 :::
 
@@ -134,8 +133,7 @@ plt.show()
 | 2次元の決定境界 | 直線で判定 | 傾きと切片（変数2つ） |
 | クラスタリング | k-means | 重心の座標リスト（N次元の変数k個） |
 
-::: {.callout-caution}
-## kはハイパパラメータ
+::: {.callout-caution title="kはハイパパラメータ"}
 - k-meansのkは、ユーザが関数に与える変数、つまりプログラミングの意味では「パラメータ」だが、[決定木の深さ](classification-evaluation.qmd#peek-hyperparameter){.peek}と同じく**ハイパパラメータ**
    - 学習中に更新されないからパラメータではない
 - 逆に、表題のパラメータ、最適化の過程で更新される側（k-meansなら重心の座標）は、学習可能パラメータ（[trainable parameter]{.en} / [learnable parameter]{.en}）と呼ばれる。
@@ -227,7 +225,7 @@ plt.show()
 これまで学んだ手法も、裏ではすべて**最適化問題**を解いていた：
 
 - **しきい値による分類**: 誤分類が最も少なくなる場所にしきい値を置く
-- **k-means**: 各点から中心までの距離の合計（inertia）を最小にする
+- **k-means**: 各点から自分の重心までの距離を 2 乗して合計した値（[SSE](clustering-kmeans.qmd#peek-sse){.peek}）を最小にする
 - **境界**: 損失関数を最小にするパラメータを探す
 
 ::: {.callout-note title="機械学習 = 最適化"}

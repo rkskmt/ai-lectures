@@ -137,8 +137,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-:::{.callout-note}
-## ここまでで分かること
+::: {.callout-note title="ここまでで分かること"}
 - Salmon（黒丸）は左側（暗い）に集中
 - Sea bass（赤四角）は右側（明るい）に集中
 - しかし**5〜6あたりで少し重なっている**
@@ -274,8 +273,7 @@ $$\text{Gini} = 1 - (p_{\text{salmon}}^2 + p_{\text{sea bass}}^2)$$
 - **Gini = 0**: 完全に1クラスだけ（純粋）
 - **Gini = 0.5**: 50:50で混ざってる（不純）
 
-:::{.callout-note}
-## 例
+::: {.callout-note title="例"}
 - データ10個：Salmon 10個、Sea bass 0個 → Gini = 1 - (1² + 0²) = **0**
 - データ10個：Salmon 5個、Sea bass 5個 → Gini = 1 - (0.5² + 0.5²) = **0.5**
 - データ10個：Salmon 8個、Sea bass 2個 → Gini = 1 - (0.8² + 0.2²) = **0.32**
@@ -406,9 +404,7 @@ print(f"  weighted Gini = {weighted_gini:.3f}")
 | 線を端に寄せたら？ | `lightness_threshold = 5.5` → `2.0` |
 :::
 
-::: {.callout-tip}
-## 結果
-
+::: {.callout-tip title="結果"}
 - 5.5 では 0.237
    - 5.0 にすると **0.167** まで下がる（左側が Salmon 32匹だけの純粋な領域になる）
 - 2.0 では全員が右側に入り、分割前と同じ **0.5**
@@ -465,9 +461,7 @@ for threshold in candidates:
 print(f"最適な閾値: {best_threshold:.2f}（weighted Gini {best_gini:.3f}）")
 ```
 
-::: {.callout-tip}
-## 結果
-
+::: {.callout-tip title="結果"}
 - 最適は **5.0**（加重平均ジニ不純度 0.167）
    - Tweak で見つけた値と同じ
 - ただし試したのは 0.5 刻みの 16 個だけ
@@ -570,9 +564,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-::: {.callout-tip}
-## 結果
-
+::: {.callout-tip title="結果"}
 - 最適は**輝度 5.00**（加重平均ジニ不純度 0.167）
    - 目で引いた 5.5 より少し左
 - 5.00 の縦線での誤分類は **8匹**（正答率 90.0%）
@@ -1161,9 +1153,7 @@ plt.show()
 :::
 
 
-::: {.callout-tip}
-## 結果
-
+::: {.callout-tip title="結果"}
 - 深さ3では 97.5%。**深さ6で初めて100%** に届く
    - 満点までに増えた3段の if が何をしているかは、深さ無制限の境界の図に現れている
 :::
@@ -1171,9 +1161,7 @@ plt.show()
 
 ## まとめ
 
-:::{.callout-important}
-## 重要なポイント
-
+::: {.callout-important title="重要なポイント"}
 1. **2次元にすることで分類精度が向上**
    - 重さ + 輝度の組み合わせで、より正確に分類
 

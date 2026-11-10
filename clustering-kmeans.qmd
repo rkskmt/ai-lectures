@@ -1,17 +1,17 @@
 ---
 title: "教師なし学習とクラスタリング"
-subtitle: "ラベルのない魚たち"
+subtitle: "ラベルのないデータ"
 ---
 
-## 前回の振り返り
+## 今回は教師ナシ学習
 
-### 分類問題ではラベルが必要だった
+- 前回までは訓練データに**正解ラベル**が存在
+   - これはサーモン、これはスズキのようなメタデータ
+- 決定木は正解ラベル付きデータを使って決定境界を学習した
 
-- 訓練データに「これはサーモン、これはスズキ」という**正解ラベル**が必要
-- 決定木はラベル付きデータを使って決定境界を学習した
 
-::: {.callout-note title="今回の主題"}
-魚にラベルを付ける余裕がない場合、何もできないのか？
+::: {.takeaway}
+**今回はデータにラベルが付いていない場合の話**
 :::
 
 
@@ -39,51 +39,75 @@ subtitle: "ラベルのない魚たち"
 :::
 
 
-## ラベルのない魚たち
+## ラベルのないデータ
 
-- 80匹分の測定データ（輝度・重さ）は手元にある
-- ただし**どれが Salmon でどれが Sea bass かのラベルはない**とする
+- 今回も80個の測定データ（輝度・重さ）を使う
+   - 輝度80個と重さ80個を、別々の配列にする（同じ番号どうしが同じデータ）
+   - ただし今回は、正解ラベル `y` が**ない**
 
 ```{python}
 #| echo: true
 #| code-fold: true
-#| code-summary: "魚データの定義（クリックして展開）"
+#| code-summary: "80個の測定データ（クリックして展開）"
 import numpy as np
+
+brightness = np.array([9.8, 2.6, 3.2, 5.7, 9.5, 4.8, 6.4, 3.2, 4.4, 5.9, 2.8, 9.7, 4.4, 7.7,
+                       3.2, 8.5, 8.6, 2.6, 6.3, 3.5, 7.6, 6.8, 4.1, 9.5, 4.4, 9.0, 2.1, 6.0,
+                       5.2, 4.9, 6.4, 3.8, 5.9, 4.1, 6.9, 4.4, 8.9, 3.7, 9.1, 4.4, 5.8, 5.2,
+                       3.8, 2.6, 3.5, 2.2, 8.3, 3.2, 2.8, 2.4, 5.0, 5.4, 8.9, 9.6, 9.1, 5.6,
+                       5.3, 2.7, 5.9, 2.3, 5.4, 5.1, 6.6, 5.2, 2.7, 4.7, 8.9, 2.7, 6.0, 7.7,
+                       5.5, 6.8, 9.9, 6.6, 8.0, 2.2, 7.5, 5.4, 5.8, 5.6])
+weights = np.array([1496, 1930, 1576, 1259, 1341, 2163, 1381, 1731, 2028, 1860, 1426, 1099,
+                    1859, 1513, 1696, 1657, 1245, 1930, 1857, 2229, 2203, 1223, 2081, 1440,
+                    1839, 1567, 1861, 1414, 1820, 2194, 1445, 1652, 1591, 2094, 1787, 1838,
+                    1737, 1728, 1505, 2457, 1959, 1486, 1884, 1903, 2149, 2474, 1476, 2057,
+                    2240, 1992, 1488, 1370, 1533, 1563, 1278, 1677, 2073, 1831, 1468, 1978,
+                    1096, 1884, 1749, 1286, 1483, 1752, 1370, 1838, 1864, 1979, 2230, 1204,
+                    1432, 1333, 1748, 2037, 1327, 2181, 1554, 1531])
+```
+
+```{python}
+#| echo: true
+print(len(brightness), len(weights))   # 80 80
+print(brightness[:3], weights[:3])     # 先頭3個の輝度と重さ
+```
+
+```{python}
+#| echo: false
+# Author-side plotting setup: figures in this deck are shown, not written by students
 import matplotlib.pyplot as plt
 import japanize_matplotlib
 plt.rcParams["font.size"] = 11
 plt.rcParams["figure.dpi"] = 100
 
-salmon_weights     = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,
-                               1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,
-                               2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,
-                               1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652])
-salmon_brightness  = np.array([3.5, 5.8, 4.9, 4.4, 2.6, 2.6, 2.2, 5.5, 4.4, 4.8, 2.1,
-                               5.9, 5.3, 2.8, 2.7, 2.7, 3.2, 4.1, 3.7, 3.2, 4.4, 2.6,
-                               3.2, 3.5, 3.8, 5.1, 2.8, 4.1, 4.4, 2.2, 4.4, 2.7, 2.3,
-                               5.8, 5.9, 5.2, 3.2, 2.4, 4.7, 3.8])
-seabass_weights    = np.array([1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,
-                               1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,
-                               1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,
-                               1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531])
-seabass_brightness = np.array([5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8,
-                               8.9, 9.7, 9.5, 8.0, 9.6, 5.4, 6.0, 5.2, 6.6, 6.9, 6.4,
-                               9.1, 6.8, 6.4, 7.7, 5.7, 9.0, 5.4, 9.9, 8.9, 6.0, 5.0,
-                               9.1, 8.5, 8.6, 8.9, 5.4, 6.8, 5.6])
+cluster_colors  = ["#e74c3c", "#2980b9", "#27ae60"]
+cluster_markers = ["o", "s", "^"]
 
-X = np.column_stack([
-    np.concatenate([salmon_brightness, seabass_brightness]),
-    np.concatenate([salmon_weights,    seabass_weights])
-])
+def draw_clusters(ax, xs, ys, labels, cx, cy, old_cx=None, old_cy=None):
+    """Points coloured by cluster, centroids as stars; arrows from (old_cx, old_cy) when given."""
+    for j in range(len(cx)):
+        mask = labels == j
+        ax.scatter(xs[mask], ys[mask], c=cluster_colors[j], marker=cluster_markers[j],
+                   s=50, alpha=0.7, label=f"クラスタ {j}")
+    for j in range(len(cx)):
+        ax.scatter(cx[j], cy[j], c=cluster_colors[j], s=260, marker="*", edgecolors="black", zorder=5)
+    if old_cx is not None:
+        for j in range(len(cx)):
+            ax.scatter(old_cx[j], old_cy[j], c=cluster_colors[j], s=260, marker="*",
+                       edgecolors="black", zorder=4, alpha=0.3)
+            ax.annotate("", xy=(cx[j], cy[j]), xytext=(old_cx[j], old_cy[j]),
+                        arrowprops=dict(arrowstyle="->", color=cluster_colors[j], lw=2))
+    ax.set_xlabel("輝度"); ax.set_ylabel("重さ (g)")
+    ax.legend(); ax.grid(True, alpha=0.3)
 ```
 
 ```{python}
 #| echo: false
 #| fig-align: center
 plt.figure(figsize=(5.5, 3.4))
-plt.scatter(X[:, 0], X[:, 1], c="gray", s=50, alpha=0.7, edgecolors="dimgray")
+plt.scatter(brightness, weights, c="gray", s=50, alpha=0.7, edgecolors="dimgray")
 plt.xlabel("輝度"); plt.ylabel("重さ (g)")
-plt.title("ラベルのない80匹")
+plt.title("ラベルのない80個の点")
 plt.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.show()
@@ -95,10 +119,6 @@ plt.show()
 
 
 ## クラスタリング（[clustering]{.en}）とは
-
-::: {.fragment}
-- 人の目には**2つの塊**が見える。では、それを**機械に**見つけさせられるか？
-:::
 
 - データを**似たもの同士のグループ（クラスタ、[cluster]{.en}）**にまとめる
 - 正解ラベルがなくても、**データの分布から自然なグループ**を見つける
@@ -117,9 +137,13 @@ k-means アルゴリズム
 
 ## k-means の手順
 
-**入力**：データ点の集合、クラスタ数 $k$
+**前提**：クラスタ数 $k$ を先に決めておく（**ハイパーパラメータ**）。今回は $k = 2$ とする
 
-1. $k$ 個の重心（[centroid]{.en}）を**ランダム**に配置
+**入力**：データ点の集合
+
+**出力**：各点の所属クラスタの番号、重心 $k$ 個
+
+1. $k$ 個の重心（[centroid]{.en}）を**ランダム**に配置（データ点から $k$ 個選ぶ）
 2. 各データ点を**最も近い重心**のクラスタに割り当てる
 3. 各クラスタの**重心を再計算**（クラスタ内の平均点）
 4. 重心が変化しなくなるまで **2〜3** を繰り返す
@@ -138,92 +162,392 @@ U -> E
 
 ::: {.callout-note}
 「assign（割り当て）→ update（更新）→ 繰り返し」
-たったこれだけのシンプルな構造
+たったこれだけのシンプルな構造。この4手順を順に自分で書いていく
 :::
 
 
-## 試行1: そのまま k-means にかける
+## パラメータとハイパーパラメータ
+
+- 手順を動かす**前に人が決める**値と、手順が**データから決める**値を区別する
+
+| | 手順を動かす前に人が決める | 手順がデータから決める |
+|---|---|---|
+| 呼び方 | **ハイパーパラメータ**（[hyperparameter]{.en}） | **パラメータ**（[parameter]{.en}） |
+| k-means | クラスタ数 $k$ | 重心 $k$ 個の位置 |
+| 決定木（前回まで） | 木の深さ | [分岐の閾値](classification-2d-boundaries.qmd#最適化ジニ不純度が最小になる閾値を探索){.peek} |
+
+- ハイパーパラメータの決め方は、手順の外で別に考える
+   - 決定木の深さは[訓練データの中で交差検証して選んだ](classification-evaluation.qmd#訓練データの中で交差検証して深さを選ぶ){.peek}
+   - $k$ の決め方は後半のエルボー法で扱う
+
+
+## 手順1：重心を k 個、ランダムに置く
+
+- 重心の初期値は、80個の点から $k$ 個をランダムに選び、その位置に置く
+- 選び方は[「ランダムに並べ替えてから分ける」](classification-evaluation.qmd#peek-split){.peek}と同様
+   - 番号を並べ替えて先頭 $k$ 個を取る
 
 ```{python}
 #| echo: true
-from sklearn.cluster import KMeans
-
-# ラベルを使わずに k=2 でクラスタリング
-km = KMeans(n_clusters=2, random_state=42, n_init=10)
-km.fit(X)
-cluster_labels = km.labels_
-
-print("クラスタ割り当て（先頭10件）:", cluster_labels[:10])
-print("重心の座標（輝度, 重さ）:")
-for i, c in enumerate(km.cluster_centers_):
-    print(f"  クラスタ {i}: 輝度={c[0]:.2f}, 重さ={c[1]:.0f}g")
+#| eval: false
+k = 2                               # 前提：クラスタ数
+idx = np.arange(len(brightness))    # 0〜79 の配列
+np.random.shuffle(idx)              # ランダムに並べ替え
+cx = brightness[idx[:k]]            # 先頭 k 個の輝度を、重心の輝度（横の座標）にする
+cy = weights[idx[:k]]               # 同じ k 個の重さを、重心の重さ（縦の座標）にする
+print("重心の輝度:", cx)
+print("重心の重さ:", cy)
 ```
 
-- 重心が2つ求まった。結果を散布図に重ねて確認する
-
-
-## 試行1の結果
+```{python}
+#| echo: false
+# Displayed output and the figures of steps 1-4: the student code above with the shuffle
+# replaced by fixed indices, so every render shows the same run (see doc/measured-log.md).
+k = 2
+idx = np.array([6, 48])
+cx = brightness[idx[:k]]
+cy = weights[idx[:k]]
+print("重心の輝度:", cx)
+print("重心の重さ:", cy)
+```
 
 ```{python}
-#| echo: true
+#| echo: false
 #| fig-align: center
-colors  = ["#e74c3c", "#2980b9"]
-markers = ["o", "s"]
-
-plt.figure(figsize=(5.8, 3.6))
-for c in range(2):
-    mask = cluster_labels == c
-    plt.scatter(X[mask, 0], X[mask, 1],
-                c=colors[c], marker=markers[c], s=50, alpha=0.7, label=f"クラスタ {c}")
-for center in km.cluster_centers_:
-    plt.scatter(*center, c="black", s=200, marker="*", zorder=5)
-plt.xlabel("輝度"); plt.ylabel("重さ (g)")
-plt.legend(); plt.grid(True, alpha=0.3)
+fig, ax = plt.subplots(figsize=(5.8, 3.6))
+ax.scatter(brightness, weights, c="lightgray", s=50, edgecolors="gray", label="80個の点（まだ所属なし）")
+for j in range(k):
+    ax.scatter(cx[j], cy[j], c=cluster_colors[j], s=260, marker="*", edgecolors="black", zorder=5, label=f"重心 {j}")
+ax.set_xlabel("輝度"); ax.set_ylabel("重さ (g)")
+ax.legend(); ax.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.show()
 ```
 
-::: {.callout-important title="質問"}
-目に見える塊は「左上」と「右下」。なのに機械の答えは**ほぼ真横の輪切り**。
-輝度を完全に無視しているのはなぜ？
+
+## 手順2：1つの点に一番近い重心を選ぶ {#peek-distance}
+
+- 「近い」を数で決める：2点間の**ユークリッド距離**（[Euclidean distance]{.en}）
+
+$$d = \sqrt{(\Delta \text{輝度})^2 + (\Delta \text{重さ})^2}$$
+
+::: {.caption-note}
+$\Delta$ は点と重心の差。$d$ がその点と重心の距離
+:::
+
+- 距離の計算を関数にし、まず0番目の点について $k$ 個の重心までの距離を求める
+- 距離が最小の重心の番号が、この点の所属クラスタ
+
+```{python}
+#| echo: true
+def distance(x1, y1, x2, y2):                      # 2点 (x1, y1) と (x2, y2) の距離
+    return np.sqrt((x1 - x2)**2 + (y1 - y2)**2)    # np.sqrt は平方根
+
+dists = []
+for j in range(k):
+    dists.append(distance(brightness[0], weights[0], cx[j], cy[j]))   # 0番目の点から重心 j まで
+    print(f"重心 {j} までの距離: {dists[j]:.1f}")
+print(f"一番近い重心: {np.argmin(dists)}")         # 最小値の位置（番号）
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
+x0, y0 = brightness[0], weights[0]
+fig, ax = plt.subplots(figsize=(5.8, 3.6))
+ax.scatter(brightness, weights, c="lightgray", s=50, edgecolors="gray")
+for j in range(k):
+    d = distance(x0, y0, cx[j], cy[j])
+    ax.plot([x0, cx[j]], [y0, cy[j]], color=cluster_colors[j], lw=1.5, ls="--")
+    ax.annotate(f"{d:.1f}", xy=((x0 + cx[j]) / 2, (y0 + cy[j]) / 2),
+                color=cluster_colors[j], fontsize=10, ha="left", va="bottom")
+    ax.scatter(cx[j], cy[j], c=cluster_colors[j], s=260, marker="*", edgecolors="black", zorder=5, label=f"重心 {j}")
+ax.scatter(x0, y0, c="black", s=90, zorder=6, label="0番目の点")
+ax.set_xlabel("輝度"); ax.set_ylabel("重さ (g)")
+ax.legend(); ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+
+## 手順2：すべての点に一番近い重心の番号を付ける（assign）
+
+- 前ページの計算を80個の点すべてで繰り返し、点ごとに一番近い重心の番号を記録する
+- 手順4で何度も使うので関数にする
+
+```{python}
+#| echo: true
+def assign(xs, ys, cx, cy):                                  # 点の座標 xs, ys と重心の座標 cx, cy
+    labels = []
+    for i in range(len(xs)):                                 # i 番目の点
+        dists = []
+        for j in range(len(cx)):
+            dists.append(distance(xs[i], ys[i], cx[j], cy[j]))   # 重心 j までの距離
+        labels.append(np.argmin(dists))                      # 一番近い重心の番号
+    return np.array(labels)
+
+labels = assign(brightness, weights, cx, cy)                 # 80個の点の所属クラスタの番号
+print(labels[:10])                                           # 先頭10個（0 か 1）
+print(f"クラスタ 0: {np.sum(labels == 0)} 個, クラスタ 1: {np.sum(labels == 1)} 個")
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
+fig, ax = plt.subplots(figsize=(5.8, 3.6))
+draw_clusters(ax, brightness, weights, labels, cx, cy)
+plt.tight_layout()
+plt.show()
+```
+
+
+## 手順3：重心をメンバーの平均の位置へ動かす（update）
+
+- クラスタごとにメンバーの点を取り出し、輝度の平均と重さの平均を新しい重心にする
+- メンバーが1つもないクラスタは平均が計算できないので、重心を動かさない
+
+```{python}
+#| echo: true
+def update(xs, ys, labels, cx, cy):
+    new_cx, new_cy = [], []
+    for j in range(len(cx)):
+        mask = labels == j                       # クラスタ j の点だけ True
+        if np.sum(mask) > 0:
+            new_cx.append(xs[mask].mean())       # メンバーの横の座標の平均
+            new_cy.append(ys[mask].mean())       # メンバーの縦の座標の平均
+        else:                                    # メンバーが1つもなければ動かさない
+            new_cx.append(cx[j])
+            new_cy.append(cy[j])
+    return np.array(new_cx), np.array(new_cy)
+
+new_cx, new_cy = update(brightness, weights, labels, cx, cy)
+print("更新前 輝度:", cx.round(1), " 重さ:", cy.round(1))
+print("更新後 輝度:", new_cx.round(1), " 重さ:", new_cy.round(1))
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
+fig, ax = plt.subplots(figsize=(5.8, 3.6))
+draw_clusters(ax, brightness, weights, labels, new_cx, new_cy, old_cx=cx, old_cy=cy)
+plt.tight_layout()
+plt.show()
+```
+
+
+## 手順4：重心が動かなくなるまで繰り返す
+
+- 手順2（assign）と手順3（update）を交互に繰り返す
+- 更新しても重心が1つも動かなければ終了（念のため上限は100周）
+
+```{python}
+#| echo: true
+for step in range(1, 101):
+    labels = assign(brightness, weights, cx, cy)                    # 手順2
+    new_cx, new_cy = update(brightness, weights, labels, cx, cy)    # 手順3
+    if np.all(new_cx == cx) and np.all(new_cy == cy):               # 全要素が等しい → 重心が動かなかった
+        print(f"{step} 周目で重心が動かなくなった")
+        break
+    cx, cy = new_cx, new_cy
+
+print("重心の輝度:", cx.round(1), " 重心の重さ:", cy.round(1))
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
+fig, ax = plt.subplots(figsize=(5.8, 3.6))
+draw_clusters(ax, brightness, weights, labels, cx, cy)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-caution title="これは失敗"}
+- 境界は**横一直線**で、重さだけで上下に輪切りにしている
+- 輝度は結果にまったく効いていない
 :::
 
 
-## なぜ輝度が無視されたのか
+## 上手くいかなかった理由（スケールの相違） {#peek-scale-mismatch}
 
-::: {.fragment}
-- k-means は**距離**だけでグループを決める
+- k-means は手順2の**距離**だけでグループを決める
 - 重さの差は**数百 g**、輝度の差は**せいぜい数ポイント**
 
 $$\text{距離}^2 = \underbrace{(\Delta \text{輝度})^2}_{\sim 10} + \underbrace{(\Delta \text{重さ})^2}_{\sim 100{,}000}$$
 
 - 距離の計算が**重さに支配され**、輝度はあってもなくても同じだった
-:::
 
-::: {.callout-warning title="スケールの罠"}
+::: {.callout-warning title="スケールの罠は常に存在"}
 - 単位もケタも違う特徴量をそのまま距離計算に入れてはいけない
-- 距離を使う手法（k-means、k-NN など）共通の落とし穴
+- 距離を使う手法（k-means、k-NN など）を使うときに起こる
 :::
 
 
-## 試行2: スケールを揃えて再挑戦 {#peek-scale}
+## 単位がちがうものを比べる：基準化
+
+- スケールが違うデータ同士は比較しづらい
+- そこで、ユニバーサルなスケールにそろえる
+- これが**標準化**（[standardization]{.en}）（または**基準化**）
+
+$$z = \frac{x - \text{平均}}{\rule{0pt}{1em}\text{標準偏差}}$$
+
+::: {.caption-note .center}
+- $x$ ：元データ
+- $z$ ：単位のない **z スコア**（[z-score]{.en}）という値
+:::
+
+- 基準化するとデータも平均 0、標準偏差 1 になる
+   - 平均を引くと、新しい平均は 0 になる
+      - 全体の平行移動なので散らばりは変わらない
+   - 標準偏差で割ると、散らばり（標準偏差）も同じ数で割られて 1 になる
+      - （参考）[標準偏差とは](#peek-std){.peek}、[同じ形の計算：画像の座標の正規化](#peek-normalize){.peek}
+- 例えば、輝度の $z = 1.5$ と重さの $z = 1.5$ は、どちらも「平均より標準偏差 1.5 個分大きい」で同じ
+
+
+## 身近な基準化：偏差値
+
+- テストの難易度は毎回ちがうので、素点は回をまたいで比べられない
+- 点を基準化し、見やすいように 10 倍して 50 を足したものが**偏差値**
+
+$$\text{偏差値} = 50 + 10 \times \frac{\text{点} - \text{平均}}{\rule{0pt}{1em}\text{標準偏差}} = 50 + 10z$$
+
+::: {.caption-note .center}
+どの回も平均 50、標準偏差 10 になる
+:::
+
+```{python}
+#| echo: false
+#| fig-align: center
+import numpy as np
+import matplotlib.pyplot as plt
+import japanize_matplotlib
+from math import erfc
+
+z = np.linspace(-4, 4, 801)
+hensachi = 50 + 10 * z
+pdf = np.exp(-z**2 / 2) / np.sqrt(2 * np.pi)              # standard normal density
+upper_tail = lambda z0: 100 * 0.5 * erfc(z0 / np.sqrt(2))  # P(Z >= z0) in percent
+
+fig, ax = plt.subplots(figsize=(7.0, 3.8))
+ax.plot(hensachi, pdf, color="dimgray", lw=2)
+ax.fill_between(hensachi, pdf, where=z >= 1.0, color="tab:blue", alpha=0.25)
+ax.fill_between(hensachi, pdf, where=z >= 2.2, color="tab:red", alpha=0.45)
+for z0, color, y_label in [(1.0, "tab:blue", 0.53), (2.2, "tab:red", 0.40)]:
+    h = 50 + 10 * z0
+    ax.axvline(h, color=color, lw=1.5, ls="--")
+    ax.text(h, y_label, f"偏差値 {h:.0f} 以上\n上位 {upper_tail(z0):.1f}%",
+            color=color, fontsize=11, ha="center", va="bottom",
+            bbox=dict(facecolor="white", edgecolor="none", pad=2))   # label sits on its own dashed line
+ax.axvline(50, color="gray", lw=1, ls=":")
+ax.set_xticks([20, 30, 40, 50, 60, 70, 80])
+ax.set_xlabel("偏差値")
+sec = ax.secondary_xaxis("top", functions=(lambda h: (h - 50) / 10, lambda zz: 50 + 10 * zz))
+sec.set_xticks([-3, -2, -1, 0, 1, 2, 3])
+sec.set_xlabel("z（平均から標準偏差いくつ分）")
+ax.set_yticks([])
+ax.set_ylim(0, 0.64)
+for s in ("left", "right", "top"):
+    ax.spines[s].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-note title="要するに"}
+- 点数の分布が**正規分布**（[normal distribution]{.en}）に近ければ、偏差値から「上位何%か」が決まる
+   - 偏差値 60（$z = 1$）は上位 15.9%、およそ 6 人に 1 人
+   - 偏差値 72（$z = 2.2$）は上位 1.4%、およそ 70 人に 1 人
+- この対応は回がちがっても変わらないので、回をまたいで比べられる
+:::
+
+
+## 実際に標準化をしてみる {#peek-scale}
+
+- 輝度と重さのそれぞれで「平均を引いて、標準偏差で割る」（さっきの $z$ を別々に計算）
+- どちらも平均 0、標準偏差 1 になる
 
 ```{python}
 #| echo: true
+z_brightness = (brightness - brightness.mean()) / brightness.std()   # 輝度の z
+z_weights = (weights - weights.mean()) / weights.std()               # 重さの z
+
+print(f"輝度: 平均 {brightness.mean():.2f}, 標準偏差 {brightness.std():.2f}")
+print(f"重さ: 平均 {weights.mean():.2f}, 標準偏差 {weights.std():.2f}")
+print(z_brightness[:3].round(2), z_weights[:3].round(2))   # 先頭3個。どちらも「平均から標準偏差いくつ分ずれているか」
+```
+
+```{python}
+#| echo: false
 #| fig-align: center
-from sklearn.preprocessing import StandardScaler
+fig, ax = plt.subplots(figsize=(5.0, 3.6))
+ax.scatter(z_brightness, z_weights, c="gray", s=50, alpha=0.7, edgecolors="dimgray")
+ax.set_xlabel("輝度（標準化）"); ax.set_ylabel("重さ（標準化）")
+ax.set_title("標準化後：横軸と縦軸が同じ尺度")
+ax.set_aspect("equal"); ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
 
-X_scaled = StandardScaler().fit_transform(X)   # 各特徴量を平均0・分散1に（標準化, standardization）
 
-km2 = KMeans(n_clusters=2, random_state=42, n_init=10)
-km2.fit(X_scaled)
-cluster_labels2 = km2.labels_
+## 手順1〜4 を関数にまとめる
+
+- 標準化したデータでもう一度回すので、手順を関数にする
+- 手順1 と 手順2〜4 は別の関数にする
+   - ランダムなのは手順1だけ
+   - 手順2〜4 は、同じ初期重心から始めれば毎回同じ答えになる
+
+```{python}
+#| echo: true
+def init_centroids(xs, ys, k):                             # 手順1：ランダムな k 個の点を初期重心に
+    idx = np.arange(len(xs))
+    np.random.shuffle(idx)
+    return xs[idx[:k]], ys[idx[:k]]
+
+def kmeans(xs, ys, cx, cy):                                # 手順2〜4：初期重心 cx, cy から始める
+    for step in range(100):
+        labels = assign(xs, ys, cx, cy)                    # 手順2
+        new_cx, new_cy = update(xs, ys, labels, cx, cy)    # 手順3
+        if np.all(new_cx == cx) and np.all(new_cy == cy):  # 手順4：動かなくなったら終了
+            break
+        cx, cy = new_cx, new_cy
+    return labels, cx, cy
+```
+
+
+## スケールを揃えて再挑戦
+
+```{python}
+#| echo: true
+#| eval: false
+cx, cy = init_centroids(z_brightness, z_weights, 2)               # 手順1
+labels_z, cx_z, cy_z = kmeans(z_brightness, z_weights, cx, cy)    # 手順2〜4
+print(f"クラスタ 0: {np.sum(labels_z == 0)} 個, クラスタ 1: {np.sum(labels_z == 1)} 個")
+```
+
+```{python}
+#| echo: false
+# Displayed output and figure: the student code above with init_centroids replaced by
+# the same fixed points as steps 1-4 (see doc/measured-log.md).
+idx = np.array([6, 48])
+labels_z, cx_z, cy_z = kmeans(z_brightness, z_weights, z_brightness[idx], z_weights[idx])
+print(f"クラスタ 0: {np.sum(labels_z == 0)} 個, クラスタ 1: {np.sum(labels_z == 1)} 個")
+```
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "（参考）描画コード"
+#| fig-align: center
+import matplotlib.pyplot as plt
+import japanize_matplotlib
+
+colors  = ["#e74c3c", "#2980b9"]
+markers = ["o", "s"]
 
 plt.figure(figsize=(5.8, 3.6))
-for c in range(2):
-    mask = cluster_labels2 == c
-    plt.scatter(X[mask, 0], X[mask, 1],
-                c=colors[c], marker=markers[c], s=50, alpha=0.7, label=f"クラスタ {c}")
+for j in range(2):
+    mask = labels_z == j                       # 所属は標準化データで決めた結果
+    plt.scatter(brightness[mask], weights[mask],   # 座標は元の単位で描く
+                c=colors[j], marker=markers[j], s=50, alpha=0.7, label=f"クラスタ {j}")
 plt.xlabel("輝度"); plt.ylabel("重さ (g)")
 plt.legend(); plt.grid(True, alpha=0.3)
 plt.tight_layout()
@@ -231,236 +555,562 @@ plt.show()
 ```
 
 ::: {.takeaway}
-スケールを揃えると、**目で見た通りの2つの塊**に分かれた
+スケールを揃えると、境界が**斜め**になり、輝度と重さの**両方**が効いた分け方になった
 :::
 
 
-## 答え合わせ：実はラベルを知っていた
+## 最初の重心しだいで、おかしな答えに落ち着くことがある
 
-- このデータの正体は、これまでの講義で使ってきた Salmon / Sea bass
+- 手順1の初期重心は**ランダム**。初期値が違えば、たどる道も違う
+- 山が5つある2次元のデータで確かめる
+- k = 5 で、初期重心だけ変えて2回動かす
+   - A と B は、ランダムに選んだ初期重心から2組を取り出したもの
 
 ```{python}
 #| echo: true
-y_true = np.array([1]*40 + [0]*40)   # 1=Salmon, 0=Sea bass（隠していた正解）
+#| code-fold: true
+#| code-summary: "5つの山のデータ（クリックして展開）"
+import numpy as np
 
-agree = np.mean(cluster_labels2 == y_true)
-agree = max(agree, 1 - agree)        # クラスタ番号 0/1 は任意なので向きを合わせる
-print(f"正解ラベルとの一致: {agree:.1%}（{int(round(agree * len(y_true)))}/80匹）")
+# 5つの山から取った400個の点（bx が横の座標、by が縦の座標）
+bx = np.array([0.2, 0.2, 0.5, -0.3, 0.2, 0.0, -0.4, -0.3, 0.0, -0.5, 0.0, 0.8,
+               -1.6, -0.1, 0.1, 1.3, -0.2, 0.4, -0.3, 0.1, -0.7, 0.0, -0.1, 0.0,
+               0.4, 0.2, 0.4, 0.5, 0.5, -0.7, 0.0, -0.6, 0.1, 0.1, -1.0, 0.7,
+               -0.5, 0.2, -0.2, -0.1, 0.5, -1.0, 0.5, -0.4, 0.3, 0.5, -0.1, 0.6,
+               -0.1, -0.9, -0.4, -0.1, 0.7, -0.5, 1.1, -0.4, -0.1, 0.0, -0.4, -0.6,
+               0.9, -1.5, 1.5, -0.8, -0.5, -0.2, -0.2, -0.1, -0.2, 0.0, -0.7, 0.0,
+               0.3, -0.1, 0.2, 0.5, -0.6, -0.2, -0.7, -1.3, 0.5, -0.4, 0.4, 1.2,
+               -0.4, 0.0, 0.0, -1.0, -0.3, 0.4, 0.3, -0.6, 0.5, -0.5, -0.9, -0.3,
+               0.6, 0.0, 0.7, 0.3, 1.1, -0.6, -0.4, -0.8, -0.6, 0.3, -0.1, -0.1,
+               -0.3, -0.2, -0.2, -0.2, -0.4, -0.8, -0.7, 0.2, -0.2, 0.3, -0.8, -0.4,
+               0.1, 0.1, 1.1, -0.9, -0.2, -0.2, 0.1, 0.4, -0.5, 0.3, -0.5, -1.1,
+               0.0, 0.0, 0.5, -0.4, -1.5, -0.4, 0.5, -1.1, 5.0, 4.3, 4.0, 4.6,
+               3.7, 4.0, 4.6, 4.6, 4.0, 5.6, 4.1, 4.2, 4.6, 5.4, 4.7, 4.3,
+               4.1, 4.3, 3.7, 3.5, 4.5, 4.0, 4.4, 3.9, 4.2, 5.2, 4.8, 4.9,
+               4.8, 3.1, 3.8, 3.7, 4.6, 4.5, 4.2, 4.5, 5.0, 5.0, 5.0, 4.8,
+               4.9, 4.1, 4.5, 4.9, 4.8, 5.8, 4.2, 3.7, 4.8, 4.1, 4.6, 4.5,
+               4.0, 4.4, 4.8, 4.9, 4.4, 4.4, 4.6, 4.0, 3.7, 4.2, 3.5, 5.1,
+               5.2, 3.1, 3.8, 3.8, 5.0, 5.0, 4.4, 4.4, 4.7, 5.1, 4.7, 5.4,
+               5.5, 4.4, 4.9, 3.8, 4.2, 5.2, 5.0, 4.2, 5.0, 5.0, 4.5, 4.0,
+               4.6, 4.5, 5.6, 5.5, 4.2, 4.5, 4.4, 4.8, 4.5, 4.7, 4.6, 4.9,
+               8.9, 9.6, 10.5, 9.6, 8.9, 8.3, 9.7, 9.1, 9.3, 9.1, 8.2, 8.2,
+               8.3, 8.5, 9.4, 8.2, 10.0, 8.5, 9.5, 9.4, 9.6, 8.0, 10.4, 9.0,
+               8.1, 8.2, 8.7, 9.2, 9.3, 9.7, 9.0, 8.4, 8.9, 9.3, 9.1, 8.3,
+               8.5, 9.6, 9.5, 9.0, 8.6, 9.6, 8.7, 8.9, 9.1, 9.2, 9.4, 9.0,
+               7.9, 8.9, 9.4, 9.6, 8.6, 8.5, 8.4, 7.2, 8.8, 8.1, 8.7, 9.2,
+               1.5, 3.1, 2.2, 2.0, 1.2, 3.3, 2.0, 2.1, 1.9, 2.4, 3.0, 1.8,
+               1.5, 1.8, 3.1, 1.8, 0.9, 2.6, 1.7, 2.4, 2.2, 2.0, 1.6, 0.9,
+               1.7, 2.1, 1.4, 1.8, 1.1, 2.6, 1.9, 2.1, 0.7, 3.1, 2.7, 0.7,
+               1.7, 2.5, 1.7, 1.5, 1.4, 1.3, 2.2, 1.5, 2.5, 1.4, 2.3, 1.8,
+               1.6, 1.0, 1.7, -0.1, 1.7, 1.7, 0.6, 1.3, 2.9, 1.7, 1.3, 2.0,
+               7.6, 6.8, 6.5, 6.6, 7.6, 7.8, 7.2, 6.3, 7.2, 7.4, 6.9, 6.7,
+               7.6, 7.7, 6.2, 6.3, 7.7, 6.6, 7.1, 7.1, 6.7, 7.1, 6.5, 7.1,
+               6.4, 7.6, 6.5, 7.0, 6.8, 6.8, 6.8, 6.8, 6.6, 6.1, 6.9, 6.3,
+               7.0, 8.1, 6.3, 7.8])
+by = np.array([0.5, -0.8, 0.3, 0.3, 0.2, 0.3, -0.1, 0.4, -0.2, -0.2, -0.2, 0.6,
+               -1.1, -0.3, 0.1, -0.7, 1.2, 0.4, -1.0, 0.1, -0.4, -0.6, 0.1, -0.3,
+               0.5, -0.5, -0.3, -0.6, 0.0, -0.2, 0.2, -0.7, -0.3, 0.5, 0.2, -0.2,
+               0.5, 0.5, -0.9, -0.3, 0.1, -0.7, 0.4, 0.0, 0.3, 0.2, -0.2, -1.4,
+               0.0, 0.2, 0.5, 0.4, 0.2, -0.9, -0.1, 0.1, 0.5, 0.0, 0.3, 0.4,
+               -0.9, 0.4, -0.6, 0.4, -0.3, 0.3, 0.2, -0.5, -0.6, -0.7, 0.9, 0.0,
+               -0.3, 0.3, -0.7, -0.4, -0.5, 1.0, 0.1, 0.0, -0.1, 0.1, 0.4, 0.1,
+               -0.1, 0.1, 0.1, 0.5, -0.7, 0.8, 0.1, 1.7, -0.7, 0.1, 0.1, 0.7,
+               -1.6, -1.0, 0.1, -0.6, 1.2, 0.2, 0.0, 1.1, -0.2, -0.4, -0.3, -0.7,
+               -0.1, 0.0, 0.5, -0.1, -0.3, 0.3, -0.4, 0.2, -1.2, 0.2, 0.5, -0.7,
+               -0.1, -1.0, -0.4, 0.4, 0.2, 0.0, -0.4, -0.3, 0.0, -0.1, 0.4, -0.6,
+               -0.8, 0.0, -0.5, 0.2, 1.9, -0.4, 0.0, 0.4, 0.2, 0.8, 0.8, 0.1,
+               0.4, 1.1, 1.0, 0.7, 0.9, 0.3, 0.4, 0.1, 0.3, 0.5, 1.1, 1.4,
+               0.0, 0.4, 0.5, 1.3, 0.1, 0.3, -0.1, 0.4, 1.1, 0.5, -0.3, 0.5,
+               1.5, 0.7, 0.9, 0.2, 0.9, 0.0, 1.0, -0.5, 0.7, 0.3, -0.1, 0.2,
+               1.1, 0.5, 1.2, -0.2, 0.9, -0.5, 1.3, -0.2, 1.1, 0.8, 1.4, 1.1,
+               0.4, 1.2, 0.0, 1.0, 0.3, -0.5, 0.6, 0.9, 0.2, 1.7, 0.8, 0.7,
+               -0.1, 1.0, 0.3, 1.1, 0.1, 0.6, 0.5, 0.9, 0.3, 0.1, 0.8, 0.2,
+               0.6, 0.1, 0.5, -0.2, 0.1, 1.3, 0.7, 0.5, 1.8, 0.3, 0.2, 0.4,
+               1.6, 1.3, 0.5, 0.9, 0.7, 0.4, 0.6, 0.0, -0.4, 0.9, 0.7, 0.1,
+               0.3, 0.2, -0.1, 0.8, -0.5, 0.1, 0.2, -0.2, -1.3, 0.0, 1.3, -0.6,
+               0.7, 0.4, 0.2, -0.4, -0.8, -0.1, 0.2, -0.6, 0.3, 0.9, -0.5, 0.8,
+               -1.2, -0.3, 0.4, -0.7, 1.1, 0.6, 0.6, 0.5, 0.7, -0.7, 0.7, -0.3,
+               -0.9, 0.8, 0.1, 0.1, 0.5, 0.6, 0.0, 1.1, -1.1, 1.1, 0.5, -1.2,
+               -0.7, 0.2, -0.2, -0.2, 0.5, -1.6, 0.1, -0.2, -0.9, -0.3, 0.8, -0.9,
+               4.9, 4.7, 5.6, 4.3, 4.2, 3.6, 3.7, 5.0, 4.9, 4.8, 5.0, 4.1,
+               4.8, 6.1, 4.4, 5.5, 4.2, 4.0, 4.3, 4.6, 4.9, 5.2, 3.6, 3.5,
+               5.1, 4.1, 4.2, 4.2, 4.2, 3.2, 3.2, 4.1, 4.6, 4.6, 4.5, 4.8,
+               3.6, 4.7, 5.0, 4.9, 4.8, 5.4, 5.4, 4.2, 2.9, 5.1, 5.1, 4.8,
+               3.7, 4.2, 4.1, 3.3, 4.7, 4.0, 5.7, 5.5, 4.7, 4.6, 4.7, 4.8,
+               6.0, 5.6, 4.5, 4.4, 5.6, 5.0, 4.7, 5.3, 4.3, 4.0, 4.6, 4.3,
+               5.3, 5.1, 4.8, 5.3, 5.2, 4.8, 4.1, 5.1, 4.7, 4.5, 5.5, 6.0,
+               3.9, 5.6, 4.1, 3.9, 3.7, 3.7, 5.9, 5.4, 4.4, 5.6, 5.9, 4.8,
+               5.8, 4.6, 3.9, 4.9])
+```
+
+```{python}
+#| echo: true
+init_A = [94, 32, 225, 157, 356]      # 初期値 A：この番号の5個の点を初期重心にする
+init_B = [132, 309, 341, 196, 246]    # 初期値 B
+labels_A, cx_A, cy_A = kmeans(bx, by, bx[init_A], by[init_A])
+labels_B, cx_B, cy_B = kmeans(bx, by, bx[init_B], by[init_B])
 ```
 
 ```{python}
 #| echo: false
 #| fig-align: center
-fig, axes = plt.subplots(1, 2, figsize=(10, 3.4))
+blob_colors = ["#e74c3c", "#2980b9", "#27ae60", "#8e44ad", "#f39c12"]
 
-ax = axes[0]
-for c in range(2):
-    mask = cluster_labels2 == c
-    ax.scatter(X[mask, 0], X[mask, 1],
-               c=colors[c], marker=markers[c], s=45, alpha=0.7, label=f"クラスタ {c}")
-ax.set_xlabel("輝度"); ax.set_ylabel("重さ (g)")
-ax.set_title("k-means（ラベルなし）"); ax.legend(); ax.grid(True, alpha=0.3)
-
-ax2 = axes[1]
-for label, name, col, m in [(1, "Salmon", "black", "o"), (0, "Sea bass", "red", "s")]:
-    mask = y_true == label
-    ax2.scatter(X[mask, 0], X[mask, 1], c=col, marker=m, s=45, alpha=0.7, label=name)
-ax2.set_xlabel("輝度"); ax2.set_ylabel("重さ (g)")
-ax2.set_title("正解ラベル"); ax2.legend(); ax2.grid(True, alpha=0.3)
-
-plt.tight_layout()
-plt.show()
-```
-
-::: {.callout-note}
-ラベルを**1枚も見せていない**のに、80匹中74匹を正しく仕分けた。
-クラスタの**番号（0/1）は任意**で、大切なのは「同じグループにまとまっているか」。
-:::
-
-
-## k-means の動き（中で起きていたこと）
-
-```{python}
-#| echo: false
-#| fig-align: center
-def assign_clusters(Xd, centroids):
-    dists = np.linalg.norm(Xd[:, None] - centroids[None, :], axis=2)
-    return dists.argmin(axis=1)
-
-def update_centroids(Xd, labels, k):
-    return np.array([Xd[labels == i].mean(axis=0) for i in range(k)])
-
-rng = np.random.default_rng(2)
-k = 2
-centroids = X_scaled[rng.choice(len(X_scaled), k, replace=False)].copy()
-
-fig, axes = plt.subplots(1, 4, figsize=(13, 3.2))
-titles = ["① 初期重心（ランダム）", "② クラスタ割り当て", "③ 重心を更新", "④ 収束"]
-
-# ① 初期重心
-ax = axes[0]
-ax.scatter(X_scaled[:, 0], X_scaled[:, 1], c="lightgray", s=40, edgecolors="gray")
-for i, c in enumerate(centroids):
-    ax.scatter(*c, c=colors[i], s=220, marker="*", edgecolors="black", zorder=5)
-ax.set_title(titles[0], fontsize=9); ax.axis("off")
-
-# ② 割り当て
-labels = assign_clusters(X_scaled, centroids)
-ax = axes[1]
-ax.scatter(X_scaled[:, 0], X_scaled[:, 1],
-           c=[colors[l] for l in labels], s=40, edgecolors="gray", alpha=0.7)
-for i, c in enumerate(centroids):
-    ax.scatter(*c, c=colors[i], s=220, marker="*", edgecolors="black", zorder=5)
-ax.set_title(titles[1], fontsize=9); ax.axis("off")
-
-# ③ 重心更新
-new_centroids = update_centroids(X_scaled, labels, k)
-ax = axes[2]
-ax.scatter(X_scaled[:, 0], X_scaled[:, 1],
-           c=[colors[l] for l in labels], s=40, edgecolors="gray", alpha=0.7)
-for i in range(k):
-    ax.scatter(*centroids[i], c=colors[i], s=220, marker="*",
-               edgecolors="black", zorder=4, alpha=0.3)
-    ax.scatter(*new_centroids[i], c=colors[i], s=220, marker="*",
-               edgecolors="black", zorder=5)
-    ax.annotate("", xy=new_centroids[i], xytext=centroids[i],
-                arrowprops=dict(arrowstyle="->", color=colors[i], lw=2))
-ax.set_title(titles[2], fontsize=9); ax.axis("off")
-
-# ④ 収束
-c = new_centroids.copy()
-for _ in range(20):
-    l = assign_clusters(X_scaled, c)
-    c = update_centroids(X_scaled, l, k)
-labels_final = assign_clusters(X_scaled, c)
-ax = axes[3]
-ax.scatter(X_scaled[:, 0], X_scaled[:, 1],
-           c=[colors[l] for l in labels_final], s=40, edgecolors="gray", alpha=0.7)
-for i in range(k):
-    ax.scatter(*c[i], c=colors[i], s=220, marker="*", edgecolors="black", zorder=5)
-ax.set_title(titles[3], fontsize=9); ax.axis("off")
-
-plt.tight_layout()
-plt.show()
-```
-
-::: {.callout-note title="要するに"}
-- どこに重心を置いても「assign → update」の繰り返しで塊に吸い寄せられていく
-- 図はスケールを揃えた空間（標準化済み）での動き
-:::
-
-
-## ところで、最初の重心はどこに置く？
-
-- 「assign → update」は**最初の重心の位置**から始まる。そこは**ランダム**に選ばれる
-- 運の悪い初期値だと、おかしな所で落ち着く（下の左：青が2つの塊を飲み込んだ）
-
-```{python}
-#| echo: false
-#| fig-align: center
-from sklearn.datasets import make_blobs
-
-X_demo, _ = make_blobs(n_samples=300, centers=[[0, 0], [5, 0], [2.5, 4.5]],
-                       cluster_std=0.9, random_state=1)
-cols3 = ["#e74c3c", "#2980b9", "#27ae60"]
-bad  = KMeans(n_clusters=3, n_init=1, init="random", random_state=52).fit(X_demo)
-good = KMeans(n_clusters=3, n_init=10, random_state=0).fit(X_demo)
-
-fig, axes = plt.subplots(1, 3, figsize=(13, 4))
-for ax, km, title in [
-        (axes[0], bad,  f"運の悪い初期値で1回だけ\ninertia = {bad.inertia_:.0f}（大きい＝悪い）"),
-        (axes[1], good, f"10回試して最良を採用\ninertia = {good.inertia_:.0f}（小さい＝良い）")]:
-    for i in range(3):
-        ax.scatter(X_demo[km.labels_ == i, 0], X_demo[km.labels_ == i, 1],
-                   c=cols3[i], s=14, alpha=0.6)
-        ax.scatter(*km.cluster_centers_[i], c=cols3[i], s=240, marker="*",
-                   edgecolors="black", zorder=5)
+fig, axes = plt.subplots(1, 2, figsize=(9, 3.4))
+for ax, labs, cxs, cys, title in [(axes[0], labels_A, cx_A, cy_A, "初期値 A から"),
+                                  (axes[1], labels_B, cx_B, cy_B, "初期値 B から")]:
+    for j in range(5):
+        ax.scatter(bx[labs == j], by[labs == j], c=blob_colors[j], s=12, alpha=0.6)
+        ax.scatter(cxs[j], cys[j], c=blob_colors[j], s=240, marker="*", edgecolors="black", zorder=5)
     ax.set_title(title, fontsize=11); ax.set_aspect("equal"); ax.axis("off")
-
-inertias = [KMeans(n_clusters=3, n_init=1, init="random", random_state=s)
-            .fit(X_demo).inertia_ for s in range(10)]
-ax = axes[2]
-bars = ax.bar(range(10), inertias, color="#aab7c4")
-bars[int(np.argmin(inertias))].set_color("#27ae60")
-ax.axhline(min(inertias), color="#27ae60", ls="--", lw=1)
-ax.set_title("初期値10回ぶんの inertia\n（緑＝最小＝これを採用）", fontsize=11)
-ax.set_xlabel("試行"); ax.set_ylabel("inertia")
 plt.tight_layout()
 plt.show()
 ```
 
-- k-means は「**クラスタ内二乗和（[inertia]{.en}）**を小さくする」最適化。ただし初期値しだいで**悪い谷**にハマる
-- 対策は「**何度も別の初期値で試して、一番 inertia が小さいものを採る**」
-
-::: {.callout-tip title="（参考）マルチスタート"}
-初期値しだいで結果が変わる → 何回も試して最良を選ぶ。この作戦は**マルチスタート**と呼ばれ、
-参考資料 **[ローカルミニマムの罠](optimization-local-minima-appendix.qmd)** で詳しく扱っている。
-`KMeans(..., n_init=10)` の `n_init` が「10回試す」の正体（既定でこうなっている）。
+::: {.callout-note title="結果"}
+- A：上の2つの山を1つのクラスタが飲み込み、左下の大きな山が2つに割られた
+- B：山ごとに1つのクラスタ
+- 手順どおりに回しても、良い答えに着く保証はない
 :::
 
 
-## {background-color="white" .center .break-slide}
+## どちらのほうが「良い」のか
 
-::: {.break-title}
-k の決め方：エルボー法
+- 初期値 A と B、どちらの答えが良いかを定量化したい
+- 各点から自分のクラスタの重心（★）まで線を引く
+
+```{python}
+#| echo: false
+#| fig-align: center
+#| classes: fig-small
+fig, axes = plt.subplots(1, 2, figsize=(7.2, 3.0))
+for ax, labs, cxs, cys, title in [(axes[0], labels_A, cx_A, cy_A, "初期値 A から"),
+                                  (axes[1], labels_B, cx_B, cy_B, "初期値 B から")]:
+    for i in range(len(bx)):
+        j = labs[i]
+        ax.plot([bx[i], cxs[j]], [by[i], cys[j]], color="gray", lw=0.5, alpha=0.6, zorder=1)
+    for j in range(5):
+        ax.scatter(bx[labs == j], by[labs == j], c=blob_colors[j], s=10, alpha=0.6, zorder=2)
+        ax.scatter(cxs[j], cys[j], c=blob_colors[j], s=200, marker="*", edgecolors="black", zorder=3)
+    ax.set_title(title, fontsize=11); ax.set_aspect("equal"); ax.axis("off")
+plt.tight_layout()
+plt.show()
+```
+
+::: {.caption-note .center}
+灰色の線：各点から自分の重心（★）までの距離
+:::
+
+::: {.callout-note title="結果"}
+- A では、2つの山を飲み込んだクラスタの線が長い
+- B では、どの線も短い
+:::
+
+::: {.callout-note title="こう考えられる気がする"}
+- この距離を、その点の**誤差**（[error]{.en}）と呼ぼう
+- いい塊ほどメンバーの誤差は小さい
+   - つまりよく固まっている
 :::
 
 
-## エルボー法（[elbow method]{.en}）
+## 結果の良さを数で測る：SSE（誤差の二乗和） {#peek-sse}
 
-- 今回は「2種類の魚」と知っていたから k=2 にできた
-- 本当のラベルなしデータでは **k 自体を決める必要がある**
-- **エルボー法**：k を変えながら「クラスタ内のまとまり度」を測る
+- 各点の誤差を 1 つの数にまとめる
+- 誤差を 2 乗して全部足す
+   - 2 乗するのは、大きな誤差を重く数えるため（誤差 10 の点 1 個は、誤差 1 の点 100 個ぶん）
+   - 小さいほど塊がきつい
+- この合計を **SSE（[**Sum of Squared Errors**]{.en} / 誤差の二乗和）** と呼ぶ（クラスタリングでは「クラスタ内二乗和」とも）
+
+$$\text{SSE} = \sum_{\text{全点}} (\text{誤差})^2 = \sum_{\text{全点}} (\text{自分の重心までの距離})^2$$
 
 ```{python}
 #| echo: true
+def sse(xs, ys, labels, cx, cy):
+    total = 0.0
+    for j in range(len(cx)):
+        mask = labels == j                                               # クラスタ j の点だけ True
+        total += np.sum((xs[mask] - cx[j])**2 + (ys[mask] - cy[j])**2)  # 重心までの距離の2乗を合計
+    return total
+
+print(f"A の SSE: {sse(bx, by, labels_A, cx_A, cy_A):.1f}")
+print(f"B の SSE: {sse(bx, by, labels_B, cx_B, cy_B):.1f}")
+```
+
+::: {.callout-note title="結果"}
+- B の SSE は A のおよそ 3 分の 1
+   - 目で見たとおり B のほうがまとまっている
+:::
+
+
+## k-means は SSE を下げていき、下がらなくなった所で止まる
+
+- **手順1（初期重心をランダムに置く）**：探索の出発点を決めるだけで、SSE はまだ減らさない
+- **手順2（assign）**：重心を固定し、各点を一番近い重心に付け替えるので、その点の誤差は最小になる
+- **手順3（update）**：所属を固定し、重心をメンバーの平均へ動かすので、メンバーの誤差の二乗和は最小になる（平均はそれを最小にする点）
+- **手順4（繰り返し）**：手順2も手順3も SSE を減らすか変えないかなので、繰り返すと必ず止まる
+
+```{python}
+#| echo: true
+#| eval: false
+cx, cy = init_centroids(bx, by, 5)                            # 手順1：出発点（ランダム）
+for step in range(1, 5):                                      # 手順4：繰り返し
+    labels = assign(bx, by, cx, cy)                           # 手順2
+    print(f"{step} 周目 assign 後: SSE={sse(bx, by, labels, cx, cy):.2f}")
+    cx, cy = update(bx, by, labels, cx, cy)                   # 手順3
+    print(f"{step} 周目 update 後: SSE={sse(bx, by, labels, cx, cy):.2f}")
+```
+
+```{python}
+#| echo: false
+# Displayed output: the student code above starting from 初期値 A instead of a random start.
+cx, cy = bx[init_A], by[init_A]
+for step in range(1, 5):
+    labels = assign(bx, by, cx, cy)
+    print(f"{step} 周目 assign 後: SSE={sse(bx, by, labels, cx, cy):.2f}")
+    cx, cy = update(bx, by, labels, cx, cy)
+    print(f"{step} 周目 update 後: SSE={sse(bx, by, labels, cx, cy):.2f}")
+```
+
+::: {.callout-note title="結果"}
+- assign の後も update の後も、SSE は一度も増えていない
+   - 出発点はランダムなので数は実行ごとに変わるが、増えないことはどの出発点でも同じ
+:::
+
+::: {.callout-note title="（参考）平均が誤差の二乗和を最小にする理由"}
+1つのクラスタのメンバー $x_1, \ldots, x_n$（1次元で考える）と重心 $m$ について、$\sum_i (x_i - m)^2$ を $m$ で微分して 0 と置く：
+$$-2\sum_i (x_i - m) = 0 \;\Rightarrow\; m = \frac{1}{n}\sum_i x_i$$
+:::
+
+
+## 止まった所が全体で最小とは限らない：ローカルミニマム
+
+```{python}
+#| echo: false
 #| fig-align: center
-inertias = []
+#| classes: fig-small
+def sse_trace(xs, ys, cx, cy):
+    # Steps 2-3 until the centroids stop moving, recording the SSE after each update.
+    trace = []
+    for step in range(100):
+        labels = assign(xs, ys, cx, cy)
+        new_cx, new_cy = update(xs, ys, labels, cx, cy)
+        trace.append(sse(xs, ys, labels, new_cx, new_cy))
+        if np.all(new_cx == cx) and np.all(new_cy == cy):
+            break
+        cx, cy = new_cx, new_cy
+    return trace, cx, cy
+
+trace_stop, cx_stop, cy_stop = sse_trace(bx, by, bx[init_A], by[init_A])   # the same start as 初期値 A
+assert np.allclose(cx_stop, cx_A) and np.allclose(cy_stop, cy_A)
+# Centroids moved away from A's stopping point, frozen (A's stop + N(0, 1.0) from default_rng(6),
+# rounded to 1 decimal; see doc/measured-log.md). Steps 2-3 from here reach the best answer.
+cx_moved = np.array([0.5, -2.3, 10.0, 5.2, 4.2])
+cy_moved = np.array([2.1, -0.4, 1.4, 2.1, 5.2])
+sse_moved = sse(bx, by, assign(bx, by, cx_moved, cy_moved), cx_moved, cy_moved)
+trace_after, _, _ = sse_trace(bx, by, cx_moved, cy_moved)
+
+n = len(trace_stop)
+line, move = "#34495e", "#e67e22"
+fig, ax = plt.subplots(figsize=(6.4, 3.0))
+ax.plot(range(1, n + 1), trace_stop, "o-", color=line, ms=4, lw=1.5)
+ax.plot([n, n], [trace_stop[-1], sse_moved], ls="--", color=move, lw=1.5)
+ax.plot(range(n, n + len(trace_after) + 1), [sse_moved] + trace_after, "o-", color=line, ms=4, lw=1.5)
+ax.scatter([n], [sse_moved], color=move, s=30, zorder=3)
+ax.annotate("本来はここで止まる", (n, trace_stop[-1]), xytext=(-8, -14), textcoords="offset points",
+            ha="right", va="top", fontsize=10, color=line)
+ax.annotate("重心を動かす", (n, sse_moved), xytext=(-8, 0), textcoords="offset points",
+            ha="right", va="center", fontsize=10, color=move)
+ax.set_xticks(range(1, n + len(trace_after) + 1))
+ax.set_xlabel("何周目"); ax.set_ylabel("SSE")
+ax.spines[["top", "right"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-important title="ローカルミニマム"}
+- 手順2と手順3ではもう SSE が下がらないのに、別の所にもっと SSE の小さい答えがある点を**ローカルミニマム**（[local minimum]{.en} / 局所的最小値）と呼ぶ
+   - まわりでは一番小さいが、全体で一番小さいとは限らない
+- 全体で一番小さい所は**グローバルミニマム**（[global minimum]{.en} / 大域的最小値）
+:::
+
+::: {.takeaway}
+k-means が止まった所はローカルミニマムかもしれず、どこで止まるかは手順1の出発点しだい
+:::
+
+::: {.callout-tip title="（参考）k-means 以外でも起こる"}
+後の回で学ぶ勾配降下法でも、初期値しだいでローカルミニマムに止まることがある
+:::
+
+
+## 初期値を変えて何度も回し、SSE 最小の答えを採る
+
+- 1回の k-means は初期値しだい。そこで初期値を変えて決めた回数だけ回し、SSE が最小の結果だけを残す
+- この作戦を**ランダムリスタート**（[random restart]{.en}）と呼ぶ
+
+```{python}
+#| echo: true
+#| eval: false
+def kmeans_best(xs, ys, k, n_init=10):
+    best_score = None
+    for trial in range(n_init):
+        cx, cy = init_centroids(xs, ys, k)               # 毎回ちがうランダムな初期値
+        labels, cx, cy = kmeans(xs, ys, cx, cy)
+        score = sse(xs, ys, labels, cx, cy)
+        if best_score is None or score < best_score:    # これまでの最小より小さければ入れ替え
+            best_score, best_labels, best_cx, best_cy = score, labels, cx, cy
+    return best_labels, best_cx, best_cy
+
+labels_best, cx_best, cy_best = kmeans_best(bx, by, 5)
+print(f"10回の最良の SSE: {sse(bx, by, labels_best, cx_best, cy_best):.2f}")
+```
+
+```{python}
+#| echo: false
+# Displayed output and the bar chart: the student code above with the ten random
+# initialisations replaced by fixed point indices (drawn once; see doc/measured-log.md).
+# Run 1 is 初期値 B and run 3 is 初期値 A.
+restart_inits = [[132, 309, 341, 196, 246], [398, 125, 328, 339, 172], [94, 32, 225, 157, 356],
+                 [376, 16, 365, 82, 107], [184, 6, 61, 312, 100], [218, 191, 117, 50, 348],
+                 [137, 138, 13, 95, 175], [265, 65, 120, 132, 378], [68, 222, 53, 305, 0],
+                 [57, 32, 17, 167, 2]]
+scores = []
+for init in restart_inits:
+    labs, cxs, cys = kmeans(bx, by, bx[init], by[init])
+    scores.append(sse(bx, by, labs, cxs, cys))
+print(f"10回の最良の SSE: {min(scores):.2f}")
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
+fig, ax = plt.subplots(figsize=(6, 3.0))
+bars = ax.bar(range(1, 11), scores, color="#aab7c4")
+for b, v in zip(bars, scores):
+    if np.isclose(v, min(scores)):
+        b.set_color("#27ae60")
+ax.axhline(min(scores), color="#27ae60", ls="--", lw=1)
+ax.set_title("5つの山データ：初期値を変えた10回の SSE（緑＝最小。この答えを採る）", fontsize=10)
+ax.set_xticks(range(1, 11))
+ax.set_xlabel("何回目"); ax.set_ylabel("SSE")
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-tip title="（参考）ランダムリスタート"}
+初期値しだいで結果が変わる最適化の、一般的な対策。参考資料 **[ローカルミニマムの罠](optimization-local-minima-appendix.qmd)** で詳しく扱っている
+:::
+
+
+## **Tweak** やり直しの回数を変更 {.badge-practice}
+
+- 下の「土台のコード」を1つの `.py` ファイルにして実行し、表の行を1つずつ**書き換えて実行**
+
+```{python}
+#| echo: true
+#| output: false
+#| code-fold: true
+#| code-summary: "土台のコード"
+import numpy as np
+import matplotlib.pyplot as plt
+import japanize_matplotlib
+
+# 5つの山から取った400個の点（「最初の重心しだいで…」のスライドと同じデータ）
+bx = np.array([0.2, 0.2, 0.5, -0.3, 0.2, 0.0, -0.4, -0.3, 0.0, -0.5, 0.0, 0.8,
+               -1.6, -0.1, 0.1, 1.3, -0.2, 0.4, -0.3, 0.1, -0.7, 0.0, -0.1, 0.0,
+               0.4, 0.2, 0.4, 0.5, 0.5, -0.7, 0.0, -0.6, 0.1, 0.1, -1.0, 0.7,
+               -0.5, 0.2, -0.2, -0.1, 0.5, -1.0, 0.5, -0.4, 0.3, 0.5, -0.1, 0.6,
+               -0.1, -0.9, -0.4, -0.1, 0.7, -0.5, 1.1, -0.4, -0.1, 0.0, -0.4, -0.6,
+               0.9, -1.5, 1.5, -0.8, -0.5, -0.2, -0.2, -0.1, -0.2, 0.0, -0.7, 0.0,
+               0.3, -0.1, 0.2, 0.5, -0.6, -0.2, -0.7, -1.3, 0.5, -0.4, 0.4, 1.2,
+               -0.4, 0.0, 0.0, -1.0, -0.3, 0.4, 0.3, -0.6, 0.5, -0.5, -0.9, -0.3,
+               0.6, 0.0, 0.7, 0.3, 1.1, -0.6, -0.4, -0.8, -0.6, 0.3, -0.1, -0.1,
+               -0.3, -0.2, -0.2, -0.2, -0.4, -0.8, -0.7, 0.2, -0.2, 0.3, -0.8, -0.4,
+               0.1, 0.1, 1.1, -0.9, -0.2, -0.2, 0.1, 0.4, -0.5, 0.3, -0.5, -1.1,
+               0.0, 0.0, 0.5, -0.4, -1.5, -0.4, 0.5, -1.1, 5.0, 4.3, 4.0, 4.6,
+               3.7, 4.0, 4.6, 4.6, 4.0, 5.6, 4.1, 4.2, 4.6, 5.4, 4.7, 4.3,
+               4.1, 4.3, 3.7, 3.5, 4.5, 4.0, 4.4, 3.9, 4.2, 5.2, 4.8, 4.9,
+               4.8, 3.1, 3.8, 3.7, 4.6, 4.5, 4.2, 4.5, 5.0, 5.0, 5.0, 4.8,
+               4.9, 4.1, 4.5, 4.9, 4.8, 5.8, 4.2, 3.7, 4.8, 4.1, 4.6, 4.5,
+               4.0, 4.4, 4.8, 4.9, 4.4, 4.4, 4.6, 4.0, 3.7, 4.2, 3.5, 5.1,
+               5.2, 3.1, 3.8, 3.8, 5.0, 5.0, 4.4, 4.4, 4.7, 5.1, 4.7, 5.4,
+               5.5, 4.4, 4.9, 3.8, 4.2, 5.2, 5.0, 4.2, 5.0, 5.0, 4.5, 4.0,
+               4.6, 4.5, 5.6, 5.5, 4.2, 4.5, 4.4, 4.8, 4.5, 4.7, 4.6, 4.9,
+               8.9, 9.6, 10.5, 9.6, 8.9, 8.3, 9.7, 9.1, 9.3, 9.1, 8.2, 8.2,
+               8.3, 8.5, 9.4, 8.2, 10.0, 8.5, 9.5, 9.4, 9.6, 8.0, 10.4, 9.0,
+               8.1, 8.2, 8.7, 9.2, 9.3, 9.7, 9.0, 8.4, 8.9, 9.3, 9.1, 8.3,
+               8.5, 9.6, 9.5, 9.0, 8.6, 9.6, 8.7, 8.9, 9.1, 9.2, 9.4, 9.0,
+               7.9, 8.9, 9.4, 9.6, 8.6, 8.5, 8.4, 7.2, 8.8, 8.1, 8.7, 9.2,
+               1.5, 3.1, 2.2, 2.0, 1.2, 3.3, 2.0, 2.1, 1.9, 2.4, 3.0, 1.8,
+               1.5, 1.8, 3.1, 1.8, 0.9, 2.6, 1.7, 2.4, 2.2, 2.0, 1.6, 0.9,
+               1.7, 2.1, 1.4, 1.8, 1.1, 2.6, 1.9, 2.1, 0.7, 3.1, 2.7, 0.7,
+               1.7, 2.5, 1.7, 1.5, 1.4, 1.3, 2.2, 1.5, 2.5, 1.4, 2.3, 1.8,
+               1.6, 1.0, 1.7, -0.1, 1.7, 1.7, 0.6, 1.3, 2.9, 1.7, 1.3, 2.0,
+               7.6, 6.8, 6.5, 6.6, 7.6, 7.8, 7.2, 6.3, 7.2, 7.4, 6.9, 6.7,
+               7.6, 7.7, 6.2, 6.3, 7.7, 6.6, 7.1, 7.1, 6.7, 7.1, 6.5, 7.1,
+               6.4, 7.6, 6.5, 7.0, 6.8, 6.8, 6.8, 6.8, 6.6, 6.1, 6.9, 6.3,
+               7.0, 8.1, 6.3, 7.8])
+by = np.array([0.5, -0.8, 0.3, 0.3, 0.2, 0.3, -0.1, 0.4, -0.2, -0.2, -0.2, 0.6,
+               -1.1, -0.3, 0.1, -0.7, 1.2, 0.4, -1.0, 0.1, -0.4, -0.6, 0.1, -0.3,
+               0.5, -0.5, -0.3, -0.6, 0.0, -0.2, 0.2, -0.7, -0.3, 0.5, 0.2, -0.2,
+               0.5, 0.5, -0.9, -0.3, 0.1, -0.7, 0.4, 0.0, 0.3, 0.2, -0.2, -1.4,
+               0.0, 0.2, 0.5, 0.4, 0.2, -0.9, -0.1, 0.1, 0.5, 0.0, 0.3, 0.4,
+               -0.9, 0.4, -0.6, 0.4, -0.3, 0.3, 0.2, -0.5, -0.6, -0.7, 0.9, 0.0,
+               -0.3, 0.3, -0.7, -0.4, -0.5, 1.0, 0.1, 0.0, -0.1, 0.1, 0.4, 0.1,
+               -0.1, 0.1, 0.1, 0.5, -0.7, 0.8, 0.1, 1.7, -0.7, 0.1, 0.1, 0.7,
+               -1.6, -1.0, 0.1, -0.6, 1.2, 0.2, 0.0, 1.1, -0.2, -0.4, -0.3, -0.7,
+               -0.1, 0.0, 0.5, -0.1, -0.3, 0.3, -0.4, 0.2, -1.2, 0.2, 0.5, -0.7,
+               -0.1, -1.0, -0.4, 0.4, 0.2, 0.0, -0.4, -0.3, 0.0, -0.1, 0.4, -0.6,
+               -0.8, 0.0, -0.5, 0.2, 1.9, -0.4, 0.0, 0.4, 0.2, 0.8, 0.8, 0.1,
+               0.4, 1.1, 1.0, 0.7, 0.9, 0.3, 0.4, 0.1, 0.3, 0.5, 1.1, 1.4,
+               0.0, 0.4, 0.5, 1.3, 0.1, 0.3, -0.1, 0.4, 1.1, 0.5, -0.3, 0.5,
+               1.5, 0.7, 0.9, 0.2, 0.9, 0.0, 1.0, -0.5, 0.7, 0.3, -0.1, 0.2,
+               1.1, 0.5, 1.2, -0.2, 0.9, -0.5, 1.3, -0.2, 1.1, 0.8, 1.4, 1.1,
+               0.4, 1.2, 0.0, 1.0, 0.3, -0.5, 0.6, 0.9, 0.2, 1.7, 0.8, 0.7,
+               -0.1, 1.0, 0.3, 1.1, 0.1, 0.6, 0.5, 0.9, 0.3, 0.1, 0.8, 0.2,
+               0.6, 0.1, 0.5, -0.2, 0.1, 1.3, 0.7, 0.5, 1.8, 0.3, 0.2, 0.4,
+               1.6, 1.3, 0.5, 0.9, 0.7, 0.4, 0.6, 0.0, -0.4, 0.9, 0.7, 0.1,
+               0.3, 0.2, -0.1, 0.8, -0.5, 0.1, 0.2, -0.2, -1.3, 0.0, 1.3, -0.6,
+               0.7, 0.4, 0.2, -0.4, -0.8, -0.1, 0.2, -0.6, 0.3, 0.9, -0.5, 0.8,
+               -1.2, -0.3, 0.4, -0.7, 1.1, 0.6, 0.6, 0.5, 0.7, -0.7, 0.7, -0.3,
+               -0.9, 0.8, 0.1, 0.1, 0.5, 0.6, 0.0, 1.1, -1.1, 1.1, 0.5, -1.2,
+               -0.7, 0.2, -0.2, -0.2, 0.5, -1.6, 0.1, -0.2, -0.9, -0.3, 0.8, -0.9,
+               4.9, 4.7, 5.6, 4.3, 4.2, 3.6, 3.7, 5.0, 4.9, 4.8, 5.0, 4.1,
+               4.8, 6.1, 4.4, 5.5, 4.2, 4.0, 4.3, 4.6, 4.9, 5.2, 3.6, 3.5,
+               5.1, 4.1, 4.2, 4.2, 4.2, 3.2, 3.2, 4.1, 4.6, 4.6, 4.5, 4.8,
+               3.6, 4.7, 5.0, 4.9, 4.8, 5.4, 5.4, 4.2, 2.9, 5.1, 5.1, 4.8,
+               3.7, 4.2, 4.1, 3.3, 4.7, 4.0, 5.7, 5.5, 4.7, 4.6, 4.7, 4.8,
+               6.0, 5.6, 4.5, 4.4, 5.6, 5.0, 4.7, 5.3, 4.3, 4.0, 4.6, 4.3,
+               5.3, 5.1, 4.8, 5.3, 5.2, 4.8, 4.1, 5.1, 4.7, 4.5, 5.5, 6.0,
+               3.9, 5.6, 4.1, 3.9, 3.7, 3.7, 5.9, 5.4, 4.4, 5.6, 5.9, 4.8,
+               5.8, 4.6, 3.9, 4.9])
+
+def distance(x1, y1, x2, y2):
+    return np.sqrt((x1 - x2)**2 + (y1 - y2)**2)
+
+def assign(xs, ys, cx, cy):
+    labels = []
+    for i in range(len(xs)):
+        dists = []
+        for j in range(len(cx)):
+            dists.append(distance(xs[i], ys[i], cx[j], cy[j]))
+        labels.append(np.argmin(dists))
+    return np.array(labels)
+
+def update(xs, ys, labels, cx, cy):
+    new_cx, new_cy = [], []
+    for j in range(len(cx)):
+        mask = labels == j
+        if np.sum(mask) > 0:
+            new_cx.append(xs[mask].mean())
+            new_cy.append(ys[mask].mean())
+        else:
+            new_cx.append(cx[j])
+            new_cy.append(cy[j])
+    return np.array(new_cx), np.array(new_cy)
+
+def init_centroids(xs, ys, k):
+    idx = np.arange(len(xs))
+    np.random.shuffle(idx)
+    return xs[idx[:k]], ys[idx[:k]]
+
+def kmeans(xs, ys, cx, cy):
+    for step in range(100):
+        labels = assign(xs, ys, cx, cy)
+        new_cx, new_cy = update(xs, ys, labels, cx, cy)
+        if np.all(new_cx == cx) and np.all(new_cy == cy):
+            break
+        cx, cy = new_cx, new_cy
+    return labels, cx, cy
+
+def sse(xs, ys, labels, cx, cy):
+    total = 0.0
+    for j in range(len(cx)):
+        mask = labels == j
+        total += np.sum((xs[mask] - cx[j])**2 + (ys[mask] - cy[j])**2)
+    return total
+
+def kmeans_best(xs, ys, k, n_init=10):
+    best_score = None
+    for trial in range(n_init):
+        cx, cy = init_centroids(xs, ys, k)
+        labels, cx, cy = kmeans(xs, ys, cx, cy)
+        score = sse(xs, ys, labels, cx, cy)
+        if best_score is None or score < best_score:
+            best_score, best_labels, best_cx, best_cy = score, labels, cx, cy
+    return best_labels, best_cx, best_cy
+
+labels, cx, cy = kmeans_best(bx, by, 5)
+print(f"SSE: {sse(bx, by, labels, cx, cy):.2f}")
+
+colors = ["#e74c3c", "#2980b9", "#27ae60", "#8e44ad", "#f39c12"]
+plt.figure(figsize=(5.8, 3.6))
+for j in range(5):
+    mask = labels == j
+    plt.scatter(bx[mask], by[mask], c=colors[j], s=20, alpha=0.7)
+    plt.scatter(cx[j], cy[j], c=colors[j], s=240, marker="*", edgecolors="black")
+plt.gca().set_aspect("equal")
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.tweak}
+| やりたいこと | コード |
+|--|--|
+| 初期値を1回勝負にせよ | `kmeans_best(bx, by, 5)` → `kmeans_best(bx, by, 5, n_init=1)`。何度か実行して SSE と図を見比べよ |
+| やり直しを3回にせよ | `kmeans_best(bx, by, 5)` → `kmeans_best(bx, by, 5, n_init=3)`。何度か実行し、SSE 275.79 が毎回出るか確かめよ |
+:::
+
+::: {.callout-tip title="チェックポイント"}
+- 1回勝負では、実行するたびに答えが変わる
+   - 山ごとに分けた答え（SSE 275.79）のときも、山を飲み込んだり割ったりした答え（SSE がずっと大きい）のときもある
+- やり直しの回数を増やすほど、SSE 275.79 に着きやすくなる
+:::
+
+
+## ハイパパラメータ k の決め方：エルボー法（[elbow method]{.en}）
+
+- 標準化した80個の点（`z_brightness`, `z_weights`）では、$k = 2$ と決めて進めた
+- $k$ もデータから決めたい
+- **エルボー法**：k を 1 から順に増やしながら SSE を測り、折れ曲がる所を探す
+   - 各 k では、ランダムリスタートで SSE 最小の答えを採る
+
+```{python}
+#| echo: true
+#| eval: false
 ks = range(1, 9)
-
+sse_list = []
 for k in ks:
-    km_k = KMeans(n_clusters=k, random_state=42, n_init=10)
-    km_k.fit(X_scaled)
-    inertias.append(km_k.inertia_)   # クラスタ内二乗和
+    labels_k, cx_k, cy_k = kmeans_best(z_brightness, z_weights, k)
+    sse_list.append(sse(z_brightness, z_weights, labels_k, cx_k, cy_k))
+print(np.array(sse_list).round(1))
+```
 
+```{python}
+#| echo: false
+# Displayed output and figure: one run of the student code above, frozen
+# (captured with tools/measure_clustering_kmeans.py; see doc/measured-log.md).
+ks = range(1, 9)
+sse_list = [160.0, 67.79, 49.17, 37.18, 25.88, 22.22, 18.81, 16.93]
+print(np.array(sse_list).round(1))
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
 plt.figure(figsize=(6, 3.5))
-plt.plot(list(ks), inertias, "o-", color="#2980b9")
+plt.plot(list(ks), sse_list, "o-", color="#2980b9")
 plt.xlabel("クラスタ数 k")
-plt.ylabel("Inertia（クラスタ内二乗和）")
+plt.ylabel("SSE（クラスタ内二乗和）")
 plt.title("エルボー法")
 plt.grid(True, alpha=0.4)
 plt.tight_layout()
 plt.show()
 ```
 
-::: {.callout-tip}
-## エルボー（肘）の見方
+::: {.callout-tip title="エルボー（肘）の見方"}
 グラフが**急激に折れ曲がる点**（肘のような形）が最適な k の目安。
-それ以上増やしても改善幅が小さい。魚データでは k=2 で折れている。
-:::
-
-
-## **Tweak** k と単位を変更 {.badge-practice}
-
-- [スケール済み k-means のコード](#peek-scale){.peek}を**書き換えて実行**（描画セルまで続けて実行）
-
-::: {.tweak}
-| やりたいこと | コード |
-|--|--|
-| クラスタを3つにせよ | `n_clusters=2` → `3`（描画の `range(2)` も `range(3)` に） |
-| 単位をキログラムにせよ | `X_kg = X.copy(); X_kg[:, 1] /= 1000` を作って `km2.fit(X_kg)` |
-| 初期値ガチャを1回勝負に | `n_init=10` → `n_init=1, init="random"` |
-:::
-
-::: {.callout-tip}
-## チェックポイント
-
-- k=3 の3つ目のクラスタは **Sea bass 側を割って**生まれる（Salmon 34匹の塊はほぼ無傷）
-   - 増やした分は「一番ゆるい塊」が割られる
-- グラム→キログラムに変えただけで、こんどは==輝度だけで割り方が決まる==
-   - どの特徴量が距離を支配するかは**単位次第**。それを消すのがスケーリング
-- この魚データでは1回勝負でも inertia は 67.8 前後でほぼ不動
-   - きれいな2つの山は初期値に強い（崩れる実例は「最初の重心」のスライドの3つの山データ）
+それ以上増やしても改善幅が小さい。このデータでは k=2 で折れている。
 :::
 
 
@@ -469,22 +1119,25 @@ plt.show()
 ```{python}
 #| echo: false
 #| fig-align: center
-from sklearn.datasets import make_circles, make_moons
+rng = np.random.default_rng(42)
+t = rng.uniform(0, 2 * np.pi, 100)
+ring = np.column_stack([np.cos(t), np.sin(t)])
+X_circ = np.vstack([ring, 0.4 * ring]) + rng.normal(0, 0.04, (200, 2))        # outer and inner circle
+t = rng.uniform(0, np.pi, 100)
+X_moon = np.vstack([np.column_stack([np.cos(t), np.sin(t)]),
+                    np.column_stack([1 - np.cos(t), 0.5 - np.sin(t)])]) + rng.normal(0, 0.05, (200, 2))
 
+# Fixed initial points (indices) that reach the lowest SSE found for each shape
+# (tools/measure_clustering_kmeans.py), so the figure is the same on every render.
 fig, axes = plt.subplots(1, 2, figsize=(9, 3.5))
-
-X_circ, _ = make_circles(n_samples=200, noise=0.04, factor=0.4, random_state=42)
-X_moon, _ = make_moons(n_samples=200, noise=0.05, random_state=42)
-
-for ax, (X_ex, title) in zip(axes, [
-    (X_circ, "同心円（k-means は苦手）"),
-    (X_moon, "三日月形（k-means は苦手）")
+for ax, (X_ex, init, title) in zip(axes, [
+    (X_circ, [0, 45], "同心円（k-means は苦手）"),
+    (X_moon, [0, 1], "三日月形（k-means は苦手）")
 ]):
-    km_ex = KMeans(n_clusters=2, random_state=42, n_init=10)
-    labs  = km_ex.fit_predict(X_ex)
-    for c_id, col in enumerate(["#e74c3c", "#2980b9"]):
-        ax.scatter(X_ex[labs == c_id, 0], X_ex[labs == c_id, 1],
-                   c=col, s=20, alpha=0.7)
+    xs, ys = X_ex[:, 0], X_ex[:, 1]
+    labs, _, _ = kmeans(xs, ys, xs[init], ys[init])
+    for j in range(2):
+        ax.scatter(xs[labs == j], ys[labs == j], c=cluster_colors[j], s=20, alpha=0.7)
     ax.set_title(title, fontsize=10)
     ax.set_aspect("equal")
     ax.axis("off")
@@ -494,30 +1147,34 @@ plt.tight_layout()
 plt.show()
 ```
 
-::: {.callout-warning}
-## k-means が苦手なケース
+::: {.callout-warning title="k-means が苦手なケース"}
 - **非球状のクラスタ**（同心円、三日月形など）
 - クラスタの**サイズが大きく異なる**場合
-- 初期値によって結果が変わる → `n_init`（マルチスタート）で回避（前述）
+- 初期値によって結果が変わる → ランダムリスタート（`kmeans_best`）で回避（前述）
 :::
 
 
 ## まとめ
 
 - **教師なし学習**：ラベルなしでデータの構造を見つける
-- **k-means**：「assign → update → 繰り返し」だけで、魚80匹中74匹を正しく仕分けた
-- **スケールの罠**：距離を使う手法では、特徴量のスケールを揃えてから
+- **k-means**：「assign → update → 繰り返し」だけで、データをクラスタに分ける
+- **ハイパーパラメータ**：クラスタ数 $k$ のように、手順を動かす前に人が決める値
+   - 手順がデータから決める値（重心）がパラメータ
+- **SSE**：k-means は SSE（誤差の二乗和）を下げていき、下がらなくなった所で止まる
+- **スケールの罠**：距離を使う手法では、特徴量を標準化してから
+- **ローカルミニマム**：止まった所が全体で最小とは限らない
+   - ランダムリスタート（何回も回して SSE 最小）で保険をかける
+
+今日書いた関数：
 
 ```python
-from sklearn.cluster import KMeans
-from sklearn.preprocessing import StandardScaler
-
-X_scaled = StandardScaler().fit_transform(X)   # まずスケールを揃える
-km = KMeans(n_clusters=2, random_state=42, n_init=10)
-km.fit(X_scaled)
-km.labels_          # クラスタ番号（各データ点）
-km.cluster_centers_ # 重心の座標
-km.inertia_         # クラスタ内二乗和（エルボー法に使う）
+distance(x1, y1, x2, y2)         # 2点間のユークリッド距離
+assign(xs, ys, cx, cy)           # 手順2：各点を最寄りの重心へ
+update(xs, ys, labels, cx, cy)   # 手順3：重心をメンバーの平均へ
+init_centroids(xs, ys, k)        # 手順1：ランダムな k 個の点を初期重心に
+kmeans(xs, ys, cx, cy)           # 手順2〜4：初期重心から、重心が動かなくなるまで
+sse(xs, ys, labels, cx, cy)      # 結果の良さ（SSE：クラスタ内二乗和）
+kmeans_best(xs, ys, k, n_init=10)   # 初期値を変えて n_init 回、SSE 最小を採用
 ```
 
 | 長所 | 短所 |
@@ -525,29 +1182,27 @@ km.inertia_         # クラスタ内二乗和（エルボー法に使う）
 | シンプルで高速 | k を事前に決める必要がある |
 | 結果が直感的 | 球状クラスタしか見つけられない |
 
-::: {.callout-note}
-## 次回予告
+::: {.callout-note title="次回予告"}
 「特徴量を増やせば精度が上がった。では増やし続けたらどうなる？」
 :::
 
 
-## 練習問題
+## 問題1：k-means を手で1周回す
 
-問題1は**手計算**、問題2は**Pythonコード**で解け
-
-### 問題1：k-means を手で1周回す
-
-4点だけの世界：$A(0, 0)$、$B(0, 2)$、$C(4, 0)$、$D(4, 2)$。$k = 2$、最初の重心を $M_1 = (0, 0)$、$M_2 = (0, 2)$ に置く。
+4点だけの世界：$A(0, 0)$、$B(0, 2)$、$C(4, 0)$、$D(4, 2)$。$k = 2$、最初の重心を $M_1 = (0, 0)$、$M_2 = (0, 2)$ に置く。**手計算**で解け。
 
 1. **assign**：各点を近い方の重心に割り当てよ（距離はユークリッド距離）
 2. **update**：割り当てから新しい重心を計算せよ
-3. assign が変わらなくなるまで繰り返せ。最終的なクラスタ分けと inertia（各点から自分の重心までの**二乗**距離の合計）を求めよ
-4. このデータの「自然な」分け方 $\{A, B\}$ と $\{C, D\}$ の inertia も計算し、3.の結果と比較せよ
+3. assign が変わらなくなるまで繰り返せ。最終的なクラスタ分けと SSE（各点から自分の重心までの**二乗**距離の合計）を求めよ
+4. このデータの「自然な」分け方 $\{A, B\}$ と $\{C, D\}$ の SSE も計算し、3.の結果と比較せよ
 
-### 問題2：n_init がこの罠を救うことを確かめる
+## 問題2：初期重心を変えて SSE を比べる
 
-1. `KMeans(n_clusters=2, init=np.array([[0.0, 0.0], [0.0, 2.0]]), n_init=1)` で問題1を再現し、`labels_` と `inertia_` を表示せよ
-2. `KMeans(n_clusters=2, n_init=10, random_state=0)` で再実行し、`inertia_` を比較せよ
+本編で書いた `kmeans`・`sse` を使い、問題1を **Pythonコード**で再現せよ。
+
+0. 4点 A, B, C, D の横の座標を `px = np.array([0.0, 0.0, 4.0, 4.0])`、縦の座標を `py = np.array([0.0, 2.0, 0.0, 2.0])` で定義
+1. 初期重心を $(0, 0)$、$(0, 2)$ にして `kmeans` を回し、所属クラスタと SSE を表示（手計算と一致するか確認）
+2. 初期重心を $(0, 0)$、$(4, 0)$ に変えて再実行し、SSE を比較
 
 
 ## 問題1の解答例
@@ -560,16 +1215,14 @@ km.inertia_         # クラスタ内二乗和（エルボー法に使う）
 
 **結果**：$\{A, C\}$ と $\{B, D\}$（上下の分割）。各点は重心から距離2なので
 
-$$\text{inertia} = 2^2 \times 4 = 16$$
+$$\text{SSE} = 2^2 \times 4 = 16$$
 
-**自然な分け方** $\{A, B\}, \{C, D\}$：重心は $(0,1)$ と $(4,1)$、各点は距離1なので inertia $= 1^2 \times 4 = 4$。
+**自然な分け方** $\{A, B\}, \{C, D\}$：重心は $(0,1)$ と $(4,1)$、各点は距離1なので SSE$= 1^2 \times 4 = 4$。
 
-::: {.callout-important}
-## 結果
-
-k-means の手順を**正しく**回したのに、inertia 16 の**悪い答え**で止まった（最適は 4）。
-assign → update は inertia を減らすことしかできず、**最初の重心の置き方**が悪いと抜け出せない。
-本編の「変な分け方に落ち着く」を、4点で完全に再現できた。
+::: {.callout-important title="結果"}
+k-means の手順を**正しく**回したのに、SSE16 の**悪い答え**で止まった（最適は 4）。
+assign → update は SSE を減らすことしかできず、**最初の重心の置き方**が悪いと抜け出せない。
+本編の「最初の重心しだいで、おかしな答えに落ち着くことがある」を、4点で再現できた。
 :::
 
 
@@ -580,17 +1233,202 @@ assign → update は inertia を減らすことしかできず、**最初の重
 #| code-fold: true
 #| code-summary: "解答例を見る"
 import numpy as np
-from sklearn.cluster import KMeans
 
-P = np.array([[0.0, 0.0], [0.0, 2.0], [4.0, 0.0], [4.0, 2.0]])   # A, B, C, D
+px = np.array([0.0, 0.0, 4.0, 4.0])   # A, B, C, D の横の座標
+py = np.array([0.0, 2.0, 0.0, 2.0])   # A, B, C, D の縦の座標
 
-bad = KMeans(n_clusters=2, init=np.array([[0.0, 0.0], [0.0, 2.0]]), n_init=1).fit(P)
-print(f"悪い初期値: labels={bad.labels_}, inertia={bad.inertia_:.1f}")
+labels, cx, cy = kmeans(px, py, np.array([0.0, 0.0]), np.array([0.0, 2.0]))   # 初期重心 (0,0), (0,2)
+print(f"初期重心 (0,0), (0,2): labels={labels}, SSE={sse(px, py, labels, cx, cy):.1f}")
 
-good = KMeans(n_clusters=2, n_init=10, random_state=0).fit(P)
-print(f"n_init=10 : labels={good.labels_}, inertia={good.inertia_:.1f}")
+labels, cx, cy = kmeans(px, py, np.array([0.0, 4.0]), np.array([0.0, 0.0]))   # 初期重心 (0,0), (4,0)
+print(f"初期重心 (0,0), (4,0): labels={labels}, SSE={sse(px, py, labels, cx, cy):.1f}")
 ```
 
-- 悪い初期値からは手計算どおり inertia 16 の分割に落ちる
-- `n_init=10` は初期値を変えて10回回し、inertia 最小（4）の分割を選んでくれる
-- この「何回も試して一番良いのを選ぶ」作戦の一般論は、参考資料 **[ローカルミニマムの罠](optimization-local-minima-appendix.qmd)** で扱う
+- 初期重心 (0,0), (0,2) からは手計算どおり SSE16 の分割（上下）に落ちる
+- 初期重心 (0,0), (4,0) からは SSE4 の分割（左右）に着く
+- `kmeans_best` はこれを自動でやる：初期値を変えて回し、SSE 最小の分割を選ぶ
+   - 一般論は参考資料 **[ローカルミニマムの罠](optimization-local-minima-appendix.qmd)** で扱う
+
+
+## （参考）scikit-learn では
+
+- 今日書いた標準化、手順1〜4、SSE、ランダムリスタートは、ライブラリでは2つのクラスにまとまっている
+- ライブラリはデータを行列（1行が1個のデータ、1列が1つの特徴量）で受け取る
+   - [前回の `X`](classification-2d-boundaries.qmd#特徴量行列の作成){.peek} と同じ形
+
+```{python}
+#| echo: true
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+
+X = np.column_stack([brightness, weights])              # 輝度と重さを並べて80行2列の行列にする
+X_scaled = StandardScaler().fit_transform(X)            # 標準化（平均を引いて標準偏差で割る）
+
+km = KMeans(n_clusters=2, n_init=10, random_state=0)    # k=2。初期値を変えて10回回し、SSE 最小を採用
+km.fit(X_scaled)                                        # 手順1〜4
+
+print(km.labels_[:10])                                  # 各点の所属クラスタ
+print(km.cluster_centers_.round(2))                     # 重心（標準化した座標）。1行が1個の重心
+print(f"SSE: {km.inertia_:.2f}")                        # scikit-learn は SSE を inertia_ と呼ぶ
+```
+
+| 今日書いたもの | scikit-learn |
+|---|---|
+| `(brightness - brightness.mean()) / brightness.std()` など | `StandardScaler().fit_transform(X)` |
+| `kmeans_best(z_brightness, z_weights, 2, n_init=10)` | `KMeans(n_clusters=2, n_init=10).fit(X_scaled)` |
+| `labels` | `km.labels_` |
+| `cx`, `cy` | `km.cluster_centers_` |
+| `sse(z_brightness, z_weights, labels, cx, cy)` | `km.inertia_` |
+
+::: {.callout-note title="結果"}
+scikit-learn は SSE を `inertia_`（慣性）と呼ぶ。値は自作の `kmeans_best` と同じ 67.79。中で動いているのは今日書いたものと同じ手順
+:::
+
+
+## （参考）標準偏差とは {#peek-std}
+
+- **標準偏差**（[standard deviation]{.en}）：データが平均のまわりにどれだけ散らばっているかを表す1つの数
+- **例**：8個の輝度 2, 4, 4, 4, 5, 5, 7, 9 で求める（平均は 40 / 8 = 5）
+
+::: {.table-compact}
+| データ | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 合計 |
+|---|---|---|---|---|---|---|---|---|---|
+| 輝度 | 2 | 4 | 4 | 4 | 5 | 5 | 7 | 9 | 40 |
+| 偏差（輝度 − 5） | −3 | −1 | −1 | −1 | 0 | 0 | 2 | 4 | 0 |
+| 偏差の2乗 | 9 | 1 | 1 | 1 | 0 | 0 | 4 | 16 | 32 |
+:::
+
+1. 各データの輝度から平均を引く：**偏差**（[deviation]{.en}）
+   - 偏差の合計は必ず 0 になる（プラスとマイナスが打ち消し合う）ので、そのまま平均しても散らばりは測れない
+2. 偏差を2乗して、マイナスを消す
+3. 2乗の平均を取る：**分散**（[variance]{.en}）$= 32 / 8 = 4$
+4. 分散の平方根を取る：**標準偏差** $= \sqrt{4} = 2$
+   - 2乗で変わった単位を、元のデータの単位に戻す
+
+$$\text{標準偏差} = \sqrt{\,\text{偏差の2乗の平均}\,}$$
+
+```{python}
+#| echo: false
+#| fig-align: center
+x_sd = np.array([2, 4, 4, 4, 5, 5, 7, 9])
+m_sd, s_sd = x_sd.mean(), x_sd.std()
+
+fig, ax = plt.subplots(figsize=(6.4, 3.4))
+ax.axvspan(m_sd - s_sd, m_sd + s_sd, color="tab:blue", alpha=0.12,
+           label=f"平均 ± 標準偏差（{m_sd - s_sd:.0f}〜{m_sd + s_sd:.0f}）")
+ax.axvline(m_sd, color="gray", ls="--", lw=1.2, label=f"平均 {m_sd:.0f}")
+for i, v in enumerate(x_sd):
+    row = len(x_sd) - i                                  # data 1 on top
+    d = v - m_sd
+    if d != 0:
+        ax.annotate("", xy=(v, row), xytext=(m_sd, row),
+                    arrowprops=dict(arrowstyle="->", color="tab:red", lw=1.5))
+    ax.scatter(v, row, c="black", s=40, zorder=3)
+    label = "0" if d == 0 else f"{d:+.0f}".replace("-", "−")
+    ax.text(v + (0.25 if d >= 0 else -0.25), row, label, color="tab:red",
+            ha="left" if d >= 0 else "right", va="center", fontsize=10)
+ax.set_yticks(range(1, len(x_sd) + 1))
+ax.set_yticklabels([f"データ {len(x_sd) + 1 - r}" for r in range(1, len(x_sd) + 1)])
+ax.set_xlim(0, 10.5); ax.set_ylim(0.3, len(x_sd) + 0.7)
+ax.set_xlabel("輝度")
+ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1.0), ncol=2, fontsize=9, frameon=False)
+ax.grid(True, axis="x", alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.caption-note .center}
+赤い矢印：偏差（平均からの各データの差）
+:::
+
+::: {.callout-note title="Point"}
+- 平均からのずれが大きいデータほど、標準偏差は大きい
+- 標準偏差の単位は元のデータと同じ（例えばg）
+:::
+
+```{python}
+#| echo: true
+import numpy as np
+
+x = np.array([2, 4, 4, 4, 5, 5, 7, 9])     # 8個の輝度
+dev = x - x.mean()                         # 偏差
+print(dev)
+print(np.mean(dev**2))                     # 分散
+print(np.sqrt(np.mean(dev**2)))            # 標準偏差
+print(x.std())                             # NumPy の std も同じ値
+```
+
+
+## （参考）画像の座標の正規化 {#peek-normalize}
+
+- 横幅のちがう画像では、ピクセル座標のままだと位置を比べられない
+   - ある x = 480 の点を考える
+     - 横幅 1920 px の画像では左寄り
+     - 横幅 640 px の画像では右寄り
+- そこで x 座標から中心を引き、横幅で割る：**正規化**（[normalization]{.en}）
+   - y 座標も同じく、縦の中心を引いて縦幅で割る
+   - どの画像も中心が 0、横幅も縦幅も 1（端は −0.5 と 0.5）になる
+
+$$\text{正規化した座標} = \frac{x - \text{中心}}{\rule{0pt}{1em}\text{横幅}}$$
+
+```{python}
+#| echo: false
+#| fig-align: center
+img_size = np.array([640, 480])                          # width, height in px
+img_pts = np.random.default_rng(3).uniform(20, img_size - 20, size=(40, 2))
+img_mark = np.array([480, 120])                          # highlighted point
+to_norm = lambda p: (p - img_size / 2) / img_size        # subtract center, divide by size
+num = lambda v: f"{v:g}".replace("-", "−")
+panels = [("ピクセル座標（640 × 480）", img_pts, img_mark, np.zeros(2), img_size),
+          ("正規化した座標", to_norm(img_pts), to_norm(img_mark), np.full(2, -0.5), np.ones(2))]
+fig, axes = plt.subplots(1, 2, figsize=(8, 3.4), gridspec_kw={"width_ratios": [1.3, 1]})
+for ax, (title, pts, mark, (x0, y0), (w, h)) in zip(axes, panels):
+    xt, yt = [x0, x0 + w / 2, x0 + w], [y0, y0 + h / 2, y0 + h]
+    pad = 0.05 * w
+    ax.add_patch(plt.Rectangle((x0, y0), w, h, facecolor="#eef3f8", edgecolor="dimgray"))
+    ax.axvline(xt[1], color="gray", ls="--", lw=1)
+    ax.axhline(yt[1], color="gray", ls="--", lw=1)
+    ax.scatter(pts[:, 0], pts[:, 1], s=18, c="tab:blue", alpha=0.7)
+    ax.scatter(*mark, s=70, c="tab:red", zorder=3)
+    ax.annotate(f"({num(mark[0])}, {num(mark[1])})", mark, xytext=(6, 6),
+                textcoords="offset points", color="tab:red", fontsize=10,
+                bbox=dict(boxstyle="round,pad=0.15", fc="white", ec="none", alpha=0.85))
+    ax.set_xlim(x0 - pad, x0 + w + pad)
+    ax.set_ylim(y0 + h + pad, y0 - pad)                   # image convention: y points down
+    ax.set_xticks(xt, [num(v) for v in xt])
+    ax.set_yticks(yt, [num(v) for v in yt])
+    ax.set_aspect("equal")
+    ax.set_title(title, fontsize=11)
+    for s in ("left", "right", "top", "bottom"):
+        ax.spines[s].set_visible(False)
+plt.tight_layout(w_pad=5)
+fig.canvas.draw()                                        # fix axes positions after set_aspect
+x_from, x_to = axes[0].get_position().x1, axes[1].get_position().x0
+axes[0].annotate("", xy=(x_to - 0.01, 0.5), xytext=(x_from + 0.01, 0.5), xycoords="figure fraction",
+                 arrowprops=dict(arrowstyle="->", lw=1.5, color="dimgray"))
+fig.text((x_from + x_to) / 2, 0.55, "正規化", ha="center", va="bottom", fontsize=11, color="dimgray")
+plt.show()
+```
+
+::: {.caption-note .center}
+画像の座標は左上が原点（y は下向き）。赤い点は左右で同じ点、点線は中心
+:::
+
+
+::: {.callout-note title="x = 480は、正規化後は"}
+- 横幅 1920 px なら $(480 - 960) / 1920 = -0.25$
+- 横幅 640 px なら $(480 - 320) / 640 = 0.25$
+:::
+
+
+::: {.takeaway .dark}
+これは標準化の $z$ も同じ形
+:::
+
+::: {.table-compact}
+| | 画像の座標の正規化 | 標準化の $z$ |
+|---|---|---|
+| 引く数（新しい 0 の位置） | 中心 | 平均 |
+| 割る数（新しい 1 目盛り） | 横幅 | 標準偏差 |
+| 割ったあと | 横幅は 1 | 標準偏差は 1 |
+:::

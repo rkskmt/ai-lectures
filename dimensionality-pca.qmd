@@ -23,24 +23,153 @@ subtitle: "特徴量を増やし続けると何が起きるか"
 
 ## 次元の呪い（[Curse of Dimensionality]{.en}） {#peek-curse}
 
-> "データの次元が増えるにつれて、空間が指数的に広くなり、データが希薄になる"
->
-> ── Richard Bellman（1961）
-
+- データの次元が増えるにつれて、空間が指数的に広くなり、データがまばらになる現象
 - 2次元で十分だったサンプル数が、10次元では**全く足りなくなる**
 - 高次元空間は私たちの直感とは全く異なる振る舞いをする
 
 ::: {.callout-note}
-1960年代にベルマン（動的計画法の発明者）が提唱した概念。
+名づけたのは Richard Bellman（動的計画法の発明者）。
 現代機械学習でも最重要トピックの一つ。
+:::
+
+
+
+## 準備
+
+- 各特徴量は 0〜1 に正規化してあるとする（各軸の長さ＝1）
+- そこに**100個の点**をランダムにばらまく
+- 点は「行＝点、列＝特徴量」の配列で持つ
+- まず特徴量2個（2次元）で、散布図に描く
+
+```{python}
+#| echo: true
+#| eval: false
+import numpy as np
+import matplotlib.pyplot as plt
+import japanize_matplotlib
+
+rng = np.random.default_rng()
+P   = rng.random((100, 2))          # 100個の点（行＝点、列＝特徴量）
+
+plt.figure(figsize=(4.4, 4.4))
+plt.scatter(P[:, 0], P[:, 1], s=28, c="#2980b9")
+plt.xlabel("特徴量 1")
+plt.ylabel("特徴量 2")
+plt.xlim(0, 1)
+plt.ylim(0, 1)
+plt.gca().set_aspect("equal")
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
+import numpy as np
+import matplotlib.pyplot as plt
+import japanize_matplotlib
+plt.rcParams["font.size"] = 11
+plt.rcParams["figure.dpi"] = 100
+
+# Frozen points: one run of the cell above (tools/measure_dimensionality_pca.py).
+# The student cell is unseeded; the slides 準備 and 距離を測る show these points.
+P = np.array([
+    [0.480, 0.232], [0.802, 0.924], [0.266, 0.539], [0.443, 0.931], [0.041, 0.732],
+    [0.614, 0.028], [0.719, 0.016], [0.758, 0.513], [0.929, 0.066], [0.841, 0.067],
+    [0.344, 0.430], [0.966, 0.562], [0.259, 0.242], [0.888, 0.226], [0.125, 0.288],
+    [0.586, 0.554], [0.810, 0.560], [0.288, 0.413], [0.818, 0.627], [0.959, 0.369],
+    [0.553, 0.594], [0.848, 0.145], [0.407, 0.910], [0.043, 0.823], [0.415, 0.830],
+    [0.010, 0.365], [0.079, 0.653], [0.274, 0.703], [0.944, 0.127], [0.865, 0.059],
+    [0.381, 0.430], [0.489, 0.976], [0.776, 0.309], [0.270, 0.863], [0.881, 0.511],
+    [0.344, 0.995], [0.316, 0.183], [0.880, 0.812], [0.668, 0.958], [0.926, 0.748],
+    [0.861, 0.247], [0.141, 0.670], [0.715, 0.167], [0.396, 0.910], [0.561, 0.578],
+    [0.194, 0.526], [0.523, 0.089], [0.982, 0.571], [0.006, 0.773], [0.978, 0.590],
+    [0.320, 0.188], [0.673, 0.195], [0.578, 0.602], [0.962, 0.072], [0.500, 0.744],
+    [0.177, 0.388], [0.063, 0.726], [0.088, 0.395], [0.874, 0.472], [0.913, 0.766],
+    [0.915, 0.127], [0.074, 0.070], [0.869, 0.634], [0.497, 0.164], [0.674, 0.318],
+    [0.711, 0.460], [0.507, 0.790], [0.093, 0.579], [0.197, 0.808], [0.489, 0.989],
+    [0.183, 0.963], [0.801, 0.481], [0.814, 0.603], [0.655, 0.914], [0.065, 0.835],
+    [0.382, 0.326], [0.994, 0.781], [0.486, 0.423], [0.878, 0.087], [0.708, 0.789],
+    [0.799, 0.322], [0.797, 0.225], [0.362, 0.417], [0.541, 0.113], [0.407, 0.000],
+    [0.744, 0.852], [0.139, 0.704], [0.821, 0.982], [0.844, 0.424], [0.980, 0.974],
+    [0.504, 0.753], [0.914, 0.476], [0.864, 0.702], [0.294, 0.768], [0.571, 0.094],
+    [0.391, 0.074], [0.476, 0.429], [0.424, 0.586], [0.123, 0.934], [0.684, 0.824],
+])
+
+plt.figure(figsize=(4.4, 4.4))
+plt.scatter(P[:, 0], P[:, 1], s=28, c="#2980b9")
+plt.xlabel("特徴量 1")
+plt.ylabel("特徴量 2")
+plt.xlim(0, 1)
+plt.ylim(0, 1)
+plt.gca().set_aspect("equal")
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.caption-note .center}
+点は実行のたびに変わるので、手元の図は少し違う
+:::
+
+
+## 距離を測る
+
+- 2点間の距離は、[**ユークリッド距離**](clustering-kmeans.qmd#peek-distance){.peek}で測る
+- ある点から、ほかの99個の点までの距離をすべて測る
+- その中でいちばん小さいものが、**いちばん近い点（最近傍, [nearest neighbor]{.en}）までの距離**
+
+```{python}
+#| echo: true
+def nearest_distance(P, i):
+    dist = np.sqrt(((P - P[i]) ** 2).sum(axis=1))   # 点 i から全部の点までの距離
+    dist[i] = np.inf                                # 自分自身は除外
+    return dist.min()                               # いちばん近い点までの距離
+
+print(f"点 0 からいちばん近い点まで: {nearest_distance(P, 0):.3f}")
+
+nn = []
+for i in range(len(P)):                             # 100個の点すべてで測る
+    nn.append(nearest_distance(P, i))
+print(f"100個の中央値: {np.median(nn):.3f}")
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
+d0 = np.sqrt(((P - P[0]) ** 2).sum(axis=1))
+d0[0] = np.inf
+j0 = d0.argmin()
+
+plt.figure(figsize=(4.6, 4.6))
+for q in P[1:]:
+    plt.plot([P[0, 0], q[0]], [P[0, 1], q[1]], color="#bbbbbb", lw=0.5, zorder=1)
+plt.plot([P[0, 0], P[j0, 0]], [P[0, 1], P[j0, 1]], color="#e74c3c", lw=2.5, zorder=3)
+plt.scatter(P[:, 0], P[:, 1], s=28, c="#2980b9", zorder=2)
+plt.scatter(P[0, 0], P[0, 1], s=70, c="#e74c3c", zorder=4)
+plt.xlabel("特徴量 1")
+plt.ylabel("特徴量 2")
+plt.xlim(0, 1)
+plt.ylim(0, 1)
+plt.gca().set_aspect("equal")
+plt.title(f"点 0（赤い丸）から全部の点への距離\n赤い線がいちばん近い点（距離 {d0.min():.3f}）",
+          fontsize=10.5)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-note title="結果"}
+- 点 0 からいちばん近い点までの距離は **0.070**（図の赤い線）
+- この距離は、100個の点それぞれに1つずつ決まる
+   - その中央値 **0.042** を、点の混み具合を表す値として使う
+- 軸の長さ 1 に対して 0.04 ほどなので、2次元ではすぐ隣に点がある
 :::
 
 
 ## 質問：いちばん近い点まで、どれくらい？
 
-- 各特徴量は 0〜1 に正規化してあるとする（各軸の長さ＝1）
-- そこに**100個の点**をランダムにばらまく
-- **1次元**なら、いちばん近い点までの距離はだいたい **0.003**（ぎゅうぎゅう）
+- **2次元**では、いちばん近い点までの距離（中央値）は **0.04** ほどだった
 
 ::: {.callout-important title="質問"}
 特徴量を増やして **10次元** にしたら、いちばん近い点までの距離はいくつになると思う？
@@ -52,22 +181,21 @@ subtitle: "特徴量を増やし続けると何が起きるか"
 
 ```{python}
 #| echo: true
-#| fig-align: center
-import numpy as np
-import matplotlib.pyplot as plt
-import japanize_matplotlib
-plt.rcParams["font.size"] = 11
-plt.rcParams["figure.dpi"] = 100
+#| eval: false
+for d in [1, 2, 3, 5, 10, 20]:
+    P  = rng.random((100, d))                   # 100個の点を d 次元にばらまく
+    nn = []
+    for i in range(len(P)):                     # 「距離を測る」と同じ測り方
+        nn.append(nearest_distance(P, i))
+    print(f"{d:2d}次元: いちばん近い点まで {np.median(nn):.3f}")
+```
 
-rng  = np.random.default_rng(0)
+```{python}
+#| echo: false
+# Frozen result of one run of the cell above (tools/measure_dimensionality_pca.py).
+# The student cell is unseeded; the slide shows these values.
 dims = [1, 2, 3, 5, 10, 20]
-nn_median = []
-
-for d in dims:
-    P = rng.random((100, d))                       # 100点を [0,1]^d にばらまく
-    D = np.sqrt(((P[:, None, :] - P[None, :, :]) ** 2).sum(axis=2))
-    np.fill_diagonal(D, np.inf)                    # 自分自身は除外
-    nn_median.append(np.median(D.min(axis=1)))     # 最近傍距離の中央値
+nn_median = [0.003, 0.042, 0.121, 0.306, 0.703, 1.195]
 
 for d, m in zip(dims, nn_median):
     print(f"{d:2d}次元: いちばん近い点まで {m:.3f}")
@@ -113,8 +241,17 @@ $$\left(\frac{1}{2}\right)^d \qquad
 fig, axes = plt.subplots(1, 2, figsize=(9.5, 3.4))
 
 ax = axes[0]
-rng2 = np.random.default_rng(7)
-pts = rng2.random((60, 2))
+# Frozen illustration points (tools/measure_dimensionality_pca.py)
+pts = np.array([[0.63, 0.9], [0.78, 0.23], [0.3, 0.87], [0.01, 0.82], [0.8, 0.47], [0.3, 0.28],
+                [0.25, 0.45], [0.5, 0.55], [1.0, 0.79], [0.62, 0.99], [0.22, 0.16], [0.61, 0.04],
+                [0.04, 0.51], [0.47, 0.92], [0.63, 0.51], [0.5, 0.25], [0.01, 0.19], [0.69, 0.2],
+                [0.37, 0.0], [0.83, 0.15], [0.27, 0.88], [0.51, 0.85], [0.64, 0.74], [0.09, 0.54],
+                [0.51, 0.87], [0.36, 0.6], [0.06, 0.39], [0.32, 0.15], [0.82, 0.38], [0.98, 0.59],
+                [0.61, 0.64], [0.68, 0.15], [0.44, 0.24], [0.4, 0.1], [0.97, 0.22], [0.67, 0.3],
+                [0.87, 0.66], [0.13, 0.85], [0.94, 0.9], [0.57, 0.15], [0.19, 0.93], [0.55, 0.18],
+                [0.88, 0.64], [0.57, 0.38], [0.41, 0.24], [0.04, 0.88], [0.47, 0.55], [0.32, 0.75],
+                [0.03, 0.37], [0.03, 0.12], [0.97, 0.66], [0.43, 0.52], [0.87, 0.34], [0.59, 0.68],
+                [0.36, 0.52], [0.77, 0.91], [0.15, 0.93], [0.01, 0.75], [0.81, 0.14], [0.42, 0.82]])
 inside = ((pts > 0.25) & (pts < 0.75)).all(axis=1)
 ax.add_patch(plt.Rectangle((0, 0), 1, 1, fill=False, ec="#555", lw=1.5))
 ax.add_patch(plt.Rectangle((0.25, 0.25), 0.5, 0.5, fc="#fdebd0", ec="#b9770e", lw=1.5))
@@ -142,20 +279,17 @@ plt.show()
 ```
 
 ::: {.callout-note title="要するに"}
-- ほぼすべての点が、**どこかの軸では端っこ**。つまり「角のあたり」に住むことになる
-- しかも角の数は $2^d$ 個（20次元で約105万個）。**データは100万個の角に散り散り**になる
-:::
-
-::: {.callout-note}
-教科書によく出る言い換え：「単位立方体に内接する球（＝どの軸でも中央寄りの領域）の体積は、
-高次元で 0 に向かう」。いま見たのと同じ現象。
+- ほぼすべての点が、**どこかの軸では中央から外れている**
+- 各軸を半分に切ると、空間は $2^d$ 個の区画に分かれる（20次元で約105万個）
+   - 100個の点は、ほぼ1個ずつ別の区画に入る
+   - **データは100万個の区画に散り散り**になる
 :::
 
 
-## なぜ？　その2：「ご近所」を集めると世界を覆ってしまう
+## なぜ？　その2：「ご近所」の箱が各軸の大半にまたがる
 
 - 「近い点」を頼りにする手法のつもりで、周りの**データの1%**を「ご近所」として集めたい
-- 各軸を割合 $r$ だけ切り取った箱は、データの $r^d$ 割を含む。1% 集めるには：
+- 各軸を割合 $r$ だけ切り取った箱は、全体の体積の $r^d$ を占める（点が一様なら、データの割合も $r^d$）。1% 集めるには：
 
 $$r = 0.01^{1/d}$$
 
@@ -176,7 +310,7 @@ for d_pt, txt, xy_t in [(1, "1次元：辺の1%でOK", (2.5, 0.07)),
 plt.xlabel("次元数 d")
 plt.ylabel("データの1%を含む箱の一辺")
 plt.ylim(0, 1.08)
-plt.title("「ご近所」のはずが、空間の大半を覆ってしまう", fontsize=11)
+plt.title("1%の「ご近所」なのに、各軸の大半にまたがる", fontsize=11)
 plt.grid(True, alpha=0.4)
 plt.tight_layout()
 plt.show()
@@ -184,25 +318,31 @@ plt.show()
 
 ::: {.callout-note title="要するに"}
 - 10次元では、たった1%の「ご近所」を集めるのに**各軸の63%**を見渡す必要がある
-- それはもう「近所」ではない。**「近い」に頼る手法（k-means など）が最初に壊れる**
+- それはもう「近所」ではない
+   - **「近い点どうしは似ている」を前提にする手法（k-means など）は、前提が成り立ちにくくなる**
 :::
 
 
-## 距離が意味をなさなくなる
+## 「近い」と「遠い」の区別が弱くなる
 
 - k-means をはじめ、多くの手法は**距離**に依存している
-- 高次元では最近傍と最遠傍の距離差が消えていく
+- 点を一様にばらまき、ある1点からほかの2000点までの距離を測る
+- 距離のばらつきを、**変動係数（[coefficient of variation]{.en}）**＝ 標準偏差 ÷ 平均 で比べる
 
 ```{python}
 #| echo: true
-#| fig-align: center
-np.random.seed(42)
+#| eval: false
+import numpy as np
+import matplotlib.pyplot as plt
+import japanize_matplotlib
+
+rng     = np.random.default_rng()
 dims    = [1, 2, 3, 5, 10, 20, 50, 100]
 cv_list = []   # 変動係数 = std / mean
 
 for d in dims:
-    pts   = np.random.rand(2000, d)
-    query = np.random.rand(d)
+    pts   = rng.random((2000, d))
+    query = rng.random(d)
     dists = np.sqrt(((pts - query) ** 2).sum(axis=1))
     cv_list.append(dists.std() / dists.mean())
 
@@ -210,16 +350,34 @@ plt.figure(figsize=(7, 3.5))
 plt.plot(dims, cv_list, "o-", color="#e74c3c")
 plt.xlabel("次元数 d")
 plt.ylabel("変動係数（std / mean）")
-plt.title("高次元では全点がほぼ等距離になる")
+plt.title("高次元では、距離が平均のまわりに集まる")
 plt.grid(True, alpha=0.4)
 plt.tight_layout()
 plt.show()
 ```
 
-::: {.callout-warning}
-## 変動係数が 0 に近づく
-「最も近い点」と「最も遠い点」の距離がほぼ同じになる。
-**「近い」という概念が意味をなさなくなる。**
+```{python}
+#| echo: false
+#| fig-align: center
+# Frozen result of one run of the cell above (tools/measure_dimensionality_pca.py).
+# The student cell is unseeded; the slide shows these values.
+dims    = [1, 2, 3, 5, 10, 20, 50, 100]
+cv_list = [0.689, 0.451, 0.357, 0.265, 0.177, 0.126, 0.077, 0.054]
+
+plt.figure(figsize=(7, 3.5))
+plt.plot(dims, cv_list, "o-", color="#e74c3c")
+plt.xlabel("次元数 d")
+plt.ylabel("変動係数（std / mean）")
+plt.title("高次元では、距離が平均のまわりに集まる")
+plt.grid(True, alpha=0.4)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-warning title="変動係数が 0 に近づく"}
+- 距離のばらつきが、平均距離に比べて小さくなる
+- 「最も近い点」と「最も遠い点」の距離の**比**が 1 に近づく
+   - 差そのものは縮まらないが、距離全体が大きくなるので**「近い」の意味が薄れる**
 :::
 
 
@@ -230,10 +388,15 @@ plt.show()
 ```{python}
 #| echo: false
 #| fig-align: center
-np.random.seed(0)
+# Frozen illustration points (tools/measure_dimensionality_pca.py)
+pts1d = np.array([0.55, 0.72, 0.6, 0.54, 0.42, 0.65, 0.44, 0.89, 0.96, 0.38,
+                  0.79, 0.53, 0.57, 0.93, 0.07, 0.09, 0.02, 0.83, 0.78, 0.87])
+pts2d = np.array([[0.98, 0.8], [0.46, 0.78], [0.12, 0.64], [0.14, 0.94], [0.52, 0.41],
+                  [0.26, 0.77], [0.46, 0.57], [0.02, 0.62], [0.61, 0.62], [0.94, 0.68],
+                  [0.36, 0.44], [0.7, 0.06], [0.67, 0.67], [0.21, 0.13], [0.32, 0.36],
+                  [0.57, 0.44], [0.99, 0.1], [0.21, 0.16], [0.65, 0.25], [0.47, 0.24]])
 fig, axes = plt.subplots(1, 2, figsize=(8, 3.5))
 
-pts1d = np.random.rand(20)
 axes[0].scatter(pts1d, np.zeros(20), s=60, alpha=0.8, c="#2980b9", edgecolors="gray")
 axes[0].axhline(y=0, color="gray", lw=0.8)
 axes[0].set_xlim(-0.05, 1.05)
@@ -241,7 +404,6 @@ axes[0].set_ylim(-0.5, 0.5)
 axes[0].set_title("1次元（20点）", fontsize=11)
 axes[0].axis("off")
 
-pts2d = np.random.rand(20, 2)
 axes[1].scatter(pts2d[:, 0], pts2d[:, 1], s=60, alpha=0.8, c="#2980b9", edgecolors="gray")
 axes[1].set_xlim(0, 1); axes[1].set_ylim(0, 1)
 axes[1].set_aspect("equal")
@@ -266,12 +428,11 @@ plt.show()
 | モデルの精度が上がらない | データが疎でパターンが見えない |
 | 過学習しやすくなる | データに比べてパラメータが多すぎる |
 | 計算コストが増大 | 距離計算などが次元数に比例して重くなる |
-| 可視化できない | 3次元以上は直接見られない |
+| 可視化できない | 4次元以上は図に描けない |
 
-::: {.callout-tip}
-## 次元の呪いへの対処
-1. **特徴量選択**：重要な特徴量だけを残す
-2. **次元削減**：情報を保ったまま次元を圧縮する
+::: {.callout-tip title="次元の呪いへの対処"}
+1. **特徴量選択（[feature selection]{.en}）**：重要な特徴量だけを残す
+2. **次元削減（[dimensionality reduction]{.en}）**：情報を保ったまま次元を圧縮する
 3. **正則化（[regularization]{.en}）**：過学習を防ぐ（線形回帰の回で扱う）
 :::
 
@@ -362,7 +523,8 @@ print(f"相関係数: {np.corrcoef(lengths, weights)[0, 1]:.3f}")
 **主成分分析（[Principal Component Analysis]{.en}、PCA）**
 
 - 斜めに細長い雲は、もとの2軸より「**長い方向**と**細い方向**」で見るほうが自然
-- データの**分散（[variance]{.en}）が最大になる方向**に新しい軸（主成分）を取る
+- データの**分散（[variance]{.en}）が最大になる方向**に新しい軸（主成分, [principal component]{.en}）を取る
+   - 2本目以降は、前の軸と直交する方向の中で分散が最大の方向
 
 ```{python}
 #| echo: false
@@ -495,7 +657,12 @@ $\|\mathbf{v}\| = 1$ のもとで $\mathbf{v}^{\mathsf T} C \mathbf{v}$（＝ $\
 
 ## ところで「固有ベクトル」と「固有値」とは
 
-- 行列 $A$ は、ベクトルを別のベクトルへ移す**変換**（回して・伸ばす機械）。次の $A$ で実験：
+
+::: {.takeaway}
+[3Blue1Brownの固有値の回](https://youtu.be/tWE3R01HkO0?si=DuJcO-JWiz2GB4tR)
+:::
+
+- 行列 $A$ は、ベクトルを別のベクトルへ移す**変換**（回して・伸ばす機械）
 
 $$A = \begin{pmatrix} 1.75 & 1.25 \\ 1.25 & 1.75 \end{pmatrix}$$
 
@@ -686,11 +853,17 @@ plt.show()
 ```{python}
 #| echo: true
 # 組み立てて確認：R S R^T がたしかに A になる
-print(R_rot @ S_str @ R_rot.T)
+import numpy as np
+
+t = np.radians(45)
+R = np.array([[np.cos(t), -np.sin(t)],
+              [np.sin(t),  np.cos(t)]])
+S = np.diag([3.0, 0.5])
+print(R @ S @ R.T)
 ```
 
 ::: {.callout-tip}
-対称行列は**かならず**この「回転・伸縮・逆回転」の形に分解できる。これが**固有値分解**。
+対称行列は**かならず**この「回転・伸縮・逆回転」の形に分解できる。これが**固有値分解（[eigendecomposition]{.en}）**。
 `np.linalg.eigh` が返してくるのは、この $R$（固有ベクトル）と $S$ の対角成分（固有値）。
 :::
 
@@ -698,8 +871,20 @@ print(R_rot @ S_str @ R_rot.T)
 ## 答えが「固有ベクトル」になる理由
 
 - $\|\mathbf{v}\| = 1$ は「$\mathbf{v}$ の先端は半径1の球面の上」という意味
-- 球面上の**てっぺん**では、球面に沿ってどちらへ動いても $\mathbf{v}^{\mathsf T} C \mathbf{v}$ は増えない
-- 増える向きを表すのは勾配 $2C\mathbf{v}$。これが球面の法線方向（$\mathbf{v}$ 自身）と**平行**になるしかない：
+- $\mathbf{v}$ を少しだけ $\boldsymbol{\varepsilon}$ 動かすと、分散 $\mathbf{v}^{\mathsf T} C \mathbf{v}$ はこう変わる：
+
+$$(\mathbf{v} + \boldsymbol{\varepsilon})^{\mathsf T} C\, (\mathbf{v} + \boldsymbol{\varepsilon})
+= \mathbf{v}^{\mathsf T} C \mathbf{v} + 2\, \boldsymbol{\varepsilon}^{\mathsf T} (C \mathbf{v}) + \boldsymbol{\varepsilon}^{\mathsf T} C \boldsymbol{\varepsilon}$$
+
+::: {.caption-note .center}
+$C$ は対称なので $\mathbf{v}^{\mathsf T} C \boldsymbol{\varepsilon}$ と $\boldsymbol{\varepsilon}^{\mathsf T} C \mathbf{v}$ は同じ値。$\boldsymbol{\varepsilon}$ が小さければ最後の項は無視できる
+:::
+
+- 増える量は $2\, \boldsymbol{\varepsilon}^{\mathsf T} (C \mathbf{v})$、つまり $\boldsymbol{\varepsilon}$ と $C\mathbf{v}$ の**内積**の2倍
+   - 内積は向きがそろうほど大きいので、分散がいちばん増える向きは $C\mathbf{v}$
+- 球面に沿って動くとき、$\boldsymbol{\varepsilon}$ は $\mathbf{v}$ と直交する
+- 球面上の**てっぺん**では、球面に沿ってどちらへ動いても分散は増えない
+   - $\mathbf{v}$ と直交するどの $\boldsymbol{\varepsilon}$ とも $C\mathbf{v}$ の内積が 0 になるので、$C\mathbf{v}$ は $\mathbf{v}$ と**平行**になるしかない：
 
 $$C \mathbf{v} = \lambda \mathbf{v} \quad \text{（固有ベクトルの定義式そのもの！）}$$
 
@@ -709,6 +894,7 @@ $$C \mathbf{v} = \lambda \mathbf{v} \quad \text{（固有ベクトルの定義�
 - **固有ベクトル**＝「球面上でこれ以上増やせない方向」の候補リスト
 - **固有値**＝その候補での分散の値
 - $\lambda_1 \geq \lambda_2 \geq \cdots$ と並べて、一番大きい候補から PC1, PC2, … と呼ぶ
+   - 対称行列の固有ベクトルは互いに直交するので、PC2 は「PC1 と直交する方向の中で分散が最大」の軸
 :::
 
 
@@ -718,6 +904,9 @@ $$C \mathbf{v} = \lambda \mathbf{v} \quad \text{（固有ベクトルの定義�
 
 ```{python}
 #| echo: true
+X_lw    = np.column_stack([lengths, weights])               # 体長と重さの2列
+X_lw_sc = (X_lw - X_lw.mean(axis=0)) / X_lw.std(axis=0)     # 標準化
+
 thetas = np.radians(np.arange(0, 181))
 proj_var = np.array([
     np.var(X_lw_sc @ np.array([np.cos(t), np.sin(t)]), ddof=1)
@@ -772,6 +961,10 @@ lam, V = np.linalg.eigh(C)
 order  = np.argsort(lam)[::-1]          # 固有値の大きい順に並べ替え → PC1, PC2
 lam, V = lam[order], V[:, order]
 
+# 3) 同じデータを sklearn の PCA に渡す
+from sklearn.decomposition import PCA
+pca_d = PCA(n_components=2).fit(X_lw_sc)
+
 print("固有値（自作）        :", lam.round(4))
 print("分散（sklearnのPCA）  :", pca_d.explained_variance_.round(4))
 print("固有ベクトル（自作・列がPC）:")
@@ -785,11 +978,10 @@ print(pca_d.components_.T.round(4))
 - ベクトルは列によって**符号が逆**になることがある。軸の向きが180°逆なだけで、**同じ軸**
 :::
 
-::: {.callout-tip}
-## （参考）sklearn の中身は SVD
-
-実務の PCA は、共分散行列を作らずに中心化したデータを **SVD（特異値分解）** に
-かけて同じ答えを出している（大きいデータで速く、数値的にも安定）。
+::: {.callout-tip title="（参考）SVD でも同じ答えが出る"}
+中心化したデータを **SVD（特異値分解, [**Singular Value Decomposition**]{.en}）** にかけると、
+共分散行列を作らずに同じ分散が出る。
+scikit-learn の PCA は、データの形に応じて固有値分解と SVD を使い分けている。
 
 ```{python}
 #| echo: true
@@ -812,6 +1004,9 @@ PCAを使う
 
 ```{python}
 #| echo: true
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+
 X3 = np.column_stack([brightness, weights, lengths])   # 3特徴量
 
 X3_scaled = StandardScaler().fit_transform(X3)   # スケールを揃えてから PCA
@@ -819,7 +1014,7 @@ X3_scaled = StandardScaler().fit_transform(X3)   # スケールを揃えてか�
 pca = PCA(n_components=3)
 X3_pca = pca.fit_transform(X3_scaled)
 
-print("各主成分の寄与率（情報量の割合）:")
+print("各主成分の寄与率（分散の割合）:")
 for i, r in enumerate(pca.explained_variance_ratio_):
     print(f"  PC{i+1}: {r:.1%}")
 ```
@@ -829,7 +1024,7 @@ PC3 の寄与率は **1% 未満**。これは何を意味している？
 :::
 
 ::: {.fragment}
-- 体長と重さがほぼ同じ情報だから、3本目の軸には**情報が残っていない**
+- 体長と重さがほぼ同じ動きをするので、3本目の軸には**ばらつきがほとんど残っていない**
 - この魚データは、3次元に見えて**実質2次元**だった
 :::
 
@@ -873,8 +1068,6 @@ fig3d.write_html("iframes/pca_fish_3d.html", include_plotlyjs="directory")
 ```{python}
 #| echo: true
 #| fig-align: center
-colors  = ["#e74c3c", "#2980b9"]
-
 plt.figure(figsize=(5.8, 3.8))
 for label, name, col, m in [(1, "Salmon", "#e74c3c", "o"), (0, "Sea bass", "#2980b9", "s")]:
     mask = y == label
@@ -889,13 +1082,12 @@ plt.show()
 ```
 
 ::: {.takeaway}
-次元を1つ捨てたのに、2種類の魚は**今までどおり分離できている**。累積寄与率 99%、捨てたのは「情報のない軸」だけ
+次元を1つ捨てたのに、2種類の魚は**今までどおり分離できている**。累積寄与率（[cumulative explained variance ratio]{.en}）99%、捨てた軸に残っていたばらつきは 1% 未満
 :::
 
-::: {.callout-note}
-## StandardScaler を使う理由
+::: {.callout-note title="StandardScaler を使う理由"}
 輝度（2〜10）・重さ（1100〜2500g）・体長（45〜62cm）はスケールが全く違う。
-標準化しないと重さだけが主成分を支配してしまう（クラスタリング回のスケールの罠と同じ）。
+標準化しないと[重さだけが主成分を支配してしまう](clustering-kmeans.qmd#peek-scale-mismatch){.peek}。
 :::
 
 
@@ -935,7 +1127,7 @@ plt.show()
 ```
 
 ::: {.callout-note}
-4次元を2次元に圧縮しても全情報の約 96% が保たれている。
+4次元を2次元に圧縮しても、分散の約 96% が保たれている。
 setosa（赤丸）が完全に分離できているのも図から見える。
 :::
 
@@ -966,16 +1158,18 @@ plt.tight_layout()
 plt.show()
 ```
 
-::: {.callout-tip}
-## 何次元に削減するか？
-一般的には**累積寄与率が 80〜95%** を超える次元数を選ぶ。
-Iris は PC1+PC2 だけで約 96% に達するので2次元で十分。
+::: {.callout-tip title="何次元に削減するか？"}
+- 一般的には**累積寄与率が 80〜95%** を超える次元数を目安にする
+   - Iris は PC1+PC2 だけで約 96% に達する
+- 寄与率は分散の割合で、分類に役立つ度合いではない
+   - 分類に使うなら、圧縮後のデータで精度を確かめる
 :::
 
 
 ## **Tweak** 軸の中身を見る {.badge-practice}
 
 - [魚3特徴量の PCA](#peek-pca-fish){.peek}のコードを**書き換えて実行**
+- 1行ずつ試し、次の行の前に元へ戻す
 
 ::: {.tweak}
 | やりたいこと | コード |
@@ -985,11 +1179,9 @@ Iris は PC1+PC2 だけで約 96% に達するので2次元で十分。
 | Iris を3軸まで残せ | Iris のセルで `PCA(n_components=2)` → `3` |
 :::
 
-::: {.callout-tip}
-## 結果
-
+::: {.callout-tip title="結果"}
 - スケールを揃えないと **PC1 の寄与率が 100.0%** になる
-   - 目盛りの大きい「重さ（グラム）」だけで軸が決まる。k-means の回のスケールの罠と同じ
+   - [目盛りの大きい「重さ（グラム）」だけで軸が決まる](clustering-kmeans.qmd#peek-scale-mismatch){.peek}
 - レシピの1行目（PC1）は重さと体長を**同じ重み（0.62）**で足している
    - 「2つはほぼ同じ情報」を PCA が自力で見抜いた証拠。3行目（PC3）は重さ−体長の**差分（0.71, −0.71）**、だから空っぽ
 - Iris の3軸目を足しても累積寄与率は 95.8% → **99.5%**
@@ -999,7 +1191,7 @@ Iris は PC1+PC2 だけで約 96% に達するので2次元で十分。
 
 ## まとめ
 
-- **次元の呪い**：次元が増えると空間が広くなり、距離が意味をなさなくなる
+- **次元の呪い**：次元が増えると空間が広くなり、「近い」と「遠い」の区別が弱くなる
 - **特徴量を増やしても情報が増えるとは限らない**：体長は重さの言い換えだった
 - **PCA**：分散が最大の方向（= 共分散行列の固有ベクトル）に軸を取り直す
   - 寄与率を見れば「データの**実質的な次元**」がわかる（魚は3次元に見えて実質2次元）
@@ -1017,17 +1209,16 @@ pca.explained_variance_ratio_   # 各 PC の寄与率
 
 | 概念 | 意味 |
 |---|---|
-| 主成分（PC） | 分散が最大の方向（固有ベクトル） |
+| 主成分（PC） | 分散が大きい順に取った、互いに直交する軸（固有ベクトル） |
 | 固有値 | その方向の分散の大きさ |
-| 寄与率 | 情報量の割合（累積80〜95%を目安に次元数を決める） |
+| 寄与率 | 全分散に占める割合（累積80〜95%を目安に次元数を決める） |
 
-::: {.callout-note}
-## 分類問題と特徴量のまとめ
+::: {.callout-note title="分類問題と特徴量のまとめ"}
 1D → 2D の分類、評価と汎化、教師なし学習（k-means）、次元の呪いと PCA。
 **機械学習の基本的な問いと道具が揃った。**
 
-ここまで `model.fit(X, y)` という1行を何度も呼んだが、**中身は一度も見ていない**。
-次の「最適化」から、この1行を開けにいく。
+ここまで `fit()` の1行を何度も呼び、その中身（最良のパラメータの探し方）も手法ごとに見てきた。
+次の「最適化」では、**多くの手法で使える探し方**を作る。
 :::
 
 

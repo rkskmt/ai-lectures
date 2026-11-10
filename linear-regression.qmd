@@ -96,6 +96,7 @@ plt.show()
 $$L(a, b) = \frac{1}{N} \sum_{i} \left( \underbrace{a x_i + b}_{\text{予測}} - \underbrace{t_i}_{\text{実際}} \right)^2$$
 
 - **MSE（[**Mean Squared Error**]{.en} / 平均二乗誤差）**と呼ぶ
+- [クラスタリングの回の SSE](clustering-kmeans.qmd#peek-sse){.peek} と同じ発想で、誤差を 2 乗して集めたものを点の数で割った平均
 - 全魚のズレを1本のベクトルと見ると、MSE はその**ノルム（[norm]{.en}・ベクトルの長さ）**の2乗を $N$ で割ったもの
 
 ::: {.callout-note title="損失関数は MSE だけではない"}
@@ -162,9 +163,7 @@ for i in range(1, 101):
 | 壊す | `lr = 1.1` |
 :::
 
-::: {.callout-tip}
-## ここで観察
-
+::: {.callout-tip title="ここで観察"}
 - `0.9` は行きすぎて戻ってを繰り返しながら、それでも収束する
 - `1.1` は MSE がどうなっていく？ — 前回の「学習率が大きすぎると発散」を、本物の `fit()` で再現できた
 :::
@@ -421,12 +420,271 @@ NN でも同じ道具（L2正則化＝weight decay）がそのまま使われる
 | 罰金を強烈にする | `lam = 10` |
 :::
 
-::: {.callout-tip}
-## ここで観察
-
+::: {.callout-tip title="ここで観察"}
 - `0.0`：テストMSEは 3,427 → **21,721** と6倍以上悪化。ただし厳密解の大暴れ（929万）までは行かない。勾配降下法を1万回で打ち切ること自体が、暴走を途中で止める弱いブレーキになっているため
 - `10`：曲線はほぼ**まっすぐ寝て**、訓練MSEまで悪化する（3,585 → 35,665）。罰金が強すぎて、訓練データに合わせる力が負けた
 - ちょうど良い $\lambda$ は問題ごとに違う。**訓練データではなくテストデータの MSE** で選ぶ
+:::
+
+
+## {background-color="white" .center .break-slide}
+
+::: {.break-title}
+外れ値と RANSAC
+:::
+
+
+## 伝票に打ち間違いが2枚あった
+
+- 魚市場の伝票（1匹につき1枚、体長と重さ）80 枚のうち 2 枚で、重さの欄に 0 が1つ多く打たれていた
+- 間違っていたのは、いちばん大きい 2 匹（2,457 g → 24,570 g、2,474 g → 24,740 g）
+- この 80 枚で直線を fit し直す
+
+```{python}
+#| echo: true
+from sklearn.linear_model import LinearRegression
+
+bad = [3, 6]                                       # 打ち間違えた2枚（いちばん大きい2匹）
+weights_typo = weights.copy()
+weights_typo[bad] *= 10                            # 0 が1つ多い ＝ 10倍
+
+reg_ok   = LinearRegression().fit(lengths.reshape(-1, 1), weights)        # 正しい80枚
+reg_typo = LinearRegression().fit(lengths.reshape(-1, 1), weights_typo)   # 2枚が間違った80枚
+print(f"正しい80枚で fit  : 体長 1cm あたり {reg_ok.coef_[0]:.1f} g")
+print(f"2枚が間違った80枚 : 体長 1cm あたり {reg_typo.coef_[0]:.1f} g")
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
+grid_cm = np.linspace(44, 63, 50)
+ok = np.ones(80, dtype=bool)
+ok[bad] = False
+fig, axes = plt.subplots(1, 2, figsize=(10.5, 3.8))
+for ax, title in zip(axes, ["全体", "魚のまわりを拡大"]):
+    ax.scatter(lengths[ok], weights[ok], s=30, alpha=0.6, c="#5dade2", edgecolors="gray", lw=0.4, label="正しい伝票（78枚）")
+    ax.scatter(lengths[bad], weights_typo[bad], s=70, c="#e74c3c", marker="s", label="打ち間違い（2枚）")
+    ax.plot(grid_cm, reg_ok.predict(grid_cm.reshape(-1, 1)), "--", color="gray", lw=1.5, label="正しい80枚で fit")
+    ax.plot(grid_cm, reg_typo.predict(grid_cm.reshape(-1, 1)), "-", color="#e74c3c", lw=2, label="2枚が間違った80枚で fit")
+    ax.set_title(title, fontsize=10); ax.set_xlabel("体長 (cm)"); ax.grid(True, alpha=0.3)
+axes[0].set_ylabel("重さ (g)"); axes[0].legend(fontsize=8, loc="upper left")
+axes[1].set_ylim(-2500, 6500)
+axes[1].axhline(0, color="black", lw=0.8)
+axes[1].annotate("打ち間違いの2枚は 24,000 g 台（図の外）", xy=(62.5, 6300), ha="right", va="top", fontsize=8, color="#e74c3c")
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-note title="結果"}
+- たった 2 枚で、傾きは 91 g/cm から 451 g/cm になった
+- 直線は魚の群れから離れた
+   - 45 cm の魚の予測は −1,660 g（マイナスの重さ）
+   - 62 cm の魚の予測は 6,010 g（実際は 2,400 g 台）
+- 間違った 2 枚が、正しい 78 枚の予測を全部壊している
+:::
+
+
+## 二乗で測ると、2枚のズレが78枚を圧倒する
+
+- MSE は「ズレの二乗」の平均なので、ズレが 100 倍なら損失への寄与は 10,000 倍
+- 正しい 80 枚の直線からの、各伝票のズレを比べる
+
+```{python}
+#| echo: true
+pred_ok = reg_ok.predict(lengths.reshape(-1, 1))        # 正しい80枚の直線による予測
+error   = weights_typo - pred_ok                        # 各伝票のズレ（g）
+ok      = np.ones(80, dtype=bool)
+ok[bad] = False                                         # 正しい78枚だけ True
+print(f"正しい78枚のズレ  : 最大 {np.abs(error[ok]).max():.0f} g / 二乗の合計 {np.sum(error[ok]**2):,.0f}")
+print(f"打ち間違い2枚のズレ: 最小 {np.abs(error[bad]).min():.0f} g / 二乗の合計 {np.sum(error[bad]**2):,.0f}")
+```
+
+::: {.callout-tip title="要するに"}
+- 2 枚の二乗和は 78 枚の 2,290 倍
+- MSE を下げるには、正しい 78 枚を全部見捨ててでも、この 2 枚に直線を寄せたほうが「得」になる
+:::
+
+::: {.callout-important title="外れ値（outlier）"}
+- 他の記録から大きく離れた記録（ここでは打ち間違いの 2 枚）
+- 最小二乗法は二乗で測るので、少数の外れ値に直線が引っ張られる
+:::
+
+
+## 対策：賛同者が最多の直線を探す（RANSAC）
+
+- 全部の伝票に合わせるのをやめ、**多くの伝票が賛同する直線**を探す
+- 直線は 2 点で決まるので、2 枚の伝票から直線を引き、その直線の近くにある伝票を数える
+- 手順：
+   1. 伝票から 2 枚をランダムに選ぶ
+   2. その 2 点を通る直線を引く
+   3. 直線から 300 g 以内にある伝票（**賛同者**、インライア、[inlier]{.en}）を数える
+   4. 1〜3 を 200 回繰り返し、賛同者が最多だった直線を残す
+   5. その賛同者だけで最小二乗法をやり直す
+- この手法を **RANSAC（[**Random Sample Consensus**]{.en} / ランダムに選んだ標本の合意）** と呼ぶ
+
+::: {.caption-note}
+300 g の根拠：正しい伝票のズレは最大 206 g だった（前のスライド）。それより少し広くとる
+:::
+
+
+## 1回の試行を図で見る
+
+```{python}
+#| echo: false
+#| fig-align: center
+# One good and one bad RANSAC trial, picked deterministically for the figure.
+rng_fig = np.random.default_rng(5)
+best_count, best_pair, bad_pair = 0, None, None
+for _ in range(200):
+    i, j = rng_fig.choice(80, 2, replace=False)
+    if lengths[i] == lengths[j]:
+        continue
+    a_ij = (weights_typo[j] - weights_typo[i]) / (lengths[j] - lengths[i])
+    b_ij = weights_typo[i] - a_ij * lengths[i]
+    count = int((np.abs(a_ij * lengths + b_ij - weights_typo) < 300).sum())
+    if count > best_count:
+        best_count, best_pair = count, (i, j)
+    if bad_pair is None and (i in bad or j in bad):
+        bad_pair = (i, j)
+
+def trial_panel(ax, pair, title, note=None):
+    i, j = pair
+    a_ij = (weights_typo[j] - weights_typo[i]) / (lengths[j] - lengths[i])
+    b_ij = weights_typo[i] - a_ij * lengths[i]
+    inl = np.abs(a_ij * lengths + b_ij - weights_typo) < 300
+    ax.fill_between(grid_cm, a_ij * grid_cm + b_ij - 300, a_ij * grid_cm + b_ij + 300, color="#2980b9", alpha=0.12)
+    ax.plot(grid_cm, a_ij * grid_cm + b_ij, color="#2980b9", lw=1.5)
+    ax.scatter(lengths[inl], weights_typo[inl], s=30, c="#2980b9", alpha=0.7, label=f"賛同者 {inl.sum()} 枚")
+    ax.scatter(lengths[~inl], weights_typo[~inl], s=30, c="lightgray", edgecolors="gray", lw=0.4, label=f"それ以外 {(~inl).sum()} 枚")
+    ax.scatter(lengths[[i, j]], weights_typo[[i, j]], s=170, facecolors="none", edgecolors="black", lw=2, label="選んだ2枚")
+    if note:
+        ax.annotate(note, xy=(62.5, 6300), ha="right", va="top", fontsize=8, color="#e74c3c")
+    ax.set_title(title, fontsize=10); ax.set_xlabel("体長 (cm)")
+    ax.set_ylim(-2500, 6500); ax.axhline(0, color="black", lw=0.8)
+    ax.legend(fontsize=8, loc="upper left"); ax.grid(True, alpha=0.3)
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 3.9), sharey=True)
+trial_panel(axes[0], best_pair, "正しい伝票を2枚引いた回")
+trial_panel(axes[1], bad_pair, "打ち間違いの伝票を引いてしまった回", note="選んだ2枚のうち1枚は 24,000 g 台（図の外）")
+axes[0].set_ylabel("重さ (g)")
+plt.tight_layout()
+plt.show()
+```
+
+::: {.caption-note}
+帯の幅が ±300 g。賛同者の数がその直線の点数。外れ値を引いた回は点数が低く、自然に捨てられる
+:::
+
+
+## RANSAC を実装する {#peek-ransac-code}
+
+```{python}
+#| echo: true
+def ransac_line(x, t, threshold, n_trials=200):
+    best_count = 0
+    for trial in range(n_trials):
+        i, j = np.random.choice(len(x), 2, replace=False)      # 手順1：2枚をランダムに選ぶ
+        if x[i] == x[j]:                                        # 体長が同じ2枚では直線が引けないので、この回は飛ばす
+            continue
+        a = (t[j] - t[i]) / (x[j] - x[i])                       # 手順2：2点を通る直線 t = a x + b
+        b = t[i] - a * x[i]
+        inliers = np.abs(a * x + b - t) < threshold             # 手順3：直線から threshold 以内なら True（賛同者）
+        if inliers.sum() > best_count:                          # 手順4：賛同者が最多の直線を覚えておく
+            best_count, best_inliers = inliers.sum(), inliers
+    reg = LinearRegression().fit(x[best_inliers].reshape(-1, 1), t[best_inliers])   # 手順5：賛同者だけで fit し直す
+    return reg.coef_[0], reg.intercept_, best_inliers
+
+a_r, b_r, inliers = ransac_line(lengths, weights_typo, threshold=300)
+print(f"賛同者 {inliers.sum()} 枚、除外 {(~inliers).sum()} 枚")
+print(f"RANSAC の直線: 体長 1cm あたり {a_r:.1f} g")
+```
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "描画コード"
+grid_cm = np.linspace(44, 63, 50)
+plt.figure(figsize=(6.5, 3.6))
+plt.scatter(lengths[inliers], weights_typo[inliers], s=36, alpha=0.7, c="#2980b9", label=f"賛同者（{inliers.sum()}枚）")
+plt.scatter(lengths[~inliers], weights_typo[~inliers], s=70, c="#e74c3c", marker="x", label=f"除外（{(~inliers).sum()}枚、図の外）")
+plt.plot(grid_cm, reg_typo.predict(grid_cm.reshape(-1, 1)), "--", color="#e74c3c", lw=1.5, label="最小二乗法（80枚全部）")
+plt.plot(grid_cm, a_r * grid_cm + b_r, "-", color="#2980b9", lw=2, label="RANSAC")
+plt.ylim(-2500, 6500)                                   # 除外した2枚（24,000 g 台）は図の外
+plt.axhline(0, color="black", lw=0.8)
+plt.xlabel("体長 (cm)"); plt.ylabel("重さ (g)")
+plt.legend(fontsize=8); plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-note title="結果"}
+- 除外された 2 枚は、ちょうど打ち間違いの 2 枚
+- RANSAC の直線は、正しい 78 枚だけで fit した直線（90.0 g/cm）と一致する
+- 最小二乗法は全部の伝票への妥協点を探すが、RANSAC は多数派に賛同されない伝票を無視する
+:::
+
+
+## （参考）何回試せば十分か
+
+- 2 枚とも正しい伝票を引く確率は $w^2$（$w$ は正しい伝票の割合）
+   - 今回は $w = 78/80$ なので $w^2 \approx 0.95$
+- $N$ 回すべて外す確率は $(1 - w^2)^N$
+   - $N = 3$ で 0.01 % なので、正しい 2 枚を引くだけなら数回で足りる
+- ただし正しい 2 枚を引いても、その 2 枚のばらつきで直線が少し傾き、賛同者を取りこぼすことがある
+   - 回数は多めにとる（今回は 200 回）
+
+
+## **Tweak** しきい値と回数を変える {.badge-practice}
+
+- [さっきのコード](#peek-ransac-code){.peek} の引数を**書き換えて実行**（描画コードまで続けて実行すると図で確認できる）
+- `bad` を変える行は、伝票のセルから実行し直す
+
+::: {.tweak}
+| やりたいこと | コード |
+|--|--|
+| 基準を厳しくせよ | `threshold=300` → `threshold=50` |
+| 打ち間違いを端から真ん中へ移せ | `bad = [3, 6]` → `bad = [54, 39]`（体長 53.7 cm と 53.8 cm の魚） |
+| 3回だけで決めよ | `threshold=300)` → `threshold=300, n_trials=3)`。何度か実行せよ |
+| 打ち間違いを20枚にせよ | `bad = [3, 6]` → `bad = list(range(0, 80, 4))` |
+:::
+
+::: {.callout-tip title="チェックポイント"}
+- `50`：賛同者が 37〜39 枚に減り、傾きは実行ごとに 86〜100 g/cm とぶれる
+   - 正しい伝票の半分を外れ値扱いしている
+   - 基準は正しい記録のばらつき（最大 206 g）より広くとる
+- 真ん中の 2 枚：最小二乗法の傾きは 92 g/cm とほぼ変わらず、直線全体が 380 g ほど持ち上がる
+   - 端の外れ値は傾きを、真ん中の外れ値は高さを動かす（てこの原理）
+   - RANSAC はどちらでも 2 枚を除外する
+- `n_trials=3`：4回に1回は賛同者を取りこぼし、傾きが大きくぶれる（−86〜113 g/cm）
+   - 10 回なら 99 %、200 回ならほぼ毎回 78 枚そろう
+- 打ち間違い 20 枚：最小二乗法の傾きは 398 g/cm、RANSAC は 92 g/cm
+   - 外れ値が多数派にならない限り、RANSAC は壊れない
+:::
+
+
+## （参考）scikit-learn では
+
+- 今日書いた `ransac_line` は、ライブラリでは `RANSACRegressor` に入っている
+
+```{python}
+#| echo: true
+from sklearn.linear_model import RANSACRegressor
+
+ransac = RANSACRegressor(LinearRegression(), residual_threshold=300, random_state=0)
+ransac.fit(lengths.reshape(-1, 1), weights_typo)
+
+print(f"賛同者 {ransac.inlier_mask_.sum()} 枚")
+print(f"体長 1cm あたり {ransac.estimator_.coef_[0]:.1f} g")
+```
+
+| 今日書いたもの | scikit-learn |
+|---|---|
+| `ransac_line(x, t, threshold=300)` | `RANSACRegressor(LinearRegression(), residual_threshold=300).fit(X, t)` |
+| `inliers` | `ransac.inlier_mask_` |
+| `a_r`, `b_r` | `ransac.estimator_.coef_[0]`, `ransac.estimator_.intercept_` |
+
+::: {.callout-note title="（参考）RANSAC の出番"}
+直線に限らず、平面・円・2枚の写真の対応関係など「少数の点で決まるモデル」なら同じ手順で使える。画像処理では、写真どうしの対応点から変換を推定するとき（パノラマ合成など）の定番
 :::
 
 
@@ -437,6 +695,8 @@ NN でも同じ道具（L2正則化＝weight decay）がそのまま使われる
 - **多項式回帰**：特徴量に $x^2, x^3, \ldots$ を足せば道具は線形回帰のまま
 - **過学習は回帰でも起きる**：次数を上げると訓練誤差↓・テスト誤差爆発
 - **正則化（[regularization]{.en}）**：大きい係数に罰金 → 暴れる曲線を手なずける
+- **外れ値（[outlier]{.en}）**：二乗で測る最小二乗法は、少数の外れ値に引っ張られる
+   - **RANSAC**：ランダムな 2 点の直線を何度も引き、賛同者が最多の直線を採る
 
 ::: {.callout-note title="次回予告"}
 回帰の `fit()` は開けた。次は**分類**の `fit()` —
@@ -444,20 +704,25 @@ NN でも同じ道具（L2正則化＝weight decay）がそのまま使われる
 :::
 
 
-## 練習問題
-
-以下の問題を**手計算**と**Pythonコード**の両方で解け。
-
-### 問題1：魚2匹だけの世界で fit する
+## 問題1：魚2匹だけの世界で fit する
 
 データは2点だけ：$(x_1, t_1) = (-1, 0)$、$(x_2, t_2) = (1, 2)$。
-直線 $ax + b$ を勾配降下法で fit する。初期値 $a = 0, b = 0$、学習率 $\alpha = 0.1$。
+直線 $ax + b$ を勾配降下法で fit する。初期値 $a = 0, b = 0$、学習率 $\alpha = 0.1$。**手計算**と**Pythonコード**の両方で解け。
 
 1. 勾配の式に代入して、$\dfrac{\partial L}{\partial a}$ と $\dfrac{\partial L}{\partial b}$ を求めよ
 2. 更新を3回、手計算で示せ
 3. 同じ更新をコードで100回繰り返し、`sklearn` の答えと比較せよ
 
 ヒント：2点を通る直線は $y = x + 1$。つまり答えは $a = 1, b = 1$ になるはず。
+
+## 問題2：RANSAC を手で1周回す
+
+5 点：$A(0, 0)$、$B(1, 1)$、$C(2, 2)$、$D(3, 3)$、$E(2, 8)$。しきい値は 0.5。1〜3 は**手計算**、4 は**Pythonコード**で解け。
+
+1. $A$ と $B$ を通る直線を求め、直線からのズレが 0.5 未満の点（賛同者）を数えよ
+2. $A$ と $E$ を通る直線で同じことをせよ
+3. RANSAC が最終的に選ぶ直線と、その賛同者を答えよ
+4. Python：問題1のコードで 5 点に勾配降下法の直線を fit し（学習率 0.1、100 回）、本編の `ransac_line` の直線と比較せよ（傾きと切片を表示）
 
 
 ## 問題1の解答例
@@ -522,3 +787,39 @@ print(f"\nsklearn の fit: a={reg.coef_[0]:.4f}, b={reg.intercept_:.4f}")
 ```
 
 手計算の3回（0.2 → 0.36 → 0.488）とコードの出力が一致し、100回で $a = b = 1$（`sklearn` と同じ）に収束する。
+
+
+## 問題2の解答例
+
+- $A$、$B$ を通る直線は $t = x$
+   - $C$、$D$ のズレは 0、$E$ のズレは $|8 - 2| = 6$
+   - 賛同者は $A, B, C, D$ の 4 点
+- $A$、$E$ を通る直線は $t = 4x$
+   - $B$ のズレは $|1 - 4| = 3$、$C$ は $|2 - 8| = 6$、$D$ は $|3 - 12| = 9$
+   - 賛同者は $A, E$ の 2 点
+- 賛同者が最多（4 点）なのは $t = x$
+   - 賛同者 $A, B, C, D$ だけで最小二乗法をやり直しても、4 点が一直線上なので $t = x$ のまま
+- 勾配降下法で 5 点すべてに fit すると $a \approx 1.46$、$b \approx 0.46$
+   - $E$ の 1 点に引っ張られ、傾きが 1.46 倍になった
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "解答例を見る"
+import numpy as np
+from sklearn.linear_model import LinearRegression
+
+P_x = np.array([0.0, 1.0, 2.0, 3.0, 2.0])   # A, B, C, D, E の x
+P_t = np.array([0.0, 1.0, 2.0, 3.0, 8.0])   # A, B, C, D, E の t
+
+a, b = 0.0, 0.0
+lr = 0.1
+for i in range(100):
+    pred = a * P_x + b
+    a -= lr * 2 * np.mean((pred - P_t) * P_x)
+    b -= lr * 2 * np.mean(pred - P_t)
+print(f"勾配降下法（5点すべて）: a={a:.2f}, b={b:.2f}")
+
+a_r, b_r, inliers = ransac_line(P_x, P_t, threshold=0.5)
+print(f"RANSAC: a={a_r:.2f}, b={b_r:.2f}, 賛同者={inliers.astype(int)}")
+```
