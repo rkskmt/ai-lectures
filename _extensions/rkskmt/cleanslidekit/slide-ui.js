@@ -112,10 +112,6 @@
       } catch (e) {}
     }
 
-    function isFirstSlide() {
-      return Reveal.getIndices().h === 0 && Reveal.getIndices().v === 0;
-    }
-
     function goHome() {
       try { sessionStorage.setItem('lastSlide', window.location.href); } catch (e) {}
       window.location.href = './index.html';
@@ -149,12 +145,10 @@
       btn.classList.add('nav-pressed');
       setTimeout(function() { btn.classList.remove('nav-pressed'); }, 220);
       initCounter();
+      // Prev on the first slide stays put (the button is drawn disabled
+      // there); leaving the deck is the Home button's job only.
       if (btn.id === 'nav-prev') {
-        if (isFirstSlide()) {
-          goHome();
-        } else {
-          Reveal.prev();
-        }
+        Reveal.prev();
       }
       if (btn.id === 'nav-next') {
         if (isIndexPage()) {
@@ -460,9 +454,6 @@
         // locked-down deck) disables Reveal's keyboard; this handler must stand
         // down with it, or arrows navigate the page out from under the modal.
         if (Reveal.getConfig && Reveal.getConfig().keyboard === false) return;
-        if (isFirstSlide() && (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp')) {
-          goHome();
-        }
         if (isIndexPage() && (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown')) {
           goBack();
         }
