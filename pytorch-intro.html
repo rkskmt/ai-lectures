@@ -248,6 +248,7 @@
   <script src="peek-ui.js" defer=""></script>
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
+  <meta name="qmd-web-source" content="759994350f9ef6244c1b52c570e6623187ec515d">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -368,7 +369,7 @@ rkskmt
 <section id="tensornumpy-配列の親戚" class="slide level2">
 <h2>tensor：NumPy 配列の親戚</h2>
 <div class="slide-body">
-<div id="249bfcf9" class="cell" data-execution_count="1">
+<div id="ae9a3749" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
 <span id="cb1-2"><a aria-label="2"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a aria-label="3"></a></span>
@@ -388,7 +389,7 @@ rkskmt
 <section id="tensor-は形型置き場所を持つ" class="slide level2">
 <h2>tensor は形・型・置き場所を持つ</h2>
 <div class="slide-body">
-<div id="015ea613" class="cell" data-execution_count="2">
+<div id="4fb056f6" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
 <span id="cb3-2"><a aria-label="2"></a></span>
 <span id="cb3-3"><a aria-label="3"></a>x <span class="op">=</span> torch.tensor([[<span class="fl">1.0</span>, <span class="fl">2.0</span>], [<span class="fl">3.0</span>, <span class="fl">4.0</span>]], dtype<span class="op">=</span>torch.float32)</span>
@@ -439,7 +440,7 @@ device: cpu</code></pre>
 <ul>
 <li>まず<strong>いちばん小さな例</strong>で挙動を見る。<span class="math inline">\(y = x^2\)</span> の <span class="math inline">\(x = 3\)</span> での微分は、高校の答えなら <span class="math inline">\(2x = 6\)</span></li>
 </ul>
-<div id="38218525" class="cell" data-execution_count="3">
+<div id="73f48b31" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
 <span id="cb5-2"><a aria-label="2"></a></span>
 <span id="cb5-3"><a aria-label="3"></a>x <span class="op">=</span> torch.tensor(<span class="fl">3.0</span>, requires_grad<span class="op">=</span><span class="va">True</span>)   <span class="co"># 「勾配を追跡せよ」の印</span></span>
@@ -487,7 +488,7 @@ device: cpu</code></pre>
 <ul>
 <li>バックプロパゲーションの回と<strong>まったく同じ</strong>ネットワーク・同じ数値を流す</li>
 </ul>
-<div id="8b3beb86" class="cell" data-execution_count="4">
+<div id="55811b12" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a aria-label="1"></a>w <span class="op">=</span> torch.tensor([<span class="fl">0.3</span>, <span class="op">-</span><span class="fl">0.2</span>], requires_grad<span class="op">=</span><span class="va">True</span>)   <span class="co"># w1, w2</span></span>
 <span id="cb7-2"><a aria-label="2"></a>b <span class="op">=</span> torch.tensor(<span class="fl">0.1</span>,  requires_grad<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb7-3"><a aria-label="3"></a>v <span class="op">=</span> torch.tensor(<span class="fl">0.5</span>,  requires_grad<span class="op">=</span><span class="va">True</span>)</span>
@@ -602,7 +603,7 @@ device: cpu</code></pre>
 </ul>
 <p><span class="math display">\[u \xrightarrow{\;\sigma\;} p
 \xrightarrow{\;\text{交差エントロピー}\;} L\]</span></p>
-<div id="e3190a5a" class="cell" data-execution_count="5">
+<div id="e81010dc" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
 <span id="cb9-2"><a aria-label="2"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
 <span id="cb9-3"><a aria-label="3"></a></span>
@@ -652,7 +653,7 @@ device: cpu</code></pre>
 <section id="nn部品には全部見覚えがある" class="slide level2">
 <h2>nn：部品には全部、見覚えがある</h2>
 <div class="slide-body">
-<div id="5b4205bc" class="cell" data-execution_count="6">
+<div id="6987068c" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a aria-label="1"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
 <span id="cb12-2"><a aria-label="2"></a></span>
 <span id="cb12-3"><a aria-label="3"></a>model <span class="op">=</span> nn.Sequential(</span>
@@ -744,7 +745,7 @@ device: cpu</code></pre>
 <ul>
 <li>部品を1個だけ取り出して、素性を確認する</li>
 </ul>
-<div id="950293b1" class="cell" data-execution_count="7">
+<div id="7a198fcd" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
 <span id="cb16-2"><a aria-label="2"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
 <span id="cb16-3"><a aria-label="3"></a></span>
@@ -791,7 +792,7 @@ tensor([[ 0.7393, -1.0621,  0.0441]], grad_fn=&lt;AddBackward0&gt;)</code></pre>
 <section id="optimizer.step-が勾配降下の1歩" class="slide level2">
 <h2><code>optimizer.step()</code> が勾配降下の1歩</h2>
 <div class="slide-body">
-<div id="0f2e6865" class="cell" data-execution_count="8">
+<div id="828b3d6c" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
 <span id="cb20-2"><a aria-label="2"></a></span>
 <span id="cb20-3"><a aria-label="3"></a>theta <span class="op">=</span> torch.tensor(<span class="fl">2.0</span>, requires_grad<span class="op">=</span><span class="va">True</span>)</span>
@@ -859,7 +860,7 @@ tensor([[ 0.7393, -1.0621,  0.0441]], grad_fn=&lt;AddBackward0&gt;)</code></pre>
 <section id="peek-train-loop" class="slide level2">
 <h2>学習ループ：3拍子</h2>
 <div class="slide-body">
-<div id="52f31776" class="cell" data-execution_count="9">
+<div id="670f914a" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a aria-label="1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> make_moons</span>
 <span id="cb23-2"><a aria-label="2"></a></span>
 <span id="cb23-3"><a aria-label="3"></a>X, y <span class="op">=</span> make_moons(n_samples<span class="op">=</span><span class="dv">200</span>, noise<span class="op">=</span><span class="fl">0.1</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
@@ -965,7 +966,7 @@ tensor([[ 0.7393, -1.0621,  0.0441]], grad_fn=&lt;AddBackward0&gt;)</code></pre>
 </div>
 </div>
 </div>
-<div id="400a8a53" class="cell" data-execution_count="10">
+<div id="3a545972" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
 <span id="cb26-2"><a aria-label="2"></a></span>
 <span id="cb26-3"><a aria-label="3"></a>theta <span class="op">=</span> torch.tensor(<span class="fl">2.0</span>, requires_grad<span class="op">=</span><span class="va">True</span>)</span>
@@ -995,7 +996,7 @@ tensor(7.2000)</code></pre>
 <section id="境界も同じものが出る" class="slide level2">
 <h2>境界も同じものが出る</h2>
 <div class="slide-body">
-<div id="597be160" class="cell" data-execution_count="11">
+<div id="99f04008" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>描画コード</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a aria-label="1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -1186,7 +1187,7 @@ tensor(7.2000)</code></pre>
 <section id="解答例" class="slide level2">
 <h2>解答例</h2>
 <div class="slide-body">
-<div id="d77756f5" class="cell" data-execution_count="12">
+<div id="32be88b4" class="cell" data-execution_count="12">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
@@ -1244,6 +1245,7 @@ x = (-1.0, 0.5) | L = 0.7981
   <script src="site_libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
   <script src="site_libs/revealjs/plugin/reveal-menu/menu.js"></script>
   <script src="site_libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="site_libs/revealjs/plugin/qmd-web-bridge/bridge.js"></script>
   <script src="site_libs/revealjs/plugin/quarto-support/support.js"></script>
   
 
@@ -1266,6 +1268,7 @@ x = (-1.0, 0.5) | L = 0.7981
 'autoAnimateUnmatched': true,
 'jumpToSlide': true,
 'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":false},
+'qmdweb': {"editors":["https://editor.rkskmt.com"]},
 'smaller': false,
  
         // Display controls in the bottom right corner
@@ -1436,7 +1439,7 @@ x = (-1.0, 0.5) | L = 0.7981
         },
 
         // reveal.js plugins
-        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QmdWebBridge, QuartoSupport,
 
           RevealMath,
           RevealNotes,

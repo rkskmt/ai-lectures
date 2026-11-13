@@ -248,6 +248,7 @@
   <script src="peek-ui.js" defer=""></script>
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
+  <meta name="qmd-web-source" content="0b8eb6715ea3b3b44bdad9ded0c3e8ce97040325">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -270,7 +271,7 @@ rkskmt
 <h2>初回の約束、覚えているか</h2>
 <div class="slide-body">
 <p>TODO；おぼえてるわけねえだろ。くだらないことかくな</p>
-<div id="d576316c" class="cell" data-execution_count="1">
+<div id="7960e93c" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -294,7 +295,7 @@ rkskmt
 <ul>
 <li>手書き数字の定番データセット。<strong>訓練6万枚・テスト1万枚</strong>、各28×28ピクセル</li>
 </ul>
-<div id="fb0ff63b" class="cell" data-execution_count="2">
+<div id="e38ca7be" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
 <span id="cb1-2"><a aria-label="2"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
 <span id="cb1-3"><a aria-label="3"></a><span class="im">from</span> torchvision <span class="im">import</span> datasets, transforms</span>
@@ -311,7 +312,7 @@ rkskmt
 1枚の形: (1, 28, 28)  正解ラベル: 5</code></pre>
 </div>
 </div>
-<div id="675a0127" class="cell" data-execution_count="3">
+<div id="19787b73" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -369,7 +370,7 @@ rkskmt
 <li>魚は2次元（輝度・重さ）だった。<a href="./dimensionality-pca.html#peek-curse" class="peek">次元の呪いの回で扱った高次元</a>が、<strong>本物の入力</strong>として現れる</li>
 <li><code>nn.Flatten()</code> が「画像 → ベクトル」の変換をやる</li>
 </ul>
-<div id="c6a4c27e" class="cell" data-execution_count="4">
+<div id="1f3f8772" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
 <span id="cb3-2"><a aria-label="2"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
 <span id="cb3-3"><a aria-label="3"></a></span>
@@ -507,7 +508,7 @@ rkskmt
 <section id="ソフトマックスの仕事ぶり" class="slide level2">
 <h2>ソフトマックスの仕事ぶり</h2>
 <div class="slide-body">
-<div id="8f5f366c" class="cell" data-execution_count="5">
+<div id="a4d4583e" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -525,7 +526,7 @@ rkskmt
 <section id="crossentropyloss-はsoftmax込み" class="slide level2">
 <h2><code>CrossEntropyLoss</code> はsoftmax込み</h2>
 <div class="slide-body">
-<div id="04c53405" class="cell" data-execution_count="6">
+<div id="504411f0" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
 <span id="cb5-2"><a aria-label="2"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
 <span id="cb5-3"><a aria-label="3"></a></span>
@@ -550,7 +551,7 @@ rkskmt
 <section id="モデル784-128-10" class="slide level2">
 <h2>モデル：784 → 128 → 10</h2>
 <div class="slide-body">
-<div id="013244f2" class="cell" data-execution_count="7">
+<div id="a7a9ab6f" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a aria-label="1"></a>torch.manual_seed(<span class="dv">0</span>)</span>
 <span id="cb7-2"><a aria-label="2"></a></span>
 <span id="cb7-3"><a aria-label="3"></a>model <span class="op">=</span> nn.Sequential(</span>
@@ -620,7 +621,7 @@ rkskmt
 <li>6万枚まとめて勾配を計算すると重い → <strong>128枚ずつ</strong>取り出して1歩ずつ進む — この一口が<strong>ミニバッチ</strong>（<span class="en">mini-batch</span>）</li>
 <li>データを一巡することを <strong>1エポック</strong>（<span class="en">epoch</span>）と呼ぶ</li>
 </ul>
-<div id="a3f8dc68" class="cell" data-execution_count="8">
+<div id="bf9308e9" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a aria-label="1"></a>train_loader <span class="op">=</span> torch.utils.data.DataLoader(train_ds, batch_size<span class="op">=</span><span class="dv">128</span>, shuffle<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb10-2"><a aria-label="2"></a>test_loader  <span class="op">=</span> torch.utils.data.DataLoader(test_ds,  batch_size<span class="op">=</span><span class="dv">1000</span>)</span>
 <span id="cb10-3"><a aria-label="3"></a></span>
@@ -674,7 +675,7 @@ rkskmt
 <section id="peek-mnist-train" class="slide level2">
 <h2>学習する</h2>
 <div class="slide-body">
-<div id="ab1ed42e" class="cell" data-execution_count="9">
+<div id="794d75b6" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a aria-label="1"></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">4</span>):</span>
 <span id="cb12-2"><a aria-label="2"></a>    loss_sum <span class="op">=</span> <span class="fl">0.0</span></span>
 <span id="cb12-3"><a aria-label="3"></a>    <span class="cf">for</span> x_batch, y_batch <span class="kw">in</span> train_loader:</span>
@@ -763,7 +764,7 @@ rkskmt
 <section id="読めている様子" class="slide level2">
 <h2>読めている様子</h2>
 <div class="slide-body">
-<div id="c52c0852" class="cell" data-execution_count="10">
+<div id="7441be09" class="cell" data-execution_count="10">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -780,7 +781,7 @@ rkskmt
 <section id="間違いを眺める" class="slide level2">
 <h2>間違いを眺める</h2>
 <div class="slide-body">
-<div id="1c8b58d9" class="cell" data-execution_count="11">
+<div id="f52470ce" class="cell" data-execution_count="11">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -813,7 +814,7 @@ rkskmt
 </div>
 </div>
 </div>
-<div id="6886929b" class="cell" data-execution_count="12">
+<div id="c0b2ca4e" class="cell" data-execution_count="12">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -832,7 +833,7 @@ rkskmt
 <section id="自信満々の間違い" class="slide level2">
 <h2>自信満々の間違い</h2>
 <div class="slide-body">
-<div id="abdf5390" class="cell" data-execution_count="13">
+<div id="c6f73624" class="cell" data-execution_count="13">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -854,7 +855,7 @@ rkskmt
 <ul>
 <li>第1層 <code>nn.Linear(784, 128)</code> の各ユニットは、784本の重みを持つ ＝ <strong>28×28の「模様」</strong>として絵にできる</li>
 </ul>
-<div id="cb2422f5" class="cell" data-execution_count="14">
+<div id="6d9be5cc" class="cell" data-execution_count="14">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -900,7 +901,7 @@ rkskmt
 <h2>自分の字は読めるのか（持ち帰りデモ）</h2>
 <div class="slide-body">
 <p>紙に数字を書いて撮影し、この機械に読ませてみよう。 ただし<strong>写真をそのまま28×28に縮めても、まず読めない</strong> — MNISTの画像は「数字を20ピクセル角に収め、重心をど真ん中に置く」ように揃えてあり、撮った写真はそうなっていないから。同じ揃え方を自分でやってから見せる：</p>
-<div id="6f0c6dfa" class="cell" data-execution_count="15">
+<div id="3d27e9af" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a aria-label="1"></a><span class="im">from</span> PIL <span class="im">import</span> Image</span>
 <span id="cb14-2"><a aria-label="2"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb14-3"><a aria-label="3"></a><span class="im">import</span> torch</span>
@@ -1108,6 +1109,7 @@ rkskmt
   <script src="site_libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
   <script src="site_libs/revealjs/plugin/reveal-menu/menu.js"></script>
   <script src="site_libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="site_libs/revealjs/plugin/qmd-web-bridge/bridge.js"></script>
   <script src="site_libs/revealjs/plugin/quarto-support/support.js"></script>
   
 
@@ -1130,6 +1132,7 @@ rkskmt
 'autoAnimateUnmatched': true,
 'jumpToSlide': true,
 'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":false},
+'qmdweb': {"editors":["https://editor.rkskmt.com"]},
 'smaller': false,
  
         // Display controls in the bottom right corner
@@ -1300,7 +1303,7 @@ rkskmt
         },
 
         // reveal.js plugins
-        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QmdWebBridge, QuartoSupport,
 
           RevealMath,
           RevealNotes,

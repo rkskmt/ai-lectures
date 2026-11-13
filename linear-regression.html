@@ -248,6 +248,7 @@
   <script src="peek-ui.js" defer=""></script>
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
+  <meta name="qmd-web-source" content="1dada6593341cc74b542c5ba8d8f7b9cf278cf85">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -383,7 +384,7 @@ rkskmt
 <li>次元削減の回で測った<strong>体長</strong>を使う</li>
 <li>体長を測るだけで重さが分かれば、<strong>秤に乗せる手間が省ける</strong></li>
 </ul>
-<div id="5255853f" class="cell" data-execution_count="1">
+<div id="49833f78" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>魚データの定義（クリックして展開）</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -408,7 +409,7 @@ rkskmt
 <span id="cb1-20"><a aria-label="20"></a>lengths <span class="op">=</span> np.<span class="bu">round</span>(np.cbrt(weights) <span class="op">*</span> <span class="fl">4.5</span> <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="fl">1.0</span>, <span class="bu">len</span>(weights)), <span class="dv">1</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="8ce72af7" class="cell" data-execution_count="2">
+<div id="fd4819b2" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -494,7 +495,7 @@ rkskmt
 <ul>
 <li>スケールを揃えてから（<a href="./clustering-kmeans.html#peek-scale" class="peek">クラスタリングの回の教訓</a>。学習率を1つで済ませるため）</li>
 </ul>
-<div id="d4e7f188" class="cell" data-execution_count="3">
+<div id="56993437" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a>x <span class="op">=</span> (lengths <span class="op">-</span> lengths.mean()) <span class="op">/</span> lengths.std()   <span class="co"># 標準化した体長</span></span>
 <span id="cb2-2"><a aria-label="2"></a>t <span class="op">=</span> (weights <span class="op">-</span> weights.mean()) <span class="op">/</span> weights.std()   <span class="co"># 標準化した重さ</span></span>
 <span id="cb2-3"><a aria-label="3"></a></span>
@@ -575,7 +576,7 @@ rkskmt
 <section id="直線が合っていく様子" class="slide level2">
 <h2>直線が合っていく様子</h2>
 <div class="slide-body">
-<div id="42aa162a" class="cell" data-execution_count="4">
+<div id="c0fa2aaa" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -627,7 +628,7 @@ rkskmt
 <section id="答え合わせsklearn-と比べる" class="slide level2">
 <h2>答え合わせ：sklearn と比べる</h2>
 <div class="slide-body">
-<div id="52bff94c" class="cell" data-execution_count="5">
+<div id="11047b9c" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a aria-label="1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
 <span id="cb4-2"><a aria-label="2"></a></span>
 <span id="cb4-3"><a aria-label="3"></a>reg <span class="op">=</span> LinearRegression().fit(x.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), t)</span>
@@ -694,7 +695,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <section id="次数を上げてみる" class="slide level2">
 <h2>次数を上げてみる</h2>
 <div class="slide-body">
-<div id="b14759de" class="cell" data-execution_count="6">
+<div id="f37f0553" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a aria-label="1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
@@ -739,7 +740,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <section id="数字で見るまた会ったな過学習" class="slide level2">
 <h2>数字で見る：また会ったな、過学習</h2>
 <div class="slide-body">
-<div id="3ccf218c" class="cell" data-execution_count="7">
+<div id="919baf36" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a aria-label="1"></a>degrees <span class="op">=</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">10</span>)</span>
 <span id="cb7-2"><a aria-label="2"></a>train_mse, test_mse <span class="op">=</span> [], []</span>
 <span id="cb7-3"><a aria-label="3"></a><span class="cf">for</span> deg <span class="kw">in</span> degrees:</span>
@@ -776,7 +777,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <ul>
 <li>暴れている曲線の正体は、<strong>巨大な係数</strong></li>
 </ul>
-<div id="c8520802" class="cell" data-execution_count="8">
+<div id="8911f05f" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a aria-label="1"></a>plain <span class="op">=</span> make_pipeline(PolynomialFeatures(<span class="dv">9</span>), StandardScaler(), LinearRegression())</span>
 <span id="cb8-2"><a aria-label="2"></a>plain.fit(X_train, y_train)</span>
 <span id="cb8-3"><a aria-label="3"></a><span class="bu">print</span>(<span class="st">"次数9の係数の最大絶対値:"</span>, <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">abs</span>(plain[<span class="op">-</span><span class="dv">1</span>].coef_)<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
@@ -802,7 +803,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <li>sklearn には任せない。冒頭で自作した勾配降下法に、<strong>罰金の項を足すだけ</strong></li>
 <li>罰金 <span class="math inline">\(\lambda \sum w^2\)</span> の微分は <span class="math inline">\(2\lambda w\)</span>。各係数の勾配に足せばよい</li>
 </ul>
-<div id="e80210dd" class="cell" data-execution_count="9">
+<div id="8142b845" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a aria-label="1"></a><span class="co"># 特徴量 x, x², …, x⁹ も自分で作る（列が x^1 〜 x^9 の配列）</span></span>
 <span id="cb10-2"><a aria-label="2"></a>P_train <span class="op">=</span> X_train <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)          <span class="co"># 形 (10, 9)</span></span>
 <span id="cb10-3"><a aria-label="3"></a>P_test  <span class="op">=</span> X_test  <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)</span>
@@ -840,7 +841,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <section id="罰金ありなしを見比べる" class="slide level2">
 <h2>罰金あり・なしを見比べる</h2>
 <div class="slide-body">
-<div id="72f4eb26" class="cell" data-execution_count="10">
+<div id="b34832ac" class="cell" data-execution_count="10">
 <details class="code-fold">
 <summary>描画コード</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a aria-label="1"></a>P_grid    <span class="op">=</span> ((grid <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)) <span class="op">-</span> mu) <span class="op">/</span> sd</span>
@@ -967,7 +968,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <li>間違っていたのは、いちばん大きい 2 匹（2,457 g → 24,570 g、2,474 g → 24,740 g）</li>
 <li>この 80 枚で直線を fit し直す</li>
 </ul>
-<div id="b6f40cc9" class="cell" data-execution_count="11">
+<div id="f2e31f84" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a aria-label="1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
 <span id="cb13-2"><a aria-label="2"></a></span>
 <span id="cb13-3"><a aria-label="3"></a>bad <span class="op">=</span> [<span class="dv">3</span>, <span class="dv">6</span>]                                       <span class="co"># 打ち間違えた2枚（いちばん大きい2匹）</span></span>
@@ -983,7 +984,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 2枚が間違った80枚 : 体長 1cm あたり 451.2 g</code></pre>
 </div>
 </div>
-<div id="3da13fb3" class="cell" data-execution_count="12">
+<div id="95c7e7a8" class="cell" data-execution_count="12">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1024,7 +1025,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <li>MSE は「ズレの二乗」の平均なので、ズレが 100 倍なら損失への寄与は 10,000 倍</li>
 <li>正しい 80 枚の直線からの、各伝票のズレを比べる</li>
 </ul>
-<div id="5d4740e6" class="cell" data-execution_count="13">
+<div id="c78fa261" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a aria-label="1"></a>pred_ok <span class="op">=</span> reg_ok.predict(lengths.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>))        <span class="co"># 正しい80枚の直線による予測</span></span>
 <span id="cb15-2"><a aria-label="2"></a>error   <span class="op">=</span> weights_typo <span class="op">-</span> pred_ok                        <span class="co"># 各伝票のズレ（g）</span></span>
 <span id="cb15-3"><a aria-label="3"></a>ok      <span class="op">=</span> np.ones(<span class="dv">80</span>, dtype<span class="op">=</span><span class="bu">bool</span>)</span>
@@ -1098,7 +1099,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <section id="回の試行を図で見る" class="slide level2">
 <h2>1回の試行を図で見る</h2>
 <div class="slide-body">
-<div id="9dcf2a2c" class="cell" data-execution_count="14">
+<div id="fc251343" class="cell" data-execution_count="14">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1115,7 +1116,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <section id="peek-ransac-code" class="slide level2">
 <h2>RANSAC を実装する</h2>
 <div class="slide-body">
-<div id="6aaba802" class="cell" data-execution_count="15">
+<div id="cb0c3130" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a aria-label="1"></a><span class="kw">def</span> ransac_line(x, t, threshold, n_trials<span class="op">=</span><span class="dv">200</span>):</span>
 <span id="cb17-2"><a aria-label="2"></a>    best_count <span class="op">=</span> <span class="dv">0</span></span>
 <span id="cb17-3"><a aria-label="3"></a>    <span class="cf">for</span> trial <span class="kw">in</span> <span class="bu">range</span>(n_trials):</span>
@@ -1138,7 +1139,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 RANSAC の直線: 体長 1cm あたり 90.0 g</code></pre>
 </div>
 </div>
-<div id="ba7c63ab" class="cell" data-execution_count="16">
+<div id="9399e017" class="cell" data-execution_count="16">
 <details class="code-fold">
 <summary>描画コード</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a aria-label="1"></a>grid_cm <span class="op">=</span> np.linspace(<span class="dv">44</span>, <span class="dv">63</span>, <span class="dv">50</span>)</span>
@@ -1283,7 +1284,7 @@ RANSAC の直線: 体長 1cm あたり 90.0 g</code></pre>
 <ul>
 <li>今日書いた <code>ransac_line</code> は、ライブラリでは <code>RANSACRegressor</code> に入っている</li>
 </ul>
-<div id="b3beb838" class="cell" data-execution_count="17">
+<div id="834725d0" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a aria-label="1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> RANSACRegressor</span>
 <span id="cb20-2"><a aria-label="2"></a></span>
 <span id="cb20-3"><a aria-label="3"></a>ransac <span class="op">=</span> RANSACRegressor(LinearRegression(), residual_threshold<span class="op">=</span><span class="dv">300</span>, random_state<span class="op">=</span><span class="dv">0</span>)</span>
@@ -1422,7 +1423,7 @@ a = 0.2 + 0.16 = 0.36\]</span></p>
 </div>
 </div>
 <h3 id="コードで確認">コードで確認</h3>
-<div id="36da53c5" class="cell" data-execution_count="18">
+<div id="01aa1869" class="cell" data-execution_count="18">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -1480,7 +1481,7 @@ sklearn の fit: a=1.0000, b=1.0000</code></pre>
 <li><span class="math inline">\(E\)</span> の 1 点に引っ張られ、傾きが 1.46 倍になった</li>
 </ul></li>
 </ul>
-<div id="b93659f4" class="cell" data-execution_count="19">
+<div id="e2716667" class="cell" data-execution_count="19">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -1526,6 +1527,7 @@ RANSAC: a=1.00, b=0.00, 賛同者=[1 1 1 1 0]</code></pre>
   <script src="site_libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
   <script src="site_libs/revealjs/plugin/reveal-menu/menu.js"></script>
   <script src="site_libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="site_libs/revealjs/plugin/qmd-web-bridge/bridge.js"></script>
   <script src="site_libs/revealjs/plugin/quarto-support/support.js"></script>
   
 
@@ -1548,6 +1550,7 @@ RANSAC: a=1.00, b=0.00, 賛同者=[1 1 1 1 0]</code></pre>
 'autoAnimateUnmatched': true,
 'jumpToSlide': true,
 'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":false},
+'qmdweb': {"editors":["https://editor.rkskmt.com"]},
 'smaller': false,
  
         // Display controls in the bottom right corner
@@ -1718,7 +1721,7 @@ RANSAC: a=1.00, b=0.00, 賛同者=[1 1 1 1 0]</code></pre>
         },
 
         // reveal.js plugins
-        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QmdWebBridge, QuartoSupport,
 
           RevealMath,
           RevealNotes,

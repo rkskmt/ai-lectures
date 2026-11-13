@@ -248,6 +248,7 @@
   <script src="peek-ui.js" defer=""></script>
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
+  <meta name="qmd-web-source" content="9f0624a63f21b62a3e1023a7fbdade4c30806e6e">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -833,7 +834,7 @@ rkskmt
 <section id="匹分のbackwardをnumpyで実装する" class="slide level2">
 <h2>1匹分のBackwardをNumPyで実装する</h2>
 <div class="slide-body">
-<div id="60e7bb51" class="cell" data-execution_count="1">
+<div id="0fed12a2" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb2-2"><a aria-label="2"></a></span>
 <span id="cb2-3"><a aria-label="3"></a><span class="kw">def</span> sigmoid(u):</span>
@@ -887,7 +888,7 @@ grad_c: -0.4875</code></pre>
 <ul>
 <li>微分の定義 <span class="math inline">\(\dfrac{\ell(\theta + \varepsilon) - \ell(\theta)}{\varepsilon}\)</span> で、手計算を検算できる（<strong>数値微分</strong>）</li>
 </ul>
-<div id="5aa573f2" class="cell" data-execution_count="2">
+<div id="b308627c" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb4-2"><a aria-label="2"></a></span>
 <span id="cb4-3"><a aria-label="3"></a>x1, x2, y <span class="op">=</span> <span class="fl">1.0</span>, <span class="fl">0.5</span>, <span class="fl">1.0</span></span>
@@ -1045,7 +1046,7 @@ dell/dc = -0.4875</code></pre>
 <section id="peek-matrix-backward" class="slide level2">
 <h2>2層NNのBackwardをNumPyで実装する</h2>
 <div class="slide-body">
-<div id="05e2db11" class="cell" data-execution_count="3">
+<div id="f25c9215" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb6-2"><a aria-label="2"></a></span>
 <span id="cb6-3"><a aria-label="3"></a><span class="kw">def</span> backward(X, y, Z1, H, P, W2):</span>
@@ -1151,7 +1152,7 @@ dW2: (2, 1)  db2: (1,)</code></pre>
 <li>変わるのは、<code>forward</code> と <code>backward</code> の中に層が1つ増えたことだけ</li>
 <li>下の <code>for</code> 1周が<a href="#/peek-epoch" class="peek">1 epoch</a>であり、全200件から求めた勾配で1回更新する</li>
 </ul>
-<div id="e1c26f93" class="cell" data-execution_count="4">
+<div id="15ef72e4" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb8-2"><a aria-label="2"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> make_moons</span>
 <span id="cb8-3"><a aria-label="3"></a></span>
@@ -1230,7 +1231,7 @@ Accuracy: 100.0%</code></pre>
 <section id="学習したnnの決定境界" class="slide level2">
 <h2>学習したNNの決定境界</h2>
 <div class="slide-body">
-<div id="14e9232e" class="cell fig-medium" data-execution_count="5">
+<div id="05d220aa" class="cell fig-medium" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1291,7 +1292,7 @@ Accuracy: 100.0%</code></pre>
 <li>中間層に ReLU が選ばれる大きな理由</li>
 </ul></li>
 </ul>
-<div id="a42199d3" class="cell" data-execution_count="6">
+<div id="12e55511" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1418,7 +1419,7 @@ Accuracy: 100.0%</code></pre>
 <li><span class="math inline">\(v\)</span> が負なので、中間層へ戻る <span class="math inline">\(\delta\)</span> は符号が反転する。重みが復路の向きと大きさも決める。</li>
 </ul>
 <h3 id="数値微分で検算">数値微分で検算</h3>
-<div id="2f1bc151" class="cell" data-execution_count="7">
+<div id="f28ecbc9" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -1507,6 +1508,7 @@ dell/dc = 0.5000</code></pre>
   <script src="site_libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
   <script src="site_libs/revealjs/plugin/reveal-menu/menu.js"></script>
   <script src="site_libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="site_libs/revealjs/plugin/qmd-web-bridge/bridge.js"></script>
   <script src="site_libs/revealjs/plugin/quarto-support/support.js"></script>
   
 
@@ -1529,6 +1531,7 @@ dell/dc = 0.5000</code></pre>
 'autoAnimateUnmatched': true,
 'jumpToSlide': true,
 'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":false},
+'qmdweb': {"editors":["https://editor.rkskmt.com"]},
 'smaller': false,
  
         // Display controls in the bottom right corner
@@ -1699,7 +1702,7 @@ dell/dc = 0.5000</code></pre>
         },
 
         // reveal.js plugins
-        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QmdWebBridge, QuartoSupport,
 
           RevealMath,
           RevealNotes,
