@@ -1075,7 +1075,7 @@
     "href": "dimensionality-pca.html#準備",
     "title": "次元の呪いと次元削減",
     "section": "準備",
-    "text": "準備\n\n\n各特徴量は 0〜1 に正規化してあるとする（各軸の長さ＝1）\nそこに100個の点をランダムにばらまく\n点は「行＝点、列＝特徴量」の配列で持つ\nまず特徴量2個（2次元）で、散布図に描く\n\n\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\n\nrng = np.random.default_rng()\nP   = rng.random((100, 2))          # 100個の点（行＝点、列＝特徴量）\n\nplt.figure(figsize=(4.4, 4.4))\nplt.scatter(P[:, 0], P[:, 1], s=28, c=\"#2980b9\")\nplt.xlabel(\"特徴量 1\")\nplt.ylabel(\"特徴量 2\")\nplt.xlim(0, 1)\nplt.ylim(0, 1)\nplt.gca().set_aspect(\"equal\")\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n点は実行のたびに変わるので、手元の図は少し違う"
+    "text": "準備\n\n\n各特徴量は 0〜1 に正規化してあるとする（各軸の長さ＝1）\nそこに100個の点をランダムにばらまく\n点は「行＝点、列＝特徴量」の配列で持つ\nまず特徴量2個（2次元）で、散布図に描く\n\n\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\n\nrng = np.random.default_rng()  # 乱数の生成器（実行するたびに違う点になる）\nP   = rng.random((100, 2))          # 100個の点（行＝点、列＝特徴量）\n\nplt.figure(figsize=(4.4, 4.4))\nplt.scatter(P[:, 0], P[:, 1], s=28, c=\"#2980b9\")\nplt.xlabel(\"特徴量 1\")\nplt.ylabel(\"特徴量 2\")\nplt.xlim(0, 1)\nplt.ylim(0, 1)\nplt.gca().set_aspect(\"equal\")\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n点は実行のたびに変わるので、手元の図は少し違う"
   },
   {
     "objectID": "dimensionality-pca.html#距離を測る",
