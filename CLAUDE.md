@@ -12,7 +12,7 @@ Quarto-based AI lecture website ("AI Lectures"). Slide decks for machine learnin
 - **Python 3** via Jupyter kernel for code cells
 - **MathJax** for math rendering
 - **D2** (quarto-d2) for diagrams
-- Extensions: `cleanslidekit`, `d2` (both vendored). Click-to-zoom images use Quarto's built-in lightbox (`lightbox: auto`; built in since Quarto 1.4, so the old `quarto-ext/lightbox` extension is not needed)
+- Extensions: `cleanslidekit`, `d2`, `qmd-web` (all vendored; `qmd-web` lets the qmd web editor follow and live-update the published decks). Click-to-zoom images use Quarto's built-in lightbox (`lightbox: auto`; built in since Quarto 1.4, so the old `quarto-ext/lightbox` extension is not needed)
 
 ## Structure
 
