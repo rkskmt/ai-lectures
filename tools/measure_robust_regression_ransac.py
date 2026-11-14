@@ -10,6 +10,9 @@
 #          by 10: "an extra zero typed on two slips"
 #   runs : the deck's RANSAC cell is unseeded, so every claim is checked over
 #          many seeds here
+#   fixed: the deck shows its RANSAC output and figure from hidden cells that
+#          replace the random draws by fixed pairs; those pairs are read from
+#          the .qmd and checked against the seeded runs
 #
 # Usage: python tools/measure_robust_regression_ransac.py   (from the repo root)
 
@@ -72,6 +75,85 @@ def ransac_line(x, t, threshold, n_trials=200):
     return a, b, best_inliers
 
 
+def ransac_line_fixed(x, t, threshold, pairs):
+    """The deck's display twin of ransac_line: the random draws replaced by fixed pairs."""
+    best_count = 0
+    for i, j in pairs:
+        if x[i] == x[j]:
+            continue
+        a = (t[j] - t[i]) / (x[j] - x[i])
+        b = t[i] - a * x[i]
+        inliers = np.abs(a * x + b - t) < threshold
+        if inliers.sum() > best_count:
+            best_count, best_inliers = inliers.sum(), inliers
+    a, b = ls_fit(x[best_inliers], t[best_inliers])
+    return a, b, best_inliers
+
+
+def load_fixed_pairs():
+    """Read the fixed pairs the deck's hidden cells use, so the two can never drift apart.
+
+    Returns the figure's {"best_pair": (i, j), "bad_pair": (i, j)} and the pair
+    lists passed to ransac_line_fixed, keyed by the data argument ("lengths" for
+    the slips, "P_x" for the exercise)."""
+    src = DECK.read_text(encoding="utf-8")
+    figure = {name: (int(i), int(j))
+              for name, i, j in re.findall(r"^(best_pair|bad_pair)\s*=\s*\((\d+),\s*(\d+)\)", src, re.M)}
+    assert set(figure) == {"best_pair", "bad_pair"}, figure
+    twins = {}
+    for x_name, pairs in re.findall(r"ransac_line_fixed\((\w+),\s*\w+,\s*[\d.]+,\s*(\[[^\]]*\])\)", src):
+        twins[x_name] = [(int(i), int(j)) for i, j in re.findall(r"\((\d+),\s*(\d+)\)", pairs)]
+    assert set(twins) == {"lengths", "P_x"}, twins
+    return figure, twins
+
+
+def inlier_breakdown(x, t, threshold, n_trials, full, seeds=SEEDS):
+    """Slope of the refit line grouped by inlier count, for the runs that miss some inliers."""
+    by_count = {}
+    for s in range(seeds):
+        np.random.seed(s)
+        a, b, inl = ransac_line(x, t, threshold, n_trials)
+        by_count.setdefault(int(inl.sum()), []).append(a)
+    np.random.seed()
+    a_full = by_count[full][0]
+    missed = [a for k, v in by_count.items() if k != full for a in v]
+    print(f"   [n_trials={n_trials}, {seeds} seeds] {full} inliers: {len(by_count[full])} runs (slope {a_full:.2f}); "
+          f"fewer: {len(missed)} runs")
+    for k in sorted(by_count, reverse=True):
+        if k == full:
+            continue
+        v = by_count[k]
+        dev = max(abs(a - a_full) for a in v)
+        print(f"      {k:2d} inliers x{len(v):2d}: slope {min(v):7.2f} .. {max(v):7.2f}   max |slope - {a_full:.2f}| {dev:6.2f}")
+    shown_same = sum(f"{a:.1f}" == f"{a_full:.1f}" for a in missed)
+    print(f"      runs with fewer inliers whose slope still prints as {a_full:.1f} (1 decimal): {shown_same}")
+
+
+def reachable_inlier_sets(x, t, threshold, full):
+    """Every inlier set RANSAC can end with: the best set is always one induced by some pair.
+
+    Answers, without seeds, whether a run that misses inliers can still print the
+    full-set slope at 1 decimal."""
+    sets = {}
+    for i in range(len(x)):
+        for j in range(i + 1, len(x)):
+            if x[i] == x[j]:
+                continue
+            a = (t[j] - t[i]) / (x[j] - x[i])
+            b = t[i] - a * x[i]
+            inl = np.abs(a * x + b - t) < threshold
+            sets[inl.tobytes()] = inl
+    slopes = {}
+    for inl in sets.values():
+        slopes.setdefault(int(inl.sum()), []).append(ls_fit(x[inl], t[inl])[0])
+    a_full = slopes[full][0]
+    fewer = [a for k, v in slopes.items() if k < full for a in v]
+    print(f"   [all pairs] {len(sets)} distinct inlier sets; {full - 1} inliers: {len(slopes[full - 1])} sets, "
+          f"slope {min(slopes[full - 1]):.2f} .. {max(slopes[full - 1]):.2f}")
+    print(f"      sets with fewer than {full} inliers whose slope prints as {a_full:.1f}: "
+          f"{sum(f'{a:.1f}' == f'{a_full:.1f}' for a in fewer)}")
+
+
 def ransac_stats(label, x, t, bad, threshold, n_trials, seeds=SEEDS):
     good = np.ones(len(x), bool)
     good[bad] = False
@@ -118,11 +200,26 @@ def main():
 
     print("\n[RANSAC on the 80 slips with 2 typos]")
     ransac_stats("main", lengths, wt, BAD, THRESHOLD, N_TRIALS)
+
+    figure, twins = load_fixed_pairs()
+    print(f"\n[fixed pairs in the deck's hidden cells (threshold {THRESHOLD} g)]")
+    for name, (i, j) in figure.items():
+        a = (wt[j] - wt[i]) / (lengths[j] - lengths[i]); b = wt[i] - a * lengths[i]
+        inl = np.abs(a * lengths + b - wt) < THRESHOLD
+        print(f"   figure {name} = ({i}, {j}): lengths {lengths[i]}, {lengths[j]}; weights {wt[i]:.0f}, {wt[j]:.0f}; "
+              f"typo in pair: {i in BAD or j in BAD}; inliers {inl.sum()}")
+    a_t, b_t, inl_t = ransac_line_fixed(lengths, wt, THRESHOLD, twins["lengths"])
+    print(f"   display twin pairs {twins['lengths']}: inliers {inl_t.sum()}, a={a_t:.2f} b={b_t:.1f}, "
+          f"exactly the 78 correct slips: {np.array_equal(inl_t, good)}")
+
     print("\n[Tweak rows]")
     ransac_stats("threshold 50", lengths, wt, BAD, 50, N_TRIALS)
     ransac_stats("threshold 30000", lengths, wt, BAD, 30000, N_TRIALS)
     ransac_stats("n_trials 3", lengths, wt, BAD, THRESHOLD, 3)
+    inlier_breakdown(lengths, wt, THRESHOLD, 3, full=78)
+    reachable_inlier_sets(lengths, wt, THRESHOLD, full=78)
     ransac_stats("n_trials 10", lengths, wt, BAD, THRESHOLD, 10)
+    inlier_breakdown(lengths, wt, THRESHOLD, 10, full=78)
     bad_mid = mid[:2].tolist()
     wt_mid = with_typos(weights, bad_mid)
     a_mid, b_mid = ls_fit(lengths, wt_mid)
@@ -159,6 +256,8 @@ def main():
         results[(round(float(a), 4), round(float(b), 4), int(inl.sum()))] += 1
     np.random.seed()
     print(f"   ransac_line over {SEEDS} seeds: {dict(results)}")
+    a, b, inl = ransac_line_fixed(px, pt, 0.5, twins["P_x"])
+    print(f"   display twin pairs {twins['P_x']}: a={a:.4f} b={b:.4f} inliers={inl.astype(int).tolist()}")
     a, b = 0.0, 0.0
     for i in range(1, 101):
         pred = a * px + b
