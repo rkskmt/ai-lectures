@@ -868,7 +868,7 @@ plt.show()
 :::
 
 
-## 3 次元の空間を、格子状の箱に分ける（Octree）
+## 空間を箱に分けておけば、近くの箱だけ測ればよい（Octree）
 
 ::: {.takeaway .dark}
 **Octree（八分木）の作り方**
@@ -879,7 +879,8 @@ plt.show()
 3. 中の点が 15 点以下になった箱は、それ以上分けない
 
 - いちばん近い点を探すときは、★ の入っている箱の点から距離を測る
-   - 見つかった距離より遠い箱は、中の点を測らずに飛ばせる
+- 見つかった距離より遠い箱は、中の点を測らずに飛ばせる
+   - 全部の点を測らずにすむ（全探索をしなくてよい）
 
 ```{python}
 #| echo: false
@@ -950,9 +951,33 @@ fig_oct.write_html("iframes/knn_octree_3d.html", include_plotlyjs="directory")
 ドラッグで回せる（黄色の箱が、★ の入っている箱）
 :::
 
-::: {.callout-note title="ただし"}
+
+## Octree の弱点：箱の中の点の数がそろわない
+
 - 点がどこにあるかに関係なく、中点で切る
-- そのため、箱の中の点の数がそろわない（図では 1 点から 14 点まで）
+- そのため、箱によって中の点の数がばらばらになる（前のスライドの図では 1 点から 14 点まで）
+   - 点の多い箱：★ がそこに入ると、中の点を全部測ることになる
+   - 点の少ない箱：近い点が箱の中になく、まわりの箱まで調べることになる
+
+```{python}
+#| echo: false
+#| fig-align: center
+# Points per box of the octree on the previous slide (leaves3), smallest first.
+oct_sizes = sorted(len(idx) for lo, hi, idx in leaves3)
+plt.figure(figsize=(7, 3.0))
+plt.bar(range(1, len(oct_sizes) + 1), oct_sizes, color="#7f8c8d", width=0.7)
+plt.xlabel("箱（中の点が少ない順）")
+plt.ylabel("箱の中の点の数")
+plt.title(f"Octree の {len(oct_sizes)} 個の箱：中の点は {oct_sizes[0]} 点から {oct_sizes[-1]} 点まで", fontsize=10.5)
+plt.xticks([])
+plt.yticks(range(0, oct_sizes[-1] + 1, 2))
+plt.grid(True, axis="y", alpha=0.4)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-important title="質問"}
+箱の中の点の数をそろえるには、どこで切ればよい？
 :::
 
 
