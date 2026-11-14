@@ -390,3 +390,43 @@ for d in [2, 5, 10, 20]:
           f"far side searched at {far:.3f} of the splits")
 print("kd_dims =", [round(float(c), 1) for c in kd_dims])
 check("kd_dims", kd_dims, 1)
+
+
+# ==== checkpoint: the fish of the evaluation deck ====
+#   The checkpoint asks the student to split the 120 fish at random (96 / 24),
+#   compare a depth-3 decision tree with k-NN (k = 3), and redo k-NN after
+#   standardizing with the training mean and std. Its answer states
+#   properties only; the numbers below are the evidence over 1000 random
+#   splits (default_rng(0).permutation), not slide content.
+
+print("# ---- checkpoint: fish ----")
+EVAL_SRC = (ROOT / "classification-evaluation.qmd").read_text(encoding="utf-8")
+fish = {}
+for name in ["salmon_weights", "salmon_brightness", "seabass_weights", "seabass_brightness"]:
+    fish[name] = np.array(deck_literal(name))
+    m = re.search(r"^" + name + r"\s*=\s*np\.array\((\[.*?\])\)", EVAL_SRC, re.S | re.M)
+    assert np.array_equal(fish[name], np.array(ast.literal_eval(m.group(1)))), \
+        f"{name}: the checkpoint's fish differ from classification-evaluation.qmd"
+print("# the checkpoint's fish are the 120 fish of classification-evaluation.qmd")
+Xf = np.array([[fish["salmon_brightness"][i], fish["salmon_weights"][i]] for i in range(60)]
+              + [[fish["seabass_brightness"][i], fish["seabass_weights"][i]] for i in range(60)])
+yf = np.array([1] * 60 + [0] * 60)
+print(f"# brightness {Xf[:, 0].min()} to {Xf[:, 0].max()} (std {Xf[:, 0].std():.2f}), "
+      f"weight {Xf[:, 1].min():.0f} to {Xf[:, 1].max():.0f} g (std {Xf[:, 1].std():.1f} g)")
+rng = np.random.default_rng(0)
+acc_tree, acc_raw, acc_std, same_tree = [], [], [], 0
+for _ in range(1000):
+    idx = rng.permutation(120)
+    Xtr, ytr, Xte, yte = Xf[idx[:96]], yf[idx[:96]], Xf[idx[96:]], yf[idx[96:]]
+    mean, std = Xtr.mean(axis=0), Xtr.std(axis=0)
+    t_raw = DecisionTreeClassifier(max_depth=3, random_state=0).fit(Xtr, ytr)
+    t_std = DecisionTreeClassifier(max_depth=3, random_state=0).fit((Xtr - mean) / std, ytr)
+    same_tree += np.array_equal(t_raw.predict(Xte), t_std.predict((Xte - mean) / std))
+    acc_tree.append(np.mean(t_raw.predict(Xte) == yte))
+    acc_raw.append(accuracy_knn(Xtr, ytr, Xte, yte, 3))
+    acc_std.append(accuracy_knn((Xtr - mean) / std, ytr, (Xte - mean) / std, yte, 3))
+acc_raw, acc_std = np.array(acc_raw), np.array(acc_std)
+print(f"# 1000 random 96/24 splits, mean test accuracy: tree (depth 3) {np.mean(acc_tree):.3f}, "
+      f"k-NN k = 3 raw {acc_raw.mean():.3f}, standardized {acc_std.mean():.3f}")
+print(f"#   standardized better {np.sum(acc_std > acc_raw)}, worse {np.sum(acc_std < acc_raw)}, "
+      f"equal {np.sum(acc_std == acc_raw)}; tree predictions identical raw vs standardized {same_tree} / 1000")
