@@ -108,7 +108,7 @@ error   = weights_typo - pred_ok                        # 各伝票のズレ（g
 ok      = np.ones(80, dtype=bool)
 ok[bad] = False                                         # 正しい78枚だけ True
 print(f"正しい78枚のズレ  : 最大 {np.abs(error[ok]).max():.0f} g / 二乗の合計 {np.sum(error[ok]**2):,.0f}")
-print(f"打ち間違い2枚のズレ: 最小 {np.abs(error[bad]).min():.0f} g / 二乗の合計 {np.sum(error[bad]**2):,.0f}")
+print(f"打ち間違い2枚のズレ: 最小 {np.abs(error[bad]).min():,.0f} g / 二乗の合計 {np.sum(error[bad]**2):,.0f}")
 ```
 
 ::: {.callout-tip title="要するに"}
@@ -197,7 +197,7 @@ $$\frac{\partial L}{\partial a} = \frac{1}{N} \sum_i \mathrm{sign}(a x_i + b - t
 - [MSE の勾配](linear-regression.qmd#peek-mse-grad){.peek}の「ズレ」が、「ズレの符号」に変わる
 
 | 損失 | 1 枚の伝票が勾配に渡すもの | 22,000 g ずれた伝票 |
-|---|---|---|
+|--|------|---------|
 | MSE | ズレそのもの | 100 g ずれた伝票の 220 倍の力で直線を引く |
 | MAE | ズレの符号（$+1$ か $-1$） | 100 g ずれた伝票と同じ力で直線を引く |
 
@@ -275,7 +275,7 @@ plt.show()
 ## 揺れる理由：MAE の 1 歩は、谷底の近くでも縮まない
 
 | 損失 | 勾配の大きさを決めるもの | 谷底に近づくと |
-|---|---|---|
+|--|-------|---------|
 | MSE | ズレの大きさ | 勾配が 0 に近づき、1 歩が自然に縮む |
 | MAE | 伝票が直線の上にあるか下にあるか | 谷底まで 1 g でも 1,000 g でも、1 歩は同じ |
 
@@ -383,20 +383,9 @@ RANSAC
 ```{python}
 #| echo: false
 #| fig-align: center
-# One good and one bad RANSAC trial, picked deterministically for the figure.
-rng_fig = np.random.default_rng(5)
-best_count, best_pair, bad_pair = 0, None, None
-for _ in range(200):
-    i, j = rng_fig.choice(80, 2, replace=False)
-    if lengths[i] == lengths[j]:
-        continue
-    a_ij = (weights_typo[j] - weights_typo[i]) / (lengths[j] - lengths[i])
-    b_ij = weights_typo[i] - a_ij * lengths[i]
-    count = int((np.abs(a_ij * lengths + b_ij - weights_typo) < 300).sum())
-    if count > best_count:
-        best_count, best_pair = count, (i, j)
-    if bad_pair is None and (i in bad or j in bad):
-        bad_pair = (i, j)
+# One good and one bad RANSAC trial, fixed by slip index (not by a seed).
+best_pair = (49, 22)   # two correct slips: 78 inliers
+bad_pair  = (0, 3)     # slip 3 is one of the two typos: 2 inliers
 
 def trial_panel(ax, pair, title, note=None):
     i, j = pair
@@ -431,6 +420,7 @@ plt.show()
 
 ```{python}
 #| echo: true
+#| eval: false
 def ransac_line(x, t, threshold, n_trials=200):
     best_count = 0
     for trial in range(n_trials):
@@ -446,6 +436,28 @@ def ransac_line(x, t, threshold, n_trials=200):
     return reg.coef_[0], reg.intercept_, best_inliers
 
 a_r, b_r, inliers = ransac_line(lengths, weights_typo, threshold=300)
+print(f"賛同者 {inliers.sum()} 枚、除外 {(~inliers).sum()} 枚")
+print(f"RANSAC の直線: 体長 1cm あたり {a_r:.1f} g")
+```
+
+```{python}
+#| echo: false
+# Display twin of the student cell above: the same steps, with the random draw
+# replaced by two fixed trials (slip pairs), so the shown output never changes.
+def ransac_line_fixed(x, t, threshold, pairs):
+    best_count = 0
+    for i, j in pairs:
+        if x[i] == x[j]:
+            continue
+        a = (t[j] - t[i]) / (x[j] - x[i])
+        b = t[i] - a * x[i]
+        inliers = np.abs(a * x + b - t) < threshold
+        if inliers.sum() > best_count:
+            best_count, best_inliers = inliers.sum(), inliers
+    reg = LinearRegression().fit(x[best_inliers].reshape(-1, 1), t[best_inliers])
+    return reg.coef_[0], reg.intercept_, best_inliers
+
+a_r, b_r, inliers = ransac_line_fixed(lengths, weights_typo, 300, [(0, 3), (49, 22)])
 print(f"賛同者 {inliers.sum()} 枚、除外 {(~inliers).sum()} 枚")
 print(f"RANSAC の直線: 体長 1cm あたり {a_r:.1f} g")
 ```
@@ -500,14 +512,15 @@ plt.show()
 :::
 
 ::: {.callout-tip title="チェックポイント"}
-- `50`：賛同者が 37〜39 枚に減り、傾きは実行ごとに 86〜100 g/cm とぶれる
+- `50`：賛同者が 78 枚の半分ほどに減り、傾きは実行するたびに変わる（`threshold=300` では 90.0 g/cm のまま）
    - 正しい伝票の半分を外れ値扱いしている
    - 基準は正しい記録のばらつき（最大 206 g）より広くとる
 - 真ん中の 2 枚：最小二乗法の傾きは 92 g/cm とほぼ変わらず、直線全体が 380 g ほど持ち上がる
    - 端の外れ値は傾きを、真ん中の外れ値は高さを動かす（てこの原理）
    - RANSAC はどちらでも 2 枚を除外する
-- `n_trials=3`：4回に1回は賛同者を取りこぼし、傾きが大きくぶれる（−86〜113 g/cm）
-   - 10 回なら 99 %、200 回ならほぼ毎回 78 枚そろう
+- `n_trials=3`：何度か実行すると、賛同者が 78 枚そろわない回がある
+   - そろわない回は、傾きが 90.0 g/cm から大きく外れる
+   - 回数を増やすほど、78 枚そろいやすくなる
 - 打ち間違い 20 枚：最小二乗法の傾きは 398 g/cm、RANSAC は 92 g/cm
    - 外れ値が多数派にならない限り、RANSAC は壊れない
 :::
@@ -595,6 +608,7 @@ print(f"体長 1cm あたり {ransac.estimator_.coef_[0]:.1f} g")
 #| echo: true
 #| code-fold: true
 #| code-summary: "解答例を見る"
+#| eval: false
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
@@ -610,6 +624,33 @@ for i in range(100):
 print(f"勾配降下法（5点すべて）: a={a:.2f}, b={b:.2f}")
 
 a_r, b_r, inliers = ransac_line(P_x, P_t, threshold=0.5)
+print(f"RANSAC: a={a_r:.2f}, b={b_r:.2f}, 賛同者={inliers.astype(int)}")
+
+a, b = 0.0, 0.0
+lr = 0.001
+for i in range(10000):
+    pred = a * P_x + b
+    a -= lr * np.mean(np.sign(pred - P_t) * P_x)
+    b -= lr * np.mean(np.sign(pred - P_t))
+print(f"MAE の勾配降下法（5点すべて）: a={a:.2f}, b={b:.2f}")
+```
+
+```{python}
+#| echo: false
+# Display twin of the solution cell above: the same code, with ransac_line's random
+# draw replaced by the two trials of the hand calculation (A-E, then A-B).
+P_x = np.array([0.0, 1.0, 2.0, 3.0, 2.0])
+P_t = np.array([0.0, 1.0, 2.0, 3.0, 8.0])
+
+a, b = 0.0, 0.0
+lr = 0.1
+for i in range(100):
+    pred = a * P_x + b
+    a -= lr * 2 * np.mean((pred - P_t) * P_x)
+    b -= lr * 2 * np.mean(pred - P_t)
+print(f"勾配降下法（5点すべて）: a={a:.2f}, b={b:.2f}")
+
+a_r, b_r, inliers = ransac_line_fixed(P_x, P_t, 0.5, [(0, 4), (0, 1)])
 print(f"RANSAC: a={a_r:.2f}, b={b_r:.2f}, 賛同者={inliers.astype(int)}")
 
 a, b = 0.0, 0.0
