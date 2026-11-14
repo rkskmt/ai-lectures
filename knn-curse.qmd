@@ -1,6 +1,6 @@
 ---
 title: "k-NN と次元の呪い"
-subtitle: "近い魚に答えを聞く"
+subtitle: "近いデータのラベルで分類する"
 ---
 
 ## ここまでの道具
@@ -9,218 +9,208 @@ subtitle: "近い魚に答えを聞く"
 - **距離**：k-means で、[2点がどれだけ近いか](clustering-kmeans.qmd#peek-distance){.peek}を測った
 
 ::: {.callout-note title="今回の主題"}
-- 境界を作らずに、近い魚に答えを聞いて分類する
-- その方法は、特徴量を増やすとどうなるか
+- 境界を学習せずに、分類できるか
+- 境界を作らない分類は、特徴量を増やすとどうなるか
 :::
 
 
-## データ：過学習の回の 120 匹
+## 似た事例から判断する
 
-- 輝度と重さの 2 つの特徴量で、Salmon と Sea bass を分類する
+- 新しいものを、似ている過去の例から判断することは多い
+   - 例：迷惑メールに似た文面のメールは、迷惑メールだと考える
+   - 例：中古車の値段を、年式や走行距離が近い車の値段から見積もる
+- 規則や境界を作らなくても、「似ているデータは、同じラベルを持ちやすい」と考えれば予測できる
+- データどうしが似ているかは、特徴量の空間での**距離の近さ**で測る
+
+
+## データ：ラベルの付いた点
+
+- 2 つの特徴量を持つ点を、0〜1 の範囲にばらまいた
+- ラベルは、座標の合計が 1 より大きければ 1、そうでなければ 0
+   - ただし 1 割ほどの点は、ラベルを逆にしてある（現実のデータにある例外や誤りの代わり）
+- 訓練データ 100 点と、テストデータ 100 点
 
 ```{python}
 #| echo: true
 #| code-fold: true
-#| code-summary: "魚データの定義（クリックして展開）"
+#| code-summary: "データの定義（クリックして展開）"
 import numpy as np
 import matplotlib.pyplot as plt
 import japanize_matplotlib
 plt.rcParams["font.size"] = 11
 plt.rcParams["figure.dpi"] = 100
 
-salmon_weights     = np.array([1883, 1903, 1652, 1483, 1825, 2474, 2457, 1503, 2057, 1836,
-                               1825, 2094, 2149, 1930, 2028, 1959, 1859, 1936, 1861, 2240,
-                               2081, 1838, 1728, 1426, 2229, 1838, 1884, 1860, 1930, 1733,
-                               2163, 1831, 1591, 2073, 1706, 1644, 2194, 1828, 1820, 1834,
-                               1554, 1615, 1884, 1979, 1839, 2230, 1986, 1978, 1731, 1796,
-                               1872, 2031, 1458, 1405, 2037, 1576, 1774, 1992, 1696, 1752])
-salmon_brightness  = np.array([7.5, 2.6, 3.8, 2.7, 5.8, 2.2, 4.4, 6.0, 3.2, 4.7, 5.7, 4.1,
-                               3.5, 2.6, 4.4, 5.8, 4.4, 5.4, 2.1, 2.8, 4.1, 2.7, 3.7, 2.8,
-                               3.5, 4.4, 3.8, 5.9, 2.6, 7.2, 4.8, 2.7, 5.9, 5.3, 6.1, 5.4,
-                               4.9, 7.2, 5.2, 5.4, 5.8, 5.1, 5.1, 5.8, 4.4, 5.5, 5.9, 2.3,
-                               3.2, 5.3, 4.8, 4.0, 5.0, 6.6, 2.2, 3.2, 4.4, 2.4, 3.2, 4.7])
-seabass_weights    = np.array([2181, 1749, 1864, 1327, 1819, 1979, 1787, 1488, 1370, 1476,
-                               1472, 1533, 1099, 1368, 1486, 1663, 1992, 1370, 1906, 1480,
-                               1426, 1677, 1286, 1445, 1381, 1333, 1505, 1857, 1767, 1492,
-                               1502, 1468, 1259, 1517, 1278, 1223, 1595, 1531, 1096, 1582,
-                               1513, 1440, 1703, 1490, 1432, 2019, 1397, 1341, 1657, 1414,
-                               1748, 1859, 1820, 1245, 2203, 1204, 1496, 1567, 1563, 1737])
-seabass_brightness = np.array([5.4, 6.6, 6.0, 7.5, 4.9, 7.7, 6.9, 5.0, 8.9, 8.3, 5.7, 8.9,
-                               9.7, 6.9, 5.2, 4.7, 5.3, 5.4, 5.1, 4.8, 3.8, 5.6, 5.2, 6.4,
-                               6.4, 6.6, 9.1, 6.3, 4.9, 5.9, 5.6, 5.9, 5.7, 5.2, 9.1, 6.8,
-                               3.5, 5.6, 5.4, 5.4, 7.7, 9.5, 4.7, 4.7, 9.9, 5.4, 5.3, 9.5,
-                               8.5, 6.0, 8.0, 5.7, 6.0, 8.6, 7.6, 6.8, 9.8, 9.0, 9.6, 8.9])
+# 訓練データ 100 点：1 行が 1 点の [特徴量 1, 特徴量 2]
+X_train = np.array([
+    [0.493, 0.303], [0.269, 0.985], [0.220, 0.032], [0.855, 0.171], [0.843, 0.723],
+    [0.079, 0.104], [0.453, 0.743], [0.116, 0.179], [0.772, 0.325], [0.806, 0.115],
+    [0.942, 0.015], [0.151, 0.074], [0.677, 0.891], [0.081, 0.396], [0.872, 0.060],
+    [0.345, 0.397], [0.399, 0.927], [0.824, 0.991], [0.048, 0.438], [0.719, 0.688],
+    [0.936, 0.542], [0.161, 0.363], [0.168, 0.078], [0.957, 0.504], [0.282, 0.657],
+    [0.420, 0.986], [0.172, 0.332], [0.247, 0.663], [0.119, 0.812], [0.603, 0.441],
+    [0.450, 0.038], [0.524, 0.399], [0.889, 0.470], [0.216, 0.939], [0.200, 0.769],
+    [0.601, 0.847], [0.638, 0.871], [0.394, 0.402], [0.577, 0.937], [0.032, 0.582],
+    [0.989, 0.606], [0.846, 0.221], [0.673, 0.948], [0.499, 0.850], [0.590, 0.145],
+    [0.227, 0.341], [0.301, 0.241], [0.515, 0.015], [0.973, 0.929], [0.941, 0.798],
+    [0.313, 0.265], [0.265, 0.262], [0.003, 0.842], [0.802, 0.328], [0.124, 0.272],
+    [0.861, 0.516], [0.147, 0.794], [0.900, 0.219], [0.164, 0.146], [0.338, 0.374],
+    [0.248, 0.292], [0.249, 0.369], [0.083, 0.219], [0.763, 0.154], [0.657, 0.118],
+    [0.961, 0.435], [0.524, 0.955], [0.390, 0.045], [0.307, 0.657], [0.751, 0.827],
+    [0.371, 0.941], [0.999, 0.810], [0.693, 0.545], [0.990, 0.729], [0.219, 0.138],
+    [0.390, 0.262], [0.675, 0.904], [0.878, 0.566], [0.673, 0.753], [0.837, 0.937],
+    [0.646, 0.856], [0.311, 0.484], [0.923, 0.378], [0.106, 0.190], [0.604, 0.928],
+    [0.211, 0.981], [0.886, 0.676], [0.223, 0.344], [0.215, 0.523], [0.811, 0.615],
+    [0.600, 0.249], [0.479, 0.840], [0.211, 0.482], [0.205, 0.218], [0.768, 0.715],
+    [0.432, 0.208], [0.419, 0.277], [0.651, 0.252], [0.792, 0.546], [0.592, 0.185],
+])
+# 訓練データのラベル（X_train と同じ順）
+y_train = np.array([0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1,
+                    0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0])
 
-# i 匹目の [輝度, 重さ] を1組にして、Salmon 60組のあとに Sea bass 60組を並べる
-rows = []
-for i in range(60):
-    rows.append([salmon_brightness[i], salmon_weights[i]])
-for i in range(60):
-    rows.append([seabass_brightness[i], seabass_weights[i]])
-X = np.array(rows)                 # 120組。表にすると120行2列
-y = np.array([1]*60 + [0]*60)      # X と同じ魚の順。1=Salmon, 0=Sea bass
+# テストデータ 100 点：作り方は訓練データと同じ
+X_test = np.array([
+    [0.739, 0.340], [0.171, 0.260], [0.914, 0.047], [0.147, 0.470], [0.238, 0.603],
+    [0.188, 0.509], [0.006, 0.381], [0.299, 0.337], [0.301, 0.001], [0.970, 0.659],
+    [0.989, 0.465], [0.273, 0.209], [0.585, 0.069], [0.219, 0.939], [0.185, 0.103],
+    [0.284, 0.773], [0.563, 0.315], [0.432, 0.917], [0.302, 0.238], [0.440, 0.457],
+    [0.930, 0.833], [0.617, 0.096], [0.417, 0.114], [0.338, 0.182], [0.023, 0.605],
+    [0.284, 0.353], [0.594, 0.401], [0.238, 0.793], [0.602, 0.038], [0.891, 0.033],
+    [0.297, 0.876], [0.047, 0.296], [0.003, 0.018], [0.562, 0.996], [0.395, 0.496],
+    [0.708, 0.778], [0.466, 0.699], [0.490, 0.960], [0.531, 0.720], [0.411, 0.415],
+    [0.159, 0.410], [0.189, 0.454], [0.237, 0.728], [0.500, 0.325], [0.550, 0.533],
+    [0.585, 0.040], [0.801, 0.898], [0.081, 0.622], [0.634, 0.221], [0.522, 0.211],
+    [0.467, 0.575], [0.974, 0.980], [0.653, 0.278], [0.058, 0.754], [0.702, 0.630],
+    [0.498, 0.715], [0.279, 0.883], [0.281, 0.183], [0.568, 0.280], [0.656, 0.527],
+    [0.067, 0.101], [0.174, 0.575], [0.939, 0.664], [0.936, 0.936], [0.644, 0.224],
+    [0.110, 0.945], [0.949, 0.496], [0.546, 0.591], [0.548, 0.281], [0.046, 0.830],
+    [0.430, 0.345], [0.874, 0.525], [0.407, 0.252], [0.001, 0.846], [0.602, 0.670],
+    [0.885, 0.914], [0.882, 0.546], [0.419, 0.606], [0.876, 0.236], [0.569, 0.075],
+    [0.482, 0.392], [0.416, 0.715], [0.282, 0.676], [0.317, 0.897], [0.712, 0.004],
+    [0.506, 0.539], [0.086, 0.696], [0.205, 0.710], [0.110, 0.825], [0.821, 0.152],
+    [0.580, 0.023], [0.908, 0.355], [0.667, 0.070], [0.355, 0.619], [0.883, 0.730],
+    [0.557, 0.961], [0.049, 0.290], [0.937, 0.649], [0.880, 0.939], [0.017, 0.106],
+])
+y_test = np.array([1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0,
+                   1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0])
 ```
-
 
 ```{python}
 #| echo: false
 #| fig-align: center
-plt.figure(figsize=(7, 4.2))
-plt.scatter(X[y == 1, 0], X[y == 1, 1], c="black", marker="o", s=40, alpha=0.7, label="Salmon")
-plt.scatter(X[y == 0, 0], X[y == 0, 1], c="red", marker="s", s=40, alpha=0.7, label="Sea bass")
-plt.xlabel("輝度"); plt.ylabel("重さ (g)")
-plt.legend(); plt.grid(True, alpha=0.3)
+def draw_points(ax, X, y, s=28, alpha=0.75):
+    ax.scatter(X[y == 0, 0], X[y == 0, 1], c="#2980b9", marker="o", s=s, alpha=alpha, label="ラベル 0")
+    ax.scatter(X[y == 1, 0], X[y == 1, 1], c="#e67e22", marker="s", s=s, alpha=alpha, label="ラベル 1")
+
+
+def square_axes(ax):
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    ax.set_aspect("equal")
+    ax.set_xlabel("特徴量 1")
+    ax.set_ylabel("特徴量 2")
+    ax.grid(True, alpha=0.3)
+
+
+fig, ax = plt.subplots(figsize=(4.8, 5.2))
+draw_points(ax, X_train, y_train)
+ax.plot([0, 1], [1, 0], color="gray", ls="--", lw=1.2, label="座標の合計 = 1")
+square_axes(ax)
+ax.set_title("訓練データ（100 点）", fontsize=10.5)
+ax.legend(fontsize=9, loc="upper center", bbox_to_anchor=(0.5, -0.14), ncol=3)
 plt.tight_layout()
 plt.show()
 ```
 
 
-## 近い事例を参考にする（k-nearest neighbors）
-
-
-- 種類の分かっている魚（訓練データ）を、そのまま取っておく
-- 新しい魚が来たら、訓練データの中から**近い魚を k 匹**探す
-- その k 匹の種類から、新しい魚の種類を予測する
-- **k-NN（[k-nearest neighbors]{.en} / k 近傍法）**と呼ぶ
-   - まず k = 1（いちばん近い 1 匹）から作る
-
-| | 学習でやること | 予測でやること |
-|--|-----|------|
-| 決定木 | データから境界を作る | 境界のどちら側かを見る |
-| k-NN | 訓練データを取っておくだけ | 訓練データの中から近い魚を探す |
-
-
-## 準備：データを分けて、スケールを揃える {#peek-knn-prepare}
-
-- [ランダムに並べ替えて](classification-evaluation.qmd#peek-split){.peek}、96 匹を訓練データ、24 匹をテストデータにする
-- 距離を測る前に、[標準化](clustering-kmeans.qmd#peek-scale){.peek}でスケールを揃える
-   - 重さは 1,000〜2,500 g、輝度は 2〜10 なので、そのままでは[重さだけで距離が決まる](clustering-kmeans.qmd#peek-scale-mismatch){.peek}
-   - 平均と標準偏差は、訓練データから求める
-
-```{python}
-#| echo: true
-#| eval: false
-idx = np.arange(len(y))
-np.random.shuffle(idx)                                  # ランダムに並べ替えてから分ける
-X_train, y_train = X[idx[:96]], y[idx[:96]]             # 96 匹：種類の分かっている魚
-X_test,  y_test  = X[idx[96:]], y[idx[96:]]             # 24 匹：新しく来た魚の役
-
-mean, std = X_train.mean(axis=0), X_train.std(axis=0)   # 訓練データの平均と標準偏差（列ごと）
-Z_train = (X_train - mean) / std                        # 標準化した訓練データ
-Z_test  = (X_test  - mean) / std                        # テストデータも、同じ平均と標準偏差で標準化
-print(f"訓練データ {len(Z_train)} 匹、テストデータ {len(Z_test)} 匹")
-```
-
-```{python}
-#| echo: false
-# Display twin of the cell above: the same steps with the shuffle replaced by one frozen
-# order of the 120 fish (tools/measure_knn_curse.py), so that every output and figure of
-# the k-NN slides is the same on every render.
-idx = np.array([101, 67, 36, 114, 1, 23, 13, 16, 107, 27, 5, 50, 84, 44, 98, 100, 111, 117, 99, 87,
-                110, 97, 20, 34, 88, 10, 39, 105, 113, 72, 52, 11, 83, 8, 9, 37, 22, 19, 66, 81,
-                55, 4, 25, 92, 109, 53, 74, 75, 71, 3, 93, 82, 42, 15, 30, 2, 35, 94, 80, 43,
-                17, 90, 28, 64, 18, 6, 65, 68, 24, 86, 57, 21, 91, 85, 104, 47, 0, 60, 70, 62,
-                45, 102, 26, 51, 49, 96, 112, 115, 40, 61, 12, 118, 32, 116, 89, 46, 58, 14, 73, 38,
-                106, 31, 108, 48, 77, 76, 7, 103, 63, 119, 69, 78, 59, 54, 29, 41, 56, 33, 79, 95])
-X_train, y_train = X[idx[:96]], y[idx[:96]]
-X_test,  y_test  = X[idx[96:]], y[idx[96:]]
-
-mean, std = X_train.mean(axis=0), X_train.std(axis=0)
-Z_train = (X_train - mean) / std
-Z_test  = (X_test  - mean) / std
-print(f"訓練データ {len(Z_train)} 匹、テストデータ {len(Z_test)} 匹")
-```
-
-::: {.caption-note .center}
-分け方は実行のたびに変わるので、ここから先の手元の数字は、スライドと少し違う
-:::
-
-
-## いちばん近い 1 匹で予測する（k = 1） {#peek-nearest-code}
-
-- 新しい魚から、訓練データの全部の魚までの距離を測る
-- いちばん近い魚の種類を返す
-
-```{python}
-#| echo: true
-def predict_nearest(Z_train, y_train, z):
-    dist = np.sqrt(((Z_train - z) ** 2).sum(axis=1))    # 新しい魚 z から、訓練データ全部までの距離
-    return y_train[dist.argmin()]                       # いちばん近い魚の種類（1=Salmon, 0=Sea bass）
-
-pred = []
-for z in Z_test:                                        # テストデータの 24 匹を、1 匹ずつ予測する
-    pred.append(predict_nearest(Z_train, y_train, z))
-pred = np.array(pred)
-
-print(f"当たった数: {np.sum(pred == y_test)} / {len(y_test)}")
-print(f"Accuracy: {np.mean(pred == y_test):.3f}")
-```
+## 境界で決めるか、近い点の投票で決めるか
 
 ```{python}
 #| echo: false
 #| fig-align: center
-def neighbor_figure(i, k, title):
-    """Test fish i, its k nearest training fish (circled) and the lines to them."""
-    dist = np.sqrt(((Z_train - Z_test[i]) ** 2).sum(axis=1))
-    near = np.argsort(dist)[:k]
-    plt.figure(figsize=(5.6, 4.6))
-    plt.scatter(Z_train[y_train == 1, 0], Z_train[y_train == 1, 1], c="black", marker="o", s=28, alpha=0.6, label="Salmon（訓練データ）")
-    plt.scatter(Z_train[y_train == 0, 0], Z_train[y_train == 0, 1], c="red", marker="s", s=28, alpha=0.6, label="Sea bass（訓練データ）")
-    for j in near:
-        plt.plot([Z_test[i, 0], Z_train[j, 0]], [Z_test[i, 1], Z_train[j, 1]], color="#2980b9", lw=1.5, zorder=1)
-    plt.scatter(Z_train[near, 0], Z_train[near, 1], s=170, facecolors="none", edgecolors="#2980b9", lw=2, zorder=3)
-    plt.scatter(Z_test[i, 0], Z_test[i, 1], marker="*", s=260, c="#27ae60", edgecolors="black", zorder=4, label="新しい魚（テストデータ）")
-    plt.xlim(Z_test[i, 0] - 1.3, Z_test[i, 0] + 1.3)
-    plt.ylim(Z_test[i, 1] - 1.0, Z_test[i, 1] + 1.0)
-    plt.xlabel("輝度（標準化後）"); plt.ylabel("重さ（標準化後）")
-    plt.title(title, fontsize=10.5)
-    plt.legend(fontsize=8, loc="upper right"); plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.show()
+from sklearn.tree import DecisionTreeClassifier
 
-neighbor_figure(4, 1, "テストデータの 5 匹目（Sea bass）のまわりを拡大\nいちばん近い 1 匹は Salmon")
+x_new = np.array([0.7, 0.6])
+tree_clf = DecisionTreeClassifier(max_depth=3, random_state=0).fit(X_train, y_train)
+g0, g1 = np.meshgrid(np.linspace(0, 1, 301), np.linspace(0, 1, 301))
+region = tree_clf.predict(np.column_stack([g0.ravel(), g1.ravel()])).reshape(g0.shape)
+
+fig, axes = plt.subplots(1, 2, figsize=(10.5, 5.4))
+ax = axes[0]
+ax.contourf(g0, g1, region, levels=[-0.5, 0.5, 1.5], colors=["#d6eaf8", "#fdebd0"])
+ax.contour(g0, g1, region, levels=[0.5], colors="#555555", linewidths=1.5)
+draw_points(ax, X_train, y_train, alpha=0.6)
+ax.scatter(*x_new, marker="*", s=420, c="#27ae60", edgecolors="black", zorder=5, label="新しい点 ★")
+square_axes(ax)
+ax.set_title(f"決定木（深さ 3）\n★ は {tree_clf.predict([x_new])[0]} の領域にある → ラベル {tree_clf.predict([x_new])[0]}",
+             fontsize=10.5)
+
+ax = axes[1]
+dist = np.sqrt(((X_train - x_new) ** 2).sum(axis=1))
+near = np.argsort(dist)[:3]
+draw_points(ax, X_train, y_train, alpha=0.6)
+for j in near:
+    ax.plot([x_new[0], X_train[j, 0]], [x_new[1], X_train[j, 1]], color="#27ae60", lw=2, zorder=3)
+ax.scatter(X_train[near, 0], X_train[near, 1], s=230, facecolors="none", edgecolors="#27ae60", lw=2.2, zorder=4)
+ax.scatter(*x_new, marker="*", s=420, c="#27ae60", edgecolors="black", zorder=5)
+square_axes(ax)
+votes = y_train[near]
+ax.set_title(f"境界なし：★ に近い 3 点の投票\nラベル 1 が {votes.sum()} 票、0 が {3 - votes.sum()} 票 → ラベル {int(votes.sum() > 1.5)}",
+             fontsize=10.5)
+handles, labels = axes[0].get_legend_handles_labels()
+fig.legend(handles, labels, loc="lower center", ncol=3, fontsize=9.5)
+plt.tight_layout(rect=[0, 0.07, 1, 1])
+plt.show()
 ```
 
-::: {.callout-note title="結果"}
-- 24 匹中 **18 匹**で当たる
-- 図の魚は外れた
-   - 本当は Sea bass だが、いちばん近い 1 匹がたまたま Salmon だった
+::: {.callout-note title="要するに"}
+- **決定木**：先に訓練データから境界を作り、★ がどちらの領域に入るかでラベルを決める
+- **近い点の投票**：境界は作らず、★ に近い 3 点のラベルを見て、多いほうに決める
+   - 近い 3 点のうち 1 点はラベル 0 だが、多数決なので 1 になる
 :::
 
 
-## 近い k 匹の多数決にする {#peek-knn-code}
+## 近い k 点の多数決にする（k-NN） {#peek-knn-code}
 
-- いちばん近い 1 匹だけに聞くと、その 1 匹に答えが左右される
-- 近い順に **k 匹**を選び、多いほうの種類を答えにする
+- 新しい点 $x$ のラベルを、次の手順で決める
+   1. $x$ から、訓練データの全部の点までの距離を測る
+   2. 距離が小さい順に、k 点を選ぶ
+   3. k 点のラベルのうち、多いほうを $x$ のラベルとする
+- **k-NN（[k-nearest neighbors]{.en} / k 近傍法）**と呼ぶ
+   - k は奇数にする（偶数だと、同数で決まらないことがある）
 
 ```{python}
 #| echo: true
-def predict_knn(Z_train, y_train, z, k):
-    dist    = np.sqrt(((Z_train - z) ** 2).sum(axis=1)) # 新しい魚 z から、訓練データ全部までの距離
-    nearest = np.argsort(dist)[:k]                      # 距離が小さい順に並べた番号の、先頭 k 個
-    votes   = y_train[nearest]                          # 近い k 匹の種類（1=Salmon, 0=Sea bass）
-    return int(votes.sum() > k / 2)                     # Salmon が半分より多ければ 1
+def predict_knn(X_train, y_train, x, k):
+    dist    = np.sqrt(((X_train - x) ** 2).sum(axis=1))  # 1. x から、訓練データの全部の点までの距離
+    nearest = np.argsort(dist)[:k]                       # 2. 距離が小さい順に並べた番号の、先頭 k 個
+    votes   = y_train[nearest]                           #    k 点のラベル（0 か 1）
+    return int(votes.sum() > k / 2)                      # 3. ラベル 1 が半分より多ければ 1、そうでなければ 0
 
-k = 5
+x_new = np.array([0.7, 0.6])                             # 前のスライドの ★
+print(f"★ の予測（k = 3）: {predict_knn(X_train, y_train, x_new, 3)}")
+```
+
+
+## テストデータで確かめる {#peek-knn-test}
+
+- テストデータの 100 点を、k = 3 の k-NN で 1 点ずつ予測し、当たった数を数える
+
+```{python}
+#| echo: true
+k = 3
 pred = []
-for z in Z_test:
-    pred.append(predict_knn(Z_train, y_train, z, k))
+for x in X_test:                                         # テストデータの 100 点を、1 点ずつ予測する
+    pred.append(predict_knn(X_train, y_train, x, k))
 pred = np.array(pred)
 
 print(f"k = {k}: 当たった数 {np.sum(pred == y_test)} / {len(y_test)}")
-print(f"5 匹目の予測: {predict_knn(Z_train, y_train, Z_test[4], k)}（正解は {y_test[4]}）")
-```
-
-```{python}
-#| echo: false
-#| fig-align: center
-neighbor_figure(4, 5, "同じ魚の、近い 5 匹\nSea bass が 4 匹、Salmon が 1 匹")
+print(f"Accuracy: {np.mean(pred == y_test):.3f}")
 ```
 
 ::: {.callout-note title="結果"}
-- さっき外れた魚は、Sea bass 4 匹と Salmon 1 匹の多数決で、Sea bass と正しく予測できた
-- 全体では 24 匹中 18 匹のままで、当たる魚が入れ替わっただけ
-- k は奇数にする（偶数だと、同数で決まらないことがある）
+- 100 点中 **85 点**で当たる
+- テストデータの 100 点のうち 13 点は、ラベルを逆にした点
+   - 規則（座標の合計 > 1）そのもので答えても、当たるのは 87 点
 :::
 
 
@@ -229,30 +219,30 @@ neighbor_figure(4, 5, "同じ魚の、近い 5 匹\nSea bass が 4 匹、Salmon 
 ```{python}
 #| echo: false
 #| fig-align: center
-g0, g1 = np.meshgrid(np.arange(-2.4, 2.6, 0.04), np.arange(-2.6, 2.9, 0.04))
+g0, g1 = np.meshgrid(np.arange(0, 1.0001, 0.005), np.arange(0, 1.0001, 0.005))
 grid_pts = np.column_stack([g0.ravel(), g1.ravel()])
-grid_dist = np.sqrt(((grid_pts[:, None, :] - Z_train[None, :, :]) ** 2).sum(axis=2))
-grid_order = np.argsort(grid_dist, axis=1)
+grid_order = np.argsort(((grid_pts[:, None, :] - X_train[None, :, :]) ** 2).sum(axis=2), axis=1)
 
-fig, axes = plt.subplots(1, 3, figsize=(13, 4), sharey=True)
-for ax, k_show in zip(axes, [1, 5, 31]):
+fig, axes = plt.subplots(1, 3, figsize=(13, 4.6), sharey=True)
+for ax, k_show in zip(axes, [1, 3, 31]):
     votes = y_train[grid_order[:, :k_show]].sum(axis=1)
     region = (votes > k_show / 2).astype(int).reshape(g0.shape)
-    ax.contourf(g0, g1, region, alpha=0.3, levels=1, colors=["lightcoral", "lightblue"])
-    ax.contour(g0, g1, region, levels=[0.5], colors="blue", linewidths=1.5)
-    ax.scatter(Z_train[y_train == 1, 0], Z_train[y_train == 1, 1], c="black", marker="o", s=20, alpha=0.7, label="Salmon")
-    ax.scatter(Z_train[y_train == 0, 0], Z_train[y_train == 0, 1], c="red", marker="s", s=20, alpha=0.7, label="Sea bass")
+    ax.contourf(g0, g1, region, levels=[-0.5, 0.5, 1.5], colors=["#d6eaf8", "#fdebd0"])
+    ax.contour(g0, g1, region, levels=[0.5], colors="#555555", linewidths=1.3)
+    draw_points(ax, X_train, y_train, s=20)
+    square_axes(ax)
     ax.set_title(f"k = {k_show}")
-    ax.set_xlabel("輝度（標準化後）")
-axes[0].set_ylabel("重さ（標準化後）")
-axes[0].legend(fontsize=8, loc="upper right")
-plt.tight_layout()
+axes[1].set_ylabel("")
+axes[2].set_ylabel("")
+handles, labels = axes[0].get_legend_handles_labels()
+fig.legend(handles, labels, loc="lower center", ncol=2, fontsize=9.5)
+plt.tight_layout(rect=[0, 0.1, 1, 1])
 plt.show()
 ```
 
 ::: {.callout-note title="結果"}
-- k-NN は境界を作らないが、「どこに来た魚を Salmon と答えるか」を塗ると、境界が見える
-- **k = 1**：訓練データの魚 1 匹ごとに、飛び地ができる
+- k-NN は境界を作らないが、「どこに来た点を 1 と答えるか」を塗ると、境界が見える
+- **k = 1**：ラベルを逆にした点のまわりに、飛び地ができる
    - [深い決定木](classification-2d-boundaries.qmd#peek-overfit-boundary){.peek}と同じで、訓練データの細部まで覚え込んでいる
 - **k を増やす**と、境界はなめらかになる
 :::
@@ -265,86 +255,68 @@ plt.show()
 ```{python}
 #| echo: true
 #| fig-align: center
-def accuracy_knn(Z, y_true, k):
-    """Z の魚を 1 匹ずつ k-NN で予測し、当たった割合を返す"""
+def accuracy_knn(X_train, y_train, X, y, k):
+    """X の点を 1 点ずつ k-NN で予測し、当たった割合を返す"""
     pred = []
-    for z in Z:
-        pred.append(predict_knn(Z_train, y_train, z, k))
-    return np.mean(np.array(pred) == y_true)
+    for x in X:
+        pred.append(predict_knn(X_train, y_train, x, k))
+    return np.mean(np.array(pred) == y)
 
-ks = [1, 3, 5, 7, 9, 11, 15, 21, 31, 41]
+ks = [1, 3, 5, 9, 15, 21, 31, 51, 71]
 train_acc, test_acc = [], []
 for k in ks:
-    train_acc.append(accuracy_knn(Z_train, y_train, k))
-    test_acc.append(accuracy_knn(Z_test, y_test, k))
+    train_acc.append(accuracy_knn(X_train, y_train, X_train, y_train, k))
+    test_acc.append(accuracy_knn(X_train, y_train, X_test, y_test, k))
     print(f"k = {k:2d}: train {train_acc[-1]:.3f}  test {test_acc[-1]:.3f}")
 
 plt.figure(figsize=(6.5, 3.4))
 plt.plot(ks, train_acc, "o-", color="#2980b9", label="訓練データ")
 plt.plot(ks, test_acc, "s-", color="#e74c3c", label="テストデータ")
-plt.xlabel("k"); plt.ylabel("Accuracy")
-plt.legend(); plt.grid(True, alpha=0.4)
+plt.xlabel("k")
+plt.ylabel("Accuracy")
+plt.legend()
+plt.grid(True, alpha=0.4)
 plt.tight_layout()
 plt.show()
 ```
 
 ::: {.callout-note title="結果"}
-- **k = 1**：訓練データでは 1.000、テストデータでは 0.750
-   - 訓練データの魚にいちばん近いのは自分自身なので、必ず当たる
+- **k = 1**：訓練データでは 1.000、テストデータでは 0.810
+   - 訓練データの点にいちばん近いのは、その点自身なので、必ず当たる
    - [訓練とテストの差が大きい](classification-evaluation.qmd#peek-generalization-gap){.peek}ので、過学習している
-- k を増やすと、訓練データの Accuracy は 0.78 前後まで下がり、テストデータとの差が縮まる
+- k = 3〜31 では、テストデータは 0.81〜0.85
+- k を大きくしすぎると、遠くの点まで多数決に入り、テストデータでも下がる（k = 71 で 0.790）
 :::
 
-::: {.callout-important title="ポイント"}
+::: {.callout-important title="重要ポイント"}
 - k は[ハイパパラメータ](classification-evaluation.qmd#peek-hyperparameter){.peek}
 - テストデータの成績を見て k を選ばない
 - [訓練データの中の交差検証](classification-evaluation.qmd#peek-cv){.peek}で選ぶ
 :::
 
 
-## **Tweak** k と標準化を変える {.badge-practice}
+## **Tweak** k を変える {.badge-practice}
 
-- [k-NN のコード](#peek-knn-code){.peek}を**書き換えて実行**
+- [テストデータで確かめたコード](#peek-knn-test){.peek}を**書き換えて実行**
 
 ::: {.tweak}
 | やりたいこと | コード |
 |--|--|
-| 1 匹だけに聞け | `k = 5` → `k = 1` |
-| 31 匹に聞け | `k = 5` → `k = 31` |
-| 標準化をやめよ | `predict_knn(Z_train, y_train, z, k)` → `predict_knn(X_train, y_train, z, k)`、`for z in Z_test:` → `for z in X_test:` |
+| 1 点だけに聞け | `k = 3` → `k = 1` |
+| 31 点に聞け | `k = 3` → `k = 31` |
 :::
 
 ::: {.callout-tip title="チェックポイント"}
-- `k = 1`：[いちばん近い 1 匹で予測したとき](#peek-nearest-code){.peek}と同じ結果になる
-- `k = 31`：スライドの分け方では、24 匹中 19 匹で当たる
-- 標準化をやめると、スライドの分け方では 18 匹から 16 匹に減る
-   - 重さの差（数百 g）に比べて輝度の差（数）が小さく、距離がほぼ重さだけで決まる
+- `k = 1`：100 点中 81 点
+- `k = 31`：100 点中 84 点
 :::
-
-
-## （参考）scikit-learn では
-
-- k-NN は `KNeighborsClassifier` に入っている
-
-```{python}
-#| echo: true
-from sklearn.neighbors import KNeighborsClassifier
-
-knn = KNeighborsClassifier(n_neighbors=5).fit(Z_train, y_train)
-print(f"当たった数: {np.sum(knn.predict(Z_test) == y_test)} / {len(y_test)}")
-```
-
-| 今日書いたもの | scikit-learn |
-|---|---|
-| 訓練データを取っておく | `KNeighborsClassifier(n_neighbors=5).fit(Z_train, y_train)` |
-| `predict_knn(Z_train, y_train, z, 5)` を 1 匹ずつ | `knn.predict(Z_test)` |
 
 
 ## 特徴量の数を増やすのが最強か？
 
-- **重さだけ**でサーモンを分類すると、ある程度できた
-- **輝度も追加**して2次元で分類すると、精度が上がった
-- ならば**特徴量を増やし続ければ**もっと精度が上がる？
+- 2 つの特徴量で、k-NN はテストデータの 100 点中 85 点で当たった
+- 特徴量を増やせば、分類の手がかりが増える
+- ならば**特徴量を増やし続ければ**、もっと当たる？
 
 ::: {.callout-important title="質問"}
 特徴量（次元）を増やし続けると何が起きるか？
@@ -355,6 +327,75 @@ print(f"当たった数: {np.sum(knn.predict(Z_test) == y_test)} / {len(y_test)}
 
 ::: {.break-title}
 次元の呪い
+:::
+
+
+## 同じ作り方で、特徴量を増やす {#peek-knn-dims}
+
+- データを作る関数 `make_data` を用意する
+   - $d$ 個の特徴量を持つ点を、0〜1 の範囲にばらまく
+   - ラベルは、座標の合計が真ん中の値 $d / 2$ より大きければ 1（1 割ほどは逆）
+   - 2 次元のデータも、この作り方で作った
+- 特徴量を 2, 3, 5, 10, 20 個に増やし、k = 3 の k-NN でテストデータ 1,000 点を予測する
+   - 訓練データは、どの次元でも 100 点
+
+```{python}
+#| echo: true
+#| eval: false
+rng = np.random.default_rng()                        # 乱数の生成器（実行するたびに違う点になる）
+
+def make_data(n, d):
+    X = rng.random((n, d))                           # n 点を、d 次元の 0〜1 の範囲にばらまく
+    y = (X.sum(axis=1) > d / 2).astype(int)          # 座標の合計が d/2 より大きければ 1
+    flip = rng.random(n) < 0.1                       # 1 割ほどの点を選び、
+    y[flip] = 1 - y[flip]                            # ラベルを逆にする
+    return X, y
+
+for d in [2, 3, 5, 10, 20]:
+    Xd_train, yd_train = make_data(100, d)           # 訓練データ 100 点
+    Xd_test,  yd_test  = make_data(1000, d)          # テストデータ 1,000 点
+    acc = accuracy_knn(Xd_train, yd_train, Xd_test, yd_test, 3)
+    print(f"{d:2d}次元: Accuracy {acc:.3f}")
+```
+
+```{python}
+#| echo: false
+# Frozen result of one run of the cell above (tools/measure_knn_curse.py, default_rng(0)).
+# The student cell is unseeded; the slide shows these values.
+dims_knn = [2, 3, 5, 10, 20]
+knn_dims = [0.838, 0.808, 0.796, 0.679, 0.634]
+
+for d, a in zip(dims_knn, knn_dims):
+    print(f"{d:2d}次元: Accuracy {a:.3f}")
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
+plt.figure(figsize=(7, 3.3))
+plt.plot(dims_knn, knn_dims, "o-", color="#e74c3c", label="k-NN（k = 3）")
+plt.axhline(0.9, color="#27ae60", ls="--", lw=1.2, label="上限（ラベルの 1 割が逆）")
+plt.axhline(0.5, color="gray", ls=":", lw=1.2, label="でたらめに答えたとき")
+plt.ylim(0.45, 1.0)
+plt.xticks(dims_knn)
+plt.xlabel("次元数 d（特徴量の数）")
+plt.ylabel("Accuracy")
+plt.title("特徴量を増やすと、k-NN は当たらなくなる")
+plt.legend(fontsize=9, loc="lower left")
+plt.grid(True, alpha=0.4)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-note title="結果"}
+- 2 次元では 0.838、20 次元では 0.634 まで下がる
+   - ラベルの 1 割が逆なので、上限は 0.9 ほど
+   - でたらめに答えても 0.5
+- どの特徴量もラベルに関係しているのに、特徴量を増やすほど当たらなくなる
+:::
+
+::: {.caption-note .center}
+点は実行のたびに変わるので、手元の数字は少し違う
 :::
 
 
@@ -370,171 +411,80 @@ print(f"当たった数: {np.sum(knn.predict(Z_test) == y_test)} / {len(y_test)}
 :::
 
 
+## いちばん近い点までの距離を測る
 
-## 準備
-
-- 各特徴量は 0〜1 に正規化してあるとする（各軸の長さ＝1）
-- そこに**100個の点**をランダムにばらまく
-- 点は「行＝点、列＝特徴量」の配列で持つ
-- まず特徴量2個（2次元）で、散布図に描く
-
-```{python}
-#| echo: true
-#| eval: false
-import numpy as np
-import matplotlib.pyplot as plt
-import japanize_matplotlib
-
-rng = np.random.default_rng()  # 乱数の生成器（実行するたびに違う点になる）
-P   = rng.random((100, 2))          # 100個の点（行＝点、列＝特徴量）
-
-plt.figure(figsize=(4.4, 4.4))
-plt.scatter(P[:, 0], P[:, 1], s=28, c="#2980b9")
-plt.xlabel("特徴量 1")
-plt.ylabel("特徴量 2")
-plt.xlim(0, 1)
-plt.ylim(0, 1)
-plt.gca().set_aspect("equal")
-plt.grid(True, alpha=0.3)
-plt.tight_layout()
-plt.show()
-```
-
-```{python}
-#| echo: false
-#| fig-align: center
-import numpy as np
-import matplotlib.pyplot as plt
-import japanize_matplotlib
-plt.rcParams["font.size"] = 11
-plt.rcParams["figure.dpi"] = 100
-
-# Frozen points: one run of the cell above (tools/measure_knn_curse.py).
-# The student cell is unseeded; the slides 準備 and 距離を測る show these points.
-P = np.array([
-    [0.480, 0.232], [0.802, 0.924], [0.266, 0.539], [0.443, 0.931], [0.041, 0.732],
-    [0.614, 0.028], [0.719, 0.016], [0.758, 0.513], [0.929, 0.066], [0.841, 0.067],
-    [0.344, 0.430], [0.966, 0.562], [0.259, 0.242], [0.888, 0.226], [0.125, 0.288],
-    [0.586, 0.554], [0.810, 0.560], [0.288, 0.413], [0.818, 0.627], [0.959, 0.369],
-    [0.553, 0.594], [0.848, 0.145], [0.407, 0.910], [0.043, 0.823], [0.415, 0.830],
-    [0.010, 0.365], [0.079, 0.653], [0.274, 0.703], [0.944, 0.127], [0.865, 0.059],
-    [0.381, 0.430], [0.489, 0.976], [0.776, 0.309], [0.270, 0.863], [0.881, 0.511],
-    [0.344, 0.995], [0.316, 0.183], [0.880, 0.812], [0.668, 0.958], [0.926, 0.748],
-    [0.861, 0.247], [0.141, 0.670], [0.715, 0.167], [0.396, 0.910], [0.561, 0.578],
-    [0.194, 0.526], [0.523, 0.089], [0.982, 0.571], [0.006, 0.773], [0.978, 0.590],
-    [0.320, 0.188], [0.673, 0.195], [0.578, 0.602], [0.962, 0.072], [0.500, 0.744],
-    [0.177, 0.388], [0.063, 0.726], [0.088, 0.395], [0.874, 0.472], [0.913, 0.766],
-    [0.915, 0.127], [0.074, 0.070], [0.869, 0.634], [0.497, 0.164], [0.674, 0.318],
-    [0.711, 0.460], [0.507, 0.790], [0.093, 0.579], [0.197, 0.808], [0.489, 0.989],
-    [0.183, 0.963], [0.801, 0.481], [0.814, 0.603], [0.655, 0.914], [0.065, 0.835],
-    [0.382, 0.326], [0.994, 0.781], [0.486, 0.423], [0.878, 0.087], [0.708, 0.789],
-    [0.799, 0.322], [0.797, 0.225], [0.362, 0.417], [0.541, 0.113], [0.407, 0.000],
-    [0.744, 0.852], [0.139, 0.704], [0.821, 0.982], [0.844, 0.424], [0.980, 0.974],
-    [0.504, 0.753], [0.914, 0.476], [0.864, 0.702], [0.294, 0.768], [0.571, 0.094],
-    [0.391, 0.074], [0.476, 0.429], [0.424, 0.586], [0.123, 0.934], [0.684, 0.824],
-])
-
-plt.figure(figsize=(4.4, 4.4))
-plt.scatter(P[:, 0], P[:, 1], s=28, c="#2980b9")
-plt.xlabel("特徴量 1")
-plt.ylabel("特徴量 2")
-plt.xlim(0, 1)
-plt.ylim(0, 1)
-plt.gca().set_aspect("equal")
-plt.grid(True, alpha=0.3)
-plt.tight_layout()
-plt.show()
-```
-
-::: {.caption-note .center}
-点は実行のたびに変わるので、手元の図は少し違う
-:::
-
-
-## 距離を測る
-
-- 2点間の距離は、[**ユークリッド距離**](clustering-kmeans.qmd#peek-distance){.peek}で測る
-- ある点から、ほかの99個の点までの距離をすべて測る
+- 訓練データの点 0 から、ほかの 99 点までの距離をすべて測る
 - その中でいちばん小さいものが、**いちばん近い点（最近傍, [nearest neighbor]{.en}）までの距離**
+- 100 点それぞれで測り、その中央値を、点の混み具合として使う
 
 ```{python}
 #| echo: true
 def nearest_distance(P, i):
-    dist = np.sqrt(((P - P[i]) ** 2).sum(axis=1))   # 点 i から全部の点までの距離
-    dist[i] = np.inf                                # 自分自身は除外
-    return dist.min()                               # いちばん近い点までの距離
+    dist = np.sqrt(((P - P[i]) ** 2).sum(axis=1))    # 点 i から全部の点までの距離
+    dist[i] = np.inf                                 # 自分自身は除外
+    return dist.min()                                # いちばん近い点までの距離
 
-print(f"点 0 からいちばん近い点まで: {nearest_distance(P, 0):.3f}")
+print(f"点 0 からいちばん近い点まで: {nearest_distance(X_train, 0):.3f}")
 
 nn = []
-for i in range(len(P)):                             # 100個の点すべてで測る
-    nn.append(nearest_distance(P, i))
-print(f"100個の中央値: {np.median(nn):.3f}")
+for i in range(len(X_train)):                        # 100 点すべてで測る
+    nn.append(nearest_distance(X_train, i))
+print(f"100 点の中央値: {np.median(nn):.3f}")
 ```
 
 ```{python}
 #| echo: false
 #| fig-align: center
-d0 = np.sqrt(((P - P[0]) ** 2).sum(axis=1))
+d0 = np.sqrt(((X_train - X_train[0]) ** 2).sum(axis=1))
 d0[0] = np.inf
 j0 = d0.argmin()
 
 plt.figure(figsize=(4.6, 4.6))
-for q in P[1:]:
-    plt.plot([P[0, 0], q[0]], [P[0, 1], q[1]], color="#bbbbbb", lw=0.5, zorder=1)
-plt.plot([P[0, 0], P[j0, 0]], [P[0, 1], P[j0, 1]], color="#e74c3c", lw=2.5, zorder=3)
-plt.scatter(P[:, 0], P[:, 1], s=28, c="#2980b9", zorder=2)
-plt.scatter(P[0, 0], P[0, 1], s=70, c="#e74c3c", zorder=4)
+for q in X_train[1:]:
+    plt.plot([X_train[0, 0], q[0]], [X_train[0, 1], q[1]], color="#bbbbbb", lw=0.5, zorder=1)
+plt.plot([X_train[0, 0], X_train[j0, 0]], [X_train[0, 1], X_train[j0, 1]], color="#e74c3c", lw=2.5, zorder=3)
+plt.scatter(X_train[:, 0], X_train[:, 1], s=28, c="#7f8c8d", zorder=2)
+plt.scatter(X_train[0, 0], X_train[0, 1], s=70, c="#e74c3c", zorder=4)
 plt.xlabel("特徴量 1")
 plt.ylabel("特徴量 2")
 plt.xlim(0, 1)
 plt.ylim(0, 1)
 plt.gca().set_aspect("equal")
-plt.title(f"点 0（赤い丸）から全部の点への距離\n赤い線がいちばん近い点（距離 {d0.min():.3f}）",
-          fontsize=10.5)
+plt.title(f"点 0（赤い丸）から全部の点への距離\n赤い線がいちばん近い点（距離 {d0.min():.3f}）", fontsize=10.5)
 plt.tight_layout()
 plt.show()
 ```
 
 ::: {.callout-note title="結果"}
-- 点 0 からいちばん近い点までの距離は **0.070**（図の赤い線）
-- この距離は、100個の点それぞれに1つずつ決まる
-   - その中央値 **0.042** を、点の混み具合を表す値として使う
-- 軸の長さ 1 に対して 0.04 ほどなので、2次元ではすぐ隣に点がある
+- 点 0 からいちばん近い点までは **0.078**（図の赤い線）
+- 100 点の中央値は **0.052**
+   - 軸の長さ 1 に対して 0.05 ほどなので、2 次元ではすぐ近くに点がある
 :::
 
 
-## 質問：いちばん近い点まで、どれくらい？ {#peek-nn-distance}
+## 次元を増やすと、いちばん近い点が遠くなる {#peek-nn-distance}
 
-- **2次元**では、いちばん近い点までの距離（中央値）は **0.04** ほどだった
-
-::: {.callout-important title="質問"}
-特徴量を増やして **10次元** にしたら、いちばん近い点までの距離はいくつになると思う？
-
-（各軸の長さは1のまま。点の数も100個のまま）
-:::
-
-::: {.fragment}
+- `make_data` で 100 点を作り、特徴量を 2, 3, 5, 10, 20 個に増やして、いちばん近い点までの距離（中央値）を測る
 
 ```{python}
 #| echo: true
 #| eval: false
-for d in [1, 2, 3, 5, 10, 20]:
-    P  = rng.random((100, d))                   # 100個の点を d 次元にばらまく
+for d in [2, 3, 5, 10, 20]:
+    P, label = make_data(100, d)                     # 100 点を d 次元にばらまく（ラベルは使わない）
     nn = []
-    for i in range(len(P)):                     # 「距離を測る」と同じ測り方
+    for i in range(len(P)):                          # 「いちばん近い点までの距離を測る」と同じ測り方
         nn.append(nearest_distance(P, i))
     print(f"{d:2d}次元: いちばん近い点まで {np.median(nn):.3f}")
 ```
 
 ```{python}
 #| echo: false
-# Frozen result of one run of the cell above (tools/measure_knn_curse.py).
+# Frozen result of one run of the cell above (tools/measure_knn_curse.py, default_rng(0)).
 # The student cell is unseeded; the slide shows these values.
-dims = [1, 2, 3, 5, 10, 20]
-nn_median = [0.003, 0.042, 0.121, 0.306, 0.703, 1.195]
+dims_nn = [2, 3, 5, 10, 20]
+nn_median = [0.049, 0.121, 0.299, 0.692, 1.195]
 
-for d, m in zip(dims, nn_median):
+for d, m in zip(dims_nn, nn_median):
     print(f"{d:2d}次元: いちばん近い点まで {m:.3f}")
 ```
 
@@ -542,14 +492,14 @@ for d, m in zip(dims, nn_median):
 #| echo: false
 #| fig-align: center
 plt.figure(figsize=(7, 3.2))
-plt.plot(dims, nn_median, "o-", color="#e74c3c")
+plt.plot(dims_nn, nn_median, "o-", color="#e74c3c")
+plt.xticks(dims_nn)
 plt.axhline(1.0, color="gray", ls="--", lw=1.2)
-plt.text(1.2, 1.03, "各軸の長さ（=1）", fontsize=9.5, color="gray")
-plt.annotate("軸の長さより遠い！", xy=(20, nn_median[-1]),
-             xytext=(13.5, 0.75), fontsize=10.5, color="#c0392b",
+plt.text(2.2, 1.03, "各軸の長さ（= 1）", fontsize=9.5, color="gray")
+plt.annotate("軸の長さより遠い", xy=(20, nn_median[-1]), xytext=(13.5, 0.75), fontsize=10.5, color="#c0392b",
              arrowprops={"arrowstyle": "->", "color": "#c0392b"})
 plt.xlabel("次元数 d")
-plt.ylabel("最近傍までの距離（中央値）")
+plt.ylabel("いちばん近い点までの距離（中央値）")
 plt.title("「いちばん近い点」が、どんどん遠くなる")
 plt.grid(True, alpha=0.4)
 plt.tight_layout()
@@ -557,10 +507,14 @@ plt.show()
 ```
 
 ::: {.callout-note title="結果"}
-- 10次元で **0.70**、20次元では **1.2**。もはや「お隣さん」は存在しない
-- 同じ100点なのに。なぜこんなことが起きるのか、2つの理由を見る
+- 10 次元で **0.69**、20 次元では **1.2**（各軸の長さ 1 より遠い）
+- 点の数は 100 点のままなのに、近くに点がなくなる
+   - k-NN が投票させる「近い点」が、実際には遠い点になっている
+- なぜこうなるのか、2 つの理由を見る
 :::
 
+::: {.caption-note .center}
+点は実行のたびに変わるので、手元の数字は少し違う
 :::
 
 
@@ -656,13 +610,13 @@ plt.show()
 ::: {.callout-note title="要するに"}
 - 10次元では、たった1%の「ご近所」を集めるのに**各軸の63%**を見渡す必要がある
 - それはもう「近所」ではない
-   - **「近い点どうしは似ている」を前提にする手法（k-means など）は、前提が成り立ちにくくなる**
+   - **「近い点どうしは似ている」を前提にする手法（k-NN や k-means など）は、前提が成り立ちにくくなる**
 :::
 
 
 ## 「近い」と「遠い」の区別が弱くなる
 
-- k-means をはじめ、多くの手法は**距離**に依存している
+- k-NN や k-means をはじめ、多くの手法は**距離**に依存している
 - 点を一様にばらまき、ある1点からほかの2000点までの距離を測る
 - 距離のばらつきを、**変動係数（[coefficient of variation]{.en}）**＝ 標準偏差 ÷ 平均 で比べる
 
@@ -758,204 +712,60 @@ plt.show()
 :::
 
 
-## ばらまいた点で、k-NN を試す {#peek-nn-method}
-
-- 100個の点に、正解のラベルを付ける
-   - 座標の合計が 1 より大きければ `True`、そうでなければ `False`（図の点線が境目）
-- 各点のラベルを、[k = 1 の k-NN](#peek-nearest-code){.peek}で予測する
-   - 訓練データとテストデータには分けず、自分以外の 99個の中から、いちばん近い点を探す
-- 100個の点すべてで予測し、当たった割合を出す
-
-```{python}
-#| echo: true
-#| eval: false
-def nearest_index(P, i):
-    dist = np.sqrt(((P - P[i]) ** 2).sum(axis=1))   # 点 i から全部の点までの距離
-    dist[i] = np.inf                                # 自分自身は除外
-    return dist.argmin()                            # いちばん近い点の番号
-
-P     = rng.random((100, 2))                        # 100個の点を 2 次元にばらまく
-label = P.sum(axis=1) > 1                           # 正解のラベル：座標の合計が 1 より大きいか
-
-hit = []
-for i in range(len(P)):                             # 100個の点すべてで予測する
-    j = nearest_index(P, i)                         # 点 i にいちばん近い点
-    hit.append(label[j] == label[i])                # 点 j のラベルで、点 i のラベルが当たったか
-print(f"当たった割合: {np.mean(hit):.2f}")
-```
-
-```{python}
-#| echo: false
-#| fig-align: center
-# Display twin of the cell above: the same steps on the frozen points P of the
-# slide 準備 instead of a fresh random draw, so the shown output never changes.
-def nearest_index(P, i):
-    dist = np.sqrt(((P - P[i]) ** 2).sum(axis=1))
-    dist[i] = np.inf
-    return dist.argmin()
-
-label = P.sum(axis=1) > 1
-near  = np.array([nearest_index(P, i) for i in range(len(P))])
-hit   = label[near] == label
-print(f"当たった割合: {np.mean(hit):.2f}")
-
-plt.figure(figsize=(4.8, 5.2))
-plt.plot([0, 1], [1, 0], color="gray", ls="--", lw=1.2, zorder=1)
-for i in range(len(P)):
-    plt.plot([P[i, 0], P[near[i], 0]], [P[i, 1], P[near[i], 1]],
-             color="#bbbbbb" if hit[i] else "#e74c3c", lw=0.8 if hit[i] else 2.2, zorder=2)
-plt.scatter(P[label, 0], P[label, 1], s=30, c="#e67e22", label="True", zorder=3)
-plt.scatter(P[~label, 0], P[~label, 1], s=30, c="#2980b9", label="False", zorder=3)
-plt.scatter(P[~hit, 0], P[~hit, 1], s=150, facecolors="none", edgecolors="#e74c3c", lw=2,
-            label="外れた点", zorder=4)
-plt.xlabel("特徴量 1")
-plt.ylabel("特徴量 2")
-plt.xlim(0, 1)
-plt.ylim(0, 1)
-plt.gca().set_aspect("equal")
-plt.legend(fontsize=9, loc="upper center", bbox_to_anchor=(0.5, -0.14), ncol=3)
-plt.title("各点を、いちばん近い点と線で結ぶ\n赤い線は、ラベルが違う組", fontsize=10.5)
-plt.tight_layout()
-plt.show()
-```
-
-::: {.callout-note title="結果"}
-- 100個中 **95個**で当たる
-- 外れた 5 個は、境目のすぐ近くの点（図の赤い丸）
-:::
-
-::: {.caption-note .center}
-点は実行のたびに変わるので、手元の数字は少し違う
-:::
-
-
-## 質問：次元を増やすと、k-NN は当たる？ {#peek-nn-task}
-
-- **2次元**では、k-NN は 100個中 95個で当たった
-
-::: {.callout-important title="質問"}
-特徴量を増やして **10次元** にしたら、当たる割合はどうなると思う？
-
-（ラベルは、座標の合計が真ん中の値 $d / 2$ より大きいかで付ける。どの特徴量もラベルに関係している。点の数は100個のまま）
-:::
-
-::: {.fragment}
-
-```{python}
-#| echo: true
-#| eval: false
-for d in [1, 2, 3, 5, 10, 20]:
-    P     = rng.random((100, d))                    # 100個の点を d 次元にばらまく
-    label = P.sum(axis=1) > d / 2                   # 正解のラベル：座標の合計が真ん中の値より大きいか
-    hit   = []
-    for i in range(len(P)):                         # k = 1 の k-NN で、100個の点すべてを予測する
-        j = nearest_index(P, i)
-        hit.append(label[j] == label[i])
-    print(f"{d:2d}次元: 当たった割合 {np.mean(hit):.2f}")
-```
-
-```{python}
-#| echo: false
-# Frozen result of one run of the cell above (tools/measure_knn_curse.py, default_rng(0)).
-# The student cell is unseeded; the slide shows these values.
-hit_dims = [1, 2, 3, 5, 10, 20]
-nn_hit   = [1.00, 0.95, 0.92, 0.83, 0.74, 0.67]
-
-for d, h in zip(hit_dims, nn_hit):
-    print(f"{d:2d}次元: 当たった割合 {h:.2f}")
-```
-
-```{python}
-#| echo: false
-#| fig-align: center
-plt.figure(figsize=(7, 3.2))
-plt.plot(hit_dims, nn_hit, "o-", color="#e74c3c")
-plt.axhline(0.5, color="gray", ls="--", lw=1.2)
-plt.text(13.2, 0.515, "でたらめに答えたときの割合（0.5）", fontsize=9.5, color="gray")
-plt.ylim(0.45, 1.03)
-plt.xlabel("次元数 d")
-plt.ylabel("当たった割合")
-plt.title("次元が増えると、k-NN は当たらなくなる")
-plt.grid(True, alpha=0.4)
-plt.tight_layout()
-plt.show()
-```
-
-::: {.callout-note title="結果"}
-- 10次元で **0.74**、20次元では **0.67** まで下がる
-   - でたらめに答えても 0.5 は当たる
-- 次元が増えると、[いちばん近い点でも遠く離れている](#peek-nn-distance){.peek}
-   - 遠く離れた点のラベルは、当てにならない
-- どの特徴量もラベルに関係しているのに、100個の点では足りなくなった
-:::
-
-::: {.caption-note .center}
-点は実行のたびに変わるので、手元の数字は少し違う
-:::
-
-:::
-
-
 ## 点を 1000 倍に増やしても、追いつかない {#peek-more-points}
 
-- 当たらなくなったのは、点が 100個しかないからかもしれない
-- 点の数を 10 倍ずつ増やして、k-NN で予測する
-   - 予測するのは先頭の 1000個で、いちばん近い点は全部の点から探す
+- 当たらなくなったのは、訓練データが 100 点しかないからかもしれない
+- 訓練データを 1,000 → 1 万 → 10 万点に増やし、k = 3 の k-NN でテストデータ 1,000 点を予測する
 
 ```{python}
 #| echo: true
 #| eval: false
-print("points      2D    5D   10D   20D")
-for n in [1000, 10000, 100000]:                     # 点の数
+print("points      2D     5D    10D    20D")
+for n in [1000, 10000, 100000]:                      # 訓練データの点の数
     row = []
     for d in [2, 5, 10, 20]:
-        P     = rng.random((n, d))                  # n 個の点を d 次元にばらまく
-        label = P.sum(axis=1) > d / 2               # 正解のラベル：座標の合計が真ん中の値より大きいか
-        hit   = []
-        for i in range(1000):                       # 先頭の 1000個を予測する
-            j = nearest_index(P, i)                 # いちばん近い点は、n 個全部から探す
-            hit.append(label[j] == label[i])
-        row.append(np.mean(hit))
-    print(f"{n:<8d}  {row[0]:.2f}  {row[1]:.2f}  {row[2]:.2f}  {row[3]:.2f}")
+        Xd_train, yd_train = make_data(n, d)
+        Xd_test,  yd_test  = make_data(1000, d)
+        row.append(accuracy_knn(Xd_train, yd_train, Xd_test, yd_test, 3))
+    print(f"{n:<8d}  {row[0]:.3f}  {row[1]:.3f}  {row[2]:.3f}  {row[3]:.3f}")
 ```
 
 ```{python}
 #| echo: false
 # Frozen result of one run of the cell above (tools/measure_knn_curse.py, default_rng(0)).
 # The student cell is unseeded; the slide shows these values.
-more_n   = [1000, 10000, 100000]
-more_hit = [[0.98, 0.89, 0.80, 0.73],
-            [1.00, 0.93, 0.86, 0.78],
-            [1.00, 0.97, 0.90, 0.79]]
+more_n = [1000, 10000, 100000]
+more_acc = [[0.868, 0.786, 0.762, 0.682], [0.876, 0.839, 0.783, 0.705], [0.851, 0.863, 0.79, 0.739]]
 
-print("points      2D    5D   10D   20D")
-for n, row in zip(more_n, more_hit):
-    print(f"{n:<8d}  {row[0]:.2f}  {row[1]:.2f}  {row[2]:.2f}  {row[3]:.2f}")
+print("points      2D     5D    10D    20D")
+for n, row in zip(more_n, more_acc):
+    print(f"{n:<8d}  {row[0]:.3f}  {row[1]:.3f}  {row[2]:.3f}  {row[3]:.3f}")
 ```
 
 ```{python}
 #| echo: false
 #| fig-align: center
-# 100 points: the values of the previous slide (nn_hit) for 2, 5, 10 and 20 dimensions.
-first = [nn_hit[1], nn_hit[3], nn_hit[4], nn_hit[5]]
+# 100 points: the values of the slide 同じ作り方で、特徴量を増やす (knn_dims) for 2, 5, 10 and 20 dimensions.
+first = [knn_dims[0], knn_dims[2], knn_dims[3], knn_dims[4]]
 plt.figure(figsize=(7, 3.4))
-for k, (d, mark) in enumerate(zip([2, 5, 10, 20], ["o", "s", "^", "D"])):
-    plt.semilogx([100] + more_n, [first[k]] + [row[k] for row in more_hit], marker=mark, label=f"{d}次元")
-plt.axhline(0.95, color="gray", ls="--", lw=1.2, label="2次元・100個のとき（0.95）")
+for c, (d, mark) in enumerate(zip([2, 5, 10, 20], ["o", "s", "^", "D"])):
+    plt.semilogx([100] + more_n, [first[c]] + [row[c] for row in more_acc], marker=mark, label=f"{d}次元")
+plt.axhline(0.9, color="#27ae60", ls="--", lw=1.2, label="上限（0.9 ほど）")
 plt.xticks([100, 1000, 10000, 100000], ["100", "1,000", "10,000", "100,000"])
 plt.minorticks_off()
-plt.ylim(0.55, 1.03)
-plt.xlabel("点の数")
-plt.ylabel("当たった割合")
-plt.legend(fontsize=9, loc="lower right")
+plt.ylim(0.55, 1.0)
+plt.xlabel("訓練データの点の数")
+plt.ylabel("Accuracy")
+plt.legend(fontsize=9, loc="lower right", ncol=2)
 plt.grid(True, alpha=0.4)
 plt.tight_layout()
 plt.show()
 ```
 
 ::: {.callout-note title="結果"}
-- 5次元：1000 倍の 10万個で、ようやく 0.95 を超える
-- 10次元と 20次元：10万個でも 0.95 に届かない（0.90 と 0.79）
+- 2 次元：1,000 点で 0.868 と、すでに上限（0.9 ほど）に近い
+- 5 次元：10 万点で 0.863 まで上がり、ようやく 2 次元に並ぶ
+- 10 次元と 20 次元：10 万点でも 0.790 と 0.739
 - 次元が増えると、[同じ密度を保つのに必要な点の数が指数的に増える](#peek-sparsity){.peek}
    - 点を集めるだけでは追いつかない
 :::
@@ -981,6 +791,332 @@ plt.show()
 :::
 
 
+## 予測のたびに、全部の点までの距離を測る
+
+- k-NN の学習は、訓練データを取っておくだけ
+- その代わり、予測のたびに、訓練データの全部の点までの距離を測る（**全探索**, [brute-force search]{.en}）
+   - [10 万点の実験](#peek-more-points){.peek}では、テストデータ 1 点を予測するたびに、距離の計算が 10 万回
+
+| | 学習でやること | 予測でやること |
+|--|-----|------|
+| 決定木 | データから境界を作る | 境界のどちら側かを見る |
+| k-NN | 訓練データを取っておくだけ | 全部の点までの距離を測り、近い k 点の多数決を取る |
+
+::: {.callout-important title="質問"}
+全部の点を測らずに、いちばん近い点を見つけるにはどうすればよい？
+:::
+
+
+## 空間を軸で半分ずつに分ける（KD-tree）
+
+- 1 つの軸で点を並べ、真ん中の点の値で 2 つに分ける
+- 分けた両側を、次の軸でさらに分ける（特徴量 1 → 特徴量 2 → 特徴量 1 → …）
+- 箱の中の点が 5 点以下になったら止める
+- **KD-tree（[k-d tree]{.en}）**と呼ぶ
+   - [決定木](classification-2d-boundaries.qmd#peek-overfit-boundary){.peek}と同じく、軸に沿った線で空間を分ける木
+   - k-d の k は特徴量の数（次元）で、k-NN の k とは別
+
+```{python}
+#| echo: false
+#| fig-align: center
+def kd_build(X, idx, depth, leaf_size):
+    # Same algorithm as the student's build_kdtree on the next slide.
+    if len(idx) <= leaf_size:
+        return {"points": idx}
+    axis = depth % X.shape[1]
+    idx = idx[np.argsort(X[idx, axis])]
+    mid = len(idx) // 2
+    return {"axis": axis, "value": X[idx[mid], axis],
+            "left": kd_build(X, idx[:mid], depth + 1, leaf_size),
+            "right": kd_build(X, idx[mid:], depth + 1, leaf_size)}
+
+
+def draw_splits(ax, node, lo, hi, depth):
+    """Draw the split lines of the subtree inside the box lo..hi."""
+    if "points" in node:
+        return
+    a, v = node["axis"], node["value"]
+    lw = max(3.0 - 0.5 * depth, 0.7)
+    if a == 0:
+        ax.plot([v, v], [lo[1], hi[1]], color="#34495e", lw=lw, zorder=2)
+    else:
+        ax.plot([lo[0], hi[0]], [v, v], color="#34495e", lw=lw, zorder=2)
+    hi_left, lo_right = hi.copy(), lo.copy()
+    hi_left[a], lo_right[a] = v, v
+    draw_splits(ax, node["left"], lo, hi_left, depth + 1)
+    draw_splits(ax, node["right"], lo_right, hi, depth + 1)
+
+
+kd_fig_tree = kd_build(X_train, np.arange(len(X_train)), 0, 5)
+fig, ax = plt.subplots(figsize=(4.8, 4.8))
+draw_splits(ax, kd_fig_tree, np.array([0.0, 0.0]), np.array([1.0, 1.0]), 0)
+ax.scatter(X_train[:, 0], X_train[:, 1], s=22, c="#7f8c8d", zorder=3)
+square_axes(ax)
+ax.set_title("訓練データ 100 点を、箱が 5 点以下になるまで分ける\n（太い線ほど先に分けた線）", fontsize=10.5)
+plt.tight_layout()
+plt.show()
+```
+
+
+## KD-tree を作る
+
+- 関数の中で、同じ関数をもう一度呼ぶ（**再帰**, [recursion]{.en}）
+   - 分けた片側を、同じ関数でさらに分ける
+- 木の各部分は辞書で表す
+   - 分ける部分：分ける軸 `axis`、分ける値 `value`、小さい側 `left`、大きい側 `right`
+   - 分けずに止めた箱（**葉**, [leaf]{.en}）：中の点の番号 `points`
+
+```{python}
+#| echo: true
+def build_kdtree(X, idx, depth, leaf_size):
+    if len(idx) <= leaf_size:                        # 点が leaf_size 個以下なら、分けずに止める（葉）
+        return {"points": idx}
+    axis = depth % X.shape[1]                        # 分ける軸：深さ 0 は特徴量 1、深さ 1 は特徴量 2、…
+    idx  = idx[np.argsort(X[idx, axis])]             # その軸の値が小さい順に、点の番号を並べる
+    mid  = len(idx) // 2
+    return {"axis":  axis,
+            "value": X[idx[mid], axis],              # 真ん中の点の値で分ける
+            "left":  build_kdtree(X, idx[:mid], depth + 1, leaf_size),   # 小さい側を、同じ関数でさらに分ける
+            "right": build_kdtree(X, idx[mid:], depth + 1, leaf_size)}   # 大きい側も同じ
+
+tree = build_kdtree(X_train, np.arange(len(X_train)), 0, 5)
+print(f"最初の分け目: 特徴量 {tree['axis'] + 1} = {tree['value']}")
+```
+
+::: {.caption-note .center}
+前のスライドの図で、いちばん太い線がこの分け目
+:::
+
+
+## 近い箱から調べて、遠い側は飛ばす {#peek-kd-search}
+
+- ★ の入っている箱まで、分け目をたどって下りる
+- ★ の入っている箱の中の点と、距離を測る
+   - いちばん近い距離を r とする（もっと近い点が見つかれば、r を更新する）
+- 分け目に戻るたびに、反対側を調べるか決める
+   - 分け目までの距離が r より近い：反対側に、もっと近い点があるかもしれないので調べる
+   - 分け目までの距離が r 以上：反対側の点は全部 r より遠いので、飛ばす
+
+```{python}
+#| echo: false
+#| fig-align: center
+def kd_trace(node, x, best, lo, hi, visited):
+    # Same search as the student's search_kdtree on the next slide, also recording the boxes it measures.
+    if "points" in node:
+        visited.append((lo, hi))
+        dist = np.sqrt(((X_train[node["points"]] - x) ** 2).sum(axis=1))
+        best["count"] += len(dist)
+        j = dist.argmin()
+        if dist[j] < best["dist"]:
+            best["index"], best["dist"] = node["points"][j], dist[j]
+        return
+    a, v = node["axis"], node["value"]
+    hi_left, lo_right = hi.copy(), lo.copy()
+    hi_left[a], lo_right[a] = v, v
+    if x[a] - v < 0:
+        sides = [(node["left"], lo, hi_left), (node["right"], lo_right, hi)]
+    else:
+        sides = [(node["right"], lo_right, hi), (node["left"], lo, hi_left)]
+    kd_trace(sides[0][0], x, best, sides[0][1], sides[0][2], visited)
+    if abs(x[a] - v) < best["dist"]:
+        kd_trace(sides[1][0], x, best, sides[1][1], sides[1][2], visited)
+
+
+best_fig = {"index": -1, "dist": np.inf, "count": 0}
+visited = []
+kd_trace(kd_fig_tree, x_new, best_fig, np.array([0.0, 0.0]), np.array([1.0, 1.0]), visited)
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 4.9))
+for ax, (lo_v, hi_v) in zip(axes, [((0, 0), (1, 1)), (x_new - 0.17, x_new + 0.17)]):
+    for lo, hi in visited:
+        ax.add_patch(plt.Rectangle(lo, hi[0] - lo[0], hi[1] - lo[1], fc="#fff3b0", ec="none", zorder=1))
+    draw_splits(ax, kd_fig_tree, np.array([0.0, 0.0]), np.array([1.0, 1.0]), 0)
+    ax.scatter(X_train[:, 0], X_train[:, 1], s=22, c="#7f8c8d", zorder=3)
+    ax.scatter(*X_train[best_fig["index"]], s=200, facecolors="none", edgecolors="#e74c3c", lw=2.2, zorder=4)
+    ax.add_patch(plt.Circle(x_new, best_fig["dist"], fill=False, ls="--", ec="#e74c3c", lw=1.5, zorder=4))
+    ax.scatter(*x_new, marker="*", s=380, c="#27ae60", edgecolors="black", zorder=5)
+    square_axes(ax)
+    ax.set_xlim(lo_v[0], hi_v[0])
+    ax.set_ylim(lo_v[1], hi_v[1])
+axes[0].set_title(f"黄色の箱だけ、点との距離を測る（100 点中 {best_fig['count']} 点）", fontsize=10.5)
+axes[1].set_title("★ のまわりを拡大：赤い破線の円の半径が r\n円が分け目を越えた側だけを調べる", fontsize=10.5)
+plt.tight_layout()
+plt.show()
+```
+
+
+## いちばん近い点を KD-tree で探す
+
+```{python}
+#| echo: true
+def search_kdtree(node, X, x, best):
+    if "points" in node:                             # 葉：箱の中の点と距離を測る
+        dist = np.sqrt(((X[node["points"]] - x) ** 2).sum(axis=1))
+        best["count"] += len(dist)                   # 距離を測った点の数
+        j = dist.argmin()
+        if dist[j] < best["dist"]:                   # 今までより近い点があれば、入れ替える
+            best["index"] = node["points"][j]
+            best["dist"]  = dist[j]
+        return
+    diff = x[node["axis"]] - node["value"]           # 分け目から x までの、軸に沿った差
+    if diff < 0:                                     # x は分け目より小さい側にある
+        near, far = node["left"], node["right"]
+    else:
+        near, far = node["right"], node["left"]
+    search_kdtree(near, X, x, best)                  # まず x のある側を調べる
+    if abs(diff) < best["dist"]:                     # 分け目までの距離が r より近いときだけ
+        search_kdtree(far, X, x, best)               # 反対側も調べる
+
+def nearest_kdtree(tree, X, x):
+    best = {"index": -1, "dist": np.inf, "count": 0} # r（best["dist"]）は無限大から始める
+    search_kdtree(tree, X, x, best)
+    return best
+
+best = nearest_kdtree(tree, X_train, x_new)
+print(f"KD-tree: いちばん近い点 {best['index']}、距離 {best['dist']:.3f}、距離を測った点 {best['count']} / {len(X_train)}")
+dist = np.sqrt(((X_train - x_new) ** 2).sum(axis=1))
+print(f"全探索 : いちばん近い点 {dist.argmin()}、距離 {dist.min():.3f}、距離を測った点 {len(X_train)} / {len(X_train)}")
+```
+
+::: {.callout-note title="結果"}
+- 見つかった点は、全探索と同じ
+- 距離を測ったのは、100 点中 **15 点**
+- k 点を探すときも、r を「k 番目に近い距離」にすれば、同じように飛ばせる
+:::
+
+
+## 点を増やしても、測る点の数はほとんど増えない {#peek-kd-count}
+
+- 2 次元の 0〜1 の範囲に点をばらまき、新しい点 100 個で、いちばん近い点を探す
+- 点の数を 1,000 → 1 万 → 10 万点に増やし、距離を測った点の数（平均）を比べる
+
+```{python}
+#| echo: true
+#| eval: false
+print("points       all  KD-tree")
+for n in [1000, 10000, 100000]:
+    X    = rng.random((n, 2))                        # n 点を 2 次元にばらまく
+    tree = build_kdtree(X, np.arange(n), 0, 5)
+    count = []
+    for q in rng.random((100, 2)):                   # 新しい点 100 個で、いちばん近い点を探す
+        count.append(nearest_kdtree(tree, X, q)["count"])
+    print(f"{n:<8d}  {n:6d}  {np.mean(count):7.1f}")
+```
+
+```{python}
+#| echo: false
+# Frozen result of one run of the cell above (tools/measure_knn_curse.py, default_rng(0)).
+# The student cell is unseeded; the slide shows these values.
+kd_n = [1000, 10000, 100000]
+kd_count = [9.6, 11.8, 8.1]
+
+print("points       all  KD-tree")
+for n, c in zip(kd_n, kd_count):
+    print(f"{n:<8d}  {n:6d}  {c:7.1f}")
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
+plt.figure(figsize=(6.5, 3.4))
+plt.loglog(kd_n, kd_n, "o-", color="#7f8c8d", label="全探索（全部の点を測る）")
+plt.loglog(kd_n, kd_count, "s-", color="#e74c3c", label="KD-tree")
+plt.xticks(kd_n, ["1,000", "10,000", "100,000"])
+plt.minorticks_off()
+plt.xlabel("点の数")
+plt.ylabel("距離を測った点の数（平均）")
+plt.legend(fontsize=9)
+plt.grid(True, alpha=0.4, which="both")
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-note title="結果"}
+- 全探索では、点の数と同じ回数だけ距離を測る
+- KD-tree では、10 万点でも平均 **8.1 点**（1,000 点で 9.6 点、1 万点で 11.8 点）
+:::
+
+::: {.caption-note .center}
+点は実行のたびに変わるので、手元の数字は少し違う
+:::
+
+
+## 次元が高いと、KD-tree でも飛ばせない
+
+- 1 万点で、特徴量を 2, 5, 10, 20 個に増やし、同じように探す
+
+```{python}
+#| echo: true
+#| eval: false
+n = 10000
+for d in [2, 5, 10, 20]:
+    X    = rng.random((n, d))                        # 1 万点を d 次元にばらまく
+    tree = build_kdtree(X, np.arange(n), 0, 5)
+    count = []
+    for q in rng.random((100, d)):                   # 新しい点 100 個で、いちばん近い点を探す
+        count.append(nearest_kdtree(tree, X, q)["count"])
+    print(f"{d:2d}次元: 距離を測った点 {np.mean(count):7.1f} / {n}")
+```
+
+```{python}
+#| echo: false
+# Frozen result of one run of the cell above (tools/measure_knn_curse.py, default_rng(0)).
+# The student cell is unseeded; the slide shows these values.
+kd_d = [2, 5, 10, 20]
+kd_dims = [11.6, 95.0, 3207.4, 9997.9]
+
+for d, c in zip(kd_d, kd_dims):
+    print(f"{d:2d}次元: 距離を測った点 {c:7.1f} / 10000")
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
+share = [100 * c / 10000 for c in kd_dims]
+plt.figure(figsize=(6.5, 3.2))
+plt.bar([str(d) for d in kd_d], share, color="#e74c3c", width=0.55)
+for i, s in enumerate(share):
+    plt.text(i, s + 2, f"{s:.1f}%", ha="center", fontsize=10)
+plt.ylim(0, 112)
+plt.xlabel("次元数 d")
+plt.ylabel("距離を測った点の割合（%）")
+plt.title("1 万点のうち、距離を測った点の割合")
+plt.grid(True, axis="y", alpha=0.4)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-note title="結果"}
+- 10 次元で約 3 割（3,207 点）、20 次元ではほぼ全部（9,998 点）を測る
+- [いちばん近い点が遠くなる](#peek-nn-distance){.peek}ので、r が分け目までの距離より大きくなり、反対側を毎回調べる
+   - 20 次元では、いちばん近い点までの距離（中央値）が 0.92 で、反対側を調べた割合は 100%
+:::
+
+::: {.caption-note .center}
+点は実行のたびに変わるので、手元の数字は少し違う
+:::
+
+
+## （参考）scikit-learn では
+
+- k-NN は `KNeighborsClassifier` に入っている
+- `algorithm="kd_tree"` を指定すると、`fit` で KD-tree を作り、`predict` で KD-tree を使って近い点を探す
+   - 既定の `"auto"` では、データに合わせて探し方を選ぶ
+
+```{python}
+#| echo: true
+from sklearn.neighbors import KNeighborsClassifier
+
+knn = KNeighborsClassifier(n_neighbors=3, algorithm="kd_tree").fit(X_train, y_train)
+print(f"当たった数: {np.sum(knn.predict(X_test) == y_test)} / {len(y_test)}")
+```
+
+| 今日書いたもの | scikit-learn |
+|---|---|
+| `build_kdtree` で木を作る | `KNeighborsClassifier(n_neighbors=3, algorithm="kd_tree").fit(X_train, y_train)` |
+| `predict_knn(X_train, y_train, x, 3)` を 1 点ずつ | `knn.predict(X_test)` |
+
+
 ## （参考）次元を減らす：PCA
 
 - 特徴量どうしが似た動きをしていれば、情報をほとんど失わずに、特徴量の数を減らせる
@@ -991,13 +1127,13 @@ plt.show()
 
 ## まとめ
 
-- **k-NN**：近い k 匹の多数決で分類する
+- **k-NN**：新しい点のラベルを、近い k 点のラベルの多数決で決める
   - 学習では境界を作らず、訓練データをそのまま取っておく
-  - 距離を使うので、先に標準化する
 - **k はハイパパラメータ**：k = 1 は訓練データで必ず当たるが、テストデータでは下がる（過学習）
-- **次元の呪い**：次元が増えると空間が広くなり、「近い」と「遠い」の区別が弱くなる
-  - いちばん近い点が遠くなり、k-NN が当たらなくなる
-  - 点を増やしても、次元が高いと追いつかない
+- **次元の呪い**：特徴量を増やすと空間が広くなり、いちばん近い点も遠くなる
+  - k-NN は当たらなくなり、点を増やしても追いつかない
+- **KD-tree**：軸で空間を半分ずつに分け、遠い箱を飛ばして、いちばん近い点を速く探す
+  - 次元が高いと、飛ばせる箱がなくなる
 
 ::: {.callout-note title="分類問題と特徴量のまとめ"}
 1D → 2D の分類、評価と汎化、教師なし学習（k-means）、k-NN と次元の呪い。
@@ -1021,28 +1157,28 @@ plt.show()
 
 ## 練習問題：k で答えが変わる
 
-種類の分かっている点が 5 個ある：$A(3, 4)$ は Sea bass、$B(1, 3)$ は Salmon、$C(3, 1)$ は Salmon、$D(6, 7)$ は Sea bass、$E(7, 6)$ は Sea bass。新しい点 $N(3, 3)$ の種類を k-NN で予測せよ。1〜3 は**手計算**、4 は**Pythonコード**で解け。
+ラベルの分かっている点が 5 個ある：$A(3, 4)$ はラベル 0、$B(1, 3)$ はラベル 1、$C(3, 1)$ はラベル 1、$D(6, 7)$ はラベル 0、$E(7, 6)$ はラベル 0。新しい点 $N(3, 3)$ のラベルを k-NN で予測せよ。1〜3 は**手計算**、4 は**Pythonコード**で解け。
 
 1. $N$ から $A$〜$E$ までの距離を、それぞれ求めよ
 2. $k = 1$ のときの予測を答えよ
 3. $k = 3$ と $k = 5$ のときの予測を、それぞれ答えよ
-4. Python：本編の `predict_knn` で、$k = 1, 3, 5$ の予測を表示せよ（標準化はしない）
+4. Python：本編の `predict_knn` で、$k = 1, 3, 5$ の予測を表示せよ
 
 
 ## 練習問題の解答例
 
 - 距離は $A$ が 1、$B$ が 2、$C$ が 2、$D$ が 5、$E$ が 5
    - 例：$D$ は $\sqrt{(6 - 3)^2 + (7 - 3)^2} = \sqrt{25} = 5$
-- $k = 1$：いちばん近いのは $A$ なので、Sea bass
-- $k = 3$：近い 3 個は $A$、$B$、$C$。Salmon が 2 個なので、Salmon
-- $k = 5$：5 個全部で多数決。Sea bass が 3 個なので、Sea bass
+- $k = 1$：いちばん近いのは $A$ なので、ラベル 0
+- $k = 3$：近い 3 個は $A$、$B$、$C$ で、ラベル 1 が 2 個なので、ラベル 1
+- $k = 5$：5 個全部で多数決し、ラベル 0 が 3 個なので、ラベル 0
 
 ```{python}
 #| echo: true
 #| code-fold: true
 #| code-summary: "解答例を見る"
 Q_train = np.array([[3.0, 4.0], [1.0, 3.0], [3.0, 1.0], [6.0, 7.0], [7.0, 6.0]])   # A, B, C, D, E
-q_label = np.array([0, 1, 1, 0, 0])                                               # 1=Salmon, 0=Sea bass
+q_label = np.array([0, 1, 1, 0, 0])                                               # A〜E のラベル
 q_new   = np.array([3.0, 3.0])                                                    # N
 
 for k in [1, 3, 5]:

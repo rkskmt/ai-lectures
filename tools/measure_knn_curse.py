@@ -1,34 +1,49 @@
 # Measures every number asserted in knn-curse.qmd and generates the frozen
-# values written into its hidden cells, so that doc/measured-log.md and the
-# deck are filled from this output and never from memory.
+# values written into the deck, so that doc/measured-log.md and the deck are
+# filled from this output and never from memory.
 #
-# k-NN on the fish
-#   The 120 fish and the frozen order `idx` are read out of the .qmd. `idx` is
-#   np.random.default_rng(0).permutation(120): the student cell shuffles
-#   without a seed, the hidden display twin uses this order. Everything is
-#   computed with the deck's predict_knn (argsort of the Euclidean distances,
-#   majority vote), with the mean and std of the 96 training fish.
+# Data (make_data, the same function as in the deck)
+#   n points uniform in [0,1]^d; label 1 when the sum of the coordinates is
+#   larger than d/2, else 0; each label flipped with probability 0.1.
 #
-# Curse of dimensionality
-#   The student cells draw fresh random points on every run (no seed). What
-#   the slides display comes from the values below, generated once here and
-#   pasted into hidden cells as literals:
-#     nn_median : median nearest-neighbour distance of 100 uniform points in
-#                 [0,1]^d, default_rng(0). Its 2-D draw, rounded to 3
-#                 decimals, is the frozen point set P.
-#     cv_list   : std/mean of the distances from one query point to 2000
-#                 uniform points, legacy np.random.seed(42); also prints
-#                 min / max / difference / ratio as evidence for the wording
-#                 "the ratio approaches 1, the difference does not shrink"
-#     pts       : 60 points of the "central 50%" figure, default_rng(7)
-#     pts1d / pts2d : 20 points each of the sparsity figure, np.random.seed(0)
-#     nn_hit    : nearest-neighbour hit rate on 100 points with the label
-#                 "sum of coordinates > d/2", default_rng(0)
-#     more_hit  : the same on n = 1000 / 10000 / 100000 points (the first 1000
-#                 predicted, the neighbour searched among all n),
-#                 default_rng(0) drawn in the order of the slide's loops
-#   Each generated value is compared with the literal in the deck; a mismatch
-#   stops the script.
+# k-NN in 2-D
+#   X_train / y_train / X_test / y_test (100 + 100 points) are one run of
+#   make_data with default_rng(seed), coordinates rounded to 3 decimals and
+#   the label rule re-applied to the rounded coordinates (flips kept). The
+#   seed is the one in 0..199 whose train/test accuracy curves over KS are
+#   closest to the mean curves of all 200 seeds, so that the slides show the
+#   typical shape and not the noise of one draw. They are written into the
+#   deck as literals.
+#   x_new (a literal in the deck) is the new point of the comparison slide:
+#   the depth-3 decision tree and the vote of its 3 nearest training points
+#   must give the same label, with a 2 : 1 vote.
+#
+# Raising the dimension (student cells unseeded, eval: false; the slides show
+# one run with default_rng(0), drawn in the order of the slide's loops)
+#   knn_dims  : k-NN (k = 3) accuracy, 100 training / 1000 test points,
+#               d = 2, 3, 5, 10, 20
+#   nn_median : median distance from each of 100 points to its nearest
+#               other point, d = 2, 3, 5, 10, 20
+#   more_acc  : k-NN (k = 3) accuracy with 1000 / 10000 / 100000 training
+#               points and 1000 test points, d = 2, 5, 10, 20
+#
+# Curse of dimensionality, figures (unchanged)
+#   cv_list   : std/mean of the distances from one query point to 2000
+#               uniform points, legacy np.random.seed(42)
+#   pts       : 60 points of the "central 50%" figure, default_rng(7)
+#   pts1d / pts2d : 20 points each of the sparsity figure, np.random.seed(0)
+#
+# KD-tree (the deck's build_kdtree / nearest_kdtree: median split, axes in
+# turn, leaf size 5, the far side searched only when the split is closer
+# than the best distance so far; slides show one run with default_rng(0))
+#   kd_count : mean number of distance computations for 100 uniform query
+#              points in 2-D, n = 1000 / 10000 / 100000
+#   kd_dims  : the same for n = 10000 in 2 / 5 / 10 / 20 dimensions; also
+#              prints the median nearest distance and how often the far side
+#              of a split had to be searched
+#
+# Each generated value is compared with the literal in the deck; a mismatch
+# stops the script.
 #
 # Usage: python tools/measure_knn_curse.py    (from the repo root)
 
@@ -37,6 +52,8 @@ import re
 from pathlib import Path
 
 import numpy as np
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
 
 ROOT = Path(__file__).resolve().parents[1]
 DECK = ROOT / "knn-curse.qmd"
@@ -76,94 +93,193 @@ def literal(name, arr, decimals):
     print(f"{name} = np.array({np.round(arr, decimals).tolist()})")
 
 
+def print_points(name, X):
+    print(f"{name} = np.array([")
+    for k in range(0, len(X), 5):
+        print("    " + ", ".join(f"[{a:.3f}, {b:.3f}]" for a, b in X[k:k + 5]) + ",")
+    print("])")
+
+
+def print_labels(name, y):
+    print(f"{name} = np.array([" + ", ".join(map(str, y[:50])) + ",")
+    print(" " * (len(name) + 13) + ", ".join(map(str, y[50:])) + "])")
+
+
 # ---- the deck's functions ----
 
-def predict_knn(Z_train, y_train, z, k):
-    dist = np.sqrt(((Z_train - z) ** 2).sum(axis=1))
+def make_data(rng, n, d):
+    X = rng.random((n, d))
+    y = (X.sum(axis=1) > d / 2).astype(int)
+    flip = rng.random(n) < 0.1
+    y[flip] = 1 - y[flip]
+    return X, y
+
+
+def predict_knn(X_train, y_train, x, k):
+    dist = np.sqrt(((X_train - x) ** 2).sum(axis=1))
     nearest = np.argsort(dist)[:k]
     votes = y_train[nearest]
     return int(votes.sum() > k / 2)
 
 
-def predictions(Z_train, y_train, Z, k):
-    return np.array([predict_knn(Z_train, y_train, z, k) for z in Z])
+def accuracy_knn(X_train, y_train, X, y, k):
+    pred = [predict_knn(X_train, y_train, x, k) for x in X]
+    return np.mean(np.array(pred) == y)
 
 
-def nearest_index(P, i):
+def nearest_distance(P, i):
     dist = np.sqrt(((P - P[i]) ** 2).sum(axis=1))
     dist[i] = np.inf
-    return dist.argmin()
+    return dist.min()
 
 
-def nn_hits(P, label, count):
-    return np.array([label[nearest_index(P, i)] == label[i] for i in range(count)])
+def build_kdtree(X, idx, depth, leaf_size):
+    if len(idx) <= leaf_size:
+        return {"points": idx}
+    axis = depth % X.shape[1]
+    idx = idx[np.argsort(X[idx, axis])]
+    mid = len(idx) // 2
+    return {"axis": axis,
+            "value": X[idx[mid], axis],
+            "left": build_kdtree(X, idx[:mid], depth + 1, leaf_size),
+            "right": build_kdtree(X, idx[mid:], depth + 1, leaf_size)}
 
 
-# ==== k-NN on the fish ====
+def search_kdtree(node, X, x, best):
+    if "points" in node:
+        dist = np.sqrt(((X[node["points"]] - x) ** 2).sum(axis=1))
+        best["count"] += len(dist)
+        j = dist.argmin()
+        if dist[j] < best["dist"]:
+            best["index"] = node["points"][j]
+            best["dist"] = dist[j]
+        return
+    diff = x[node["axis"]] - node["value"]
+    if diff < 0:
+        near, far = node["left"], node["right"]
+    else:
+        near, far = node["right"], node["left"]
+    search_kdtree(near, X, x, best)
+    best["splits"] += 1                      # tool only: splits met on the way back
+    if abs(diff) < best["dist"]:
+        best["far"] += 1                     # tool only: far sides searched
+        search_kdtree(far, X, x, best)
 
-print("# ---- k-NN on the fish ----")
-salmon_weights = np.array(deck_literal("salmon_weights"))
-salmon_brightness = np.array(deck_literal("salmon_brightness"))
-seabass_weights = np.array(deck_literal("seabass_weights"))
-seabass_brightness = np.array(deck_literal("seabass_brightness"))
-X = np.array([[salmon_brightness[i], salmon_weights[i]] for i in range(60)]
-             + [[seabass_brightness[i], seabass_weights[i]] for i in range(60)])
-y = np.array([1] * 60 + [0] * 60)
 
-check("idx", np.random.default_rng(0).permutation(120), 0)
-idx = np.array(deck_literal("idx"))
-X_train, y_train = X[idx[:96]], y[idx[:96]]
-X_test, y_test = X[idx[96:]], y[idx[96:]]
-mean, std = X_train.mean(axis=0), X_train.std(axis=0)
-Z_train = (X_train - mean) / std
-Z_test = (X_test - mean) / std
-print(f"# train {len(y_train)} fish ({y_train.sum()} Salmon), test {len(y_test)} fish ({y_test.sum()} Salmon)")
-print(f"# train std: brightness {std[0]:.2f}, weight {std[1]:.1f} g")
-u, inv, cnt = np.unique(X_train, axis=0, return_inverse=True, return_counts=True)
-for g in np.flatnonzero(cnt > 1):
-    same = np.flatnonzero(inv.ravel() == g)
-    print(f"# identical training fish {same.tolist()} (original rows {idx[same].tolist()}): "
-          f"{X_train[same[0]].tolist()}, labels {y_train[same].tolist()}")
+def nearest_kdtree(tree, X, x):
+    best = {"index": -1, "dist": np.inf, "count": 0, "splits": 0, "far": 0}
+    search_kdtree(tree, X, x, best)
+    return best
 
-# A distance tie at the k-th neighbour leaves the vote to the order argsort
-# returns. It is harmless only when every tied fish has the same label.
-ks = deck_literal("ks")
+
+def leaves(node):
+    if "points" in node:
+        return [node["points"]]
+    return leaves(node["left"]) + leaves(node["right"])
+
+
+# ==== k-NN in 2-D: the data ====
+
+print("# ---- k-NN in 2-D ----")
+KS = [1, 3, 5, 9, 15, 21, 31, 51, 71]
+
+
+def frozen_2d(seed):
+    """One run of make_data, rounded to 3 decimals, label rule re-applied."""
+    rng = np.random.default_rng(seed)
+    out = []
+    for n in [100, 100]:
+        X, y = make_data(rng, n, 2)
+        flipped = y != (X.sum(axis=1) > 1)
+        X = np.round(X, 3)
+        out += [X, ((X.sum(axis=1) > 1) != flipped).astype(int)]
+    return out
+
+
+def curves(X_train, y_train, X_test, y_test):
+    out = []
+    for X, y in [(X_train, y_train), (X_test, y_test)]:
+        order = np.argsort(((X[:, None, :] - X_train[None, :, :]) ** 2).sum(axis=2), axis=1)
+        out.append([np.mean((y_train[order[:, :k]].sum(axis=1) > k / 2).astype(int) == y) for k in KS])
+    return np.array(out)
+
+
+all_curves = np.array([curves(*frozen_2d(s)) for s in range(200)])
+mean_curve = all_curves.mean(axis=0)
+seed = int(((all_curves - mean_curve) ** 2).sum(axis=(1, 2)).argmin())
+print(f"# KS = {KS}")
+print("# mean over 200 seeds  train " + " ".join(f"{v:.3f}" for v in mean_curve[0]))
+print("#                      test  " + " ".join(f"{v:.3f}" for v in mean_curve[1]))
+print(f"# chosen seed {seed:<3d}     train " + " ".join(f"{v:.3f}" for v in all_curves[seed][0]))
+print("#                      test  " + " ".join(f"{v:.3f}" for v in all_curves[seed][1]))
+
+X_train, y_train, X_test, y_test = frozen_2d(seed)
+for name, X, y in [("X_train", X_train, y_train), ("X_test", X_test, y_test)]:
+    flipped = np.flatnonzero(y != (X.sum(axis=1) > 1))
+    print(f"# {name}: label 1 {y.sum()}, label 0 {len(y) - y.sum()}, flipped {len(flipped)}: {flipped.tolist()}")
+print_points("X_train", X_train)
+print_labels("y_train", y_train)
+print_points("X_test", X_test)
+print_labels("y_test", y_test)
+check("X_train", X_train, 3)
+check("y_train", y_train, 0)
+check("X_test", X_test, 3)
+check("y_test", y_test, 0)
+check("ks", KS, 0)
+
+# ==== k-NN in 2-D: the slides ====
+
+dup = len(X_train) - len(np.unique(X_train, axis=0))
+assert dup == 0, "identical training points: k = 1 on the training data is no longer self-evident"
 ties = 0
-for k in ks:
-    for z in np.vstack([Z_train, Z_test]):
-        dist = np.sqrt(((Z_train - z) ** 2).sum(axis=1))
+for k in KS:
+    for x in np.vstack([X_train, X_test]):
+        dist = np.sqrt(((X_train - x) ** 2).sum(axis=1))
         kth = np.sort(dist)[k - 1]
         if np.isclose(kth, np.sort(dist)[k]):
             tied = np.flatnonzero(np.isclose(dist, kth))
-            assert len(set(y_train[tied])) == 1, f"k = {k}: tied fish {tied} differ in label"
+            assert len(set(y_train[tied])) == 1, f"k = {k}: tied points {tied} differ in label"
             ties += 1
-print(f"# {ties} distance ties at the k-th neighbour over k = {ks}, all between fish of one label")
+print(f"# no identical training points; {ties} distance ties at the k-th neighbour over KS, "
+      "all between points of one label")
 
-p1 = predictions(Z_train, y_train, Z_test, 1)
-print(f"# k = 1: test hits {np.sum(p1 == y_test)} / 24, Accuracy {np.mean(p1 == y_test):.3f}")
-d4 = np.sqrt(((Z_train - Z_test[4]) ** 2).sum(axis=1))
-o4 = np.argsort(d4)
-print(f"# test fish 4: true {y_test[4]} (1=Salmon, 0=Sea bass), nearest training fish {y_train[o4[0]]}, "
-      f"5 nearest {y_train[o4[:5]].tolist()} (Salmon {y_train[o4[:5]].sum()}, Sea bass {5 - y_train[o4[:5]].sum()})")
-p5 = predictions(Z_train, y_train, Z_test, 5)
-print(f"# k = 5: test hits {np.sum(p5 == y_test)} / 24; fish 4 predicted {p5[4]}")
-print(f"#   right at k = 1 only: {np.flatnonzero((p1 == y_test) & (p5 != y_test)).tolist()}, "
-      f"right at k = 5 only: {np.flatnonzero((p1 != y_test) & (p5 == y_test)).tolist()} (test fish numbers)")
+tree_clf = DecisionTreeClassifier(max_depth=3, random_state=0).fit(X_train, y_train)
+x_new = np.array(deck_literal("x_new"))
+d_new = np.sqrt(((X_train - x_new) ** 2).sum(axis=1))
+o_new = np.argsort(d_new)
+tree_label = int(tree_clf.predict([x_new])[0])
+vote = y_train[o_new[:3]]
+print(f"# x_new {x_new.tolist()}: depth-3 tree says {tree_label}; 3 nearest X_train{o_new[:3].tolist()} "
+      f"labels {vote.tolist()} at {np.round(d_new[o_new[:3]], 3).tolist()}; "
+      f"flipped among them: {[int(i) for i in o_new[:3] if y_train[i] != (X_train[i].sum() > 1)]}")
+assert sorted(vote.tolist()) in ([0, 1, 1], [0, 0, 1]) and int(vote.sum() > 1.5) == tree_label, \
+    "x_new must get a 2 : 1 vote that agrees with the tree"
+print(f"# depth-3 tree: train accuracy {tree_clf.score(X_train, y_train):.3f}, "
+      f"test accuracy {tree_clf.score(X_test, y_test):.3f}")
+
+p3 = np.array([predict_knn(X_train, y_train, x, 3) for x in X_test])
+print(f"# k = 3: test hits {np.sum(p3 == y_test)} / 100; x_new predicted {predict_knn(X_train, y_train, x_new, 3)}")
 print("# k    train  test")
-for k in ks:
-    tr = np.mean(predictions(Z_train, y_train, Z_train, k) == y_train)
-    te = np.mean(predictions(Z_train, y_train, Z_test, k) == y_test)
-    print(f"# {k:2d}   {tr:.3f}  {te:.3f}")
-p31 = predictions(Z_train, y_train, Z_test, 31)
-print(f"# k = 31: test hits {np.sum(p31 == y_test)} / 24")
-for k in [1, 5]:
-    praw = predictions(X_train, y_train, X_test, k)
-    print(f"# without standardization, k = {k}: test hits {np.sum(praw == y_test)} / 24")
+for k in KS:
+    print(f"# {k:2d}   {accuracy_knn(X_train, y_train, X_train, y_train, k):.3f}  "
+          f"{accuracy_knn(X_train, y_train, X_test, y_test, k):.3f}")
+for k in [1, 31]:
+    p = np.array([predict_knn(X_train, y_train, x, k) for x in X_test])
+    print(f"# k = {k}: test hits {np.sum(p == y_test)} / 100")
+print(f"# best possible on the test data (labels that follow the rule): "
+      f"{np.mean(y_test == (X_test.sum(axis=1) > 1)):.3f}")
 
-from sklearn.neighbors import KNeighborsClassifier  # noqa: E402  (only for the (参考) slide)
-sk = KNeighborsClassifier(n_neighbors=5).fit(Z_train, y_train).predict(Z_test)
-print(f"# KNeighborsClassifier(n_neighbors=5): test hits {np.sum(sk == y_test)} / 24, "
-      f"same predictions as predict_knn: {np.array_equal(sk, p5)}")
+for algorithm in ["auto", "kd_tree"]:
+    sk = KNeighborsClassifier(n_neighbors=3, algorithm=algorithm).fit(X_train, y_train)
+    print(f"# KNeighborsClassifier(n_neighbors=3, algorithm={algorithm!r}): test hits "
+          f"{np.sum(sk.predict(X_test) == y_test)} / 100, same as predict_knn: "
+          f"{np.array_equal(sk.predict(X_test), p3)}")
+
+nn0 = nearest_distance(X_train, 0)
+nn_all = [nearest_distance(X_train, i) for i in range(len(X_train))]
+j0 = np.argsort(np.sqrt(((X_train - X_train[0]) ** 2).sum(axis=1)))[1]
+print(f"# X_train point 0 {X_train[0].tolist()}: nearest point {j0} at {nn0:.3f}; "
+      f"median over the 100 points {np.median(nn_all):.3f} (min {min(nn_all):.3f}, max {max(nn_all):.3f})")
 
 Q = np.array([[3.0, 4.0], [1.0, 3.0], [3.0, 1.0], [6.0, 7.0], [7.0, 6.0]])   # A, B, C, D, E
 q_label = np.array([0, 1, 1, 0, 0])
@@ -172,41 +288,46 @@ print(f"# exercise: distances A-E {np.sqrt(((Q - q_new) ** 2).sum(axis=1)).tolis
       f"predictions k = 1, 3, 5: {[predict_knn(Q, q_label, q_new, k) for k in [1, 3, 5]]}")
 
 
-# ==== curse of dimensionality ====
+# ==== raising the dimension ====
 
-print("# ---- curse of dimensionality ----")
+print("# ---- raising the dimension ----")
 rng = np.random.default_rng(0)
-dims = [1, 2, 3, 5, 10, 20]
+knn_dims, best = [], []
+for d in [2, 3, 5, 10, 20]:
+    Xtr, ytr = make_data(rng, 100, d)
+    Xte, yte = make_data(rng, 1000, d)
+    knn_dims.append(accuracy_knn(Xtr, ytr, Xte, yte, 3))
+    best.append(np.mean(yte == (Xte.sum(axis=1) > d / 2)))
+print("knn_dims =", [round(float(a), 3) for a in knn_dims])
+print("# best possible on each test set:", [round(float(b), 3) for b in best])
+check("knn_dims", knn_dims, 3)
+
+rng = np.random.default_rng(0)
 nn_median = []
-for d in dims:
-    P = rng.random((100, d))
-    if d == 2:
-        # The 2-D sample of this run is the frozen point set `P` of the
-        # slides 準備 / 距離を測る / ばらまいた点で、最近傍法を試す
-        # (rounded to 3 decimals).
-        P2 = np.round(P, 3)
-    D = np.sqrt(((P[:, None, :] - P[None, :, :]) ** 2).sum(axis=2))
-    np.fill_diagonal(D, np.inf)
-    nn_median.append(np.median(D.min(axis=1)))
-print("dims =", dims)
+for d in [2, 3, 5, 10, 20]:
+    P, label = make_data(rng, 100, d)
+    nn_median.append(np.median([nearest_distance(P, i) for i in range(len(P))]))
 print("nn_median =", [round(float(m), 3) for m in nn_median])
 check("nn_median", nn_median, 3)
 
-# Frozen 2-D points and the numbers the slide 距離を測る prints for them
-print("P = np.array([")
-for k in range(0, 100, 5):
-    print("    " + ", ".join(f"[{x:.3f}, {y:.3f}]" for x, y in P2[k:k + 5]) + ",")
-print("])")
-check("P", P2, 3)
-D2 = np.sqrt(((P2[:, None, :] - P2[None, :, :]) ** 2).sum(axis=2))
-np.fill_diagonal(D2, np.inf)
-nn2 = D2.min(axis=1)
-for i in range(5):
-    print(f"# P point {i}: nearest is point {D2[i].argmin()}, "
-          f"distance {nn2[i]:.3f}, coords {P2[i]}")
-print(f"# P: median nearest distance {np.median(nn2):.3f}, "
-      f"min {nn2.min():.3f}, max {nn2.max():.3f}")
+rng = np.random.default_rng(0)
+more_acc, best = [], []
+for n in [1000, 10000, 100000]:
+    row = []
+    for d in [2, 5, 10, 20]:
+        Xtr, ytr = make_data(rng, n, d)
+        Xte, yte = make_data(rng, 1000, d)
+        row.append(accuracy_knn(Xtr, ytr, Xte, yte, 3))
+        best.append(np.mean(yte == (Xte.sum(axis=1) > d / 2)))
+    more_acc.append(row)
+print("more_acc =", [[round(float(a), 3) for a in row] for row in more_acc])
+print(f"# best possible on these test sets: {min(best):.3f} to {max(best):.3f}")
+check("more_acc", more_acc, 3)
 
+
+# ==== curse of dimensionality: figures ====
+
+print("# ---- curse of dimensionality: figures ----")
 np.random.seed(42)
 dims = [1, 2, 3, 5, 10, 20, 50, 100]
 cv_list = []
@@ -219,15 +340,12 @@ for d in dims:
           f"diff {dists.max() - dists.min():.3f}  "
           f"max/min {dists.max() / dists.min():.2f}  "
           f"cv {cv_list[-1]:.3f}")
-print("dims =", dims)
 print("cv_list =", [round(float(c), 3) for c in cv_list])
 check("cv_list", cv_list, 3)
 
 pts_mid = np.round(np.random.default_rng(7).random((60, 2)), 2)
 literal("pts", pts_mid, 2)
 check("pts", pts_mid, 2)
-inside = ((pts_mid > 0.25) & (pts_mid < 0.75)).all(axis=1)
-print(f"# pts: {inside.sum()} of 60 inside the central square")
 
 np.random.seed(0)
 pts1d, pts2d = np.random.rand(20), np.random.rand(20, 2)
@@ -236,33 +354,39 @@ literal("pts2d", pts2d, 2)
 check("pts1d", pts1d, 2)
 check("pts2d", pts2d, 2)
 
-# Nearest-neighbour method on the frozen P (the slide ばらまいた点で、最近傍法を試す)
-label = P2.sum(axis=1) > 1
-hit = nn_hits(P2, label, 100)
-gap = np.abs(P2.sum(axis=1) - 1)          # how far off the boundary x + y = 1
-rank = np.argsort(np.argsort(gap))         # 0 = the point closest to the boundary
-print(f"# nearest-neighbour method on P (label x + y > 1): {hit.sum()} / 100 hit")
-print(f"#   missed points {np.flatnonzero(~hit).tolist()}: |x + y - 1| "
-      f"{np.round(gap[~hit], 3).tolist()}, closeness rank among 100 {rank[~hit].tolist()}")
-print(f"#   |x + y - 1| over all 100 points: median {np.median(gap):.3f}")
 
-# nn_hit: the loop of the slide 質問：次元を増やすと、最近傍法は当たる？
-rng = np.random.default_rng(0)
-nn_hit = []
-for d in [1, 2, 3, 5, 10, 20]:
-    P = rng.random((100, d))
-    nn_hit.append(nn_hits(P, P.sum(axis=1) > d / 2, 100).mean())
-print("nn_hit =", [round(float(h), 2) for h in nn_hit])
-check("nn_hit", nn_hit, 2)
+# ==== KD-tree ====
 
-# more_hit: the loop of the slide 点を 1000 倍に増やしても、追いつかない
+print("# ---- KD-tree ----")
+tree = build_kdtree(X_train, np.arange(len(X_train)), 0, 5)
+lv = leaves(tree)
+print(f"# tree on X_train (leaf size 5): {len(lv)} leaves of {sorted({len(p) for p in lv})} points; "
+      f"first split feature {tree['axis'] + 1} = {tree['value']}")
+b = nearest_kdtree(tree, X_train, x_new)
+assert b["index"] == o_new[0], "the KD-tree must find the same nearest point as the full search"
+print(f"# x_new: KD-tree finds X_train[{b['index']}] at {b['dist']:.3f} after {b['count']} distance computations "
+      f"(far side searched {b['far']} of {b['splits']} splits)")
+
 rng = np.random.default_rng(0)
-more_hit = []
+kd_count = []
 for n in [1000, 10000, 100000]:
-    row = []
-    for d in [2, 5, 10, 20]:
-        P = rng.random((n, d))
-        row.append(nn_hits(P, P.sum(axis=1) > d / 2, 1000).mean())
-    more_hit.append(row)
-print("more_hit =", [[round(float(h), 2) for h in row] for row in more_hit])
-check("more_hit", more_hit, 2)
+    X = rng.random((n, 2))
+    tree = build_kdtree(X, np.arange(n), 0, 5)
+    kd_count.append(np.mean([nearest_kdtree(tree, X, q)["count"] for q in rng.random((100, 2))]))
+print("kd_count =", [round(float(c), 1) for c in kd_count])
+check("kd_count", kd_count, 1)
+
+rng = np.random.default_rng(0)
+kd_dims = []
+n = 10000
+for d in [2, 5, 10, 20]:
+    X = rng.random((n, d))
+    tree = build_kdtree(X, np.arange(n), 0, 5)
+    found = [nearest_kdtree(tree, X, q) for q in rng.random((100, d))]
+    kd_dims.append(np.mean([f["count"] for f in found]))
+    far = sum(f["far"] for f in found) / sum(f["splits"] for f in found)
+    print(f"# {d:2d}-D, n = {n}: mean count {kd_dims[-1]:.1f} ({kd_dims[-1] / n:.3f} of n), "
+          f"median nearest distance {np.median([f['dist'] for f in found]):.3f}, "
+          f"far side searched at {far:.3f} of the splits")
+print("kd_dims =", [round(float(c), 1) for c in kd_dims])
+check("kd_dims", kd_dims, 1)
