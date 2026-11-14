@@ -13,7 +13,7 @@
   <meta name="generator" content="quarto-1.10.19">
 
   <meta name="author" content="rkskmt">
-  <title>AI Lectures – 次元の呪いと次元削減</title>
+  <title>AI Lectures – 次元削減と PCA</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -248,15 +248,15 @@
   <script src="peek-ui.js" defer=""></script>
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="31a45ca414d931f28105b0e26319c73177dbac8f">
+  <meta name="qmd-web-source" content="4d7bd7fd7e870e32d39884891574b45d5c7938d9">
 </head>
 <body class="quarto-light">
   <div class="reveal">
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">次元の呪いと次元削減</h1>
-  <p class="subtitle">特徴量を増やし続けると何が起きるか</p>
+  <h1 class="title">次元削減と PCA</h1>
+  <p class="subtitle">重複した特徴量をまとめる</p>
 
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
@@ -267,13 +267,12 @@ rkskmt
 </div>
 
 </section>
-<section id="特徴量の数を増やすのが最強か" class="slide level2">
-<h2>特徴量の数を増やすのが最強か？</h2>
+<section id="ここまでの道具" class="slide level2">
+<h2>ここまでの道具</h2>
 <div class="slide-body">
 <ul>
-<li><strong>重さだけ</strong>でサーモンを分類すると、ある程度できた</li>
-<li><strong>輝度も追加</strong>して2次元で分類すると、精度が上がった</li>
-<li>ならば<strong>特徴量を増やし続ければ</strong>もっと精度が上がる？</li>
+<li><a href="./knn-curse.html#peek-curse" class="peek"><strong>次元の呪い</strong></a>：特徴量を増やすと空間が広くなり、データがまばらになる</li>
+<li>対処の 1 つが、情報を保ったまま特徴量の数を減らす<strong>次元削減</strong></li>
 </ul>
 <div title="今回の主題">
 <div class="callout callout-note callout-titled callout-style-default">
@@ -285,443 +284,11 @@ rkskmt
 <p><strong>今回の主題</strong></p>
 </div>
 <div class="callout-content">
-<p>特徴量（次元）を増やし続けると何が起きるか？</p>
+<p>特徴量を増やすと、手に入る情報も同じだけ増えるのか</p>
 </div>
 </div>
 </div>
 </div>
-</div>
-</section>
-<section id="section" class="slide level2 center break-slide" data-background-color="white">
-<h2></h2>
-<div class="break-title">
-<p>次元の呪い</p>
-</div>
-</section>
-<section id="peek-curse" class="slide level2">
-<h2>次元の呪い（<span class="en">Curse of Dimensionality</span>）</h2>
-<div class="slide-body">
-<ul>
-<li>データの次元が増えるにつれて、空間が指数的に広くなり、データがまばらになる現象</li>
-<li>2次元で十分だったサンプル数が、10次元では<strong>全く足りなくなる</strong></li>
-<li>高次元空間は私たちの直感とは全く異なる振る舞いをする</li>
-</ul>
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>ノート</strong></p>
-</div>
-<div class="callout-content">
-<p>名づけたのは Richard Bellman（動的計画法の発明者）。 現代機械学習でも最重要トピックの一つ。</p>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="準備" class="slide level2">
-<h2>準備</h2>
-<div class="slide-body">
-<ul>
-<li>各特徴量は 0〜1 に正規化してあるとする（各軸の長さ＝1）</li>
-<li>そこに<strong>100個の点</strong>をランダムにばらまく</li>
-<li>点は「行＝点、列＝特徴量」の配列で持つ</li>
-<li>まず特徴量2個（2次元）で、散布図に描く</li>
-</ul>
-<div id="d2efdcb5" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-2"><a aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb1-3"><a aria-label="3"></a><span class="im">import</span> japanize_matplotlib</span>
-<span id="cb1-4"><a aria-label="4"></a></span>
-<span id="cb1-5"><a aria-label="5"></a>rng <span class="op">=</span> np.random.default_rng()  <span class="co"># 乱数の生成器（実行するたびに違う点になる）</span></span>
-<span id="cb1-6"><a aria-label="6"></a>P   <span class="op">=</span> rng.random((<span class="dv">100</span>, <span class="dv">2</span>))          <span class="co"># 100個の点（行＝点、列＝特徴量）</span></span>
-<span id="cb1-7"><a aria-label="7"></a></span>
-<span id="cb1-8"><a aria-label="8"></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">4.4</span>, <span class="fl">4.4</span>))</span>
-<span id="cb1-9"><a aria-label="9"></a>plt.scatter(P[:, <span class="dv">0</span>], P[:, <span class="dv">1</span>], s<span class="op">=</span><span class="dv">28</span>, c<span class="op">=</span><span class="st">"#2980b9"</span>)</span>
-<span id="cb1-10"><a aria-label="10"></a>plt.xlabel(<span class="st">"特徴量 1"</span>)</span>
-<span id="cb1-11"><a aria-label="11"></a>plt.ylabel(<span class="st">"特徴量 2"</span>)</span>
-<span id="cb1-12"><a aria-label="12"></a>plt.xlim(<span class="dv">0</span>, <span class="dv">1</span>)</span>
-<span id="cb1-13"><a aria-label="13"></a>plt.ylim(<span class="dv">0</span>, <span class="dv">1</span>)</span>
-<span id="cb1-14"><a aria-label="14"></a>plt.gca().set_aspect(<span class="st">"equal"</span>)</span>
-<span id="cb1-15"><a aria-label="15"></a>plt.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
-<span id="cb1-16"><a aria-label="16"></a>plt.tight_layout()</span>
-<span id="cb1-17"><a aria-label="17"></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div id="0e0aea31" class="cell" data-execution_count="2">
-<div class="cell-output cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><a href="dimensionality-pca_files/figure-revealjs/cell-3-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img data-src="dimensionality-pca_files/figure-revealjs/cell-3-output-1.png" class="quarto-figure quarto-figure-center" width="429" height="414"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="caption-note center">
-<p>点は実行のたびに変わるので、手元の図は少し違う</p>
-</div>
-</div>
-</section>
-<section id="距離を測る" class="slide level2">
-<h2>距離を測る</h2>
-<div class="slide-body">
-<ul>
-<li>2点間の距離は、<a href="./clustering-kmeans.html#peek-distance" class="peek"><strong>ユークリッド距離</strong></a>で測る</li>
-<li>ある点から、ほかの99個の点までの距離をすべて測る</li>
-<li>その中でいちばん小さいものが、<strong>いちばん近い点（最近傍, <span class="en">nearest neighbor</span>）までの距離</strong></li>
-</ul>
-<div id="635f7710" class="cell" data-execution_count="3">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a><span class="kw">def</span> nearest_distance(P, i):</span>
-<span id="cb2-2"><a aria-label="2"></a>    dist <span class="op">=</span> np.sqrt(((P <span class="op">-</span> P[i]) <span class="op">**</span> <span class="dv">2</span>).<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>))   <span class="co"># 点 i から全部の点までの距離</span></span>
-<span id="cb2-3"><a aria-label="3"></a>    dist[i] <span class="op">=</span> np.inf                                <span class="co"># 自分自身は除外</span></span>
-<span id="cb2-4"><a aria-label="4"></a>    <span class="cf">return</span> dist.<span class="bu">min</span>()                               <span class="co"># いちばん近い点までの距離</span></span>
-<span id="cb2-5"><a aria-label="5"></a></span>
-<span id="cb2-6"><a aria-label="6"></a><span class="bu">print</span>(<span class="ss">f"点 0 からいちばん近い点まで: </span><span class="sc">{</span>nearest_distance(P, <span class="dv">0</span>)<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
-<span id="cb2-7"><a aria-label="7"></a></span>
-<span id="cb2-8"><a aria-label="8"></a>nn <span class="op">=</span> []</span>
-<span id="cb2-9"><a aria-label="9"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(P)):                             <span class="co"># 100個の点すべてで測る</span></span>
-<span id="cb2-10"><a aria-label="10"></a>    nn.append(nearest_distance(P, i))</span>
-<span id="cb2-11"><a aria-label="11"></a><span class="bu">print</span>(<span class="ss">f"100個の中央値: </span><span class="sc">{</span>np<span class="sc">.</span>median(nn)<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>点 0 からいちばん近い点まで: 0.070
-100個の中央値: 0.042</code></pre>
-</div>
-</div>
-<div id="d49e97cb" class="cell" data-execution_count="4">
-<div class="cell-output cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><a href="dimensionality-pca_files/figure-revealjs/cell-5-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img data-src="dimensionality-pca_files/figure-revealjs/cell-5-output-1.png" class="quarto-figure quarto-figure-center" width="432" height="447"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div title="結果">
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>結果</strong></p>
-</div>
-<div class="callout-content">
-<ul>
-<li>点 0 からいちばん近い点までの距離は <strong>0.070</strong>（図の赤い線）</li>
-<li>この距離は、100個の点それぞれに1つずつ決まる
-<ul>
-<li>その中央値 <strong>0.042</strong> を、点の混み具合を表す値として使う</li>
-</ul></li>
-<li>軸の長さ 1 に対して 0.04 ほどなので、2次元ではすぐ隣に点がある</li>
-</ul>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="質問いちばん近い点までどれくらい" class="slide level2">
-<h2>質問：いちばん近い点まで、どれくらい？</h2>
-<div class="slide-body">
-<ul>
-<li><strong>2次元</strong>では、いちばん近い点までの距離（中央値）は <strong>0.04</strong> ほどだった</li>
-</ul>
-<div title="質問">
-<div class="callout callout-important callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>質問</strong></p>
-</div>
-<div class="callout-content">
-<p>特徴量を増やして <strong>10次元</strong> にしたら、いちばん近い点までの距離はいくつになると思う？</p>
-<p>（各軸の長さは1のまま。点の数も100個のまま）</p>
-</div>
-</div>
-</div>
-</div>
-<div class="fragment">
-<div id="d0a4f136" class="cell" data-execution_count="5">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a aria-label="1"></a><span class="cf">for</span> d <span class="kw">in</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">20</span>]:</span>
-<span id="cb4-2"><a aria-label="2"></a>    P  <span class="op">=</span> rng.random((<span class="dv">100</span>, d))                   <span class="co"># 100個の点を d 次元にばらまく</span></span>
-<span id="cb4-3"><a aria-label="3"></a>    nn <span class="op">=</span> []</span>
-<span id="cb4-4"><a aria-label="4"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(P)):                     <span class="co"># 「距離を測る」と同じ測り方</span></span>
-<span id="cb4-5"><a aria-label="5"></a>        nn.append(nearest_distance(P, i))</span>
-<span id="cb4-6"><a aria-label="6"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>d<span class="sc">:2d}</span><span class="ss">次元: いちばん近い点まで </span><span class="sc">{</span>np<span class="sc">.</span>median(nn)<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div id="9339cc75" class="cell" data-execution_count="6">
-<div class="cell-output cell-output-stdout">
-<pre><code> 1次元: いちばん近い点まで 0.003
- 2次元: いちばん近い点まで 0.042
- 3次元: いちばん近い点まで 0.121
- 5次元: いちばん近い点まで 0.306
-10次元: いちばん近い点まで 0.703
-20次元: いちばん近い点まで 1.195</code></pre>
-</div>
-</div>
-<div id="d6c9e3ad" class="cell" data-execution_count="7">
-<div class="cell-output cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><a href="dimensionality-pca_files/figure-revealjs/cell-8-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img data-src="dimensionality-pca_files/figure-revealjs/cell-8-output-1.png" class="quarto-figure quarto-figure-center" width="687" height="307"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div title="結果">
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>結果</strong></p>
-</div>
-<div class="callout-content">
-<ul>
-<li>10次元で <strong>0.70</strong>、20次元では <strong>1.2</strong>。もはや「お隣さん」は存在しない</li>
-<li>同じ100点なのに。なぜこんなことが起きるのか、2つの理由を見る</li>
-</ul>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="なぜ-その1真ん中に居続けられない" class="slide level2">
-<h2>なぜ？　その1：真ん中に居続けられない</h2>
-<div class="slide-body">
-<ul>
-<li>ある点が、ある軸で「中央寄り」（その軸の<strong>中央50%</strong>）に入る確率は <span class="math inline">\(\dfrac{1}{2}\)</span></li>
-<li><span class="math inline">\(d\)</span> 次元で「<strong>全部の軸</strong>で中央寄り」でいられる確率は：</li>
-</ul>
-<p><span class="math display">\[\left(\frac{1}{2}\right)^d \qquad
-\text{1次元: } 50\% \quad \text{3次元: } 12.5\% \quad \text{10次元: } 0.1\% \quad \text{20次元: } 100万分の1\]</span></p>
-<div id="6639aee0" class="cell" data-execution_count="8">
-<div class="cell-output cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><a href="dimensionality-pca_files/figure-revealjs/cell-9-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img data-src="dimensionality-pca_files/figure-revealjs/cell-9-output-1.png" class="quarto-figure quarto-figure-center" width="840" height="327"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div title="要するに">
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>要するに</strong></p>
-</div>
-<div class="callout-content">
-<ul>
-<li>ほぼすべての点が、<strong>どこかの軸では中央から外れている</strong></li>
-<li>各軸を半分に切ると、空間は <span class="math inline">\(2^d\)</span> 個の区画に分かれる（20次元で約105万個）
-<ul>
-<li>100個の点は、ほぼ1個ずつ別の区画に入る</li>
-<li><strong>データは100万個の区画に散り散り</strong>になる</li>
-</ul></li>
-</ul>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="なぜ-その2ご近所の箱が各軸の大半にまたがる" class="slide level2">
-<h2>なぜ？　その2：「ご近所」の箱が各軸の大半にまたがる</h2>
-<div class="slide-body">
-<ul>
-<li>「近い点」を頼りにする手法のつもりで、周りの<strong>データの1%</strong>を「ご近所」として集めたい</li>
-<li>各軸を割合 <span class="math inline">\(r\)</span> だけ切り取った箱は、全体の体積の <span class="math inline">\(r^d\)</span> を占める（点が一様なら、データの割合も <span class="math inline">\(r^d\)</span>）。1% 集めるには：</li>
-</ul>
-<p><span class="math display">\[r = 0.01^{1/d}\]</span></p>
-<div id="8274cff1" class="cell" data-execution_count="9">
-<div class="cell-output cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><a href="dimensionality-pca_files/figure-revealjs/cell-10-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img data-src="dimensionality-pca_files/figure-revealjs/cell-10-output-1.png" class="quarto-figure quarto-figure-center" width="686" height="327"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div title="要するに">
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>要するに</strong></p>
-</div>
-<div class="callout-content">
-<ul>
-<li>10次元では、たった1%の「ご近所」を集めるのに<strong>各軸の63%</strong>を見渡す必要がある</li>
-<li>それはもう「近所」ではない
-<ul>
-<li><strong>「近い点どうしは似ている」を前提にする手法（k-means など）は、前提が成り立ちにくくなる</strong></li>
-</ul></li>
-</ul>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="近いと遠いの区別が弱くなる" class="slide level2">
-<h2>「近い」と「遠い」の区別が弱くなる</h2>
-<div class="slide-body">
-<ul>
-<li>k-means をはじめ、多くの手法は<strong>距離</strong>に依存している</li>
-<li>点を一様にばらまき、ある1点からほかの2000点までの距離を測る</li>
-<li>距離のばらつきを、<strong>変動係数（<span class="en">coefficient of variation</span>）</strong>＝ 標準偏差 ÷ 平均 で比べる</li>
-</ul>
-<div id="deb78c94" class="cell" data-execution_count="10">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb6-2"><a aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb6-3"><a aria-label="3"></a><span class="im">import</span> japanize_matplotlib</span>
-<span id="cb6-4"><a aria-label="4"></a></span>
-<span id="cb6-5"><a aria-label="5"></a>rng     <span class="op">=</span> np.random.default_rng()</span>
-<span id="cb6-6"><a aria-label="6"></a>dims    <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">50</span>, <span class="dv">100</span>]</span>
-<span id="cb6-7"><a aria-label="7"></a>cv_list <span class="op">=</span> []   <span class="co"># 変動係数 = std / mean</span></span>
-<span id="cb6-8"><a aria-label="8"></a></span>
-<span id="cb6-9"><a aria-label="9"></a><span class="cf">for</span> d <span class="kw">in</span> dims:</span>
-<span id="cb6-10"><a aria-label="10"></a>    pts   <span class="op">=</span> rng.random((<span class="dv">2000</span>, d))</span>
-<span id="cb6-11"><a aria-label="11"></a>    query <span class="op">=</span> rng.random(d)</span>
-<span id="cb6-12"><a aria-label="12"></a>    dists <span class="op">=</span> np.sqrt(((pts <span class="op">-</span> query) <span class="op">**</span> <span class="dv">2</span>).<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>))</span>
-<span id="cb6-13"><a aria-label="13"></a>    cv_list.append(dists.std() <span class="op">/</span> dists.mean())</span>
-<span id="cb6-14"><a aria-label="14"></a></span>
-<span id="cb6-15"><a aria-label="15"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.5</span>))</span>
-<span id="cb6-16"><a aria-label="16"></a>plt.plot(dims, cv_list, <span class="st">"o-"</span>, color<span class="op">=</span><span class="st">"#e74c3c"</span>)</span>
-<span id="cb6-17"><a aria-label="17"></a>plt.xlabel(<span class="st">"次元数 d"</span>)</span>
-<span id="cb6-18"><a aria-label="18"></a>plt.ylabel(<span class="st">"変動係数（std / mean）"</span>)</span>
-<span id="cb6-19"><a aria-label="19"></a>plt.title(<span class="st">"高次元では、距離が平均のまわりに集まる"</span>)</span>
-<span id="cb6-20"><a aria-label="20"></a>plt.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.4</span>)</span>
-<span id="cb6-21"><a aria-label="21"></a>plt.tight_layout()</span>
-<span id="cb6-22"><a aria-label="22"></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div id="447654f1" class="cell" data-execution_count="11">
-<div class="cell-output cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><a href="dimensionality-pca_files/figure-revealjs/cell-12-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img data-src="dimensionality-pca_files/figure-revealjs/cell-12-output-1.png" class="quarto-figure quarto-figure-center" width="686" height="337"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div title="変動係数が 0 に近づく">
-<div class="callout callout-warning callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>変動係数が 0 に近づく</strong></p>
-</div>
-<div class="callout-content">
-<ul>
-<li>距離のばらつきが、平均距離に比べて小さくなる</li>
-<li>「最も近い点」と「最も遠い点」の距離の<strong>比</strong>が 1 に近づく
-<ul>
-<li>差そのものは縮まらないが、距離全体が大きくなるので<strong>「近い」の意味が薄れる</strong></li>
-</ul></li>
-</ul>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="データが疎になるsparsity" class="slide level2">
-<h2>データが疎になる（<span class="en">Sparsity</span>）</h2>
-<div class="slide-body">
-<ul>
-<li>同じサンプル数でも、次元が増えると空間が広くなりすぎる</li>
-</ul>
-<div id="8fadaabd" class="cell" data-execution_count="12">
-<div class="cell-output cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><a href="dimensionality-pca_files/figure-revealjs/cell-13-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img data-src="dimensionality-pca_files/figure-revealjs/cell-13-output-1.png" class="quarto-figure quarto-figure-center" width="731" height="346"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>ノート</strong></p>
-</div>
-<div class="callout-content">
-<p>密度を保つには、次元数に対して<strong>指数的にサンプルを増やす</strong>必要がある。 1次元で10点あれば足りた密度を10次元で保つには、<span class="math inline">\(10^{10}\)</span> 点が必要という計算になる。</p>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="実用への影響" class="slide level2 scrollable">
-<h2>実用への影響</h2>
-<div class="slide-body">
-<table class="caption-top">
-<thead>
-<tr class="header">
-<th>問題</th>
-<th>原因</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>モデルの精度が上がらない</td>
-<td>データが疎でパターンが見えない</td>
-</tr>
-<tr class="even">
-<td>過学習しやすくなる</td>
-<td>データに比べてパラメータが多すぎる</td>
-</tr>
-<tr class="odd">
-<td>計算コストが増大</td>
-<td>距離計算などが次元数に比例して重くなる</td>
-</tr>
-<tr class="even">
-<td>可視化できない</td>
-<td>4次元以上は図に描けない</td>
-</tr>
-</tbody>
-</table>
-<div title="次元の呪いへの対処">
-<div class="callout callout-tip callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>次元の呪いへの対処</strong></p>
-</div>
-<div class="callout-content">
-<ol type="1">
-<li><strong>特徴量選択（<span class="en">feature selection</span>）</strong>：重要な特徴量だけを残す</li>
-<li><strong>次元削減（<span class="en">dimensionality reduction</span>）</strong>：情報を保ったまま次元を圧縮する</li>
-<li><strong>正則化（<span class="en">regularization</span>）</strong>：過学習を防ぐ（線形回帰の回で扱う）</li>
-</ol>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="section-1" class="slide level2 center break-slide" data-background-color="white">
-<h2></h2>
-<div class="break-title">
-<p>次元削減と PCA</p>
 </div>
 </section>
 <section id="つ目の特徴量体長" class="slide level2">
@@ -730,43 +297,49 @@ rkskmt
 <ul>
 <li>重さ・輝度で精度が上がった。気を良くして、80匹全部の<strong>体長</strong>も測った</li>
 </ul>
-<div id="182a31e0" class="cell" data-execution_count="13">
+<div id="718fccb4" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>魚データの定義（クリックして展開）</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a aria-label="1"></a>salmon_weights     <span class="op">=</span> np.array([<span class="dv">2149</span>, <span class="dv">1959</span>, <span class="dv">2194</span>, <span class="dv">2457</span>, <span class="dv">1930</span>, <span class="dv">1930</span>, <span class="dv">2474</span>, <span class="dv">2230</span>, <span class="dv">1859</span>, <span class="dv">2163</span>,</span>
-<span id="cb7-2"><a aria-label="2"></a>                               <span class="dv">1861</span>, <span class="dv">1860</span>, <span class="dv">2073</span>, <span class="dv">1426</span>, <span class="dv">1483</span>, <span class="dv">1831</span>, <span class="dv">1696</span>, <span class="dv">2094</span>, <span class="dv">1728</span>, <span class="dv">1576</span>,</span>
-<span id="cb7-3"><a aria-label="3"></a>                               <span class="dv">2028</span>, <span class="dv">1903</span>, <span class="dv">2057</span>, <span class="dv">2229</span>, <span class="dv">1884</span>, <span class="dv">1884</span>, <span class="dv">2240</span>, <span class="dv">2081</span>, <span class="dv">1838</span>, <span class="dv">2037</span>,</span>
-<span id="cb7-4"><a aria-label="4"></a>                               <span class="dv">1839</span>, <span class="dv">1838</span>, <span class="dv">1978</span>, <span class="dv">1554</span>, <span class="dv">1591</span>, <span class="dv">1820</span>, <span class="dv">1731</span>, <span class="dv">1992</span>, <span class="dv">1752</span>, <span class="dv">1652</span>])</span>
-<span id="cb7-5"><a aria-label="5"></a>salmon_brightness  <span class="op">=</span> np.array([<span class="fl">3.5</span>, <span class="fl">5.8</span>, <span class="fl">4.9</span>, <span class="fl">4.4</span>, <span class="fl">2.6</span>, <span class="fl">2.6</span>, <span class="fl">2.2</span>, <span class="fl">5.5</span>, <span class="fl">4.4</span>, <span class="fl">4.8</span>, <span class="fl">2.1</span>,</span>
-<span id="cb7-6"><a aria-label="6"></a>                               <span class="fl">5.9</span>, <span class="fl">5.3</span>, <span class="fl">2.8</span>, <span class="fl">2.7</span>, <span class="fl">2.7</span>, <span class="fl">3.2</span>, <span class="fl">4.1</span>, <span class="fl">3.7</span>, <span class="fl">3.2</span>, <span class="fl">4.4</span>, <span class="fl">2.6</span>,</span>
-<span id="cb7-7"><a aria-label="7"></a>                               <span class="fl">3.2</span>, <span class="fl">3.5</span>, <span class="fl">3.8</span>, <span class="fl">5.1</span>, <span class="fl">2.8</span>, <span class="fl">4.1</span>, <span class="fl">4.4</span>, <span class="fl">2.2</span>, <span class="fl">4.4</span>, <span class="fl">2.7</span>, <span class="fl">2.3</span>,</span>
-<span id="cb7-8"><a aria-label="8"></a>                               <span class="fl">5.8</span>, <span class="fl">5.9</span>, <span class="fl">5.2</span>, <span class="fl">3.2</span>, <span class="fl">2.4</span>, <span class="fl">4.7</span>, <span class="fl">3.8</span>])</span>
-<span id="cb7-9"><a aria-label="9"></a>seabass_weights    <span class="op">=</span> np.array([<span class="dv">1677</span>, <span class="dv">1327</span>, <span class="dv">1486</span>, <span class="dv">1440</span>, <span class="dv">1857</span>, <span class="dv">1476</span>, <span class="dv">1749</span>, <span class="dv">2203</span>, <span class="dv">1979</span>, <span class="dv">1468</span>,</span>
-<span id="cb7-10"><a aria-label="10"></a>                               <span class="dv">1496</span>, <span class="dv">1737</span>, <span class="dv">1099</span>, <span class="dv">1341</span>, <span class="dv">1748</span>, <span class="dv">1563</span>, <span class="dv">2181</span>, <span class="dv">1414</span>, <span class="dv">1286</span>, <span class="dv">1333</span>,</span>
-<span id="cb7-11"><a aria-label="11"></a>                               <span class="dv">1787</span>, <span class="dv">1445</span>, <span class="dv">1505</span>, <span class="dv">1204</span>, <span class="dv">1381</span>, <span class="dv">1513</span>, <span class="dv">1259</span>, <span class="dv">1567</span>, <span class="dv">1370</span>, <span class="dv">1432</span>,</span>
-<span id="cb7-12"><a aria-label="12"></a>                               <span class="dv">1370</span>, <span class="dv">1864</span>, <span class="dv">1488</span>, <span class="dv">1278</span>, <span class="dv">1657</span>, <span class="dv">1245</span>, <span class="dv">1533</span>, <span class="dv">1096</span>, <span class="dv">1223</span>, <span class="dv">1531</span>])</span>
-<span id="cb7-13"><a aria-label="13"></a>seabass_brightness <span class="op">=</span> np.array([<span class="fl">5.6</span>, <span class="fl">7.5</span>, <span class="fl">5.2</span>, <span class="fl">9.5</span>, <span class="fl">6.3</span>, <span class="fl">8.3</span>, <span class="fl">6.6</span>, <span class="fl">7.6</span>, <span class="fl">7.7</span>, <span class="fl">5.9</span>, <span class="fl">9.8</span>,</span>
-<span id="cb7-14"><a aria-label="14"></a>                               <span class="fl">8.9</span>, <span class="fl">9.7</span>, <span class="fl">9.5</span>, <span class="fl">8.0</span>, <span class="fl">9.6</span>, <span class="fl">5.4</span>, <span class="fl">6.0</span>, <span class="fl">5.2</span>, <span class="fl">6.6</span>, <span class="fl">6.9</span>, <span class="fl">6.4</span>,</span>
-<span id="cb7-15"><a aria-label="15"></a>                               <span class="fl">9.1</span>, <span class="fl">6.8</span>, <span class="fl">6.4</span>, <span class="fl">7.7</span>, <span class="fl">5.7</span>, <span class="fl">9.0</span>, <span class="fl">5.4</span>, <span class="fl">9.9</span>, <span class="fl">8.9</span>, <span class="fl">6.0</span>, <span class="fl">5.0</span>,</span>
-<span id="cb7-16"><a aria-label="16"></a>                               <span class="fl">9.1</span>, <span class="fl">8.5</span>, <span class="fl">8.6</span>, <span class="fl">8.9</span>, <span class="fl">5.4</span>, <span class="fl">6.8</span>, <span class="fl">5.6</span>])</span>
-<span id="cb7-17"><a aria-label="17"></a></span>
-<span id="cb7-18"><a aria-label="18"></a><span class="co"># 体長の測定値（cm）</span></span>
-<span id="cb7-19"><a aria-label="19"></a>salmon_lengths     <span class="op">=</span> np.array([<span class="fl">58.4</span>, <span class="fl">55.3</span>, <span class="fl">59.2</span>, <span class="fl">61.7</span>, <span class="fl">54.1</span>, <span class="fl">54.7</span>, <span class="fl">61.0</span>, <span class="fl">58.5</span>, <span class="fl">55.3</span>, <span class="fl">57.3</span>,</span>
-<span id="cb7-20"><a aria-label="20"></a>                               <span class="fl">56.2</span>, <span class="fl">56.1</span>, <span class="fl">57.4</span>, <span class="fl">51.8</span>, <span class="fl">51.8</span>, <span class="fl">54.2</span>, <span class="fl">54.0</span>, <span class="fl">56.6</span>, <span class="fl">54.9</span>, <span class="fl">52.3</span>,</span>
-<span id="cb7-21"><a aria-label="21"></a>                               <span class="fl">56.8</span>, <span class="fl">55.1</span>, <span class="fl">58.5</span>, <span class="fl">58.6</span>, <span class="fl">55.2</span>, <span class="fl">55.2</span>, <span class="fl">59.4</span>, <span class="fl">57.8</span>, <span class="fl">55.5</span>, <span class="fl">57.5</span>,</span>
-<span id="cb7-22"><a aria-label="22"></a>                               <span class="fl">57.3</span>, <span class="fl">54.7</span>, <span class="fl">56.0</span>, <span class="fl">51.3</span>, <span class="fl">53.1</span>, <span class="fl">56.1</span>, <span class="fl">53.9</span>, <span class="fl">55.8</span>, <span class="fl">53.4</span>, <span class="fl">53.8</span>])</span>
-<span id="cb7-23"><a aria-label="23"></a>seabass_lengths    <span class="op">=</span> np.array([<span class="fl">54.2</span>, <span class="fl">50.0</span>, <span class="fl">50.7</span>, <span class="fl">51.0</span>, <span class="fl">55.4</span>, <span class="fl">51.5</span>, <span class="fl">55.1</span>, <span class="fl">58.8</span>, <span class="fl">57.2</span>, <span class="fl">51.2</span>,</span>
-<span id="cb7-24"><a aria-label="24"></a>                               <span class="fl">51.8</span>, <span class="fl">54.7</span>, <span class="fl">45.0</span>, <span class="fl">49.3</span>, <span class="fl">53.7</span>, <span class="fl">51.6</span>, <span class="fl">58.1</span>, <span class="fl">52.0</span>, <span class="fl">48.1</span>, <span class="fl">50.5</span>,</span>
-<span id="cb7-25"><a aria-label="25"></a>                               <span class="fl">52.9</span>, <span class="fl">50.5</span>, <span class="fl">51.7</span>, <span class="fl">48.5</span>, <span class="fl">50.8</span>, <span class="fl">52.5</span>, <span class="fl">48.2</span>, <span class="fl">51.8</span>, <span class="fl">50.8</span>, <span class="fl">50.5</span>,</span>
-<span id="cb7-26"><a aria-label="26"></a>                               <span class="fl">48.7</span>, <span class="fl">54.2</span>, <span class="fl">50.5</span>, <span class="fl">49.3</span>, <span class="fl">53.4</span>, <span class="fl">49.1</span>, <span class="fl">51.5</span>, <span class="fl">46.6</span>, <span class="fl">48.7</span>, <span class="fl">51.6</span>])</span>
-<span id="cb7-27"><a aria-label="27"></a></span>
-<span id="cb7-28"><a aria-label="28"></a>weights    <span class="op">=</span> np.concatenate([salmon_weights, seabass_weights])</span>
-<span id="cb7-29"><a aria-label="29"></a>brightness <span class="op">=</span> np.concatenate([salmon_brightness, seabass_brightness])</span>
-<span id="cb7-30"><a aria-label="30"></a>lengths    <span class="op">=</span> np.concatenate([salmon_lengths, seabass_lengths])</span>
-<span id="cb7-31"><a aria-label="31"></a>y          <span class="op">=</span> np.array([<span class="dv">1</span>]<span class="op">*</span><span class="dv">40</span> <span class="op">+</span> [<span class="dv">0</span>]<span class="op">*</span><span class="dv">40</span>)   <span class="co"># 1=Salmon, 0=Sea bass</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a aria-label="3"></a><span class="im">import</span> japanize_matplotlib</span>
+<span id="cb1-4"><a aria-label="4"></a>plt.rcParams[<span class="st">"font.size"</span>] <span class="op">=</span> <span class="dv">11</span></span>
+<span id="cb1-5"><a aria-label="5"></a>plt.rcParams[<span class="st">"figure.dpi"</span>] <span class="op">=</span> <span class="dv">100</span></span>
+<span id="cb1-6"><a aria-label="6"></a></span>
+<span id="cb1-7"><a aria-label="7"></a>salmon_weights     <span class="op">=</span> np.array([<span class="dv">2149</span>, <span class="dv">1959</span>, <span class="dv">2194</span>, <span class="dv">2457</span>, <span class="dv">1930</span>, <span class="dv">1930</span>, <span class="dv">2474</span>, <span class="dv">2230</span>, <span class="dv">1859</span>, <span class="dv">2163</span>,</span>
+<span id="cb1-8"><a aria-label="8"></a>                               <span class="dv">1861</span>, <span class="dv">1860</span>, <span class="dv">2073</span>, <span class="dv">1426</span>, <span class="dv">1483</span>, <span class="dv">1831</span>, <span class="dv">1696</span>, <span class="dv">2094</span>, <span class="dv">1728</span>, <span class="dv">1576</span>,</span>
+<span id="cb1-9"><a aria-label="9"></a>                               <span class="dv">2028</span>, <span class="dv">1903</span>, <span class="dv">2057</span>, <span class="dv">2229</span>, <span class="dv">1884</span>, <span class="dv">1884</span>, <span class="dv">2240</span>, <span class="dv">2081</span>, <span class="dv">1838</span>, <span class="dv">2037</span>,</span>
+<span id="cb1-10"><a aria-label="10"></a>                               <span class="dv">1839</span>, <span class="dv">1838</span>, <span class="dv">1978</span>, <span class="dv">1554</span>, <span class="dv">1591</span>, <span class="dv">1820</span>, <span class="dv">1731</span>, <span class="dv">1992</span>, <span class="dv">1752</span>, <span class="dv">1652</span>])</span>
+<span id="cb1-11"><a aria-label="11"></a>salmon_brightness  <span class="op">=</span> np.array([<span class="fl">3.5</span>, <span class="fl">5.8</span>, <span class="fl">4.9</span>, <span class="fl">4.4</span>, <span class="fl">2.6</span>, <span class="fl">2.6</span>, <span class="fl">2.2</span>, <span class="fl">5.5</span>, <span class="fl">4.4</span>, <span class="fl">4.8</span>, <span class="fl">2.1</span>,</span>
+<span id="cb1-12"><a aria-label="12"></a>                               <span class="fl">5.9</span>, <span class="fl">5.3</span>, <span class="fl">2.8</span>, <span class="fl">2.7</span>, <span class="fl">2.7</span>, <span class="fl">3.2</span>, <span class="fl">4.1</span>, <span class="fl">3.7</span>, <span class="fl">3.2</span>, <span class="fl">4.4</span>, <span class="fl">2.6</span>,</span>
+<span id="cb1-13"><a aria-label="13"></a>                               <span class="fl">3.2</span>, <span class="fl">3.5</span>, <span class="fl">3.8</span>, <span class="fl">5.1</span>, <span class="fl">2.8</span>, <span class="fl">4.1</span>, <span class="fl">4.4</span>, <span class="fl">2.2</span>, <span class="fl">4.4</span>, <span class="fl">2.7</span>, <span class="fl">2.3</span>,</span>
+<span id="cb1-14"><a aria-label="14"></a>                               <span class="fl">5.8</span>, <span class="fl">5.9</span>, <span class="fl">5.2</span>, <span class="fl">3.2</span>, <span class="fl">2.4</span>, <span class="fl">4.7</span>, <span class="fl">3.8</span>])</span>
+<span id="cb1-15"><a aria-label="15"></a>seabass_weights    <span class="op">=</span> np.array([<span class="dv">1677</span>, <span class="dv">1327</span>, <span class="dv">1486</span>, <span class="dv">1440</span>, <span class="dv">1857</span>, <span class="dv">1476</span>, <span class="dv">1749</span>, <span class="dv">2203</span>, <span class="dv">1979</span>, <span class="dv">1468</span>,</span>
+<span id="cb1-16"><a aria-label="16"></a>                               <span class="dv">1496</span>, <span class="dv">1737</span>, <span class="dv">1099</span>, <span class="dv">1341</span>, <span class="dv">1748</span>, <span class="dv">1563</span>, <span class="dv">2181</span>, <span class="dv">1414</span>, <span class="dv">1286</span>, <span class="dv">1333</span>,</span>
+<span id="cb1-17"><a aria-label="17"></a>                               <span class="dv">1787</span>, <span class="dv">1445</span>, <span class="dv">1505</span>, <span class="dv">1204</span>, <span class="dv">1381</span>, <span class="dv">1513</span>, <span class="dv">1259</span>, <span class="dv">1567</span>, <span class="dv">1370</span>, <span class="dv">1432</span>,</span>
+<span id="cb1-18"><a aria-label="18"></a>                               <span class="dv">1370</span>, <span class="dv">1864</span>, <span class="dv">1488</span>, <span class="dv">1278</span>, <span class="dv">1657</span>, <span class="dv">1245</span>, <span class="dv">1533</span>, <span class="dv">1096</span>, <span class="dv">1223</span>, <span class="dv">1531</span>])</span>
+<span id="cb1-19"><a aria-label="19"></a>seabass_brightness <span class="op">=</span> np.array([<span class="fl">5.6</span>, <span class="fl">7.5</span>, <span class="fl">5.2</span>, <span class="fl">9.5</span>, <span class="fl">6.3</span>, <span class="fl">8.3</span>, <span class="fl">6.6</span>, <span class="fl">7.6</span>, <span class="fl">7.7</span>, <span class="fl">5.9</span>, <span class="fl">9.8</span>,</span>
+<span id="cb1-20"><a aria-label="20"></a>                               <span class="fl">8.9</span>, <span class="fl">9.7</span>, <span class="fl">9.5</span>, <span class="fl">8.0</span>, <span class="fl">9.6</span>, <span class="fl">5.4</span>, <span class="fl">6.0</span>, <span class="fl">5.2</span>, <span class="fl">6.6</span>, <span class="fl">6.9</span>, <span class="fl">6.4</span>,</span>
+<span id="cb1-21"><a aria-label="21"></a>                               <span class="fl">9.1</span>, <span class="fl">6.8</span>, <span class="fl">6.4</span>, <span class="fl">7.7</span>, <span class="fl">5.7</span>, <span class="fl">9.0</span>, <span class="fl">5.4</span>, <span class="fl">9.9</span>, <span class="fl">8.9</span>, <span class="fl">6.0</span>, <span class="fl">5.0</span>,</span>
+<span id="cb1-22"><a aria-label="22"></a>                               <span class="fl">9.1</span>, <span class="fl">8.5</span>, <span class="fl">8.6</span>, <span class="fl">8.9</span>, <span class="fl">5.4</span>, <span class="fl">6.8</span>, <span class="fl">5.6</span>])</span>
+<span id="cb1-23"><a aria-label="23"></a></span>
+<span id="cb1-24"><a aria-label="24"></a><span class="co"># 体長の測定値（cm）</span></span>
+<span id="cb1-25"><a aria-label="25"></a>salmon_lengths     <span class="op">=</span> np.array([<span class="fl">58.4</span>, <span class="fl">55.3</span>, <span class="fl">59.2</span>, <span class="fl">61.7</span>, <span class="fl">54.1</span>, <span class="fl">54.7</span>, <span class="fl">61.0</span>, <span class="fl">58.5</span>, <span class="fl">55.3</span>, <span class="fl">57.3</span>,</span>
+<span id="cb1-26"><a aria-label="26"></a>                               <span class="fl">56.2</span>, <span class="fl">56.1</span>, <span class="fl">57.4</span>, <span class="fl">51.8</span>, <span class="fl">51.8</span>, <span class="fl">54.2</span>, <span class="fl">54.0</span>, <span class="fl">56.6</span>, <span class="fl">54.9</span>, <span class="fl">52.3</span>,</span>
+<span id="cb1-27"><a aria-label="27"></a>                               <span class="fl">56.8</span>, <span class="fl">55.1</span>, <span class="fl">58.5</span>, <span class="fl">58.6</span>, <span class="fl">55.2</span>, <span class="fl">55.2</span>, <span class="fl">59.4</span>, <span class="fl">57.8</span>, <span class="fl">55.5</span>, <span class="fl">57.5</span>,</span>
+<span id="cb1-28"><a aria-label="28"></a>                               <span class="fl">57.3</span>, <span class="fl">54.7</span>, <span class="fl">56.0</span>, <span class="fl">51.3</span>, <span class="fl">53.1</span>, <span class="fl">56.1</span>, <span class="fl">53.9</span>, <span class="fl">55.8</span>, <span class="fl">53.4</span>, <span class="fl">53.8</span>])</span>
+<span id="cb1-29"><a aria-label="29"></a>seabass_lengths    <span class="op">=</span> np.array([<span class="fl">54.2</span>, <span class="fl">50.0</span>, <span class="fl">50.7</span>, <span class="fl">51.0</span>, <span class="fl">55.4</span>, <span class="fl">51.5</span>, <span class="fl">55.1</span>, <span class="fl">58.8</span>, <span class="fl">57.2</span>, <span class="fl">51.2</span>,</span>
+<span id="cb1-30"><a aria-label="30"></a>                               <span class="fl">51.8</span>, <span class="fl">54.7</span>, <span class="fl">45.0</span>, <span class="fl">49.3</span>, <span class="fl">53.7</span>, <span class="fl">51.6</span>, <span class="fl">58.1</span>, <span class="fl">52.0</span>, <span class="fl">48.1</span>, <span class="fl">50.5</span>,</span>
+<span id="cb1-31"><a aria-label="31"></a>                               <span class="fl">52.9</span>, <span class="fl">50.5</span>, <span class="fl">51.7</span>, <span class="fl">48.5</span>, <span class="fl">50.8</span>, <span class="fl">52.5</span>, <span class="fl">48.2</span>, <span class="fl">51.8</span>, <span class="fl">50.8</span>, <span class="fl">50.5</span>,</span>
+<span id="cb1-32"><a aria-label="32"></a>                               <span class="fl">48.7</span>, <span class="fl">54.2</span>, <span class="fl">50.5</span>, <span class="fl">49.3</span>, <span class="fl">53.4</span>, <span class="fl">49.1</span>, <span class="fl">51.5</span>, <span class="fl">46.6</span>, <span class="fl">48.7</span>, <span class="fl">51.6</span>])</span>
+<span id="cb1-33"><a aria-label="33"></a></span>
+<span id="cb1-34"><a aria-label="34"></a>weights    <span class="op">=</span> np.concatenate([salmon_weights, seabass_weights])</span>
+<span id="cb1-35"><a aria-label="35"></a>brightness <span class="op">=</span> np.concatenate([salmon_brightness, seabass_brightness])</span>
+<span id="cb1-36"><a aria-label="36"></a>lengths    <span class="op">=</span> np.concatenate([salmon_lengths, seabass_lengths])</span>
+<span id="cb1-37"><a aria-label="37"></a>y          <span class="op">=</span> np.array([<span class="dv">1</span>]<span class="op">*</span><span class="dv">40</span> <span class="op">+</span> [<span class="dv">0</span>]<span class="op">*</span><span class="dv">40</span>)   <span class="co"># 1=Salmon, 0=Sea bass</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="b5a1db1b" class="cell" data-execution_count="14">
+<div id="5f24483c" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-stdout">
 <pre><code>体長（先頭5匹）: [58.4 55.3 59.2 61.7 54.1] cm
 体長の範囲: 45.0〜61.7 cm</code></pre>
@@ -792,19 +365,19 @@ rkskmt
 <section id="体長と重さを並べてみる" class="slide level2">
 <h2>体長と重さを並べてみる</h2>
 <div class="slide-body">
-<div id="9bc62312" class="cell" data-execution_count="15">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a aria-label="1"></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">5.5</span>, <span class="fl">3.6</span>))</span>
-<span id="cb9-2"><a aria-label="2"></a>plt.scatter(lengths, weights, alpha<span class="op">=</span><span class="fl">0.6</span>, s<span class="op">=</span><span class="dv">40</span>, c<span class="op">=</span><span class="st">"#5dade2"</span>, edgecolors<span class="op">=</span><span class="st">"gray"</span>)</span>
-<span id="cb9-3"><a aria-label="3"></a>plt.xlabel(<span class="st">"体長 (cm)"</span>)<span class="op">;</span> plt.ylabel(<span class="st">"重さ (g)"</span>)</span>
-<span id="cb9-4"><a aria-label="4"></a>plt.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
-<span id="cb9-5"><a aria-label="5"></a>plt.tight_layout()</span>
-<span id="cb9-6"><a aria-label="6"></a>plt.show()</span>
-<span id="cb9-7"><a aria-label="7"></a></span>
-<span id="cb9-8"><a aria-label="8"></a><span class="bu">print</span>(<span class="ss">f"相関係数: </span><span class="sc">{</span>np<span class="sc">.</span>corrcoef(lengths, weights)[<span class="dv">0</span>, <span class="dv">1</span>]<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="eeb83c5e" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a aria-label="1"></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">5.5</span>, <span class="fl">3.6</span>))</span>
+<span id="cb3-2"><a aria-label="2"></a>plt.scatter(lengths, weights, alpha<span class="op">=</span><span class="fl">0.6</span>, s<span class="op">=</span><span class="dv">40</span>, c<span class="op">=</span><span class="st">"#5dade2"</span>, edgecolors<span class="op">=</span><span class="st">"gray"</span>)</span>
+<span id="cb3-3"><a aria-label="3"></a>plt.xlabel(<span class="st">"体長 (cm)"</span>)<span class="op">;</span> plt.ylabel(<span class="st">"重さ (g)"</span>)</span>
+<span id="cb3-4"><a aria-label="4"></a>plt.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb3-5"><a aria-label="5"></a>plt.tight_layout()</span>
+<span id="cb3-6"><a aria-label="6"></a>plt.show()</span>
+<span id="cb3-7"><a aria-label="7"></a></span>
+<span id="cb3-8"><a aria-label="8"></a><span class="bu">print</span>(<span class="ss">f"相関係数: </span><span class="sc">{</span>np<span class="sc">.</span>corrcoef(lengths, weights)[<span class="dv">0</span>, <span class="dv">1</span>]<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="dimensionality-pca_files/figure-revealjs/cell-16-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img data-src="dimensionality-pca_files/figure-revealjs/cell-16-output-1.png" class="quarto-figure quarto-figure-center" width="536" height="347"></a></p>
+<p><a href="dimensionality-pca_files/figure-revealjs/cell-4-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img data-src="dimensionality-pca_files/figure-revealjs/cell-4-output-1.png" class="quarto-figure quarto-figure-center" width="536" height="347"></a></p>
 </figure>
 </div>
 </div>
@@ -844,11 +417,11 @@ rkskmt
 <li>2本目以降は、前の軸と直交する方向の中で分散が最大の方向</li>
 </ul></li>
 </ul>
-<div id="1cc578ed" class="cell" data-execution_count="16">
+<div id="f11ecc49" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="dimensionality-pca_files/figure-revealjs/cell-17-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img data-src="dimensionality-pca_files/figure-revealjs/cell-17-output-1.png" class="quarto-figure quarto-figure-center" width="467" height="407"></a></p>
+<p><a href="dimensionality-pca_files/figure-revealjs/cell-5-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img data-src="dimensionality-pca_files/figure-revealjs/cell-5-output-1.png" class="quarto-figure quarto-figure-center" width="467" height="407"></a></p>
 </figure>
 </div>
 </div>
@@ -879,11 +452,11 @@ rkskmt
 <li>実はどちらも「<strong>足（誤差）の二乗和が最小になる直線</strong>」を探している</li>
 <li>違うのは<strong>足の向き</strong>だけ</li>
 </ul>
-<div id="7e7c1e05" class="cell" data-execution_count="17">
+<div id="5baf4274" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="dimensionality-pca_files/figure-revealjs/cell-18-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10"><img data-src="dimensionality-pca_files/figure-revealjs/cell-18-output-1.png" class="quarto-figure quarto-figure-center" width="960" height="427"></a></p>
+<p><a href="dimensionality-pca_files/figure-revealjs/cell-6-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img data-src="dimensionality-pca_files/figure-revealjs/cell-6-output-1.png" class="quarto-figure quarto-figure-center" width="960" height="427"></a></p>
 </figure>
 </div>
 </div>
@@ -910,7 +483,7 @@ rkskmt
 </div>
 </div>
 </section>
-<section id="section-2" class="slide level2 center break-slide" data-background-color="white">
+<section id="section" class="slide level2 center break-slide" data-background-color="white">
 <h2></h2>
 <div class="break-title">
 <p>なぜ固有ベクトルなのか</p>
@@ -962,11 +535,11 @@ rkskmt
 <li>行列 <span class="math inline">\(A\)</span> は、ベクトルを別のベクトルへ移す<strong>変換</strong>（回して・伸ばす機械）</li>
 </ul>
 <p><span class="math display">\[A = \begin{pmatrix} 1.75 &amp; 1.25 \\ 1.25 &amp; 1.75 \end{pmatrix}\]</span></p>
-<div id="ee660d30" class="cell" data-execution_count="18">
+<div id="d7d7a5c3" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="dimensionality-pca_files/figure-revealjs/cell-19-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11"><img data-src="dimensionality-pca_files/figure-revealjs/cell-19-output-1.png" class="quarto-figure quarto-figure-center" width="1069" height="490"></a></p>
+<p><a href="dimensionality-pca_files/figure-revealjs/cell-7-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img data-src="dimensionality-pca_files/figure-revealjs/cell-7-output-1.png" class="quarto-figure quarto-figure-center" width="1069" height="490"></a></p>
 </figure>
 </div>
 </div>
@@ -980,11 +553,11 @@ rkskmt
 <section id="同じ変換を名画にかける" class="slide level2">
 <h2>同じ変換を名画にかける</h2>
 <div class="slide-body">
-<div id="b72b947b" class="cell" data-execution_count="19">
+<div id="93023c2f" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="dimensionality-pca_files/figure-revealjs/cell-20-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-12"><img data-src="dimensionality-pca_files/figure-revealjs/cell-20-output-1.png" class="quarto-figure quarto-figure-center" width="1017" height="489"></a></p>
+<p><a href="dimensionality-pca_files/figure-revealjs/cell-8-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img data-src="dimensionality-pca_files/figure-revealjs/cell-8-output-1.png" class="quarto-figure quarto-figure-center" width="1017" height="489"></a></p>
 </figure>
 </div>
 </div>
@@ -1018,11 +591,11 @@ rkskmt
 R = \begin{pmatrix} \cos 45^\circ &amp; -\sin 45^\circ \\ \sin 45^\circ &amp; \cos 45^\circ \end{pmatrix}, \qquad
 S = \begin{pmatrix} 3 &amp; 0 \\ 0 &amp; 0.5 \end{pmatrix}\]</span></p>
 <p>読み方は<strong>右から</strong>（ベクトルに近い順）。モナ・リザで1段ずつ：</p>
-<div id="11e0bafc" class="cell" data-execution_count="20">
+<div id="31322d06" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="dimensionality-pca_files/figure-revealjs/cell-21-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-13"><img data-src="dimensionality-pca_files/figure-revealjs/cell-21-output-1.png" class="quarto-figure quarto-figure-center" width="1236" height="314"></a></p>
+<p><a href="dimensionality-pca_files/figure-revealjs/cell-9-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img data-src="dimensionality-pca_files/figure-revealjs/cell-9-output-1.png" class="quarto-figure quarto-figure-center" width="1236" height="314"></a></p>
 </figure>
 </div>
 </div>
@@ -1034,15 +607,15 @@ S = \begin{pmatrix} 3 &amp; 0 \\ 0 &amp; 0.5 \end{pmatrix}\]</span></p>
 <li>つまり「回らない方向」の正体は、<strong><span class="math inline">\(S\)</span> がただ伸縮するだけの軸を、<span class="math inline">\(R\)</span> が <span class="math inline">\(45^\circ\)</span> に向けた先</strong></li>
 <li><strong>固有ベクトル＝ <span class="math inline">\(R\)</span> の列</strong>（軸の向き先）、<strong>固有値＝ <span class="math inline">\(S\)</span> の対角成分</strong>（3 と 0.5）</li>
 </ul>
-<div id="309a5a4e" class="cell" data-execution_count="21">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a aria-label="1"></a><span class="co"># 組み立てて確認：R S R^T がたしかに A になる</span></span>
-<span id="cb11-2"><a aria-label="2"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb11-3"><a aria-label="3"></a></span>
-<span id="cb11-4"><a aria-label="4"></a>t <span class="op">=</span> np.radians(<span class="dv">45</span>)</span>
-<span id="cb11-5"><a aria-label="5"></a>R <span class="op">=</span> np.array([[np.cos(t), <span class="op">-</span>np.sin(t)],</span>
-<span id="cb11-6"><a aria-label="6"></a>              [np.sin(t),  np.cos(t)]])</span>
-<span id="cb11-7"><a aria-label="7"></a>S <span class="op">=</span> np.diag([<span class="fl">3.0</span>, <span class="fl">0.5</span>])</span>
-<span id="cb11-8"><a aria-label="8"></a><span class="bu">print</span>(R <span class="op">@</span> S <span class="op">@</span> R.T)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="2720ad26" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a aria-label="1"></a><span class="co"># 組み立てて確認：R S R^T がたしかに A になる</span></span>
+<span id="cb5-2"><a aria-label="2"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb5-3"><a aria-label="3"></a></span>
+<span id="cb5-4"><a aria-label="4"></a>t <span class="op">=</span> np.radians(<span class="dv">45</span>)</span>
+<span id="cb5-5"><a aria-label="5"></a>R <span class="op">=</span> np.array([[np.cos(t), <span class="op">-</span>np.sin(t)],</span>
+<span id="cb5-6"><a aria-label="6"></a>              [np.sin(t),  np.cos(t)]])</span>
+<span id="cb5-7"><a aria-label="7"></a>S <span class="op">=</span> np.diag([<span class="fl">3.0</span>, <span class="fl">0.5</span>])</span>
+<span id="cb5-8"><a aria-label="8"></a><span class="bu">print</span>(R <span class="op">@</span> S <span class="op">@</span> R.T)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[[1.75 1.25]
  [1.25 1.75]]</code></pre>
@@ -1116,30 +689,30 @@ S = \begin{pmatrix} 3 &amp; 0 \\ 0 &amp; 0.5 \end{pmatrix}\]</span></p>
 <h2>総当たりで確かめる：全方向の分散を測る</h2>
 <div class="slide-body">
 <p>固有値分解を信じる前に、<strong>力ずく</strong>で確認してみる。方向 <span class="math inline">\(\mathbf{v}\)</span> を1度刻みで全部試す。</p>
-<div id="0532619f" class="cell" data-execution_count="22">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a aria-label="1"></a>X_lw    <span class="op">=</span> np.column_stack([lengths, weights])               <span class="co"># 体長と重さの2列</span></span>
-<span id="cb13-2"><a aria-label="2"></a>X_lw_sc <span class="op">=</span> (X_lw <span class="op">-</span> X_lw.mean(axis<span class="op">=</span><span class="dv">0</span>)) <span class="op">/</span> X_lw.std(axis<span class="op">=</span><span class="dv">0</span>)     <span class="co"># 標準化</span></span>
-<span id="cb13-3"><a aria-label="3"></a></span>
-<span id="cb13-4"><a aria-label="4"></a>thetas <span class="op">=</span> np.radians(np.arange(<span class="dv">0</span>, <span class="dv">181</span>))</span>
-<span id="cb13-5"><a aria-label="5"></a>proj_var <span class="op">=</span> np.array([</span>
-<span id="cb13-6"><a aria-label="6"></a>    np.var(X_lw_sc <span class="op">@</span> np.array([np.cos(t), np.sin(t)]), ddof<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb13-7"><a aria-label="7"></a>    <span class="cf">for</span> t <span class="kw">in</span> thetas</span>
-<span id="cb13-8"><a aria-label="8"></a>])</span>
-<span id="cb13-9"><a aria-label="9"></a></span>
-<span id="cb13-10"><a aria-label="10"></a><span class="bu">print</span>(<span class="ss">f"分散が最大の角度: </span><span class="sc">{</span>np<span class="sc">.</span>degrees(thetas[proj_var.argmax()])<span class="sc">:.0f}</span><span class="ss">°"</span></span>
-<span id="cb13-11"><a aria-label="11"></a>      <span class="ss">f"（分散 </span><span class="sc">{</span>proj_var<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.4f}</span><span class="ss">）"</span>)</span>
-<span id="cb13-12"><a aria-label="12"></a><span class="bu">print</span>(<span class="ss">f"分散が最小の角度: </span><span class="sc">{</span>np<span class="sc">.</span>degrees(thetas[proj_var.argmin()])<span class="sc">:.0f}</span><span class="ss">°"</span></span>
-<span id="cb13-13"><a aria-label="13"></a>      <span class="ss">f"（分散 </span><span class="sc">{</span>proj_var<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.4f}</span><span class="ss">）"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="04833f77" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a aria-label="1"></a>X_lw    <span class="op">=</span> np.column_stack([lengths, weights])               <span class="co"># 体長と重さの2列</span></span>
+<span id="cb7-2"><a aria-label="2"></a>X_lw_sc <span class="op">=</span> (X_lw <span class="op">-</span> X_lw.mean(axis<span class="op">=</span><span class="dv">0</span>)) <span class="op">/</span> X_lw.std(axis<span class="op">=</span><span class="dv">0</span>)     <span class="co"># 標準化</span></span>
+<span id="cb7-3"><a aria-label="3"></a></span>
+<span id="cb7-4"><a aria-label="4"></a>thetas <span class="op">=</span> np.radians(np.arange(<span class="dv">0</span>, <span class="dv">181</span>))</span>
+<span id="cb7-5"><a aria-label="5"></a>proj_var <span class="op">=</span> np.array([</span>
+<span id="cb7-6"><a aria-label="6"></a>    np.var(X_lw_sc <span class="op">@</span> np.array([np.cos(t), np.sin(t)]), ddof<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb7-7"><a aria-label="7"></a>    <span class="cf">for</span> t <span class="kw">in</span> thetas</span>
+<span id="cb7-8"><a aria-label="8"></a>])</span>
+<span id="cb7-9"><a aria-label="9"></a></span>
+<span id="cb7-10"><a aria-label="10"></a><span class="bu">print</span>(<span class="ss">f"分散が最大の角度: </span><span class="sc">{</span>np<span class="sc">.</span>degrees(thetas[proj_var.argmax()])<span class="sc">:.0f}</span><span class="ss">°"</span></span>
+<span id="cb7-11"><a aria-label="11"></a>      <span class="ss">f"（分散 </span><span class="sc">{</span>proj_var<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.4f}</span><span class="ss">）"</span>)</span>
+<span id="cb7-12"><a aria-label="12"></a><span class="bu">print</span>(<span class="ss">f"分散が最小の角度: </span><span class="sc">{</span>np<span class="sc">.</span>degrees(thetas[proj_var.argmin()])<span class="sc">:.0f}</span><span class="ss">°"</span></span>
+<span id="cb7-13"><a aria-label="13"></a>      <span class="ss">f"（分散 </span><span class="sc">{</span>proj_var<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.4f}</span><span class="ss">）"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>分散が最大の角度: 45°（分散 1.9978）
 分散が最小の角度: 135°（分散 0.0275）</code></pre>
 </div>
 </div>
-<div id="92b3247f" class="cell" data-execution_count="23">
+<div id="76dada20" class="cell" data-execution_count="11">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="dimensionality-pca_files/figure-revealjs/cell-24-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-14"><img data-src="dimensionality-pca_files/figure-revealjs/cell-24-output-1.png" class="quarto-figure quarto-figure-center" width="685" height="327"></a></p>
+<p><a href="dimensionality-pca_files/figure-revealjs/cell-12-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img data-src="dimensionality-pca_files/figure-revealjs/cell-12-output-1.png" class="quarto-figure quarto-figure-center" width="685" height="327"></a></p>
 </figure>
 </div>
 </div>
@@ -1169,26 +742,26 @@ S = \begin{pmatrix} 3 &amp; 0 \\ 0 &amp; 0.5 \end{pmatrix}\]</span></p>
 <h2>NumPy で確かめる</h2>
 <div class="slide-body">
 <p>スライドの式を<strong>そのまま</strong>コードにして、sklearn の答えと突き合わせる。</p>
-<div id="23df4ae5" class="cell" data-execution_count="24">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a aria-label="1"></a><span class="co"># 1) 式のとおりに共分散行列を作る（専用関数は要らない）</span></span>
-<span id="cb15-2"><a aria-label="2"></a>Xc <span class="op">=</span> X_lw_sc <span class="op">-</span> X_lw_sc.mean(axis<span class="op">=</span><span class="dv">0</span>)     <span class="co"># 中心化 X~</span></span>
-<span id="cb15-3"><a aria-label="3"></a>C  <span class="op">=</span> Xc.T <span class="op">@</span> Xc <span class="op">/</span> (<span class="bu">len</span>(Xc) <span class="op">-</span> <span class="dv">1</span>)          <span class="co"># C = X~^T X~ / (n-1)</span></span>
-<span id="cb15-4"><a aria-label="4"></a></span>
-<span id="cb15-5"><a aria-label="5"></a><span class="co"># 2) 固有値・固有ベクトル（C のような対称行列には eigh を使う）</span></span>
-<span id="cb15-6"><a aria-label="6"></a>lam, V <span class="op">=</span> np.linalg.eigh(C)</span>
-<span id="cb15-7"><a aria-label="7"></a>order  <span class="op">=</span> np.argsort(lam)[::<span class="op">-</span><span class="dv">1</span>]          <span class="co"># 固有値の大きい順に並べ替え → PC1, PC2</span></span>
-<span id="cb15-8"><a aria-label="8"></a>lam, V <span class="op">=</span> lam[order], V[:, order]</span>
-<span id="cb15-9"><a aria-label="9"></a></span>
-<span id="cb15-10"><a aria-label="10"></a><span class="co"># 3) 同じデータを sklearn の PCA に渡す</span></span>
-<span id="cb15-11"><a aria-label="11"></a><span class="im">from</span> sklearn.decomposition <span class="im">import</span> PCA</span>
-<span id="cb15-12"><a aria-label="12"></a>pca_d <span class="op">=</span> PCA(n_components<span class="op">=</span><span class="dv">2</span>).fit(X_lw_sc)</span>
-<span id="cb15-13"><a aria-label="13"></a></span>
-<span id="cb15-14"><a aria-label="14"></a><span class="bu">print</span>(<span class="st">"固有値（自作）        :"</span>, lam.<span class="bu">round</span>(<span class="dv">4</span>))</span>
-<span id="cb15-15"><a aria-label="15"></a><span class="bu">print</span>(<span class="st">"分散（sklearnのPCA）  :"</span>, pca_d.explained_variance_.<span class="bu">round</span>(<span class="dv">4</span>))</span>
-<span id="cb15-16"><a aria-label="16"></a><span class="bu">print</span>(<span class="st">"固有ベクトル（自作・列がPC）:"</span>)</span>
-<span id="cb15-17"><a aria-label="17"></a><span class="bu">print</span>(V.<span class="bu">round</span>(<span class="dv">4</span>))</span>
-<span id="cb15-18"><a aria-label="18"></a><span class="bu">print</span>(<span class="st">"components_.T（sklearn）:"</span>)</span>
-<span id="cb15-19"><a aria-label="19"></a><span class="bu">print</span>(pca_d.components_.T.<span class="bu">round</span>(<span class="dv">4</span>))</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="9122201a" class="cell" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a aria-label="1"></a><span class="co"># 1) 式のとおりに共分散行列を作る（専用関数は要らない）</span></span>
+<span id="cb9-2"><a aria-label="2"></a>Xc <span class="op">=</span> X_lw_sc <span class="op">-</span> X_lw_sc.mean(axis<span class="op">=</span><span class="dv">0</span>)     <span class="co"># 中心化 X~</span></span>
+<span id="cb9-3"><a aria-label="3"></a>C  <span class="op">=</span> Xc.T <span class="op">@</span> Xc <span class="op">/</span> (<span class="bu">len</span>(Xc) <span class="op">-</span> <span class="dv">1</span>)          <span class="co"># C = X~^T X~ / (n-1)</span></span>
+<span id="cb9-4"><a aria-label="4"></a></span>
+<span id="cb9-5"><a aria-label="5"></a><span class="co"># 2) 固有値・固有ベクトル（C のような対称行列には eigh を使う）</span></span>
+<span id="cb9-6"><a aria-label="6"></a>lam, V <span class="op">=</span> np.linalg.eigh(C)</span>
+<span id="cb9-7"><a aria-label="7"></a>order  <span class="op">=</span> np.argsort(lam)[::<span class="op">-</span><span class="dv">1</span>]          <span class="co"># 固有値の大きい順に並べ替え → PC1, PC2</span></span>
+<span id="cb9-8"><a aria-label="8"></a>lam, V <span class="op">=</span> lam[order], V[:, order]</span>
+<span id="cb9-9"><a aria-label="9"></a></span>
+<span id="cb9-10"><a aria-label="10"></a><span class="co"># 3) 同じデータを sklearn の PCA に渡す</span></span>
+<span id="cb9-11"><a aria-label="11"></a><span class="im">from</span> sklearn.decomposition <span class="im">import</span> PCA</span>
+<span id="cb9-12"><a aria-label="12"></a>pca_d <span class="op">=</span> PCA(n_components<span class="op">=</span><span class="dv">2</span>).fit(X_lw_sc)</span>
+<span id="cb9-13"><a aria-label="13"></a></span>
+<span id="cb9-14"><a aria-label="14"></a><span class="bu">print</span>(<span class="st">"固有値（自作）        :"</span>, lam.<span class="bu">round</span>(<span class="dv">4</span>))</span>
+<span id="cb9-15"><a aria-label="15"></a><span class="bu">print</span>(<span class="st">"分散（sklearnのPCA）  :"</span>, pca_d.explained_variance_.<span class="bu">round</span>(<span class="dv">4</span>))</span>
+<span id="cb9-16"><a aria-label="16"></a><span class="bu">print</span>(<span class="st">"固有ベクトル（自作・列がPC）:"</span>)</span>
+<span id="cb9-17"><a aria-label="17"></a><span class="bu">print</span>(V.<span class="bu">round</span>(<span class="dv">4</span>))</span>
+<span id="cb9-18"><a aria-label="18"></a><span class="bu">print</span>(<span class="st">"components_.T（sklearn）:"</span>)</span>
+<span id="cb9-19"><a aria-label="19"></a><span class="bu">print</span>(pca_d.components_.T.<span class="bu">round</span>(<span class="dv">4</span>))</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>固有値（自作）        : [1.9978 0.0275]
 分散（sklearnのPCA）  : [1.9978 0.0275]
@@ -1229,9 +802,9 @@ components_.T（sklearn）:
 </div>
 <div class="callout-content">
 <p>中心化したデータを <strong>SVD（特異値分解, <span class="en"><strong>Singular Value Decomposition</strong></span>）</strong> にかけると、 共分散行列を作らずに同じ分散が出る。 scikit-learn の PCA は、データの形に応じて固有値分解と SVD を使い分けている。</p>
-<div id="ae7ca436" class="cell" data-execution_count="25">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a aria-label="1"></a>U, S, Vt <span class="op">=</span> np.linalg.svd(Xc)</span>
-<span id="cb17-2"><a aria-label="2"></a><span class="bu">print</span>(<span class="st">"SVD から出した分散:"</span>, (S<span class="op">**</span><span class="dv">2</span> <span class="op">/</span> (<span class="bu">len</span>(Xc) <span class="op">-</span> <span class="dv">1</span>)).<span class="bu">round</span>(<span class="dv">4</span>))   <span class="co"># ↑の固有値と一致</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="198c991c" class="cell" data-execution_count="13">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a aria-label="1"></a>U, S, Vt <span class="op">=</span> np.linalg.svd(Xc)</span>
+<span id="cb11-2"><a aria-label="2"></a><span class="bu">print</span>(<span class="st">"SVD から出した分散:"</span>, (S<span class="op">**</span><span class="dv">2</span> <span class="op">/</span> (<span class="bu">len</span>(Xc) <span class="op">-</span> <span class="dv">1</span>)).<span class="bu">round</span>(<span class="dv">4</span>))   <span class="co"># ↑の固有値と一致</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>SVD から出した分散: [1.9978 0.0275]</code></pre>
 </div>
@@ -1242,7 +815,7 @@ components_.T（sklearn）:
 </div>
 </div>
 </section>
-<section id="section-3" class="slide level2 center break-slide" data-background-color="white">
+<section id="section-1" class="slide level2 center break-slide" data-background-color="white">
 <h2></h2>
 <div class="break-title">
 <p>PCAを使う</p>
@@ -1254,20 +827,20 @@ components_.T（sklearn）:
 <ul>
 <li>輝度・重さ・体長の<strong>3特徴量</strong>を PCA にかけ、各主成分の<strong>寄与率（<span class="en">explained variance ratio</span>）</strong>を見る</li>
 </ul>
-<div id="3ac4b3f2" class="cell" data-execution_count="26">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a aria-label="1"></a><span class="im">from</span> sklearn.decomposition <span class="im">import</span> PCA</span>
-<span id="cb19-2"><a aria-label="2"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
-<span id="cb19-3"><a aria-label="3"></a></span>
-<span id="cb19-4"><a aria-label="4"></a>X3 <span class="op">=</span> np.column_stack([brightness, weights, lengths])   <span class="co"># 3特徴量</span></span>
-<span id="cb19-5"><a aria-label="5"></a></span>
-<span id="cb19-6"><a aria-label="6"></a>X3_scaled <span class="op">=</span> StandardScaler().fit_transform(X3)   <span class="co"># スケールを揃えてから PCA</span></span>
-<span id="cb19-7"><a aria-label="7"></a></span>
-<span id="cb19-8"><a aria-label="8"></a>pca <span class="op">=</span> PCA(n_components<span class="op">=</span><span class="dv">3</span>)</span>
-<span id="cb19-9"><a aria-label="9"></a>X3_pca <span class="op">=</span> pca.fit_transform(X3_scaled)</span>
-<span id="cb19-10"><a aria-label="10"></a></span>
-<span id="cb19-11"><a aria-label="11"></a><span class="bu">print</span>(<span class="st">"各主成分の寄与率（分散の割合）:"</span>)</span>
-<span id="cb19-12"><a aria-label="12"></a><span class="cf">for</span> i, r <span class="kw">in</span> <span class="bu">enumerate</span>(pca.explained_variance_ratio_):</span>
-<span id="cb19-13"><a aria-label="13"></a>    <span class="bu">print</span>(<span class="ss">f"  PC</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>r<span class="sc">:.1%}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="4064ffaf" class="cell" data-execution_count="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a aria-label="1"></a><span class="im">from</span> sklearn.decomposition <span class="im">import</span> PCA</span>
+<span id="cb13-2"><a aria-label="2"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
+<span id="cb13-3"><a aria-label="3"></a></span>
+<span id="cb13-4"><a aria-label="4"></a>X3 <span class="op">=</span> np.column_stack([brightness, weights, lengths])   <span class="co"># 3特徴量</span></span>
+<span id="cb13-5"><a aria-label="5"></a></span>
+<span id="cb13-6"><a aria-label="6"></a>X3_scaled <span class="op">=</span> StandardScaler().fit_transform(X3)   <span class="co"># スケールを揃えてから PCA</span></span>
+<span id="cb13-7"><a aria-label="7"></a></span>
+<span id="cb13-8"><a aria-label="8"></a>pca <span class="op">=</span> PCA(n_components<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb13-9"><a aria-label="9"></a>X3_pca <span class="op">=</span> pca.fit_transform(X3_scaled)</span>
+<span id="cb13-10"><a aria-label="10"></a></span>
+<span id="cb13-11"><a aria-label="11"></a><span class="bu">print</span>(<span class="st">"各主成分の寄与率（分散の割合）:"</span>)</span>
+<span id="cb13-12"><a aria-label="12"></a><span class="cf">for</span> i, r <span class="kw">in</span> <span class="bu">enumerate</span>(pca.explained_variance_ratio_):</span>
+<span id="cb13-13"><a aria-label="13"></a>    <span class="bu">print</span>(<span class="ss">f"  PC</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>r<span class="sc">:.1%}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>各主成分の寄与率（分散の割合）:
   PC1: 79.2%
@@ -1328,22 +901,22 @@ components_.T（sklearn）:
 <section id="次元に圧縮しても分離は保たれる" class="slide level2">
 <h2>2次元に圧縮しても分離は保たれる</h2>
 <div class="slide-body">
-<div id="45ca94d9" class="cell" data-execution_count="28">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a aria-label="1"></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">5.8</span>, <span class="fl">3.8</span>))</span>
-<span id="cb21-2"><a aria-label="2"></a><span class="cf">for</span> label, name, col, m <span class="kw">in</span> [(<span class="dv">1</span>, <span class="st">"Salmon"</span>, <span class="st">"#e74c3c"</span>, <span class="st">"o"</span>), (<span class="dv">0</span>, <span class="st">"Sea bass"</span>, <span class="st">"#2980b9"</span>, <span class="st">"s"</span>)]:</span>
-<span id="cb21-3"><a aria-label="3"></a>    mask <span class="op">=</span> y <span class="op">==</span> label</span>
-<span id="cb21-4"><a aria-label="4"></a>    plt.scatter(X3_pca[mask, <span class="dv">0</span>], X3_pca[mask, <span class="dv">1</span>],</span>
-<span id="cb21-5"><a aria-label="5"></a>                c<span class="op">=</span>col, marker<span class="op">=</span>m, s<span class="op">=</span><span class="dv">45</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, label<span class="op">=</span>name)</span>
-<span id="cb21-6"><a aria-label="6"></a>plt.xlabel(<span class="ss">f"PC1（寄与率 </span><span class="sc">{</span>pca<span class="sc">.</span>explained_variance_ratio_[<span class="dv">0</span>]<span class="sc">:.1%}</span><span class="ss">）"</span>)</span>
-<span id="cb21-7"><a aria-label="7"></a>plt.ylabel(<span class="ss">f"PC2（寄与率 </span><span class="sc">{</span>pca<span class="sc">.</span>explained_variance_ratio_[<span class="dv">1</span>]<span class="sc">:.1%}</span><span class="ss">）"</span>)</span>
-<span id="cb21-8"><a aria-label="8"></a>plt.title(<span class="st">"3特徴量 → 2次元に圧縮"</span>)</span>
-<span id="cb21-9"><a aria-label="9"></a>plt.legend()<span class="op">;</span> plt.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
-<span id="cb21-10"><a aria-label="10"></a>plt.tight_layout()</span>
-<span id="cb21-11"><a aria-label="11"></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="a2f95192" class="cell" data-execution_count="16">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a aria-label="1"></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">5.8</span>, <span class="fl">3.8</span>))</span>
+<span id="cb15-2"><a aria-label="2"></a><span class="cf">for</span> label, name, col, m <span class="kw">in</span> [(<span class="dv">1</span>, <span class="st">"Salmon"</span>, <span class="st">"#e74c3c"</span>, <span class="st">"o"</span>), (<span class="dv">0</span>, <span class="st">"Sea bass"</span>, <span class="st">"#2980b9"</span>, <span class="st">"s"</span>)]:</span>
+<span id="cb15-3"><a aria-label="3"></a>    mask <span class="op">=</span> y <span class="op">==</span> label</span>
+<span id="cb15-4"><a aria-label="4"></a>    plt.scatter(X3_pca[mask, <span class="dv">0</span>], X3_pca[mask, <span class="dv">1</span>],</span>
+<span id="cb15-5"><a aria-label="5"></a>                c<span class="op">=</span>col, marker<span class="op">=</span>m, s<span class="op">=</span><span class="dv">45</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, label<span class="op">=</span>name)</span>
+<span id="cb15-6"><a aria-label="6"></a>plt.xlabel(<span class="ss">f"PC1（寄与率 </span><span class="sc">{</span>pca<span class="sc">.</span>explained_variance_ratio_[<span class="dv">0</span>]<span class="sc">:.1%}</span><span class="ss">）"</span>)</span>
+<span id="cb15-7"><a aria-label="7"></a>plt.ylabel(<span class="ss">f"PC2（寄与率 </span><span class="sc">{</span>pca<span class="sc">.</span>explained_variance_ratio_[<span class="dv">1</span>]<span class="sc">:.1%}</span><span class="ss">）"</span>)</span>
+<span id="cb15-8"><a aria-label="8"></a>plt.title(<span class="st">"3特徴量 → 2次元に圧縮"</span>)</span>
+<span id="cb15-9"><a aria-label="9"></a>plt.legend()<span class="op">;</span> plt.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb15-10"><a aria-label="10"></a>plt.tight_layout()</span>
+<span id="cb15-11"><a aria-label="11"></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="dimensionality-pca_files/figure-revealjs/cell-29-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-15"><img data-src="dimensionality-pca_files/figure-revealjs/cell-29-output-1.png" class="quarto-figure quarto-figure-center" width="567" height="367"></a></p>
+<p><a href="dimensionality-pca_files/figure-revealjs/cell-17-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img data-src="dimensionality-pca_files/figure-revealjs/cell-17-output-1.png" class="quarto-figure quarto-figure-center" width="567" height="367"></a></p>
 </figure>
 </div>
 </div>
@@ -1372,37 +945,37 @@ components_.T（sklearn）:
 <h2>4次元データを2次元に圧縮（Iris）</h2>
 <div class="slide-body">
 <p>Fisher の Iris データセット：4特徴量（がく片長さ・幅、花弁長さ・幅）</p>
-<div id="c5ba9f8f" class="cell" data-execution_count="29">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a aria-label="1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> load_iris</span>
-<span id="cb22-2"><a aria-label="2"></a></span>
-<span id="cb22-3"><a aria-label="3"></a>iris   <span class="op">=</span> load_iris()</span>
-<span id="cb22-4"><a aria-label="4"></a>X_iris <span class="op">=</span> StandardScaler().fit_transform(iris.data)   <span class="co"># 4特徴量</span></span>
-<span id="cb22-5"><a aria-label="5"></a>y_iris <span class="op">=</span> iris.target</span>
-<span id="cb22-6"><a aria-label="6"></a></span>
-<span id="cb22-7"><a aria-label="7"></a>pca4  <span class="op">=</span> PCA(n_components<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb22-8"><a aria-label="8"></a>X_2d  <span class="op">=</span> pca4.fit_transform(X_iris)</span>
-<span id="cb22-9"><a aria-label="9"></a></span>
-<span id="cb22-10"><a aria-label="10"></a>colors  <span class="op">=</span> [<span class="st">"#e74c3c"</span>, <span class="st">"#27ae60"</span>, <span class="st">"#2980b9"</span>]</span>
-<span id="cb22-11"><a aria-label="11"></a>markers <span class="op">=</span> [<span class="st">"o"</span>, <span class="st">"s"</span>, <span class="st">"^"</span>]</span>
-<span id="cb22-12"><a aria-label="12"></a></span>
-<span id="cb22-13"><a aria-label="13"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">6</span>, <span class="fl">4.5</span>))</span>
-<span id="cb22-14"><a aria-label="14"></a><span class="cf">for</span> label, name <span class="kw">in</span> <span class="bu">enumerate</span>(iris.target_names):</span>
-<span id="cb22-15"><a aria-label="15"></a>    mask <span class="op">=</span> y_iris <span class="op">==</span> label</span>
-<span id="cb22-16"><a aria-label="16"></a>    plt.scatter(X_2d[mask, <span class="dv">0</span>], X_2d[mask, <span class="dv">1</span>],</span>
-<span id="cb22-17"><a aria-label="17"></a>                c<span class="op">=</span>colors[label], marker<span class="op">=</span>markers[label],</span>
-<span id="cb22-18"><a aria-label="18"></a>                s<span class="op">=</span><span class="dv">50</span>, alpha<span class="op">=</span><span class="fl">0.8</span>, label<span class="op">=</span>name)</span>
-<span id="cb22-19"><a aria-label="19"></a></span>
-<span id="cb22-20"><a aria-label="20"></a>plt.xlabel(<span class="ss">f"PC1（寄与率 </span><span class="sc">{</span>pca4<span class="sc">.</span>explained_variance_ratio_[<span class="dv">0</span>]<span class="sc">:.1%}</span><span class="ss">）"</span>)</span>
-<span id="cb22-21"><a aria-label="21"></a>plt.ylabel(<span class="ss">f"PC2（寄与率 </span><span class="sc">{</span>pca4<span class="sc">.</span>explained_variance_ratio_[<span class="dv">1</span>]<span class="sc">:.1%}</span><span class="ss">）"</span>)</span>
-<span id="cb22-22"><a aria-label="22"></a>plt.title(<span class="st">"Iris（4次元）を PCA で2次元に圧縮"</span>)</span>
-<span id="cb22-23"><a aria-label="23"></a>plt.legend()</span>
-<span id="cb22-24"><a aria-label="24"></a>plt.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
-<span id="cb22-25"><a aria-label="25"></a>plt.tight_layout()</span>
-<span id="cb22-26"><a aria-label="26"></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="4787240d" class="cell" data-execution_count="17">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a aria-label="1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> load_iris</span>
+<span id="cb16-2"><a aria-label="2"></a></span>
+<span id="cb16-3"><a aria-label="3"></a>iris   <span class="op">=</span> load_iris()</span>
+<span id="cb16-4"><a aria-label="4"></a>X_iris <span class="op">=</span> StandardScaler().fit_transform(iris.data)   <span class="co"># 4特徴量</span></span>
+<span id="cb16-5"><a aria-label="5"></a>y_iris <span class="op">=</span> iris.target</span>
+<span id="cb16-6"><a aria-label="6"></a></span>
+<span id="cb16-7"><a aria-label="7"></a>pca4  <span class="op">=</span> PCA(n_components<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb16-8"><a aria-label="8"></a>X_2d  <span class="op">=</span> pca4.fit_transform(X_iris)</span>
+<span id="cb16-9"><a aria-label="9"></a></span>
+<span id="cb16-10"><a aria-label="10"></a>colors  <span class="op">=</span> [<span class="st">"#e74c3c"</span>, <span class="st">"#27ae60"</span>, <span class="st">"#2980b9"</span>]</span>
+<span id="cb16-11"><a aria-label="11"></a>markers <span class="op">=</span> [<span class="st">"o"</span>, <span class="st">"s"</span>, <span class="st">"^"</span>]</span>
+<span id="cb16-12"><a aria-label="12"></a></span>
+<span id="cb16-13"><a aria-label="13"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">6</span>, <span class="fl">4.5</span>))</span>
+<span id="cb16-14"><a aria-label="14"></a><span class="cf">for</span> label, name <span class="kw">in</span> <span class="bu">enumerate</span>(iris.target_names):</span>
+<span id="cb16-15"><a aria-label="15"></a>    mask <span class="op">=</span> y_iris <span class="op">==</span> label</span>
+<span id="cb16-16"><a aria-label="16"></a>    plt.scatter(X_2d[mask, <span class="dv">0</span>], X_2d[mask, <span class="dv">1</span>],</span>
+<span id="cb16-17"><a aria-label="17"></a>                c<span class="op">=</span>colors[label], marker<span class="op">=</span>markers[label],</span>
+<span id="cb16-18"><a aria-label="18"></a>                s<span class="op">=</span><span class="dv">50</span>, alpha<span class="op">=</span><span class="fl">0.8</span>, label<span class="op">=</span>name)</span>
+<span id="cb16-19"><a aria-label="19"></a></span>
+<span id="cb16-20"><a aria-label="20"></a>plt.xlabel(<span class="ss">f"PC1（寄与率 </span><span class="sc">{</span>pca4<span class="sc">.</span>explained_variance_ratio_[<span class="dv">0</span>]<span class="sc">:.1%}</span><span class="ss">）"</span>)</span>
+<span id="cb16-21"><a aria-label="21"></a>plt.ylabel(<span class="ss">f"PC2（寄与率 </span><span class="sc">{</span>pca4<span class="sc">.</span>explained_variance_ratio_[<span class="dv">1</span>]<span class="sc">:.1%}</span><span class="ss">）"</span>)</span>
+<span id="cb16-22"><a aria-label="22"></a>plt.title(<span class="st">"Iris（4次元）を PCA で2次元に圧縮"</span>)</span>
+<span id="cb16-23"><a aria-label="23"></a>plt.legend()</span>
+<span id="cb16-24"><a aria-label="24"></a>plt.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb16-25"><a aria-label="25"></a>plt.tight_layout()</span>
+<span id="cb16-26"><a aria-label="26"></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="dimensionality-pca_files/figure-revealjs/cell-30-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-16"><img data-src="dimensionality-pca_files/figure-revealjs/cell-30-output-1.png" class="quarto-figure quarto-figure-center" width="587" height="437"></a></p>
+<p><a href="dimensionality-pca_files/figure-revealjs/cell-18-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img data-src="dimensionality-pca_files/figure-revealjs/cell-18-output-1.png" class="quarto-figure quarto-figure-center" width="587" height="437"></a></p>
 </figure>
 </div>
 </div>
@@ -1425,30 +998,30 @@ components_.T（sklearn）:
 <section id="寄与率explained-variance-ratio" class="slide level2">
 <h2>寄与率（<span class="en">Explained Variance Ratio</span>）</h2>
 <div class="slide-body">
-<div id="36c38da8" class="cell" data-execution_count="30">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a aria-label="1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">5</span>, <span class="fl">3.5</span>))</span>
-<span id="cb23-2"><a aria-label="2"></a>x_pos <span class="op">=</span> [<span class="st">"PC1"</span>, <span class="st">"PC2"</span>, <span class="st">"PC3"</span>, <span class="st">"PC4"</span>]</span>
-<span id="cb23-3"><a aria-label="3"></a></span>
-<span id="cb23-4"><a aria-label="4"></a><span class="co"># 全4成分を改めて計算</span></span>
-<span id="cb23-5"><a aria-label="5"></a>pca_full <span class="op">=</span> PCA(n_components<span class="op">=</span><span class="dv">4</span>).fit(X_iris)</span>
-<span id="cb23-6"><a aria-label="6"></a>ratios_full <span class="op">=</span> pca_full.explained_variance_ratio_</span>
-<span id="cb23-7"><a aria-label="7"></a>cum_full    <span class="op">=</span> np.cumsum(ratios_full)</span>
-<span id="cb23-8"><a aria-label="8"></a></span>
-<span id="cb23-9"><a aria-label="9"></a>ax.bar(x_pos, ratios_full, color<span class="op">=</span>[<span class="st">"#e74c3c"</span>, <span class="st">"#e67e22"</span>, <span class="st">"#bdc3c7"</span>, <span class="st">"#bdc3c7"</span>])</span>
-<span id="cb23-10"><a aria-label="10"></a>ax.plot(x_pos, cum_full, <span class="st">"o-"</span>, color<span class="op">=</span><span class="st">"black"</span>, label<span class="op">=</span><span class="st">"累積寄与率"</span>)</span>
-<span id="cb23-11"><a aria-label="11"></a><span class="cf">for</span> pc, cum <span class="kw">in</span> <span class="bu">zip</span>(x_pos, cum_full):</span>
-<span id="cb23-12"><a aria-label="12"></a>    ax.text(pc, cum <span class="op">+</span> <span class="fl">0.02</span>, <span class="ss">f"</span><span class="sc">{</span>cum<span class="sc">:.1%}</span><span class="ss">"</span>, ha<span class="op">=</span><span class="st">"center"</span>, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
-<span id="cb23-13"><a aria-label="13"></a>ax.set_ylabel(<span class="st">"寄与率"</span>)</span>
-<span id="cb23-14"><a aria-label="14"></a>ax.set_ylim(<span class="dv">0</span>, <span class="fl">1.15</span>)</span>
-<span id="cb23-15"><a aria-label="15"></a>ax.legend(fontsize<span class="op">=</span><span class="dv">9</span>)</span>
-<span id="cb23-16"><a aria-label="16"></a>ax.set_title(<span class="st">"Iris の主成分別寄与率"</span>)</span>
-<span id="cb23-17"><a aria-label="17"></a>ax.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>, axis<span class="op">=</span><span class="st">"y"</span>)</span>
-<span id="cb23-18"><a aria-label="18"></a>plt.tight_layout()</span>
-<span id="cb23-19"><a aria-label="19"></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="4c4c458c" class="cell" data-execution_count="18">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a aria-label="1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">5</span>, <span class="fl">3.5</span>))</span>
+<span id="cb17-2"><a aria-label="2"></a>x_pos <span class="op">=</span> [<span class="st">"PC1"</span>, <span class="st">"PC2"</span>, <span class="st">"PC3"</span>, <span class="st">"PC4"</span>]</span>
+<span id="cb17-3"><a aria-label="3"></a></span>
+<span id="cb17-4"><a aria-label="4"></a><span class="co"># 全4成分を改めて計算</span></span>
+<span id="cb17-5"><a aria-label="5"></a>pca_full <span class="op">=</span> PCA(n_components<span class="op">=</span><span class="dv">4</span>).fit(X_iris)</span>
+<span id="cb17-6"><a aria-label="6"></a>ratios_full <span class="op">=</span> pca_full.explained_variance_ratio_</span>
+<span id="cb17-7"><a aria-label="7"></a>cum_full    <span class="op">=</span> np.cumsum(ratios_full)</span>
+<span id="cb17-8"><a aria-label="8"></a></span>
+<span id="cb17-9"><a aria-label="9"></a>ax.bar(x_pos, ratios_full, color<span class="op">=</span>[<span class="st">"#e74c3c"</span>, <span class="st">"#e67e22"</span>, <span class="st">"#bdc3c7"</span>, <span class="st">"#bdc3c7"</span>])</span>
+<span id="cb17-10"><a aria-label="10"></a>ax.plot(x_pos, cum_full, <span class="st">"o-"</span>, color<span class="op">=</span><span class="st">"black"</span>, label<span class="op">=</span><span class="st">"累積寄与率"</span>)</span>
+<span id="cb17-11"><a aria-label="11"></a><span class="cf">for</span> pc, cum <span class="kw">in</span> <span class="bu">zip</span>(x_pos, cum_full):</span>
+<span id="cb17-12"><a aria-label="12"></a>    ax.text(pc, cum <span class="op">+</span> <span class="fl">0.02</span>, <span class="ss">f"</span><span class="sc">{</span>cum<span class="sc">:.1%}</span><span class="ss">"</span>, ha<span class="op">=</span><span class="st">"center"</span>, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb17-13"><a aria-label="13"></a>ax.set_ylabel(<span class="st">"寄与率"</span>)</span>
+<span id="cb17-14"><a aria-label="14"></a>ax.set_ylim(<span class="dv">0</span>, <span class="fl">1.15</span>)</span>
+<span id="cb17-15"><a aria-label="15"></a>ax.legend(fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb17-16"><a aria-label="16"></a>ax.set_title(<span class="st">"Iris の主成分別寄与率"</span>)</span>
+<span id="cb17-17"><a aria-label="17"></a>ax.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>, axis<span class="op">=</span><span class="st">"y"</span>)</span>
+<span id="cb17-18"><a aria-label="18"></a>plt.tight_layout()</span>
+<span id="cb17-19"><a aria-label="19"></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="dimensionality-pca_files/figure-revealjs/cell-31-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-17"><img data-src="dimensionality-pca_files/figure-revealjs/cell-31-output-1.png" class="quarto-figure quarto-figure-center" width="487" height="337"></a></p>
+<p><a href="dimensionality-pca_files/figure-revealjs/cell-19-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10"><img data-src="dimensionality-pca_files/figure-revealjs/cell-19-output-1.png" class="quarto-figure quarto-figure-center" width="487" height="337"></a></p>
 </figure>
 </div>
 </div>
@@ -1548,21 +1121,20 @@ components_.T（sklearn）:
 <h2>まとめ</h2>
 <div class="slide-body">
 <ul>
-<li><strong>次元の呪い</strong>：次元が増えると空間が広くなり、「近い」と「遠い」の区別が弱くなる</li>
 <li><strong>特徴量を増やしても情報が増えるとは限らない</strong>：体長は重さの言い換えだった</li>
 <li><strong>PCA</strong>：分散が最大の方向（= 共分散行列の固有ベクトル）に軸を取り直す
 <ul>
 <li>寄与率を見れば「データの<strong>実質的な次元</strong>」がわかる（魚は3次元に見えて実質2次元）</li>
 </ul></li>
 </ul>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a aria-label="1"></a><span class="im">from</span> sklearn.decomposition <span class="im">import</span> PCA</span>
-<span id="cb24-2"><a aria-label="2"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
-<span id="cb24-3"><a aria-label="3"></a></span>
-<span id="cb24-4"><a aria-label="4"></a>X_scaled <span class="op">=</span> StandardScaler().fit_transform(X)   <span class="co"># 標準化（スケールを揃える）</span></span>
-<span id="cb24-5"><a aria-label="5"></a>pca <span class="op">=</span> PCA(n_components<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb24-6"><a aria-label="6"></a>X_2d <span class="op">=</span> pca.fit_transform(X_scaled)             <span class="co"># 2次元に圧縮</span></span>
-<span id="cb24-7"><a aria-label="7"></a></span>
-<span id="cb24-8"><a aria-label="8"></a>pca.explained_variance_ratio_   <span class="co"># 各 PC の寄与率</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a aria-label="1"></a><span class="im">from</span> sklearn.decomposition <span class="im">import</span> PCA</span>
+<span id="cb18-2"><a aria-label="2"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
+<span id="cb18-3"><a aria-label="3"></a></span>
+<span id="cb18-4"><a aria-label="4"></a>X_scaled <span class="op">=</span> StandardScaler().fit_transform(X)   <span class="co"># 標準化（スケールを揃える）</span></span>
+<span id="cb18-5"><a aria-label="5"></a>pca <span class="op">=</span> PCA(n_components<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb18-6"><a aria-label="6"></a>X_2d <span class="op">=</span> pca.fit_transform(X_scaled)             <span class="co"># 2次元に圧縮</span></span>
+<span id="cb18-7"><a aria-label="7"></a></span>
+<span id="cb18-8"><a aria-label="8"></a>pca.explained_variance_ratio_   <span class="co"># 各 PC の寄与率</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <table class="caption-top">
 <colgroup>
 <col style="width: 50%">
@@ -1589,35 +1161,6 @@ components_.T（sklearn）:
 </tr>
 </tbody>
 </table>
-<div title="分類問題と特徴量のまとめ">
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>分類問題と特徴量のまとめ</strong></p>
-</div>
-<div class="callout-content">
-<p>1D → 2D の分類、評価と汎化、教師なし学習（k-means）、次元の呪いと PCA。 <strong>機械学習の基本的な問いと道具が揃った。</strong></p>
-<p>ここまで <code>fit()</code> の1行を何度も呼び、その中身（最良のパラメータの探し方）も手法ごとに見てきた。 次の「最適化」では、<strong>多くの手法で使える探し方</strong>を作る。</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="到達チェック-新しい魚が届いた" class="slide level2 badge-practice scrollable">
-<h2><strong>到達チェック</strong> 新しい魚が届いた</h2>
-<div class="slide-body">
-<div class="prompt">
-<p>新しい仕入れ先の魚100匹を受け取った。これまでの道具を使い、分類器の実力を確かめる手順を隣の人に説明せよ。</p>
-</div>
-<ol start="0" type="1">
-<li>訓練用と最終確認用を分けるタイミング</li>
-<li>正答率だけでは見落とす失敗の確認方法</li>
-<li>特徴量を20個に増やす前に疑うこと</li>
-</ol>
 </div>
 </section>
 <section id="練習問題" class="slide level2 scrollable">
@@ -1647,17 +1190,17 @@ components_.T（sklearn）:
 <section id="問題2の解答例" class="slide level2">
 <h2>問題2の解答例</h2>
 <div class="slide-body">
-<div id="5d1c82a0" class="cell" data-execution_count="31">
+<div id="076ef1d9" class="cell" data-execution_count="19">
 <details class="code-fold">
 <summary>解答例を見る</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb25-2"><a aria-label="2"></a><span class="im">from</span> sklearn.decomposition <span class="im">import</span> PCA</span>
-<span id="cb25-3"><a aria-label="3"></a></span>
-<span id="cb25-4"><a aria-label="4"></a>P <span class="op">=</span> np.array([[<span class="fl">2.0</span>, <span class="fl">1.0</span>], [<span class="fl">4.0</span>, <span class="fl">2.0</span>], [<span class="fl">6.0</span>, <span class="fl">3.0</span>], [<span class="fl">8.0</span>, <span class="fl">4.0</span>]])</span>
-<span id="cb25-5"><a aria-label="5"></a></span>
-<span id="cb25-6"><a aria-label="6"></a>pca_check <span class="op">=</span> PCA(n_components<span class="op">=</span><span class="dv">2</span>).fit(P)</span>
-<span id="cb25-7"><a aria-label="7"></a><span class="bu">print</span>(<span class="st">"寄与率:"</span>, pca_check.explained_variance_ratio_.<span class="bu">round</span>(<span class="dv">4</span>))</span>
-<span id="cb25-8"><a aria-label="8"></a><span class="bu">print</span>(<span class="st">"第1主成分の方向:"</span>, pca_check.components_[<span class="dv">0</span>].<span class="bu">round</span>(<span class="dv">4</span>))</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb19-2"><a aria-label="2"></a><span class="im">from</span> sklearn.decomposition <span class="im">import</span> PCA</span>
+<span id="cb19-3"><a aria-label="3"></a></span>
+<span id="cb19-4"><a aria-label="4"></a>P <span class="op">=</span> np.array([[<span class="fl">2.0</span>, <span class="fl">1.0</span>], [<span class="fl">4.0</span>, <span class="fl">2.0</span>], [<span class="fl">6.0</span>, <span class="fl">3.0</span>], [<span class="fl">8.0</span>, <span class="fl">4.0</span>]])</span>
+<span id="cb19-5"><a aria-label="5"></a></span>
+<span id="cb19-6"><a aria-label="6"></a>pca_check <span class="op">=</span> PCA(n_components<span class="op">=</span><span class="dv">2</span>).fit(P)</span>
+<span id="cb19-7"><a aria-label="7"></a><span class="bu">print</span>(<span class="st">"寄与率:"</span>, pca_check.explained_variance_ratio_.<span class="bu">round</span>(<span class="dv">4</span>))</span>
+<span id="cb19-8"><a aria-label="8"></a><span class="bu">print</span>(<span class="st">"第1主成分の方向:"</span>, pca_check.components_[<span class="dv">0</span>].<span class="bu">round</span>(<span class="dv">4</span>))</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>寄与率: [1. 0.]
