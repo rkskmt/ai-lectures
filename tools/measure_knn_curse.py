@@ -7,6 +7,8 @@
 #   larger than d/2, else 0; each label flipped with probability 0.1.
 #
 # k-NN in 2-D
+#   X3 / y3 (the 3-D figure): one run of make_data(100, 3) with
+#   default_rng(0), rounded to 2 decimals, label rule re-applied (flips kept).
 #   X_train / y_train / X_test / y_test (100 + 100 points) are one run of
 #   make_data with default_rng(seed), coordinates rounded to 3 decimals and
 #   the label rule re-applied to the rounded coordinates (flips kept). The
@@ -93,10 +95,10 @@ def literal(name, arr, decimals):
     print(f"{name} = np.array({np.round(arr, decimals).tolist()})")
 
 
-def print_points(name, X):
+def print_points(name, X, decimals=3):
     print(f"{name} = np.array([")
     for k in range(0, len(X), 5):
-        print("    " + ", ".join(f"[{a:.3f}, {b:.3f}]" for a, b in X[k:k + 5]) + ",")
+        print("    " + ", ".join("[" + ", ".join(f"{v:.{decimals}f}" for v in row) + "]" for row in X[k:k + 5]) + ",")
     print("])")
 
 
@@ -226,6 +228,20 @@ check("y_train", y_train, 0)
 check("X_test", X_test, 3)
 check("y_test", y_test, 0)
 check("ks", KS, 0)
+
+# 3-D points of the slide 特徴量を 1 つ足すと、軸が 1 本増える: one run of
+# make_data(100, 3) with default_rng(0), rounded to 2 decimals, label rule
+# re-applied to the rounded coordinates (flips kept).
+rng = np.random.default_rng(0)
+X3, y3 = make_data(rng, 100, 3)
+flipped3 = y3 != (X3.sum(axis=1) > 1.5)
+X3 = np.round(X3, 2)
+y3 = ((X3.sum(axis=1) > 1.5) != flipped3).astype(int)
+print(f"# X3: label 1 {y3.sum()}, label 0 {len(y3) - y3.sum()}, flipped {flipped3.sum()}")
+print_points("X3", X3, 2)
+print_labels("y3", y3)
+check("X3", X3, 2)
+check("y3", y3, 0)
 
 # ==== k-NN in 2-D: the slides ====
 
