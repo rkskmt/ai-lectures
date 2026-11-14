@@ -460,3 +460,33 @@ print(f"# 1000 random 96/24 splits, mean test accuracy: tree (depth 3) {np.mean(
       f"k-NN k = 3 raw {acc_raw.mean():.3f}, standardized {acc_std.mean():.3f}")
 print(f"#   standardized better {np.sum(acc_std > acc_raw)}, worse {np.sum(acc_std < acc_raw)}, "
       f"equal {np.sum(acc_std == acc_raw)}; tree predictions identical raw vs standardized {same_tree} / 1000")
+
+
+# ==== octree of the 3-D points (slide 3 次元の空間を、格子状の箱に分ける) ====
+#   The same recursive midpoint split as the deck's hidden figure cell:
+#   boxes holding more than 15 points are cut at the midpoint of every axis.
+
+def octree_leaves(P, idx, lo, hi, max_points, out):
+    if len(idx) <= max_points:
+        out.append((lo, hi, idx))
+        return
+    mid = (lo + hi) / 2
+    for corner in range(8):
+        upper = np.array([(corner >> a) & 1 for a in range(3)], dtype=bool)
+        clo, chi = np.where(upper, mid, lo), np.where(upper, hi, mid)
+        inside = np.all((P[idx] >= clo) & ((P[idx] < chi) | (chi == 1.0)), axis=1)
+        octree_leaves(P, idx[inside], clo, chi, max_points, out)
+
+
+print("# ---- octree ----")
+oct_leaves = []
+octree_leaves(X3, np.arange(len(X3)), np.zeros(3), np.ones(3), 15, oct_leaves)
+sizes = sorted(len(idx) for _, _, idx in oct_leaves)
+assert sum(sizes) == len(X3)
+print(f"# octree of X3 (split above 15 points): {len(oct_leaves)} boxes, points per box {sizes}")
+star3 = np.array(deck_literal("star3"))
+home = [(lo, hi, idx) for lo, hi, idx in oct_leaves if np.all((star3 >= lo) & (star3 < hi))]
+assert len(home) == 1
+print(f"# star3 {star3.tolist()} is in box {home[0][0].tolist()}..{home[0][1].tolist()} with {len(home[0][2])} points")
+kd_sizes = sorted(len(p) for p in leaves(build_kdtree(X_train, np.arange(len(X_train)), 0, 5)))
+print(f"# KD-tree of X_train (leaf size 5): {len(kd_sizes)} boxes, points per box {min(kd_sizes)} to {max(kd_sizes)}")
