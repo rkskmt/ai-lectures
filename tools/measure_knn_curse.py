@@ -378,6 +378,20 @@ tree = build_kdtree(X_train, np.arange(len(X_train)), 0, 5)
 lv = leaves(tree)
 print(f"# tree on X_train (leaf size 5): {len(lv)} leaves of {sorted({len(p) for p in lv})} points; "
       f"first split feature {tree['axis'] + 1} = {tree['value']}")
+node, path = tree, []
+while "axis" in node:                        # the descent of step 1 for the question point
+    side = "left" if x_new[node["axis"]] - node["value"] < 0 else "right"
+    path.append((node["axis"], node["value"], side))
+    node = node[side]
+for n_step, (a, v, side) in enumerate(path, 1):
+    print(f"# x_new descent {n_step}: feature {a + 1} = {v}, x_new has {x_new[a]} -> "
+          f"{'smaller' if side == 'left' else 'larger'} side")
+print(f"# x_new's leaf holds X_train{node['points'].tolist()}; nearest X_train[{o_new[0]}] = "
+      f"{X_train[o_new[0]].tolist()} is in it: {o_new[0] in node['points']}")
+a2, v2, side2 = path[1]
+assert o_new[0] not in node["points"] and (X_train[o_new[0], a2] < v2) == (side2 == "right"), \
+    "the slide says the nearest point lies across the second split"
+print(f"#   the nearest point lies across split 2 (feature {a2 + 1} = {v2})")
 b = nearest_kdtree(tree, X_train, x_new)
 assert b["index"] == o_new[0], "the KD-tree must find the same nearest point as the full search"
 print(f"# x_new: KD-tree finds X_train[{b['index']}] at {b['dist']:.3f} after {b['count']} distance computations "
