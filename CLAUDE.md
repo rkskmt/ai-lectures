@@ -90,6 +90,7 @@ Use Python as the vehicle, but frame concepts as broadly as possible. Where a co
 
 Apply to every deck:
 
+- **Do not force the fish into every deck.** The Salmon / Sea bass data is one dataset among many, not the course's theme. For each topic, use the data that shows the concept best (synthetic points, a real dataset, images, text, …), and do not phrase titles, explanations or metaphors around fish out of habit. Keeping the same data across decks is not a goal: data chosen for continuity instead of fit hides the concept.
 - **Do not ration slides.** One concept may use the full 動機（問いかけ）→ 実験/図 → 組み立て → 観察 sequence; "one slide = one idea" works toward **more** slides, not fewer (typical deck: 18–25).
 - **Figures, code, and interactivity are investments that lower explanation cost** — when in doubt, add them. In particular: (1) every function that appears as a formula also gets its **curve** (sigmoid, ReLU, softmax, −log, …); (2) every network gets a **D2 structure diagram** (no code-only or math-only component definitions); (3) interactive versions (explorer, plotly) beat static images.
 - **Write procedures as readable code, not library calls.** Library functions (`train_test_split`, `cross_val_score`, …) go in a (参考) slide.
