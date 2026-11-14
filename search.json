@@ -3888,8 +3888,8 @@
     "objectID": "knn-curse.html#peek-knn-code",
     "href": "knn-curse.html#peek-knn-code",
     "title": "k-NN と次元の呪い",
-    "section": "近い k 点の多数決にする（k-NN）",
-    "text": "近い k 点の多数決にする（k-NN）\n\n\n新しい点 \\(x\\) から、訓練データの全部の点までの距離を測る\n距離が小さい順に、k 点を選ぶ\nk 点のラベルのうち、多いほうを \\(x\\) のラベルとする\n\n\nk-NN（k-nearest neighbors / k 近傍法）と呼ぶ\n\nk は奇数にする（偶数だと、同数で決まらないことがある）\n\n\n\ndef predict_knn(X_train, y_train, x, k):\n    dist    = np.sqrt(((X_train - x) ** 2).sum(axis=1))  # 1. x から、訓練データの全部の点までの距離\n    nearest = np.argsort(dist)[:k]                       # 2. 距離が小さい順に並べた番号の、先頭 k 個\n    votes   = y_train[nearest]                           #    k 点のラベル（0 か 1）\n    return int(votes.sum() &gt; k / 2)                      # 3. ラベル 1 が半分より多ければ 1、そうでなければ 0\n\nx_new = np.array([0.7, 0.6])                             # 前のスライドの ★\nprint(f\"★ の予測（k = 3）: {predict_knn(X_train, y_train, x_new, 3)}\")\n\n★ の予測（k = 3）: 1"
+    "section": "近い k 個のデータの投票で決める（k-nearest neighbors）",
+    "text": "近い k 個のデータの投票で決める（k-nearest neighbors）\n\n\nk-nearest neighbors（k-NN / k 近傍法）のアルゴリズム\n\n\n新しい点 \\(x\\) から、訓練データの全部の点までの距離を測る\n距離が小さい順に、k 個を選ぶ\nk 個のラベルのうち、多いほうを \\(x\\) のラベルとする\n\n\ndef predict_knn(X_train, y_train, x, k):\n    dist    = np.sqrt(((X_train - x) ** 2).sum(axis=1))  # 1. x から、訓練データの全部の点までの距離\n    nearest = np.argsort(dist)[:k]                       # 2. 距離が小さい順に並べた番号の、先頭 k 個\n    votes   = y_train[nearest]                           #    k 個のラベル（0 か 1）\n    return int(votes.sum() &gt; k / 2)                      # 3. ラベル 1 が半分より多ければ 1、そうでなければ 0\n\nx_new = np.array([0.7, 0.6])                             # 前のスライドの ★\nprint(f\"★ の予測（k = 3）: {predict_knn(X_train, y_train, x_new, 3)}\")\n\n★ の予測（k = 3）: 1\n\n\n\n\n\n\n\n\n\nただし\n\n\nk は奇数（偶数だと同数で決まらないことがあるため）"
   },
   {
     "objectID": "knn-curse.html#peek-knn-test",
@@ -3945,7 +3945,7 @@
     "href": "knn-curse.html#peek-knn-dims",
     "title": "k-NN と次元の呪い",
     "section": "同じ作り方で、特徴量を増やす",
-    "text": "同じ作り方で、特徴量を増やす\n\n\nデータを作る関数 make_data を用意する\n\n\\(d\\) 個の特徴量を持つ点を、0〜1 の範囲にばらまく\nラベルは、座標の合計が真ん中の値 \\(d / 2\\) より大きければ 1（1 割ほどは逆）\n2 次元のデータも、この作り方で作った\n\n特徴量を 2, 3, 5, 10, 20 個に増やし、k = 3 の k-NN でテストデータ 1,000 点を予測する\n\n訓練データは、どの次元でも 100 点\n\n\n\nrng = np.random.default_rng()                        # 乱数の生成器（実行するたびに違う点になる）\n\ndef make_data(n, d):\n    X = rng.random((n, d))                           # n 点を、d 次元の 0〜1 の範囲にばらまく\n    y = (X.sum(axis=1) &gt; d / 2).astype(int)          # 座標の合計が d/2 より大きければ 1\n    flip = rng.random(n) &lt; 0.1                       # 1 割ほどの点を選び、\n    y[flip] = 1 - y[flip]                            # ラベルを逆にする\n    return X, y\n\nfor d in [2, 3, 5, 10, 20]:\n    Xd_train, yd_train = make_data(100, d)           # 訓練データ 100 点\n    Xd_test,  yd_test  = make_data(1000, d)          # テストデータ 1,000 点\n    acc = accuracy_knn(Xd_train, yd_train, Xd_test, yd_test, 3)\n    print(f\"{d:2d}次元: Accuracy {acc:.3f}\")\n\n\n\n 2次元: Accuracy 0.838\n 3次元: Accuracy 0.808\n 5次元: Accuracy 0.796\n10次元: Accuracy 0.679\n20次元: Accuracy 0.634\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n2 次元では 0.838、20 次元では 0.634 まで下がる\n\nラベルの 1 割が逆なので、上限は 0.9 ほど\nでたらめに答えても 0.5\n\nどの特徴量もラベルに関係しているのに、特徴量を増やすほど当たらなくなる\n\n\n\n\n\n\n点は実行のたびに変わるので、手元の数字は少し違う"
+    "text": "同じ作り方で、特徴量を増やす\n\n\nデータを作る関数 make_data を用意する\n\n\\(d\\) 個の特徴量を持つ点を、0〜1 の範囲にばらまく\nラベルは、座標の合計が真ん中の値 \\(d / 2\\) より大きければ 1（1 割ほどは逆）\n2 次元のデータも、この作り方で作った\n\n特徴量を 2, 3, 5, 10, 20 個に増やし、k = 3 の k-NN でテストデータ 1,000 点を予測する\n\n訓練データは、どの次元でも 100 点\n\n\n\nrng = np.random.default_rng()                        # 乱数の生成器（実行するたびに違う点になる）\n\ndef make_data(n, d):\n    X = rng.random((n, d))                           # n 点を、d 次元の 0〜1 の範囲にばらまく\n    y = (X.sum(axis=1) &gt; d / 2).astype(int)          # 座標の合計が d/2 より大きければ 1\n    flip = rng.random(n) &lt; 0.1                       # 1 割ほどの点を選び、\n    y[flip] = 1 - y[flip]                            # ラベルを逆にする\n    return X, y\n\nfor d in [2, 3, 5, 10, 20]:\n    Xd_train, yd_train = make_data(100, d)           # 訓練データ 100 点\n    Xd_test,  yd_test  = make_data(1000, d)          # テストデータ 1,000 点\n    acc = accuracy_knn(Xd_train, yd_train, Xd_test, yd_test, 3)\n    print(f\"{d:2d}次元: Accuracy {acc:.3f}\")\n\n\n\n 2次元: Accuracy 0.838\n 3次元: Accuracy 0.808\n 5次元: Accuracy 0.796\n10次元: Accuracy 0.679\n20次元: Accuracy 0.634\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n2 次元では 0.838、20 次元では 0.634 まで下がる\n\nラベルの 1 割が逆なので、上限は 0.9 ほど\nでたらめに答えても 0.5\n\nどの特徴量もラベルに関係しているのに、特徴量を増やすほど当たらなくなる"
   },
   {
     "objectID": "knn-curse.html#peek-curse",
@@ -3966,7 +3966,7 @@
     "href": "knn-curse.html#peek-nn-distance",
     "title": "k-NN と次元の呪い",
     "section": "次元を増やすと、いちばん近い点が遠くなる",
-    "text": "次元を増やすと、いちばん近い点が遠くなる\n\n\nmake_data で 100 点を作り、特徴量を 2, 3, 5, 10, 20 個に増やして、いちばん近い点までの距離（中央値）を測る\n\n\nfor d in [2, 3, 5, 10, 20]:\n    P, label = make_data(100, d)                     # 100 点を d 次元にばらまく（ラベルは使わない）\n    nn = []\n    for i in range(len(P)):                          # 「いちばん近い点までの距離を測る」と同じ測り方\n        nn.append(nearest_distance(P, i))\n    print(f\"{d:2d}次元: いちばん近い点まで {np.median(nn):.3f}\")\n\n\n\n 2次元: いちばん近い点まで 0.049\n 3次元: いちばん近い点まで 0.121\n 5次元: いちばん近い点まで 0.299\n10次元: いちばん近い点まで 0.692\n20次元: いちばん近い点まで 1.195\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n10 次元で 0.69、20 次元では 1.2（各軸の長さ 1 より遠い）\n点の数は 100 点のままなのに、近くに点がなくなる\n\nk-NN が投票させる「近い点」が、実際には遠い点になっている\n\nなぜこうなるのか、2 つの理由を見る\n\n\n\n\n\n\n点は実行のたびに変わるので、手元の数字は少し違う"
+    "text": "次元を増やすと、いちばん近い点が遠くなる\n\n\nmake_data で 100 点を作り、特徴量を 2, 3, 5, 10, 20 個に増やして、いちばん近い点までの距離（中央値）を測る\n\n\nfor d in [2, 3, 5, 10, 20]:\n    P, label = make_data(100, d)                     # 100 点を d 次元にばらまく（ラベルは使わない）\n    nn = []\n    for i in range(len(P)):                          # 「いちばん近い点までの距離を測る」と同じ測り方\n        nn.append(nearest_distance(P, i))\n    print(f\"{d:2d}次元: いちばん近い点まで {np.median(nn):.3f}\")\n\n\n\n 2次元: いちばん近い点まで 0.049\n 3次元: いちばん近い点まで 0.121\n 5次元: いちばん近い点まで 0.299\n10次元: いちばん近い点まで 0.692\n20次元: いちばん近い点まで 1.195\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n10 次元で 0.69、20 次元では 1.2（各軸の長さ 1 より遠い）\n点の数は 100 点のままなのに、近くに点がなくなる\n\nk-NN が投票させる「近い点」が、実際には遠い点になっている\n\nなぜこうなるのか、2 つの理由を見る"
   },
   {
     "objectID": "knn-curse.html#なぜ-その1真ん中に居続けられない",
@@ -4001,7 +4001,7 @@
     "href": "knn-curse.html#peek-more-points",
     "title": "k-NN と次元の呪い",
     "section": "点を 1000 倍に増やしても、追いつかない",
-    "text": "点を 1000 倍に増やしても、追いつかない\n\n\n当たらなくなったのは、訓練データが 100 点しかないからかもしれない\n訓練データを 1,000 → 1 万 → 10 万点に増やし、k = 3 の k-NN でテストデータ 1,000 点を予測する\n\n\nprint(\"points      2D     5D    10D    20D\")\nfor n in [1000, 10000, 100000]:                      # 訓練データの点の数\n    row = []\n    for d in [2, 5, 10, 20]:\n        Xd_train, yd_train = make_data(n, d)\n        Xd_test,  yd_test  = make_data(1000, d)\n        row.append(accuracy_knn(Xd_train, yd_train, Xd_test, yd_test, 3))\n    print(f\"{n:&lt;8d}  {row[0]:.3f}  {row[1]:.3f}  {row[2]:.3f}  {row[3]:.3f}\")\n\n\n\npoints      2D     5D    10D    20D\n1000      0.868  0.786  0.762  0.682\n10000     0.876  0.839  0.783  0.705\n100000    0.851  0.863  0.790  0.739\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n2 次元：1,000 点で 0.868 と、すでに上限（0.9 ほど）に近い\n5 次元：10 万点で 0.863 まで上がり、ようやく 2 次元に並ぶ\n10 次元と 20 次元：10 万点でも 0.790 と 0.739\n次元が増えると、同じ密度を保つのに必要な点の数が指数的に増える\n\n点を集めるだけでは追いつかない\n\n\n\n\n\n\n\n点は実行のたびに変わるので、手元の数字は少し違う"
+    "text": "点を 1000 倍に増やしても、追いつかない\n\n\n当たらなくなったのは、訓練データが 100 点しかないからかもしれない\n訓練データを 1,000 → 1 万 → 10 万点に増やし、k = 3 の k-NN でテストデータ 1,000 点を予測する\n\n\nprint(\"points      2D     5D    10D    20D\")\nfor n in [1000, 10000, 100000]:                      # 訓練データの点の数\n    row = []\n    for d in [2, 5, 10, 20]:\n        Xd_train, yd_train = make_data(n, d)\n        Xd_test,  yd_test  = make_data(1000, d)\n        row.append(accuracy_knn(Xd_train, yd_train, Xd_test, yd_test, 3))\n    print(f\"{n:&lt;8d}  {row[0]:.3f}  {row[1]:.3f}  {row[2]:.3f}  {row[3]:.3f}\")\n\n\n\npoints      2D     5D    10D    20D\n1000      0.868  0.786  0.762  0.682\n10000     0.876  0.839  0.783  0.705\n100000    0.851  0.863  0.790  0.739\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n2 次元：1,000 点で 0.868 と、すでに上限（0.9 ほど）に近い\n5 次元：10 万点で 0.863 まで上がり、ようやく 2 次元に並ぶ\n10 次元と 20 次元：10 万点でも 0.790 と 0.739\n次元が増えると、同じ密度を保つのに必要な点の数が指数的に増える\n\n点を集めるだけでは追いつかない"
   },
   {
     "objectID": "knn-curse.html#実用への影響",
@@ -4011,18 +4011,25 @@
     "text": "実用への影響\n\n\n\n\n問題\n原因\n\n\n\n\nモデルの精度が上がらない\nデータが疎でパターンが見えない\n\n\n過学習しやすくなる\nデータに比べてパラメータが多すぎる\n\n\n計算コストが増大\n距離計算などが次元数に比例して重くなる\n\n\n可視化できない\n4次元以上は図に描けない\n\n\n\n\n\n\n\n\n\n\n次元の呪いへの対処\n\n\n\n特徴量選択（feature selection）：重要な特徴量だけを残す\n次元削減（dimensionality reduction）：情報を保ったまま次元を圧縮する\n正則化（regularization）：過学習を防ぐ（線形回帰の回で扱う）"
   },
   {
-    "objectID": "knn-curse.html#予測のたびに全部の点までの距離を測る",
-    "href": "knn-curse.html#予測のたびに全部の点までの距離を測る",
+    "objectID": "knn-curse.html#k-nn-の弱点毎回全部の点までの距離を測る",
+    "href": "knn-curse.html#k-nn-の弱点毎回全部の点までの距離を測る",
     "title": "k-NN と次元の呪い",
-    "section": "予測のたびに、全部の点までの距離を測る",
-    "text": "予測のたびに、全部の点までの距離を測る\n\n\nk-NN の学習は、訓練データを取っておくだけ\nその代わり、予測のたびに、訓練データの全部の点までの距離を測る（全探索, brute-force search）\n\n10 万点の実験では、テストデータ 1 点を予測するたびに、距離の計算が 10 万回\n\n\n\n\n\n\n\n\n\n\n\n学習でやること\n予測でやること\n\n\n\n\n決定木\nデータから境界を作る\n境界のどちら側かを見る\n\n\nk-NN\n訓練データを取っておくだけ\n全部の点までの距離を測り、近い k 点の多数決を取る\n\n\n\n\n\n\n\n\n\n\n質問\n\n\n全部の点を測らずに、いちばん近い点を見つけるにはどうすればよい？"
+    "section": "k-NN の弱点：毎回、全部の点までの距離を測る",
+    "text": "k-NN の弱点：毎回、全部の点までの距離を測る\n\n\nk-NN は、予測のたびに、訓練データの全部の点までの距離を測る（全探索, brute-force search）\n\n10 万点の実験では、テストデータ 1 点の予測に距離の計算が 10 万回、1,000 点で 1 億回\n\n投票に使うのは近い k 個だけなので、遠くの点まで測るのは、ほとんどが無駄\n\n\n\n\n\n\n\n\n\n\n学習でやること\n予測でやること\n\n\n\n\n決定木\nデータから境界を作る\n境界のどちら側かを見る\n\n\nk-NN\n訓練データを取っておくだけ\n全部の点までの距離を測り、近い k 個の投票で決める\n\n\n\n\n\n\n\n\n\n\n質問\n\n\n遠くの点を測らずに、近い点だけを見つけるにはどうすればよい？"
+  },
+  {
+    "objectID": "knn-curse.html#空間を-8-つの箱に分けていくoctree",
+    "href": "knn-curse.html#空間を-8-つの箱に分けていくoctree",
+    "title": "k-NN と次元の呪い",
+    "section": "空間を 8 つの箱に分けていく（Octree）",
+    "text": "空間を 8 つの箱に分けていく（Octree）\n\n\nOctree（八分木）の作り方\n\n\n立方体を、各軸の真ん中で切って、8 つの箱に分ける\n中の点が 15 点より多い箱は、同じように 8 つに分ける\n中の点が 15 点以下になった箱は、それ以上分けない\n\n\nいちばん近い点を探すときは、★ の入っている箱の点から距離を測る\n\n見つかった距離より遠い箱は、中の点を測らずに飛ばせる\n\n\n\n\n\n\nドラッグで回せる（黄色の箱が、★ の入っている箱）\n\n\n\n\n\n\n\n\nただし\n\n\nd 次元では、1 回切るだけで \\(2^d\\) 個の箱に分かれる（20 次元なら約 105 万個）"
   },
   {
     "objectID": "knn-curse.html#軸で半分ずつ空間を箱に分けるkd-tree",
     "href": "knn-curse.html#軸で半分ずつ空間を箱に分けるkd-tree",
     "title": "k-NN と次元の呪い",
     "section": "軸で半分ずつ、空間を箱に分ける（KD-tree）",
-    "text": "軸で半分ずつ、空間を箱に分ける（KD-tree）\n\n\n1 つの軸で点を並べ、真ん中の点の値で 2 つに分ける\n分けた両側それぞれで、次の軸を使って 1 をくり返す（特徴量 1 → 特徴量 2 → 特徴量 1 → …）\n箱の中の点が 5 点以下になったら、その箱は分けずに止める\n\n\nKD-tree（k-d tree）と呼ぶ\n\n決定木と同じく、軸に沿った線で空間を分ける木\nk-d の k は特徴量の数（次元）で、k-NN の k とは別"
+    "text": "軸で半分ずつ、空間を箱に分ける（KD-tree）\n\n\nKD-tree（k-d tree）の作り方\n\n\n1 つの軸で点を並べ、真ん中の点の値で 2 つに分ける\n分けた両側それぞれで、次の軸を使って 1 をくり返す（特徴量 1 → 特徴量 2 → 特徴量 1 → …）\n箱の中の点が 5 点以下になったら、その箱は分けずに止める\n\n\nOctree と違い、1 回に切る軸は 1 つなので、次元が増えても 2 つに分かれるだけ\n決定木と同じく、軸に沿った線で空間を分ける木\n図は 2 次元の訓練データ（100 点）で描く（作り方は何次元でも同じ）\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nただし\n\n\nk-d の k は特徴量の数（次元）で、k-NN の k とは別"
   },
   {
     "objectID": "knn-curse.html#kd-tree-を作る",
@@ -4036,7 +4043,7 @@
     "href": "knn-curse.html#peek-kd-search",
     "title": "k-NN と次元の呪い",
     "section": "近い箱から調べて、遠い側は飛ばす",
-    "text": "近い箱から調べて、遠い側は飛ばす\n\n\n最初の分け目（図のいちばん太い線）から、★ の入っている箱まで下りる\n\n分け目ごとに、その軸での ★ の座標と分ける値を比べ、★ のある側へ進む\n軸は、木を作ったときと同じく、特徴量 1 → 特徴量 2 → 特徴量 1 → … と交互\n\n★ の入っている箱の中の点と距離を測り、いちばん近い距離を r とする\n下りてきた分け目を逆にたどって戻り、分け目ごとに反対側を調べるか決める\n\n分け目までの距離が r より近い：反対側に、もっと近い点があるかもしれないので調べる（もっと近い点が見つかれば、r を更新する）\n分け目までの距離が r 以上：反対側の点は全部 r より遠いので、飛ばす\n\n\n\n\n\n\n\n\n\n\n\n★ = (0.7, 0.6) の下り方（手順 1）：\n\n\n\n\n分け目\n★ の座標\n進む側\n\n\n\n\n1 回目\n特徴量 1 = 0.499\n0.7\n大きい側\n\n\n2 回目\n特徴量 2 = 0.566\n0.6\n大きい側\n\n\n3 回目\n特徴量 1 = 0.751\n0.7\n小さい側\n\n\n4 回目\n特徴量 2 = 0.891\n0.6\n小さい側\n\n\n5 回目\n特徴量 1 = 0.646\n0.7\n大きい側"
+    "text": "近い箱から調べて、遠い側は飛ばす\n\n\nKD-tree でいちばん近い点を探すアルゴリズム\n\n\n最初の分け目（図のいちばん太い線）から、★ の入っている箱まで下りる\n\n分け目ごとに、その軸での ★ の座標と分ける値を比べ、★ のある側へ進む\n軸は、木を作ったときと同じく、特徴量 1 → 特徴量 2 → 特徴量 1 → … と交互\n\n★ の入っている箱の中の点と距離を測り、いちばん近い距離を r とする\n下りてきた分け目を逆にたどって戻り、分け目ごとに反対側を調べるか決める\n\n分け目までの距離が r より近い：反対側に、もっと近い点があるかもしれないので調べる（もっと近い点が見つかれば、r を更新する）\n分け目までの距離が r 以上：反対側の点は全部 r より遠いので、飛ばす\n\n\n\n\n\n\n\n\n\n\n\n★ = (0.7, 0.6) の下り方（手順 1）：\n\n\n\n\n分け目\n★ の座標\n進む側\n\n\n\n\n1 回目\n特徴量 1 = 0.499\n0.7\n大きい側\n\n\n2 回目\n特徴量 2 = 0.566\n0.6\n大きい側\n\n\n3 回目\n特徴量 1 = 0.751\n0.7\n小さい側\n\n\n4 回目\n特徴量 2 = 0.891\n0.6\n小さい側\n\n\n5 回目\n特徴量 1 = 0.646\n0.7\n大きい側"
   },
   {
     "objectID": "knn-curse.html#いちばん近い点を-kd-tree-で探す",
@@ -4050,14 +4057,14 @@
     "href": "knn-curse.html#peek-kd-count",
     "title": "k-NN と次元の呪い",
     "section": "点を増やしても、測る点の数はほとんど増えない",
-    "text": "点を増やしても、測る点の数はほとんど増えない\n\n\n2 次元の 0〜1 の範囲に点をばらまき、新しい点 100 個で、いちばん近い点を探す\n点の数を 1,000 → 1 万 → 10 万点に増やし、距離を測った点の数（平均）を比べる\n\n\nprint(\"points       all  KD-tree\")\nfor n in [1000, 10000, 100000]:\n    X    = rng.random((n, 2))                        # n 点を 2 次元にばらまく\n    tree = build_kdtree(X, np.arange(n), 0, 5)\n    count = []\n    for q in rng.random((100, 2)):                   # 新しい点 100 個で、いちばん近い点を探す\n        count.append(nearest_kdtree(tree, X, q)[\"count\"])\n    print(f\"{n:&lt;8d}  {n:6d}  {np.mean(count):7.1f}\")\n\n\n\npoints       all  KD-tree\n1000        1000      9.6\n10000      10000     11.8\n100000    100000      8.1\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n全探索では、点の数と同じ回数だけ距離を測る\nKD-tree では、10 万点でも平均 8.1 点（1,000 点で 9.6 点、1 万点で 11.8 点）\n\n\n\n\n\n\n点は実行のたびに変わるので、手元の数字は少し違う"
+    "text": "点を増やしても、測る点の数はほとんど増えない\n\n\n2 次元の 0〜1 の範囲に点をばらまき、新しい点 100 個で、いちばん近い点を探す\n点の数を 1,000 → 1 万 → 10 万点に増やし、距離を測った点の数（平均）を比べる\n\n\nprint(\"points       all  KD-tree\")\nfor n in [1000, 10000, 100000]:\n    X    = rng.random((n, 2))                        # n 点を 2 次元にばらまく\n    tree = build_kdtree(X, np.arange(n), 0, 5)\n    count = []\n    for q in rng.random((100, 2)):                   # 新しい点 100 個で、いちばん近い点を探す\n        count.append(nearest_kdtree(tree, X, q)[\"count\"])\n    print(f\"{n:&lt;8d}  {n:6d}  {np.mean(count):7.1f}\")\n\n\n\npoints       all  KD-tree\n1000        1000      9.6\n10000      10000     11.8\n100000    100000      8.1\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n全探索では、点の数と同じ回数だけ距離を測る\nKD-tree では、10 万点でも平均 8.1 点（1,000 点で 9.6 点、1 万点で 11.8 点）"
   },
   {
     "objectID": "knn-curse.html#次元が高いとkd-tree-でも飛ばせない",
     "href": "knn-curse.html#次元が高いとkd-tree-でも飛ばせない",
     "title": "k-NN と次元の呪い",
     "section": "次元が高いと、KD-tree でも飛ばせない",
-    "text": "次元が高いと、KD-tree でも飛ばせない\n\n\n1 万点で、特徴量を 2, 5, 10, 20 個に増やし、同じように探す\n\n\nn = 10000\nfor d in [2, 5, 10, 20]:\n    X    = rng.random((n, d))                        # 1 万点を d 次元にばらまく\n    tree = build_kdtree(X, np.arange(n), 0, 5)\n    count = []\n    for q in rng.random((100, d)):                   # 新しい点 100 個で、いちばん近い点を探す\n        count.append(nearest_kdtree(tree, X, q)[\"count\"])\n    print(f\"{d:2d}次元: 距離を測った点 {np.mean(count):7.1f} / {n}\")\n\n\n\n 2次元: 距離を測った点    11.6 / 10000\n 5次元: 距離を測った点    95.0 / 10000\n10次元: 距離を測った点  3207.4 / 10000\n20次元: 距離を測った点  9997.9 / 10000\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n10 次元で約 3 割（3,207 点）、20 次元ではほぼ全部（9,998 点）を測る\nいちばん近い点が遠くなるので、r が分け目までの距離より大きくなり、反対側を毎回調べる\n\n20 次元では、いちばん近い点までの距離（中央値）が 0.92 で、反対側を調べた割合は 100%\n\n\n\n\n\n\n\n点は実行のたびに変わるので、手元の数字は少し違う"
+    "text": "次元が高いと、KD-tree でも飛ばせない\n\n\n1 万点で、特徴量を 2, 5, 10, 20 個に増やし、同じように探す\n\n\nn = 10000\nfor d in [2, 5, 10, 20]:\n    X    = rng.random((n, d))                        # 1 万点を d 次元にばらまく\n    tree = build_kdtree(X, np.arange(n), 0, 5)\n    count = []\n    for q in rng.random((100, d)):                   # 新しい点 100 個で、いちばん近い点を探す\n        count.append(nearest_kdtree(tree, X, q)[\"count\"])\n    print(f\"{d:2d}次元: 距離を測った点 {np.mean(count):7.1f} / {n}\")\n\n\n\n 2次元: 距離を測った点    11.6 / 10000\n 5次元: 距離を測った点    95.0 / 10000\n10次元: 距離を測った点  3207.4 / 10000\n20次元: 距離を測った点  9997.9 / 10000\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n10 次元で約 3 割（3,207 点）、20 次元ではほぼ全部（9,998 点）を測る\nいちばん近い点が遠くなるので、r が分け目までの距離より大きくなり、反対側を毎回調べる\n\n20 次元では、いちばん近い点までの距離（中央値）が 0.92 で、反対側を調べた割合は 100%"
   },
   {
     "objectID": "knn-curse.html#参考scikit-learn-では",
