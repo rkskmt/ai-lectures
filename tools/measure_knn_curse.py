@@ -297,11 +297,13 @@ j0 = np.argsort(np.sqrt(((X_train - X_train[0]) ** 2).sum(axis=1)))[1]
 print(f"# X_train point 0 {X_train[0].tolist()}: nearest point {j0} at {nn0:.3f}; "
       f"median over the 100 points {np.median(nn_all):.3f} (min {min(nn_all):.3f}, max {max(nn_all):.3f})")
 
-Q = np.array([[3.0, 4.0], [1.0, 3.0], [3.0, 1.0], [6.0, 7.0], [7.0, 6.0]])   # A, B, C, D, E
-q_label = np.array([0, 1, 1, 0, 0])
-q_new = np.array([3.0, 3.0])
-print(f"# exercise: distances A-E {np.sqrt(((Q - q_new) ** 2).sum(axis=1)).tolist()}, "
-      f"predictions k = 1, 3, 5: {[predict_knn(Q, q_label, q_new, k) for k in [1, 3, 5]]}")
+# Practice problem (10 points A-J and N): the layout and the by-hand box searches are checked by
+# tools/design_knn_exercise.py; here only the distances and the predictions of the answer cell.
+Q = np.array(deck_literal("Q_train"))
+q_label = np.array(deck_literal("q_label"))
+q_new = np.array(deck_literal("q_new"))
+print(f"# exercise: squared distances A-J {((Q - q_new) ** 2).sum(axis=1).tolist()}, "
+      f"predictions k = 1, 3: {[predict_knn(Q, q_label, q_new, k) for k in [1, 3]]}")
 
 
 # ==== raising the dimension ====
@@ -433,14 +435,16 @@ print("# ---- checkpoint: fish ----")
 EVAL_SRC = (ROOT / "classification-evaluation.qmd").read_text(encoding="utf-8")
 fish = {}
 for name in ["salmon_weights", "salmon_brightness", "seabass_weights", "seabass_brightness"]:
-    fish[name] = np.array(deck_literal(name))
     m = re.search(r"^" + name + r"\s*=\s*np\.array\((\[.*?\])\)", EVAL_SRC, re.S | re.M)
-    assert np.array_equal(fish[name], np.array(ast.literal_eval(m.group(1)))), \
-        f"{name}: the checkpoint's fish differ from classification-evaluation.qmd"
+    fish[name] = np.array(ast.literal_eval(m.group(1)))
+# The deck gives the fish as X (120 rows of [brightness, weight], Salmon first) and y.
+Xf = np.array(deck_literal("X"), dtype=float)
+yf = np.array(deck_literal("y"))
+assert np.array_equal(Xf, np.array([[fish["salmon_brightness"][i], fish["salmon_weights"][i]] for i in range(60)]
+                                   + [[fish["seabass_brightness"][i], fish["seabass_weights"][i]] for i in range(60)])), \
+    "the checkpoint's fish differ from classification-evaluation.qmd"
+assert yf.tolist() == [1] * 60 + [0] * 60
 print("# the checkpoint's fish are the 120 fish of classification-evaluation.qmd")
-Xf = np.array([[fish["salmon_brightness"][i], fish["salmon_weights"][i]] for i in range(60)]
-              + [[fish["seabass_brightness"][i], fish["seabass_weights"][i]] for i in range(60)])
-yf = np.array([1] * 60 + [0] * 60)
 print(f"# brightness {Xf[:, 0].min()} to {Xf[:, 0].max()} (std {Xf[:, 0].std():.2f}), "
       f"weight {Xf[:, 1].min():.0f} to {Xf[:, 1].max():.0f} g (std {Xf[:, 1].std():.1f} g)")
 rng = np.random.default_rng(0)
@@ -490,3 +494,5 @@ assert len(home) == 1
 print(f"# star3 {star3.tolist()} is in box {home[0][0].tolist()}..{home[0][1].tolist()} with {len(home[0][2])} points")
 kd_sizes = sorted(len(p) for p in leaves(build_kdtree(X_train, np.arange(len(X_train)), 0, 5)))
 print(f"# KD-tree of X_train (leaf size 5): {len(kd_sizes)} boxes, points per box {min(kd_sizes)} to {max(kd_sizes)}")
+kd_sizes3 = sorted(len(p) for p in leaves(build_kdtree(X3, np.arange(len(X3)), 0, 5)))
+print(f"# KD-tree of X3 (leaf size 5): {len(kd_sizes3)} boxes, points per box {min(kd_sizes3)} to {max(kd_sizes3)}")
