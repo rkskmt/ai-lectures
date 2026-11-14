@@ -1,6 +1,8 @@
-# Measures every number asserted in the RANSAC section of linear-regression.qmd
-# with the deck's own code (2-point RANSAC + least-squares refit), so that
-# doc/measured-log.md can be written from this output and never from memory.
+# Measures every number asserted in the RANSAC part of robust-regression.qmd
+# (外れ値に強い回帰) with the deck's own code (2-point RANSAC + least-squares
+# refit), so that doc/measured-log.md can be written from this output and never
+# from memory. The MAE part of the deck is measured by
+# tools/measure_robust_regression.py.
 #
 #   data : the 80 fish defined in the deck (weights listed in the .qmd, lengths
 #          synthesised with default_rng(42) exactly as the deck does)
@@ -9,7 +11,7 @@
 #   runs : the deck's RANSAC cell is unseeded, so every claim is checked over
 #          many seeds here
 #
-# Usage: python tools/measure_linear_regression_ransac.py   (from the repo root)
+# Usage: python tools/measure_robust_regression_ransac.py   (from the repo root)
 
 import re
 from collections import Counter
@@ -19,7 +21,7 @@ import numpy as np
 from sklearn.linear_model import LinearRegression, RANSACRegressor
 
 ROOT = Path(__file__).resolve().parents[1]
-DECK = ROOT / "linear-regression.qmd"
+DECK = ROOT / "robust-regression.qmd"
 
 BAD = [3, 6]                           # the two heaviest fish, weight x10 (extra zero)
 BAD20 = list(range(0, 80, 4))          # Tweak row: 20 slips with an extra zero
