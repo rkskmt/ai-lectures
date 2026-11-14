@@ -1047,7 +1047,7 @@
     "href": "index.html#人工知能",
     "title": "AI Lectures",
     "section": "人工知能",
-    "text": "人工知能\n\nPDF\n\n\n\n\n\n\n\n\n導入\n\n\n\n人工知能概論\n\n\n\n分類問題と特徴量\n\n\n\n２クラス分類\n2次元の決定境界\n過学習と汎化\n教師なし学習・クラスタリング\n次元の呪いと次元削減\n\n\n\nfit() の中身を開ける\n\n\n\n最適化と勾配降下法\n線形回帰と正則化\nロジスティック回帰\n\n\n\nニューラルネットワーク\n\n\n\nロジスティック回帰をNNとして実装する\n隠れ層とReLUで曲がる境界をつくる\nバックプロパゲーション\nPyTorch入門\n手書き数字分類プロジェクト\n\n\n\n参考資料 回数外\n\n\n\nNewton法\nローカルミニマムの罠"
+    "text": "人工知能\n\nPDF\n\n\n\n\n\n\n\n\n導入\n\n\n\n人工知能概論\n\n\n\n分類問題と特徴量\n\n\n\n２クラス分類\n2次元の決定境界\n過学習と汎化\n教師なし学習・クラスタリング\n次元の呪いと次元削減\n\n\n\nfit() の中身を開ける\n\n\n\n最適化と勾配降下法\n線形回帰と正則化\nロジスティック回帰\n\n\n\nニューラルネットワーク\n\n\n\nロジスティック回帰をNNとして実装する\n隠れ層とReLUで曲がる境界をつくる\nバックプロパゲーション\nPyTorch入門\n手書き数字分類プロジェクト\n\n\n\n参考資料 回数外\n\n\n\n外れ値に強い回帰\nNewton法\nローカルミニマムの罠"
   },
   {
     "objectID": "dimensionality-pca.html#特徴量の数を増やすのが最強か",
@@ -1383,7 +1383,7 @@
     "href": "classification-evaluation.html#peek-split",
     "title": "過学習と汎化",
     "section": "ランダムに並べ替えてから分ける",
-    "text": "ランダムに並べ替えてから分ける\n\n\nまずデータをランダムに並べ替えて、そのあとスライスすればOK\n\n\nidx = np.arange(len(y))              # 0〜119 の配列\nprint(idx[:10])\nnp.random.shuffle(idx)               # ランダムに並べ替え（idx そのものが書き換わる）\nprint(idx[:10])\n\nX_shuffled = X[idx]                  # データを idx の順に並べ替え\ny_shuffled = y[idx]                  # y も同じ順なので、特徴量とラベルの組は崩れない\n\nn_train = 96                         # 訓練に回す匹数（全体の8割）\nX_train, y_train = X_shuffled[:n_train], y_shuffled[:n_train]   # 先頭96匹を訓練データに\nX_test,  y_test  = X_shuffled[n_train:], y_shuffled[n_train:]   # 残り24匹をテストデータに\n\nprint(f\"訓練データ {len(X_train)} 匹\")\nprint(f\"テストデータ {len(X_test)} 匹\")\nprint(f\"テストデータの内訳: Salmon {np.sum(y_test == 1)} 匹, Sea bass {np.sum(y_test == 0)} 匹\")\n\n[0 1 2 3 4 5 6 7 8 9]\n[ 15  75  47  97 115  39  46   9 112  70]\n訓練データ 96 匹\nテストデータ 24 匹\nテストデータの内訳: Salmon 8 匹, Sea bass 16 匹\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n先頭で切っても、テストデータには Salmon と Sea bass の両方が入る\nもう一度実行すると並べ替えが変わり、内訳も変わる\n\nこのスライドの数字と、自分で実行した数字は一致しない"
+    "text": "ランダムに並べ替えてから分ける\n\n\nまずデータをランダムに並べ替えて、そのあとスライスすればOK\n\n\nidx = np.arange(len(y))              # 0〜119 の配列\nprint(idx[:10])\nnp.random.shuffle(idx)               # ランダムに並べ替え（idx そのものが書き換わる）\nprint(idx[:10])\n\nX_shuffled = X[idx]                  # データを idx の順に並べ替え\ny_shuffled = y[idx]                  # y も同じ順なので、特徴量とラベルの組は崩れない\n\nn_train = 96                         # 訓練に回す匹数（全体の8割）\nX_train, y_train = X_shuffled[:n_train], y_shuffled[:n_train]   # 先頭96匹を訓練データに\nX_test,  y_test  = X_shuffled[n_train:], y_shuffled[n_train:]   # 残り24匹をテストデータに\n\nprint(f\"訓練データ {len(X_train)} 匹\")\nprint(f\"テストデータ {len(X_test)} 匹\")\nprint(f\"テストデータの内訳: Salmon {np.sum(y_test == 1)} 匹, Sea bass {np.sum(y_test == 0)} 匹\")\n\n[0 1 2 3 4 5 6 7 8 9]\n[ 71  54  40  33  83 115   4  84 112  88]\n訓練データ 96 匹\nテストデータ 24 匹\nテストデータの内訳: Salmon 12 匹, Sea bass 12 匹\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n先頭で切っても、テストデータには Salmon と Sea bass の両方が入る\nもう一度実行すると並べ替えが変わり、内訳も変わる\n\nこのスライドの数字と、自分で実行した数字は一致しない"
   },
   {
     "objectID": "classification-evaluation.html#peek-depth-curve",
@@ -1425,7 +1425,7 @@
     "href": "classification-evaluation.html#回分けるだけでは揺れる",
     "title": "過学習と汎化",
     "section": "1回分けるだけでは揺れる",
-    "text": "1回分けるだけでは揺れる\n\n\n訓練データ96匹を、学習用76匹と検証データ20匹にランダムに分ける\n深さ3の木を検証データで採点し、分け方を変えて5回くり返す\n\n\ntree = DecisionTreeClassifier(max_depth=3)\nidx = np.arange(len(y_train))\nfor i in range(5):\n    np.random.shuffle(idx)                                  # 毎回ちがう並べ替えで分け直す\n    X_fit, y_fit = X_train[idx][:76], y_train[idx][:76]     # 先頭76匹で学習\n    X_val, y_val = X_train[idx][76:], y_train[idx][76:]     # 残り20匹が検証データ\n    pred = tree.fit(X_fit, y_fit).predict(X_val)   # fit の戻り値は学習済みモデルなので、続けて predict できる\n    print(f\"split {i + 1}  Precision: {precision_score(y_val, pred):.3f}  Recall: {recall_score(y_val, pred):.3f}\")\n\nsplit 1  Precision: 0.571  Recall: 0.364\nsplit 2  Precision: 0.643  Recall: 0.900\nsplit 3  Precision: 0.667  Recall: 0.545\nsplit 4  Precision: 1.000  Recall: 0.800\nsplit 5  Precision: 0.750  Recall: 0.900\n\n\n\n\n\n\n\n\n\nデータが少ないほど揺れが大きい\n\n\n\n検証データは20匹で、そのうち Salmon は10匹前後\n\nSalmon 1匹の見逃しで Recall が約 10% 変わる\n\nこれでは深さを変えて成績が変わっても、深さのせいか分け方のせいか分からない"
+    "text": "1回分けるだけでは揺れる\n\n\n訓練データ96匹を、学習用76匹と検証データ20匹にランダムに分ける\n深さ3の木を検証データで採点し、分け方を変えて5回くり返す\n\n\ntree = DecisionTreeClassifier(max_depth=3)\nidx = np.arange(len(y_train))\nfor i in range(5):\n    np.random.shuffle(idx)                                  # 毎回ちがう並べ替えで分け直す\n    X_fit, y_fit = X_train[idx][:76], y_train[idx][:76]     # 先頭76匹で学習\n    X_val, y_val = X_train[idx][76:], y_train[idx][76:]     # 残り20匹が検証データ\n    pred = tree.fit(X_fit, y_fit).predict(X_val)   # fit の戻り値は学習済みモデルなので、続けて predict できる\n    print(f\"split {i + 1}  Precision: {precision_score(y_val, pred):.3f}  Recall: {recall_score(y_val, pred):.3f}\")\n\nsplit 1  Precision: 0.750  Recall: 0.667\nsplit 2  Precision: 0.706  Recall: 1.000\nsplit 3  Precision: 0.714  Recall: 0.455\nsplit 4  Precision: 0.667  Recall: 0.750\nsplit 5  Precision: 0.833  Recall: 0.833\n\n\n\n\n\n\n\n\n\nデータが少ないほど揺れが大きい\n\n\n\n検証データは20匹で、そのうち Salmon は10匹前後\n\nSalmon 1匹の見逃しで Recall が約 10% 変わる\n\nこれでは深さを変えて成績が変わっても、深さのせいか分け方のせいか分からない"
   },
   {
     "objectID": "classification-evaluation.html#k-fold-交差検証k-fold-cross-validation",
@@ -1439,21 +1439,21 @@
     "href": "classification-evaluation.html#peek-cv",
     "title": "過学習と汎化",
     "section": "5-fold 交差検証で採点する",
-    "text": "5-fold 交差検証で採点する\n\n\n訓練データに、順に 0〜4 のグループ番号を振る（訓練データはすでにランダムな順）\nグループ i を検証データ、残りを学習に使い、5回採点する\n5回の成績を平均する\n\n\nimport numpy as np\nfrom sklearn.tree import DecisionTreeClassifier\nfrom sklearn.metrics import precision_score, recall_score\n\nk = 5\ngroup = np.arange(len(y_train)) % k        # 0, 1, 2, 3, 4, 0, 1, ... と番号を振る\n\nprecisions, recalls = [], []\nfor i in range(k):\n    tree = DecisionTreeClassifier(max_depth=3)\n    tree.fit(X_train[group != i], y_train[group != i])     # グループ i 以外で学習\n    pred = tree.predict(X_train[group == i])               # グループ i（検証データ）で採点\n    precisions.append(precision_score(y_train[group == i], pred))\n    recalls.append(recall_score(y_train[group == i], pred))\n    print(f\"group {i}  Precision: {precisions[-1]:.3f}  Recall: {recalls[-1]:.3f}\")\n\nprint(f\"平均 Precision: {np.mean(precisions):.3f}\")\nprint(f\"平均 Recall:    {np.mean(recalls):.3f}\")\n\ngroup 0  Precision: 1.000  Recall: 0.846\ngroup 1  Precision: 0.600  Recall: 0.857\ngroup 2  Precision: 0.929  Recall: 0.867\ngroup 3  Precision: 0.700  Recall: 0.636\ngroup 4  Precision: 0.571  Recall: 0.667\n平均 Precision: 0.760\n平均 Recall:    0.775\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n5回の平均なので、1回の分割よりも偶然に左右されにくい"
+    "text": "5-fold 交差検証で採点する\n\n\n訓練データに、順に 0〜4 のグループ番号を振る（訓練データはすでにランダムな順）\nグループ i を検証データ、残りを学習に使い、5回採点する\n5回の成績を平均する\n\n\nimport numpy as np\nfrom sklearn.tree import DecisionTreeClassifier\nfrom sklearn.metrics import precision_score, recall_score\n\nk = 5\ngroup = np.arange(len(y_train)) % k        # 0, 1, 2, 3, 4, 0, 1, ... と番号を振る\n\nprecisions, recalls = [], []\nfor i in range(k):\n    tree = DecisionTreeClassifier(max_depth=3)\n    tree.fit(X_train[group != i], y_train[group != i])     # グループ i 以外で学習\n    pred = tree.predict(X_train[group == i])               # グループ i（検証データ）で採点\n    precisions.append(precision_score(y_train[group == i], pred))\n    recalls.append(recall_score(y_train[group == i], pred))\n    print(f\"group {i}  Precision: {precisions[-1]:.3f}  Recall: {recalls[-1]:.3f}\")\n\nprint(f\"平均 Precision: {np.mean(precisions):.3f}\")\nprint(f\"平均 Recall:    {np.mean(recalls):.3f}\")\n\ngroup 0  Precision: 0.556  Recall: 1.000\ngroup 1  Precision: 0.786  Recall: 0.917\ngroup 2  Precision: 0.667  Recall: 0.800\ngroup 3  Precision: 0.714  Recall: 0.417\ngroup 4  Precision: 0.667  Recall: 0.667\n平均 Precision: 0.678\n平均 Recall:    0.760\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n5回の平均なので、1回の分割よりも偶然に左右されにくい"
   },
   {
     "objectID": "classification-evaluation.html#訓練データの中で交差検証して深さを選ぶ",
     "href": "classification-evaluation.html#訓練データの中で交差検証して深さを選ぶ",
     "title": "過学習と汎化",
     "section": "訓練データの中で交差検証して深さを選ぶ",
-    "text": "訓練データの中で交差検証して深さを選ぶ\n\n\n深さを比べる指標は用途で決める（レストラン向けは Precision、缶詰工場向けは Recall）\nここでは高級レストラン向け（Sea bass の混入を避けたい）として、Precision で選ぶ\n交差検証のコードを関数にまとめ、深さ 1〜10 で1回ずつ呼ぶ\n\n\ndef kfold_precision(depth, X, y, k):\n    \"\"\"深さ depth の木を k-fold 交差検証し、平均 Precision を返す\"\"\"\n    group = np.arange(len(y)) % k      # 訓練データはすでにランダムな順なので、そのまま番号を振る\n    precisions = []\n    for i in range(k):\n        tree = DecisionTreeClassifier(max_depth=depth)\n        tree.fit(X[group != i], y[group != i])\n        pred = tree.predict(X[group == i])\n        precisions.append(precision_score(y[group == i], pred))\n    return np.mean(precisions)\n\nsel_depths = list(range(1, 11))\ncv_precisions = []\nfor d in sel_depths:\n    cv_precisions.append(kfold_precision(d, X_train, y_train, 5))   # 訓練データだけで交差検証\n\nbest_depth = sel_depths[int(np.argmax(cv_precisions))]   # 最大値の位置（0始まり）を深さ（1始まり）に直す\nprint(f\"平均 Precision が最大の深さ: {best_depth}\")\n\n平均 Precision が最大の深さ: 3"
+    "text": "訓練データの中で交差検証して深さを選ぶ\n\n\n深さを比べる指標は用途で決める（レストラン向けは Precision、缶詰工場向けは Recall）\nここでは高級レストラン向け（Sea bass の混入を避けたい）として、Precision で選ぶ\n交差検証のコードを関数にまとめ、深さ 1〜10 で1回ずつ呼ぶ\n\n\ndef kfold_precision(depth, X, y, k):\n    \"\"\"深さ depth の木を k-fold 交差検証し、平均 Precision を返す\"\"\"\n    group = np.arange(len(y)) % k      # 訓練データはすでにランダムな順なので、そのまま番号を振る\n    precisions = []\n    for i in range(k):\n        tree = DecisionTreeClassifier(max_depth=depth)\n        tree.fit(X[group != i], y[group != i])\n        pred = tree.predict(X[group == i])\n        precisions.append(precision_score(y[group == i], pred))\n    return np.mean(precisions)\n\nsel_depths = list(range(1, 11))\ncv_precisions = []\nfor d in sel_depths:\n    cv_precisions.append(kfold_precision(d, X_train, y_train, 5))   # 訓練データだけで交差検証\n\nbest_depth = sel_depths[int(np.argmax(cv_precisions))]   # 最大値の位置（0始まり）を深さ（1始まり）に直す\nprint(f\"平均 Precision が最大の深さ: {best_depth}\")\n\n平均 Precision が最大の深さ: 1"
   },
   {
     "objectID": "classification-evaluation.html#選んだ深さでテストデータを採点",
     "href": "classification-evaluation.html#選んだ深さでテストデータを採点",
     "title": "過学習と汎化",
     "section": "選んだ深さでテストデータを採点",
-    "text": "選んだ深さでテストデータを採点\n\n\n# 選んだ深さで、訓練データ全体を学習し直す\nbest_tree = DecisionTreeClassifier(max_depth=best_depth).fit(X_train, y_train)\npred_test = best_tree.predict(X_test)\nprint(f\"Precision {precision_score(y_test, pred_test):.3f}  Recall {recall_score(y_test, pred_test):.3f}\")\n\nPrecision 0.636  Recall 0.875"
+    "text": "選んだ深さでテストデータを採点\n\n\n# 選んだ深さで、訓練データ全体を学習し直す\nbest_tree = DecisionTreeClassifier(max_depth=best_depth).fit(X_train, y_train)\npred_test = best_tree.predict(X_test)\nprint(f\"Precision {precision_score(y_test, pred_test):.3f}  Recall {recall_score(y_test, pred_test):.3f}\")\n\nPrecision 0.692  Recall 0.750"
   },
   {
     "objectID": "classification-evaluation.html#混同行列テストデータだけ",
@@ -1474,7 +1474,7 @@
     "href": "classification-evaluation.html#まとめ",
     "title": "過学習と汎化",
     "section": "まとめ",
-    "text": "まとめ\n\n\n訓練データで評価した成績は楽観的\n汎化：学習に使っていないデータにも通用すること\n過学習：訓練データを暗記して、新しいデータで性能が落ちること\n\n証拠は訓練とテストの成績のギャップ\n\nパラメータ：学習（fit）がデータから決める\nハイパパラメータ：学習の前に人が決める（決定木の深さなど）\nホールドアウト法：手軽だが分割次第で成績が揺れる\nk-fold 交差検証：k 回の平均で揺れを抑える\nハイパパラメータの選択：訓練データの中の交差検証（検証データ）で選び、テストデータは最後に一度だけ使う\n\n\n\n\n\n\n\n\n次回\n\n\n「分類にはラベルが必要だった。ラベルがない場合はどうすれば？」"
+    "text": "まとめ\n\n\n訓練データで評価した成績は楽観的\n汎化：学習に使っていないデータにも通用すること\n過学習：訓練データを暗記して、新しいデータで性能が落ちること\n\n証拠は汎化ギャップ（訓練とテストの成績の差）\n\nパラメータ：学習（fit）がデータから決める\nハイパパラメータ：学習の前に人が決める（決定木の深さなど）\nホールドアウト法：手軽だが分割次第で成績が揺れる\nk-fold 交差検証：k 回の平均で揺れを抑える\nハイパパラメータの選択：訓練データの中の交差検証（検証データ）で選び、テストデータは最後に一度だけ使う\n\n\n\n\n\n\n\n\n次回\n\n\n「分類にはラベルが必要だった。ラベルがない場合はどうすれば？」"
   },
   {
     "objectID": "classification-evaluation.html#練習問題1どちらのモデルを仕入れる",
@@ -1502,21 +1502,21 @@
     "href": "classification-evaluation.html#問題2の解答例",
     "title": "過学習と汎化",
     "section": "問題2の解答例",
-    "text": "問題2の解答例\n\n\n\n解答例を見る\nimport numpy as np\nfrom sklearn.tree import DecisionTreeClassifier\nfrom sklearn.metrics import precision_score, recall_score\n\ndef kfold_recall(depth, X, y, k):\n    \"\"\"深さ depth の木を k-fold 交差検証し、平均 Recall を返す\"\"\"\n    group = np.arange(len(y)) % k      # 訓練データはすでにランダムな順なので、そのまま番号を振る\n    recalls = []\n    for i in range(k):\n        tree = DecisionTreeClassifier(max_depth=depth)\n        tree.fit(X[group != i], y[group != i])\n        pred = tree.predict(X[group == i])\n        recalls.append(recall_score(y[group == i], pred))\n    return np.mean(recalls)\n\ndepths = list(range(1, 11))\ncv_recalls = []\nfor d in depths:\n    cv_recalls.append(kfold_recall(d, X_train, y_train, 5))\n    print(f\"depth {d:2d}: mean Recall {cv_recalls[-1]:.3f}\")\n\nbest_depth_r = depths[int(np.argmax(cv_recalls))]\ntree_r = DecisionTreeClassifier(max_depth=best_depth_r).fit(X_train, y_train)\npred_test = tree_r.predict(X_test)\nprint(f\"test Precision {precision_score(y_test, pred_test):.3f}  Recall {recall_score(y_test, pred_test):.3f}\")\nprint(f\"Recall で選んだ深さ: {best_depth_r}\")\nprint(f\"Precision で選んだ深さ（本編）: {best_depth}\")\n\n\ndepth  1: mean Recall 0.659\ndepth  2: mean Recall 0.775\ndepth  3: mean Recall 0.775\ndepth  4: mean Recall 0.723\ndepth  5: mean Recall 0.792\ndepth  6: mean Recall 0.776\ndepth  7: mean Recall 0.776\ndepth  8: mean Recall 0.750\ndepth  9: mean Recall 0.763\ndepth 10: mean Recall 0.761\ntest Precision 0.583  Recall 0.875\nRecall で選んだ深さ: 5\nPrecision で選んだ深さ（本編）: 3\n\n\n\nRecall で選んだ深さと Precision で選んだ深さは、違うことが多い\n\n選ぶ指標が変わると選ばれる深さも変わるので、どの指標で選ぶかは用途で決める"
+    "text": "問題2の解答例\n\n\n\n解答例を見る\nimport numpy as np\nfrom sklearn.tree import DecisionTreeClassifier\nfrom sklearn.metrics import precision_score, recall_score\n\ndef kfold_recall(depth, X, y, k):\n    \"\"\"深さ depth の木を k-fold 交差検証し、平均 Recall を返す\"\"\"\n    group = np.arange(len(y)) % k      # 訓練データはすでにランダムな順なので、そのまま番号を振る\n    recalls = []\n    for i in range(k):\n        tree = DecisionTreeClassifier(max_depth=depth)\n        tree.fit(X[group != i], y[group != i])\n        pred = tree.predict(X[group == i])\n        recalls.append(recall_score(y[group == i], pred))\n    return np.mean(recalls)\n\ndepths = list(range(1, 11))\ncv_recalls = []\nfor d in depths:\n    cv_recalls.append(kfold_recall(d, X_train, y_train, 5))\n    print(f\"depth {d:2d}: mean Recall {cv_recalls[-1]:.3f}\")\n\nbest_depth_r = depths[int(np.argmax(cv_recalls))]\ntree_r = DecisionTreeClassifier(max_depth=best_depth_r).fit(X_train, y_train)\npred_test = tree_r.predict(X_test)\nprint(f\"test Precision {precision_score(y_test, pred_test):.3f}  Recall {recall_score(y_test, pred_test):.3f}\")\nprint(f\"Recall で選んだ深さ: {best_depth_r}\")\nprint(f\"Precision で選んだ深さ（本編）: {best_depth}\")\n\n\ndepth  1: mean Recall 0.696\ndepth  2: mean Recall 0.830\ndepth  3: mean Recall 0.760\ndepth  4: mean Recall 0.760\ndepth  5: mean Recall 0.749\ndepth  6: mean Recall 0.749\ndepth  7: mean Recall 0.802\ndepth  8: mean Recall 0.782\ndepth  9: mean Recall 0.782\ndepth 10: mean Recall 0.786\ntest Precision 0.714  Recall 0.833\nRecall で選んだ深さ: 2\nPrecision で選んだ深さ（本編）: 1\n\n\n\nRecall で選んだ深さと Precision で選んだ深さは、違うことが多い\n\n選ぶ指標が変わると選ばれる深さも変わるので、どの指標で選ぶかは用途で決める"
   },
   {
     "objectID": "classification-evaluation.html#参考train_test_split-で分割",
     "href": "classification-evaluation.html#参考train_test_split-で分割",
     "title": "過学習と汎化",
     "section": "（参考）train_test_split で分割",
-    "text": "（参考）train_test_split で分割\n\n\n訓練データとテストデータの分離をしてくれる関数がscikit-learnにある\n\ntrain_test_split\n\n引数test_size=0.2：テストに回す割合\n返り値：X_train, X_test, y_train, y_test\n\n\n\n\nfrom sklearn.model_selection import train_test_split\n\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)\n\nprint(f\"訓練データ {len(X_train)} 匹\")\nprint(f\"テストデータ {len(X_test)} 匹: Salmon {np.sum(y_test == 1)} 匹, Sea bass {np.sum(y_test == 0)} 匹\")\n\n訓練データ 96 匹\nテストデータ 24 匹: Salmon 10 匹, Sea bass 14 匹"
+    "text": "（参考）train_test_split で分割\n\n\n訓練データとテストデータの分離をしてくれる関数がscikit-learnにある\n\ntrain_test_split\n\n引数test_size=0.2：テストに回す割合\n返り値：X_train, X_test, y_train, y_test\n\n\n\n\nfrom sklearn.model_selection import train_test_split\n\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)\n\nprint(f\"訓練データ {len(X_train)} 匹\")\nprint(f\"テストデータ {len(X_test)} 匹: Salmon {np.sum(y_test == 1)} 匹, Sea bass {np.sum(y_test == 0)} 匹\")\n\n訓練データ 96 匹\nテストデータ 24 匹: Salmon 14 匹, Sea bass 10 匹"
   },
   {
     "objectID": "classification-evaluation.html#参考cross_val_score-で交差検証",
     "href": "classification-evaluation.html#参考cross_val_score-で交差検証",
     "title": "過学習と汎化",
     "section": "（参考）cross_val_score で交差検証",
-    "text": "（参考）cross_val_score で交差検証\n\n\nk-fold 交差検証をしてくれる関数がscikit-learnにある\n\ncross_val_score\n\n引数cv=5：グループの数 k\n引数scoring=\"precision\"：測る指標\n返り値：k 個の成績\n\n\n\n\nfrom sklearn.model_selection import cross_val_score\nfrom sklearn.tree import DecisionTreeClassifier\n\nscores = cross_val_score(DecisionTreeClassifier(max_depth=3), X_train, y_train, cv=5, scoring=\"precision\")\nprint(scores)\nprint(f\"平均 Precision: {scores.mean():.3f}\")\n\n[0.6        0.69230769 0.75       0.83333333 0.6       ]\n平均 Precision: 0.695"
+    "text": "（参考）cross_val_score で交差検証\n\n\nk-fold 交差検証をしてくれる関数がscikit-learnにある\n\ncross_val_score\n\n引数cv=5：グループの数 k\n引数scoring=\"precision\"：測る指標\n返り値：k 個の成績\n\n\n\n\nfrom sklearn.model_selection import cross_val_score\nfrom sklearn.tree import DecisionTreeClassifier\n\nscores = cross_val_score(DecisionTreeClassifier(max_depth=3), X_train, y_train, cv=5, scoring=\"precision\")\nprint(scores)\nprint(f\"平均 Precision: {scores.mean():.3f}\")\n\n[0.72727273 0.66666667 0.75       0.6        0.72727273]\n平均 Precision: 0.694"
   },
   {
     "objectID": "classification-2d-boundaries.html#次元での分類",
@@ -2573,7 +2573,7 @@
     "href": "handouts.html#handouts",
     "title": "AI Lectures",
     "section": "Handouts",
-    "text": "Handouts\n\n← Lectures\n\n各回スライドの配布用 PDF。クリックで開く。番号は講義一覧と対応。\n\n\n\n導入\n\n\n\n人工知能概論\n\n\n\n分類問題と特徴量\n\n\n\n1次元分類の基礎\n2次元の決定境界\n過学習と汎化\n教師なし学習・クラスタリング\n次元の呪いと次元削減\n\n\n\nfit() の中身を開ける\n\n\n\n最適化と勾配降下法\n線形回帰と正則化\nロジスティック回帰\n\n\n\nニューラルネットワーク\n\n\n\nロジスティック回帰をNNとして実装する\n隠れ層とReLUで曲がる境界をつくる\nバックプロパゲーション\nPyTorch入門\n手書き数字分類プロジェクト\n\n\n\n参考資料 回数外\n\n\n\nNewton法\nローカルミニマムの罠"
+    "text": "Handouts\n\n← Lectures\n\n各回スライドの配布用 PDF。クリックで開く。番号は講義一覧と対応。\n\n\n\n導入\n\n\n\n人工知能概論\n\n\n\n分類問題と特徴量\n\n\n\n1次元分類の基礎\n2次元の決定境界\n過学習と汎化\n教師なし学習・クラスタリング\n次元の呪いと次元削減\n\n\n\nfit() の中身を開ける\n\n\n\n最適化と勾配降下法\n線形回帰と正則化\nロジスティック回帰\n\n\n\nニューラルネットワーク\n\n\n\nロジスティック回帰をNNとして実装する\n隠れ層とReLUで曲がる境界をつくる\nバックプロパゲーション\nPyTorch入門\n手書き数字分類プロジェクト\n\n\n\n参考資料 回数外\n\n\n\n外れ値に強い回帰\nNewton法\nローカルミニマムの罠"
   },
   {
     "objectID": "linear-regression.html#ここまでの道具",
@@ -2699,14 +2699,14 @@
     "href": "linear-regression.html#罰金ありなしを見比べる",
     "title": "線形回帰と正則化",
     "section": "罰金あり・なしを見比べる",
-    "text": "罰金あり・なしを見比べる\n\n\n\n描画コード\nP_grid    = ((grid ** np.arange(1, 10)) - mu) / sd\nown_curve = (P_grid @ w + b) * t_std + t_mean\n\nfig, axes = plt.subplots(1, 2, figsize=(9.5, 3.6))\nfor ax, curve, name, mse in [\n        (axes[0], plain.predict(grid), \"次数9（正則化なし）\",\n         mean_squared_error(y_test, plain.predict(X_test))),\n        (axes[1], own_curve, \"次数9 + 正則化（自作の勾配降下法）\",\n         np.mean((test_pred - y_test) ** 2))]:\n    ax.scatter(X_train, y_train, c=\"#2980b9\", s=45)\n    ax.scatter(X_test, y_test, c=\"#e74c3c\", marker=\"s\", s=45)\n    ax.plot(grid, curve, \"k-\", lw=2)\n    ax.set_ylim(800, 2900)\n    ax.set_title(f\"{name}　テストMSE {mse:,.0f}\", fontsize=10)\n    ax.set_xlabel(\"体長 (cm)\")\naxes[0].set_ylabel(\"重さ (g)\")\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n同じ次数9なのに、罰金の項を1つ足しただけで素直な曲線に戻った\nテストMSEは 9,286,680 → 3,427 と3桁以上改善\n\n\n\n\n\n\n\n\n（参考）世間での呼び名\n\n\n\\(\\lambda \\sum w^2\\) 型の罰金は L2正則化、L2正則化つきの線形回帰はリッジ回帰（Ridge regression）と呼ばれる。sklearn にも Ridge として入っている。\n\n\n\n\n\n\n\n\n\n\n\n過学習スレッド、完結\n\n\n引き（決定木のあやしい満点）→ 正体（訓練とテストのギャップ）→ 対抗手段（複雑さの制御と正則化）。 NN でも同じ道具（L2正則化＝weight decay）がそのまま使われる。"
+    "text": "罰金あり・なしを見比べる\n\n\n\n描画コード\nP_grid    = ((grid ** np.arange(1, 10)) - mu) / sd\nown_curve = (P_grid @ w + b) * t_std + t_mean\n\nfig, axes = plt.subplots(1, 2, figsize=(9.5, 3.6))\nfor ax, curve, name, mse in [\n        (axes[0], plain.predict(grid), \"次数9（正則化なし）\",\n         mean_squared_error(y_test, plain.predict(X_test))),\n        (axes[1], own_curve, \"次数9 + 正則化（自作の勾配降下法）\",\n         np.mean((test_pred - y_test) ** 2))]:\n    ax.scatter(X_train, y_train, c=\"#2980b9\", s=45)\n    ax.scatter(X_test, y_test, c=\"#e74c3c\", marker=\"s\", s=45)\n    ax.plot(grid, curve, \"k-\", lw=2)\n    ax.set_ylim(800, 2900)\n    ax.set_title(f\"{name}　テストMSE {mse:,.0f}\", fontsize=10)\n    ax.set_xlabel(\"体長 (cm)\")\naxes[0].set_ylabel(\"重さ (g)\")\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n同じ次数9なのに、罰金の項を1つ足しただけで素直な曲線に戻った\nテストMSEは 9,286,680 → 3,427 と3桁以上改善\n\n\n\n\n\n\n\n\n過学習スレッド、完結\n\n\n引き（決定木のあやしい満点）→ 正体（訓練とテストのギャップ）→ 対抗手段（複雑さの制御と正則化）。"
   },
   {
     "objectID": "linear-regression.html#tweak-罰金の強さで曲線が変わる",
     "href": "linear-regression.html#tweak-罰金の強さで曲線が変わる",
     "title": "線形回帰と正則化",
     "section": "Tweak 罰金の強さで曲線が変わる",
-    "text": "Tweak 罰金の強さで曲線が変わる\n\n\nさっきのコード の lam = 0.1 を書き換えて実行（比較の図まで続けて実行すると形の変化が見える）\n\n\n\n\n\nやりたいこと\nコード\n\n\n\n\n罰金をゼロにする\nlam = 0.0\n\n\n罰金を強烈にする\nlam = 10\n\n\n\n\n\n\n\n\n\n\n\nここで観察\n\n\n\n0.0：テストMSEは 3,427 → 21,721 と6倍以上悪化。ただし厳密解の大暴れ（929万）までは行かない。勾配降下法を1万回で打ち切ること自体が、暴走を途中で止める弱いブレーキになっているため\n10：曲線はほぼまっすぐ寝て、訓練MSEまで悪化する（3,585 → 35,665）。罰金が強すぎて、訓練データに合わせる力が負けた\nちょうど良い \\(\\lambda\\) は問題ごとに違う。訓練データではなくテストデータの MSE で選ぶ"
+    "text": "Tweak 罰金の強さで曲線が変わる\n\n\nさっきのコード の lam = 0.1 を書き換えて実行（比較の図まで続けて実行すると形の変化が見える）\n\n\n\n\n\nやりたいこと\nコード\n\n\n\n\n罰金をゼロにする\nlam = 0.0\n\n\n罰金を強烈にする\nlam = 10\n\n\n\n\n\n\n\n\n\n\n\nここで観察\n\n\n\n0.0：テストMSEは 3,427 → 21,721 と6倍以上悪化。ただし厳密解の大暴れ（929万）までは行かない。勾配降下法を1万回で打ち切ること自体が、暴走を途中で止める弱いブレーキになっているため\n10：曲線はほぼまっすぐ寝て、訓練MSEまで悪化する（3,585 → 35,665）。罰金が強すぎて、訓練データに合わせる力が負けた\nちょうど良い \\(\\lambda\\) は問題ごとに違う\n\n訓練MSEでは選べない（\\(\\lambda\\) を小さくするほど下がるので、必ず \\(\\lambda = 0\\) が選ばれる）\nテストMSEでも選ばない（テストデータを確認してからモデルを調整しない）\n訓練データの中の交差検証で選ぶ（検証用に別のデータを用意しなくてよい）"
   },
   {
     "objectID": "linear-regression.html#section-1",
@@ -2776,7 +2776,7 @@
     "href": "linear-regression.html#まとめ",
     "title": "線形回帰と正則化",
     "section": "まとめ",
-    "text": "まとめ\n\n\n回帰：数値を予測する。損失は二乗誤差（MSE）— 微分しやすさで選ぶ\n勾配降下法で fit を自作 → sklearn と完全一致\n多項式回帰：特徴量に \\(x^2, x^3, \\ldots\\) を足せば道具は線形回帰のまま\n過学習は回帰でも起きる：次数を上げると訓練誤差↓・テスト誤差爆発\n正則化（regularization）：大きい係数に罰金 → 暴れる曲線を手なずける\n外れ値（outlier）：二乗で測る最小二乗法は、少数の外れ値に引っ張られる\n\nRANSAC：ランダムな 2 点の直線を何度も引き、賛同者が最多の直線を採る\n\n\n\n\n\n\n\n\n\n次回予告\n\n\n回帰の fit() は開けた。次は分類の fit() — 次の相手は分類の定番、ロジスティック回帰。同じ道具（損失＋勾配降下法）で fit() を開けにいく。"
+    "text": "まとめ\n\n\n回帰：数値を予測する。損失は二乗誤差（MSE）— 微分しやすさで選ぶ\n勾配降下法で fit を自作 → sklearn と完全一致\n多項式回帰：特徴量に \\(x^2, x^3, \\ldots\\) を足せば道具は線形回帰のまま\n過学習は回帰でも起きる：次数を上げると訓練誤差↓・テスト誤差爆発\n正則化（regularization）：大きい係数に罰金 → 暴れる曲線を手なずける\n\n\n\n\n\n\n\n\n次回予告\n\n\n回帰の fit() は開けた。次は分類の fit() — 次の相手は分類の定番、ロジスティック回帰。同じ道具（損失＋勾配降下法）で fit() を開けにいく。"
   },
   {
     "objectID": "linear-regression.html#問題1魚2匹だけの世界で-fit-する",
@@ -3820,5 +3820,215 @@
     "title": "ローカルミニマムの罠",
     "section": "問題1の解答例",
     "text": "問題1の解答例\n\n導関数（手計算）: \\[g'(x) = 4x^3 - 16x + 3\\]\n\n\n解答例を見る\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\n\ndef g(x):\n    return x**4 - 8*x**2 + 3*x\n\ndef g_prime(x):\n    return 4*x**3 - 16*x + 3\n\n# 1. グラフを描いて谷の数を確認\nxs = np.linspace(-3.5, 3.5, 300)\nplt.figure(figsize=(8, 3.2))\nplt.plot(xs, g(xs), \"b-\", linewidth=2)\nplt.xlabel(\"x\")\nplt.ylabel(\"g(x)\")\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\n# 3. 3つの初期値から勾配降下法\nprint(f\"{'x0':&gt;4}  →  {'到着地点':&gt;8}  →  {'g(x)':&gt;8}\")\nprint(\"-\" * 40)\nresults = []\nfor x0 in [-3, 0, 3]:\n    x = x0\n    for _ in range(10000):\n        grad = g_prime(x)\n        if abs(grad) &lt; 1e-6:\n            break\n        x = x - 0.01 * grad\n    results.append((x0, x, g(x)))\n    print(f\"{x0:4.1f}  →  {x:8.4f}  →  {g(x):8.4f}\")\n\n# 4. g(x) が最小のものを採用\nbest = min(results, key=lambda r: r[2])\nprint(f\"\\n★ グローバルミニマム: x = {best[1]:.4f}, g(x) = {best[2]:.4f}\")\n\n\n\n\n\n\n\n\n\n  x0  →      到着地点  →      g(x)\n----------------------------------------\n-3.0  →   -2.0879  →  -22.1346\n 0.0  →   -2.0879  →  -22.1346\n 3.0  →    1.8987  →  -10.1479\n\n★ グローバルミニマム: x = -2.0879, g(x) = -22.1346\n\n\n\n\\(x_0 = -3, 0\\) → 左の谷（\\(x \\approx -2.1\\)）、\\(x_0 = 3\\) → 右の谷（\\(x \\approx 1.9\\)）\n\\(x_0 = 0\\) は傾き \\(g'(0) = 3\\)（右上り坂）なので左へ転がり落ちる\n左の谷が \\(g \\approx -22\\) でグローバルミニマム — 今回の資料の関数とは逆に、今度は左が正解\nどっちの谷が深いかは関数ごとに違う。だから毎回、複数の初期値で確かめる"
+  },
+  {
+    "objectID": "robust-regression.html#ここまでの道具",
+    "href": "robust-regression.html#ここまでの道具",
+    "title": "外れ値に強い回帰",
+    "section": "ここまでの道具",
+    "text": "ここまでの道具\n\n\n線形回帰：MSE を勾配降下法で小さくして、体長から重さを予測する直線を fit した\nMSE：予測と実際のズレを二乗して平均した損失\n\n\n\n\n\n\n\n\n今回の主題\n\n\n\nデータに間違った記録が混ざっていたら、fit した直線はどうなるか\n間違った記録に引っ張られない fit の方法を 2 つ作る"
+  },
+  {
+    "objectID": "robust-regression.html#準備魚の体長と重さ",
+    "href": "robust-regression.html#準備魚の体長と重さ",
+    "title": "外れ値に強い回帰",
+    "section": "準備：魚の体長と重さ",
+    "text": "準備：魚の体長と重さ\n\n\n線形回帰で使った 80 匹の体長と重さを使う\n\n\n\n魚データの定義（クリックして展開）\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\nplt.rcParams[\"font.size\"] = 11\nplt.rcParams[\"figure.dpi\"] = 100\n\nsalmon_weights     = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,\n                               1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,\n                               2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,\n                               1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652])\nseabass_weights    = np.array([1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,\n                               1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,\n                               1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,\n                               1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531])\n\nweights = np.concatenate([salmon_weights, seabass_weights]).astype(float)\n\n# 体長の測定値（cm）— 次元削減の回と同じ\nrng     = np.random.default_rng(42)\nlengths = np.round(np.cbrt(weights) * 4.5 + rng.normal(0, 1.0, len(weights)), 1)"
+  },
+  {
+    "objectID": "robust-regression.html#peek-typo-slips",
+    "href": "robust-regression.html#peek-typo-slips",
+    "title": "外れ値に強い回帰",
+    "section": "伝票に打ち間違いが2枚あった",
+    "text": "伝票に打ち間違いが2枚あった\n\n\n魚市場の伝票（1匹につき1枚、体長と重さ）80 枚のうち 2 枚で、重さの欄に 0 が1つ多く打たれていた\n間違っていたのは、いちばん大きい 2 匹（2,457 g → 24,570 g、2,474 g → 24,740 g）\nこの 80 枚で直線を fit し直す\n\n\nfrom sklearn.linear_model import LinearRegression\n\nbad = [3, 6]                                       # 打ち間違えた2枚（いちばん大きい2匹）\nweights_typo = weights.copy()\nweights_typo[bad] *= 10                            # 0 が1つ多い ＝ 10倍\n\nreg_ok   = LinearRegression().fit(lengths.reshape(-1, 1), weights)        # 正しい80枚\nreg_typo = LinearRegression().fit(lengths.reshape(-1, 1), weights_typo)   # 2枚が間違った80枚\nprint(f\"正しい80枚で fit  : 体長 1cm あたり {reg_ok.coef_[0]:.1f} g\")\nprint(f\"2枚が間違った80枚 : 体長 1cm あたり {reg_typo.coef_[0]:.1f} g\")\n\n正しい80枚で fit  : 体長 1cm あたり 91.0 g\n2枚が間違った80枚 : 体長 1cm あたり 451.2 g\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\nたった 2 枚で、傾きは 91 g/cm から 451 g/cm になった\n直線は魚の群れから離れた\n\n45 cm の魚の予測は −1,660 g（マイナスの重さ）\n62 cm の魚の予測は 6,010 g（実際は 2,400 g 台）\n\n間違った 2 枚が、正しい 78 枚の予測を全部壊している"
+  },
+  {
+    "objectID": "robust-regression.html#peek-outlier-squares",
+    "href": "robust-regression.html#peek-outlier-squares",
+    "title": "外れ値に強い回帰",
+    "section": "二乗で測ると、2枚のズレが78枚を圧倒する",
+    "text": "二乗で測ると、2枚のズレが78枚を圧倒する\n\n\nMSE は「ズレの二乗」の平均なので、ズレが 100 倍なら損失への寄与は 10,000 倍\n正しい 80 枚の直線からの、各伝票のズレを比べる\n\n\npred_ok = reg_ok.predict(lengths.reshape(-1, 1))        # 正しい80枚の直線による予測\nerror   = weights_typo - pred_ok                        # 各伝票のズレ（g）\nok      = np.ones(80, dtype=bool)\nok[bad] = False                                         # 正しい78枚だけ True\nprint(f\"正しい78枚のズレ  : 最大 {np.abs(error[ok]).max():.0f} g / 二乗の合計 {np.sum(error[ok]**2):,.0f}\")\nprint(f\"打ち間違い2枚のズレ: 最小 {np.abs(error[bad]).min():.0f} g / 二乗の合計 {np.sum(error[bad]**2):,.0f}\")\n\n正しい78枚のズレ  : 最大 206 g / 二乗の合計 432,045\n打ち間違い2枚のズレ: 最小 22125 g / 二乗の合計 989,425,380\n\n\n\n\n\n\n\n\n\n要するに\n\n\n\n2 枚の二乗和は 78 枚の 2,290 倍\nMSE を下げるには、正しい 78 枚を全部見捨ててでも、この 2 枚に直線を寄せたほうが「得」になる\n\n\n\n\n\n\n\n\n\n\n\n\n外れ値（outlier）\n\n\n\n他の記録から大きく離れた記録（ここでは打ち間違いの 2 枚）\n最小二乗法は二乗で測るので、少数の外れ値に直線が引っ張られる"
+  },
+  {
+    "objectID": "robust-regression.html#section",
+    "href": "robust-regression.html#section",
+    "title": "外れ値に強い回帰",
+    "section": "",
+    "text": "MAE"
+  },
+  {
+    "objectID": "robust-regression.html#peek-mae",
+    "href": "robust-regression.html#peek-mae",
+    "title": "外れ値に強い回帰",
+    "section": "対策：ズレを二乗せずに測る（MAE）",
+    "text": "対策：ズレを二乗せずに測る（MAE）\n\n\n外れ値に引っ張られる原因は二乗なので、二乗をやめる\nズレの絶対値を平均する\n\n\\[L(a, b) = \\frac{1}{N} \\sum_{i} \\left| \\underbrace{a x_i + b}_{\\text{予測}} - \\underbrace{t_i}_{\\text{実際}} \\right|\\]\n\nMAE（Mean Absolute Error / 平均絶対誤差）と呼ぶ\nMSE との違いは、二乗が絶対値に変わったことだけ\n正しい 80 枚の直線からのズレを、絶対値で比べる\n\n\nprint(f\"正しい78枚のズレ: 絶対値の合計 {np.sum(np.abs(error[ok])):,.0f} g\")\nprint(f\"打ち間違い2枚のズレ: 絶対値の合計 {np.sum(np.abs(error[bad])):,.0f} g\")\n\n正しい78枚のズレ: 絶対値の合計 4,734 g\n打ち間違い2枚のズレ: 絶対値の合計 44,484 g\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n2 枚の絶対値の和は、78 枚の 9.4 倍\n\n二乗の和では 2,290 倍だった\n\nズレが 100 倍でも、損失への寄与は 100 倍で済む"
+  },
+  {
+    "objectID": "robust-regression.html#絶対値の微分は符号だけになる",
+    "href": "robust-regression.html#絶対値の微分は符号だけになる",
+    "title": "外れ値に強い回帰",
+    "section": "絶対値の微分は、符号だけになる",
+    "text": "絶対値の微分は、符号だけになる\n\n\n勾配降下法には、損失の微分が要る\n\\(u^2\\) の微分は \\(2u\\)、\\(|u|\\) の微分は \\(u\\) の符号\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n符号を返す関数 sign\n\n\n\n\\(\\mathrm{sign}(u)\\)：\\(u &gt; 0\\) なら \\(+1\\)、\\(u &lt; 0\\) なら \\(-1\\)、\\(u = 0\\) なら \\(0\\)\n\nコードでは np.sign\n\n\\(|u|\\) は \\(u = 0\\) で折れていて微分できない\n\nnp.sign(0) は 0 を返すので、勾配降下法はそのまま続けられる"
+  },
+  {
+    "objectID": "robust-regression.html#peek-mae-grad",
+    "href": "robust-regression.html#peek-mae-grad",
+    "title": "外れ値に強い回帰",
+    "section": "MAE の勾配：ズレの大きさが消える",
+    "text": "MAE の勾配：ズレの大きさが消える\n\n\\(L\\) を \\(a\\) と \\(b\\) でそれぞれ微分する：\n\\[\\frac{\\partial L}{\\partial a} = \\frac{1}{N} \\sum_i \\mathrm{sign}(a x_i + b - t_i) \\, x_i\n\\qquad\n\\frac{\\partial L}{\\partial b} = \\frac{1}{N} \\sum_i \\mathrm{sign}(a x_i + b - t_i)\\]\n\nMSE の勾配の「ズレ」が、「ズレの符号」に変わる\n\n\n\n\n\n\n\n\n\n損失\n1 枚の伝票が勾配に渡すもの\n22,000 g ずれた伝票\n\n\n\n\nMSE\nズレそのもの\n100 g ずれた伝票の 220 倍の力で直線を引く\n\n\nMAE\nズレの符号（\\(+1\\) か \\(-1\\)）\n100 g ずれた伝票と同じ力で直線を引く"
+  },
+  {
+    "objectID": "robust-regression.html#peek-mae-code",
+    "href": "robust-regression.html#peek-mae-code",
+    "title": "外れ値に強い回帰",
+    "section": "MAE で fit する",
+    "text": "MAE で fit する\n\n\n線形回帰の勾配降下法の、勾配の 2 行を書き換える\n学習率 0.1 と更新 100 回は変えない\n\n\nx = (lengths - lengths.mean()) / lengths.std()                   # 標準化した体長\nt = (weights_typo - weights_typo.mean()) / weights_typo.std()    # 標準化した重さ（打ち間違い入り）\n\ndef to_gram(a, b, cm):\n    \"\"\"標準化したデータで fit した直線 (a, b) で、体長 cm の魚の重さ（g）を予測する\"\"\"\n    x_cm = (cm - lengths.mean()) / lengths.std()\n    return (a * x_cm + b) * weights_typo.std() + weights_typo.mean()\n\na, b = 0.0, 0.0\nlr = 0.1\nfor i in range(1, 101):\n    pred   = a * x + b\n    grad_a = np.mean(np.sign(pred - t) * x)     # MSE では 2 * np.mean((pred - t) * x)\n    grad_b = np.mean(np.sign(pred - t))         # MSE では 2 * np.mean(pred - t)\n    a -= lr * grad_a\n    b -= lr * grad_b\n    if i in (1, 3, 10, 50, 100):\n        print(f\"更新 {i:3d}回 | 45 cm の予測 {to_gram(a, b, 45):6,.0f} g | 62 cm の予測 {to_gram(a, b, 62):6,.0f} g\")\n\n更新   1回 | 45 cm の予測  1,830 g | 62 cm の予測  2,029 g\n更新   3回 | 45 cm の予測    539 g | 62 cm の予測  2,712 g\n更新  10回 | 45 cm の予測  1,110 g | 62 cm の予測  2,537 g\n更新  50回 | 45 cm の予測  1,066 g | 62 cm の予測  2,737 g\n更新 100回 | 45 cm の予測  1,094 g | 62 cm の予測  2,711 g\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n100 回更新後の予測は、45 cm で 1,094 g、62 cm で 2,711 g\n\nMSE では −1,660 g と 6,010 gだった\n\nただし 50 回と 100 回で値が違い、直線はまだ動いている"
+  },
+  {
+    "objectID": "robust-regression.html#peek-mae-history",
+    "href": "robust-regression.html#peek-mae-history",
+    "title": "外れ値に強い回帰",
+    "section": "MAE の勾配降下法は、止まらずに揺れ続ける",
+    "text": "MAE の勾配降下法は、止まらずに揺れ続ける\n\n\n更新を 300 回に増やす\n更新のたびに、45 cm の魚の予測を記録する\n\n\ndef fit_mae(lr, n_updates):\n    \"\"\"MAE の勾配降下法で fit し、更新ごとの「45 cm の魚の予測（g）」も返す\"\"\"\n    a, b = 0.0, 0.0\n    history = []\n    for i in range(n_updates):\n        pred = a * x + b\n        a -= lr * np.mean(np.sign(pred - t) * x)\n        b -= lr * np.mean(np.sign(pred - t))\n        history.append(to_gram(a, b, 45))\n    return a, b, history\n\na, b, history = fit_mae(lr=0.1, n_updates=300)\nprint(f\"最後の50回の予測: {min(history[-50:]):,.0f} g から {max(history[-50:]):,.0f} g\")\n\nplt.figure(figsize=(7, 3.2))\nplt.plot(history, color=\"#27ae60\", lw=1)\nplt.xlabel(\"更新回数\"); plt.ylabel(\"45 cm の魚の予測 (g)\")\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\n最後の50回の予測: 658 g から 1,111 g\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n300 回更新しても、予測は 658 g と 1,111 g のあいだを行き来する\nMSE のときは、50 回あたりで動かなくなった"
+  },
+  {
+    "objectID": "robust-regression.html#揺れる理由mae-の-1-歩は谷底の近くでも縮まない",
+    "href": "robust-regression.html#揺れる理由mae-の-1-歩は谷底の近くでも縮まない",
+    "title": "外れ値に強い回帰",
+    "section": "揺れる理由：MAE の 1 歩は、谷底の近くでも縮まない",
+    "text": "揺れる理由：MAE の 1 歩は、谷底の近くでも縮まない\n\n\n\n\n\n\n\n\n\n損失\n勾配の大きさを決めるもの\n谷底に近づくと\n\n\n\n\nMSE\nズレの大きさ\n勾配が 0 に近づき、1 歩が自然に縮む\n\n\nMAE\n伝票が直線の上にあるか下にあるか\n谷底まで 1 g でも 1,000 g でも、1 歩は同じ\n\n\n\n\n学習率 0.1 の 1 歩を、重さ（g）に直す\n\n直線の高さ \\(b\\) の 1 歩は「学習率 × 勾配」で、MAE の勾配は最大 1\n標準化した重さの 1 は、標準偏差 1 つ分の重さ\n\n\n\nprint(f\"重さの標準偏差: {weights_typo.std():,.0f} g\")\nprint(f\"学習率 0.1 の 1 歩: 最大 {0.1 * weights_typo.std():,.0f} g\")\nprint(f\"正しい伝票のズレ: 最大 {np.abs(error[ok]).max():,.0f} g\")\n\n重さの標準偏差: 3,596 g\n学習率 0.1 の 1 歩: 最大 360 g\n正しい伝票のズレ: 最大 206 g\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n1 歩が最大 360 g で、正しい伝票のズレ（最大 206 g）より大きい\n1 歩で伝票の群れをまたいでしまい、次の 1 歩で戻る"
+  },
+  {
+    "objectID": "robust-regression.html#tweak-学習率を小さくして揺れを抑える",
+    "href": "robust-regression.html#tweak-学習率を小さくして揺れを抑える",
+    "title": "外れ値に強い回帰",
+    "section": "Tweak 学習率を小さくして揺れを抑える",
+    "text": "Tweak 学習率を小さくして揺れを抑える\n\n\nさっきのコードの fit_mae(lr=0.1, n_updates=300) を書き換えて実行\n\n\n\n\n\n\n\n\n\nやりたいこと\nコード\n\n\n\n\n学習率を 1/10 にせよ\nlr=0.1 → lr=0.01\n\n\nさらに 1/10 にせよ\nlr=0.01 → lr=0.001\n\n\n更新回数を 10 倍にせよ\nn_updates=300 → n_updates=3000（lr=0.001 のまま）\n\n\n\n\n\n\n\n\n\n\n\nチェックポイント\n\n\n\nlr=0.01：最後の 50 回の予測は 873 g から 876 g に収まる\n\n揺れの幅は、学習率とともに小さくなる\n\nlr=0.001：300 回では 924 g から 938 g で、まだ下がっている途中\n\n1 歩が小さいぶん、谷底に着くまでの更新回数が増える\n\nn_updates=3000：872 g で動かなくなる\n外れ値に強くなる代わりに、学習率と更新回数を自分で調整することになる"
+  },
+  {
+    "objectID": "robust-regression.html#mae-の直線をmse-の直線と比べる",
+    "href": "robust-regression.html#mae-の直線をmse-の直線と比べる",
+    "title": "外れ値に強い回帰",
+    "section": "MAE の直線を、MSE の直線と比べる",
+    "text": "MAE の直線を、MSE の直線と比べる\n\n\na, b, history = fit_mae(lr=0.01, n_updates=1000)\na_mae = (to_gram(a, b, 62) - to_gram(a, b, 45)) / (62 - 45)     # 傾き（g/cm）\nprint(f\"MAE の直線: 体長 1cm あたり {a_mae:.1f} g\")\nprint(f\"45 cm の予測: {to_gram(a, b, 45):,.0f} g\")\nprint(f\"62 cm の予測: {to_gram(a, b, 62):,.0f} g\")\n\nMAE の直線: 体長 1cm あたり 96.1 g\n45 cm の予測: 875 g\n62 cm の予測: 2,508 g\n\n\n\n\n描画コード\ngrid_cm = np.linspace(44, 63, 50)\nplt.figure(figsize=(6.5, 3.6))\nplt.scatter(lengths[ok], weights[ok], s=30, alpha=0.6, c=\"#5dade2\", edgecolors=\"gray\", lw=0.4, label=\"正しい伝票（78枚）\")\nplt.plot(grid_cm, reg_typo.predict(grid_cm.reshape(-1, 1)), \"--\", color=\"#e74c3c\", lw=1.5, label=\"MSE（最小二乗法）\")\nplt.plot(grid_cm, to_gram(a, b, grid_cm), \"-\", color=\"#27ae60\", lw=2, label=\"MAE\")\nplt.ylim(-2500, 6500)                                   # 打ち間違いの2枚（24,000 g 台）は図の外\nplt.axhline(0, color=\"black\", lw=0.8)\nplt.xlabel(\"体長 (cm)\"); plt.ylabel(\"重さ (g)\")\nplt.legend(fontsize=8); plt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n傾きは 451 g/cm から 96 g/cm になった（正しい 80 枚の直線は 91 g/cm）\n打ち間違いの 2 枚は取り除いていない\n\n2 枚とも、ほかの伝票と同じ 1 枚分の力でしか直線を引けない"
+  },
+  {
+    "objectID": "robust-regression.html#section-1",
+    "href": "robust-regression.html#section-1",
+    "title": "外れ値に強い回帰",
+    "section": "",
+    "text": "RANSAC"
+  },
+  {
+    "objectID": "robust-regression.html#もう1つの対策賛同者が最多の直線を探すransac",
+    "href": "robust-regression.html#もう1つの対策賛同者が最多の直線を探すransac",
+    "title": "外れ値に強い回帰",
+    "section": "もう1つの対策：賛同者が最多の直線を探す（RANSAC）",
+    "text": "もう1つの対策：賛同者が最多の直線を探す（RANSAC）\n\n\n全部の伝票に合わせるのをやめ、多くの伝票が賛同する直線を探す\n直線は 2 点で決まるので、2 枚の伝票から直線を引き、その直線の近くにある伝票を数える\n手順：\n\n伝票から 2 枚をランダムに選ぶ\nその 2 点を通る直線を引く\n直線から 300 g 以内にある伝票（賛同者、インライア、inlier）を数える\n1〜3 を 200 回繰り返し、賛同者が最多だった直線を残す\nその賛同者だけで最小二乗法をやり直す\n\nこの手法を RANSAC（Random Sample Consensus / ランダムに選んだ標本の合意） と呼ぶ\n\n\n300 g の根拠：正しい伝票のズレは最大 206 g だった。それより少し広くとる"
+  },
+  {
+    "objectID": "robust-regression.html#回の試行を図で見る",
+    "href": "robust-regression.html#回の試行を図で見る",
+    "title": "外れ値に強い回帰",
+    "section": "1回の試行を図で見る",
+    "text": "1回の試行を図で見る\n\n\n\n\n\n\n\n\n\n\n\n帯の幅が ±300 g。賛同者の数がその直線の点数。外れ値を引いた回は点数が低く、自然に捨てられる"
+  },
+  {
+    "objectID": "robust-regression.html#peek-ransac-code",
+    "href": "robust-regression.html#peek-ransac-code",
+    "title": "外れ値に強い回帰",
+    "section": "RANSAC を実装する",
+    "text": "RANSAC を実装する\n\n\ndef ransac_line(x, t, threshold, n_trials=200):\n    best_count = 0\n    for trial in range(n_trials):\n        i, j = np.random.choice(len(x), 2, replace=False)      # 手順1：2枚をランダムに選ぶ\n        if x[i] == x[j]:                                        # 体長が同じ2枚では直線が引けないので、この回は飛ばす\n            continue\n        a = (t[j] - t[i]) / (x[j] - x[i])                       # 手順2：2点を通る直線 t = a x + b\n        b = t[i] - a * x[i]\n        inliers = np.abs(a * x + b - t) &lt; threshold             # 手順3：直線から threshold 以内なら True（賛同者）\n        if inliers.sum() &gt; best_count:                          # 手順4：賛同者が最多の直線を覚えておく\n            best_count, best_inliers = inliers.sum(), inliers\n    reg = LinearRegression().fit(x[best_inliers].reshape(-1, 1), t[best_inliers])   # 手順5：賛同者だけで fit し直す\n    return reg.coef_[0], reg.intercept_, best_inliers\n\na_r, b_r, inliers = ransac_line(lengths, weights_typo, threshold=300)\nprint(f\"賛同者 {inliers.sum()} 枚、除外 {(~inliers).sum()} 枚\")\nprint(f\"RANSAC の直線: 体長 1cm あたり {a_r:.1f} g\")\n\n賛同者 78 枚、除外 2 枚\nRANSAC の直線: 体長 1cm あたり 90.0 g\n\n\n\n\n描画コード\ngrid_cm = np.linspace(44, 63, 50)\nplt.figure(figsize=(6.5, 3.6))\nplt.scatter(lengths[inliers], weights_typo[inliers], s=36, alpha=0.7, c=\"#2980b9\", label=f\"賛同者（{inliers.sum()}枚）\")\nplt.scatter(lengths[~inliers], weights_typo[~inliers], s=70, c=\"#e74c3c\", marker=\"x\", label=f\"除外（{(~inliers).sum()}枚、図の外）\")\nplt.plot(grid_cm, reg_typo.predict(grid_cm.reshape(-1, 1)), \"--\", color=\"#e74c3c\", lw=1.5, label=\"最小二乗法（80枚全部）\")\nplt.plot(grid_cm, a_r * grid_cm + b_r, \"-\", color=\"#2980b9\", lw=2, label=\"RANSAC\")\nplt.ylim(-2500, 6500)                                   # 除外した2枚（24,000 g 台）は図の外\nplt.axhline(0, color=\"black\", lw=0.8)\nplt.xlabel(\"体長 (cm)\"); plt.ylabel(\"重さ (g)\")\nplt.legend(fontsize=8); plt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n除外された 2 枚は、ちょうど打ち間違いの 2 枚\nRANSAC の直線は、正しい 78 枚だけで fit した直線（90.0 g/cm）と一致する\n最小二乗法は全部の伝票への妥協点を探すが、RANSAC は多数派に賛同されない伝票を無視する"
+  },
+  {
+    "objectID": "robust-regression.html#参考何回試せば十分か",
+    "href": "robust-regression.html#参考何回試せば十分か",
+    "title": "外れ値に強い回帰",
+    "section": "（参考）何回試せば十分か",
+    "text": "（参考）何回試せば十分か\n\n\n2 枚とも正しい伝票を引く確率は \\(w^2\\)（\\(w\\) は正しい伝票の割合）\n\n今回は \\(w = 78/80\\) なので \\(w^2 \\approx 0.95\\)\n\n\\(N\\) 回すべて外す確率は \\((1 - w^2)^N\\)\n\n\\(N = 3\\) で 0.01 % なので、正しい 2 枚を引くだけなら数回で足りる\n\nただし正しい 2 枚を引いても、その 2 枚のばらつきで直線が少し傾き、賛同者を取りこぼすことがある\n\n回数は多めにとる（今回は 200 回）"
+  },
+  {
+    "objectID": "robust-regression.html#tweak-しきい値と回数を変える",
+    "href": "robust-regression.html#tweak-しきい値と回数を変える",
+    "title": "外れ値に強い回帰",
+    "section": "Tweak しきい値と回数を変える",
+    "text": "Tweak しきい値と回数を変える\n\n\nさっきのコード の引数を書き換えて実行（描画コードまで続けて実行すると図で確認できる）\nbad を変える行は、伝票のセルから実行し直す\n\n\n\n\n\n\n\n\n\nやりたいこと\nコード\n\n\n\n\n基準を厳しくせよ\nthreshold=300 → threshold=50\n\n\n打ち間違いを端から真ん中へ移せ\nbad = [3, 6] → bad = [54, 39]（体長 53.7 cm と 53.8 cm の魚）\n\n\n3回だけで決めよ\nthreshold=300) → threshold=300, n_trials=3)。何度か実行せよ\n\n\n打ち間違いを20枚にせよ\nbad = [3, 6] → bad = list(range(0, 80, 4))\n\n\n\n\n\n\n\n\n\n\n\nチェックポイント\n\n\n\n50：賛同者が 37〜39 枚に減り、傾きは実行ごとに 86〜100 g/cm とぶれる\n\n正しい伝票の半分を外れ値扱いしている\n基準は正しい記録のばらつき（最大 206 g）より広くとる\n\n真ん中の 2 枚：最小二乗法の傾きは 92 g/cm とほぼ変わらず、直線全体が 380 g ほど持ち上がる\n\n端の外れ値は傾きを、真ん中の外れ値は高さを動かす（てこの原理）\nRANSAC はどちらでも 2 枚を除外する\n\nn_trials=3：4回に1回は賛同者を取りこぼし、傾きが大きくぶれる（−86〜113 g/cm）\n\n10 回なら 99 %、200 回ならほぼ毎回 78 枚そろう\n\n打ち間違い 20 枚：最小二乗法の傾きは 398 g/cm、RANSAC は 92 g/cm\n\n外れ値が多数派にならない限り、RANSAC は壊れない"
+  },
+  {
+    "objectID": "robust-regression.html#参考scikit-learn-では",
+    "href": "robust-regression.html#参考scikit-learn-では",
+    "title": "外れ値に強い回帰",
+    "section": "（参考）scikit-learn では",
+    "text": "（参考）scikit-learn では\n\n\n今日書いた ransac_line は、ライブラリでは RANSACRegressor に入っている\n\n\nfrom sklearn.linear_model import RANSACRegressor\n\nransac = RANSACRegressor(LinearRegression(), residual_threshold=300, random_state=0)\nransac.fit(lengths.reshape(-1, 1), weights_typo)\n\nprint(f\"賛同者 {ransac.inlier_mask_.sum()} 枚\")\nprint(f\"体長 1cm あたり {ransac.estimator_.coef_[0]:.1f} g\")\n\n賛同者 78 枚\n体長 1cm あたり 90.0 g\n\n\n\n\n\n\n\n\n\n今日書いたもの\nscikit-learn\n\n\n\n\nransac_line(x, t, threshold=300)\nRANSACRegressor(LinearRegression(), residual_threshold=300).fit(X, t)\n\n\ninliers\nransac.inlier_mask_\n\n\na_r, b_r\nransac.estimator_.coef_[0], ransac.estimator_.intercept_\n\n\n\n\n\n\n\n\n\n\n（参考）RANSAC の出番\n\n\n直線に限らず、平面・円・2枚の写真の対応関係など「少数の点で決まるモデル」なら同じ手順で使える。画像処理では、写真どうしの対応点から変換を推定するとき（パノラマ合成など）の定番"
+  },
+  {
+    "objectID": "robust-regression.html#mae-と-ransac-を比べる",
+    "href": "robust-regression.html#mae-と-ransac-を比べる",
+    "title": "外れ値に強い回帰",
+    "section": "MAE と RANSAC を比べる",
+    "text": "MAE と RANSAC を比べる\n\n\n\n\n\nMSE（最小二乗法）\nMAE\nRANSAC\n\n\n\n\n外れ値の扱い\n二乗して数える\n1 枚 1 票で数える\n除外する\n\n\n傾き（g/cm）\n451\n96\n90\n\n\n外れ値の伝票を特定するか\nしない\nしない\nする（除外された 2 枚）\n\n\n自分で決めるもの\n学習率\n学習率と更新回数\nしきい値と試行回数\n\n\n\n\n正しい 80 枚で fit した直線の傾きは 91 g/cm"
+  },
+  {
+    "objectID": "robust-regression.html#まとめ",
+    "href": "robust-regression.html#まとめ",
+    "title": "外れ値に強い回帰",
+    "section": "まとめ",
+    "text": "まとめ\n\n\n外れ値：他の記録から大きく離れた記録\nMSE は二乗で測るので、少数の外れ値に直線が引っ張られる\nMAE：ズレを絶対値で測る\n\n勾配に残るのはズレの符号だけで、外れ値も 1 枚 1 票\n1 歩が谷底の近くでも縮まないので、学習率を小さくして揺れを抑える\n\nRANSAC：ランダムな 2 点の直線を何度も引き、賛同者が最多の直線を採る\n\n外れ値の伝票を除外して fit し直す\n\n損失を変えると、fit の結果も、勾配降下法のふるまいも変わる"
+  },
+  {
+    "objectID": "robust-regression.html#練習問題ransac-を手で1周回す",
+    "href": "robust-regression.html#練習問題ransac-を手で1周回す",
+    "title": "外れ値に強い回帰",
+    "section": "練習問題：RANSAC を手で1周回す",
+    "text": "練習問題：RANSAC を手で1周回す\n\n5 点：\\(A(0, 0)\\)、\\(B(1, 1)\\)、\\(C(2, 2)\\)、\\(D(3, 3)\\)、\\(E(2, 8)\\)。しきい値は 0.5。1〜3 は手計算、4 と 5 はPythonコードで解け。\n\n\\(A\\) と \\(B\\) を通る直線を求め、直線からのズレが 0.5 未満の点（賛同者）を数えよ\n\\(A\\) と \\(E\\) を通る直線で同じことをせよ\nRANSAC が最終的に選ぶ直線と、その賛同者を答えよ\nPython：5 点に MSE の勾配降下法で直線を fit し（標準化なし、学習率 0.1、100 回）、本編の ransac_line の直線と比較せよ（傾きと切片を表示）\nPython：4 の勾配を MAE の勾配に書き換えて fit せよ（学習率 0.001、10000 回、傾きと切片を表示）"
+  },
+  {
+    "objectID": "robust-regression.html#練習問題の解答例",
+    "href": "robust-regression.html#練習問題の解答例",
+    "title": "外れ値に強い回帰",
+    "section": "練習問題の解答例",
+    "text": "練習問題の解答例\n\n\n\\(A\\)、\\(B\\) を通る直線は \\(t = x\\)\n\n\\(C\\)、\\(D\\) のズレは 0、\\(E\\) のズレは \\(|8 - 2| = 6\\)\n賛同者は \\(A, B, C, D\\) の 4 点\n\n\\(A\\)、\\(E\\) を通る直線は \\(t = 4x\\)\n\n\\(B\\) のズレは \\(|1 - 4| = 3\\)、\\(C\\) は \\(|2 - 8| = 6\\)、\\(D\\) は \\(|3 - 12| = 9\\)\n賛同者は \\(A, E\\) の 2 点\n\n賛同者が最多（4 点）なのは \\(t = x\\)\n\n賛同者 \\(A, B, C, D\\) だけで最小二乗法をやり直しても、4 点が一直線上なので \\(t = x\\) のまま\n\n勾配降下法で 5 点すべてに fit すると \\(a \\approx 1.46\\)、\\(b \\approx 0.46\\)\n\n\\(E\\) の 1 点に引っ張られ、傾きが 1.46 倍になった\n\nMAE の勾配降下法では \\(a \\approx 1.00\\)、\\(b \\approx 0.00\\)\n\n\\(E\\) を除外していないのに、RANSAC と同じ直線になった\n\n\n\n\n解答例を見る\nimport numpy as np\nfrom sklearn.linear_model import LinearRegression\n\nP_x = np.array([0.0, 1.0, 2.0, 3.0, 2.0])   # A, B, C, D, E の x\nP_t = np.array([0.0, 1.0, 2.0, 3.0, 8.0])   # A, B, C, D, E の t\n\na, b = 0.0, 0.0\nlr = 0.1\nfor i in range(100):\n    pred = a * P_x + b\n    a -= lr * 2 * np.mean((pred - P_t) * P_x)\n    b -= lr * 2 * np.mean(pred - P_t)\nprint(f\"勾配降下法（5点すべて）: a={a:.2f}, b={b:.2f}\")\n\na_r, b_r, inliers = ransac_line(P_x, P_t, threshold=0.5)\nprint(f\"RANSAC: a={a_r:.2f}, b={b_r:.2f}, 賛同者={inliers.astype(int)}\")\n\na, b = 0.0, 0.0\nlr = 0.001\nfor i in range(10000):\n    pred = a * P_x + b\n    a -= lr * np.mean(np.sign(pred - P_t) * P_x)\n    b -= lr * np.mean(np.sign(pred - P_t))\nprint(f\"MAE の勾配降下法（5点すべて）: a={a:.2f}, b={b:.2f}\")\n\n\n勾配降下法（5点すべて）: a=1.46, b=0.46\nRANSAC: a=1.00, b=0.00, 賛同者=[1 1 1 1 0]\nMAE の勾配降下法（5点すべて）: a=1.00, b=0.00"
+  },
+  {
+    "objectID": "linear-regression.html#peek-mse",
+    "href": "linear-regression.html#peek-mse",
+    "title": "線形回帰と正則化",
+    "section": "損失関数：二乗誤差（MSE）",
+    "text": "損失関数：二乗誤差（MSE）\n\n\n各魚について「予測と実際のズレ」を測り、二乗して平均する\n\n\\[L(a, b) = \\frac{1}{N} \\sum_{i} \\left( \\underbrace{a x_i + b}_{\\text{予測}} - \\underbrace{t_i}_{\\text{実際}} \\right)^2\\]\n\nMSE（Mean Squared Error / 平均二乗誤差）と呼ぶ\nクラスタリングの回の SSE と同じ発想で、誤差を 2 乗して集めたものを点の数で割った平均\n全魚のズレを1本のベクトルと見ると、MSE はそのノルム（norm・ベクトルの長さ）の2乗を \\(N\\) で割ったもの\n\n\n\n\n\n\n\n\n損失関数は MSE だけではない\n\n\n\nズレの絶対値の平均でも「小さいほど良い直線」は測れる — MAE（Mean Absolute Error / 平均絶対誤差）\nズレの4乗の平均でもよい。「ズレが減るほど小さくなる」関数なら損失関数の候補になれる\n今回 MSE を選ぶ理由は微分のしやすさ：絶対値は 0 のところで折れていて微分できない。二乗なら微分がきれい\nMAE での fit は外れ値に強い回帰で扱う"
+  },
+  {
+    "objectID": "linear-regression.html#peek-mse-grad",
+    "href": "linear-regression.html#peek-mse-grad",
+    "title": "線形回帰と正則化",
+    "section": "勾配を手で出す",
+    "text": "勾配を手で出す\n\n\\(L\\) を \\(a\\) と \\(b\\) でそれぞれ微分する（合成関数の微分）：\n\\[\\frac{\\partial L}{\\partial a} = \\frac{2}{N} \\sum_i (a x_i + b - t_i) \\, x_i\n\\qquad\n\\frac{\\partial L}{\\partial b} = \\frac{2}{N} \\sum_i (a x_i + b - t_i)\\]\n\n構造は単純：「予測と正解の差」を入力の大きさに応じて配る\nあとは勾配降下法に渡すだけ：\n\n\\[a \\leftarrow a - \\alpha \\frac{\\partial L}{\\partial a}, \\qquad b \\leftarrow b - \\alpha \\frac{\\partial L}{\\partial b}\\]\n\n\n\n\n\n\n\n数式とコードの名前\n\n\n\n数式では、勾配降下法の回と同じく学習率を \\(\\alpha\\) と書く\nコードでは、learning rateを略して lr と書く"
+  },
+  {
+    "objectID": "linear-regression.html#peek-l2-ridge",
+    "href": "linear-regression.html#peek-l2-ridge",
+    "title": "線形回帰と正則化",
+    "section": "この罰金の名前：L2正則化とリッジ回帰",
+    "text": "この罰金の名前：L2正則化とリッジ回帰\n\n\n\\(\\lambda \\sum_j w_j^2\\) の形の罰金：L2正則化（L2 regularization）\nL2正則化つきの線形回帰：リッジ回帰（Ridge regression）\n\nsklearn には Ridge として入っている\n\nNN でも同じ道具がそのまま使われる（weight decay と呼ぶ）"
+  },
+  {
+    "objectID": "linear-regression.html#peek-regularization-broad",
+    "href": "linear-regression.html#peek-regularization-broad",
+    "title": "線形回帰と正則化",
+    "section": "深さの制限も、広い意味での正則化",
+    "text": "深さの制限も、広い意味での正則化\n\n\n次数9の曲線の MSE を、罰金のあり・なしで比べる\n\n\n\n\n\n訓練MSE\nテストMSE\n\n\n\n\n罰金なし\n1,294\n9,286,680\n\n\n罰金あり（\\(\\lambda = 0.1\\)）\n3,585\n3,427\n\n\n\n\n\n\n\n\n\n\n広い意味での正則化\n\n\n\n訓練誤差を犠牲にして、汎化誤差を下げる工夫\n\n罰金：訓練MSEは上がり、テストMSEは下がった\n決定木の深さの制限：訓練データでの成績は満点でなくなる"
+  },
+  {
+    "objectID": "classification-evaluation.html#peek-generalization-gap",
+    "href": "classification-evaluation.html#peek-generalization-gap",
+    "title": "過学習と汎化",
+    "section": "汎化誤差と汎化ギャップ",
+    "text": "汎化誤差と汎化ギャップ\n\n\n誤差（error）：間違いの多さ\n\n成績が高いほど、誤差は小さい\n\n\n\n\n\n名前\n意味\n深さを変える実験では\n\n\n\n\n訓練誤差（training error）\n訓練データでの誤差\n訓練データの折れ線\n\n\n汎化誤差（generalization error）\n学習に使っていないデータでの誤差\nテストデータの折れ線\n\n\n汎化ギャップ（generalization gap）\n訓練誤差と汎化誤差の差\n2本の線の折れ線\n\n\n\n\n\n\n\n\n\n\n過学習を換言すれば\n\n\n\n訓練誤差は小さいのに、汎化誤差は大きい（汎化ギャップが大きい）状態"
+  },
+  {
+    "objectID": "classification-evaluation.html#peek-refit-all",
+    "href": "classification-evaluation.html#peek-refit-all",
+    "title": "過学習と汎化",
+    "section": "最後にテストのあとは全データで学習し直す",
+    "text": "最後にテストのあとは全データで学習し直す\n\n\nテストデータの採点で、成績の見積もりは終わった\n本番で使うモデルは、選んだ深さのまま、全120匹で学習し直す\n\n\n# 選んだ深さのまま、全データ（訓練データ＋テストデータ）で学習し直す\nfinal_tree = DecisionTreeClassifier(max_depth=best_depth).fit(X, y)\nprint(f\"深さ {best_depth}、{len(y)} 匹で学習\")\n\n深さ 1、120 匹で学習\n\n\n\n\n\n\n\n\n\n全データ（テストデータ含む）でもOK\n\n\n\nハイパパラメータ（深さ）：交差検証で選んだまま変えない\nパラメータ：全データで決め直してよい\n\n学習に使えるデータは多いほうがよい\n\nこのモデルの成績は、もう測れない（採点に使えるデータが残っていない）\n\nテストデータでの成績を、その見積もりとして使う"
   }
 ]

@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+<html lang="ja"><head>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-html/tabby.min.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.10.19">
+
+  <meta name="author" content="rkskmt">
+  <title>AI Lectures – 外れ値に強い回帰</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/reveal.css">
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #24292e;  }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #24292e; } /* Normal */
+    code span.al { color: #ff5555; font-weight: bold; } /* Alert */
+    code span.an { color: #6a737d; } /* Annotation */
+    code span.at { color: #d73a49; } /* Attribute */
+    code span.bn { color: #005cc5; } /* BaseN */
+    code span.bu { color: #d73a49; } /* BuiltIn */
+    code span.cf { color: #d73a49; } /* ControlFlow */
+    code span.ch { color: #032f62; } /* Char */
+    code span.cn { color: #005cc5; } /* Constant */
+    code span.co { color: #6a737d; } /* Comment */
+    code span.cv { color: #6a737d; } /* CommentVar */
+    code span.do { color: #6a737d; } /* Documentation */
+    code span.dt { color: #d73a49; } /* DataType */
+    code span.dv { color: #005cc5; } /* DecVal */
+    code span.er { color: #ff5555; text-decoration: underline; } /* Error */
+    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
+    code span.fl { color: #005cc5; } /* Float */
+    code span.fu { color: #6f42c1; } /* Function */
+    code span.im { color: #032f62; } /* Import */
+    code span.in { color: #6a737d; } /* Information */
+    code span.kw { color: #d73a49; } /* Keyword */
+    code span.op { color: #24292e; } /* Operator */
+    code span.ot { color: #6f42c1; } /* Other */
+    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.re { color: #6a737d; } /* RegionMarker */
+    code span.sc { color: #005cc5; } /* SpecialChar */
+    code span.ss { color: #032f62; } /* SpecialString */
+    code span.st { color: #032f62; } /* String */
+    code span.va { color: #e36209; } /* Variable */
+    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.wa { color: #ff5555; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-e69bca93ec9d1486cefcf16a785f5ce6.css">
+  <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="site_libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="custom.css">
+  <script>
+  // MathJax v2's HTML-CSS renderer (Quarto hardcodes config=TeX-AMS_HTML-full)
+  // measures glyph widths in the live DOM, so when its TeX webfonts arrive
+  // after typesetting (VSCode webviews, high-DPI Windows, slow networks) the
+  // repaint leaves inline math wider than its reserved box and it overpaints
+  // the neighboring text. The CommonHTML renderer lays out from built-in
+  // metric tables and has no such race. Quarto offers no knob for this, so
+  // trap the Reveal global (reveal.js loads later, in <body>) and rewrite
+  // the math config before Reveal.initialize hands it to the math plugin.
+  //
+  // CommonHTML still sizes math by measuring an ex-height probe in the
+  // DOM next to each equation (matchFontHeight). reveal.css keeps every
+  // section display:none until Reveal's first layout, so when MathJax
+  // loads fast (warm HTTP cache) the initial whole-deck typeset runs
+  // against hidden slides: the probe measures 0, MathJax substitutes
+  // the 16px-body default ex but keeps the real 32px font-size, and
+  // every equation renders at ~50-61% — permanently, because MathJax
+  // never re-typesets processed math. A fixed scale with
+  // matchFontHeight off removes the DOM measurement entirely (which
+  // also fixes math inside collapsed code-fold / callout bodies —
+  // those always measured hidden). 127% is what the measurement
+  // itself yields for this theme's fonts when it works; retune it if
+  // the body font ever changes.
+  (function () {
+    var reveal;
+    Object.defineProperty(window, "Reveal", {
+      configurable: true,
+      get: function () { return reveal; },
+      set: function (value) {
+        reveal = value;
+        if (!value || typeof value.initialize !== "function" || value.__cskCHTML) return;
+        value.__cskCHTML = true;
+        var initialize = value.initialize;
+        value.initialize = function (config) {
+          if (config && config.math && typeof config.math.config === "string") {
+            config.math.config = config.math.config.replace("_HTML", "_CHTML");
+            config.math.CommonHTML = { scale: 127, matchFontHeight: false };
+          }
+          return initialize.call(this, config);
+        };
+      }
+    });
+  })();
+  </script>
+  <script src="slide-ui.js" defer=""></script>
+  <script src="search-ui.js" defer=""></script>
+  <script src="peek-ui.js" defer=""></script>
+  <script src="badge-ui.js" defer=""></script>
+  <script src="toc-ui.js" defer=""></script>
+  <meta name="qmd-web-source" content="0258b7debea5e2e109d2f352624266bac0b27bbb">
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">外れ値に強い回帰</h1>
+  <p class="subtitle">損失を変える・データを選ぶ</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+rkskmt
+</div>
+</div>
+</div>
+
+</section>
+<section id="ここまでの道具" class="slide level2">
+<h2>ここまでの道具</h2>
+<div class="slide-body">
+<ul>
+<li><strong>線形回帰</strong>：<a href="./linear-regression.html#peek-gdfit-code" class="peek">MSE を勾配降下法で小さくして</a>、体長から重さを予測する直線を fit した</li>
+<li><strong>MSE</strong>：予測と実際のズレを二乗して平均した損失</li>
+</ul>
+<div title="今回の主題">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>今回の主題</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>データに間違った記録が混ざっていたら、fit した直線はどうなるか</li>
+<li>間違った記録に引っ張られない fit の方法を 2 つ作る</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="準備魚の体長と重さ" class="slide level2">
+<h2>準備：魚の体長と重さ</h2>
+<div class="slide-body">
+<ul>
+<li>線形回帰で使った 80 匹の体長と重さを使う</li>
+</ul>
+<div id="20e90ce0" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>魚データの定義（クリックして展開）</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a aria-label="3"></a><span class="im">import</span> japanize_matplotlib</span>
+<span id="cb1-4"><a aria-label="4"></a>plt.rcParams[<span class="st">"font.size"</span>] <span class="op">=</span> <span class="dv">11</span></span>
+<span id="cb1-5"><a aria-label="5"></a>plt.rcParams[<span class="st">"figure.dpi"</span>] <span class="op">=</span> <span class="dv">100</span></span>
+<span id="cb1-6"><a aria-label="6"></a></span>
+<span id="cb1-7"><a aria-label="7"></a>salmon_weights     <span class="op">=</span> np.array([<span class="dv">2149</span>, <span class="dv">1959</span>, <span class="dv">2194</span>, <span class="dv">2457</span>, <span class="dv">1930</span>, <span class="dv">1930</span>, <span class="dv">2474</span>, <span class="dv">2230</span>, <span class="dv">1859</span>, <span class="dv">2163</span>,</span>
+<span id="cb1-8"><a aria-label="8"></a>                               <span class="dv">1861</span>, <span class="dv">1860</span>, <span class="dv">2073</span>, <span class="dv">1426</span>, <span class="dv">1483</span>, <span class="dv">1831</span>, <span class="dv">1696</span>, <span class="dv">2094</span>, <span class="dv">1728</span>, <span class="dv">1576</span>,</span>
+<span id="cb1-9"><a aria-label="9"></a>                               <span class="dv">2028</span>, <span class="dv">1903</span>, <span class="dv">2057</span>, <span class="dv">2229</span>, <span class="dv">1884</span>, <span class="dv">1884</span>, <span class="dv">2240</span>, <span class="dv">2081</span>, <span class="dv">1838</span>, <span class="dv">2037</span>,</span>
+<span id="cb1-10"><a aria-label="10"></a>                               <span class="dv">1839</span>, <span class="dv">1838</span>, <span class="dv">1978</span>, <span class="dv">1554</span>, <span class="dv">1591</span>, <span class="dv">1820</span>, <span class="dv">1731</span>, <span class="dv">1992</span>, <span class="dv">1752</span>, <span class="dv">1652</span>])</span>
+<span id="cb1-11"><a aria-label="11"></a>seabass_weights    <span class="op">=</span> np.array([<span class="dv">1677</span>, <span class="dv">1327</span>, <span class="dv">1486</span>, <span class="dv">1440</span>, <span class="dv">1857</span>, <span class="dv">1476</span>, <span class="dv">1749</span>, <span class="dv">2203</span>, <span class="dv">1979</span>, <span class="dv">1468</span>,</span>
+<span id="cb1-12"><a aria-label="12"></a>                               <span class="dv">1496</span>, <span class="dv">1737</span>, <span class="dv">1099</span>, <span class="dv">1341</span>, <span class="dv">1748</span>, <span class="dv">1563</span>, <span class="dv">2181</span>, <span class="dv">1414</span>, <span class="dv">1286</span>, <span class="dv">1333</span>,</span>
+<span id="cb1-13"><a aria-label="13"></a>                               <span class="dv">1787</span>, <span class="dv">1445</span>, <span class="dv">1505</span>, <span class="dv">1204</span>, <span class="dv">1381</span>, <span class="dv">1513</span>, <span class="dv">1259</span>, <span class="dv">1567</span>, <span class="dv">1370</span>, <span class="dv">1432</span>,</span>
+<span id="cb1-14"><a aria-label="14"></a>                               <span class="dv">1370</span>, <span class="dv">1864</span>, <span class="dv">1488</span>, <span class="dv">1278</span>, <span class="dv">1657</span>, <span class="dv">1245</span>, <span class="dv">1533</span>, <span class="dv">1096</span>, <span class="dv">1223</span>, <span class="dv">1531</span>])</span>
+<span id="cb1-15"><a aria-label="15"></a></span>
+<span id="cb1-16"><a aria-label="16"></a>weights <span class="op">=</span> np.concatenate([salmon_weights, seabass_weights]).astype(<span class="bu">float</span>)</span>
+<span id="cb1-17"><a aria-label="17"></a></span>
+<span id="cb1-18"><a aria-label="18"></a><span class="co"># 体長の測定値（cm）— 次元削減の回と同じ</span></span>
+<span id="cb1-19"><a aria-label="19"></a>rng     <span class="op">=</span> np.random.default_rng(<span class="dv">42</span>)</span>
+<span id="cb1-20"><a aria-label="20"></a>lengths <span class="op">=</span> np.<span class="bu">round</span>(np.cbrt(weights) <span class="op">*</span> <span class="fl">4.5</span> <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="fl">1.0</span>, <span class="bu">len</span>(weights)), <span class="dv">1</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</div>
+</section>
+<section id="peek-typo-slips" class="slide level2">
+<h2>伝票に打ち間違いが2枚あった</h2>
+<div class="slide-body">
+<ul>
+<li>魚市場の伝票（1匹につき1枚、体長と重さ）80 枚のうち 2 枚で、重さの欄に 0 が1つ多く打たれていた</li>
+<li>間違っていたのは、いちばん大きい 2 匹（2,457 g → 24,570 g、2,474 g → 24,740 g）</li>
+<li>この 80 枚で直線を fit し直す</li>
+</ul>
+<div id="f89d9d39" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
+<span id="cb2-2"><a aria-label="2"></a></span>
+<span id="cb2-3"><a aria-label="3"></a>bad <span class="op">=</span> [<span class="dv">3</span>, <span class="dv">6</span>]                                       <span class="co"># 打ち間違えた2枚（いちばん大きい2匹）</span></span>
+<span id="cb2-4"><a aria-label="4"></a>weights_typo <span class="op">=</span> weights.copy()</span>
+<span id="cb2-5"><a aria-label="5"></a>weights_typo[bad] <span class="op">*=</span> <span class="dv">10</span>                            <span class="co"># 0 が1つ多い ＝ 10倍</span></span>
+<span id="cb2-6"><a aria-label="6"></a></span>
+<span id="cb2-7"><a aria-label="7"></a>reg_ok   <span class="op">=</span> LinearRegression().fit(lengths.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), weights)        <span class="co"># 正しい80枚</span></span>
+<span id="cb2-8"><a aria-label="8"></a>reg_typo <span class="op">=</span> LinearRegression().fit(lengths.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), weights_typo)   <span class="co"># 2枚が間違った80枚</span></span>
+<span id="cb2-9"><a aria-label="9"></a><span class="bu">print</span>(<span class="ss">f"正しい80枚で fit  : 体長 1cm あたり </span><span class="sc">{</span>reg_ok<span class="sc">.</span>coef_[<span class="dv">0</span>]<span class="sc">:.1f}</span><span class="ss"> g"</span>)</span>
+<span id="cb2-10"><a aria-label="10"></a><span class="bu">print</span>(<span class="ss">f"2枚が間違った80枚 : 体長 1cm あたり </span><span class="sc">{</span>reg_typo<span class="sc">.</span>coef_[<span class="dv">0</span>]<span class="sc">:.1f}</span><span class="ss"> g"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>正しい80枚で fit  : 体長 1cm あたり 91.0 g
+2枚が間違った80枚 : 体長 1cm あたり 451.2 g</code></pre>
+</div>
+</div>
+<div id="ffb23d15" class="cell" data-execution_count="3">
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="robust-regression_files/figure-revealjs/cell-4-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img data-src="robust-regression_files/figure-revealjs/cell-4-output-1.png" class="quarto-figure quarto-figure-center" width="1036" height="367"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<div title="結果">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>結果</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>たった 2 枚で、傾きは 91 g/cm から 451 g/cm になった</li>
+<li>直線は魚の群れから離れた
+<ul>
+<li>45 cm の魚の予測は −1,660 g（マイナスの重さ）</li>
+<li>62 cm の魚の予測は 6,010 g（実際は 2,400 g 台）</li>
+</ul></li>
+<li>間違った 2 枚が、正しい 78 枚の予測を全部壊している</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-outlier-squares" class="slide level2">
+<h2>二乗で測ると、2枚のズレが78枚を圧倒する</h2>
+<div class="slide-body">
+<ul>
+<li>MSE は「ズレの二乗」の平均なので、ズレが 100 倍なら損失への寄与は 10,000 倍</li>
+<li>正しい 80 枚の直線からの、各伝票のズレを比べる</li>
+</ul>
+<div id="e6e1e03d" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a aria-label="1"></a>pred_ok <span class="op">=</span> reg_ok.predict(lengths.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>))        <span class="co"># 正しい80枚の直線による予測</span></span>
+<span id="cb4-2"><a aria-label="2"></a>error   <span class="op">=</span> weights_typo <span class="op">-</span> pred_ok                        <span class="co"># 各伝票のズレ（g）</span></span>
+<span id="cb4-3"><a aria-label="3"></a>ok      <span class="op">=</span> np.ones(<span class="dv">80</span>, dtype<span class="op">=</span><span class="bu">bool</span>)</span>
+<span id="cb4-4"><a aria-label="4"></a>ok[bad] <span class="op">=</span> <span class="va">False</span>                                         <span class="co"># 正しい78枚だけ True</span></span>
+<span id="cb4-5"><a aria-label="5"></a><span class="bu">print</span>(<span class="ss">f"正しい78枚のズレ  : 最大 </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">abs</span>(error[ok])<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.0f}</span><span class="ss"> g / 二乗の合計 </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">sum</span>(error[ok]<span class="op">**</span><span class="dv">2</span>)<span class="sc">:,.0f}</span><span class="ss">"</span>)</span>
+<span id="cb4-6"><a aria-label="6"></a><span class="bu">print</span>(<span class="ss">f"打ち間違い2枚のズレ: 最小 </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">abs</span>(error[bad])<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.0f}</span><span class="ss"> g / 二乗の合計 </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">sum</span>(error[bad]<span class="op">**</span><span class="dv">2</span>)<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>正しい78枚のズレ  : 最大 206 g / 二乗の合計 432,045
+打ち間違い2枚のズレ: 最小 22125 g / 二乗の合計 989,425,380</code></pre>
+</div>
+</div>
+<div title="要するに">
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>要するに</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>2 枚の二乗和は 78 枚の 2,290 倍</li>
+<li>MSE を下げるには、正しい 78 枚を全部見捨ててでも、この 2 枚に直線を寄せたほうが「得」になる</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div title="外れ値（outlier）">
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>外れ値（outlier）</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>他の記録から大きく離れた記録（ここでは打ち間違いの 2 枚）</li>
+<li>最小二乗法は二乗で測るので、少数の外れ値に直線が引っ張られる</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="section" class="slide level2 center break-slide" data-background-color="white">
+<h2></h2>
+<div class="break-title">
+<p>MAE</p>
+</div>
+</section>
+<section id="peek-mae" class="slide level2">
+<h2>対策：ズレを二乗せずに測る（MAE）</h2>
+<div class="slide-body">
+<ul>
+<li>外れ値に引っ張られる原因は二乗なので、二乗をやめる</li>
+<li>ズレの<strong>絶対値</strong>を平均する</li>
+</ul>
+<p><span class="math display">\[L(a, b) = \frac{1}{N} \sum_{i} \left| \underbrace{a x_i + b}_{\text{予測}} - \underbrace{t_i}_{\text{実際}} \right|\]</span></p>
+<ul>
+<li><strong>MAE（<span class="en"><strong>Mean Absolute Error</strong></span> / 平均絶対誤差）</strong>と呼ぶ</li>
+<li><a href="./linear-regression.html#peek-mse" class="peek">MSE</a> との違いは、二乗が絶対値に変わったことだけ</li>
+<li>正しい 80 枚の直線からのズレを、絶対値で比べる</li>
+</ul>
+<div id="4c72db7d" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a aria-label="1"></a><span class="bu">print</span>(<span class="ss">f"正しい78枚のズレ: 絶対値の合計 </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">sum</span>(np.<span class="bu">abs</span>(error[ok]))<span class="sc">:,.0f}</span><span class="ss"> g"</span>)</span>
+<span id="cb6-2"><a aria-label="2"></a><span class="bu">print</span>(<span class="ss">f"打ち間違い2枚のズレ: 絶対値の合計 </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">sum</span>(np.<span class="bu">abs</span>(error[bad]))<span class="sc">:,.0f}</span><span class="ss"> g"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>正しい78枚のズレ: 絶対値の合計 4,734 g
+打ち間違い2枚のズレ: 絶対値の合計 44,484 g</code></pre>
+</div>
+</div>
+<div title="結果">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>結果</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>2 枚の絶対値の和は、78 枚の 9.4 倍
+<ul>
+<li>二乗の和では <a href="#/peek-outlier-squares" class="peek">2,290 倍</a>だった</li>
+</ul></li>
+<li>ズレが 100 倍でも、損失への寄与は 100 倍で済む</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="絶対値の微分は符号だけになる" class="slide level2">
+<h2>絶対値の微分は、符号だけになる</h2>
+<div class="slide-body">
+<ul>
+<li>勾配降下法には、損失の微分が要る</li>
+<li><span class="math inline">\(u^2\)</span> の微分は <span class="math inline">\(2u\)</span>、<span class="math inline">\(|u|\)</span> の微分は <span class="math inline">\(u\)</span> の符号</li>
+</ul>
+<div id="8641e8fd" class="cell" data-execution_count="6">
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="robust-regression_files/figure-revealjs/cell-7-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img data-src="robust-regression_files/figure-revealjs/cell-7-output-1.png" class="quarto-figure quarto-figure-center" width="937" height="313"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<div title="符号を返す関数 sign">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>符号を返す関数 sign</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li><span class="math inline">\(\mathrm{sign}(u)\)</span>：<span class="math inline">\(u &gt; 0\)</span> なら <span class="math inline">\(+1\)</span>、<span class="math inline">\(u &lt; 0\)</span> なら <span class="math inline">\(-1\)</span>、<span class="math inline">\(u = 0\)</span> なら <span class="math inline">\(0\)</span>
+<ul>
+<li>コードでは <code>np.sign</code></li>
+</ul></li>
+<li><span class="math inline">\(|u|\)</span> は <span class="math inline">\(u = 0\)</span> で折れていて微分できない
+<ul>
+<li><code>np.sign(0)</code> は 0 を返すので、勾配降下法はそのまま続けられる</li>
+</ul></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-mae-grad" class="slide level2">
+<h2>MAE の勾配：ズレの大きさが消える</h2>
+<div class="slide-body">
+<p><span class="math inline">\(L\)</span> を <span class="math inline">\(a\)</span> と <span class="math inline">\(b\)</span> でそれぞれ微分する：</p>
+<p><span class="math display">\[\frac{\partial L}{\partial a} = \frac{1}{N} \sum_i \mathrm{sign}(a x_i + b - t_i) \, x_i
+\qquad
+\frac{\partial L}{\partial b} = \frac{1}{N} \sum_i \mathrm{sign}(a x_i + b - t_i)\]</span></p>
+<ul>
+<li><a href="./linear-regression.html#peek-mse-grad" class="peek">MSE の勾配</a>の「ズレ」が、「ズレの符号」に変わる</li>
+</ul>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>損失</th>
+<th>1 枚の伝票が勾配に渡すもの</th>
+<th>22,000 g ずれた伝票</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>MSE</td>
+<td>ズレそのもの</td>
+<td>100 g ずれた伝票の 220 倍の力で直線を引く</td>
+</tr>
+<tr class="even">
+<td>MAE</td>
+<td>ズレの符号（<span class="math inline">\(+1\)</span> か <span class="math inline">\(-1\)</span>）</td>
+<td>100 g ずれた伝票と同じ力で直線を引く</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="peek-mae-code" class="slide level2">
+<h2>MAE で fit する</h2>
+<div class="slide-body">
+<ul>
+<li><a href="./linear-regression.html#peek-gdfit-code" class="peek">線形回帰の勾配降下法</a>の、勾配の 2 行を書き換える</li>
+<li>学習率 0.1 と更新 100 回は変えない</li>
+</ul>
+<div id="229b896b" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a aria-label="1"></a>x <span class="op">=</span> (lengths <span class="op">-</span> lengths.mean()) <span class="op">/</span> lengths.std()                   <span class="co"># 標準化した体長</span></span>
+<span id="cb8-2"><a aria-label="2"></a>t <span class="op">=</span> (weights_typo <span class="op">-</span> weights_typo.mean()) <span class="op">/</span> weights_typo.std()    <span class="co"># 標準化した重さ（打ち間違い入り）</span></span>
+<span id="cb8-3"><a aria-label="3"></a></span>
+<span id="cb8-4"><a aria-label="4"></a><span class="kw">def</span> to_gram(a, b, cm):</span>
+<span id="cb8-5"><a aria-label="5"></a>    <span class="co">"""標準化したデータで fit した直線 (a, b) で、体長 cm の魚の重さ（g）を予測する"""</span></span>
+<span id="cb8-6"><a aria-label="6"></a>    x_cm <span class="op">=</span> (cm <span class="op">-</span> lengths.mean()) <span class="op">/</span> lengths.std()</span>
+<span id="cb8-7"><a aria-label="7"></a>    <span class="cf">return</span> (a <span class="op">*</span> x_cm <span class="op">+</span> b) <span class="op">*</span> weights_typo.std() <span class="op">+</span> weights_typo.mean()</span>
+<span id="cb8-8"><a aria-label="8"></a></span>
+<span id="cb8-9"><a aria-label="9"></a>a, b <span class="op">=</span> <span class="fl">0.0</span>, <span class="fl">0.0</span></span>
+<span id="cb8-10"><a aria-label="10"></a>lr <span class="op">=</span> <span class="fl">0.1</span></span>
+<span id="cb8-11"><a aria-label="11"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">101</span>):</span>
+<span id="cb8-12"><a aria-label="12"></a>    pred   <span class="op">=</span> a <span class="op">*</span> x <span class="op">+</span> b</span>
+<span id="cb8-13"><a aria-label="13"></a>    grad_a <span class="op">=</span> np.mean(np.sign(pred <span class="op">-</span> t) <span class="op">*</span> x)     <span class="co"># MSE では 2 * np.mean((pred - t) * x)</span></span>
+<span id="cb8-14"><a aria-label="14"></a>    grad_b <span class="op">=</span> np.mean(np.sign(pred <span class="op">-</span> t))         <span class="co"># MSE では 2 * np.mean(pred - t)</span></span>
+<span id="cb8-15"><a aria-label="15"></a>    a <span class="op">-=</span> lr <span class="op">*</span> grad_a</span>
+<span id="cb8-16"><a aria-label="16"></a>    b <span class="op">-=</span> lr <span class="op">*</span> grad_b</span>
+<span id="cb8-17"><a aria-label="17"></a>    <span class="cf">if</span> i <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">10</span>, <span class="dv">50</span>, <span class="dv">100</span>):</span>
+<span id="cb8-18"><a aria-label="18"></a>        <span class="bu">print</span>(<span class="ss">f"更新 </span><span class="sc">{</span>i<span class="sc">:3d}</span><span class="ss">回 | 45 cm の予測 </span><span class="sc">{</span>to_gram(a, b, <span class="dv">45</span>)<span class="sc">:6,.0f}</span><span class="ss"> g | 62 cm の予測 </span><span class="sc">{</span>to_gram(a, b, <span class="dv">62</span>)<span class="sc">:6,.0f}</span><span class="ss"> g"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>更新   1回 | 45 cm の予測  1,830 g | 62 cm の予測  2,029 g
+更新   3回 | 45 cm の予測    539 g | 62 cm の予測  2,712 g
+更新  10回 | 45 cm の予測  1,110 g | 62 cm の予測  2,537 g
+更新  50回 | 45 cm の予測  1,066 g | 62 cm の予測  2,737 g
+更新 100回 | 45 cm の予測  1,094 g | 62 cm の予測  2,711 g</code></pre>
+</div>
+</div>
+<div title="結果">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>結果</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>100 回更新後の予測は、45 cm で 1,094 g、62 cm で 2,711 g
+<ul>
+<li>MSE では <a href="#/peek-typo-slips" class="peek">−1,660 g と 6,010 g</a>だった</li>
+</ul></li>
+<li>ただし 50 回と 100 回で値が違い、直線はまだ動いている</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-mae-history" class="slide level2">
+<h2>MAE の勾配降下法は、止まらずに揺れ続ける</h2>
+<div class="slide-body">
+<ul>
+<li>更新を 300 回に増やす</li>
+<li>更新のたびに、45 cm の魚の予測を記録する</li>
+</ul>
+<div id="ddac986a" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a aria-label="1"></a><span class="kw">def</span> fit_mae(lr, n_updates):</span>
+<span id="cb10-2"><a aria-label="2"></a>    <span class="co">"""MAE の勾配降下法で fit し、更新ごとの「45 cm の魚の予測（g）」も返す"""</span></span>
+<span id="cb10-3"><a aria-label="3"></a>    a, b <span class="op">=</span> <span class="fl">0.0</span>, <span class="fl">0.0</span></span>
+<span id="cb10-4"><a aria-label="4"></a>    history <span class="op">=</span> []</span>
+<span id="cb10-5"><a aria-label="5"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n_updates):</span>
+<span id="cb10-6"><a aria-label="6"></a>        pred <span class="op">=</span> a <span class="op">*</span> x <span class="op">+</span> b</span>
+<span id="cb10-7"><a aria-label="7"></a>        a <span class="op">-=</span> lr <span class="op">*</span> np.mean(np.sign(pred <span class="op">-</span> t) <span class="op">*</span> x)</span>
+<span id="cb10-8"><a aria-label="8"></a>        b <span class="op">-=</span> lr <span class="op">*</span> np.mean(np.sign(pred <span class="op">-</span> t))</span>
+<span id="cb10-9"><a aria-label="9"></a>        history.append(to_gram(a, b, <span class="dv">45</span>))</span>
+<span id="cb10-10"><a aria-label="10"></a>    <span class="cf">return</span> a, b, history</span>
+<span id="cb10-11"><a aria-label="11"></a></span>
+<span id="cb10-12"><a aria-label="12"></a>a, b, history <span class="op">=</span> fit_mae(lr<span class="op">=</span><span class="fl">0.1</span>, n_updates<span class="op">=</span><span class="dv">300</span>)</span>
+<span id="cb10-13"><a aria-label="13"></a><span class="bu">print</span>(<span class="ss">f"最後の50回の予測: </span><span class="sc">{</span><span class="bu">min</span>(history[<span class="op">-</span><span class="dv">50</span>:])<span class="sc">:,.0f}</span><span class="ss"> g から </span><span class="sc">{</span><span class="bu">max</span>(history[<span class="op">-</span><span class="dv">50</span>:])<span class="sc">:,.0f}</span><span class="ss"> g"</span>)</span>
+<span id="cb10-14"><a aria-label="14"></a></span>
+<span id="cb10-15"><a aria-label="15"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.2</span>))</span>
+<span id="cb10-16"><a aria-label="16"></a>plt.plot(history, color<span class="op">=</span><span class="st">"#27ae60"</span>, lw<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb10-17"><a aria-label="17"></a>plt.xlabel(<span class="st">"更新回数"</span>)<span class="op">;</span> plt.ylabel(<span class="st">"45 cm の魚の予測 (g)"</span>)</span>
+<span id="cb10-18"><a aria-label="18"></a>plt.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb10-19"><a aria-label="19"></a>plt.tight_layout()</span>
+<span id="cb10-20"><a aria-label="20"></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>最後の50回の予測: 658 g から 1,111 g</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="robust-regression_files/figure-revealjs/cell-9-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img data-src="robust-regression_files/figure-revealjs/cell-9-output-2.png" class="quarto-figure quarto-figure-center" width="686" height="307"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<div title="結果">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>結果</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>300 回更新しても、予測は 658 g と 1,111 g のあいだを行き来する</li>
+<li>MSE のときは、<a href="./linear-regression.html#peek-gdfit-code" class="peek">50 回あたりで動かなくなった</a></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="揺れる理由mae-の-1-歩は谷底の近くでも縮まない" class="slide level2">
+<h2>揺れる理由：MAE の 1 歩は、谷底の近くでも縮まない</h2>
+<div class="slide-body">
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>損失</th>
+<th>勾配の大きさを決めるもの</th>
+<th>谷底に近づくと</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>MSE</td>
+<td>ズレの大きさ</td>
+<td>勾配が 0 に近づき、1 歩が自然に縮む</td>
+</tr>
+<tr class="even">
+<td>MAE</td>
+<td>伝票が直線の上にあるか下にあるか</td>
+<td>谷底まで 1 g でも 1,000 g でも、1 歩は同じ</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>学習率 0.1 の 1 歩を、重さ（g）に直す
+<ul>
+<li>直線の高さ <span class="math inline">\(b\)</span> の 1 歩は「学習率 × 勾配」で、MAE の勾配は最大 1</li>
+<li>標準化した重さの 1 は、標準偏差 1 つ分の重さ</li>
+</ul></li>
+</ul>
+<div id="3cffe6f1" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a aria-label="1"></a><span class="bu">print</span>(<span class="ss">f"重さの標準偏差: </span><span class="sc">{</span>weights_typo<span class="sc">.</span>std()<span class="sc">:,.0f}</span><span class="ss"> g"</span>)</span>
+<span id="cb12-2"><a aria-label="2"></a><span class="bu">print</span>(<span class="ss">f"学習率 0.1 の 1 歩: 最大 </span><span class="sc">{</span><span class="fl">0.1</span> <span class="op">*</span> weights_typo<span class="sc">.</span>std()<span class="sc">:,.0f}</span><span class="ss"> g"</span>)</span>
+<span id="cb12-3"><a aria-label="3"></a><span class="bu">print</span>(<span class="ss">f"正しい伝票のズレ: 最大 </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">abs</span>(error[ok])<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss"> g"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>重さの標準偏差: 3,596 g
+学習率 0.1 の 1 歩: 最大 360 g
+正しい伝票のズレ: 最大 206 g</code></pre>
+</div>
+</div>
+<div title="結果">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>結果</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>1 歩が最大 360 g で、正しい伝票のズレ（最大 206 g）より大きい</li>
+<li>1 歩で伝票の群れをまたいでしまい、次の 1 歩で戻る</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="tweak-学習率を小さくして揺れを抑える" class="slide level2 badge-practice">
+<h2><strong>Tweak</strong> 学習率を小さくして揺れを抑える</h2>
+<div class="slide-body">
+<ul>
+<li><a href="#/peek-mae-history" class="peek">さっきのコード</a>の <code>fit_mae(lr=0.1, n_updates=300)</code> を<strong>書き換えて実行</strong></li>
+</ul>
+<div class="tweak">
+<table class="caption-top">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>やりたいこと</th>
+<th>コード</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>学習率を 1/10 にせよ</td>
+<td><code>lr=0.1</code> → <code>lr=0.01</code></td>
+</tr>
+<tr class="even">
+<td>さらに 1/10 にせよ</td>
+<td><code>lr=0.01</code> → <code>lr=0.001</code></td>
+</tr>
+<tr class="odd">
+<td>更新回数を 10 倍にせよ</td>
+<td><code>n_updates=300</code> → <code>n_updates=3000</code>（<code>lr=0.001</code> のまま）</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div title="チェックポイント">
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>チェックポイント</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li><code>lr=0.01</code>：最後の 50 回の予測は 873 g から 876 g に収まる
+<ul>
+<li>揺れの幅は、学習率とともに小さくなる</li>
+</ul></li>
+<li><code>lr=0.001</code>：300 回では 924 g から 938 g で、まだ下がっている途中
+<ul>
+<li>1 歩が小さいぶん、谷底に着くまでの更新回数が増える</li>
+</ul></li>
+<li><code>n_updates=3000</code>：872 g で動かなくなる</li>
+<li>外れ値に強くなる代わりに、学習率と更新回数を自分で調整することになる</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="mae-の直線をmse-の直線と比べる" class="slide level2">
+<h2>MAE の直線を、MSE の直線と比べる</h2>
+<div class="slide-body">
+<div id="3e08eb39" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a aria-label="1"></a>a, b, history <span class="op">=</span> fit_mae(lr<span class="op">=</span><span class="fl">0.01</span>, n_updates<span class="op">=</span><span class="dv">1000</span>)</span>
+<span id="cb14-2"><a aria-label="2"></a>a_mae <span class="op">=</span> (to_gram(a, b, <span class="dv">62</span>) <span class="op">-</span> to_gram(a, b, <span class="dv">45</span>)) <span class="op">/</span> (<span class="dv">62</span> <span class="op">-</span> <span class="dv">45</span>)     <span class="co"># 傾き（g/cm）</span></span>
+<span id="cb14-3"><a aria-label="3"></a><span class="bu">print</span>(<span class="ss">f"MAE の直線: 体長 1cm あたり </span><span class="sc">{</span>a_mae<span class="sc">:.1f}</span><span class="ss"> g"</span>)</span>
+<span id="cb14-4"><a aria-label="4"></a><span class="bu">print</span>(<span class="ss">f"45 cm の予測: </span><span class="sc">{</span>to_gram(a, b, <span class="dv">45</span>)<span class="sc">:,.0f}</span><span class="ss"> g"</span>)</span>
+<span id="cb14-5"><a aria-label="5"></a><span class="bu">print</span>(<span class="ss">f"62 cm の予測: </span><span class="sc">{</span>to_gram(a, b, <span class="dv">62</span>)<span class="sc">:,.0f}</span><span class="ss"> g"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>MAE の直線: 体長 1cm あたり 96.1 g
+45 cm の予測: 875 g
+62 cm の予測: 2,508 g</code></pre>
+</div>
+</div>
+<div id="abad1c5c" class="cell" data-execution_count="11">
+<details class="code-fold">
+<summary>描画コード</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a aria-label="1"></a>grid_cm <span class="op">=</span> np.linspace(<span class="dv">44</span>, <span class="dv">63</span>, <span class="dv">50</span>)</span>
+<span id="cb16-2"><a aria-label="2"></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">6.5</span>, <span class="fl">3.6</span>))</span>
+<span id="cb16-3"><a aria-label="3"></a>plt.scatter(lengths[ok], weights[ok], s<span class="op">=</span><span class="dv">30</span>, alpha<span class="op">=</span><span class="fl">0.6</span>, c<span class="op">=</span><span class="st">"#5dade2"</span>, edgecolors<span class="op">=</span><span class="st">"gray"</span>, lw<span class="op">=</span><span class="fl">0.4</span>, label<span class="op">=</span><span class="st">"正しい伝票（78枚）"</span>)</span>
+<span id="cb16-4"><a aria-label="4"></a>plt.plot(grid_cm, reg_typo.predict(grid_cm.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)), <span class="st">"--"</span>, color<span class="op">=</span><span class="st">"#e74c3c"</span>, lw<span class="op">=</span><span class="fl">1.5</span>, label<span class="op">=</span><span class="st">"MSE（最小二乗法）"</span>)</span>
+<span id="cb16-5"><a aria-label="5"></a>plt.plot(grid_cm, to_gram(a, b, grid_cm), <span class="st">"-"</span>, color<span class="op">=</span><span class="st">"#27ae60"</span>, lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">"MAE"</span>)</span>
+<span id="cb16-6"><a aria-label="6"></a>plt.ylim(<span class="op">-</span><span class="dv">2500</span>, <span class="dv">6500</span>)                                   <span class="co"># 打ち間違いの2枚（24,000 g 台）は図の外</span></span>
+<span id="cb16-7"><a aria-label="7"></a>plt.axhline(<span class="dv">0</span>, color<span class="op">=</span><span class="st">"black"</span>, lw<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb16-8"><a aria-label="8"></a>plt.xlabel(<span class="st">"体長 (cm)"</span>)<span class="op">;</span> plt.ylabel(<span class="st">"重さ (g)"</span>)</span>
+<span id="cb16-9"><a aria-label="9"></a>plt.legend(fontsize<span class="op">=</span><span class="dv">8</span>)<span class="op">;</span> plt.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb16-10"><a aria-label="10"></a>plt.tight_layout()</span>
+<span id="cb16-11"><a aria-label="11"></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="robust-regression_files/figure-revealjs/cell-12-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img data-src="robust-regression_files/figure-revealjs/cell-12-output-1.png" class="quarto-figure quarto-figure-center" width="636" height="347"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<div title="結果">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>結果</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>傾きは 451 g/cm から 96 g/cm になった（正しい 80 枚の直線は 91 g/cm）</li>
+<li>打ち間違いの 2 枚は取り除いていない
+<ul>
+<li>2 枚とも、ほかの伝票と同じ 1 枚分の力でしか直線を引けない</li>
+</ul></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-1" class="slide level2 center break-slide" data-background-color="white">
+<h2></h2>
+<div class="break-title">
+<p>RANSAC</p>
+</div>
+</section>
+<section id="もう1つの対策賛同者が最多の直線を探すransac" class="slide level2 scrollable">
+<h2>もう1つの対策：賛同者が最多の直線を探す（RANSAC）</h2>
+<div class="slide-body">
+<ul>
+<li>全部の伝票に合わせるのをやめ、<strong>多くの伝票が賛同する直線</strong>を探す</li>
+<li>直線は 2 点で決まるので、2 枚の伝票から直線を引き、その直線の近くにある伝票を数える</li>
+<li>手順：
+<ol type="1">
+<li>伝票から 2 枚をランダムに選ぶ</li>
+<li>その 2 点を通る直線を引く</li>
+<li>直線から 300 g 以内にある伝票（<strong>賛同者</strong>、インライア、<span class="en">inlier</span>）を数える</li>
+<li>1〜3 を 200 回繰り返し、賛同者が最多だった直線を残す</li>
+<li>その賛同者だけで最小二乗法をやり直す</li>
+</ol></li>
+<li>この手法を <strong>RANSAC（<span class="en"><strong>Random Sample Consensus</strong></span> / ランダムに選んだ標本の合意）</strong> と呼ぶ</li>
+</ul>
+<div class="caption-note">
+<p>300 g の根拠：<a href="#/peek-outlier-squares" class="peek">正しい伝票のズレは最大 206 g だった</a>。それより少し広くとる</p>
+</div>
+</div>
+</section>
+<section id="回の試行を図で見る" class="slide level2">
+<h2>1回の試行を図で見る</h2>
+<div class="slide-body">
+<div id="a8702fad" class="cell" data-execution_count="12">
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="robust-regression_files/figure-revealjs/cell-13-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img data-src="robust-regression_files/figure-revealjs/cell-13-output-1.png" class="quarto-figure quarto-figure-center" width="986" height="377"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="caption-note">
+<p>帯の幅が ±300 g。賛同者の数がその直線の点数。外れ値を引いた回は点数が低く、自然に捨てられる</p>
+</div>
+</div>
+</section>
+<section id="peek-ransac-code" class="slide level2">
+<h2>RANSAC を実装する</h2>
+<div class="slide-body">
+<div id="9abe00a1" class="cell" data-execution_count="13">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a aria-label="1"></a><span class="kw">def</span> ransac_line(x, t, threshold, n_trials<span class="op">=</span><span class="dv">200</span>):</span>
+<span id="cb17-2"><a aria-label="2"></a>    best_count <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb17-3"><a aria-label="3"></a>    <span class="cf">for</span> trial <span class="kw">in</span> <span class="bu">range</span>(n_trials):</span>
+<span id="cb17-4"><a aria-label="4"></a>        i, j <span class="op">=</span> np.random.choice(<span class="bu">len</span>(x), <span class="dv">2</span>, replace<span class="op">=</span><span class="va">False</span>)      <span class="co"># 手順1：2枚をランダムに選ぶ</span></span>
+<span id="cb17-5"><a aria-label="5"></a>        <span class="cf">if</span> x[i] <span class="op">==</span> x[j]:                                        <span class="co"># 体長が同じ2枚では直線が引けないので、この回は飛ばす</span></span>
+<span id="cb17-6"><a aria-label="6"></a>            <span class="cf">continue</span></span>
+<span id="cb17-7"><a aria-label="7"></a>        a <span class="op">=</span> (t[j] <span class="op">-</span> t[i]) <span class="op">/</span> (x[j] <span class="op">-</span> x[i])                       <span class="co"># 手順2：2点を通る直線 t = a x + b</span></span>
+<span id="cb17-8"><a aria-label="8"></a>        b <span class="op">=</span> t[i] <span class="op">-</span> a <span class="op">*</span> x[i]</span>
+<span id="cb17-9"><a aria-label="9"></a>        inliers <span class="op">=</span> np.<span class="bu">abs</span>(a <span class="op">*</span> x <span class="op">+</span> b <span class="op">-</span> t) <span class="op">&lt;</span> threshold             <span class="co"># 手順3：直線から threshold 以内なら True（賛同者）</span></span>
+<span id="cb17-10"><a aria-label="10"></a>        <span class="cf">if</span> inliers.<span class="bu">sum</span>() <span class="op">&gt;</span> best_count:                          <span class="co"># 手順4：賛同者が最多の直線を覚えておく</span></span>
+<span id="cb17-11"><a aria-label="11"></a>            best_count, best_inliers <span class="op">=</span> inliers.<span class="bu">sum</span>(), inliers</span>
+<span id="cb17-12"><a aria-label="12"></a>    reg <span class="op">=</span> LinearRegression().fit(x[best_inliers].reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), t[best_inliers])   <span class="co"># 手順5：賛同者だけで fit し直す</span></span>
+<span id="cb17-13"><a aria-label="13"></a>    <span class="cf">return</span> reg.coef_[<span class="dv">0</span>], reg.intercept_, best_inliers</span>
+<span id="cb17-14"><a aria-label="14"></a></span>
+<span id="cb17-15"><a aria-label="15"></a>a_r, b_r, inliers <span class="op">=</span> ransac_line(lengths, weights_typo, threshold<span class="op">=</span><span class="dv">300</span>)</span>
+<span id="cb17-16"><a aria-label="16"></a><span class="bu">print</span>(<span class="ss">f"賛同者 </span><span class="sc">{</span>inliers<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss"> 枚、除外 </span><span class="sc">{</span>(<span class="op">~</span>inliers)<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss"> 枚"</span>)</span>
+<span id="cb17-17"><a aria-label="17"></a><span class="bu">print</span>(<span class="ss">f"RANSAC の直線: 体長 1cm あたり </span><span class="sc">{</span>a_r<span class="sc">:.1f}</span><span class="ss"> g"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>賛同者 78 枚、除外 2 枚
+RANSAC の直線: 体長 1cm あたり 90.0 g</code></pre>
+</div>
+</div>
+<div id="a63d37a0" class="cell" data-execution_count="14">
+<details class="code-fold">
+<summary>描画コード</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a aria-label="1"></a>grid_cm <span class="op">=</span> np.linspace(<span class="dv">44</span>, <span class="dv">63</span>, <span class="dv">50</span>)</span>
+<span id="cb19-2"><a aria-label="2"></a>plt.figure(figsize<span class="op">=</span>(<span class="fl">6.5</span>, <span class="fl">3.6</span>))</span>
+<span id="cb19-3"><a aria-label="3"></a>plt.scatter(lengths[inliers], weights_typo[inliers], s<span class="op">=</span><span class="dv">36</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, c<span class="op">=</span><span class="st">"#2980b9"</span>, label<span class="op">=</span><span class="ss">f"賛同者（</span><span class="sc">{</span>inliers<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">枚）"</span>)</span>
+<span id="cb19-4"><a aria-label="4"></a>plt.scatter(lengths[<span class="op">~</span>inliers], weights_typo[<span class="op">~</span>inliers], s<span class="op">=</span><span class="dv">70</span>, c<span class="op">=</span><span class="st">"#e74c3c"</span>, marker<span class="op">=</span><span class="st">"x"</span>, label<span class="op">=</span><span class="ss">f"除外（</span><span class="sc">{</span>(<span class="op">~</span>inliers)<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">枚、図の外）"</span>)</span>
+<span id="cb19-5"><a aria-label="5"></a>plt.plot(grid_cm, reg_typo.predict(grid_cm.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)), <span class="st">"--"</span>, color<span class="op">=</span><span class="st">"#e74c3c"</span>, lw<span class="op">=</span><span class="fl">1.5</span>, label<span class="op">=</span><span class="st">"最小二乗法（80枚全部）"</span>)</span>
+<span id="cb19-6"><a aria-label="6"></a>plt.plot(grid_cm, a_r <span class="op">*</span> grid_cm <span class="op">+</span> b_r, <span class="st">"-"</span>, color<span class="op">=</span><span class="st">"#2980b9"</span>, lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">"RANSAC"</span>)</span>
+<span id="cb19-7"><a aria-label="7"></a>plt.ylim(<span class="op">-</span><span class="dv">2500</span>, <span class="dv">6500</span>)                                   <span class="co"># 除外した2枚（24,000 g 台）は図の外</span></span>
+<span id="cb19-8"><a aria-label="8"></a>plt.axhline(<span class="dv">0</span>, color<span class="op">=</span><span class="st">"black"</span>, lw<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb19-9"><a aria-label="9"></a>plt.xlabel(<span class="st">"体長 (cm)"</span>)<span class="op">;</span> plt.ylabel(<span class="st">"重さ (g)"</span>)</span>
+<span id="cb19-10"><a aria-label="10"></a>plt.legend(fontsize<span class="op">=</span><span class="dv">8</span>)<span class="op">;</span> plt.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb19-11"><a aria-label="11"></a>plt.tight_layout()</span>
+<span id="cb19-12"><a aria-label="12"></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><a href="robust-regression_files/figure-revealjs/cell-15-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img data-src="robust-regression_files/figure-revealjs/cell-15-output-1.png" width="636" height="347"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<div title="結果">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>結果</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>除外された 2 枚は、ちょうど打ち間違いの 2 枚</li>
+<li>RANSAC の直線は、正しい 78 枚だけで fit した直線（90.0 g/cm）と一致する</li>
+<li>最小二乗法は全部の伝票への妥協点を探すが、RANSAC は多数派に賛同されない伝票を無視する</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="参考何回試せば十分か" class="slide level2">
+<h2>（参考）何回試せば十分か</h2>
+<div class="slide-body">
+<ul>
+<li>2 枚とも正しい伝票を引く確率は <span class="math inline">\(w^2\)</span>（<span class="math inline">\(w\)</span> は正しい伝票の割合）
+<ul>
+<li>今回は <span class="math inline">\(w = 78/80\)</span> なので <span class="math inline">\(w^2 \approx 0.95\)</span></li>
+</ul></li>
+<li><span class="math inline">\(N\)</span> 回すべて外す確率は <span class="math inline">\((1 - w^2)^N\)</span>
+<ul>
+<li><span class="math inline">\(N = 3\)</span> で 0.01 % なので、正しい 2 枚を引くだけなら数回で足りる</li>
+</ul></li>
+<li>ただし正しい 2 枚を引いても、その 2 枚のばらつきで直線が少し傾き、賛同者を取りこぼすことがある
+<ul>
+<li>回数は多めにとる（今回は 200 回）</li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="tweak-しきい値と回数を変える" class="slide level2 badge-practice">
+<h2><strong>Tweak</strong> しきい値と回数を変える</h2>
+<div class="slide-body">
+<ul>
+<li><a href="#/peek-ransac-code" class="peek">さっきのコード</a> の引数を<strong>書き換えて実行</strong>（描画コードまで続けて実行すると図で確認できる）</li>
+<li><code>bad</code> を変える行は、伝票のセルから実行し直す</li>
+</ul>
+<div class="tweak">
+<table class="caption-top">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>やりたいこと</th>
+<th>コード</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>基準を厳しくせよ</td>
+<td><code>threshold=300</code> → <code>threshold=50</code></td>
+</tr>
+<tr class="even">
+<td>打ち間違いを端から真ん中へ移せ</td>
+<td><code>bad = [3, 6]</code> → <code>bad = [54, 39]</code>（体長 53.7 cm と 53.8 cm の魚）</td>
+</tr>
+<tr class="odd">
+<td>3回だけで決めよ</td>
+<td><code>threshold=300)</code> → <code>threshold=300, n_trials=3)</code>。何度か実行せよ</td>
+</tr>
+<tr class="even">
+<td>打ち間違いを20枚にせよ</td>
+<td><code>bad = [3, 6]</code> → <code>bad = list(range(0, 80, 4))</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div title="チェックポイント">
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>チェックポイント</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li><code>50</code>：賛同者が 37〜39 枚に減り、傾きは実行ごとに 86〜100 g/cm とぶれる
+<ul>
+<li>正しい伝票の半分を外れ値扱いしている</li>
+<li>基準は正しい記録のばらつき（最大 206 g）より広くとる</li>
+</ul></li>
+<li>真ん中の 2 枚：最小二乗法の傾きは 92 g/cm とほぼ変わらず、直線全体が 380 g ほど持ち上がる
+<ul>
+<li>端の外れ値は傾きを、真ん中の外れ値は高さを動かす（てこの原理）</li>
+<li>RANSAC はどちらでも 2 枚を除外する</li>
+</ul></li>
+<li><code>n_trials=3</code>：4回に1回は賛同者を取りこぼし、傾きが大きくぶれる（−86〜113 g/cm）
+<ul>
+<li>10 回なら 99 %、200 回ならほぼ毎回 78 枚そろう</li>
+</ul></li>
+<li>打ち間違い 20 枚：最小二乗法の傾きは 398 g/cm、RANSAC は 92 g/cm
+<ul>
+<li>外れ値が多数派にならない限り、RANSAC は壊れない</li>
+</ul></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="参考scikit-learn-では" class="slide level2">
+<h2>（参考）scikit-learn では</h2>
+<div class="slide-body">
+<ul>
+<li>今日書いた <code>ransac_line</code> は、ライブラリでは <code>RANSACRegressor</code> に入っている</li>
+</ul>
+<div id="5daadb4e" class="cell" data-execution_count="15">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a aria-label="1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> RANSACRegressor</span>
+<span id="cb20-2"><a aria-label="2"></a></span>
+<span id="cb20-3"><a aria-label="3"></a>ransac <span class="op">=</span> RANSACRegressor(LinearRegression(), residual_threshold<span class="op">=</span><span class="dv">300</span>, random_state<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb20-4"><a aria-label="4"></a>ransac.fit(lengths.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), weights_typo)</span>
+<span id="cb20-5"><a aria-label="5"></a></span>
+<span id="cb20-6"><a aria-label="6"></a><span class="bu">print</span>(<span class="ss">f"賛同者 </span><span class="sc">{</span>ransac<span class="sc">.</span>inlier_mask_<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss"> 枚"</span>)</span>
+<span id="cb20-7"><a aria-label="7"></a><span class="bu">print</span>(<span class="ss">f"体長 1cm あたり </span><span class="sc">{</span>ransac<span class="sc">.</span>estimator_<span class="sc">.</span>coef_[<span class="dv">0</span>]<span class="sc">:.1f}</span><span class="ss"> g"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>賛同者 78 枚
+体長 1cm あたり 90.0 g</code></pre>
+</div>
+</div>
+<table class="caption-top">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>今日書いたもの</th>
+<th>scikit-learn</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>ransac_line(x, t, threshold=300)</code></td>
+<td><code>RANSACRegressor(LinearRegression(), residual_threshold=300).fit(X, t)</code></td>
+</tr>
+<tr class="even">
+<td><code>inliers</code></td>
+<td><code>ransac.inlier_mask_</code></td>
+</tr>
+<tr class="odd">
+<td><code>a_r</code>, <code>b_r</code></td>
+<td><code>ransac.estimator_.coef_[0]</code>, <code>ransac.estimator_.intercept_</code></td>
+</tr>
+</tbody>
+</table>
+<div title="（参考）RANSAC の出番">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>（参考）RANSAC の出番</strong></p>
+</div>
+<div class="callout-content">
+<p>直線に限らず、平面・円・2枚の写真の対応関係など「少数の点で決まるモデル」なら同じ手順で使える。画像処理では、写真どうしの対応点から変換を推定するとき（パノラマ合成など）の定番</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="mae-と-ransac-を比べる" class="slide level2">
+<h2>MAE と RANSAC を比べる</h2>
+<div class="slide-body">
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th></th>
+<th>MSE（最小二乗法）</th>
+<th>MAE</th>
+<th>RANSAC</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>外れ値の扱い</td>
+<td>二乗して数える</td>
+<td>1 枚 1 票で数える</td>
+<td>除外する</td>
+</tr>
+<tr class="even">
+<td>傾き（g/cm）</td>
+<td>451</td>
+<td>96</td>
+<td>90</td>
+</tr>
+<tr class="odd">
+<td>外れ値の伝票を特定するか</td>
+<td>しない</td>
+<td>しない</td>
+<td>する（除外された 2 枚）</td>
+</tr>
+<tr class="even">
+<td>自分で決めるもの</td>
+<td>学習率</td>
+<td>学習率と更新回数</td>
+<td>しきい値と試行回数</td>
+</tr>
+</tbody>
+</table>
+<div class="caption-note center">
+<p>正しい 80 枚で fit した直線の傾きは 91 g/cm</p>
+</div>
+</div>
+</section>
+<section id="まとめ" class="slide level2">
+<h2>まとめ</h2>
+<div class="slide-body">
+<ul>
+<li><strong>外れ値</strong>：他の記録から大きく離れた記録</li>
+<li><strong>MSE</strong> は二乗で測るので、少数の外れ値に直線が引っ張られる</li>
+<li><strong>MAE</strong>：ズレを絶対値で測る
+<ul>
+<li>勾配に残るのはズレの符号だけで、外れ値も 1 枚 1 票</li>
+<li>1 歩が谷底の近くでも縮まないので、学習率を小さくして揺れを抑える</li>
+</ul></li>
+<li><strong>RANSAC</strong>：ランダムな 2 点の直線を何度も引き、賛同者が最多の直線を採る
+<ul>
+<li>外れ値の伝票を除外して fit し直す</li>
+</ul></li>
+<li>損失を変えると、fit の結果も、勾配降下法のふるまいも変わる</li>
+</ul>
+</div>
+</section>
+<section id="練習問題ransac-を手で1周回す" class="slide level2 scrollable">
+<h2>練習問題：RANSAC を手で1周回す</h2>
+<div class="slide-body">
+<p>5 点：<span class="math inline">\(A(0, 0)\)</span>、<span class="math inline">\(B(1, 1)\)</span>、<span class="math inline">\(C(2, 2)\)</span>、<span class="math inline">\(D(3, 3)\)</span>、<span class="math inline">\(E(2, 8)\)</span>。しきい値は 0.5。1〜3 は<strong>手計算</strong>、4 と 5 は<strong>Pythonコード</strong>で解け。</p>
+<ol type="1">
+<li><span class="math inline">\(A\)</span> と <span class="math inline">\(B\)</span> を通る直線を求め、直線からのズレが 0.5 未満の点（賛同者）を数えよ</li>
+<li><span class="math inline">\(A\)</span> と <span class="math inline">\(E\)</span> を通る直線で同じことをせよ</li>
+<li>RANSAC が最終的に選ぶ直線と、その賛同者を答えよ</li>
+<li>Python：5 点に MSE の勾配降下法で直線を fit し（標準化なし、学習率 0.1、100 回）、本編の <code>ransac_line</code> の直線と比較せよ（傾きと切片を表示）</li>
+<li>Python：4 の勾配を MAE の勾配に書き換えて fit せよ（学習率 0.001、10000 回、傾きと切片を表示）</li>
+</ol>
+</div>
+</section>
+<section id="練習問題の解答例" class="slide level2">
+<h2>練習問題の解答例</h2>
+<div class="slide-body">
+<ul>
+<li><span class="math inline">\(A\)</span>、<span class="math inline">\(B\)</span> を通る直線は <span class="math inline">\(t = x\)</span>
+<ul>
+<li><span class="math inline">\(C\)</span>、<span class="math inline">\(D\)</span> のズレは 0、<span class="math inline">\(E\)</span> のズレは <span class="math inline">\(|8 - 2| = 6\)</span></li>
+<li>賛同者は <span class="math inline">\(A, B, C, D\)</span> の 4 点</li>
+</ul></li>
+<li><span class="math inline">\(A\)</span>、<span class="math inline">\(E\)</span> を通る直線は <span class="math inline">\(t = 4x\)</span>
+<ul>
+<li><span class="math inline">\(B\)</span> のズレは <span class="math inline">\(|1 - 4| = 3\)</span>、<span class="math inline">\(C\)</span> は <span class="math inline">\(|2 - 8| = 6\)</span>、<span class="math inline">\(D\)</span> は <span class="math inline">\(|3 - 12| = 9\)</span></li>
+<li>賛同者は <span class="math inline">\(A, E\)</span> の 2 点</li>
+</ul></li>
+<li>賛同者が最多（4 点）なのは <span class="math inline">\(t = x\)</span>
+<ul>
+<li>賛同者 <span class="math inline">\(A, B, C, D\)</span> だけで最小二乗法をやり直しても、4 点が一直線上なので <span class="math inline">\(t = x\)</span> のまま</li>
+</ul></li>
+<li>勾配降下法で 5 点すべてに fit すると <span class="math inline">\(a \approx 1.46\)</span>、<span class="math inline">\(b \approx 0.46\)</span>
+<ul>
+<li><span class="math inline">\(E\)</span> の 1 点に引っ張られ、傾きが 1.46 倍になった</li>
+</ul></li>
+<li>MAE の勾配降下法では <span class="math inline">\(a \approx 1.00\)</span>、<span class="math inline">\(b \approx 0.00\)</span>
+<ul>
+<li><span class="math inline">\(E\)</span> を除外していないのに、RANSAC と同じ直線になった</li>
+</ul></li>
+</ul>
+<div id="9d9caea5" class="cell" data-execution_count="16">
+<details class="code-fold">
+<summary>解答例を見る</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb22-2"><a aria-label="2"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
+<span id="cb22-3"><a aria-label="3"></a></span>
+<span id="cb22-4"><a aria-label="4"></a>P_x <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>, <span class="fl">2.0</span>])   <span class="co"># A, B, C, D, E の x</span></span>
+<span id="cb22-5"><a aria-label="5"></a>P_t <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>, <span class="fl">8.0</span>])   <span class="co"># A, B, C, D, E の t</span></span>
+<span id="cb22-6"><a aria-label="6"></a></span>
+<span id="cb22-7"><a aria-label="7"></a>a, b <span class="op">=</span> <span class="fl">0.0</span>, <span class="fl">0.0</span></span>
+<span id="cb22-8"><a aria-label="8"></a>lr <span class="op">=</span> <span class="fl">0.1</span></span>
+<span id="cb22-9"><a aria-label="9"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">100</span>):</span>
+<span id="cb22-10"><a aria-label="10"></a>    pred <span class="op">=</span> a <span class="op">*</span> P_x <span class="op">+</span> b</span>
+<span id="cb22-11"><a aria-label="11"></a>    a <span class="op">-=</span> lr <span class="op">*</span> <span class="dv">2</span> <span class="op">*</span> np.mean((pred <span class="op">-</span> P_t) <span class="op">*</span> P_x)</span>
+<span id="cb22-12"><a aria-label="12"></a>    b <span class="op">-=</span> lr <span class="op">*</span> <span class="dv">2</span> <span class="op">*</span> np.mean(pred <span class="op">-</span> P_t)</span>
+<span id="cb22-13"><a aria-label="13"></a><span class="bu">print</span>(<span class="ss">f"勾配降下法（5点すべて）: a=</span><span class="sc">{</span>a<span class="sc">:.2f}</span><span class="ss">, b=</span><span class="sc">{</span>b<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb22-14"><a aria-label="14"></a></span>
+<span id="cb22-15"><a aria-label="15"></a>a_r, b_r, inliers <span class="op">=</span> ransac_line(P_x, P_t, threshold<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb22-16"><a aria-label="16"></a><span class="bu">print</span>(<span class="ss">f"RANSAC: a=</span><span class="sc">{</span>a_r<span class="sc">:.2f}</span><span class="ss">, b=</span><span class="sc">{</span>b_r<span class="sc">:.2f}</span><span class="ss">, 賛同者=</span><span class="sc">{</span>inliers<span class="sc">.</span>astype(<span class="bu">int</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb22-17"><a aria-label="17"></a></span>
+<span id="cb22-18"><a aria-label="18"></a>a, b <span class="op">=</span> <span class="fl">0.0</span>, <span class="fl">0.0</span></span>
+<span id="cb22-19"><a aria-label="19"></a>lr <span class="op">=</span> <span class="fl">0.001</span></span>
+<span id="cb22-20"><a aria-label="20"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10000</span>):</span>
+<span id="cb22-21"><a aria-label="21"></a>    pred <span class="op">=</span> a <span class="op">*</span> P_x <span class="op">+</span> b</span>
+<span id="cb22-22"><a aria-label="22"></a>    a <span class="op">-=</span> lr <span class="op">*</span> np.mean(np.sign(pred <span class="op">-</span> P_t) <span class="op">*</span> P_x)</span>
+<span id="cb22-23"><a aria-label="23"></a>    b <span class="op">-=</span> lr <span class="op">*</span> np.mean(np.sign(pred <span class="op">-</span> P_t))</span>
+<span id="cb22-24"><a aria-label="24"></a><span class="bu">print</span>(<span class="ss">f"MAE の勾配降下法（5点すべて）: a=</span><span class="sc">{</span>a<span class="sc">:.2f}</span><span class="ss">, b=</span><span class="sc">{</span>b<span class="sc">:.2f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>勾配降下法（5点すべて）: a=1.46, b=0.46
+RANSAC: a=1.00, b=0.00, 賛同者=[1 1 1 1 0]
+MAE の勾配降下法（5点すべて）: a=1.00, b=0.00</code></pre>
+</div>
+</div>
+
+
+<div id="3ade8a4a-fb1d-4a6c-8409-ac45482d5fc9" class="hidden">
+
+</div>
+</div>
+</section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+<!-- -->
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="site_libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="site_libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="site_libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="site_libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="site_libs/revealjs/plugin/qmd-web-bridge/bridge.js"></script>
+  <script src="site_libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="site_libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="site_libs/revealjs/plugin/search/search.js"></script>
+  <script src="site_libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="site_libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":false},
+'qmdweb': {"editors":["https://editor.rkskmt.com"]},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: false,
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1280,
+
+        height: 720,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 6.0e-2,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QmdWebBridge, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "コピーしました");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "コピーしました");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    <script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+    (function() {
+      let previousOnload = window.onload;
+      window.onload = () => {
+        if (previousOnload) {
+          previousOnload();
+        }
+        lightboxQuarto.on('slide_before_load', (data) => {
+          const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+          const href = trigger.getAttribute('href');
+          if (href !== null) {
+            const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+            if (imgEl !== null) {
+              const srcAttr = imgEl.getAttribute("src");
+              if (srcAttr && srcAttr.startsWith("data:")) {
+                slideConfig.href = srcAttr;
+              }
+            }
+          } 
+        });
+      
+        lightboxQuarto.on('slide_after_load', (data) => {
+          const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(slideNode);
+          }
+        });
+      
+      };
+      
+    })();
+              </script>
+    
+
+</body></html>
