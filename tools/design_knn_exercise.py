@@ -1,14 +1,18 @@
 # Checks the point layout of the practice problem of knn-curse.qmd
-# (練習問題：箱に分けて、近い 3 点を探す): 10 labelled points on a 16 x 16 grid and the new point N.
+# (練習問題：箱に分けて、近い 3 点を探す): 12 labelled points on a 16 x 16 grid (8 of them in one quarter) and the new point N.
 #
 # The layout was picked from a random search over integer layouts with these conditions, all of
 # which evaluate() enforces or reports:
 #   - quadtree (cut at the midpoints, split above 3 points, at most 2 levels): no point on a cut line
-#   - KD-tree (the deck's build_kdtree, leaf size 3): the median point is the only point on its line
+#   - KD-tree (leaf size 3; every split has an even count and cuts at the midpoint of the two middle
+#     points, which must differ): no point on a line
 #   - the 3 nearest points of N are unique (no tie between the 3rd and the 4th)
 #   - by-hand search (box of N, one box up while fewer than 3 points, then every box the circle of
 #     radius r reaches): the first circle already settles which boxes are measured, and for the
 #     KD-tree it measures the same points as the deck's search_kdtree extended to 3 nearest points
+#   - wanted outcome: the points are skewed, the quadtree box of N holds fewer than 3 points so the
+#     search goes one box up and measures most points, while the KD-tree box of N holds exactly the
+#     3 nearest points and the circle stays inside it
 #
 # Usage: python tools/design_knn_exercise.py    (from the repo root)
 import numpy as np
@@ -45,9 +49,7 @@ def kd_build(P, idx, depth, lo, hi):
     m = len(idx) // 2
     if P[idx[m - 1], a] == P[idx[m], a]:
         return None                                  # tie at the split: ambiguous by hand
-    v = P[idx[m], a]
-    if np.sum(P[idx, a] == v) != 1:
-        return None                                  # only the median point may lie on the line
+    v = (P[idx[m - 1], a] + P[idx[m], a]) / 2        # midpoint of the two middle points
     hl, lr = hi.copy(), lo.copy()
     hl[a], lr[a] = v, v
     L, R = kd_build(P, idx[:m], depth + 1, lo, hl), kd_build(P, idx[m:], depth + 1, lr, hi)
@@ -182,10 +184,11 @@ def evaluate(P, y, q):
 
 
 if __name__ == "__main__":
-    names = list("ABCDEFGHIJ")
-    P = np.array([[3, 15], [6, 3], [6, 9], [6, 13], [7, 10], [9, 14], [11, 13], [12, 3], [12, 7], [13, 14]], dtype=float)
-    y = np.array([1, 0, 0, 0, 1, 1, 1, 0, 1, 1])
-    q = np.array([5.0, 13.0])
+    names = list("ABCDEFGHIJKL")
+    P = np.array([[1, 11], [1, 14], [2, 7], [2, 10], [2, 14], [3, 13],
+                  [5, 4], [5, 11], [5, 14], [6, 13], [11, 12], [12, 1]], dtype=float)
+    y = np.array([1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0])
+    q = np.array([1.0, 9.0])
     r = evaluate(P, y, q)
     assert r is not None
     d2 = ((P - q) ** 2).sum(axis=1)

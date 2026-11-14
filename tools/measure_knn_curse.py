@@ -297,12 +297,12 @@ j0 = np.argsort(np.sqrt(((X_train - X_train[0]) ** 2).sum(axis=1)))[1]
 print(f"# X_train point 0 {X_train[0].tolist()}: nearest point {j0} at {nn0:.3f}; "
       f"median over the 100 points {np.median(nn_all):.3f} (min {min(nn_all):.3f}, max {max(nn_all):.3f})")
 
-# Practice problem (10 points A-J and N): the layout and the by-hand box searches are checked by
+# Practice problem (12 points A-L and N): the layout and the by-hand box searches are checked by
 # tools/design_knn_exercise.py; here only the distances and the predictions of the answer cell.
 Q = np.array(deck_literal("Q_train"))
 q_label = np.array(deck_literal("q_label"))
 q_new = np.array(deck_literal("q_new"))
-print(f"# exercise: squared distances A-J {((Q - q_new) ** 2).sum(axis=1).tolist()}, "
+print(f"# exercise: squared distances A-L {((Q - q_new) ** 2).sum(axis=1).tolist()}, "
       f"predictions k = 1, 3: {[predict_knn(Q, q_label, q_new, k) for k in [1, 3]]}")
 
 
