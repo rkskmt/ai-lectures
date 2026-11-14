@@ -169,14 +169,15 @@ plt.show()
 :::
 
 
-## 近い k 点の多数決にする（k-NN） {#peek-knn-code}
+## 近い k 個のデータの投票で決める（k-nearest neighbors） {#peek-knn-code}
+
+::: {.takeaway .dark}
+**k-nearest neighbors（ k-NN / k 近傍法）のアルゴリズム**
+:::
 
 1. 新しい点 $x$ から、訓練データの全部の点までの距離を測る
 2. 距離が小さい順に、k 点を選ぶ
 3. k 点のラベルのうち、多いほうを $x$ のラベルとする
-
-- **k-NN（[k-nearest neighbors]{.en} / k 近傍法）**と呼ぶ
-   - k は奇数にする（偶数だと、同数で決まらないことがある）
 
 ```{python}
 #| echo: true
@@ -189,6 +190,9 @@ def predict_knn(X_train, y_train, x, k):
 x_new = np.array([0.7, 0.6])                             # 前のスライドの ★
 print(f"★ の予測（k = 3）: {predict_knn(X_train, y_train, x_new, 3)}")
 ```
+::: {.callout-note title="ただし"}
+k は奇数（偶数だと同数で決まらないことがあるため）
+:::
 
 
 ## テストデータで確かめる {#peek-knn-test}
