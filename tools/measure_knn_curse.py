@@ -35,7 +35,8 @@
 #   pts       : 60 points of the "central 50%" figure, default_rng(7)
 #   pts1d / pts2d : 20 points each of the sparsity figure, np.random.seed(0)
 #
-# KD-tree (the deck's build_kdtree / nearest_kdtree: median split, axes in
+# KD-tree (the deck's build_kdtree / nearest_kdtree: an even count is cut at the
+# midpoint of the two middle points, an odd count at the median point, axes in
 # turn, leaf size 5, the far side searched only when the split is closer
 # than the best distance so far; slides show one run with default_rng(0))
 #   kd_count : mean number of distance computations for 100 uniform query
@@ -141,8 +142,12 @@ def build_kdtree(X, idx, depth, leaf_size):
     axis = depth % X.shape[1]
     idx = idx[np.argsort(X[idx, axis])]
     mid = len(idx) // 2
+    if len(idx) % 2 == 0:
+        value = (X[idx[mid - 1], axis] + X[idx[mid], axis]) / 2
+    else:
+        value = X[idx[mid], axis]
     return {"axis": axis,
-            "value": X[idx[mid], axis],
+            "value": value,
             "left": build_kdtree(X, idx[:mid], depth + 1, leaf_size),
             "right": build_kdtree(X, idx[mid:], depth + 1, leaf_size)}
 
