@@ -1494,13 +1494,12 @@ print(f"k-NN（標準化あり）: {accuracy_knn(Zf_train, yf_train, Zf_test, yf
 
 ## 練習問題：領域に分けて、近い 3 点を探す
 
-0〜16 の範囲に、ラベルの分かっている点が 12 個ある。図をノートに 2 つ写し、新しい点 $N(1, 9)$ のラベルを、k = 3 の k-NN で予測せよ。1〜4 は**手で**、5 は**Pythonコード**で解け。
+0〜16 の範囲に、ラベルの分かっている点が 12 個ある。図をノートに 2 つ写し、新しい点 $N(1, 9)$ のラベルを、k = 3 の k-NN で予測せよ。
 
 ```{python}
 #| echo: false
 #| fig-align: center
-# Practice problem: 12 labelled points on a 16 x 16 grid, 8 of them in the upper-left quarter
-# (layout checked by tools/design_knn_exercise.py).
+# Practice problem: 12 labelled points on a 16 x 16 grid, 8 of them in the upper-left quarter.
 ex_names = list("ABCDEFGHIJKL")
 ex_X = np.array([[1, 11], [1, 14], [2, 7], [2, 10], [2, 14], [3, 13],
                  [5, 4], [5, 11], [5, 14], [6, 13], [11, 12], [12, 1]], dtype=float)
@@ -1549,110 +1548,12 @@ plt.show()
    - 3 番目に近い点までの距離を $r$ とし、$N$ を中心に半径 $r$ の円を描く
    - 円がかかる領域がほかにあれば、その中の点も全部測る
 4. 1 と 2 で、$N$ の入っている領域の点の数、距離を測った点の数、近い 3 点の多数決による予測を比べよ
-5. Python：本編の `predict_knn` で、$N$ の予測を確かめよ
 
+## 練習問題：手で求めた結果をコードで確かめる
 
-## 練習問題の解答例
+前の練習問題の 12 点と $N(1, 9)$ について、手で求めた結果を、本編の関数で確かめよ。
 
-```{python}
-#| echo: false
-#| fig-align: center
-def quad_boxes(P, idx, lo, hi, max_points, boxes):
-    """Quadtree leaves (lo, hi, point indices): a box with more than max_points points is cut at its midpoints."""
-    if len(idx) <= max_points:
-        boxes.append((lo, hi, idx))
-        return
-    mid = (lo + hi) / 2
-    assert not np.any(P[idx] == mid)                 # no point on a cut line
-    for corner in range(4):
-        upper = np.array([(corner >> a) & 1 for a in range(2)], dtype=bool)
-        clo, chi = np.where(upper, mid, lo), np.where(upper, hi, mid)
-        inside = np.all((P[idx] > clo) & (P[idx] < chi), axis=1)
-        quad_boxes(P, idx[inside], clo, chi, max_points, boxes)
-
-
-def measured_points(boxes, first, q):
-    """Step 3 of the problem: the points `first`, then every box the circle of radius r reaches."""
-    d2 = ((ex_X - q) ** 2).sum(axis=1)
-    r2 = np.sort(d2[first])[2]
-    measured = set(first.tolist())
-    for lo, hi, idx in boxes:
-        if ((np.maximum(np.maximum(lo - q, q - hi), 0)) ** 2).sum() < r2:
-            measured |= set(idx.tolist())
-    return sorted(measured), r2
-
-
-ex_lo, ex_hi = np.zeros(2), np.full(2, 16.0)
-ex_quad = []
-quad_boxes(ex_X, np.arange(12), ex_lo, ex_hi, 3, ex_quad)
-ex_tree = kd_build(ex_X, np.arange(12), 0, 3)
-ex_kd = []
-kd_boxes(ex_tree, ex_lo, ex_hi, ex_kd)
-
-# Quadtree: the box of N holds only A and D, so the search starts from the box one level up (the upper-left quarter).
-quad_home = [idx for lo, hi, idx in ex_quad if np.all((ex_new > lo) & (ex_new < hi))][0]
-quad_first = np.flatnonzero((ex_X[:, 0] < 8) & (ex_X[:, 1] > 8))
-kd_first = [idx for lo, hi, idx in ex_kd if np.all((ex_new > lo) & (ex_new < hi))][0]
-quad_measured, quad_r2 = measured_points(ex_quad, quad_first, ex_new)
-kd_measured, kd_r2 = measured_points(ex_kd, kd_first, ex_new)
-ex_d2 = ((ex_X - ex_new) ** 2).sum(axis=1)
-ex_near = np.argsort(ex_d2)[:3]
-# The numbers and names written in the answer below.
-assert sorted(len(idx) for lo, hi, idx in ex_quad) == [1, 1, 1, 2, 2, 2, 3]
-assert sorted(len(idx) for lo, hi, idx in ex_kd) == [3, 3, 3, 3]
-assert (ex_tree["value"], ex_tree["left"]["value"], ex_tree["right"]["value"]) == (4, 12, 11.5)
-assert [ex_names[i] for i in ex_near] == ["D", "A", "C"] and ex_d2[ex_near].tolist() == [2, 4, 5]
-assert [ex_names[i] for i in sorted(quad_home)] == ["A", "D"]
-assert [ex_names[i] for i in quad_first] == ["A", "B", "D", "E", "F", "H", "I", "J"]
-assert sorted(ex_d2[quad_first].tolist())[2:4] == [20, 20] and ex_d2[[5, 7]].tolist() == [20, 20]
-assert [ex_names[i] for i in sorted(kd_first)] == ["A", "C", "D"]
-assert (quad_r2, kd_r2) == (20, 5)
-assert [ex_names[i] for i in quad_measured] == ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
-assert [ex_names[i] for i in kd_measured] == ["A", "C", "D"]
-assert predict_knn(ex_X, ex_y, ex_new, 3) == 1
-
-fig, axes = plt.subplots(1, 2, figsize=(11, 6.0))
-for ax, measured, r2, name in zip(axes, [quad_measured, kd_measured], [quad_r2, kd_r2], ["四分木", "KD-tree"]):
-    draw_exercise(ax)
-    ax.scatter(ex_X[measured, 0], ex_X[measured, 1], s=260, facecolors="none", edgecolors="#e74c3c", lw=1.8, zorder=4,
-               label="距離を測った点")
-    ax.add_patch(plt.Circle(ex_new, np.sqrt(r2), fill=False, ls="--", ec="#e74c3c", lw=1.5, zorder=4))
-    ax.set_title(f"{name}：距離を測ったのは {len(measured)} 点\n（赤い破線の円の半径が r）", fontsize=10.5)
-for lo, hi, idx in ex_quad:
-    axes[0].add_patch(plt.Rectangle(lo, hi[0] - lo[0], hi[1] - lo[1], fill=False, ec="#34495e", lw=1.8, zorder=2))
-draw_splits(axes[1], ex_tree, ex_lo, ex_hi, 0)
-handles, labels = axes[0].get_legend_handles_labels()
-fig.legend(handles, labels, loc="lower center", ncol=4, fontsize=9.5)
-plt.tight_layout(rect=[0, 0.06, 1, 1])
-plt.show()
-```
-
-::: {.callout-note title="答え"}
-- **四分木**：$N$ の入っている領域の点は A・D の 2 点なので、1 つ上の領域（左上の領域）に戻り、中の 8 点を全部測る
-   - 3 番目に近いのは F と H（距離の 2 乗はどちらも 20）なので、$r = \sqrt{20} \approx 4.5$
-   - 円が左下の領域にかかるので、C・G も測る（距離を測った点は 10 点）
-- **KD-tree**：$N$ の入っている領域の点は A・C・D の 3 点で、$r = \sqrt{5} \approx 2.2$
-   - 円はほかの領域にかからないので、ここで終わる（距離を測った点は 3 点）
-- どちらでも近い 3 点は D・A・C（距離の 2 乗は 2・4・5）で、ラベルは 1・1・0 なので、予測は 1
-   - 全探索なら 12 点を測る
-- 点がかたよっているので、四分木では 1 つ上の領域に 8 点が入っていた
-   - KD-tree の領域は、どれも 3 点
-:::
-
-```{python}
-#| echo: true
-#| code-fold: true
-#| code-summary: "解答例を見る"
-Q_train = np.array([[1.0, 11.0], [1.0, 14.0], [2.0, 7.0], [2.0, 10.0], [2.0, 14.0], [3.0, 13.0],       # A〜F
-                    [5.0, 4.0], [5.0, 11.0], [5.0, 14.0], [6.0, 13.0], [11.0, 12.0], [12.0, 1.0]])     # G〜L
-q_label = np.array([1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0])                                             # A〜L のラベル
-q_new   = np.array([1.0, 9.0])                                                                       # N
-
-print(f"k = 3: 予測 {predict_knn(Q_train, q_label, q_new, 3)}")
-```
-
-```{python}
-#| echo: false
-#| output: false
-assert np.array_equal(Q_train, ex_X) and np.array_equal(q_label, ex_y) and np.array_equal(q_new, ex_new)
-```
+1. 12 点の座標、ラベル、$N$ を、NumPy の配列にせよ
+2. `predict_knn` で、k = 3 の予測を表示せよ
+3. `build_kdtree`（領域の点が 3 個以下になるまで分ける）で木を作り、`nearest_kdtree` で、$N$ にいちばん近い点の番号、距離、距離を測った点の数を表示せよ
+4. 木の分ける値 `value` を表示し、手で引いた KD-tree の線の位置と比べよ
