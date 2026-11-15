@@ -474,7 +474,7 @@ plt.rcParams["figure.dpi"] = 100
 
 xx, yy = np.meshgrid(np.linspace(X[:, 0].min() - 0.4, X[:, 0].max() + 0.4, 300),
                      np.linspace(X[:, 1].min() - 0.4, X[:, 1].max() + 0.4, 300))
-grid = torch.tensor(np.c_[xx.ravel(), yy.ravel()], dtype=torch.float32)
+grid = torch.tensor(np.c_[xx.reshape(-1), yy.reshape(-1)], dtype=torch.float32)
 
 with torch.no_grad():                       # 推論だけなので履歴の記録は不要
     Zb = (torch.sigmoid(model(grid)) >= 0.5).numpy().reshape(xx.shape)

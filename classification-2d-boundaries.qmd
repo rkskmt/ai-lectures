@@ -670,7 +670,7 @@ print(X[:3])                       # 先頭3匹の [輝度, 重さ]。1組が1�
 
 - `X[行, 列]` の形で、行（何匹目か）と列（どの特徴量か）を指定する
 - `:` は「全部」の意味（`X[:3]` の `:3` から、始めと終わりを省いた形）
-   - `X[:, 0]`：全部の魚の輝度
+   - [`X[:, 0]`](numpy-recipes.qmd#peek-np-column){.peek}：全部の魚の輝度
    - `X[:, 1]`：全部の魚の重さ
 
 ```{python}
@@ -1255,7 +1255,7 @@ def weighted_gini_at(x, y, threshold):
 
 花弁の長さだけ・幅だけのそれぞれについて、加重平均ジニ不純度が最小になる閾値を求め、その閾値で分けたときの指標を表示せよ（閾値、加重平均ジニ不純度、TP・FP・FN・TN、Accuracy、Precision、Recall）
 
-1. 閾値の候補の用意（その特徴量に現れる値すべて。本編と同じく `np.unique`。長さは `X[:, 0]`、幅は `X[:, 1]`）
+1. 閾値の候補の用意（その特徴量に現れる値すべて。本編と同じく [`np.unique`](numpy-recipes.qmd#peek-np-unique){.peek}。長さは `X[:, 0]`、幅は `X[:, 1]`）
 2. 候補ごとの加重平均ジニ不純度の計算（`weighted_gini_at` を使う）
 3. 最小となる閾値で、`x < 閾値` を versicolor（陽性）、それ以外を virginica と予測したときの指標の計算
 
@@ -1284,7 +1284,7 @@ def plot_boundary(model, X, y):
     # 図の範囲を細かい格子に区切り、格子点すべてを model で予測する
     xx, yy = np.meshgrid(np.arange(X[:, 0].min() - 0.5, X[:, 0].max() + 0.5, 0.02),
                          np.arange(X[:, 1].min() - 0.2, X[:, 1].max() + 0.2, 0.01))
-    Z = model.predict(np.c_[xx.ravel(), yy.ravel()]).reshape(xx.shape)
+    Z = model.predict(np.c_[xx.reshape(-1), yy.reshape(-1)]).reshape(xx.shape)
 
     # 予測が virginica（0）の領域を赤、versicolor（1）の領域を青で塗る
     plt.figure(figsize=(7, 5))
