@@ -98,9 +98,9 @@ x = np.array([1, 2, 3])
 X = np.array([[1, 2],
               [3, 4],
               [5, 6]])
-print(x.shape)   # 要素 3 個
-print(X.shape)   # 3行2列
-print(len(X))    # 行数
+print(x.shape)   # (3,) は、[1, 2, 3] のように要素が 3 個並んだ形
+print(X.shape)   # (3, 2) は、3行2列
+print(len(X))    # 行数だけなら len
 ```
 
 
@@ -158,7 +158,7 @@ x = np.arange(6)
 print(x)
 X = x.reshape(2, 3)      # 2行3列にする
 print(X)
-print(X.reshape(-1))     # 1本に戻す
+print(X.reshape(-1))     # 1行に
 ```
 
 ::: {.callout-note}
@@ -166,25 +166,28 @@ print(X.reshape(-1))     # 1本に戻す
 :::
 
 
-## scikit-learn に渡すために、array を N行1列にしたい（`reshape(-1, 1)`） {#peek-np-reshape-column}
+## scikit-learn 用にarray を N行1列にしたい（`reshape(-1, 1)`） {#peek-np-reshape-column}
 
 ```{python}
 #| echo: true
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
-x = np.array([1, 2, 3])
-t = np.array([2, 4, 6])
-X = x.reshape(-1, 1)    # 3行1列
+# やりたいこと：入力 x から正解 t を予測する式を、fit で求める
+x = np.array([1, 2, 3])    # 入力（データ 3 個）
+t = np.array([2, 4, 6])    # それぞれの正解
+
+X = x.reshape(-1, 1)       # fit が受け取れる [[1], [2], [3]] の形にする
 print(X)
 
 reg = LinearRegression().fit(X, t)
-print(reg.predict(X))                                  # 学習に使った x で予測
-print(reg.predict(np.array([4, 5]).reshape(-1, 1)))    # 新しい値で予測
+print(reg.predict(X))
+print(reg.predict(np.array([4, 5]).reshape(-1, 1)))    # 新しい入力 4 と 5 も、同じ形にして渡す
 ```
 
 ::: {.callout-note}
-scikit-learn の `fit` と `predict` は「1行＝1個のデータ」の表を受け取る
+- 特徴量が1つでも、`[1, 2, 3]` の形のままでは `fit` に渡せない（エラーになる）
+- `reshape(-1, 1)` の `1` は列の数で、`-1` と書いた行の数は、要素の数から自動で決まる
 :::
 
 
@@ -249,8 +252,8 @@ import numpy as np
 X = np.array([[1, 10],
               [2, 20],
               [3, 30],
-              [4, 40]])
-y = np.array([0, 1, 0, 1])
+              [4, 40]])     # データ 4 個（1行が 1 個のデータ）
+y = np.array([0, 1, 0, 1])    # 各行のラベル
 # y == 1 は [False, True, False, True]
 print(X[y == 1])       # ラベルが 1 の行
 print(X[y == 0])       # ラベルが 0 の行
@@ -312,8 +315,8 @@ print(d[order])       # 値を小さい順に並べる
 #| echo: true
 import numpy as np
 
-candidates = np.array([2.0, 2.5, 3.0, 3.5])
-errors     = np.array([0.4, 0.1, 0.3, 0.6])
+candidates = np.array([2.0, 2.5, 3.0, 3.5])    # 試した値
+errors     = np.array([0.4, 0.1, 0.3, 0.6])    # それぞれの値を試したときの誤差
 print(np.argmin(errors))                # 最小の要素のインデックス
 print(np.argmax(errors))                # 最大の要素のインデックス
 print(candidates[np.argmin(errors)])    # errors が最小になる候補
@@ -373,8 +376,8 @@ x = np.array([3, 8, 5, 9, 2])
 # x >= 5 は [False, True, True, True, False]
 print(np.mean(x >= 5))         # 5 以上の割合
 
-y      = np.array([1, 0, 1, 1, 0])
-y_pred = np.array([1, 0, 0, 1, 1])
+y      = np.array([1, 0, 1, 1, 0])    # 正解
+y_pred = np.array([1, 0, 0, 1, 1])    # 予測
 # y_pred == y は [True, True, False, True, False]
 print(np.mean(y_pred == y))    # 一致した割合（正解率）
 ```
@@ -391,8 +394,8 @@ print(np.mean(y_pred == y))    # 一致した割合（正解率）
 #| echo: true
 import numpy as np
 
-y      = np.array([1, 0, 1, 1, 0])
-y_pred = np.array([1, 0, 0, 1, 1])
+y      = np.array([1, 0, 1, 1, 0])    # 正解
+y_pred = np.array([1, 0, 0, 1, 1])    # 予測
 # (y == 1) & (y_pred == 1) は [True, False, False, True, False]
 print(np.sum((y == 1) & (y_pred == 1)))    # 正解が 1 で、予測も 1
 print(np.sum((y == 0) & (y_pred == 1)))    # 正解が 0 で、予測は 1
@@ -411,12 +414,12 @@ print(np.sum((y == 0) & (y_pred == 1)))    # 正解が 0 で、予測は 1
 import numpy as np
 
 x = np.array([3, 8, 5, 9, 2])
-left = x < 5
-# left  は [True, False, False, False, True]
-# ~left は [False, True, True, True, False]
-print(x[left])          # 条件に合う側
-print(x[~left])         # 条件に合わない側
-print(np.sum(~left))    # 条件に合わない側の個数
+cond = x < 5
+# cond  は [True, False, False, False, True]
+# ~cond は [False, True, True, True, False]
+print(x[cond])          # 条件に合う側
+print(x[~cond])         # 条件に合わない側
+print(np.sum(~cond))    # 条件に合わない側の個数
 ```
 
 ::: {.callout-note}
@@ -453,7 +456,7 @@ import numpy as np
 p = np.array([0.2, 0.7, 0.5, 0.9])
 # p >= 0.5 は [False, True, True, True]
 print((p >= 0.5).astype(int))      # True を 1、False を 0 に
-print((p >= 0.8).astype(int))      # 条件を変える
+print((p >= 0.8).astype(int))      # 0.8 以上を 1 に
 print((p >= 0.5).astype(float))    # 小数にする
 ```
 
@@ -475,7 +478,7 @@ x = np.array([1.0, 4.0, 9.0])
 y = np.array([1.0, 2.0, 3.0])
 print(x * 2)         # 全要素を 2 倍
 print(x ** 2)        # 全要素を 2 乗
-print(x - y)         # array どうしは、同じ位置の要素で計算
+print(x - y)         # x と y の、同じ位置どうしで引き算
 print(np.sqrt(x))    # 全要素の平方根
 
 # for で 1 個ずつ 2 倍するようなもの
@@ -496,8 +499,8 @@ print(np.array(out))   # 結果は x * 2 と同一
 #| echo: true
 import numpy as np
 
-y      = np.array([1.0, 2.0, 3.0])
-y_pred = np.array([1.5, 2.0, 2.0])
+y      = np.array([1.0, 2.0, 3.0])    # 正解
+y_pred = np.array([1.5, 2.0, 2.0])    # 予測
 print(y_pred - y)                     # 同じ位置どうしの差
 print((y_pred - y) ** 2)              # 差の 2 乗
 print(np.mean((y_pred - y) ** 2))     # 差の 2 乗の平均
@@ -540,10 +543,10 @@ import numpy as np
 X = np.array([[1, 2],
               [3, 4],
               [5, 6]])
-w = np.array([10, 1])
+w = np.array([10, 1])    # 列ごとの重み（0 列目に 10、1 列目に 1）
 print(X @ w)        # 行ごとに 0 列目×10 + 1 列目×1
-print(X @ w + 5)    # 全部の行に 5 を足す
-print(w @ w)        # 1本どうしは内積
+print(X @ w + 5)    # その結果の全部に、定数 5 を足す
+print(w @ w)        # w どうしなら 10×10 + 1×1
 
 # for で 1 行ずつ、重みを掛けて足すようなもの
 out = []
@@ -569,7 +572,7 @@ print(np.maximum(0, z))    # 0 と比べて大きいほうを残す
 
 a = np.array([1, 5, 3])
 b = np.array([4, 2, 3])
-print(np.maximum(a, b))    # array どうしは、同じ位置で大きいほうを残す
+print(np.maximum(a, b))    # a と b の、同じ位置で大きいほうを残す
 ```
 
 ## array の値を範囲内に収めたい（`clip`） {#peek-np-clip}
@@ -581,7 +584,7 @@ import numpy as np
 z = np.array([-2.0, -0.5, 0.3, 1.5])
 print(np.clip(z, -1, 1))          # -1 から 1 の範囲に収める
 
-p = np.array([0.0, 0.3, 1.0])
+p = np.array([0.0, 0.3, 1.0])     # 確率（0 と 1 を含む）
 print(np.clip(p, 0.001, 0.999))   # 0 と 1 を、少し内側の値に直す
 ```
 
@@ -608,11 +611,11 @@ print(f"x = {x:.2f}")     # 小数点以下 2 桁
 print(f"x = {x:.4f}")     # 小数点以下 4 桁
 print(f"x = {x:8.2f}")    # 全体を 8 文字の幅にそろえる
 
-acc = 0.875
-print(f"{acc:.1%}")       # パーセント表示
+acc = 0.875               # 割合（0 から 1 の値）
+print(f"{acc:.1%}")       # パーセントに直して、小数点以下 1 桁
 
 a = np.array([0.12345, 2.5])
-print(a.round(2))         # array は round で丸める
+print(a.round(2))         # 全要素を小数点以下 2 桁に丸める
 ```
 
 
@@ -698,8 +701,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import japanize_matplotlib
 
-X = np.array([[1, 2], [2, 3], [3, 1], [6, 5], [7, 7], [8, 6]])
-y = np.array([0, 0, 0, 1, 1, 1])
+X = np.array([[1, 2], [2, 3], [3, 1], [6, 5], [7, 7], [8, 6]])    # 点の座標（1行が 1 点）
+y = np.array([0, 0, 0, 1, 1, 1])                                  # 各点のクラス
 plt.scatter(X[y == 0, 0], X[y == 0, 1], c="red", marker="s", label="0")
 plt.scatter(X[y == 1, 0], X[y == 1, 1], c="blue", marker="o", label="1")
 plt.legend()
@@ -793,7 +796,9 @@ import japanize_matplotlib
 
 xx, yy = np.meshgrid(np.linspace(-2, 2, 200), np.linspace(-2, 2, 200))
 grid = np.column_stack([xx.reshape(-1), yy.reshape(-1)])   # 1行＝1個の格子点
-z = (grid[:, 0] + grid[:, 1] > 0).astype(int)              # 格子点ごとの予測（0 か 1）
+
+# 分類器の代わりに「x + y が 0 より大きければ 1、そうでなければ 0」という規則で予測する
+z = (grid[:, 0] + grid[:, 1] > 0).astype(int)              # 格子点ごとの予測
 Z = z.reshape(xx.shape)                                    # 格子の形に戻す
 
 plt.contourf(xx, yy, Z, levels=1, colors=["lightcoral", "lightblue"])
@@ -802,5 +807,5 @@ plt.show()
 
 ::: {.callout-note}
 - [格子点](#peek-np-meshgrid){.peek}を細かく取り、1点ずつ予測して、予測の値ごとに色を塗る
-- 予測の行を `model.predict(grid)` に置き換えると、分類器の決定境界の図になる
+- `z` を求める行を `z = model.predict(grid)` に置き換えると、分類器の決定境界の図になる
 :::
