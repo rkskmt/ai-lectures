@@ -179,7 +179,7 @@
   <script src="peek-ui.js" defer=""></script>
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="055db3ec63b3644a7c30f419235505df35c43df5">
+  <meta name="qmd-web-source" content="9a28a6bc4ff696fc0fcde9ed61552e2e75658061">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -216,6 +216,7 @@
 <li><a href="./classification-evaluation.html">過学習と汎化</a></li>
 <li><a href="./clustering-kmeans.html">教師なし学習・クラスタリング</a></li>
 <li><a href="./knn-curse.html">k-NN と次元の呪い</a></li>
+<li><a href="./report-classification.html" class="report">自分のデータを分類する</a></li>
 </ul>
 </div>
 <div id="fit-の中身を開ける" class="sec cat3">
@@ -252,6 +253,11 @@ fit() の中身を開ける
 </ul>
 </div>
 </div>
+<style>
+/* A report card: no lecture number, the chip shows レ (レポート). */
+.reveal .lectures .grid li:has(> a.report){counter-increment:none}
+.reveal .lectures .grid li > a.report::before{content:"レ"!important}
+</style>
 <script>
 document.addEventListener('keydown', function(e) {
   if (e.target && /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
