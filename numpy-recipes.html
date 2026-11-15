@@ -1,0 +1,1734 @@
+<!DOCTYPE html>
+<html lang="ja"><head>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-html/tabby.min.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.10.19">
+
+  <meta name="author" content="rkskmt">
+  <title>AI Lectures – NumPy 逆引き</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/reveal.css">
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #24292e;  }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #24292e; } /* Normal */
+    code span.al { color: #ff5555; font-weight: bold; } /* Alert */
+    code span.an { color: #6a737d; } /* Annotation */
+    code span.at { color: #d73a49; } /* Attribute */
+    code span.bn { color: #005cc5; } /* BaseN */
+    code span.bu { color: #d73a49; } /* BuiltIn */
+    code span.cf { color: #d73a49; } /* ControlFlow */
+    code span.ch { color: #032f62; } /* Char */
+    code span.cn { color: #005cc5; } /* Constant */
+    code span.co { color: #6a737d; } /* Comment */
+    code span.cv { color: #6a737d; } /* CommentVar */
+    code span.do { color: #6a737d; } /* Documentation */
+    code span.dt { color: #d73a49; } /* DataType */
+    code span.dv { color: #005cc5; } /* DecVal */
+    code span.er { color: #ff5555; text-decoration: underline; } /* Error */
+    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
+    code span.fl { color: #005cc5; } /* Float */
+    code span.fu { color: #6f42c1; } /* Function */
+    code span.im { color: #032f62; } /* Import */
+    code span.in { color: #6a737d; } /* Information */
+    code span.kw { color: #d73a49; } /* Keyword */
+    code span.op { color: #24292e; } /* Operator */
+    code span.ot { color: #6f42c1; } /* Other */
+    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.re { color: #6a737d; } /* RegionMarker */
+    code span.sc { color: #005cc5; } /* SpecialChar */
+    code span.ss { color: #032f62; } /* SpecialString */
+    code span.st { color: #032f62; } /* String */
+    code span.va { color: #e36209; } /* Variable */
+    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.wa { color: #ff5555; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-e69bca93ec9d1486cefcf16a785f5ce6.css">
+  <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="site_libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="custom.css">
+  <script>
+  // MathJax v2's HTML-CSS renderer (Quarto hardcodes config=TeX-AMS_HTML-full)
+  // measures glyph widths in the live DOM, so when its TeX webfonts arrive
+  // after typesetting (VSCode webviews, high-DPI Windows, slow networks) the
+  // repaint leaves inline math wider than its reserved box and it overpaints
+  // the neighboring text. The CommonHTML renderer lays out from built-in
+  // metric tables and has no such race. Quarto offers no knob for this, so
+  // trap the Reveal global (reveal.js loads later, in <body>) and rewrite
+  // the math config before Reveal.initialize hands it to the math plugin.
+  //
+  // CommonHTML still sizes math by measuring an ex-height probe in the
+  // DOM next to each equation (matchFontHeight). reveal.css keeps every
+  // section display:none until Reveal's first layout, so when MathJax
+  // loads fast (warm HTTP cache) the initial whole-deck typeset runs
+  // against hidden slides: the probe measures 0, MathJax substitutes
+  // the 16px-body default ex but keeps the real 32px font-size, and
+  // every equation renders at ~50-61% — permanently, because MathJax
+  // never re-typesets processed math. A fixed scale with
+  // matchFontHeight off removes the DOM measurement entirely (which
+  // also fixes math inside collapsed code-fold / callout bodies —
+  // those always measured hidden). 127% is what the measurement
+  // itself yields for this theme's fonts when it works; retune it if
+  // the body font ever changes.
+  (function () {
+    var reveal;
+    Object.defineProperty(window, "Reveal", {
+      configurable: true,
+      get: function () { return reveal; },
+      set: function (value) {
+        reveal = value;
+        if (!value || typeof value.initialize !== "function" || value.__cskCHTML) return;
+        value.__cskCHTML = true;
+        var initialize = value.initialize;
+        value.initialize = function (config) {
+          if (config && config.math && typeof config.math.config === "string") {
+            config.math.config = config.math.config.replace("_HTML", "_CHTML");
+            config.math.CommonHTML = { scale: 127, matchFontHeight: false };
+          }
+          return initialize.call(this, config);
+        };
+      }
+    });
+  })();
+  </script>
+  <script src="slide-ui.js" defer=""></script>
+  <script src="search-ui.js" defer=""></script>
+  <script src="peek-ui.js" defer=""></script>
+  <script src="badge-ui.js" defer=""></script>
+  <script src="toc-ui.js" defer=""></script>
+  <meta name="qmd-web-source" content="59958a58fd00b7ba5202965d9640b6d62caa3c12">
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">NumPy 逆引き</h1>
+  <p class="subtitle">やりたいことから書き方を探す</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+rkskmt
+</div>
+</div>
+</div>
+
+</section>
+<section id="この資料の使い方" class="slide level2">
+<h2>この資料の使い方</h2>
+<div class="slide-body">
+<ul>
+<li>見出しが「やりたいこと」になっている</li>
+<li>コードは、そのまま貼れば1枚だけで動く</li>
+<li>コードの下が実行結果</li>
+<li>画面の 検索 ボタンで、関数名（<code>argsort</code> など）からも探せる</li>
+</ul>
+</div>
+</section>
+<section id="section" class="slide level2 center break-slide" data-background-color="white">
+<h2></h2>
+<div class="break-title">
+<p>配列をつくる</p>
+</div>
+</section>
+<section id="peek-np-linspace" class="slide level2">
+<h2>等間隔の数列をつくりたい</h2>
+<div class="slide-body">
+<div id="decffa25" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a aria-label="2"></a></span>
+<span id="cb1-3"><a aria-label="3"></a><span class="bu">print</span>(np.linspace(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">5</span>))    <span class="co"># 0 から 1 までを 5 個に分ける</span></span>
+<span id="cb1-4"><a aria-label="4"></a><span class="bu">print</span>(np.arange(<span class="dv">0</span>, <span class="dv">1</span>, <span class="fl">0.25</span>))   <span class="co"># 0 から 0.25 きざみ（1 は含まない）</span></span>
+<span id="cb1-5"><a aria-label="5"></a><span class="bu">print</span>(np.arange(<span class="dv">5</span>))            <span class="co"># 0 から 4 までの整数</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[0.   0.25 0.5  0.75 1.  ]
+[0.   0.25 0.5  0.75]
+[0 1 2 3 4]</code></pre>
+</div>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li><code>linspace</code> は<strong>個数</strong>を指定する</li>
+<li><code>arange</code> は<strong>きざみ幅</strong>を指定する</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-np-zeros" class="slide level2">
+<h2>0 で埋めた配列をつくりたい</h2>
+<div class="slide-body">
+<div id="b7c64570" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb3-2"><a aria-label="2"></a></span>
+<span id="cb3-3"><a aria-label="3"></a>w <span class="op">=</span> np.zeros(<span class="dv">3</span>)        <span class="co"># 要素 3 個</span></span>
+<span id="cb3-4"><a aria-label="4"></a><span class="bu">print</span>(w)</span>
+<span id="cb3-5"><a aria-label="5"></a></span>
+<span id="cb3-6"><a aria-label="6"></a>M <span class="op">=</span> np.zeros((<span class="dv">2</span>, <span class="dv">3</span>))   <span class="co"># 2行3列</span></span>
+<span id="cb3-7"><a aria-label="7"></a><span class="bu">print</span>(M)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[0. 0. 0.]
+[[0. 0. 0.]
+ [0. 0. 0.]]</code></pre>
+</div>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<p>2次元にするときは、形を <code>(行数, 列数)</code> と括弧でまとめて渡す</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-np-rng" class="slide level2">
+<h2>乱数の配列をつくりたい</h2>
+<div class="slide-body">
+<div id="90ae2944" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb5-2"><a aria-label="2"></a></span>
+<span id="cb5-3"><a aria-label="3"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">42</span>)</span>
+<span id="cb5-4"><a aria-label="4"></a><span class="bu">print</span>(rng.uniform(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">3</span>))   <span class="co"># 0 以上 1 未満の一様乱数を 3 個</span></span>
+<span id="cb5-5"><a aria-label="5"></a><span class="bu">print</span>(rng.normal(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">3</span>))    <span class="co"># 平均 0、標準偏差 1 の正規乱数を 3 個</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[0.77395605 0.43887844 0.85859792]
+[ 0.94056472 -1.95103519 -1.30217951]</code></pre>
+</div>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li><code>42</code> は乱数の種（<span class="en">seed</span>）
+<ul>
+<li>同じ種なら、何度実行しても同じ乱数になる</li>
+</ul></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-1" class="slide level2 center break-slide" data-background-color="white">
+<h2></h2>
+<div class="break-title">
+<p>形を変える・つなぐ</p>
+</div>
+</section>
+<section id="peek-np-shape" class="slide level2">
+<h2>配列の形を確認したい</h2>
+<div class="slide-body">
+<div id="8fe0fbd4" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb7-2"><a aria-label="2"></a></span>
+<span id="cb7-3"><a aria-label="3"></a>X <span class="op">=</span> np.array([[<span class="dv">1</span>, <span class="dv">2</span>],</span>
+<span id="cb7-4"><a aria-label="4"></a>              [<span class="dv">3</span>, <span class="dv">4</span>],</span>
+<span id="cb7-5"><a aria-label="5"></a>              [<span class="dv">5</span>, <span class="dv">6</span>]])</span>
+<span id="cb7-6"><a aria-label="6"></a><span class="bu">print</span>(X.shape)   <span class="co"># (行数, 列数)</span></span>
+<span id="cb7-7"><a aria-label="7"></a><span class="bu">print</span>(<span class="bu">len</span>(X))    <span class="co"># 行数</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(3, 2)
+3</code></pre>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-np-reshape-column" class="slide level2">
+<h2>1列の表に変えたい</h2>
+<div class="slide-body">
+<div id="a90dfa52" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb9-2"><a aria-label="2"></a></span>
+<span id="cb9-3"><a aria-label="3"></a>x <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>])</span>
+<span id="cb9-4"><a aria-label="4"></a><span class="bu">print</span>(x.shape)</span>
+<span id="cb9-5"><a aria-label="5"></a></span>
+<span id="cb9-6"><a aria-label="6"></a>X <span class="op">=</span> x.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)   <span class="co"># 列数は 1、行数は -1（自動で決まる）</span></span>
+<span id="cb9-7"><a aria-label="7"></a><span class="bu">print</span>(X.shape)</span>
+<span id="cb9-8"><a aria-label="8"></a><span class="bu">print</span>(X)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(3,)
+(3, 1)
+[[1]
+ [2]
+ [3]]</code></pre>
+</div>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li><code>-1</code> を書いた場所は、要素の数から自動で決まる</li>
+<li>scikit-learn の <code>fit</code> は「1行＝1個のデータ」の表を受け取る
+<ul>
+<li>特徴量が1つだけのときに、この変換を使う</li>
+</ul></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-np-reshape-flat" class="slide level2">
+<h2>表を1列に伸ばしたい</h2>
+<div class="slide-body">
+<div id="5ccf9fb3" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb11-2"><a aria-label="2"></a></span>
+<span id="cb11-3"><a aria-label="3"></a>X <span class="op">=</span> np.array([[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>],</span>
+<span id="cb11-4"><a aria-label="4"></a>              [<span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>]])</span>
+<span id="cb11-5"><a aria-label="5"></a><span class="bu">print</span>(X.reshape(<span class="op">-</span><span class="dv">1</span>))   <span class="co"># 行を順につないで 1 列にする</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1 2 3 4 5 6]</code></pre>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-np-column-stack" class="slide level2">
+<h2>2つの列を横に並べて表にしたい</h2>
+<div class="slide-body">
+<div id="528b187e" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb13-2"><a aria-label="2"></a></span>
+<span id="cb13-3"><a aria-label="3"></a>a <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>])</span>
+<span id="cb13-4"><a aria-label="4"></a>b <span class="op">=</span> np.array([<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>])</span>
+<span id="cb13-5"><a aria-label="5"></a><span class="bu">print</span>(np.column_stack([a, b]))</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[[ 1 10]
+ [ 2 20]
+ [ 3 30]]</code></pre>
+</div>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li><code>np.c_[a, b]</code> と書いても同じ結果になる
+<ul>
+<li><code>np.c_</code> は関数ではないので、<code>( )</code> ではなく <code>[ ]</code> で囲む</li>
+</ul></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-np-concatenate" class="slide level2">
+<h2>データをつないで1本にしたい</h2>
+<div class="slide-body">
+<div id="6ca72ba3" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb15-2"><a aria-label="2"></a></span>
+<span id="cb15-3"><a aria-label="3"></a>a <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>])</span>
+<span id="cb15-4"><a aria-label="4"></a>b <span class="op">=</span> np.array([<span class="dv">4</span>, <span class="dv">5</span>])</span>
+<span id="cb15-5"><a aria-label="5"></a><span class="bu">print</span>(np.concatenate([a, b]))</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1 2 3 4 5]</code></pre>
+</div>
+</div>
+</div>
+</section>
+<section id="section-2" class="slide level2 center break-slide" data-background-color="white">
+<h2></h2>
+<div class="break-title">
+<p>取り出す</p>
+</div>
+</section>
+<section id="peek-np-column" class="slide level2">
+<h2>表から1列だけ取り出したい</h2>
+<div class="slide-body">
+<div id="ecae45ae" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb17-2"><a aria-label="2"></a></span>
+<span id="cb17-3"><a aria-label="3"></a>X <span class="op">=</span> np.array([[<span class="dv">1</span>, <span class="dv">10</span>],</span>
+<span id="cb17-4"><a aria-label="4"></a>              [<span class="dv">2</span>, <span class="dv">20</span>],</span>
+<span id="cb17-5"><a aria-label="5"></a>              [<span class="dv">3</span>, <span class="dv">30</span>]])</span>
+<span id="cb17-6"><a aria-label="6"></a><span class="bu">print</span>(X[:, <span class="dv">0</span>])   <span class="co"># すべての行の、0 列目</span></span>
+<span id="cb17-7"><a aria-label="7"></a><span class="bu">print</span>(X[:, <span class="dv">1</span>])   <span class="co"># すべての行の、1 列目</span></span>
+<span id="cb17-8"><a aria-label="8"></a><span class="bu">print</span>(X[<span class="dv">0</span>])      <span class="co"># 0 行目</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1 2 3]
+[10 20 30]
+[ 1 10]</code></pre>
+</div>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<p><code>[行, 列]</code> の順に書き、<code>:</code> は「すべて」を表す</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-np-mask" class="slide level2">
+<h2>条件に合う要素だけ取り出したい</h2>
+<div class="slide-body">
+<div id="d893294f" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb19-2"><a aria-label="2"></a></span>
+<span id="cb19-3"><a aria-label="3"></a>x <span class="op">=</span> np.array([<span class="dv">3</span>, <span class="dv">8</span>, <span class="dv">5</span>, <span class="dv">9</span>, <span class="dv">2</span>])</span>
+<span id="cb19-4"><a aria-label="4"></a><span class="co"># x &gt;= 5 は [False, True, True, True, False]</span></span>
+<span id="cb19-5"><a aria-label="5"></a><span class="bu">print</span>(x[x <span class="op">&gt;=</span> <span class="dv">5</span>])</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[8 5 9]</code></pre>
+</div>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<p><code>[ ]</code> の中に True / False の配列を入れると、True の位置の要素だけが残る</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-np-mask-label" class="slide level2">
+<h2>ラベルが一致する行だけ取り出したい</h2>
+<div class="slide-body">
+<div id="e640f3d8" class="cell" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb21-2"><a aria-label="2"></a></span>
+<span id="cb21-3"><a aria-label="3"></a>X <span class="op">=</span> np.array([[<span class="dv">1</span>, <span class="dv">10</span>],</span>
+<span id="cb21-4"><a aria-label="4"></a>              [<span class="dv">2</span>, <span class="dv">20</span>],</span>
+<span id="cb21-5"><a aria-label="5"></a>              [<span class="dv">3</span>, <span class="dv">30</span>],</span>
+<span id="cb21-6"><a aria-label="6"></a>              [<span class="dv">4</span>, <span class="dv">40</span>]])</span>
+<span id="cb21-7"><a aria-label="7"></a>y <span class="op">=</span> np.array([<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>])</span>
+<span id="cb21-8"><a aria-label="8"></a><span class="co"># y == 1 は [False, True, False, True]</span></span>
+<span id="cb21-9"><a aria-label="9"></a><span class="bu">print</span>(X[y <span class="op">==</span> <span class="dv">1</span>])      <span class="co"># ラベルが 1 の行</span></span>
+<span id="cb21-10"><a aria-label="10"></a><span class="bu">print</span>(X[y <span class="op">==</span> <span class="dv">1</span>, <span class="dv">0</span>])   <span class="co"># ラベルが 1 の行の、0 列目</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[[ 2 20]
+ [ 4 40]]
+[2 4]</code></pre>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-np-where-index" class="slide level2">
+<h2>条件に合うインデックスを知りたい</h2>
+<div class="slide-body">
+<div id="ef1519fc" class="cell" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb23-2"><a aria-label="2"></a></span>
+<span id="cb23-3"><a aria-label="3"></a>x <span class="op">=</span> np.array([<span class="dv">3</span>, <span class="dv">8</span>, <span class="dv">5</span>, <span class="dv">9</span>, <span class="dv">2</span>])</span>
+<span id="cb23-4"><a aria-label="4"></a><span class="co"># x &gt;= 5 は [False, True, True, True, False]</span></span>
+<span id="cb23-5"><a aria-label="5"></a>idx <span class="op">=</span> np.where(x <span class="op">&gt;=</span> <span class="dv">5</span>)[<span class="dv">0</span>]</span>
+<span id="cb23-6"><a aria-label="6"></a><span class="bu">print</span>(idx)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1 2 3]</code></pre>
+</div>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<p><code>np.where</code> は結果をタプルに入れて返すので、<code>[0]</code> で配列を取り出す</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-np-argsort" class="slide level2">
+<h2>小さい順に k 個のインデックスがほしい</h2>
+<div class="slide-body">
+<div id="f7732874" class="cell" data-execution_count="13">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb25-2"><a aria-label="2"></a></span>
+<span id="cb25-3"><a aria-label="3"></a>d <span class="op">=</span> np.array([<span class="fl">0.9</span>, <span class="fl">0.2</span>, <span class="fl">0.7</span>, <span class="fl">0.1</span>])</span>
+<span id="cb25-4"><a aria-label="4"></a>order <span class="op">=</span> np.argsort(d)   <span class="co"># 小さい順に並べたときのインデックス</span></span>
+<span id="cb25-5"><a aria-label="5"></a><span class="bu">print</span>(order)</span>
+<span id="cb25-6"><a aria-label="6"></a><span class="bu">print</span>(order[:<span class="dv">2</span>])        <span class="co"># 小さいほうから 2 個</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[3 1 2 0]
+[3 1]</code></pre>
+</div>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<p>値そのものではなく、<strong>何番目の要素か</strong>が返る</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-np-argmin" class="slide level2">
+<h2>最小・最大の位置を知りたい</h2>
+<div class="slide-body">
+<div id="1a96d989" class="cell" data-execution_count="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb27-2"><a aria-label="2"></a></span>
+<span id="cb27-3"><a aria-label="3"></a>x <span class="op">=</span> np.array([<span class="dv">3</span>, <span class="dv">8</span>, <span class="dv">5</span>, <span class="dv">9</span>, <span class="dv">2</span>])</span>
+<span id="cb27-4"><a aria-label="4"></a><span class="bu">print</span>(np.argmin(x))   <span class="co"># 最小値 2 のインデックス</span></span>
+<span id="cb27-5"><a aria-label="5"></a><span class="bu">print</span>(np.argmax(x))   <span class="co"># 最大値 9 のインデックス</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>4
+3</code></pre>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-np-unique" class="slide level2">
+<h2>重複を除いた値の一覧がほしい</h2>
+<div class="slide-body">
+<div id="324055f3" class="cell" data-execution_count="15">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb29-2"><a aria-label="2"></a></span>
+<span id="cb29-3"><a aria-label="3"></a>y <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">0</span>])</span>
+<span id="cb29-4"><a aria-label="4"></a><span class="bu">print</span>(np.unique(y))</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[0 1 2]</code></pre>
+</div>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<p>結果は小さい順に並ぶ</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-3" class="slide level2 center break-slide" data-background-color="white">
+<h2></h2>
+<div class="break-title">
+<p>条件で数える・判定する</p>
+</div>
+</section>
+<section id="peek-np-count" class="slide level2">
+<h2>条件に合う個数を数えたい</h2>
+<div class="slide-body">
+<div id="d99637fa" class="cell" data-execution_count="16">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb31-2"><a aria-label="2"></a></span>
+<span id="cb31-3"><a aria-label="3"></a>x <span class="op">=</span> np.array([<span class="dv">3</span>, <span class="dv">8</span>, <span class="dv">5</span>, <span class="dv">9</span>, <span class="dv">2</span>])</span>
+<span id="cb31-4"><a aria-label="4"></a><span class="co"># x &gt;= 5 は [False, True, True, True, False]</span></span>
+<span id="cb31-5"><a aria-label="5"></a><span class="bu">print</span>(np.<span class="bu">sum</span>(x <span class="op">&gt;=</span> <span class="dv">5</span>))</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>3</code></pre>
+</div>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<p><code>np.sum</code> は True を 1、False を 0 として足す</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-np-ratio" class="slide level2">
+<h2>条件に合う割合を出したい</h2>
+<div class="slide-body">
+<div id="f85244ca" class="cell" data-execution_count="17">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb33-2"><a aria-label="2"></a></span>
+<span id="cb33-3"><a aria-label="3"></a>y      <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>])</span>
+<span id="cb33-4"><a aria-label="4"></a>y_pred <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>])</span>
+<span id="cb33-5"><a aria-label="5"></a><span class="co"># y_pred == y は [True, True, False, True, False]</span></span>
+<span id="cb33-6"><a aria-label="6"></a><span class="bu">print</span>(np.mean(y_pred <span class="op">==</span> y))</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>0.6</code></pre>
+</div>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<p><code>np.mean</code> は True を 1、False を 0 として平均する</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-np-and" class="slide level2">
+<h2>2つの条件を両方満たす個数を数えたい</h2>
+<div class="slide-body">
+<div id="aa293a0f" class="cell" data-execution_count="18">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb35-2"><a aria-label="2"></a></span>
+<span id="cb35-3"><a aria-label="3"></a>y      <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>])</span>
+<span id="cb35-4"><a aria-label="4"></a>y_pred <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>])</span>
+<span id="cb35-5"><a aria-label="5"></a><span class="co"># (y == 1) &amp; (y_pred == 1) は [True, False, False, True, False]</span></span>
+<span id="cb35-6"><a aria-label="6"></a><span class="bu">print</span>(np.<span class="bu">sum</span>((y <span class="op">==</span> <span class="dv">1</span>) <span class="op">&amp;</span> (y_pred <span class="op">==</span> <span class="dv">1</span>)))</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>2</code></pre>
+</div>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li><code>&amp;</code> の両側の条件は、それぞれ <code>( )</code> で囲む</li>
+<li>配列どうしでは <code>and</code> は使えない</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-np-or-not" class="slide level2">
+<h2>条件を「または」「でない」で組み合わせたい</h2>
+<div class="slide-body">
+<div id="be17ccf1" class="cell" data-execution_count="19">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb37-2"><a aria-label="2"></a></span>
+<span id="cb37-3"><a aria-label="3"></a>x <span class="op">=</span> np.array([<span class="dv">3</span>, <span class="dv">8</span>, <span class="dv">5</span>, <span class="dv">9</span>, <span class="dv">2</span>])</span>
+<span id="cb37-4"><a aria-label="4"></a><span class="co"># (x &lt; 3) | (x &gt; 8) は [False, False, False, True, True]</span></span>
+<span id="cb37-5"><a aria-label="5"></a><span class="bu">print</span>(x[(x <span class="op">&lt;</span> <span class="dv">3</span>) <span class="op">|</span> (x <span class="op">&gt;</span> <span class="dv">8</span>)])</span>
+<span id="cb37-6"><a aria-label="6"></a></span>
+<span id="cb37-7"><a aria-label="7"></a>ok <span class="op">=</span> x <span class="op">&gt;=</span> <span class="dv">5</span></span>
+<span id="cb37-8"><a aria-label="8"></a><span class="co"># ~ok は [True, False, False, False, True]</span></span>
+<span id="cb37-9"><a aria-label="9"></a><span class="bu">print</span>(x[<span class="op">~</span>ok])</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[9 2]
+[3 2]</code></pre>
+</div>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li><code>|</code> は「または」</li>
+<li><code>~</code> は True と False を入れ替える</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-np-all" class="slide level2">
+<h2>全部が条件を満たすか確かめたい</h2>
+<div class="slide-body">
+<div id="a6206694" class="cell" data-execution_count="20">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb39-2"><a aria-label="2"></a></span>
+<span id="cb39-3"><a aria-label="3"></a>a <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>])</span>
+<span id="cb39-4"><a aria-label="4"></a>b <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">4</span>])</span>
+<span id="cb39-5"><a aria-label="5"></a><span class="co"># a == b は [True, True, False]</span></span>
+<span id="cb39-6"><a aria-label="6"></a><span class="bu">print</span>(np.<span class="bu">all</span>(a <span class="op">==</span> b))   <span class="co"># すべて True か</span></span>
+<span id="cb39-7"><a aria-label="7"></a><span class="bu">print</span>(np.<span class="bu">any</span>(a <span class="op">==</span> b))   <span class="co"># 1 つでも True があるか</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>False
+True</code></pre>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-np-where-switch" class="slide level2">
+<h2>条件で値を切り替えたい</h2>
+<div class="slide-body">
+<div id="6199bb44" class="cell" data-execution_count="21">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb41-2"><a aria-label="2"></a></span>
+<span id="cb41-3"><a aria-label="3"></a>p <span class="op">=</span> np.array([<span class="fl">0.2</span>, <span class="fl">0.7</span>, <span class="fl">0.5</span>, <span class="fl">0.9</span>])</span>
+<span id="cb41-4"><a aria-label="4"></a><span class="co"># p &gt;= 0.5 は [False, True, True, True]</span></span>
+<span id="cb41-5"><a aria-label="5"></a><span class="bu">print</span>(np.where(p <span class="op">&gt;=</span> <span class="fl">0.5</span>, <span class="dv">1</span>, <span class="dv">0</span>))   <span class="co"># True の位置は 1、False の位置は 0</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[0 1 1 1]</code></pre>
+</div>
+</div>
+</div>
+</section>
+<section id="section-4" class="slide level2 center break-slide" data-background-color="white">
+<h2></h2>
+<div class="break-title">
+<p>計算する</p>
+</div>
+</section>
+<section id="peek-np-elementwise" class="slide level2">
+<h2>全要素に同じ計算をしたい</h2>
+<div class="slide-body">
+<div id="54f24f7b" class="cell" data-execution_count="22">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb43-2"><a aria-label="2"></a></span>
+<span id="cb43-3"><a aria-label="3"></a>x <span class="op">=</span> np.array([<span class="fl">1.0</span>, <span class="fl">4.0</span>, <span class="fl">9.0</span>])</span>
+<span id="cb43-4"><a aria-label="4"></a><span class="bu">print</span>(x <span class="op">*</span> <span class="dv">2</span> <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb43-5"><a aria-label="5"></a><span class="bu">print</span>(x <span class="op">**</span> <span class="dv">2</span>)</span>
+<span id="cb43-6"><a aria-label="6"></a><span class="bu">print</span>(np.sqrt(x))</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[ 3.  9. 19.]
+[ 1. 16. 81.]
+[1. 2. 3.]</code></pre>
+</div>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li><code>for</code> を書かなくても、すべての要素に同じ計算がかかる</li>
+<li><code>np.exp</code>、<code>np.log</code>、<code>np.abs</code> も同じように使える</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-np-diff" class="slide level2">
+<h2>2つの配列の差を要素ごとに計算したい</h2>
+<div class="slide-body">
+<div id="9407b534" class="cell" data-execution_count="23">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb45-2"><a aria-label="2"></a></span>
+<span id="cb45-3"><a aria-label="3"></a>y      <span class="op">=</span> np.array([<span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>])</span>
+<span id="cb45-4"><a aria-label="4"></a>y_pred <span class="op">=</span> np.array([<span class="fl">1.5</span>, <span class="fl">2.0</span>, <span class="fl">2.0</span>])</span>
+<span id="cb45-5"><a aria-label="5"></a><span class="bu">print</span>(y_pred <span class="op">-</span> y)                   <span class="co"># 同じ位置どうしの差</span></span>
+<span id="cb45-6"><a aria-label="6"></a><span class="bu">print</span>((y_pred <span class="op">-</span> y) <span class="op">**</span> <span class="dv">2</span>)            <span class="co"># 差の 2 乗</span></span>
+<span id="cb45-7"><a aria-label="7"></a><span class="bu">print</span>(np.mean((y_pred <span class="op">-</span> y) <span class="op">**</span> <span class="dv">2</span>))   <span class="co"># その平均</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[ 0.5  0.  -1. ]
+[0.25 0.   1.  ]
+0.4166666666666667</code></pre>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-np-axis" class="slide level2">
+<h2>行ごと・列ごとに合計を出したい</h2>
+<div class="slide-body">
+<div id="ff25a44e" class="cell" data-execution_count="24">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb47-2"><a aria-label="2"></a></span>
+<span id="cb47-3"><a aria-label="3"></a>X <span class="op">=</span> np.array([[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>],</span>
+<span id="cb47-4"><a aria-label="4"></a>              [<span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>]])</span>
+<span id="cb47-5"><a aria-label="5"></a><span class="bu">print</span>(np.<span class="bu">sum</span>(X))           <span class="co"># 全要素の合計</span></span>
+<span id="cb47-6"><a aria-label="6"></a><span class="bu">print</span>(np.<span class="bu">sum</span>(X, axis<span class="op">=</span><span class="dv">0</span>))   <span class="co"># 列ごとの合計（縦方向に足す）</span></span>
+<span id="cb47-7"><a aria-label="7"></a><span class="bu">print</span>(np.<span class="bu">sum</span>(X, axis<span class="op">=</span><span class="dv">1</span>))   <span class="co"># 行ごとの合計（横方向に足す）</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>21
+[5 7 9]
+[ 6 15]</code></pre>
+</div>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li><code>np.mean</code> でも <code>axis</code> の意味は同じ</li>
+<li><code>X.sum(axis=0)</code> と書いても同じ結果になる</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-np-matmul" class="slide level2">
+<h2>行列の積を計算したい</h2>
+<div class="slide-body">
+<div id="a1be2484" class="cell" data-execution_count="25">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb49-2"><a aria-label="2"></a></span>
+<span id="cb49-3"><a aria-label="3"></a>X <span class="op">=</span> np.array([[<span class="dv">1</span>, <span class="dv">2</span>],</span>
+<span id="cb49-4"><a aria-label="4"></a>              [<span class="dv">3</span>, <span class="dv">4</span>],</span>
+<span id="cb49-5"><a aria-label="5"></a>              [<span class="dv">5</span>, <span class="dv">6</span>]])     <span class="co"># 3行2列</span></span>
+<span id="cb49-6"><a aria-label="6"></a>w <span class="op">=</span> np.array([<span class="dv">10</span>, <span class="dv">1</span>])</span>
+<span id="cb49-7"><a aria-label="7"></a><span class="bu">print</span>(X <span class="op">@</span> w)        <span class="co"># 行ごとに 1列目×10 + 2列目×1</span></span>
+<span id="cb49-8"><a aria-label="8"></a><span class="bu">print</span>(X.T)          <span class="co"># .T は行と列を入れ替える</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[12 34 56]
+[[1 3 5]
+ [2 4 6]]</code></pre>
+</div>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<p><code>*</code> は同じ位置どうしの掛け算で、行列の積は <code>@</code> で書く</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-np-maximum" class="slide level2">
+<h2>0 未満を 0 にしたい</h2>
+<div class="slide-body">
+<div id="89efb61e" class="cell" data-execution_count="26">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb51-2"><a aria-label="2"></a></span>
+<span id="cb51-3"><a aria-label="3"></a>z <span class="op">=</span> np.array([<span class="op">-</span><span class="fl">2.0</span>, <span class="op">-</span><span class="fl">0.5</span>, <span class="fl">0.0</span>, <span class="fl">1.5</span>])</span>
+<span id="cb51-4"><a aria-label="4"></a><span class="bu">print</span>(np.maximum(<span class="dv">0</span>, z))     <span class="co"># 0 と比べて大きいほうを残す</span></span>
+<span id="cb51-5"><a aria-label="5"></a><span class="bu">print</span>(np.clip(z, <span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>))    <span class="co"># -1 から 1 の範囲に収める</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[0.  0.  0.  1.5]
+[-1.  -0.5  0.   1. ]</code></pre>
+</div>
+</div>
+</div>
+</section>
+<section id="section-5" class="slide level2 center break-slide" data-background-color="white">
+<h2></h2>
+<div class="break-title">
+<p>表示とループ</p>
+</div>
+</section>
+<section id="peek-py-format" class="slide level2">
+<h2>小数の桁数をそろえて表示したい</h2>
+<div class="slide-body">
+<div id="b2c9b44a" class="cell" data-execution_count="27">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a aria-label="1"></a>x <span class="op">=</span> <span class="fl">3.14159</span></span>
+<span id="cb53-2"><a aria-label="2"></a><span class="bu">print</span>(<span class="ss">f"x = </span><span class="sc">{</span>x<span class="sc">:.2f}</span><span class="ss">"</span>)   <span class="co"># 小数点以下 2 桁</span></span>
+<span id="cb53-3"><a aria-label="3"></a><span class="bu">print</span>(<span class="ss">f"x = </span><span class="sc">{</span>x<span class="sc">:.4f}</span><span class="ss">"</span>)   <span class="co"># 小数点以下 4 桁</span></span>
+<span id="cb53-4"><a aria-label="4"></a></span>
+<span id="cb53-5"><a aria-label="5"></a>acc <span class="op">=</span> <span class="fl">0.875</span></span>
+<span id="cb53-6"><a aria-label="6"></a><span class="bu">print</span>(<span class="ss">f"正解率 </span><span class="sc">{</span>acc<span class="sc">:.1%}</span><span class="ss">"</span>)   <span class="co"># パーセント表示で小数点以下 1 桁</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>x = 3.14
+x = 3.1416
+正解率 87.5%</code></pre>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-py-zip" class="slide level2">
+<h2>2つの配列を同時に回したい</h2>
+<div class="slide-body">
+<div id="2ef0116b" class="cell" data-execution_count="28">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb55-2"><a aria-label="2"></a></span>
+<span id="cb55-3"><a aria-label="3"></a>names  <span class="op">=</span> [<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>]</span>
+<span id="cb55-4"><a aria-label="4"></a>scores <span class="op">=</span> np.array([<span class="dv">70</span>, <span class="dv">85</span>, <span class="dv">60</span>])</span>
+<span id="cb55-5"><a aria-label="5"></a><span class="cf">for</span> name, score <span class="kw">in</span> <span class="bu">zip</span>(names, scores):</span>
+<span id="cb55-6"><a aria-label="6"></a>    <span class="bu">print</span>(name, score)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>a 70
+b 85
+c 60</code></pre>
+</div>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<p>同じ位置の要素が、1組ずつ取り出される</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-py-enumerate" class="slide level2">
+<h2>番号つきで回したい</h2>
+<div class="slide-body">
+<div id="a9a88996" class="cell" data-execution_count="29">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb57-2"><a aria-label="2"></a></span>
+<span id="cb57-3"><a aria-label="3"></a>scores <span class="op">=</span> np.array([<span class="dv">70</span>, <span class="dv">85</span>, <span class="dv">60</span>])</span>
+<span id="cb57-4"><a aria-label="4"></a><span class="cf">for</span> i, score <span class="kw">in</span> <span class="bu">enumerate</span>(scores):</span>
+<span id="cb57-5"><a aria-label="5"></a>    <span class="bu">print</span>(i, score)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>0 70
+1 85
+2 60</code></pre>
+</div>
+</div>
+</div>
+</section>
+<section id="section-6" class="slide level2 center break-slide" data-background-color="white">
+<h2></h2>
+<div class="break-title">
+<p>グラフ</p>
+</div>
+</section>
+<section id="peek-plt-plot" class="slide level2">
+<h2>折れ線グラフを描きたい</h2>
+<div class="slide-body">
+<div id="b270a7d3" class="cell fig-medium" data-execution_count="30">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb59"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb59-2"><a aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb59-3"><a aria-label="3"></a><span class="im">import</span> japanize_matplotlib</span>
+<span id="cb59-4"><a aria-label="4"></a></span>
+<span id="cb59-5"><a aria-label="5"></a>x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">100</span>)</span>
+<span id="cb59-6"><a aria-label="6"></a>plt.plot(x, x <span class="op">**</span> <span class="dv">2</span>, label<span class="op">=</span><span class="st">"x ** 2"</span>)</span>
+<span id="cb59-7"><a aria-label="7"></a>plt.xlabel(<span class="st">"x"</span>)</span>
+<span id="cb59-8"><a aria-label="8"></a>plt.ylabel(<span class="st">"y"</span>)</span>
+<span id="cb59-9"><a aria-label="9"></a>plt.legend()</span>
+<span id="cb59-10"><a aria-label="10"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb59-11"><a aria-label="11"></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><a href="numpy-recipes_files/figure-revealjs/cell-31-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img data-src="numpy-recipes_files/figure-revealjs/cell-31-output-1.png" width="799" height="428"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<p><code>label=</code> で付けた名前が、<code>plt.legend()</code> で凡例として表示される</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-plt-scatter" class="slide level2">
+<h2>散布図をクラスごとに描き分けたい</h2>
+<div class="slide-body">
+<div id="ebedf464" class="cell fig-medium" data-execution_count="31">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb60"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb60-2"><a aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb60-3"><a aria-label="3"></a><span class="im">import</span> japanize_matplotlib</span>
+<span id="cb60-4"><a aria-label="4"></a></span>
+<span id="cb60-5"><a aria-label="5"></a>X <span class="op">=</span> np.array([[<span class="dv">1</span>, <span class="dv">2</span>], [<span class="dv">2</span>, <span class="dv">3</span>], [<span class="dv">3</span>, <span class="dv">1</span>], [<span class="dv">6</span>, <span class="dv">5</span>], [<span class="dv">7</span>, <span class="dv">7</span>], [<span class="dv">8</span>, <span class="dv">6</span>]])</span>
+<span id="cb60-6"><a aria-label="6"></a>y <span class="op">=</span> np.array([<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>])</span>
+<span id="cb60-7"><a aria-label="7"></a>plt.scatter(X[y <span class="op">==</span> <span class="dv">0</span>, <span class="dv">0</span>], X[y <span class="op">==</span> <span class="dv">0</span>, <span class="dv">1</span>], c<span class="op">=</span><span class="st">"red"</span>, marker<span class="op">=</span><span class="st">"s"</span>, label<span class="op">=</span><span class="st">"0"</span>)</span>
+<span id="cb60-8"><a aria-label="8"></a>plt.scatter(X[y <span class="op">==</span> <span class="dv">1</span>, <span class="dv">0</span>], X[y <span class="op">==</span> <span class="dv">1</span>, <span class="dv">1</span>], c<span class="op">=</span><span class="st">"blue"</span>, marker<span class="op">=</span><span class="st">"o"</span>, label<span class="op">=</span><span class="st">"1"</span>)</span>
+<span id="cb60-9"><a aria-label="9"></a>plt.legend()</span>
+<span id="cb60-10"><a aria-label="10"></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><a href="numpy-recipes_files/figure-revealjs/cell-32-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img data-src="numpy-recipes_files/figure-revealjs/cell-32-output-1.png" width="781" height="411"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<p><a href="#/peek-np-mask-label" class="peek">ラベルごとに行を取り出し</a>、クラスの数だけ <code>plt.scatter</code> を呼ぶ</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-plt-axvline" class="slide level2">
+<h2>しきい値の位置に線を引きたい</h2>
+<div class="slide-body">
+<div id="66493db4" class="cell fig-medium" data-execution_count="32">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb61"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb61-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb61-2"><a aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb61-3"><a aria-label="3"></a><span class="im">import</span> japanize_matplotlib</span>
+<span id="cb61-4"><a aria-label="4"></a></span>
+<span id="cb61-5"><a aria-label="5"></a>x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">100</span>)</span>
+<span id="cb61-6"><a aria-label="6"></a>plt.plot(x, x <span class="op">**</span> <span class="dv">2</span>)</span>
+<span id="cb61-7"><a aria-label="7"></a>plt.axvline(x<span class="op">=</span><span class="dv">1</span>, color<span class="op">=</span><span class="st">"red"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>)    <span class="co"># x = 1 の縦線</span></span>
+<span id="cb61-8"><a aria-label="8"></a>plt.axhline(y<span class="op">=</span><span class="dv">4</span>, color<span class="op">=</span><span class="st">"gray"</span>, linestyle<span class="op">=</span><span class="st">":"</span>)    <span class="co"># y = 4 の横線</span></span>
+<span id="cb61-9"><a aria-label="9"></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><a href="numpy-recipes_files/figure-revealjs/cell-33-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img data-src="numpy-recipes_files/figure-revealjs/cell-33-output-1.png" width="781" height="411"></a></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-plt-subplots" class="slide level2">
+<h2>グラフを横に並べたい</h2>
+<div class="slide-body">
+<div id="9a9ffdcb" class="cell fig-medium" data-execution_count="33">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb62-2"><a aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb62-3"><a aria-label="3"></a><span class="im">import</span> japanize_matplotlib</span>
+<span id="cb62-4"><a aria-label="4"></a></span>
+<span id="cb62-5"><a aria-label="5"></a>x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">100</span>)</span>
+<span id="cb62-6"><a aria-label="6"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">3</span>))   <span class="co"># 1行2列</span></span>
+<span id="cb62-7"><a aria-label="7"></a>axes[<span class="dv">0</span>].plot(x, x <span class="op">**</span> <span class="dv">2</span>)</span>
+<span id="cb62-8"><a aria-label="8"></a>axes[<span class="dv">0</span>].set_title(<span class="st">"x ** 2"</span>)</span>
+<span id="cb62-9"><a aria-label="9"></a>axes[<span class="dv">1</span>].plot(x, np.<span class="bu">abs</span>(x))</span>
+<span id="cb62-10"><a aria-label="10"></a>axes[<span class="dv">1</span>].set_title(<span class="st">"abs(x)"</span>)</span>
+<span id="cb62-11"><a aria-label="11"></a>plt.tight_layout()</span>
+<span id="cb62-12"><a aria-label="12"></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><a href="numpy-recipes_files/figure-revealjs/cell-34-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img data-src="numpy-recipes_files/figure-revealjs/cell-34-output-1.png" width="758" height="277"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>並べたグラフは <code>axes[0]</code>、<code>axes[1]</code> で1枚ずつ指定する</li>
+<li>1枚ずつ指定するときは、名前に <code>set_</code> が付く
+<ul>
+<li><code>plt.title</code> → <code>set_title</code></li>
+<li><code>plt.xlabel</code> → <code>set_xlabel</code></li>
+</ul></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-np-meshgrid" class="slide level2">
+<h2>格子点の座標をつくりたい</h2>
+<div class="slide-body">
+<div id="74bd1c3c" class="cell" data-execution_count="34">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb63"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb63-2"><a aria-label="2"></a></span>
+<span id="cb63-3"><a aria-label="3"></a>xs <span class="op">=</span> np.array([<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>])</span>
+<span id="cb63-4"><a aria-label="4"></a>ys <span class="op">=</span> np.array([<span class="dv">10</span>, <span class="dv">20</span>])</span>
+<span id="cb63-5"><a aria-label="5"></a>xx, yy <span class="op">=</span> np.meshgrid(xs, ys)</span>
+<span id="cb63-6"><a aria-label="6"></a><span class="bu">print</span>(xx)   <span class="co"># 各格子点の x 座標</span></span>
+<span id="cb63-7"><a aria-label="7"></a><span class="bu">print</span>(yy)   <span class="co"># 各格子点の y 座標</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[[0 1 2]
+ [0 1 2]]
+[[10 10 10]
+ [20 20 20]]</code></pre>
+</div>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<p><code>xs</code> の 3 個と <code>ys</code> の 2 個を組み合わせた、6 個の格子点ができる</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-plt-contourf" class="slide level2">
+<h2>領域を色で塗り分けたい</h2>
+<div class="slide-body">
+<div id="d5852715" class="cell fig-medium" data-execution_count="35">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb65"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb65-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb65-2"><a aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb65-3"><a aria-label="3"></a><span class="im">import</span> japanize_matplotlib</span>
+<span id="cb65-4"><a aria-label="4"></a></span>
+<span id="cb65-5"><a aria-label="5"></a>xx, yy <span class="op">=</span> np.meshgrid(np.linspace(<span class="op">-</span><span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">200</span>), np.linspace(<span class="op">-</span><span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">200</span>))</span>
+<span id="cb65-6"><a aria-label="6"></a>grid <span class="op">=</span> np.column_stack([xx.reshape(<span class="op">-</span><span class="dv">1</span>), yy.reshape(<span class="op">-</span><span class="dv">1</span>)])   <span class="co"># 1行＝1個の格子点</span></span>
+<span id="cb65-7"><a aria-label="7"></a>z <span class="op">=</span> np.where(grid[:, <span class="dv">0</span>] <span class="op">+</span> grid[:, <span class="dv">1</span>] <span class="op">&gt;</span> <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>)            <span class="co"># 格子点ごとの判定（0 か 1）</span></span>
+<span id="cb65-8"><a aria-label="8"></a>Z <span class="op">=</span> z.reshape(xx.shape)                                    <span class="co"># 格子の形に戻す</span></span>
+<span id="cb65-9"><a aria-label="9"></a></span>
+<span id="cb65-10"><a aria-label="10"></a>plt.contourf(xx, yy, Z, levels<span class="op">=</span><span class="dv">1</span>, colors<span class="op">=</span>[<span class="st">"lightcoral"</span>, <span class="st">"lightblue"</span>])</span>
+<span id="cb65-11"><a aria-label="11"></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><a href="numpy-recipes_files/figure-revealjs/cell-36-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img data-src="numpy-recipes_files/figure-revealjs/cell-36-output-1.png" width="812" height="416"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>ノート</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li><a href="#/peek-np-meshgrid" class="peek">格子点</a>を細かく取り、1点ずつ判定して、結果の値ごとに色を塗る</li>
+<li>判定の行を分類器の予測に置き換えると、決定境界の図になる</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+<div id="3ade8a4a-fb1d-4a6c-8409-ac45482d5fc9" class="hidden">
+
+</div>
+</div>
+</section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+<!-- -->
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="site_libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="site_libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="site_libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="site_libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="site_libs/revealjs/plugin/qmd-web-bridge/bridge.js"></script>
+  <script src="site_libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="site_libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="site_libs/revealjs/plugin/search/search.js"></script>
+  <script src="site_libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="site_libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":false},
+'qmdweb': {"editors":["https://editor.rkskmt.com"]},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: false,
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1280,
+
+        height: 720,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 6.0e-2,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QmdWebBridge, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "コピーしました");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "コピーしました");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    <script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+    (function() {
+      let previousOnload = window.onload;
+      window.onload = () => {
+        if (previousOnload) {
+          previousOnload();
+        }
+        lightboxQuarto.on('slide_before_load', (data) => {
+          const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+          const href = trigger.getAttribute('href');
+          if (href !== null) {
+            const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+            if (imgEl !== null) {
+              const srcAttr = imgEl.getAttribute("src");
+              if (srcAttr && srcAttr.startsWith("data:")) {
+                slideConfig.href = srcAttr;
+              }
+            }
+          } 
+        });
+      
+        lightboxQuarto.on('slide_after_load', (data) => {
+          const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(slideNode);
+          }
+        });
+      
+      };
+      
+    })();
+              </script>
+    
+
+</body></html>
