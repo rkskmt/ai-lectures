@@ -4043,21 +4043,21 @@
     "href": "knn-curse.html#kd-tree-を作る",
     "title": "k-NN と次元の呪い",
     "section": "KD-tree を作る",
-    "text": "KD-tree を作る\n\n\n関数の中で、同じ関数をもう一度呼ぶ（再帰, recursion）\n\n分けた片側を、同じ関数でさらに分ける\n\n木の各部分は辞書で表す\n\n分ける部分：分ける軸 axis、分ける値 value、小さい側 left、大きい側 right\n分けずに止めた箱（葉, leaf）：中の点の番号 points\n\n\n\ndef build_kdtree(X, idx, depth, leaf_size):\n    if len(idx) &lt;= leaf_size:                        # 点が leaf_size 個以下なら、分けずに止める（葉）\n        return {\"points\": idx}\n    axis = depth % X.shape[1]                        # 分ける軸：深さ 0 は特徴量 1、深さ 1 は特徴量 2、…\n    idx  = idx[np.argsort(X[idx, axis])]             # その軸の値が小さい順に、点の番号を並べる\n    mid  = len(idx) // 2\n    if len(idx) % 2 == 0:                            # 偶数個：数えて半々になる 2 点の中点\n        value = (X[idx[mid - 1], axis] + X[idx[mid], axis]) / 2\n    else:                                            # 奇数個：中央値となる点（この点は大きい側に入る）\n        value = X[idx[mid], axis]\n    return {\"axis\":  axis,\n            \"value\": value,                          # 分ける値\n            \"left\":  build_kdtree(X, idx[:mid], depth + 1, leaf_size),   # 小さい側を、同じ関数でさらに分ける\n            \"right\": build_kdtree(X, idx[mid:], depth + 1, leaf_size)}   # 大きい側も同じ\n\ntree = build_kdtree(X_train, np.arange(len(X_train)), 0, 5)\n\n\n\n\n\n同じ関数で 3 次元の 100 点を分けた箱（32 個、どれも 3〜4 点）。ドラッグで回せる"
+    "text": "KD-tree を作る\n\n\n関数の中で、同じ関数をもう一度呼ぶ（再帰, recursion）\n\n分けた片側を、同じ関数でさらに分ける\n\n木の各部分は辞書で表す\n\n分ける部分：分ける軸 axis、分ける値 value、小さい側 left、大きい側 right\n分けずに止めた領域（葉, leaf）：中の点の番号 points\n\n\n\ndef build_kdtree(X, idx, depth, leaf_size):\n    if len(idx) &lt;= leaf_size:                        # 点が leaf_size 個以下なら、分けずに止める（葉）\n        return {\"points\": idx}\n    axis = depth % X.shape[1]                        # 分ける軸：深さ 0 は特徴量 1、深さ 1 は特徴量 2、…\n    idx  = idx[np.argsort(X[idx, axis])]             # その軸の値が小さい順に、点の番号を並べる\n    mid  = len(idx) // 2\n    if len(idx) % 2 == 0:                            # 偶数個：数えて半々になる 2 点の中点\n        value = (X[idx[mid - 1], axis] + X[idx[mid], axis]) / 2\n    else:                                            # 奇数個：中央値となる点（この点は大きい側に入る）\n        value = X[idx[mid], axis]\n    return {\"axis\":  axis,\n            \"value\": value,                          # 分ける値\n            \"left\":  build_kdtree(X, idx[:mid], depth + 1, leaf_size),   # 小さい側を、同じ関数でさらに分ける\n            \"right\": build_kdtree(X, idx[mid:], depth + 1, leaf_size)}   # 大きい側も同じ\n\ntree = build_kdtree(X_train, np.arange(len(X_train)), 0, 5)\n\n\n\n\n\n同じ関数で 3 次元の 100 点を分けた領域（32 個、どれも 3〜4 点）。ドラッグで回せる"
   },
   {
     "objectID": "knn-curse.html#peek-kd-search",
     "href": "knn-curse.html#peek-kd-search",
     "title": "k-NN と次元の呪い",
-    "section": "近い箱から調べて、遠い側は飛ばす",
-    "text": "近い箱から調べて、遠い側は飛ばす\n\n\nKD-tree でいちばん近い点を探すアルゴリズム\n\n\n最初の分け目（図のいちばん太い線）から、★ の入っている箱まで下りる\n\n分け目ごとに、その軸での ★ の座標と分ける値を比べ、★ のある側へ進む\n軸は、木を作ったときと同じく、特徴量 1 → 特徴量 2 → 特徴量 1 → … と交互\n\n★ の入っている箱の中の点と距離を測り、いちばん近い距離を r とする\n下りてきた分け目を逆にたどって戻り、分け目ごとに反対側を調べるか決める\n\n分け目までの距離が r より近い：反対側に、もっと近い点があるかもしれないので調べる（もっと近い点が見つかれば、r を更新する）\n分け目までの距離が r 以上：反対側の点は全部 r より遠いので、飛ばす\n\n\n\n\n\n\n\n\n\n\n\n★ = (0.7, 0.6) の下り方（手順 1）：\n\n\n\n\n分け目\n★ の座標\n進む側\n\n\n\n\n1 回目\n特徴量 1 = 0.496\n0.7\n大きい側\n\n\n2 回目\n特徴量 2 = 0.556\n0.6\n大きい側\n\n\n3 回目\n特徴量 1 = 0.751\n0.7\n小さい側\n\n\n4 回目\n特徴量 2 = 0.881\n0.6\n小さい側\n\n\n5 回目\n特徴量 1 = 0.642\n0.7\n大きい側\n\n\n\n\n\n\n\n\n\n\n一般的な k-NN の実装\n\n\n\n次元が低いときは、全探索ではなく、この探し方で近い点を探すのが一般的\n\n次元が高いと、遠い側を飛ばせなくなる（これも次元の呪い）\n\n★ を中心とする半径 r の円は、3 次元では球、4 次元以上では超球（hypersphere）"
+    "section": "近い領域から調べて、遠い側は飛ばす",
+    "text": "近い領域から調べて、遠い側は飛ばす\n\n\nKD-tree でいちばん近い点を探すアルゴリズム\n\n\n最初の分け目（図のいちばん太い線）から、★ の入っている領域まで下りる\n\n分け目ごとに、その軸での ★ の座標と分ける値を比べ、★ のある側へ進む\n軸は、木を作ったときと同じく、特徴量 1 → 特徴量 2 → 特徴量 1 → … と交互\n\n★ の入っている領域の中の点と距離を測り、いちばん近い距離を r とする\n下りてきた分け目を逆にたどって戻り、分け目ごとに反対側を調べるか決める\n\n分け目までの距離が r より近い：反対側に、もっと近い点があるかもしれないので調べる（もっと近い点が見つかれば、r を更新する）\n分け目までの距離が r 以上：反対側の点は全部 r より遠いので、飛ばす\n\n\n\n\n\n\n\n\n\n\n\n★ = (0.7, 0.6) の下り方（手順 1）：\n\n\n\n\n分け目\n★ の座標\n進む側\n\n\n\n\n1 回目\n特徴量 1 = 0.496\n0.7\n大きい側\n\n\n2 回目\n特徴量 2 = 0.556\n0.6\n大きい側\n\n\n3 回目\n特徴量 1 = 0.751\n0.7\n小さい側\n\n\n4 回目\n特徴量 2 = 0.881\n0.6\n小さい側\n\n\n5 回目\n特徴量 1 = 0.642\n0.7\n大きい側\n\n\n\n\n\n\n\n\n\n\n一般的な k-NN の実装\n\n\n\n次元が低いときは、全探索ではなく、この探し方で近い点を探すのが一般的\n\n次元が高いと、遠い側を飛ばせなくなる（これも次元の呪い）\n\n★ を中心とする半径 r の円は、3 次元では球、4 次元以上では超球（hypersphere）"
   },
   {
     "objectID": "knn-curse.html#いちばん近い点を-kd-tree-で探す",
     "href": "knn-curse.html#いちばん近い点を-kd-tree-で探す",
     "title": "k-NN と次元の呪い",
     "section": "いちばん近い点を KD-tree で探す",
-    "text": "いちばん近い点を KD-tree で探す\n\n\ndef search_kdtree(node, X, x, best):\n    if \"points\" in node:                             # 葉：箱の中の点と距離を測る\n        dist = np.sqrt(((X[node[\"points\"]] - x) ** 2).sum(axis=1))\n        best[\"count\"] += len(dist)                   # 距離を測った点の数\n        j = dist.argmin()\n        if dist[j] &lt; best[\"dist\"]:                   # 今までより近い点があれば、入れ替える\n            best[\"index\"] = node[\"points\"][j]\n            best[\"dist\"]  = dist[j]\n        return\n    diff = x[node[\"axis\"]] - node[\"value\"]           # 分け目から x までの、軸に沿った差\n    if diff &lt; 0:                                     # x は分け目より小さい側にある\n        near, far = node[\"left\"], node[\"right\"]\n    else:\n        near, far = node[\"right\"], node[\"left\"]\n    search_kdtree(near, X, x, best)                  # まず x のある側を調べる\n    if abs(diff) &lt; best[\"dist\"]:                     # 分け目までの距離が r より近いときだけ\n        search_kdtree(far, X, x, best)               # 反対側も調べる\n\ndef nearest_kdtree(tree, X, x):\n    best = {\"index\": -1, \"dist\": np.inf, \"count\": 0} # r（best[\"dist\"]）は無限大から始める\n    search_kdtree(tree, X, x, best)\n    return best\n\nbest = nearest_kdtree(tree, X_train, x_new)\nprint(f\"KD-tree: いちばん近い点 {best['index']}、距離 {best['dist']:.3f}、距離を測った点 {best['count']} / {len(X_train)}\")\ndist = np.sqrt(((X_train - x_new) ** 2).sum(axis=1))\nprint(f\"全探索 : いちばん近い点 {dist.argmin()}、距離 {dist.min():.3f}、距離を測った点 {len(X_train)} / {len(X_train)}\")\n\nKD-tree: いちばん近い点 72、距離 0.055、距離を測った点 15 / 100\n全探索 : いちばん近い点 72、距離 0.055、距離を測った点 100 / 100\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n見つかった点は、全探索と同じ\n距離を測ったのは、100 点中 15 点\n★ の入っている箱の点は 3 点で、いちばん近い点はこの箱の外にあった\n\n2 回目の分け目（特徴量 2 = 0.556）の反対側を、手順 3 で調べたので見つかった\n\nk 点を探すときも、r を「k 番目に近い距離」にすれば、同じように飛ばせる"
+    "text": "いちばん近い点を KD-tree で探す\n\n\ndef search_kdtree(node, X, x, best):\n    if \"points\" in node:                             # 葉：領域の中の点と距離を測る\n        dist = np.sqrt(((X[node[\"points\"]] - x) ** 2).sum(axis=1))\n        best[\"count\"] += len(dist)                   # 距離を測った点の数\n        j = dist.argmin()\n        if dist[j] &lt; best[\"dist\"]:                   # 今までより近い点があれば、入れ替える\n            best[\"index\"] = node[\"points\"][j]\n            best[\"dist\"]  = dist[j]\n        return\n    diff = x[node[\"axis\"]] - node[\"value\"]           # 分け目から x までの、軸に沿った差\n    if diff &lt; 0:                                     # x は分け目より小さい側にある\n        near, far = node[\"left\"], node[\"right\"]\n    else:\n        near, far = node[\"right\"], node[\"left\"]\n    search_kdtree(near, X, x, best)                  # まず x のある側を調べる\n    if abs(diff) &lt; best[\"dist\"]:                     # 分け目までの距離が r より近いときだけ\n        search_kdtree(far, X, x, best)               # 反対側も調べる\n\ndef nearest_kdtree(tree, X, x):\n    best = {\"index\": -1, \"dist\": np.inf, \"count\": 0} # r（best[\"dist\"]）は無限大から始める\n    search_kdtree(tree, X, x, best)\n    return best\n\nbest = nearest_kdtree(tree, X_train, x_new)\nprint(f\"KD-tree: いちばん近い点 {best['index']}、距離 {best['dist']:.3f}、距離を測った点 {best['count']} / {len(X_train)}\")\ndist = np.sqrt(((X_train - x_new) ** 2).sum(axis=1))\nprint(f\"全探索 : いちばん近い点 {dist.argmin()}、距離 {dist.min():.3f}、距離を測った点 {len(X_train)} / {len(X_train)}\")\n\nKD-tree: いちばん近い点 72、距離 0.055、距離を測った点 15 / 100\n全探索 : いちばん近い点 72、距離 0.055、距離を測った点 100 / 100\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n見つかった点は、全探索と同じ\n距離を測ったのは、100 点中 15 点\n★ の入っている領域の点は 3 点で、いちばん近い点はこの領域の外にあった\n\n2 回目の分け目（特徴量 2 = 0.556）の反対側を、手順 3 で調べたので見つかった\n\nk 点を探すときも、r を「k 番目に近い距離」にすれば、同じように飛ばせる"
   },
   {
     "objectID": "knn-curse.html#peek-kd-count",
@@ -4092,7 +4092,7 @@
     "href": "knn-curse.html#まとめ",
     "title": "k-NN と次元の呪い",
     "section": "まとめ",
-    "text": "まとめ\n\n\nk-NN：新しい点のラベルを、近い k 点のラベルの多数決で決める\n\n学習では境界を作らず、訓練データをそのまま取っておく\n\nk はハイパパラメータ：k = 1 は訓練データで必ず当たるが、テストデータでは下がる（過学習）\n次元の呪い：特徴量を増やすと空間が広くなり、いちばん近い点も遠くなる\n\nk-NN は当たらなくなり、点を増やしても追いつかない\n\nKD-tree：点の数が均等になるように空間を箱に分け、遠い箱を飛ばして、いちばん近い点を探す\n\n全部の点までの距離を測らずにすむ（全探索をしなくてよい）\n次元が高いと、飛ばせる箱がなくなる（これも次元の呪い）\n\n\n\n\n\n\n\n\n\n分類問題と特徴量のまとめ\n\n\n1D → 2D の分類、評価と汎化、教師なし学習（k-means）、k-NN と次元の呪い。 機械学習の基本的な問いと道具が揃った。\nここまで fit() の1行を何度も呼び、その中身（最良のパラメータの探し方）も手法ごとに見てきた。 次の「最適化」では、多くの手法で使える探し方を作る。"
+    "text": "まとめ\n\n\nk-NN：新しい点のラベルを、近い k 点のラベルの多数決で決める\n\n学習では境界を作らず、訓練データをそのまま取っておく\n\nk はハイパパラメータ：k = 1 は訓練データで必ず当たるが、テストデータでは下がる（過学習）\n次元の呪い：特徴量を増やすと空間が広くなり、いちばん近い点も遠くなる\n\nk-NN は当たらなくなり、点を増やしても追いつかない\n\nKD-tree：点の数が均等になるように空間を領域に分け、遠い領域を飛ばして、いちばん近い点を探す\n\n全部の点までの距離を測らずにすむ（全探索をしなくてよい）\n次元が高いと、飛ばせる領域がなくなる（これも次元の呪い）\n\n\n\n\n\n\n\n\n\n分類問題と特徴量のまとめ\n\n\n1D → 2D の分類、評価と汎化、教師なし学習（k-means）、k-NN と次元の呪い。 機械学習の基本的な問いと道具が揃った。\nここまで fit() の1行を何度も呼び、その中身（最良のパラメータの探し方）も手法ごとに見てきた。 次の「最適化」では、多くの手法で使える探し方を作る。"
   },
   {
     "objectID": "knn-curse.html#到達チェック-魚を-k-nn-で分類する",
@@ -4120,7 +4120,7 @@
     "href": "knn-curse.html#練習問題の解答例",
     "title": "k-NN と次元の呪い",
     "section": "練習問題の解答例",
-    "text": "練習問題の解答例\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n答え\n\n\n\n四分木：\\(N\\) の入っている箱の点は A・D の 2 点なので、1 つ上の箱（左上の箱）に戻り、中の 8 点を全部測る\n\n3 番目に近いのは F と H（距離の 2 乗はどちらも 20）なので、\\(r = \\sqrt{20} \\approx 4.5\\)\n円が左下の箱にかかるので、C・G も測る（距離を測った点は 10 点）\n\nKD-tree：\\(N\\) の入っている箱の点は A・C・D の 3 点で、\\(r = \\sqrt{5} \\approx 2.2\\)\n\n円はほかの箱にかからないので、ここで終わる（距離を測った点は 3 点）\n\nどちらでも近い 3 点は D・A・C（距離の 2 乗は 2・4・5）で、ラベルは 1・1・0 なので、予測は 1\n\n全探索なら 12 点を測る\n\n点がかたよっているので、四分木では 1 つ上の箱に 8 点が入っていた\n\nKD-tree の箱は、どれも 3 点\n\n\n\n\n\n\n\n\n解答例を見る\nQ_train = np.array([[1.0, 11.0], [1.0, 14.0], [2.0, 7.0], [2.0, 10.0], [2.0, 14.0], [3.0, 13.0],       # A〜F\n                    [5.0, 4.0], [5.0, 11.0], [5.0, 14.0], [6.0, 13.0], [11.0, 12.0], [12.0, 1.0]])     # G〜L\nq_label = np.array([1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0])                                             # A〜L のラベル\nq_new   = np.array([1.0, 9.0])                                                                       # N\n\nprint(f\"k = 3: 予測 {predict_knn(Q_train, q_label, q_new, 3)}\")\n\n\nk = 3: 予測 1"
+    "text": "練習問題の解答例\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n答え\n\n\n\n四分木：\\(N\\) の入っている領域の点は A・D の 2 点なので、1 つ上の領域（左上の領域）に戻り、中の 8 点を全部測る\n\n3 番目に近いのは F と H（距離の 2 乗はどちらも 20）なので、\\(r = \\sqrt{20} \\approx 4.5\\)\n円が左下の領域にかかるので、C・G も測る（距離を測った点は 10 点）\n\nKD-tree：\\(N\\) の入っている領域の点は A・C・D の 3 点で、\\(r = \\sqrt{5} \\approx 2.2\\)\n\n円はほかの領域にかからないので、ここで終わる（距離を測った点は 3 点）\n\nどちらでも近い 3 点は D・A・C（距離の 2 乗は 2・4・5）で、ラベルは 1・1・0 なので、予測は 1\n\n全探索なら 12 点を測る\n\n点がかたよっているので、四分木では 1 つ上の領域に 8 点が入っていた\n\nKD-tree の領域は、どれも 3 点\n\n\n\n\n\n\n\n\n解答例を見る\nQ_train = np.array([[1.0, 11.0], [1.0, 14.0], [2.0, 7.0], [2.0, 10.0], [2.0, 14.0], [3.0, 13.0],       # A〜F\n                    [5.0, 4.0], [5.0, 11.0], [5.0, 14.0], [6.0, 13.0], [11.0, 12.0], [12.0, 1.0]])     # G〜L\nq_label = np.array([1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0])                                             # A〜L のラベル\nq_new   = np.array([1.0, 9.0])                                                                       # N\n\nprint(f\"k = 3: 予測 {predict_knn(Q_train, q_label, q_new, 3)}\")\n\n\nk = 3: 予測 1"
   },
   {
     "objectID": "knn-curse.html#データの数が均等になるように分割kd-tree",
@@ -4155,7 +4155,7 @@
     "href": "knn-curse.html#点の数が均等になるように分割kd-tree",
     "title": "k-NN と次元の呪い",
     "section": "点の数が均等になるように分割（KD-tree）",
-    "text": "点の数が均等になるように分割（KD-tree）\n\n\nKD-tree（k-dimensional tree）の作り方\n\n\n1 つの軸で点を小さい順に数え、点の数が半々になるところで 2 つに分ける\n\n点が偶数個の場合：数えて半々になる 2 点の中点で切る\n点が奇数個の場合：中央値となる点のすぐ左で切る\n\n分けた両側それぞれで、次の軸を使って 1 をくり返す（特徴量 1 → 特徴量 2 → 特徴量 1 → …）\n箱の中の点が 5 点以下になったら、その箱は分けずに止める\n\n\nOctree は箱の中点で切るが、KD-tree は点を数えて切るので、両側の点の数がそろう\n\n図の箱は、どれも 3〜4 点\n\n決定木と同じく、軸に沿った線で空間を分ける木\n図は 2 次元の訓練データ（100 点）で描く（作り方は何次元でも同じ）\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nただし\n\n\nk-d の k は特徴量の数（次元）で、k-NN の k とは別"
+    "text": "点の数が均等になるように分割（KD-tree）\n\n\nKD-tree（k-dimensional tree）の作り方\n\n\n1 つの軸で点を小さい順に数え、点の数が半々になるところで 2 つに分ける\n\n点が偶数個の場合：数えて半々になる 2 点の中点で切る\n点が奇数個の場合：中央値となる点のすぐ左で切る\n\n分けた両側それぞれで、次の軸を使って 1 をくり返す（特徴量 1 → 特徴量 2 → 特徴量 1 → …）\n領域の中の点が 5 点以下になったら、その領域は分けずに止める\n\n\nOctree は領域の中点で切るが、KD-tree は点を数えて切るので、両側の点の数がそろう\n\n図の領域は、どれも 3〜4 点\n\n決定木と同じく、軸に沿った線で空間を分ける木\n図は 2 次元の訓練データ（100 点）で描く（作り方は何次元でも同じ）\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nただし\n\n\nk-d の k は特徴量の数（次元）で、k-NN の k とは別"
   },
   {
     "objectID": "knn-curse.html#練習問題箱に分けて近い-3-点を探す",
@@ -4464,5 +4464,26 @@
     "title": "NumPy 逆引き",
     "section": "領域を色で塗り分けたい",
     "text": "領域を色で塗り分けたい\n\n\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\n\nxx, yy = np.meshgrid(np.linspace(-2, 2, 200), np.linspace(-2, 2, 200))\ngrid = np.column_stack([xx.reshape(-1), yy.reshape(-1)])   # 1行＝1個の格子点\nz = np.where(grid[:, 0] + grid[:, 1] &gt; 0, 1, 0)            # 格子点ごとの判定（0 か 1）\nZ = z.reshape(xx.shape)                                    # 格子の形に戻す\n\nplt.contourf(xx, yy, Z, levels=1, colors=[\"lightcoral\", \"lightblue\"])\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nノート\n\n\n\n格子点を細かく取り、1点ずつ判定して、結果の値ごとに色を塗る\n判定の行を分類器の予測に置き換えると、決定境界の図になる"
+  },
+  {
+    "objectID": "knn-curse.html#空間を領域に分けておけば近くの領域だけ測ればよいoctree",
+    "href": "knn-curse.html#空間を領域に分けておけば近くの領域だけ測ればよいoctree",
+    "title": "k-NN と次元の呪い",
+    "section": "空間を領域に分けておけば、近くの領域だけ測ればよい（Octree）",
+    "text": "空間を領域に分けておけば、近くの領域だけ測ればよい（Octree）\n\n\nOctree（八分木）\n\n\n立方体を、各軸の中点（端と端のちょうど真ん中の位置）で切って、8 つの領域に分ける\n各軸を中点で切っているので、二分探索を 3 つの軸でやるだけで、★ の入っている領域にたどり着く\nいちばん近い点は、その領域の中の点から探す\n\n全部の点を測らずにすむ（全探索をしなくてよい）\n\nその領域の中になければ、1 つ上の領域（分ける前の領域）に戻って探す\n（参考）点の多い領域は、同じように中点で切って、さらに 8 つに分ける\n\n\n\n\n\nドラッグで回せる（黄色の領域が、★ の入っている領域）"
+  },
+  {
+    "objectID": "knn-curse.html#octree-の弱点領域の中の点の数がそろわない",
+    "href": "knn-curse.html#octree-の弱点領域の中の点の数がそろわない",
+    "title": "k-NN と次元の呪い",
+    "section": "Octree の弱点：領域の中の点の数がそろわない",
+    "text": "Octree の弱点：領域の中の点の数がそろわない\n\n\n点がどこにあるかに関係なく、中点で切る\nそのため、領域によって中の点の数がばらばらになる（前のスライドの図では 1 点から 14 点まで）\n\n点の多い領域：★ がそこに入ると、中の点を全部測ることになる\n点の少ない領域：近い点が領域の中になく、まわりの領域まで（1 つ上の領域に戻って）調べることになる\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n質問\n\n\n領域の中の点の数をそろえるには、どこで切ればよい？"
+  },
+  {
+    "objectID": "knn-curse.html#練習問題領域に分けて近い-3-点を探す",
+    "href": "knn-curse.html#練習問題領域に分けて近い-3-点を探す",
+    "title": "k-NN と次元の呪い",
+    "section": "練習問題：領域に分けて、近い 3 点を探す",
+    "text": "練習問題：領域に分けて、近い 3 点を探す\n\n0〜16 の範囲に、ラベルの分かっている点が 12 個ある。図をノートに 2 つ写し、新しい点 \\(N(1, 9)\\) のラベルを、k = 3 の k-NN で予測せよ。1〜4 は手で、5 はPythonコードで解け。\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n点\nA\nB\nC\nD\nE\nF\nG\nH\nI\nJ\nK\nL\n\n\n\n\n座標\n(1, 11)\n(1, 14)\n(2, 7)\n(2, 10)\n(2, 14)\n(3, 13)\n(5, 4)\n(5, 11)\n(5, 14)\n(6, 13)\n(11, 12)\n(12, 1)\n\n\nラベル\n1\n1\n0\n1\n1\n1\n0\n1\n1\n0\n0\n0\n\n\n\n\n1 つ目の図に、Octree の 2 次元版（四分木, quadtree）の線を引け\n\n全体を各軸の中点で切って 4 つの領域に分け、点が 3 個より多い領域だけ、同じようにもう一度 4 つに分ける\n\n2 つ目の図に、KD-tree の線を引け（特徴量 1 → 特徴量 2 の順に、領域の点が 3 個になるまで分ける）\n\n点が偶数個の場合：数えて半々になる 2 点の中点で切る\n点が奇数個の場合：中央値となる点のすぐ左で切る（特徴量 2 で切るときは、すぐ下）\n\n1 と 2 のそれぞれで、次の手順で \\(N\\) に近い 3 点を探せ\n\n\\(N\\) の入っている領域の点との距離を測る（3 点に満たなければ、1 つ上の領域に戻って、その中の点を全部測る）\n3 番目に近い点までの距離を \\(r\\) とし、\\(N\\) を中心に半径 \\(r\\) の円を描く\n円がかかる領域がほかにあれば、その中の点も全部測る\n\n1 と 2 で、\\(N\\) の入っている領域の点の数、距離を測った点の数、近い 3 点の多数決による予測を比べよ\nPython：本編の predict_knn で、\\(N\\) の予測を確かめよ"
   }
 ]
