@@ -4322,8 +4322,8 @@
     "objectID": "numpy-recipes.html#peek-np-and",
     "href": "numpy-recipes.html#peek-np-and",
     "title": "NumPy 逆引き",
-    "section": "混同行列のために、「正解が 1 で予測も 1」の個数を数えたい（&）",
-    "text": "混同行列のために、「正解が 1 で予測も 1」の個数を数えたい（&）\n\n\nimport numpy as np\n\ny      = np.array([1, 0, 1, 1, 0])\ny_pred = np.array([1, 0, 0, 1, 1])\n# (y == 1) & (y_pred == 1) は [True, False, False, True, False]\nprint(np.sum((y == 1) & (y_pred == 1)))\n\n2\n\n\n\n\n\n\n\n\nノート\n\n\n\n& の両側の条件は、それぞれ ( ) で囲む\n配列どうしでは and は使えない"
+    "section": "2つの条件を両方満たす要素の個数を数えたい（&）",
+    "text": "2つの条件を両方満たす要素の個数を数えたい（&）\n\n\nimport numpy as np\n\ny      = np.array([1, 0, 1, 1, 0])\ny_pred = np.array([1, 0, 0, 1, 1])\n# (y == 1) & (y_pred == 1) は [True, False, False, True, False]\nprint(np.sum((y == 1) & (y_pred == 1)))\n\n2\n\n\n\n\n\n\n\n\nノート\n\n\n\n& の両側の条件は、それぞれ ( ) で囲む\n配列どうしでは and は使えない"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-or-not",
@@ -4336,8 +4336,8 @@
     "objectID": "numpy-recipes.html#peek-np-all",
     "href": "numpy-recipes.html#peek-np-all",
     "title": "NumPy 逆引き",
-    "section": "収束の判定として、2つの array が完全に同じか確かめたい（all）",
-    "text": "収束の判定として、2つの array が完全に同じか確かめたい（all）\n\n\nimport numpy as np\n\nold = np.array([1, 2, 3])\nnew = np.array([1, 2, 4])\n# new == old は [True, True, False]\nprint(np.all(new == old))   # すべて True のときだけ True\n\nFalse"
+    "section": "2つの array が完全に同じか確かめたい（all）",
+    "text": "2つの array が完全に同じか確かめたい（all）\n\n\nimport numpy as np\n\nold = np.array([1, 2, 3])\nnew = np.array([1, 2, 4])\n# new == old は [True, True, False]\nprint(np.all(new == old))   # すべて True のときだけ True\n\nFalse"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-where-switch",
@@ -4364,29 +4364,29 @@
     "objectID": "numpy-recipes.html#peek-np-diff",
     "href": "numpy-recipes.html#peek-np-diff",
     "title": "NumPy 逆引き",
-    "section": "損失として、予測と正解の差の2乗の平均を計算したい（mean）",
-    "text": "損失として、予測と正解の差の2乗の平均を計算したい（mean）\n\n\nimport numpy as np\n\ny      = np.array([1.0, 2.0, 3.0])\ny_pred = np.array([1.5, 2.0, 2.0])\nprint(y_pred - y)                   # 同じ位置どうしの差\nprint((y_pred - y) ** 2)            # 差の 2 乗\nprint(np.mean((y_pred - y) ** 2))   # その平均\n\n[ 0.5  0.  -1. ]\n[0.25 0.   1.  ]\n0.4166666666666667"
+    "section": "2つの array の差の2乗の平均を計算したい（mean）",
+    "text": "2つの array の差の2乗の平均を計算したい（mean）\n\n\nimport numpy as np\n\ny      = np.array([1.0, 2.0, 3.0])\ny_pred = np.array([1.5, 2.0, 2.0])\nprint(y_pred - y)                   # 同じ位置どうしの差\nprint((y_pred - y) ** 2)            # 差の 2 乗\nprint(np.mean((y_pred - y) ** 2))   # その平均\n\n[ 0.5  0.  -1. ]\n[0.25 0.   1.  ]\n0.4166666666666667"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-axis",
     "href": "numpy-recipes.html#peek-np-axis",
     "title": "NumPy 逆引き",
-    "section": "標準化のために、特徴量ごと（列ごと）の平均を計算したい（axis=）",
-    "text": "標準化のために、特徴量ごと（列ごと）の平均を計算したい（axis=）\n\n\nimport numpy as np\n\nX = np.array([[1, 10],\n              [2, 20],\n              [3, 60]])\nprint(X.mean(axis=0))   # 列ごと（特徴量ごと）の平均\nprint(X.sum(axis=1))    # 行ごと（データごと）の合計\n\n[ 2. 30.]\n[11 22 63]\n\n\n\n\n\n\n\n\nノート\n\n\n\naxis=0 は縦方向にまとめ、axis=1 は横方向にまとめる\naxis を書かないと、全要素をまとめて計算する"
+    "section": "表の列ごとの平均を計算したい（axis=）",
+    "text": "表の列ごとの平均を計算したい（axis=）\n\n\nimport numpy as np\n\nX = np.array([[1, 10],\n              [2, 20],\n              [3, 60]])\nprint(X.mean(axis=0))   # 列ごと（特徴量ごと）の平均\nprint(X.sum(axis=1))    # 行ごと（データごと）の合計\n\n[ 2. 30.]\n[11 22 63]\n\n\n\n\n\n\n\n\nノート\n\n\n\naxis=0 は縦方向にまとめ、axis=1 は横方向にまとめる\naxis を書かないと、全要素をまとめて計算する"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-matmul",
     "href": "numpy-recipes.html#peek-np-matmul",
     "title": "NumPy 逆引き",
-    "section": "線形モデルのために、全データの「重み × 特徴量」の和を一度に計算したい（@）",
-    "text": "線形モデルのために、全データの「重み × 特徴量」の和を一度に計算したい（@）\n\n\nimport numpy as np\n\nX = np.array([[1, 2],\n              [3, 4],\n              [5, 6]])     # 3個のデータ、特徴量は2つ\nw = np.array([10, 1])      # 特徴量ごとの重み\nprint(X @ w)               # データごとに 1列目×10 + 2列目×1\n\n[12 34 56]\n\n\n\n\n\n\n\n\nノート\n\n\n\n* は同じ位置どうしの掛け算で、行列の積は @ で書く\n行と列を入れ替えた行列は X.T で得られる"
+    "section": "表の全部の行に、重みを掛けた和を一度に計算したい（@）",
+    "text": "表の全部の行に、重みを掛けた和を一度に計算したい（@）\n\n\nimport numpy as np\n\nX = np.array([[1, 2],\n              [3, 4],\n              [5, 6]])     # 3個のデータ、特徴量は2つ\nw = np.array([10, 1])      # 特徴量ごとの重み\nprint(X @ w)               # データごとに 1列目×10 + 2列目×1\n\n[12 34 56]\n\n\n\n\n\n\n\n\nノート\n\n\n\n* は同じ位置どうしの掛け算で、行列の積は @ で書く\n行と列を入れ替えた行列は X.T で得られる"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-maximum",
     "href": "numpy-recipes.html#peek-np-maximum",
     "title": "NumPy 逆引き",
-    "section": "ReLU として、array の負の要素を 0 に置き換えたい（maximum）",
-    "text": "ReLU として、array の負の要素を 0 に置き換えたい（maximum）\n\n\nimport numpy as np\n\nz = np.array([-2.0, -0.5, 0.0, 1.5])\nprint(np.maximum(0, z))   # 0 と比べて大きいほうを残す\n\n[0.  0.  0.  1.5]"
+    "section": "array の要素のうち、負の値だけを 0 に置き換えたい（maximum）",
+    "text": "array の要素のうち、負の値だけを 0 に置き換えたい（maximum）\n\n\nimport numpy as np\n\nz = np.array([-2.0, -0.5, 0.0, 1.5])\nprint(np.maximum(0, z))   # 0 と比べて大きいほうを残す\n\n[0.  0.  0.  1.5]"
   },
   {
     "objectID": "numpy-recipes.html#section-5",
