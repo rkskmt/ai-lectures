@@ -18,24 +18,37 @@ subtitle: "やりたいことから書き方を探す"
 :::
 
 
-## 等間隔の数列をつくりたい {#peek-np-linspace}
+## 関数のために x 軸の点列を用意したい（`linspace`） {#peek-np-linspace}
 
 ```{python}
 #| echo: true
 import numpy as np
 
-print(np.linspace(0, 1, 5))    # 0 から 1 までを 5 個に分ける
-print(np.arange(0, 1, 0.25))   # 0 から 0.25 きざみ（1 は含まない）
-print(np.arange(5))            # 0 から 4 までの整数
+x = np.linspace(0, 1, 5)   # 0 から 1 までを、等間隔に 5 個
+print(x)
 ```
 
 ::: {.callout-note}
-- `linspace` は**個数**を指定する
-- `arange` は**きざみ幅**を指定する
+なめらかな曲線を描くときは、個数を 100 以上にする
 :::
 
 
-## 0 で埋めた配列をつくりたい {#peek-np-zeros}
+## range のような数列を array で用意したい（`arange`） {#peek-np-arange}
+
+```{python}
+#| echo: true
+import numpy as np
+
+print(np.arange(5))                # range(5) と同じ並び
+print(np.arange(2.0, 4.0, 0.5))    # 開始、終了（含まない）、きざみ
+```
+
+::: {.callout-note}
+`range` と違い、きざみに小数を使える
+:::
+
+
+## 重みのために、初期値 0 の array を準備したい（`zeros`） {#peek-np-zeros}
 
 ```{python}
 #| echo: true
@@ -53,15 +66,17 @@ print(M)
 :::
 
 
-## 乱数の配列をつくりたい {#peek-np-rng}
+## 実験用のデータとして、乱数の array を用意したい（`default_rng`） {#peek-np-rng}
 
 ```{python}
 #| echo: true
 import numpy as np
 
 rng = np.random.default_rng(42)
-print(rng.uniform(0, 1, 3))   # 0 以上 1 未満の一様乱数を 3 個
-print(rng.normal(0, 1, 3))    # 平均 0、標準偏差 1 の正規乱数を 3 個
+X = rng.random((3, 2))          # 0 以上 1 未満の乱数を、3行2列
+print(X)
+noise = rng.normal(0, 1, 3)     # 平均 0、標準偏差 1 の正規乱数を 3 個
+print(noise)
 ```
 
 ::: {.callout-note}
@@ -73,11 +88,11 @@ print(rng.normal(0, 1, 3))    # 平均 0、標準偏差 1 の正規乱数を 3 �
 ## {background-color="white" .center .break-slide}
 
 ::: {.break-title}
-形を変える・つなぐ
+データの表をつくる
 :::
 
 
-## 配列の形を確認したい {#peek-np-shape}
+## データの個数と特徴量の数を、array の形から確かめたい（`shape`） {#peek-np-shape}
 
 ```{python}
 #| echo: true
@@ -86,70 +101,74 @@ import numpy as np
 X = np.array([[1, 2],
               [3, 4],
               [5, 6]])
-print(X.shape)   # (行数, 列数)
-print(len(X))    # 行数
+print(X.shape)   # (行数, 列数) = (データの個数, 特徴量の数)
+print(len(X))    # データの個数
 ```
 
 
-## 1列の表に変えたい {#peek-np-reshape-column}
+## 特徴量ごとの array を横に並べて、1行＝1データの表にしたい（`column_stack`） {#peek-np-column-stack}
 
 ```{python}
 #| echo: true
 import numpy as np
 
-x = np.array([1, 2, 3])
-print(x.shape)
-
-X = x.reshape(-1, 1)   # 列数は 1、行数は -1（自動で決まる）
-print(X.shape)
+length = np.array([1, 2, 3])
+weight = np.array([10, 20, 30])
+X = np.column_stack([length, weight])
 print(X)
 ```
 
 ::: {.callout-note}
-- `-1` を書いた場所は、要素の数から自動で決まる
-- scikit-learn の `fit` は「1行＝1個のデータ」の表を受け取る
-   - 特徴量が1つだけのときに、この変換を使う
-:::
-
-
-## 表を1列に伸ばしたい {#peek-np-reshape-flat}
-
-```{python}
-#| echo: true
-import numpy as np
-
-X = np.array([[1, 2, 3],
-              [4, 5, 6]])
-print(X.reshape(-1))   # 行を順につないで 1 列にする
-```
-
-
-## 2つの列を横に並べて表にしたい {#peek-np-column-stack}
-
-```{python}
-#| echo: true
-import numpy as np
-
-a = np.array([1, 2, 3])
-b = np.array([10, 20, 30])
-print(np.column_stack([a, b]))
-```
-
-::: {.callout-note}
-- `np.c_[a, b]` と書いても同じ結果になる
+- `np.c_[length, weight]` と書いても同じ結果になる
    - `np.c_` は関数ではないので、`( )` ではなく `[ ]` で囲む
 :::
 
 
-## データをつないで1本にしたい {#peek-np-concatenate}
+## クラスごとの array をつないで、1本の array にしたい（`concatenate`） {#peek-np-concatenate}
 
 ```{python}
 #| echo: true
 import numpy as np
 
-a = np.array([1, 2, 3])
-b = np.array([4, 5])
-print(np.concatenate([a, b]))
+class0 = np.array([1, 2, 3])
+class1 = np.array([4, 5])
+x = np.concatenate([class0, class1])
+print(x)
+```
+
+
+## scikit-learn に渡すために、1本の array を N行1列の表にしたい（`reshape(-1, 1)`） {#peek-np-reshape-column}
+
+```{python}
+#| echo: true
+import numpy as np
+from sklearn.linear_model import LinearRegression
+
+x = np.array([1, 2, 3])
+t = np.array([2, 4, 6])
+X = x.reshape(-1, 1)   # 列数は 1、行数は -1（自動で決まる）
+print(X)
+
+reg = LinearRegression().fit(X, t)
+print(reg.predict(X))
+```
+
+::: {.callout-note}
+- scikit-learn の `fit` と `predict` は「1行＝1個のデータ」の表を受け取る
+- `-1` を書いた場所は、要素の数から自動で決まる
+:::
+
+
+## 表示のために、N行1列の表を1本の array に戻したい（`reshape(-1)`） {#peek-np-reshape-flat}
+
+```{python}
+#| echo: true
+import numpy as np
+
+P = np.array([[0.51],
+              [0.43],
+              [0.54]])
+print(P.reshape(-1))   # 1本の配列に並べ直す
 ```
 
 
@@ -160,7 +179,7 @@ print(np.concatenate([a, b]))
 :::
 
 
-## 表から1列だけ取り出したい {#peek-np-column}
+## 表から、特徴量1つ分の列を array で取り出したい（`X[:, 0]`） {#peek-np-column}
 
 ```{python}
 #| echo: true
@@ -179,7 +198,7 @@ print(X[0])      # 0 行目
 :::
 
 
-## 条件に合う要素だけ取り出したい {#peek-np-mask}
+## しきい値以上の要素だけを array から取り出したい（`x[x >= 5]`） {#peek-np-mask}
 
 ```{python}
 #| echo: true
@@ -195,7 +214,7 @@ print(x[x >= 5])
 :::
 
 
-## ラベルが一致する行だけ取り出したい {#peek-np-mask-label}
+## ラベルを使って、あるクラスの行だけを表から取り出したい（`X[y == 1]`） {#peek-np-mask-label}
 
 ```{python}
 #| echo: true
@@ -212,7 +231,7 @@ print(X[y == 1, 0])   # ラベルが 1 の行の、0 列目
 ```
 
 
-## 条件に合うインデックスを知りたい {#peek-np-where-index}
+## 条件に合うインデックスだけを抽出したい（`where`） {#peek-np-where-index}
 
 ```{python}
 #| echo: true
@@ -229,36 +248,42 @@ print(idx)
 :::
 
 
-## 小さい順に k 個のインデックスがほしい {#peek-np-argsort}
+## 距離の array から、近い順に k 個のインデックスを取り出したい（`argsort`） {#peek-np-argsort}
 
 ```{python}
 #| echo: true
 import numpy as np
 
-d = np.array([0.9, 0.2, 0.7, 0.1])
-order = np.argsort(d)   # 小さい順に並べたときのインデックス
+dist = np.array([0.9, 0.2, 0.7, 0.1])   # 各データまでの距離
+order = np.argsort(dist)   # 距離が小さい順に並べたときのインデックス
 print(order)
-print(order[:2])        # 小さいほうから 2 個
+print(order[:2])           # 近いほうから 2 個
 ```
 
 ::: {.callout-note}
-値そのものではなく、**何番目の要素か**が返る
+距離そのものではなく、**何番目のデータか**が返る
 :::
 
 
-## 最小・最大の位置を知りたい {#peek-np-argmin}
+## 誤差の array から、最小になる候補のインデックスを取り出したい（`argmin`） {#peek-np-argmin}
 
 ```{python}
 #| echo: true
 import numpy as np
 
-x = np.array([3, 8, 5, 9, 2])
-print(np.argmin(x))   # 最小値 2 のインデックス
-print(np.argmax(x))   # 最大値 9 のインデックス
+candidates = np.array([2.0, 2.5, 3.0, 3.5])
+errors     = np.array([0.4, 0.1, 0.3, 0.6])   # 候補ごとの誤差
+best_i = np.argmin(errors)   # 誤差が最小の位置
+print(best_i)
+print(candidates[best_i])
 ```
 
+::: {.callout-note}
+大きいほどよい指標のときは `np.argmax` を使う
+:::
 
-## 重複を除いた値の一覧がほしい {#peek-np-unique}
+
+## ラベルの array から、クラスの種類を重複なしで取り出したい（`unique`） {#peek-np-unique}
 
 ```{python}
 #| echo: true
@@ -269,7 +294,7 @@ print(np.unique(y))
 ```
 
 ::: {.callout-note}
-結果は小さい順に並ぶ
+重複が除かれ、小さい順に並ぶ
 :::
 
 
@@ -280,7 +305,7 @@ print(np.unique(y))
 :::
 
 
-## 条件に合う個数を数えたい {#peek-np-count}
+## 条件に合う要素の個数を array から数えたい（`sum`） {#peek-np-count}
 
 ```{python}
 #| echo: true
@@ -296,7 +321,7 @@ print(np.sum(x >= 5))
 :::
 
 
-## 条件に合う割合を出したい {#peek-np-ratio}
+## 予測と正解の array から、正解率を計算したい（`mean`） {#peek-np-ratio}
 
 ```{python}
 #| echo: true
@@ -313,7 +338,7 @@ print(np.mean(y_pred == y))
 :::
 
 
-## 2つの条件を両方満たす個数を数えたい {#peek-np-and}
+## 2つの条件を両方満たす要素の個数を数えたい（`&`） {#peek-np-and}
 
 ```{python}
 #| echo: true
@@ -331,42 +356,39 @@ print(np.sum((y == 1) & (y_pred == 1)))
 :::
 
 
-## 条件を「または」「でない」で組み合わせたい {#peek-np-or-not}
+## 1つの条件で、array を合う側と合わない側に分けたい（`~`） {#peek-np-split}
 
 ```{python}
 #| echo: true
 import numpy as np
 
 x = np.array([3, 8, 5, 9, 2])
-# (x < 3) | (x > 8) は [False, False, False, True, True]
-print(x[(x < 3) | (x > 8)])
-
-ok = x >= 5
-# ~ok は [True, False, False, False, True]
-print(x[~ok])
+left = x < 5
+# left  は [True, False, False, False, True]
+# ~left は [False, True, True, True, False]
+print(x[left])
+print(x[~left])
 ```
 
 ::: {.callout-note}
-- `|` は「または」
-- `~` は True と False を入れ替える
+`~` は True と False を入れ替える
 :::
 
 
-## 全部が条件を満たすか確かめたい {#peek-np-all}
+## 2つの array が完全に同じか確かめたい（`all`） {#peek-np-all}
 
 ```{python}
 #| echo: true
 import numpy as np
 
-a = np.array([1, 2, 3])
-b = np.array([1, 2, 4])
-# a == b は [True, True, False]
-print(np.all(a == b))   # すべて True か
-print(np.any(a == b))   # 1 つでも True があるか
+old = np.array([1, 2, 3])
+new = np.array([1, 2, 4])
+# new == old は [True, True, False]
+print(np.all(new == old))   # すべて True のときだけ True
 ```
 
 
-## 条件で値を切り替えたい {#peek-np-where-switch}
+## 予測ラベルとして、True / False の array を 1 / 0 に直したい（`astype`） {#peek-np-astype}
 
 ```{python}
 #| echo: true
@@ -374,7 +396,8 @@ import numpy as np
 
 p = np.array([0.2, 0.7, 0.5, 0.9])
 # p >= 0.5 は [False, True, True, True]
-print(np.where(p >= 0.5, 1, 0))   # True の位置は 1、False の位置は 0
+y_pred = (p >= 0.5).astype(int)   # True を 1、False を 0 に直す
+print(y_pred)
 ```
 
 
@@ -385,7 +408,7 @@ print(np.where(p >= 0.5, 1, 0))   # True の位置は 1、False の位置は 0
 :::
 
 
-## 全要素に同じ計算をしたい {#peek-np-elementwise}
+## for を書かずに、array の全要素に同じ演算をしたい（`+ - * / **`） {#peek-np-elementwise}
 
 ```{python}
 #| echo: true
@@ -403,7 +426,7 @@ print(np.sqrt(x))
 :::
 
 
-## 2つの配列の差を要素ごとに計算したい {#peek-np-diff}
+## 2つの array の差の2乗の平均を計算したい（`mean`） {#peek-np-diff}
 
 ```{python}
 #| echo: true
@@ -417,26 +440,26 @@ print(np.mean((y_pred - y) ** 2))   # その平均
 ```
 
 
-## 行ごと・列ごとに合計を出したい {#peek-np-axis}
+## 表の列ごとの平均を計算したい（`axis=`） {#peek-np-axis}
 
 ```{python}
 #| echo: true
 import numpy as np
 
-X = np.array([[1, 2, 3],
-              [4, 5, 6]])
-print(np.sum(X))           # 全要素の合計
-print(np.sum(X, axis=0))   # 列ごとの合計（縦方向に足す）
-print(np.sum(X, axis=1))   # 行ごとの合計（横方向に足す）
+X = np.array([[1, 10],
+              [2, 20],
+              [3, 60]])
+print(X.mean(axis=0))   # 列ごと（特徴量ごと）の平均
+print(X.sum(axis=1))    # 行ごと（データごと）の合計
 ```
 
 ::: {.callout-note}
-- `np.mean` でも `axis` の意味は同じ
-- `X.sum(axis=0)` と書いても同じ結果になる
+- `axis=0` は縦方向にまとめ、`axis=1` は横方向にまとめる
+- `axis` を書かないと、全要素をまとめて計算する
 :::
 
 
-## 行列の積を計算したい {#peek-np-matmul}
+## 表の全部の行に、重みを掛けた和を一度に計算したい（`@`） {#peek-np-matmul}
 
 ```{python}
 #| echo: true
@@ -444,27 +467,43 @@ import numpy as np
 
 X = np.array([[1, 2],
               [3, 4],
-              [5, 6]])     # 3行2列
-w = np.array([10, 1])
-print(X @ w)        # 行ごとに 1列目×10 + 2列目×1
-print(X.T)          # .T は行と列を入れ替える
+              [5, 6]])     # 3個のデータ、特徴量は2つ
+w = np.array([10, 1])      # 特徴量ごとの重み
+print(X @ w)               # データごとに 1列目×10 + 2列目×1
 ```
 
 ::: {.callout-note}
-`*` は同じ位置どうしの掛け算で、行列の積は `@` で書く
+- `*` は同じ位置どうしの掛け算で、行列の積は `@` で書く
+- 行と列を入れ替えた行列は `X.T` で得られる
 :::
 
 
-## 0 未満を 0 にしたい {#peek-np-maximum}
+## array の要素のうち、負の値だけを 0 に置き換えたい（`maximum`） {#peek-np-maximum}
 
 ```{python}
 #| echo: true
 import numpy as np
 
 z = np.array([-2.0, -0.5, 0.0, 1.5])
-print(np.maximum(0, z))     # 0 と比べて大きいほうを残す
-print(np.clip(z, -1, 1))    # -1 から 1 の範囲に収める
+print(np.maximum(0, z))   # 0 と比べて大きいほうを残す
 ```
+
+
+## log に 0 を渡さないために、確率の array を範囲内に収めたい（`clip`） {#peek-np-clip}
+
+```{python}
+#| echo: true
+import numpy as np
+
+p = np.array([0.0, 0.3, 0.5])
+p = np.clip(p, 0.001, 0.999)   # 0.001 から 0.999 の範囲に収める
+print(p)
+print(np.log(p).round(2))
+```
+
+::: {.callout-note}
+`np.log(0)` は負の無限大になり、そのあとの計算が続けられなくなる
+:::
 
 
 ## {background-color="white" .center .break-slide}
@@ -474,7 +513,7 @@ print(np.clip(z, -1, 1))    # -1 から 1 の範囲に収める
 :::
 
 
-## 小数の桁数をそろえて表示したい {#peek-py-format}
+## 結果の表示のために、小数の桁数をそろえたい（`f"{x:.2f}"`） {#peek-py-format}
 
 ```{python}
 #| echo: true
@@ -487,7 +526,7 @@ print(f"正解率 {acc:.1%}")   # パーセント表示で小数点以下 1 桁
 ```
 
 
-## 2つの配列を同時に回したい {#peek-py-zip}
+## for で、2つのリストの同じ位置の値を1組ずつ取り出したい（`zip`） {#peek-py-zip}
 
 ```{python}
 #| echo: true
@@ -504,7 +543,7 @@ for name, score in zip(names, scores):
 :::
 
 
-## 番号つきで回したい {#peek-py-enumerate}
+## for で、要素と一緒に「何番目か」も取り出したい（`enumerate`） {#peek-py-enumerate}
 
 ```{python}
 #| echo: true
@@ -523,7 +562,7 @@ for i, score in enumerate(scores):
 :::
 
 
-## 折れ線グラフを描きたい {#peek-plt-plot}
+## 関数の形を折れ線グラフで見たい（`plot`） {#peek-plt-plot}
 
 ```{python}
 #| echo: true
@@ -546,7 +585,7 @@ plt.show()
 :::
 
 
-## 散布図をクラスごとに描き分けたい {#peek-plt-scatter}
+## クラスごとに色を変えた散布図を描きたい（`scatter`） {#peek-plt-scatter}
 
 ```{python}
 #| echo: true
@@ -564,11 +603,11 @@ plt.show()
 ```
 
 ::: {.callout-note}
-[ラベルごとに行を取り出し](#peek-np-mask-label){.peek}、クラスの数だけ `plt.scatter` を呼ぶ
+[クラスごとにデータを取り出し](#peek-np-mask-label){.peek}、クラスの数だけ `plt.scatter` を呼ぶ
 :::
 
 
-## しきい値の位置に線を引きたい {#peek-plt-axvline}
+## グラフに、しきい値を表す縦線・横線を引きたい（`axvline / axhline`） {#peek-plt-axvline}
 
 ```{python}
 #| echo: true
@@ -585,7 +624,7 @@ plt.show()
 ```
 
 
-## グラフを横に並べたい {#peek-plt-subplots}
+## 比較のために、2つのグラフを横に並べたい（`subplots`） {#peek-plt-subplots}
 
 ```{python}
 #| echo: true
@@ -612,7 +651,7 @@ plt.show()
 :::
 
 
-## 格子点の座標をつくりたい {#peek-np-meshgrid}
+## 塗り分けのために、平面全体の格子点の座標を用意したい（`meshgrid`） {#peek-np-meshgrid}
 
 ```{python}
 #| echo: true
@@ -630,7 +669,7 @@ print(yy)   # 各格子点の y 座標
 :::
 
 
-## 領域を色で塗り分けたい {#peek-plt-contourf}
+## 決定境界を見るために、予測の値で平面を塗り分けたい（`contourf`） {#peek-plt-contourf}
 
 ```{python}
 #| echo: true
@@ -641,7 +680,7 @@ import japanize_matplotlib
 
 xx, yy = np.meshgrid(np.linspace(-2, 2, 200), np.linspace(-2, 2, 200))
 grid = np.column_stack([xx.reshape(-1), yy.reshape(-1)])   # 1行＝1個の格子点
-z = np.where(grid[:, 0] + grid[:, 1] > 0, 1, 0)            # 格子点ごとの判定（0 か 1）
+z = (grid[:, 0] + grid[:, 1] > 0).astype(int)              # 格子点ごとの予測（0 か 1）
 Z = z.reshape(xx.shape)                                    # 格子の形に戻す
 
 plt.contourf(xx, yy, Z, levels=1, colors=["lightcoral", "lightblue"])
@@ -649,6 +688,6 @@ plt.show()
 ```
 
 ::: {.callout-note}
-- [格子点](#peek-np-meshgrid){.peek}を細かく取り、1点ずつ判定して、結果の値ごとに色を塗る
-- 判定の行を分類器の予測に置き換えると、決定境界の図になる
+- [格子点](#peek-np-meshgrid){.peek}を細かく取り、1点ずつ予測して、予測の値ごとに色を塗る
+- 予測の行を `model.predict(grid)` に置き換えると、分類器の決定境界の図になる
 :::
