@@ -4211,21 +4211,21 @@
     "href": "numpy-recipes.html#peek-np-shape",
     "title": "NumPy 逆引き",
     "section": "array の形を確かめたい（shape）",
-    "text": "array の形を確かめたい（shape）\n\n\nimport numpy as np\n\nx = np.array([1, 2, 3])\nX = np.array([[1, 2],\n              [3, 4],\n              [5, 6]])\nprint(x.shape)   # 要素 3 個\nprint(X.shape)   # 3行2列\nprint(len(X))    # 行数\n\n(3,)\n(3, 2)\n3"
+    "text": "array の形を確かめたい（shape）\n\n\nimport numpy as np\n\nx = np.array([1, 2, 3])\nX = np.array([[1, 2],\n              [3, 4],\n              [5, 6]])\nprint(x.shape)   # (3,) は、[1, 2, 3] のように要素が 3 個並んだ形\nprint(X.shape)   # (3, 2) は、3行2列\nprint(len(X))    # 行数だけなら len\n\n(3,)\n(3, 2)\n3"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-reshape-column",
     "href": "numpy-recipes.html#peek-np-reshape-column",
     "title": "NumPy 逆引き",
-    "section": "scikit-learn に渡すために、array を N行1列にしたい（reshape(-1, 1)）",
-    "text": "scikit-learn に渡すために、array を N行1列にしたい（reshape(-1, 1)）\n\n\nimport numpy as np\nfrom sklearn.linear_model import LinearRegression\n\nx = np.array([1, 2, 3])\nt = np.array([2, 4, 6])\nX = x.reshape(-1, 1)    # 3行1列\nprint(X)\n\nreg = LinearRegression().fit(X, t)\nprint(reg.predict(X))                                  # 学習に使った x で予測\nprint(reg.predict(np.array([4, 5]).reshape(-1, 1)))    # 新しい値で予測\n\n[[1]\n [2]\n [3]]\n[2. 4. 6.]\n[ 8. 10.]\n\n\n\n\n\n\n\n\nノート\n\n\nscikit-learn の fit と predict は「1行＝1個のデータ」の表を受け取る"
+    "section": "scikit-learn 用にarray を N行1列にしたい（reshape(-1, 1)）",
+    "text": "scikit-learn 用にarray を N行1列にしたい（reshape(-1, 1)）\n\n\nimport numpy as np\nfrom sklearn.linear_model import LinearRegression\n\n# やりたいこと：入力 x から正解 t を予測する式を、fit で求める\nx = np.array([1, 2, 3])    # 入力（データ 3 個）\nt = np.array([2, 4, 6])    # それぞれの正解\n\nX = x.reshape(-1, 1)       # fit が受け取れる [[1], [2], [3]] の形にする\nprint(X)\n\nreg = LinearRegression().fit(X, t)\nprint(reg.predict(X))\nprint(reg.predict(np.array([4, 5]).reshape(-1, 1)))    # 新しい入力 4 と 5 も、同じ形にして渡す\n\n[[1]\n [2]\n [3]]\n[2. 4. 6.]\n[ 8. 10.]\n\n\n\n\n\n\n\n\nノート\n\n\n\n特徴量が1つでも、[1, 2, 3] の形のままでは fit に渡せない（エラーになる）\nreshape(-1, 1) の 1 は列の数で、-1 と書いた行の数は、要素の数から自動で決まる"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-reshape-flat",
     "href": "numpy-recipes.html#peek-np-reshape-flat",
     "title": "NumPy 逆引き",
     "section": "array の形を変えたい（reshape）",
-    "text": "array の形を変えたい（reshape）\n\n\nimport numpy as np\n\nx = np.arange(6)\nprint(x)\nX = x.reshape(2, 3)      # 2行3列にする\nprint(X)\nprint(X.reshape(-1))     # 1本に戻す\n\n[0 1 2 3 4 5]\n[[0 1 2]\n [3 4 5]]\n[0 1 2 3 4 5]\n\n\n\n\n\n\n\n\nノート\n\n\n-1 を書いた場所は、要素の数から自動で決まる"
+    "text": "array の形を変えたい（reshape）\n\n\nimport numpy as np\n\nx = np.arange(6)\nprint(x)\nX = x.reshape(2, 3)      # 2行3列にする\nprint(X)\nprint(X.reshape(-1))     # 1行に\n\n[0 1 2 3 4 5]\n[[0 1 2]\n [3 4 5]]\n[0 1 2 3 4 5]\n\n\n\n\n\n\n\n\nノート\n\n\n-1 を書いた場所は、要素の数から自動で決まる"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-column-stack",
@@ -4267,7 +4267,7 @@
     "href": "numpy-recipes.html#peek-np-mask-label",
     "title": "NumPy 逆引き",
     "section": "ラベルが一致する行だけ取り出したい（X[y == 1]）",
-    "text": "ラベルが一致する行だけ取り出したい（X[y == 1]）\n\n\nimport numpy as np\n\nX = np.array([[1, 10],\n              [2, 20],\n              [3, 30],\n              [4, 40]])\ny = np.array([0, 1, 0, 1])\n# y == 1 は [False, True, False, True]\nprint(X[y == 1])       # ラベルが 1 の行\nprint(X[y == 0])       # ラベルが 0 の行\nprint(X[y == 1, 0])    # ラベルが 1 の行の、0 列目\n\n[[ 2 20]\n [ 4 40]]\n[[ 1 10]\n [ 3 30]]\n[2 4]\n\n\n\n\n\n\n\n\nノート\n\n\n条件に合う要素の取り出しと同じ仕組みで、True の位置の行だけが残る"
+    "text": "ラベルが一致する行だけ取り出したい（X[y == 1]）\n\n\nimport numpy as np\n\nX = np.array([[1, 10],\n              [2, 20],\n              [3, 30],\n              [4, 40]])     # データ 4 個（1行が 1 個のデータ）\ny = np.array([0, 1, 0, 1])    # 各行のラベル\n# y == 1 は [False, True, False, True]\nprint(X[y == 1])       # ラベルが 1 の行\nprint(X[y == 0])       # ラベルが 0 の行\nprint(X[y == 1, 0])    # ラベルが 1 の行の、0 列目\n\n[[ 2 20]\n [ 4 40]]\n[[ 1 10]\n [ 3 30]]\n[2 4]\n\n\n\n\n\n\n\n\nノート\n\n\n条件に合う要素の取り出しと同じ仕組みで、True の位置の行だけが残る"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-where-index",
@@ -4288,7 +4288,7 @@
     "href": "numpy-recipes.html#peek-np-argmin",
     "title": "NumPy 逆引き",
     "section": "最小・最大の要素のインデックスを取り出したい（argmin）",
-    "text": "最小・最大の要素のインデックスを取り出したい（argmin）\n\n\nimport numpy as np\n\ncandidates = np.array([2.0, 2.5, 3.0, 3.5])\nerrors     = np.array([0.4, 0.1, 0.3, 0.6])\nprint(np.argmin(errors))                # 最小の要素のインデックス\nprint(np.argmax(errors))                # 最大の要素のインデックス\nprint(candidates[np.argmin(errors)])    # errors が最小になる候補\n\n1\n3\n2.5"
+    "text": "最小・最大の要素のインデックスを取り出したい（argmin）\n\n\nimport numpy as np\n\ncandidates = np.array([2.0, 2.5, 3.0, 3.5])    # 試した値\nerrors     = np.array([0.4, 0.1, 0.3, 0.6])    # それぞれの値を試したときの誤差\nprint(np.argmin(errors))                # 最小の要素のインデックス\nprint(np.argmax(errors))                # 最大の要素のインデックス\nprint(candidates[np.argmin(errors)])    # errors が最小になる候補\n\n1\n3\n2.5"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-unique",
@@ -4316,14 +4316,14 @@
     "href": "numpy-recipes.html#peek-np-ratio",
     "title": "NumPy 逆引き",
     "section": "条件に合う要素の割合を計算したい（mean）",
-    "text": "条件に合う要素の割合を計算したい（mean）\n\n\nimport numpy as np\n\nx = np.array([3, 8, 5, 9, 2])\n# x &gt;= 5 は [False, True, True, True, False]\nprint(np.mean(x &gt;= 5))         # 5 以上の割合\n\ny      = np.array([1, 0, 1, 1, 0])\ny_pred = np.array([1, 0, 0, 1, 1])\n# y_pred == y は [True, True, False, True, False]\nprint(np.mean(y_pred == y))    # 一致した割合（正解率）\n\n0.6\n0.6\n\n\n\n\n\n\n\n\nノート\n\n\n\nnp.mean は True を 1、False を 0 として平均する\n個数を、要素の数で割った値になる"
+    "text": "条件に合う要素の割合を計算したい（mean）\n\n\nimport numpy as np\n\nx = np.array([3, 8, 5, 9, 2])\n# x &gt;= 5 は [False, True, True, True, False]\nprint(np.mean(x &gt;= 5))         # 5 以上の割合\n\ny      = np.array([1, 0, 1, 1, 0])    # 正解\ny_pred = np.array([1, 0, 0, 1, 1])    # 予測\n# y_pred == y は [True, True, False, True, False]\nprint(np.mean(y_pred == y))    # 一致した割合（正解率）\n\n0.6\n0.6\n\n\n\n\n\n\n\n\nノート\n\n\n\nnp.mean は True を 1、False を 0 として平均する\n個数を、要素の数で割った値になる"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-and",
     "href": "numpy-recipes.html#peek-np-and",
     "title": "NumPy 逆引き",
     "section": "2つの条件を両方満たす要素の個数を数えたい（&）",
-    "text": "2つの条件を両方満たす要素の個数を数えたい（&）\n\n\nimport numpy as np\n\ny      = np.array([1, 0, 1, 1, 0])\ny_pred = np.array([1, 0, 0, 1, 1])\n# (y == 1) & (y_pred == 1) は [True, False, False, True, False]\nprint(np.sum((y == 1) & (y_pred == 1)))    # 正解が 1 で、予測も 1\nprint(np.sum((y == 0) & (y_pred == 1)))    # 正解が 0 で、予測は 1\n\n2\n1\n\n\n\n\n\n\n\n\nノート\n\n\n\n& は「かつ」を表す（array どうしでは and の代わりに & を使う）\n& の両側の条件は、それぞれ ( ) で囲む"
+    "text": "2つの条件を両方満たす要素の個数を数えたい（&）\n\n\nimport numpy as np\n\ny      = np.array([1, 0, 1, 1, 0])    # 正解\ny_pred = np.array([1, 0, 0, 1, 1])    # 予測\n# (y == 1) & (y_pred == 1) は [True, False, False, True, False]\nprint(np.sum((y == 1) & (y_pred == 1)))    # 正解が 1 で、予測も 1\nprint(np.sum((y == 0) & (y_pred == 1)))    # 正解が 0 で、予測は 1\n\n2\n1\n\n\n\n\n\n\n\n\nノート\n\n\n\n& は「かつ」を表す（array どうしでは and の代わりに & を使う）\n& の両側の条件は、それぞれ ( ) で囲む"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-or-not",
@@ -4358,14 +4358,14 @@
     "href": "numpy-recipes.html#peek-np-elementwise",
     "title": "NumPy 逆引き",
     "section": "for を書かずに、array の全要素に同じ演算をしたい（+ - * / **）",
-    "text": "for を書かずに、array の全要素に同じ演算をしたい（+ - * / **）\n\n\nimport numpy as np\n\nx = np.array([1.0, 4.0, 9.0])\ny = np.array([1.0, 2.0, 3.0])\nprint(x * 2)         # 全要素を 2 倍\nprint(x ** 2)        # 全要素を 2 乗\nprint(x - y)         # array どうしは、同じ位置の要素で計算\nprint(np.sqrt(x))    # 全要素の平方根\n\n# for で 1 個ずつ 2 倍するようなもの\nout = []\nfor v in x:\n    out.append(v * 2)\nprint(np.array(out))   # 結果は x * 2 と同一\n\n[ 2.  8. 18.]\n[ 1. 16. 81.]\n[0. 2. 6.]\n[1. 2. 3.]\n[ 2.  8. 18.]\n\n\n\n\n\n\n\n\nノート\n\n\nnp.exp、np.log、np.abs も、全要素にまとめてかかる"
+    "text": "for を書かずに、array の全要素に同じ演算をしたい（+ - * / **）\n\n\nimport numpy as np\n\nx = np.array([1.0, 4.0, 9.0])\ny = np.array([1.0, 2.0, 3.0])\nprint(x * 2)         # 全要素を 2 倍\nprint(x ** 2)        # 全要素を 2 乗\nprint(x - y)         # x と y の、同じ位置どうしで引き算\nprint(np.sqrt(x))    # 全要素の平方根\n\n# for で 1 個ずつ 2 倍するようなもの\nout = []\nfor v in x:\n    out.append(v * 2)\nprint(np.array(out))   # 結果は x * 2 と同一\n\n[ 2.  8. 18.]\n[ 1. 16. 81.]\n[0. 2. 6.]\n[1. 2. 3.]\n[ 2.  8. 18.]\n\n\n\n\n\n\n\n\nノート\n\n\nnp.exp、np.log、np.abs も、全要素にまとめてかかる"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-diff",
     "href": "numpy-recipes.html#peek-np-diff",
     "title": "NumPy 逆引き",
     "section": "2つの array の差の2乗の平均を計算したい（mean）",
-    "text": "2つの array の差の2乗の平均を計算したい（mean）\n\n\nimport numpy as np\n\ny      = np.array([1.0, 2.0, 3.0])\ny_pred = np.array([1.5, 2.0, 2.0])\nprint(y_pred - y)                     # 同じ位置どうしの差\nprint((y_pred - y) ** 2)              # 差の 2 乗\nprint(np.mean((y_pred - y) ** 2))     # 差の 2 乗の平均\nprint(np.mean(np.abs(y_pred - y)))    # 差の絶対値の平均\n\n[ 0.5  0.  -1. ]\n[0.25 0.   1.  ]\n0.4166666666666667\n0.5"
+    "text": "2つの array の差の2乗の平均を計算したい（mean）\n\n\nimport numpy as np\n\ny      = np.array([1.0, 2.0, 3.0])    # 正解\ny_pred = np.array([1.5, 2.0, 2.0])    # 予測\nprint(y_pred - y)                     # 同じ位置どうしの差\nprint((y_pred - y) ** 2)              # 差の 2 乗\nprint(np.mean((y_pred - y) ** 2))     # 差の 2 乗の平均\nprint(np.mean(np.abs(y_pred - y)))    # 差の絶対値の平均\n\n[ 0.5  0.  -1. ]\n[0.25 0.   1.  ]\n0.4166666666666667\n0.5"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-axis",
@@ -4379,14 +4379,14 @@
     "href": "numpy-recipes.html#peek-np-matmul",
     "title": "NumPy 逆引き",
     "section": "表の全部の行に、重みを掛けた和を一度に計算したい（@）",
-    "text": "表の全部の行に、重みを掛けた和を一度に計算したい（@）\n\n\nimport numpy as np\n\nX = np.array([[1, 2],\n              [3, 4],\n              [5, 6]])\nw = np.array([10, 1])\nprint(X @ w)        # 行ごとに 0 列目×10 + 1 列目×1\nprint(X @ w + 5)    # 全部の行に 5 を足す\nprint(w @ w)        # 1本どうしは内積\n\n# for で 1 行ずつ、重みを掛けて足すようなもの\nout = []\nfor row in X:\n    out.append(row[0] * w[0] + row[1] * w[1])\nprint(np.array(out))   # 結果は X @ w と同一\n\n[12 34 56]\n[17 39 61]\n101\n[12 34 56]\n\n\n\n\n\n\n\n\nノート\n\n\n\n* は同じ位置どうしの掛け算で、行列の積は @ で書く\n行と列を入れ替えた行列は X.T で得られる"
+    "text": "表の全部の行に、重みを掛けた和を一度に計算したい（@）\n\n\nimport numpy as np\n\nX = np.array([[1, 2],\n              [3, 4],\n              [5, 6]])\nw = np.array([10, 1])    # 列ごとの重み（0 列目に 10、1 列目に 1）\nprint(X @ w)        # 行ごとに 0 列目×10 + 1 列目×1\nprint(X @ w + 5)    # その結果の全部に、定数 5 を足す\nprint(w @ w)        # w どうしなら 10×10 + 1×1\n\n# for で 1 行ずつ、重みを掛けて足すようなもの\nout = []\nfor row in X:\n    out.append(row[0] * w[0] + row[1] * w[1])\nprint(np.array(out))   # 結果は X @ w と同一\n\n[12 34 56]\n[17 39 61]\n101\n[12 34 56]\n\n\n\n\n\n\n\n\nノート\n\n\n\n* は同じ位置どうしの掛け算で、行列の積は @ で書く\n行と列を入れ替えた行列は X.T で得られる"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-maximum",
     "href": "numpy-recipes.html#peek-np-maximum",
     "title": "NumPy 逆引き",
     "section": "負の値だけを 0 に置き換えたい（maximum）",
-    "text": "負の値だけを 0 に置き換えたい（maximum）\n\n\nimport numpy as np\n\nz = np.array([-2.0, -0.5, 0.0, 1.5])\nprint(np.maximum(0, z))    # 0 と比べて大きいほうを残す\n\na = np.array([1, 5, 3])\nb = np.array([4, 2, 3])\nprint(np.maximum(a, b))    # array どうしは、同じ位置で大きいほうを残す\n\n[0.  0.  0.  1.5]\n[4 5 3]"
+    "text": "負の値だけを 0 に置き換えたい（maximum）\n\n\nimport numpy as np\n\nz = np.array([-2.0, -0.5, 0.0, 1.5])\nprint(np.maximum(0, z))    # 0 と比べて大きいほうを残す\n\na = np.array([1, 5, 3])\nb = np.array([4, 2, 3])\nprint(np.maximum(a, b))    # a と b の、同じ位置で大きいほうを残す\n\n[0.  0.  0.  1.5]\n[4 5 3]"
   },
   {
     "objectID": "numpy-recipes.html#section-5",
@@ -4400,7 +4400,7 @@
     "href": "numpy-recipes.html#peek-py-format",
     "title": "NumPy 逆引き",
     "section": "小数の桁数をそろえて表示したい（f\"{x:.2f}\"）",
-    "text": "小数の桁数をそろえて表示したい（f\"{x:.2f}\"）\n\n\nimport numpy as np\n\nx = 3.14159\nprint(f\"x = {x:.2f}\")     # 小数点以下 2 桁\nprint(f\"x = {x:.4f}\")     # 小数点以下 4 桁\nprint(f\"x = {x:8.2f}\")    # 全体を 8 文字の幅にそろえる\n\nacc = 0.875\nprint(f\"{acc:.1%}\")       # パーセント表示\n\na = np.array([0.12345, 2.5])\nprint(a.round(2))         # array は round で丸める\n\nx = 3.14\nx = 3.1416\nx =     3.14\n87.5%\n[0.12 2.5 ]"
+    "text": "小数の桁数をそろえて表示したい（f\"{x:.2f}\"）\n\n\nimport numpy as np\n\nx = 3.14159\nprint(f\"x = {x:.2f}\")     # 小数点以下 2 桁\nprint(f\"x = {x:.4f}\")     # 小数点以下 4 桁\nprint(f\"x = {x:8.2f}\")    # 全体を 8 文字の幅にそろえる\n\nacc = 0.875               # 割合（0 から 1 の値）\nprint(f\"{acc:.1%}\")       # パーセントに直して、小数点以下 1 桁\n\na = np.array([0.12345, 2.5])\nprint(a.round(2))         # 全要素を小数点以下 2 桁に丸める\n\nx = 3.14\nx = 3.1416\nx =     3.14\n87.5%\n[0.12 2.5 ]"
   },
   {
     "objectID": "numpy-recipes.html#peek-py-zip",
@@ -4435,7 +4435,7 @@
     "href": "numpy-recipes.html#peek-plt-scatter",
     "title": "NumPy 逆引き",
     "section": "クラスごとに色を変えた散布図を描きたい（scatter）",
-    "text": "クラスごとに色を変えた散布図を描きたい（scatter）\n\n\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\n\nX = np.array([[1, 2], [2, 3], [3, 1], [6, 5], [7, 7], [8, 6]])\ny = np.array([0, 0, 0, 1, 1, 1])\nplt.scatter(X[y == 0, 0], X[y == 0, 1], c=\"red\", marker=\"s\", label=\"0\")\nplt.scatter(X[y == 1, 0], X[y == 1, 1], c=\"blue\", marker=\"o\", label=\"1\")\nplt.legend()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nノート\n\n\nラベルごとに行を取り出し、クラスの数だけ plt.scatter を呼ぶ"
+    "text": "クラスごとに色を変えた散布図を描きたい（scatter）\n\n\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\n\nX = np.array([[1, 2], [2, 3], [3, 1], [6, 5], [7, 7], [8, 6]])    # 点の座標（1行が 1 点）\ny = np.array([0, 0, 0, 1, 1, 1])                                  # 各点のクラス\nplt.scatter(X[y == 0, 0], X[y == 0, 1], c=\"red\", marker=\"s\", label=\"0\")\nplt.scatter(X[y == 1, 0], X[y == 1, 1], c=\"blue\", marker=\"o\", label=\"1\")\nplt.legend()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nノート\n\n\nラベルごとに行を取り出し、クラスの数だけ plt.scatter を呼ぶ"
   },
   {
     "objectID": "numpy-recipes.html#peek-plt-axvline",
@@ -4463,7 +4463,7 @@
     "href": "numpy-recipes.html#peek-plt-contourf",
     "title": "NumPy 逆引き",
     "section": "予測の値で平面を塗り分けたい（contourf）",
-    "text": "予測の値で平面を塗り分けたい（contourf）\n\n\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\n\nxx, yy = np.meshgrid(np.linspace(-2, 2, 200), np.linspace(-2, 2, 200))\ngrid = np.column_stack([xx.reshape(-1), yy.reshape(-1)])   # 1行＝1個の格子点\nz = (grid[:, 0] + grid[:, 1] &gt; 0).astype(int)              # 格子点ごとの予測（0 か 1）\nZ = z.reshape(xx.shape)                                    # 格子の形に戻す\n\nplt.contourf(xx, yy, Z, levels=1, colors=[\"lightcoral\", \"lightblue\"])\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nノート\n\n\n\n格子点を細かく取り、1点ずつ予測して、予測の値ごとに色を塗る\n予測の行を model.predict(grid) に置き換えると、分類器の決定境界の図になる"
+    "text": "予測の値で平面を塗り分けたい（contourf）\n\n\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\n\nxx, yy = np.meshgrid(np.linspace(-2, 2, 200), np.linspace(-2, 2, 200))\ngrid = np.column_stack([xx.reshape(-1), yy.reshape(-1)])   # 1行＝1個の格子点\n\n# 分類器の代わりに「x + y が 0 より大きければ 1、そうでなければ 0」という規則で予測する\nz = (grid[:, 0] + grid[:, 1] &gt; 0).astype(int)              # 格子点ごとの予測\nZ = z.reshape(xx.shape)                                    # 格子の形に戻す\n\nplt.contourf(xx, yy, Z, levels=1, colors=[\"lightcoral\", \"lightblue\"])\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nノート\n\n\n\n格子点を細かく取り、1点ずつ予測して、予測の値ごとに色を塗る\nz を求める行を z = model.predict(grid) に置き換えると、分類器の決定境界の図になる"
   },
   {
     "objectID": "knn-curse.html#空間を領域に分けておけば近くの領域だけ測ればよいoctree",
@@ -4512,21 +4512,21 @@
     "href": "numpy-recipes.html#peek-np-split",
     "title": "NumPy 逆引き",
     "section": "条件に合う側と合わない側に array を分けたい（~）",
-    "text": "条件に合う側と合わない側に array を分けたい（~）\n\n\nimport numpy as np\n\nx = np.array([3, 8, 5, 9, 2])\nleft = x &lt; 5\n# left  は [True, False, False, False, True]\n# ~left は [False, True, True, True, False]\nprint(x[left])          # 条件に合う側\nprint(x[~left])         # 条件に合わない側\nprint(np.sum(~left))    # 条件に合わない側の個数\n\n[3 2]\n[8 5 9]\n3\n\n\n\n\n\n\n\n\nノート\n\n\n~ は True と False を入れ替える"
+    "text": "条件に合う側と合わない側に array を分けたい（~）\n\n\nimport numpy as np\n\nx = np.array([3, 8, 5, 9, 2])\ncond = x &lt; 5\n# cond  は [True, False, False, False, True]\n# ~cond は [False, True, True, True, False]\nprint(x[cond])          # 条件に合う側\nprint(x[~cond])         # 条件に合わない側\nprint(np.sum(~cond))    # 条件に合わない側の個数\n\n[3 2]\n[8 5 9]\n3\n\n\n\n\n\n\n\n\nノート\n\n\n~ は True と False を入れ替える"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-astype",
     "href": "numpy-recipes.html#peek-np-astype",
     "title": "NumPy 逆引き",
     "section": "True / False の array を 1 / 0 に直したい（astype）",
-    "text": "True / False の array を 1 / 0 に直したい（astype）\n\n\nimport numpy as np\n\np = np.array([0.2, 0.7, 0.5, 0.9])\n# p &gt;= 0.5 は [False, True, True, True]\nprint((p &gt;= 0.5).astype(int))      # True を 1、False を 0 に\nprint((p &gt;= 0.8).astype(int))      # 条件を変える\nprint((p &gt;= 0.5).astype(float))    # 小数にする\n\n[0 1 1 1]\n[0 0 0 1]\n[0. 1. 1. 1.]"
+    "text": "True / False の array を 1 / 0 に直したい（astype）\n\n\nimport numpy as np\n\np = np.array([0.2, 0.7, 0.5, 0.9])\n# p &gt;= 0.5 は [False, True, True, True]\nprint((p &gt;= 0.5).astype(int))      # True を 1、False を 0 に\nprint((p &gt;= 0.8).astype(int))      # 0.8 以上を 1 に\nprint((p &gt;= 0.5).astype(float))    # 小数にする\n\n[0 1 1 1]\n[0 0 0 1]\n[0. 1. 1. 1.]"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-clip",
     "href": "numpy-recipes.html#peek-np-clip",
     "title": "NumPy 逆引き",
     "section": "array の値を範囲内に収めたい（clip）",
-    "text": "array の値を範囲内に収めたい（clip）\n\n\nimport numpy as np\n\nz = np.array([-2.0, -0.5, 0.3, 1.5])\nprint(np.clip(z, -1, 1))          # -1 から 1 の範囲に収める\n\np = np.array([0.0, 0.3, 1.0])\nprint(np.clip(p, 0.001, 0.999))   # 0 と 1 を、少し内側の値に直す\n\n[-1.  -0.5  0.3  1. ]\n[0.001 0.3   0.999]\n\n\n\n\n\n\n\n\nノート\n\n\nnp.log(0) は負の無限大になるので、np.log に渡す前に範囲を収める"
+    "text": "array の値を範囲内に収めたい（clip）\n\n\nimport numpy as np\n\nz = np.array([-2.0, -0.5, 0.3, 1.5])\nprint(np.clip(z, -1, 1))          # -1 から 1 の範囲に収める\n\np = np.array([0.0, 0.3, 1.0])     # 確率（0 と 1 を含む）\nprint(np.clip(p, 0.001, 0.999))   # 0 と 1 を、少し内側の値に直す\n\n[-1.  -0.5  0.3  1. ]\n[0.001 0.3   0.999]\n\n\n\n\n\n\n\n\nノート\n\n\nnp.log(0) は負の無限大になるので、np.log に渡す前に範囲を収める"
   },
   {
     "objectID": "knn-curse.html#次元が高いとkd-tree-でもスキップできない",

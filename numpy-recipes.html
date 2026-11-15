@@ -248,7 +248,7 @@
   <script src="peek-ui.js" defer=""></script>
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="9a249f5d9c78193b3ca163bcc544c7e9f65303af">
+  <meta name="qmd-web-source" content="975d6cfa100ba788844200c6afdbc4d81b96292a">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -276,7 +276,7 @@ rkskmt
 <section id="peek-np-linspace" class="slide level2">
 <h2>関数のために x 軸の点列を用意したい（<code>linspace</code>）</h2>
 <div class="slide-body">
-<div id="5c9d9bb1" class="cell" data-execution_count="1">
+<div id="85cb8d75" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a aria-label="2"></a></span>
 <span id="cb1-3"><a aria-label="3"></a><span class="bu">print</span>(np.linspace(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">5</span>))     <span class="co"># 0 から 1 までを 5 個に分ける</span></span>
@@ -307,7 +307,7 @@ rkskmt
 <section id="peek-np-arange" class="slide level2">
 <h2>range のような数列を array で用意したい（<code>arange</code>）</h2>
 <div class="slide-body">
-<div id="cdc94aef" class="cell" data-execution_count="2">
+<div id="cda07a1f" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb3-2"><a aria-label="2"></a></span>
 <span id="cb3-3"><a aria-label="3"></a><span class="bu">print</span>(np.arange(<span class="dv">5</span>))                <span class="co"># 0 から 4 まで</span></span>
@@ -337,7 +337,7 @@ rkskmt
 <section id="peek-np-zeros" class="slide level2">
 <h2>重みのために、初期値 0 の array を準備したい（<code>zeros</code>）</h2>
 <div class="slide-body">
-<div id="125c9f5d" class="cell" data-execution_count="3">
+<div id="23236ea8" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb5-2"><a aria-label="2"></a></span>
 <span id="cb5-3"><a aria-label="3"></a><span class="bu">print</span>(np.zeros(<span class="dv">3</span>))         <span class="co"># 要素 3 個</span></span>
@@ -372,7 +372,7 @@ rkskmt
 <section id="peek-np-rng" class="slide level2">
 <h2>乱数の array を用意したい（<code>default_rng</code>）</h2>
 <div class="slide-body">
-<div id="7107ef48" class="cell" data-execution_count="4">
+<div id="25367a36" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb7-2"><a aria-label="2"></a></span>
 <span id="cb7-3"><a aria-label="3"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">42</span>)</span>
@@ -415,16 +415,16 @@ rkskmt
 <section id="peek-np-shape" class="slide level2">
 <h2>array の形を確かめたい（<code>shape</code>）</h2>
 <div class="slide-body">
-<div id="b9009410" class="cell" data-execution_count="5">
+<div id="f0d3e9d5" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb9-2"><a aria-label="2"></a></span>
 <span id="cb9-3"><a aria-label="3"></a>x <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>])</span>
 <span id="cb9-4"><a aria-label="4"></a>X <span class="op">=</span> np.array([[<span class="dv">1</span>, <span class="dv">2</span>],</span>
 <span id="cb9-5"><a aria-label="5"></a>              [<span class="dv">3</span>, <span class="dv">4</span>],</span>
 <span id="cb9-6"><a aria-label="6"></a>              [<span class="dv">5</span>, <span class="dv">6</span>]])</span>
-<span id="cb9-7"><a aria-label="7"></a><span class="bu">print</span>(x.shape)   <span class="co"># 要素 3 個</span></span>
-<span id="cb9-8"><a aria-label="8"></a><span class="bu">print</span>(X.shape)   <span class="co"># 3行2列</span></span>
-<span id="cb9-9"><a aria-label="9"></a><span class="bu">print</span>(<span class="bu">len</span>(X))    <span class="co"># 行数</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb9-7"><a aria-label="7"></a><span class="bu">print</span>(x.shape)   <span class="co"># (3,) は、[1, 2, 3] のように要素が 3 個並んだ形</span></span>
+<span id="cb9-8"><a aria-label="8"></a><span class="bu">print</span>(X.shape)   <span class="co"># (3, 2) は、3行2列</span></span>
+<span id="cb9-9"><a aria-label="9"></a><span class="bu">print</span>(<span class="bu">len</span>(X))    <span class="co"># 行数だけなら len</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>(3,)
 (3, 2)
@@ -436,7 +436,7 @@ rkskmt
 <section id="peek-np-column-stack" class="slide level2">
 <h2>array を横に並べて表にしたい（<code>column_stack</code>）</h2>
 <div class="slide-body">
-<div id="30e1a744" class="cell" data-execution_count="6">
+<div id="03c9b388" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb11-2"><a aria-label="2"></a></span>
 <span id="cb11-3"><a aria-label="3"></a>a <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">2</span>])</span>
@@ -472,7 +472,7 @@ rkskmt
 <section id="peek-np-concatenate" class="slide level2">
 <h2>array を連結したい（<code>concatenate</code>）</h2>
 <div class="slide-body">
-<div id="011ecc59" class="cell" data-execution_count="7">
+<div id="7b442640" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb13-2"><a aria-label="2"></a></span>
 <span id="cb13-3"><a aria-label="3"></a>l1 <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]</span>
@@ -511,14 +511,14 @@ rkskmt
 <section id="peek-np-reshape-flat" class="slide level2">
 <h2>array の形を変えたい（<code>reshape</code>）</h2>
 <div class="slide-body">
-<div id="94f0fba2" class="cell" data-execution_count="8">
+<div id="41e88566" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb15-2"><a aria-label="2"></a></span>
 <span id="cb15-3"><a aria-label="3"></a>x <span class="op">=</span> np.arange(<span class="dv">6</span>)</span>
 <span id="cb15-4"><a aria-label="4"></a><span class="bu">print</span>(x)</span>
 <span id="cb15-5"><a aria-label="5"></a>X <span class="op">=</span> x.reshape(<span class="dv">2</span>, <span class="dv">3</span>)      <span class="co"># 2行3列にする</span></span>
 <span id="cb15-6"><a aria-label="6"></a><span class="bu">print</span>(X)</span>
-<span id="cb15-7"><a aria-label="7"></a><span class="bu">print</span>(X.reshape(<span class="op">-</span><span class="dv">1</span>))     <span class="co"># 1本に戻す</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb15-7"><a aria-label="7"></a><span class="bu">print</span>(X.reshape(<span class="op">-</span><span class="dv">1</span>))     <span class="co"># 1行に</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[0 1 2 3 4 5]
 [[0 1 2]
@@ -542,20 +542,22 @@ rkskmt
 </div>
 </section>
 <section id="peek-np-reshape-column" class="slide level2">
-<h2>scikit-learn に渡すために、array を N行1列にしたい（<code>reshape(-1, 1)</code>）</h2>
+<h2>scikit-learn 用にarray を N行1列にしたい（<code>reshape(-1, 1)</code>）</h2>
 <div class="slide-body">
-<div id="32a3c6db" class="cell" data-execution_count="9">
+<div id="9fb17d49" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb17-2"><a aria-label="2"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
 <span id="cb17-3"><a aria-label="3"></a></span>
-<span id="cb17-4"><a aria-label="4"></a>x <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>])</span>
-<span id="cb17-5"><a aria-label="5"></a>t <span class="op">=</span> np.array([<span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">6</span>])</span>
-<span id="cb17-6"><a aria-label="6"></a>X <span class="op">=</span> x.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)    <span class="co"># 3行1列</span></span>
-<span id="cb17-7"><a aria-label="7"></a><span class="bu">print</span>(X)</span>
-<span id="cb17-8"><a aria-label="8"></a></span>
-<span id="cb17-9"><a aria-label="9"></a>reg <span class="op">=</span> LinearRegression().fit(X, t)</span>
-<span id="cb17-10"><a aria-label="10"></a><span class="bu">print</span>(reg.predict(X))                                  <span class="co"># 学習に使った x で予測</span></span>
-<span id="cb17-11"><a aria-label="11"></a><span class="bu">print</span>(reg.predict(np.array([<span class="dv">4</span>, <span class="dv">5</span>]).reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)))    <span class="co"># 新しい値で予測</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb17-4"><a aria-label="4"></a><span class="co"># やりたいこと：入力 x から正解 t を予測する式を、fit で求める</span></span>
+<span id="cb17-5"><a aria-label="5"></a>x <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>])    <span class="co"># 入力（データ 3 個）</span></span>
+<span id="cb17-6"><a aria-label="6"></a>t <span class="op">=</span> np.array([<span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">6</span>])    <span class="co"># それぞれの正解</span></span>
+<span id="cb17-7"><a aria-label="7"></a></span>
+<span id="cb17-8"><a aria-label="8"></a>X <span class="op">=</span> x.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)       <span class="co"># fit が受け取れる [[1], [2], [3]] の形にする</span></span>
+<span id="cb17-9"><a aria-label="9"></a><span class="bu">print</span>(X)</span>
+<span id="cb17-10"><a aria-label="10"></a></span>
+<span id="cb17-11"><a aria-label="11"></a>reg <span class="op">=</span> LinearRegression().fit(X, t)</span>
+<span id="cb17-12"><a aria-label="12"></a><span class="bu">print</span>(reg.predict(X))</span>
+<span id="cb17-13"><a aria-label="13"></a><span class="bu">print</span>(reg.predict(np.array([<span class="dv">4</span>, <span class="dv">5</span>]).reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)))    <span class="co"># 新しい入力 4 と 5 も、同じ形にして渡す</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[[1]
  [2]
@@ -573,7 +575,10 @@ rkskmt
 <p><strong>ノート</strong></p>
 </div>
 <div class="callout-content">
-<p>scikit-learn の <code>fit</code> と <code>predict</code> は「1行＝1個のデータ」の表を受け取る</p>
+<ul>
+<li>特徴量が1つでも、<code>[1, 2, 3]</code> の形のままでは <code>fit</code> に渡せない（エラーになる）</li>
+<li><code>reshape(-1, 1)</code> の <code>1</code> は列の数で、<code>-1</code> と書いた行の数は、要素の数から自動で決まる</li>
+</ul>
 </div>
 </div>
 </div>
@@ -588,7 +593,7 @@ rkskmt
 <section id="peek-np-column" class="slide level2">
 <h2>表から列や行を取り出したい（<code>X[:, 0]</code>）</h2>
 <div class="slide-body">
-<div id="401677d9" class="cell" data-execution_count="10">
+<div id="ddcb273c" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb19-2"><a aria-label="2"></a></span>
 <span id="cb19-3"><a aria-label="3"></a>X <span class="op">=</span> np.array([[<span class="dv">1</span>, <span class="dv">10</span>],</span>
@@ -626,7 +631,7 @@ rkskmt
 <section id="peek-np-mask" class="slide level2">
 <h2>条件に合う要素だけ取り出したい（<code>x[x &gt;= 5]</code>）</h2>
 <div class="slide-body">
-<div id="010ed431" class="cell" data-execution_count="11">
+<div id="8d5e1c5d" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb21-2"><a aria-label="2"></a></span>
 <span id="cb21-3"><a aria-label="3"></a>x <span class="op">=</span> np.array([<span class="dv">3</span>, <span class="dv">8</span>, <span class="dv">5</span>, <span class="dv">9</span>, <span class="dv">2</span>])</span>
@@ -664,14 +669,14 @@ rkskmt
 <section id="peek-np-mask-label" class="slide level2">
 <h2>ラベルが一致する行だけ取り出したい（<code>X[y == 1]</code>）</h2>
 <div class="slide-body">
-<div id="9dbf3c2b" class="cell" data-execution_count="12">
+<div id="6756c206" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb23-2"><a aria-label="2"></a></span>
 <span id="cb23-3"><a aria-label="3"></a>X <span class="op">=</span> np.array([[<span class="dv">1</span>, <span class="dv">10</span>],</span>
 <span id="cb23-4"><a aria-label="4"></a>              [<span class="dv">2</span>, <span class="dv">20</span>],</span>
 <span id="cb23-5"><a aria-label="5"></a>              [<span class="dv">3</span>, <span class="dv">30</span>],</span>
-<span id="cb23-6"><a aria-label="6"></a>              [<span class="dv">4</span>, <span class="dv">40</span>]])</span>
-<span id="cb23-7"><a aria-label="7"></a>y <span class="op">=</span> np.array([<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>])</span>
+<span id="cb23-6"><a aria-label="6"></a>              [<span class="dv">4</span>, <span class="dv">40</span>]])     <span class="co"># データ 4 個（1行が 1 個のデータ）</span></span>
+<span id="cb23-7"><a aria-label="7"></a>y <span class="op">=</span> np.array([<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>])    <span class="co"># 各行のラベル</span></span>
 <span id="cb23-8"><a aria-label="8"></a><span class="co"># y == 1 は [False, True, False, True]</span></span>
 <span id="cb23-9"><a aria-label="9"></a><span class="bu">print</span>(X[y <span class="op">==</span> <span class="dv">1</span>])       <span class="co"># ラベルが 1 の行</span></span>
 <span id="cb23-10"><a aria-label="10"></a><span class="bu">print</span>(X[y <span class="op">==</span> <span class="dv">0</span>])       <span class="co"># ラベルが 0 の行</span></span>
@@ -702,7 +707,7 @@ rkskmt
 <section id="peek-np-where-index" class="slide level2">
 <h2>条件に合うインデックスだけを抽出したい（<code>where</code>）</h2>
 <div class="slide-body">
-<div id="55490d3d" class="cell" data-execution_count="13">
+<div id="85d5eae4" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb25-2"><a aria-label="2"></a></span>
 <span id="cb25-3"><a aria-label="3"></a>x <span class="op">=</span> np.array([<span class="dv">3</span>, <span class="dv">8</span>, <span class="dv">5</span>, <span class="dv">9</span>, <span class="dv">2</span>])</span>
@@ -740,7 +745,7 @@ rkskmt
 <section id="peek-np-argsort" class="slide level2">
 <h2>小さい順に並べたときのインデックスを取り出したい（<code>argsort</code>）</h2>
 <div class="slide-body">
-<div id="4f9de6a1" class="cell" data-execution_count="14">
+<div id="d5bedcc1" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb27-2"><a aria-label="2"></a></span>
 <span id="cb27-3"><a aria-label="3"></a>d <span class="op">=</span> np.array([<span class="fl">0.9</span>, <span class="fl">0.2</span>, <span class="fl">0.7</span>, <span class="fl">0.1</span>])</span>
@@ -777,11 +782,11 @@ rkskmt
 <section id="peek-np-argmin" class="slide level2">
 <h2>最小・最大の要素のインデックスを取り出したい（<code>argmin</code>）</h2>
 <div class="slide-body">
-<div id="f23379f0" class="cell" data-execution_count="15">
+<div id="fb817412" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb29-2"><a aria-label="2"></a></span>
-<span id="cb29-3"><a aria-label="3"></a>candidates <span class="op">=</span> np.array([<span class="fl">2.0</span>, <span class="fl">2.5</span>, <span class="fl">3.0</span>, <span class="fl">3.5</span>])</span>
-<span id="cb29-4"><a aria-label="4"></a>errors     <span class="op">=</span> np.array([<span class="fl">0.4</span>, <span class="fl">0.1</span>, <span class="fl">0.3</span>, <span class="fl">0.6</span>])</span>
+<span id="cb29-3"><a aria-label="3"></a>candidates <span class="op">=</span> np.array([<span class="fl">2.0</span>, <span class="fl">2.5</span>, <span class="fl">3.0</span>, <span class="fl">3.5</span>])    <span class="co"># 試した値</span></span>
+<span id="cb29-4"><a aria-label="4"></a>errors     <span class="op">=</span> np.array([<span class="fl">0.4</span>, <span class="fl">0.1</span>, <span class="fl">0.3</span>, <span class="fl">0.6</span>])    <span class="co"># それぞれの値を試したときの誤差</span></span>
 <span id="cb29-5"><a aria-label="5"></a><span class="bu">print</span>(np.argmin(errors))                <span class="co"># 最小の要素のインデックス</span></span>
 <span id="cb29-6"><a aria-label="6"></a><span class="bu">print</span>(np.argmax(errors))                <span class="co"># 最大の要素のインデックス</span></span>
 <span id="cb29-7"><a aria-label="7"></a><span class="bu">print</span>(candidates[np.argmin(errors)])    <span class="co"># errors が最小になる候補</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
@@ -796,7 +801,7 @@ rkskmt
 <section id="peek-np-unique" class="slide level2">
 <h2>値の種類を重複なしで取り出したい（<code>unique</code>）</h2>
 <div class="slide-body">
-<div id="02a8915b" class="cell" data-execution_count="16">
+<div id="fab07096" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb31-2"><a aria-label="2"></a></span>
 <span id="cb31-3"><a aria-label="3"></a>y <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">0</span>])</span>
@@ -818,7 +823,7 @@ rkskmt
 <section id="peek-np-count" class="slide level2">
 <h2>条件に合う要素の個数を数えたい（<code>sum</code>）</h2>
 <div class="slide-body">
-<div id="ad51150f" class="cell" data-execution_count="17">
+<div id="043f8eb0" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb33-2"><a aria-label="2"></a></span>
 <span id="cb33-3"><a aria-label="3"></a>x <span class="op">=</span> np.array([<span class="dv">3</span>, <span class="dv">8</span>, <span class="dv">5</span>, <span class="dv">9</span>, <span class="dv">2</span>])</span>
@@ -856,15 +861,15 @@ rkskmt
 <section id="peek-np-ratio" class="slide level2">
 <h2>条件に合う要素の割合を計算したい（<code>mean</code>）</h2>
 <div class="slide-body">
-<div id="98b717dc" class="cell" data-execution_count="18">
+<div id="cf0b2822" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb35-2"><a aria-label="2"></a></span>
 <span id="cb35-3"><a aria-label="3"></a>x <span class="op">=</span> np.array([<span class="dv">3</span>, <span class="dv">8</span>, <span class="dv">5</span>, <span class="dv">9</span>, <span class="dv">2</span>])</span>
 <span id="cb35-4"><a aria-label="4"></a><span class="co"># x &gt;= 5 は [False, True, True, True, False]</span></span>
 <span id="cb35-5"><a aria-label="5"></a><span class="bu">print</span>(np.mean(x <span class="op">&gt;=</span> <span class="dv">5</span>))         <span class="co"># 5 以上の割合</span></span>
 <span id="cb35-6"><a aria-label="6"></a></span>
-<span id="cb35-7"><a aria-label="7"></a>y      <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>])</span>
-<span id="cb35-8"><a aria-label="8"></a>y_pred <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>])</span>
+<span id="cb35-7"><a aria-label="7"></a>y      <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>])    <span class="co"># 正解</span></span>
+<span id="cb35-8"><a aria-label="8"></a>y_pred <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>])    <span class="co"># 予測</span></span>
 <span id="cb35-9"><a aria-label="9"></a><span class="co"># y_pred == y は [True, True, False, True, False]</span></span>
 <span id="cb35-10"><a aria-label="10"></a><span class="bu">print</span>(np.mean(y_pred <span class="op">==</span> y))    <span class="co"># 一致した割合（正解率）</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -893,11 +898,11 @@ rkskmt
 <section id="peek-np-and" class="slide level2">
 <h2>2つの条件を両方満たす要素の個数を数えたい（<code>&amp;</code>）</h2>
 <div class="slide-body">
-<div id="515a05b8" class="cell" data-execution_count="19">
+<div id="a811582c" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb37-2"><a aria-label="2"></a></span>
-<span id="cb37-3"><a aria-label="3"></a>y      <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>])</span>
-<span id="cb37-4"><a aria-label="4"></a>y_pred <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>])</span>
+<span id="cb37-3"><a aria-label="3"></a>y      <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>])    <span class="co"># 正解</span></span>
+<span id="cb37-4"><a aria-label="4"></a>y_pred <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>])    <span class="co"># 予測</span></span>
 <span id="cb37-5"><a aria-label="5"></a><span class="co"># (y == 1) &amp; (y_pred == 1) は [True, False, False, True, False]</span></span>
 <span id="cb37-6"><a aria-label="6"></a><span class="bu">print</span>(np.<span class="bu">sum</span>((y <span class="op">==</span> <span class="dv">1</span>) <span class="op">&amp;</span> (y_pred <span class="op">==</span> <span class="dv">1</span>)))    <span class="co"># 正解が 1 で、予測も 1</span></span>
 <span id="cb37-7"><a aria-label="7"></a><span class="bu">print</span>(np.<span class="bu">sum</span>((y <span class="op">==</span> <span class="dv">0</span>) <span class="op">&amp;</span> (y_pred <span class="op">==</span> <span class="dv">1</span>)))    <span class="co"># 正解が 0 で、予測は 1</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
@@ -927,16 +932,16 @@ rkskmt
 <section id="peek-np-split" class="slide level2">
 <h2>条件に合う側と合わない側に array を分けたい（<code>~</code>）</h2>
 <div class="slide-body">
-<div id="fd0f943c" class="cell" data-execution_count="20">
+<div id="9b356d68" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb39-2"><a aria-label="2"></a></span>
 <span id="cb39-3"><a aria-label="3"></a>x <span class="op">=</span> np.array([<span class="dv">3</span>, <span class="dv">8</span>, <span class="dv">5</span>, <span class="dv">9</span>, <span class="dv">2</span>])</span>
-<span id="cb39-4"><a aria-label="4"></a>left <span class="op">=</span> x <span class="op">&lt;</span> <span class="dv">5</span></span>
-<span id="cb39-5"><a aria-label="5"></a><span class="co"># left  は [True, False, False, False, True]</span></span>
-<span id="cb39-6"><a aria-label="6"></a><span class="co"># ~left は [False, True, True, True, False]</span></span>
-<span id="cb39-7"><a aria-label="7"></a><span class="bu">print</span>(x[left])          <span class="co"># 条件に合う側</span></span>
-<span id="cb39-8"><a aria-label="8"></a><span class="bu">print</span>(x[<span class="op">~</span>left])         <span class="co"># 条件に合わない側</span></span>
-<span id="cb39-9"><a aria-label="9"></a><span class="bu">print</span>(np.<span class="bu">sum</span>(<span class="op">~</span>left))    <span class="co"># 条件に合わない側の個数</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb39-4"><a aria-label="4"></a>cond <span class="op">=</span> x <span class="op">&lt;</span> <span class="dv">5</span></span>
+<span id="cb39-5"><a aria-label="5"></a><span class="co"># cond  は [True, False, False, False, True]</span></span>
+<span id="cb39-6"><a aria-label="6"></a><span class="co"># ~cond は [False, True, True, True, False]</span></span>
+<span id="cb39-7"><a aria-label="7"></a><span class="bu">print</span>(x[cond])          <span class="co"># 条件に合う側</span></span>
+<span id="cb39-8"><a aria-label="8"></a><span class="bu">print</span>(x[<span class="op">~</span>cond])         <span class="co"># 条件に合わない側</span></span>
+<span id="cb39-9"><a aria-label="9"></a><span class="bu">print</span>(np.<span class="bu">sum</span>(<span class="op">~</span>cond))    <span class="co"># 条件に合わない側の個数</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[3 2]
 [8 5 9]
@@ -961,7 +966,7 @@ rkskmt
 <section id="peek-np-all" class="slide level2">
 <h2>2つの array が完全に同じか確かめたい（<code>all</code>）</h2>
 <div class="slide-body">
-<div id="b1518b8e" class="cell" data-execution_count="21">
+<div id="4620bdc8" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb41-2"><a aria-label="2"></a></span>
 <span id="cb41-3"><a aria-label="3"></a>a <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>])</span>
@@ -995,13 +1000,13 @@ True</code></pre>
 <section id="peek-np-astype" class="slide level2">
 <h2>True / False の array を 1 / 0 に直したい（<code>astype</code>）</h2>
 <div class="slide-body">
-<div id="0e04d7ad" class="cell" data-execution_count="22">
+<div id="4cfc4398" class="cell" data-execution_count="22">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb43-2"><a aria-label="2"></a></span>
 <span id="cb43-3"><a aria-label="3"></a>p <span class="op">=</span> np.array([<span class="fl">0.2</span>, <span class="fl">0.7</span>, <span class="fl">0.5</span>, <span class="fl">0.9</span>])</span>
 <span id="cb43-4"><a aria-label="4"></a><span class="co"># p &gt;= 0.5 は [False, True, True, True]</span></span>
 <span id="cb43-5"><a aria-label="5"></a><span class="bu">print</span>((p <span class="op">&gt;=</span> <span class="fl">0.5</span>).astype(<span class="bu">int</span>))      <span class="co"># True を 1、False を 0 に</span></span>
-<span id="cb43-6"><a aria-label="6"></a><span class="bu">print</span>((p <span class="op">&gt;=</span> <span class="fl">0.8</span>).astype(<span class="bu">int</span>))      <span class="co"># 条件を変える</span></span>
+<span id="cb43-6"><a aria-label="6"></a><span class="bu">print</span>((p <span class="op">&gt;=</span> <span class="fl">0.8</span>).astype(<span class="bu">int</span>))      <span class="co"># 0.8 以上を 1 に</span></span>
 <span id="cb43-7"><a aria-label="7"></a><span class="bu">print</span>((p <span class="op">&gt;=</span> <span class="fl">0.5</span>).astype(<span class="bu">float</span>))    <span class="co"># 小数にする</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[0 1 1 1]
@@ -1020,14 +1025,14 @@ True</code></pre>
 <section id="peek-np-elementwise" class="slide level2">
 <h2>for を書かずに、array の全要素に同じ演算をしたい（<code>+ - * / **</code>）</h2>
 <div class="slide-body">
-<div id="92f0ed2b" class="cell" data-execution_count="23">
+<div id="5100e38e" class="cell" data-execution_count="23">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb45-2"><a aria-label="2"></a></span>
 <span id="cb45-3"><a aria-label="3"></a>x <span class="op">=</span> np.array([<span class="fl">1.0</span>, <span class="fl">4.0</span>, <span class="fl">9.0</span>])</span>
 <span id="cb45-4"><a aria-label="4"></a>y <span class="op">=</span> np.array([<span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>])</span>
 <span id="cb45-5"><a aria-label="5"></a><span class="bu">print</span>(x <span class="op">*</span> <span class="dv">2</span>)         <span class="co"># 全要素を 2 倍</span></span>
 <span id="cb45-6"><a aria-label="6"></a><span class="bu">print</span>(x <span class="op">**</span> <span class="dv">2</span>)        <span class="co"># 全要素を 2 乗</span></span>
-<span id="cb45-7"><a aria-label="7"></a><span class="bu">print</span>(x <span class="op">-</span> y)         <span class="co"># array どうしは、同じ位置の要素で計算</span></span>
+<span id="cb45-7"><a aria-label="7"></a><span class="bu">print</span>(x <span class="op">-</span> y)         <span class="co"># x と y の、同じ位置どうしで引き算</span></span>
 <span id="cb45-8"><a aria-label="8"></a><span class="bu">print</span>(np.sqrt(x))    <span class="co"># 全要素の平方根</span></span>
 <span id="cb45-9"><a aria-label="9"></a></span>
 <span id="cb45-10"><a aria-label="10"></a><span class="co"># for で 1 個ずつ 2 倍するようなもの</span></span>
@@ -1061,11 +1066,11 @@ True</code></pre>
 <section id="peek-np-diff" class="slide level2">
 <h2>2つの array の差の2乗の平均を計算したい（<code>mean</code>）</h2>
 <div class="slide-body">
-<div id="4da5a55f" class="cell" data-execution_count="24">
+<div id="1eafdd91" class="cell" data-execution_count="24">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb47-2"><a aria-label="2"></a></span>
-<span id="cb47-3"><a aria-label="3"></a>y      <span class="op">=</span> np.array([<span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>])</span>
-<span id="cb47-4"><a aria-label="4"></a>y_pred <span class="op">=</span> np.array([<span class="fl">1.5</span>, <span class="fl">2.0</span>, <span class="fl">2.0</span>])</span>
+<span id="cb47-3"><a aria-label="3"></a>y      <span class="op">=</span> np.array([<span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>])    <span class="co"># 正解</span></span>
+<span id="cb47-4"><a aria-label="4"></a>y_pred <span class="op">=</span> np.array([<span class="fl">1.5</span>, <span class="fl">2.0</span>, <span class="fl">2.0</span>])    <span class="co"># 予測</span></span>
 <span id="cb47-5"><a aria-label="5"></a><span class="bu">print</span>(y_pred <span class="op">-</span> y)                     <span class="co"># 同じ位置どうしの差</span></span>
 <span id="cb47-6"><a aria-label="6"></a><span class="bu">print</span>((y_pred <span class="op">-</span> y) <span class="op">**</span> <span class="dv">2</span>)              <span class="co"># 差の 2 乗</span></span>
 <span id="cb47-7"><a aria-label="7"></a><span class="bu">print</span>(np.mean((y_pred <span class="op">-</span> y) <span class="op">**</span> <span class="dv">2</span>))     <span class="co"># 差の 2 乗の平均</span></span>
@@ -1082,7 +1087,7 @@ True</code></pre>
 <section id="peek-np-axis" class="slide level2">
 <h2>表の列ごと・行ごとに集計したい（<code>axis=</code>）</h2>
 <div class="slide-body">
-<div id="2a7faacd" class="cell" data-execution_count="25">
+<div id="a4b4adcb" class="cell" data-execution_count="25">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb49-2"><a aria-label="2"></a></span>
 <span id="cb49-3"><a aria-label="3"></a>X <span class="op">=</span> np.array([[<span class="dv">1</span>, <span class="dv">10</span>],</span>
@@ -1124,16 +1129,16 @@ True</code></pre>
 <section id="peek-np-matmul" class="slide level2">
 <h2>表の全部の行に、重みを掛けた和を一度に計算したい（<code>@</code>）</h2>
 <div class="slide-body">
-<div id="2d5299aa" class="cell" data-execution_count="26">
+<div id="2a1cc2d4" class="cell" data-execution_count="26">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb51-2"><a aria-label="2"></a></span>
 <span id="cb51-3"><a aria-label="3"></a>X <span class="op">=</span> np.array([[<span class="dv">1</span>, <span class="dv">2</span>],</span>
 <span id="cb51-4"><a aria-label="4"></a>              [<span class="dv">3</span>, <span class="dv">4</span>],</span>
 <span id="cb51-5"><a aria-label="5"></a>              [<span class="dv">5</span>, <span class="dv">6</span>]])</span>
-<span id="cb51-6"><a aria-label="6"></a>w <span class="op">=</span> np.array([<span class="dv">10</span>, <span class="dv">1</span>])</span>
+<span id="cb51-6"><a aria-label="6"></a>w <span class="op">=</span> np.array([<span class="dv">10</span>, <span class="dv">1</span>])    <span class="co"># 列ごとの重み（0 列目に 10、1 列目に 1）</span></span>
 <span id="cb51-7"><a aria-label="7"></a><span class="bu">print</span>(X <span class="op">@</span> w)        <span class="co"># 行ごとに 0 列目×10 + 1 列目×1</span></span>
-<span id="cb51-8"><a aria-label="8"></a><span class="bu">print</span>(X <span class="op">@</span> w <span class="op">+</span> <span class="dv">5</span>)    <span class="co"># 全部の行に 5 を足す</span></span>
-<span id="cb51-9"><a aria-label="9"></a><span class="bu">print</span>(w <span class="op">@</span> w)        <span class="co"># 1本どうしは内積</span></span>
+<span id="cb51-8"><a aria-label="8"></a><span class="bu">print</span>(X <span class="op">@</span> w <span class="op">+</span> <span class="dv">5</span>)    <span class="co"># その結果の全部に、定数 5 を足す</span></span>
+<span id="cb51-9"><a aria-label="9"></a><span class="bu">print</span>(w <span class="op">@</span> w)        <span class="co"># w どうしなら 10×10 + 1×1</span></span>
 <span id="cb51-10"><a aria-label="10"></a></span>
 <span id="cb51-11"><a aria-label="11"></a><span class="co"># for で 1 行ずつ、重みを掛けて足すようなもの</span></span>
 <span id="cb51-12"><a aria-label="12"></a>out <span class="op">=</span> []</span>
@@ -1168,7 +1173,7 @@ True</code></pre>
 <section id="peek-np-maximum" class="slide level2">
 <h2>負の値だけを 0 に置き換えたい（<code>maximum</code>）</h2>
 <div class="slide-body">
-<div id="6a142e5e" class="cell" data-execution_count="27">
+<div id="796f231f" class="cell" data-execution_count="27">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb53-2"><a aria-label="2"></a></span>
 <span id="cb53-3"><a aria-label="3"></a>z <span class="op">=</span> np.array([<span class="op">-</span><span class="fl">2.0</span>, <span class="op">-</span><span class="fl">0.5</span>, <span class="fl">0.0</span>, <span class="fl">1.5</span>])</span>
@@ -1176,7 +1181,7 @@ True</code></pre>
 <span id="cb53-5"><a aria-label="5"></a></span>
 <span id="cb53-6"><a aria-label="6"></a>a <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">3</span>])</span>
 <span id="cb53-7"><a aria-label="7"></a>b <span class="op">=</span> np.array([<span class="dv">4</span>, <span class="dv">2</span>, <span class="dv">3</span>])</span>
-<span id="cb53-8"><a aria-label="8"></a><span class="bu">print</span>(np.maximum(a, b))    <span class="co"># array どうしは、同じ位置で大きいほうを残す</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb53-8"><a aria-label="8"></a><span class="bu">print</span>(np.maximum(a, b))    <span class="co"># a と b の、同じ位置で大きいほうを残す</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[0.  0.  0.  1.5]
 [4 5 3]</code></pre>
@@ -1187,13 +1192,13 @@ True</code></pre>
 <section id="peek-np-clip" class="slide level2">
 <h2>array の値を範囲内に収めたい（<code>clip</code>）</h2>
 <div class="slide-body">
-<div id="0226e11d" class="cell" data-execution_count="28">
+<div id="0e26d8b6" class="cell" data-execution_count="28">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb55-2"><a aria-label="2"></a></span>
 <span id="cb55-3"><a aria-label="3"></a>z <span class="op">=</span> np.array([<span class="op">-</span><span class="fl">2.0</span>, <span class="op">-</span><span class="fl">0.5</span>, <span class="fl">0.3</span>, <span class="fl">1.5</span>])</span>
 <span id="cb55-4"><a aria-label="4"></a><span class="bu">print</span>(np.clip(z, <span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>))          <span class="co"># -1 から 1 の範囲に収める</span></span>
 <span id="cb55-5"><a aria-label="5"></a></span>
-<span id="cb55-6"><a aria-label="6"></a>p <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">0.3</span>, <span class="fl">1.0</span>])</span>
+<span id="cb55-6"><a aria-label="6"></a>p <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">0.3</span>, <span class="fl">1.0</span>])     <span class="co"># 確率（0 と 1 を含む）</span></span>
 <span id="cb55-7"><a aria-label="7"></a><span class="bu">print</span>(np.clip(p, <span class="fl">0.001</span>, <span class="fl">0.999</span>))   <span class="co"># 0 と 1 を、少し内側の値に直す</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[-1.  -0.5  0.3  1. ]
@@ -1224,7 +1229,7 @@ True</code></pre>
 <section id="peek-py-format" class="slide level2">
 <h2>小数の桁数をそろえて表示したい（<code>f"{x:.2f}"</code>）</h2>
 <div class="slide-body">
-<div id="4a4abff2" class="cell" data-execution_count="29">
+<div id="fcd9f103" class="cell" data-execution_count="29">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb57-2"><a aria-label="2"></a></span>
 <span id="cb57-3"><a aria-label="3"></a>x <span class="op">=</span> <span class="fl">3.14159</span></span>
@@ -1232,11 +1237,11 @@ True</code></pre>
 <span id="cb57-5"><a aria-label="5"></a><span class="bu">print</span>(<span class="ss">f"x = </span><span class="sc">{</span>x<span class="sc">:.4f}</span><span class="ss">"</span>)     <span class="co"># 小数点以下 4 桁</span></span>
 <span id="cb57-6"><a aria-label="6"></a><span class="bu">print</span>(<span class="ss">f"x = </span><span class="sc">{</span>x<span class="sc">:8.2f}</span><span class="ss">"</span>)    <span class="co"># 全体を 8 文字の幅にそろえる</span></span>
 <span id="cb57-7"><a aria-label="7"></a></span>
-<span id="cb57-8"><a aria-label="8"></a>acc <span class="op">=</span> <span class="fl">0.875</span></span>
-<span id="cb57-9"><a aria-label="9"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>acc<span class="sc">:.1%}</span><span class="ss">"</span>)       <span class="co"># パーセント表示</span></span>
+<span id="cb57-8"><a aria-label="8"></a>acc <span class="op">=</span> <span class="fl">0.875</span>               <span class="co"># 割合（0 から 1 の値）</span></span>
+<span id="cb57-9"><a aria-label="9"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>acc<span class="sc">:.1%}</span><span class="ss">"</span>)       <span class="co"># パーセントに直して、小数点以下 1 桁</span></span>
 <span id="cb57-10"><a aria-label="10"></a></span>
 <span id="cb57-11"><a aria-label="11"></a>a <span class="op">=</span> np.array([<span class="fl">0.12345</span>, <span class="fl">2.5</span>])</span>
-<span id="cb57-12"><a aria-label="12"></a><span class="bu">print</span>(a.<span class="bu">round</span>(<span class="dv">2</span>))         <span class="co"># array は round で丸める</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb57-12"><a aria-label="12"></a><span class="bu">print</span>(a.<span class="bu">round</span>(<span class="dv">2</span>))         <span class="co"># 全要素を小数点以下 2 桁に丸める</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>x = 3.14
 x = 3.1416
@@ -1250,7 +1255,7 @@ x =     3.14
 <section id="peek-py-zip" class="slide level2">
 <h2>2つのリストを同時にループしたい（<code>zip</code>）</h2>
 <div class="slide-body">
-<div id="a06deb0c" class="cell" data-execution_count="30">
+<div id="f593cdd0" class="cell" data-execution_count="30">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb59"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a aria-label="1"></a>names  <span class="op">=</span> [<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>]</span>
 <span id="cb59-2"><a aria-label="2"></a>scores <span class="op">=</span> [<span class="dv">70</span>, <span class="dv">85</span>, <span class="dv">60</span>]</span>
 <span id="cb59-3"><a aria-label="3"></a>ranks  <span class="op">=</span> [<span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">3</span>]</span>
@@ -1294,7 +1299,7 @@ c 60</code></pre>
 <section id="peek-py-enumerate" class="slide level2">
 <h2>何番目かも取り出しながらループしたい（<code>enumerate</code>）</h2>
 <div class="slide-body">
-<div id="f75f1ec0" class="cell" data-execution_count="31">
+<div id="4168a3dc" class="cell" data-execution_count="31">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb61"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb61-1"><a aria-label="1"></a>scores <span class="op">=</span> [<span class="dv">70</span>, <span class="dv">85</span>, <span class="dv">60</span>]</span>
 <span id="cb61-2"><a aria-label="2"></a></span>
 <span id="cb61-3"><a aria-label="3"></a><span class="cf">for</span> i, score <span class="kw">in</span> <span class="bu">enumerate</span>(scores):       <span class="co"># 0 から数える</span></span>
@@ -1329,7 +1334,7 @@ c 60</code></pre>
 <section id="peek-plt-plot" class="slide level2">
 <h2>関数の形を折れ線グラフで見たい（<code>plot</code>）</h2>
 <div class="slide-body">
-<div id="581d8b38" class="cell fig-medium" data-execution_count="32">
+<div id="ac0991a7" class="cell fig-medium" data-execution_count="32">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb63"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb63-2"><a aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb63-3"><a aria-label="3"></a><span class="im">import</span> japanize_matplotlib</span>
@@ -1368,13 +1373,13 @@ c 60</code></pre>
 <section id="peek-plt-scatter" class="slide level2">
 <h2>クラスごとに色を変えた散布図を描きたい（<code>scatter</code>）</h2>
 <div class="slide-body">
-<div id="1660011d" class="cell fig-medium" data-execution_count="33">
+<div id="c69078d6" class="cell fig-medium" data-execution_count="33">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb64"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb64-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb64-2"><a aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb64-3"><a aria-label="3"></a><span class="im">import</span> japanize_matplotlib</span>
 <span id="cb64-4"><a aria-label="4"></a></span>
-<span id="cb64-5"><a aria-label="5"></a>X <span class="op">=</span> np.array([[<span class="dv">1</span>, <span class="dv">2</span>], [<span class="dv">2</span>, <span class="dv">3</span>], [<span class="dv">3</span>, <span class="dv">1</span>], [<span class="dv">6</span>, <span class="dv">5</span>], [<span class="dv">7</span>, <span class="dv">7</span>], [<span class="dv">8</span>, <span class="dv">6</span>]])</span>
-<span id="cb64-6"><a aria-label="6"></a>y <span class="op">=</span> np.array([<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>])</span>
+<span id="cb64-5"><a aria-label="5"></a>X <span class="op">=</span> np.array([[<span class="dv">1</span>, <span class="dv">2</span>], [<span class="dv">2</span>, <span class="dv">3</span>], [<span class="dv">3</span>, <span class="dv">1</span>], [<span class="dv">6</span>, <span class="dv">5</span>], [<span class="dv">7</span>, <span class="dv">7</span>], [<span class="dv">8</span>, <span class="dv">6</span>]])    <span class="co"># 点の座標（1行が 1 点）</span></span>
+<span id="cb64-6"><a aria-label="6"></a>y <span class="op">=</span> np.array([<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>])                                  <span class="co"># 各点のクラス</span></span>
 <span id="cb64-7"><a aria-label="7"></a>plt.scatter(X[y <span class="op">==</span> <span class="dv">0</span>, <span class="dv">0</span>], X[y <span class="op">==</span> <span class="dv">0</span>, <span class="dv">1</span>], c<span class="op">=</span><span class="st">"red"</span>, marker<span class="op">=</span><span class="st">"s"</span>, label<span class="op">=</span><span class="st">"0"</span>)</span>
 <span id="cb64-8"><a aria-label="8"></a>plt.scatter(X[y <span class="op">==</span> <span class="dv">1</span>, <span class="dv">0</span>], X[y <span class="op">==</span> <span class="dv">1</span>, <span class="dv">1</span>], c<span class="op">=</span><span class="st">"blue"</span>, marker<span class="op">=</span><span class="st">"o"</span>, label<span class="op">=</span><span class="st">"1"</span>)</span>
 <span id="cb64-9"><a aria-label="9"></a>plt.legend()</span>
@@ -1405,7 +1410,7 @@ c 60</code></pre>
 <section id="peek-plt-axvline" class="slide level2">
 <h2>グラフに縦線・横線を引きたい（<code>axvline</code>）</h2>
 <div class="slide-body">
-<div id="a69b4435" class="cell fig-medium" data-execution_count="34">
+<div id="c7ef9502" class="cell fig-medium" data-execution_count="34">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb65"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb65-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb65-2"><a aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb65-3"><a aria-label="3"></a><span class="im">import</span> japanize_matplotlib</span>
@@ -1429,7 +1434,7 @@ c 60</code></pre>
 <section id="peek-plt-subplots" class="slide level2">
 <h2>2つのグラフを横に並べたい（<code>subplots</code>）</h2>
 <div class="slide-body">
-<div id="b2608189" class="cell fig-medium" data-execution_count="35">
+<div id="e7396176" class="cell fig-medium" data-execution_count="35">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb66"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb66-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb66-2"><a aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb66-3"><a aria-label="3"></a><span class="im">import</span> japanize_matplotlib</span>
@@ -1475,7 +1480,7 @@ c 60</code></pre>
 <section id="peek-np-meshgrid" class="slide level2">
 <h2>平面全体の格子点の座標を用意したい（<code>meshgrid</code>）</h2>
 <div class="slide-body">
-<div id="8d5a9082" class="cell" data-execution_count="36">
+<div id="0d561e4b" class="cell" data-execution_count="36">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb67"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb67-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb67-2"><a aria-label="2"></a></span>
 <span id="cb67-3"><a aria-label="3"></a>xs <span class="op">=</span> np.array([<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>])</span>
@@ -1528,18 +1533,20 @@ c 60</code></pre>
 <section id="peek-plt-contourf" class="slide level2">
 <h2>予測の値で平面を塗り分けたい（<code>contourf</code>）</h2>
 <div class="slide-body">
-<div id="8fa67a26" class="cell fig-medium" data-execution_count="37">
+<div id="84a836a0" class="cell fig-medium" data-execution_count="37">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb69"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb69-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb69-2"><a aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb69-3"><a aria-label="3"></a><span class="im">import</span> japanize_matplotlib</span>
 <span id="cb69-4"><a aria-label="4"></a></span>
 <span id="cb69-5"><a aria-label="5"></a>xx, yy <span class="op">=</span> np.meshgrid(np.linspace(<span class="op">-</span><span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">200</span>), np.linspace(<span class="op">-</span><span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">200</span>))</span>
 <span id="cb69-6"><a aria-label="6"></a>grid <span class="op">=</span> np.column_stack([xx.reshape(<span class="op">-</span><span class="dv">1</span>), yy.reshape(<span class="op">-</span><span class="dv">1</span>)])   <span class="co"># 1行＝1個の格子点</span></span>
-<span id="cb69-7"><a aria-label="7"></a>z <span class="op">=</span> (grid[:, <span class="dv">0</span>] <span class="op">+</span> grid[:, <span class="dv">1</span>] <span class="op">&gt;</span> <span class="dv">0</span>).astype(<span class="bu">int</span>)              <span class="co"># 格子点ごとの予測（0 か 1）</span></span>
-<span id="cb69-8"><a aria-label="8"></a>Z <span class="op">=</span> z.reshape(xx.shape)                                    <span class="co"># 格子の形に戻す</span></span>
-<span id="cb69-9"><a aria-label="9"></a></span>
-<span id="cb69-10"><a aria-label="10"></a>plt.contourf(xx, yy, Z, levels<span class="op">=</span><span class="dv">1</span>, colors<span class="op">=</span>[<span class="st">"lightcoral"</span>, <span class="st">"lightblue"</span>])</span>
-<span id="cb69-11"><a aria-label="11"></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb69-7"><a aria-label="7"></a></span>
+<span id="cb69-8"><a aria-label="8"></a><span class="co"># 分類器の代わりに「x + y が 0 より大きければ 1、そうでなければ 0」という規則で予測する</span></span>
+<span id="cb69-9"><a aria-label="9"></a>z <span class="op">=</span> (grid[:, <span class="dv">0</span>] <span class="op">+</span> grid[:, <span class="dv">1</span>] <span class="op">&gt;</span> <span class="dv">0</span>).astype(<span class="bu">int</span>)              <span class="co"># 格子点ごとの予測</span></span>
+<span id="cb69-10"><a aria-label="10"></a>Z <span class="op">=</span> z.reshape(xx.shape)                                    <span class="co"># 格子の形に戻す</span></span>
+<span id="cb69-11"><a aria-label="11"></a></span>
+<span id="cb69-12"><a aria-label="12"></a>plt.contourf(xx, yy, Z, levels<span class="op">=</span><span class="dv">1</span>, colors<span class="op">=</span>[<span class="st">"lightcoral"</span>, <span class="st">"lightblue"</span>])</span>
+<span id="cb69-13"><a aria-label="13"></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure>
@@ -1559,7 +1566,7 @@ c 60</code></pre>
 <div class="callout-content">
 <ul>
 <li><a href="#/peek-np-meshgrid" class="peek">格子点</a>を細かく取り、1点ずつ予測して、予測の値ごとに色を塗る</li>
-<li>予測の行を <code>model.predict(grid)</code> に置き換えると、分類器の決定境界の図になる</li>
+<li><code>z</code> を求める行を <code>z = model.predict(grid)</code> に置き換えると、分類器の決定境界の図になる</li>
 </ul>
 </div>
 </div>
