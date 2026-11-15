@@ -302,6 +302,163 @@ j0 = np.argsort(np.sqrt(((X_train - X_train[0]) ** 2).sum(axis=1)))[1]
 print(f"# X_train point 0 {X_train[0].tolist()}: nearest point {j0} at {nn0:.3f}; "
       f"median over the 100 points {np.median(nn_all):.3f} (min {min(nn_all):.3f}, max {max(nn_all):.3f})")
 
+
+
+# ==== raising the dimension ====
+
+print("# ---- raising the dimension ----")
+rng = np.random.default_rng(0)
+knn_dims, best = [], []
+for d in [2, 3, 5, 10, 20]:
+    Xtr, ytr = make_data(rng, 100, d)
+    Xte, yte = make_data(rng, 1000, d)
+    knn_dims.append(accuracy_knn(Xtr, ytr, Xte, yte, 3))
+    best.append(np.mean(yte == (Xte.sum(axis=1) > d / 2)))
+print("knn_dims =", [round(float(a), 3) for a in knn_dims])
+print("# best possible on each test set:", [round(float(b), 3) for b in best])
+check("knn_dims", knn_dims, 3)
+
+rng = np.random.default_rng(0)
+nn_median = []
+for d in [2, 3, 5, 10, 20]:
+    P, label = make_data(rng, 100, d)
+    nn_median.append(np.median([nearest_distance(P, i) for i in range(len(P))]))
+print("nn_median =", [round(float(m), 3) for m in nn_median])
+check("nn_median", nn_median, 3)
+
+rng = np.random.default_rng(0)
+more_acc, best = [], []
+for n in [1000, 10000, 100000]:
+    row = []
+    for d in [2, 5, 10, 20]:
+        Xtr, ytr = make_data(rng, n, d)
+        Xte, yte = make_data(rng, 1000, d)
+        row.append(accuracy_knn(Xtr, ytr, Xte, yte, 3))
+        best.append(np.mean(yte == (Xte.sum(axis=1) > d / 2)))
+    more_acc.append(row)
+print("more_acc =", [[round(float(a), 3) for a in row] for row in more_acc])
+print(f"# best possible on these test sets: {min(best):.3f} to {max(best):.3f}")
+check("more_acc", more_acc, 3)
+
+
+# ==== curse of dimensionality: figures ====
+
+print("# ---- curse of dimensionality: figures ----")
+np.random.seed(42)
+dims = [1, 2, 3, 5, 10, 20, 50, 100]
+cv_list = []
+for d in dims:
+    pts = np.random.rand(2000, d)
+    query = np.random.rand(d)
+    dists = np.sqrt(((pts - query) ** 2).sum(axis=1))
+    cv_list.append(dists.std() / dists.mean())
+    print(f"# d={d:3d}: min {dists.min():.3f}  max {dists.max():.3f}  "
+          f"diff {dists.max() - dists.min():.3f}  "
+          f"max/min {dists.max() / dists.min():.2f}  "
+          f"cv {cv_list[-1]:.3f}")
+print("cv_list =", [round(float(c), 3) for c in cv_list])
+check("cv_list", cv_list, 3)
+
+pts_mid = np.round(np.random.default_rng(7).random((60, 2)), 2)
+literal("pts", pts_mid, 2)
+check("pts", pts_mid, 2)
+
+np.random.seed(0)
+pts1d, pts2d = np.random.rand(20), np.random.rand(20, 2)
+literal("pts1d", pts1d, 2)
+literal("pts2d", pts2d, 2)
+check("pts1d", pts1d, 2)
+check("pts2d", pts2d, 2)
+
+
+# ==== KD-tree ====
+
+print("# ---- KD-tree ----")
+tree = build_kdtree(X_train, np.arange(len(X_train)), 0, 5)
+lv = leaves(tree)
+print(f"# tree on X_train (leaf size 5): {len(lv)} leaves of {sorted({len(p) for p in lv})} points; "
+      f"first split feature {tree['axis'] + 1} = {tree['value']}")
+node, path = tree, []
+while "axis" in node:                        # the descent of step 1 for the question point
+    side = "left" if x_new[node["axis"]] - node["value"] < 0 else "right"
+    path.append((node["axis"], node["value"], side))
+    node = node[side]
+for n_step, (a, v, side) in enumerate(path, 1):
+    print(f"# x_new descent {n_step}: feature {a + 1} = {v}, x_new has {x_new[a]} -> "
+          f"{'smaller' if side == 'left' else 'larger'} side")
+print(f"# x_new's leaf holds X_train{node['points'].tolist()}; nearest X_train[{o_new[0]}] = "
+      f"{X_train[o_new[0]].tolist()} is in it: {o_new[0] in node['points']}")
+a2, v2, side2 = path[1]
+assert o_new[0] not in node["points"] and (X_train[o_new[0], a2] < v2) == (side2 == "right"), \
+    "the slide says the nearest point lies across the second split"
+print(f"#   the nearest point lies across split 2 (feature {a2 + 1} = {v2})")
+b = nearest_kdtree(tree, X_train, x_new)
+assert b["index"] == o_new[0], "the KD-tree must find the same nearest point as the full search"
+print(f"# x_new: KD-tree finds X_train[{b['index']}] at {b['dist']:.3f} after {b['count']} distance computations "
+      f"(far side searched {b['far']} of {b['splits']} splits)")
+
+
+
+def search_kdtree_k(node, X, x, best, k):
+    """The deck's search_kdtree_k: the k nearest points, r = the k-th nearest distance so far."""
+    if "points" in node:
+        dist = np.sqrt(((X[node["points"]] - x) ** 2).sum(axis=1))
+        best["count"] += len(dist)
+        index = np.concatenate([best["index"], node["points"]])
+        dist = np.concatenate([best["dist"], dist])
+        order = np.argsort(dist)[:k]
+        best["index"], best["dist"] = index[order], dist[order]
+        return
+    diff = x[node["axis"]] - node["value"]
+    near, far = (node["left"], node["right"]) if diff < 0 else (node["right"], node["left"])
+    search_kdtree_k(near, X, x, best, k)
+    if len(best["dist"]) < k or abs(diff) < best["dist"][-1]:
+        search_kdtree_k(far, X, x, best, k)
+
+
+def nearest_k_kdtree(tree, X, x, k):
+    best = {"index": np.array([], dtype=int), "dist": np.array([]), "count": 0}
+    search_kdtree_k(tree, X, x, best, k)
+    return best
+
+
+b3 = nearest_k_kdtree(tree, X_train, x_new, 3)
+assert np.array_equal(b3["index"], o_new[:3]), "the KD-tree must find the same 3 nearest points as the full search"
+print(f"# x_new, k = 3: KD-tree finds X_train{b3['index'].tolist()}, r = {b3['dist'][-1]:.3f}, "
+      f"after {b3['count']} distance computations")
+found3 = [nearest_k_kdtree(tree, X_train, x, 3) for x in X_test]
+pred3 = np.array([int(y_train[f["index"]].sum() > 1.5) for f in found3])
+assert np.array_equal(pred3, np.array([predict_knn(X_train, y_train, x, 3) for x in X_test]))
+counts3 = [f["count"] for f in found3]
+print(f"# test set, k = 3 with the KD-tree: {np.sum(pred3 == y_test)} / 100 hits, the same predictions as predict_knn; "
+      f"distance computations per point: mean {np.mean(counts3):.1f}, min {min(counts3)}, max {max(counts3)}")
+
+rng = np.random.default_rng(0)
+kd_count = []
+for n in [1000, 10000, 100000]:
+    X = rng.random((n, 2))
+    tree = build_kdtree(X, np.arange(n), 0, 5)
+    kd_count.append(np.mean([nearest_kdtree(tree, X, q)["count"] for q in rng.random((100, 2))]))
+print("kd_count =", [round(float(c), 1) for c in kd_count])
+check("kd_count", kd_count, 1)
+
+rng = np.random.default_rng(0)
+kd_dims = []
+n = 10000
+for d in [2, 5, 10, 20]:
+    X = rng.random((n, d))
+    tree = build_kdtree(X, np.arange(n), 0, 5)
+    found = [nearest_kdtree(tree, X, q) for q in rng.random((100, d))]
+    kd_dims.append(np.mean([f["count"] for f in found]))
+    far = sum(f["far"] for f in found) / sum(f["splits"] for f in found)
+    print(f"# {d:2d}-D, n = {n}: mean count {kd_dims[-1]:.1f} ({kd_dims[-1] / n:.3f} of n), "
+          f"median nearest distance {np.median([f['dist'] for f in found]):.3f}, "
+          f"far side searched at {far:.3f} of the splits")
+print("kd_dims =", [round(float(c), 1) for c in kd_dims])
+check("kd_dims", kd_dims, 1)
+
+
+# ==== checkpoint: the fish of the evaluation deck ====
 #   The checkpoint asks the student to split the 120 fish at random (96 / 24),
 #   compare a depth-3 decision tree with k-NN (k = 3), and redo k-NN after
 #   standardizing with the training mean and std. Its answer states

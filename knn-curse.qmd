@@ -1246,7 +1246,92 @@ print(f"全探索 : いちばん近い点 {dist.argmin()}、距離 {dist.min():.
 - 距離を測ったのは、100 点中 **15 点**
 - ★ の入っている領域の点は 3 点で、いちばん近い点はこの領域の外にあった
    - 2 回目の分け目（特徴量 2 = 0.556）の反対側を、手順 3 で調べたので見つかった
-- k 点を探すときも、r を「k 番目に近い距離」にすれば、同じようにスキップできる
+:::
+
+
+## 近い k 点を探すように拡張する
+
+- k-NN の投票には、いちばん近い 1 点ではなく、近い k 点が要る
+- `search_kdtree` を 2 か所変える
+   - 覚えておくのは、近い順の k 点（番号と距離）
+   - r は、k 番目に近い距離（k 点そろうまでは、反対側を必ず調べる）
+
+```{python}
+#| echo: true
+def search_kdtree_k(node, X, x, best, k):
+    if "points" in node:                             # 葉：領域の中の点と距離を測る
+        dist = np.sqrt(((X[node["points"]] - x) ** 2).sum(axis=1))
+        best["count"] += len(dist)                   # 距離を測った点の数
+        index = np.concatenate([best["index"], node["points"]])   # 今までの k 点に、この領域の点をつなげる
+        dist  = np.concatenate([best["dist"], dist])
+        order = np.argsort(dist)[:k]                 # 近い順に並べ、先頭の k 個だけ残す
+        best["index"] = index[order]
+        best["dist"]  = dist[order]
+        return
+    diff = x[node["axis"]] - node["value"]           # 分け目から x までの、軸に沿った差
+    if diff < 0:                                     # x は分け目より小さい側にある
+        near, far = node["left"], node["right"]
+    else:
+        near, far = node["right"], node["left"]
+    search_kdtree_k(near, X, x, best, k)             # まず x のある側を調べる
+    if len(best["dist"]) < k or abs(diff) < best["dist"][-1]:   # k 点そろっていないか、分け目までの距離が r より近いとき
+        search_kdtree_k(far, X, x, best, k)          # 反対側も調べる
+
+def nearest_k_kdtree(tree, X, x, k):
+    best = {"index": np.array([], dtype=int),        # 近い順の k 点の番号（最初は空）
+            "dist":  np.array([]),                   # その距離（最後の要素が r）
+            "count": 0}
+    search_kdtree_k(tree, X, x, best, k)
+    return best
+
+best3 = nearest_k_kdtree(tree, X_train, x_new, 3)
+print(f"KD-tree: 近い 3 点 {best3['index']}、r = {best3['dist'][-1]:.3f}、距離を測った点 {best3['count']} / {len(X_train)}")
+dist  = np.sqrt(((X_train - x_new) ** 2).sum(axis=1))
+near3 = np.argsort(dist)[:3]
+print(f"全探索 : 近い 3 点 {near3}、r = {dist[near3[2]]:.3f}、距離を測った点 {len(X_train)} / {len(X_train)}")
+```
+
+::: {.callout-note title="結果"}
+- 見つかった 3 点は、全探索と同じ
+- 距離を測ったのは、100 点中 **21 点**（いちばん近い 1 点だけを探したときは 15 点）
+   - r が k 番目に近い距離になって大きくなるので、スキップできる領域が減る
+:::
+
+
+## KD-tree で探した k 点の投票で予測する
+
+- 近い k 点が見つかれば、あとは [`predict_knn`](#peek-knn-code){.peek} と同じ多数決
+- テストデータの 100 点を k = 3 で予測し、当たった数と、距離を測った点の数（1 点あたりの平均）を出す
+
+```{python}
+#| echo: true
+def predict_knn_kdtree(tree, X_train, y_train, x, k):
+    best  = nearest_k_kdtree(tree, X_train, x, k)    # 全探索の代わりに、KD-tree で近い k 点を探す
+    votes = y_train[best["index"]]                   # k 個のラベル（0 か 1）
+    return int(votes.sum() > k / 2)                  # ラベル 1 が半分より多ければ 1、そうでなければ 0
+
+pred, count = [], []
+for x in X_test:                                     # テストデータの 100 点を、1 点ずつ予測する
+    pred.append(predict_knn_kdtree(tree, X_train, y_train, x, 3))
+    count.append(nearest_k_kdtree(tree, X_train, x, 3)["count"])   # 距離を測った点の数
+pred = np.array(pred)
+
+print(f"当たった数 {np.sum(pred == y_test)} / {len(y_test)}")
+print(f"距離を測った点の数（1 点あたりの平均）: {np.mean(count):.1f} / {len(X_train)}")
+```
+
+```{python}
+#| echo: false
+#| output: false
+# The statements of the two result callouts (this slide and the previous one).
+full3 = np.array([predict_knn(X_train, y_train, x, 3) for x in X_test])
+assert np.array_equal(pred, full3) and np.sum(pred == y_test) == 85 and round(float(np.mean(count)), 1) == 13.6
+assert np.array_equal(best3["index"], near3) and best3["count"] == 21 and best["count"] == 15
+```
+
+::: {.callout-note title="結果"}
+- 100 点中 **85 点**で当たる（予測は、全探索の `predict_knn` と 100 点とも同じ）
+- 距離を測ったのは、1 点あたり平均 **13.6 点**（全探索なら 100 点）
 :::
 
 
@@ -1372,7 +1457,7 @@ print(f"当たった数: {np.sum(knn.predict(X_test) == y_test)} / {len(y_test)}
 | 今日書いたもの | scikit-learn |
 |---|---|
 | `build_kdtree` で木を作る | `KNeighborsClassifier(n_neighbors=3, algorithm="kd_tree").fit(X_train, y_train)` |
-| `predict_knn(X_train, y_train, x, 3)` を 1 点ずつ | `knn.predict(X_test)` |
+| `predict_knn_kdtree(tree, X_train, y_train, x, 3)` を 1 点ずつ | `knn.predict(X_test)` |
 
 
 ## （参考）次元を減らす：PCA
@@ -1555,5 +1640,6 @@ plt.show()
 
 1. 12 点の座標、ラベル、$N$ を、NumPy の配列にせよ
 2. `predict_knn` で、k = 3 の予測を表示せよ
-3. `build_kdtree`（領域の点が 3 個以下になるまで分ける）で木を作り、`nearest_kdtree` で、$N$ にいちばん近い点の番号、距離、距離を測った点の数を表示せよ
-4. 木の分ける値 `value` を表示し、手で引いた KD-tree の線の位置と比べよ
+3. `build_kdtree`（領域の点が 3 個以下になるまで分ける）で木を作り、`nearest_k_kdtree` で、$N$ に近い 3 点の番号と、距離を測った点の数を表示せよ
+4. `predict_knn_kdtree` で、k = 3 の予測を表示し、2 と比べよ
+5. 木の分ける値 `value` を表示し、手で引いた KD-tree の線の位置と比べよ
