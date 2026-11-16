@@ -572,7 +572,7 @@ plt.show()
 :::
 
 
-## 決定木のアルゴリズム（縦横交互バージョン）
+## 決定木のアルゴリズム（縦横交互バージョン） {#peek-tree-algorithm}
 
 
 ::: {.takeaway .dark}
@@ -706,7 +706,7 @@ print(np.sum(y_left == 1), np.sum(y_left == 0))
 ```
 
 
-## 決定木：最適な分割を探索
+## 決定木：最適な分割を探索 {#peek-tree-split}
 
 - `weighted_gini_at` を、`X` の列番号で特徴量を指定できる形に書き直す
 - ついでに最適な閾値も返す
@@ -893,6 +893,108 @@ print(f"  Accuracy:  {accuracy_alt:.3f}")
 print(f"  Precision: {precision_alt:.3f}")
 print(f"  Recall:    {recall_alt:.3f}")
 ```
+
+
+## 決定境界 {#peek-tree-boundary}
+
+- [決定境界](classification-basics-1d.qmd#peek-decision-boundary){.peek}：判定が Salmon と Sea bass で切り替わる境目
+- 決定木では、領域ごとの Salmon の割合を、Salmon らしさを表す値（スコア）にする
+- [各領域を多数派のクラスとする](#peek-tree-algorithm){.peek}のは、「スコアが 0.5 以上なら Salmon」と同じ
+   - スコアが 0.5 をまたぐ境目が、決定境界になる
+
+```{python}
+#| echo: true
+
+def region_of(brightness, weight):
+    """交互分割の決定木で、点が入る領域の番号（0〜3）"""
+    if brightness < split1_threshold:
+        return 0 if weight < split2_left_threshold else 1
+    else:
+        return 2 if weight < split2_right_threshold else 3
+
+regions = np.array([region_of(X[i, 0], X[i, 1]) for i in range(len(X))])
+
+salmon_share = []                                   # 領域ごとの、Salmon の割合
+for r in range(4):
+    salmon_share.append(np.mean(y[regions == r]))  # y は 1 = Salmon、0 = Sea bass
+    print(f"領域 {r}: {np.sum(regions == r)} 匹のうち Salmon の割合 {salmon_share[r]:.2f}")
+
+scores_tree = np.array([salmon_share[r] for r in regions])   # 各点のスコア：入った領域の Salmon の割合
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
+# Plane shaded by the tree's score (Salmon share of the region); the thick line is
+# where the score crosses 0.5, i.e. the decision boundary of the majority rule.
+gx, gy = np.meshgrid(np.linspace(X[:, 0].min() - 0.5, X[:, 0].max() + 0.5, 400),
+                     np.linspace(X[:, 1].min() - 100, X[:, 1].max() + 100, 400))
+grid_score = np.array([salmon_share[region_of(a, b)] for a, b in zip(gx.reshape(-1), gy.reshape(-1))]).reshape(gx.shape)
+
+plt.figure(figsize=(9, 6.2))
+shade = plt.contourf(gx, gy, grid_score, levels=np.linspace(0, 1, 11), cmap="Blues", alpha=0.45)
+plt.colorbar(shade, label="スコア（領域の Salmon の割合）")
+plt.contour(gx, gy, grid_score, levels=[0.5], colors="black", linewidths=3)
+plt.scatter(salmon_brightness, salmon_weights, c="black", marker="o", s=60, alpha=0.8, label="Salmon")
+plt.scatter(seabass_brightness, seabass_weights, c="red", marker="s", s=60, alpha=0.8, label="Sea bass")
+plt.plot([], [], color="black", linewidth=3, label="決定境界（スコア 0.5）")
+plt.xlabel("Lightness", fontsize=13)
+plt.ylabel("Weight (g)", fontsize=13)
+plt.legend(fontsize=11, loc="upper right")
+plt.tight_layout()
+plt.show()
+```
+
+
+## 決定木の ROC 曲線と AUC {#peek-tree-roc}
+
+- スコアの閾値を 0.5 から動かすことは、[決定境界](#peek-tree-boundary){.peek}を動かすこと
+   - ROC 曲線は、閾値を全通り動かしたときの TP Rate と FP Rate
+- [ROC 曲線のコード](classification-basics-1d.qmd#peek-roc-code){.peek}と同じ計算を、重さの代わりに[決定木のスコア](#peek-tree-boundary){.peek}（領域ごとの Salmon の割合）で行う
+   - スコアに当てる閾値は、スコアに現れる値と、全部を Sea bass と判定する値（最大値 + 1）
+- 面積は、[AUC](classification-basics-1d.qmd#peek-auc){.peek}と同じく、隣り合う 2 点の間の台形を足して求める
+
+```{python}
+#| echo: true
+#| fig-align: center
+
+def roc_points(scores, y):
+    """スコアに閾値を当てて、閾値ごとの TP Rate と FP Rate を返す"""
+    thresholds = list(np.unique(scores)) + [np.max(scores) + 1]   # スコアに現れる値と、全部を 0 と判定する値
+    tpr, fpr = [], []
+    for threshold in thresholds:
+        TP = np.sum((scores >= threshold) & (y == 1))
+        FN = np.sum((scores < threshold) & (y == 1))
+        FP = np.sum((scores >= threshold) & (y == 0))
+        TN = np.sum((scores < threshold) & (y == 0))
+        tpr.append(TP / (TP + FN))
+        fpr.append(FP / (FP + TN))
+    return tpr, fpr
+
+def auc_of(tpr, fpr):
+    """隣り合う 2 点の間の台形の面積を足す"""
+    auc = 0
+    for i in range(len(fpr) - 1):
+        auc += (fpr[i] - fpr[i + 1]) * (tpr[i] + tpr[i + 1]) / 2
+    return auc
+
+tpr, fpr = roc_points(scores_tree, y)
+auc_tree = auc_of(tpr, fpr)
+print(f"交互分割の決定木（深さ 2）の AUC: {auc_tree:.3f}")
+
+plt.figure(figsize=(5, 5))
+plt.plot(fpr, tpr, color="#e74c3c", marker="o", label="交互分割の決定木")
+plt.plot([0, 1], [0, 1], color="gray", linestyle="--", label="ランダムに判定")
+plt.xlabel("FP Rate")
+plt.ylabel("TP Rate（Recall）")
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.show()
+```
+
+::: {.callout-note title="結果"}
+- 領域が 4 つなので、スコアは 4 通り以下になり、曲線は数か所で折れるだけの粗い形になる
+:::
 
 
 ## {background-color="white" .center .break-slide}

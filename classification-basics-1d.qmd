@@ -193,9 +193,10 @@ if overlap_max >= overlap_min:
   -  **かなり重なっている** が、まあ分けてみましょう
 :::
 
-## 境界線（閾値）を考える
+## 境界線（閾値）を考える {#peek-decision-boundary}
 
 大体でいいので **しきい値（[threshold]{.en}）** を設定する。
+
 
 ### 方針
 
@@ -204,6 +205,11 @@ if overlap_max >= overlap_min:
 **1800g未満** → Sea bass
 
 この判定ルールで分類してみる。
+
+
+::: {.takeaway}
+閾値で分かれる境界を**決定境界**（[decision boundary]{.en}）という
+:::
 
 ## 青の破線で切ったとしたら
 
@@ -293,7 +299,7 @@ print(f"TP={TP}, FN={FN}, FP={FP}, TN={TN}")
 ```
 
 
-## 混同行列（[Confusion Matrix]{.en}）
+## 混同行列（[Confusion Matrix]{.en}） {#peek-confusion-matrix}
 
 ```{python}
 #| echo: true
@@ -594,11 +600,133 @@ print(f"min cost: {best_threshold}g")
 :::
 
 
+## ROC曲線：分類器の性能を可視化 {#peek-roc}
+
+- Precision と Recall はトレードオフ
+   - ということは、分類器の性能はこれでは表せない
+   - それなら、閾値を全通り試した結果を図にしよう
+   - これが**ROC（[Receiver Operating Characteristic]{.en}）曲線**
+
+
+::: {.takeaway}
+ROC曲線の描き方：全閾値で以下を計算して折れ線グラフにするだけ
+:::
+- 縦軸（**Recall**）：[TP Rate]{.en}$= \dfrac{TP}{TP + FN}$
+- 横軸（Precisionの代わり）：[FP Rate]{.en}$= \dfrac{FP}{FP + TN}$
+
+## ROC曲線の見方
+
+::: {.callout-tip title="一目瞭然"}
+- 分布が離れているほど、曲線は左上の角（FP Rate 0、TP Rate 1）に近づく
+- 分布が重なっているほど、曲線は対角線（ランダムに判定した場合）に近づく
+- もし曲線が対角線より下にあるなら、判定したラベルが逆
+   - 値の小さいほうを Salmon と判定すれば対角線の上に移る
+:::
+
+
+```{python}
+#| echo: false
+#| fig-align: center
+# Two hypothetical features drawn from exact normal densities (no random numbers):
+# Salmon ~ N(mu, 1), Sea bass ~ N(0, 1); mu = 2.5 separates well, mu = 0.5 hardly at all.
+from scipy.stats import norm
+
+x = np.linspace(-4, 6.5, 400)
+fig, axes = plt.subplots(2, 2, figsize=(9.5, 7.2), gridspec_kw={"height_ratios": [1, 2]})
+for col, (mu, title) in enumerate([(2.5, "よく分かれる特徴量"), (0.5, "ほとんど分かれない特徴量")]):
+    ax = axes[0, col]
+    ax.plot(x, norm.pdf(x, mu, 1), color="black", lw=2, label="Salmon")
+    ax.plot(x, norm.pdf(x, 0, 1), color="red", lw=2, label="Sea bass")
+    ax.set_title(title, fontsize=12)
+    ax.set_yticks([])
+    ax.legend(fontsize=9, loc="upper right")
+
+    ax = axes[1, col]
+    t = np.linspace(-6, 9, 600)          # thresholds from "all Salmon" to "all Sea bass"
+    ax.plot(norm.sf(t, 0, 1), norm.sf(t, mu, 1), color="#e74c3c", lw=2.5)
+    ax.plot([0, 1], [0, 1], color="gray", linestyle="--", lw=1.2, label="ランダムに判定")
+    ax.set_xlim(-0.02, 1.02)
+    ax.set_ylim(-0.02, 1.02)
+    ax.set_aspect("equal")
+    ax.set_xlabel("FP Rate")
+    ax.set_ylabel("TP Rate（Recall）")
+    ax.legend(loc="lower right", fontsize=9)
+    ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+
+
+## コード（ROC曲線） {#peek-roc-code}
+
+- 閾値をずらしつつ実行した値をグラフにする
+   - 最小値は全部を Salmon、最大値 + 1 は全部を Sea bass と判定する閾値
+      - それ以上と以下は明らかに値が同じなので意味がない
+
+```{python}
+#| echo: true
+#| fig-align: center
+weights = np.concatenate([salmon_weights, seabass_weights])     # 40 匹の重さ
+tpr = []   # TP Rate（Recall）
+fpr = []   # FP Rate
+for threshold in range(np.min(weights), np.max(weights) + 2):   # 最小値から、最大値 + 1 まで 1g ずつ
+    TP = np.sum(salmon_weights >= threshold)
+    FN = np.sum(salmon_weights < threshold)
+    FP = np.sum(seabass_weights >= threshold)
+    TN = np.sum(seabass_weights < threshold)
+    tpr.append(TP / (TP + FN))
+    fpr.append(FP / (FP + TN))
+
+plt.figure(figsize=(5, 5))
+plt.plot(fpr, tpr, color="#e74c3c", label="重さで判定")
+plt.plot([0, 1], [0, 1], color="gray", linestyle="--", label="ランダムに判定")
+plt.xlabel("FP Rate")
+plt.ylabel("TP Rate（Recall）")
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.show()
+```
+
+
+## AUC：ROC曲線の下の面積を使った分離性能を表す指標 {#peek-auc}
+
+- **AUC**（[Area Under the Curve]{.en}）：ROC 曲線の下の面積
+   - 1.0：完全に分離可能（曲線が左上の角を通る）
+   - 0.5：全く分離不可能（対角線と同じ）
+- 面積は、隣り合う 2 点の間を台形とみなして、その面積を足して求める
+   - [ROC曲線のコード](#peek-roc-code){.peek}で作った `tpr` と `fpr` をそのまま使う
+
+```{python}
+#| echo: true
+auc = 0
+for i in range(len(fpr) - 1):
+    width  = fpr[i] - fpr[i + 1]          # 台形の幅（閾値を上げると FP Rate は下がる）
+    height = (tpr[i] + tpr[i + 1]) / 2    # 上底と下底の平均
+    auc += width * height
+print(f"重さの AUC: {auc:.3f}")
+```
+
+```{python}
+#| echo: false
+#| output: false
+# Check of the value in doc/measured-log.md: the trapezoid sum above, NumPy's trapezoid
+# rule and the share of (Salmon, Sea bass) pairs with the heavier Salmon all give 0.805.
+pairs = sum(1.0 if s > b else 0.5 if s == b else 0.0 for s in salmon_weights for b in seabass_weights)
+assert abs(auc - (-np.trapezoid(tpr, fpr))) < 1e-12 and abs(auc - pairs / 400) < 1e-12 and round(auc, 3) == 0.805
+```
+
+::: {.callout-note title="結果"}
+- 重さの AUC は `{python} f"{auc:.3f}"`
+   - 重なってはいるが、ランダムに判定よりはずっと良い結果
+:::
+
+
 ## 重さだけで分類した結論
 
 ::: {.callout-important title="重要ポイント"}
 1. **重さだけでは完全な分類は不可能**
-   - データの分布が重なっている
+   - データの分布が重なっている（重さの [AUC](#peek-auc){.peek} は `{python} f"{auc:.3f}"`）
    
 2. **境界線は「方針の選択」**
    - 正解/不正解ではなく、用途に応じた最適化（[optimization]{.en}）

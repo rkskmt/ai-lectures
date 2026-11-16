@@ -320,6 +320,100 @@ plt.show()
 :::
 
 
+## k-NN の決定境界 {#peek-knn-score}
+
+- k-NN では、近い k 点のうちラベル 1 の割合を、ラベル 1 らしさを表す値（スコア）にする
+   - [`predict_knn`](#peek-knn-code){.peek} の最後の行を、多数決から割合に変えるだけ
+   - k = 3 なら、スコアは 0、1/3、2/3、1 の 4 通り
+- 多数決は、「スコアが 0.5 より大きければラベル 1」と同じ
+   - スコアが 0.5 をまたぐ境目が、[決定境界](classification-2d-boundaries.qmd#peek-tree-boundary){.peek}になる
+
+```{python}
+#| echo: true
+def score_knn(X_train, y_train, x, k):
+    dist    = np.sqrt(((X_train - x) ** 2).sum(axis=1))  # x から、訓練データの全部の点までの距離
+    nearest = np.argsort(dist)[:k]                       # 距離が小さい順に並べた番号の、先頭 k 個
+    return np.mean(y_train[nearest])                     # k 個のうち、ラベル 1 の割合
+
+print(f"★ のスコア（k = 3）: {score_knn(X_train, y_train, x_new, 3):.3f}")
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
+# Plane shaded by the k = 3 score, from grid_order of the slide "k で決定境界が変わる";
+# the thick line is where the score crosses 0.5 (the majority vote's decision boundary).
+grid_score3 = y_train[grid_order[:, :3]].mean(axis=1).reshape(g0.shape)
+
+fig, ax = plt.subplots(figsize=(6.4, 5.6))
+shade = ax.contourf(g0, g1, grid_score3, levels=[-0.01, 0.2, 0.5, 0.8, 1.01],
+                    colors=["#ffffff", "#fdebd0", "#f8c471", "#e67e22"], alpha=0.55)
+ax.contour(g0, g1, grid_score3, levels=[0.5], colors="black", linewidths=2.5)
+draw_points(ax, X_train, y_train, s=22)
+ax.plot([], [], color="black", linewidth=2.5, label="決定境界（スコア 0.5）")
+square_axes(ax)
+cbar = fig.colorbar(shade, ax=ax, ticks=[0.1, 0.35, 0.65, 0.9])
+cbar.ax.set_yticklabels(["0", "1/3", "2/3", "1"])
+cbar.set_label("スコア（k = 3、近い 3 点のうちラベル 1 の割合）")
+ax.legend(fontsize=9, loc="upper center", bbox_to_anchor=(0.5, -0.14), ncol=3)
+plt.tight_layout()
+plt.show()
+```
+
+
+## k-NN の ROC 曲線と AUC {#peek-knn-roc}
+
+- スコアの閾値を 0.5 から動かすことは、[決定境界](#peek-knn-score){.peek}を動かすこと
+- テストデータの 100 点のスコアから、k = 1、3、31 の ROC 曲線を描く
+- `roc_points` と `auc_of` は、[決定木の ROC 曲線](classification-2d-boundaries.qmd#peek-tree-roc){.peek}と同じ関数
+
+```{python}
+#| echo: true
+#| fig-align: center
+def roc_points(scores, y):
+    """スコアに閾値を当てて、閾値ごとの TP Rate と FP Rate を返す"""
+    thresholds = list(np.unique(scores)) + [np.max(scores) + 1]   # スコアに現れる値と、全部を 0 と判定する値
+    tpr, fpr = [], []
+    for threshold in thresholds:
+        TP = np.sum((scores >= threshold) & (y == 1))
+        FN = np.sum((scores < threshold) & (y == 1))
+        FP = np.sum((scores >= threshold) & (y == 0))
+        TN = np.sum((scores < threshold) & (y == 0))
+        tpr.append(TP / (TP + FN))
+        fpr.append(FP / (FP + TN))
+    return tpr, fpr
+
+def auc_of(tpr, fpr):
+    """隣り合う 2 点の間の台形の面積を足す"""
+    auc = 0
+    for i in range(len(fpr) - 1):
+        auc += (fpr[i] - fpr[i + 1]) * (tpr[i] + tpr[i + 1]) / 2
+    return auc
+
+plt.figure(figsize=(5.5, 5.5))
+aucs = []
+for k in [1, 3, 31]:
+    scores = []
+    for x in X_test:                                     # テストデータの 100 点のスコア
+        scores.append(score_knn(X_train, y_train, x, k))
+    tpr, fpr = roc_points(np.array(scores), y_test)
+    aucs.append(auc_of(tpr, fpr))
+    print(f"k = {k:2d}: AUC {aucs[-1]:.3f}")
+    plt.plot(fpr, tpr, marker="o", markersize=3, label=f"k = {k}")
+plt.plot([0, 1], [0, 1], color="gray", linestyle="--", label="ランダムに判定")
+plt.xlabel("FP Rate")
+plt.ylabel("TP Rate（Recall）")
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.show()
+```
+
+::: {.callout-note title="結果"}
+- k = 1 はスコアが 0 か 1 だけなので、曲線は 1 か所で折れるだけ（AUC `{python} f"{aucs[0]:.3f}"`）
+- k を増やすとスコアの段階が増え、曲線が細かくなる（k = 3 で AUC `{python} f"{aucs[1]:.3f}"`、k = 31 で `{python} f"{aucs[2]:.3f}"`）
+:::
+
+
 ## 特徴量の数を増やすのが最強か？
 
 - 2 つの特徴量で、k-NN はテストデータの 100 点中 85 点で当たった
