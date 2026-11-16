@@ -179,7 +179,7 @@
   <script src="peek-ui.js" defer=""></script>
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="169b10fcb21d02f0a2151f194f67cf3b8adcf01e">
+  <meta name="qmd-web-source" content="c0431dd182e0420a71e43d97bd6a06263718fd3c">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -187,7 +187,7 @@
 
 <section id="title-slide" class="quarto-title-block center">
   <h1 class="title">レポート：自分のデータを分類する</h1>
-  <p class="subtitle">決定木と k-NN を、自分で作ったデータで比べる</p>
+  <p class="subtitle">決定木と k-NN を、自分で見つけたデータで比べる</p>
 
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
@@ -198,117 +198,42 @@ rkskmt
 </div>
 
 </section>
-<section id="レポート-自分で作ったデータを決定木と-k-nn-で分類する" class="slide level2 badge-practice scrollable">
-<h2><strong>レポート</strong> 自分で作ったデータを、決定木と k-NN で分類する</h2>
+<section id="レポート-分類器を作成するに相応しいデータを自分で探せ" class="slide level2 badge-practice scrollable">
+<h2><strong>レポート</strong> 分類器を作成するに相応しいデータを自分で探せ</h2>
 <div class="slide-body">
 <div class="prompt">
-<p>2 種類のものを見分けるデータを自分で作り、決定木と k-NN で分類して、どちらが自分のデータに合うかを説明せよ。</p>
+<p>2 種類のデータを自分で探して集めて分類せよ</p>
 </div>
 <ol type="1">
-<li>2 種類のものと特徴量 2 つを決め、各 30 個以上のデータを作成（選んだ理由と、出どころまたは測り方を記述）</li>
-<li>散布図を表示し、訓練データとテストデータに分割</li>
-<li>決定木で分類し、テストデータの Accuracy を表示</li>
-<li>k-NN で分類し、テストデータの Accuracy を表示（特徴量は標準化し、近い k 点は KD-tree で探索）</li>
-<li>決定木と k-NN のどちらが自分のデータに合うかを、Accuracy と散布図から説明</li>
+<li><a href="#/peek-report-rules" class="peek">データのルール</a>に合うデータと特徴量を決め、各 30 個以上のデータを収集（選んだ理由と、出どころまたは測り方を記述）</li>
+<li>散布図と、特徴量ごとに閾値で分類した場合の <a href="./classification-basics-1d.html#peek-roc" class="peek">ROC 曲線</a>と <a href="./classification-basics-1d.html#peek-auc" class="peek">AUC</a> を表示
+<ul>
+<li>散布図はクラスで色分けすること</li>
+</ul></li>
+<li>決定木で分類し、ROC 曲線と AUC を表示</li>
+<li>k-NN で分類し、ROC 曲線と AUC を表示（特徴量は標準化し、近い k 点は KD-tree で探索）</li>
+<li>決定木と k-NN のどちらが自分のデータに合うかを説明</li>
 </ol>
 </div>
 </section>
-<section id="使う道具" class="slide level2">
-<h2>使う道具</h2>
+<section id="peek-report-rules" class="slide level2 scrollable">
+<h2>ルール</h2>
 <div class="slide-body">
-<table class="caption-top">
-<thead>
-<tr class="header">
-<th>やること</th>
-<th>使うもの</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>データを配列にする</td>
-<td><a href="./knn-curse.html#peek-knn-fish" class="peek">魚のデータ</a>と同じ形の <code>X</code>（1 行が 1 個の [特徴量 1, 特徴量 2]）と <code>y</code>（ラベル）</td>
-</tr>
-<tr class="even">
-<td>訓練データとテストデータに分ける</td>
-<td><a href="./classification-evaluation.html#peek-split" class="peek">ランダムに並べ替えてから分ける</a></td>
-</tr>
-<tr class="odd">
-<td>決定木</td>
-<td><a href="./classification-evaluation.html#peek-depth-curve" class="peek"><code>DecisionTreeClassifier</code></a></td>
-</tr>
-<tr class="even">
-<td>標準化</td>
-<td><a href="./clustering-kmeans.html#peek-scale" class="peek">平均を引いて、標準偏差で割る</a>（平均と標準偏差は訓練データから計算）</td>
-</tr>
-<tr class="odd">
-<td>KD-tree を使った k-NN</td>
-<td><a href="./knn-curse.html#peek-kd-build" class="peek"><code>build_kdtree</code></a> と <a href="./knn-curse.html#peek-kd-knn" class="peek"><code>predict_knn_kdtree</code></a></td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
-<section id="データの選び方はっきり分かれるものは選ばない" class="slide level2">
-<h2>データの選び方：はっきり分かれるものは選ばない</h2>
-<div class="slide-body">
+<ol type="1">
+<li>社会通念上、意味的に 2 種類のものを表すデータであること</li>
+<li>コードはscikit-learnなどのライブラリを使わずnumpyとpltで実装すること</li>
+<li>特徴量は3種類以上とする</li>
+<li>各特徴量単体では、完全に分類できないこと
 <ul>
-<li>例：軽自動車と普通車を、全長と車両重量で見分ける
-<ul>
-<li>軽自動車は、規格で全長 3.4 m 以下と決まっている</li>
-<li>全長だけでほぼ分かれるので、決定木でも k-NN でもほぼ満点になり、比べられない</li>
+<li>少なくとも 10% 程度以上には重なっていること</li>
 </ul></li>
-<li>散布図で、2 種類が少し重なるものを選ぶ
+<li>公序良俗に反しないこと</li>
+<li>データは、自分で計測してもよいし、Web を参照してもよい</li>
+<li>抜き出しうるデータのうち恣意的なピックアップ（チェリーピック, <span class="en">cherry picking</span>）をして、ルールにちょうど合うようにしないこと
 <ul>
-<li>重なりがあると、境界の引き方で結果が変わる</li>
+<li>例えば、パリーグの選手とセリーグの選手のうち、ちょうど重ならない選手だけ抜き出すなどはNG。ただし、WBCに出場した選手のような客観的な指標であるならばよい</li>
 </ul></li>
-</ul>
-<div title="チェックポイント">
-<div class="callout callout-tip callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>チェックポイント</strong></p>
-</div>
-<div class="callout-content">
-<p>10 個ずつ集めたところで散布図を描き、分かれすぎていないかを確かめる</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="データの選び方集め方の規則を先に決める" class="slide level2">
-<h2>データの選び方：集め方の規則を先に決める</h2>
-<div class="slide-body">
-<ul>
-<li>例：プロ野球選手と J リーグの選手を、身長と体重で見分ける
-<ul>
-<li>好きな選手を 30 人ずつ選ぶと、都合のよい選手だけを選べてしまう</li>
-</ul></li>
-<li>誰が集めても同じデータになる規則を、集める前に決める
-<ul>
-<li>例：去年の優勝チームの、開幕戦のスタメン</li>
-<li>人数が足りなければ、2 位、3 位のチームを順に足す</li>
-</ul></li>
-<li>決めた規則は、レポートに書く</li>
-</ul>
-</div>
-</section>
-<section id="特徴量の選び方2-つで見分けられなければ足していく" class="slide level2">
-<h2>特徴量の選び方：2 つで見分けられなければ、足していく</h2>
-<div class="slide-body">
-<ul>
-<li>まず 2 つの特徴量（例：身長と体重）で、決定木と k-NN を試す</li>
-<li>Accuracy が低ければ、特徴量を 1 つずつ足して、Accuracy がどう変わるかを見る
-<ul>
-<li>例：年齢、プロになってからの年数、年俸</li>
-</ul></li>
-<li>桁の違う特徴量（年俸など）を足すと、<a href="./clustering-kmeans.html#peek-scale-mismatch" class="peek">標準化しない k-NN は、その特徴量だけで距離が決まる</a></li>
-<li>特徴量を足すほど当たるとは限らない（<a href="./knn-curse.html#peek-curse" class="peek">次元の呪い</a>）</li>
-<li>特徴量が 3 つ以上のときも、散布図は 2 つを選んで描く</li>
-</ul>
+</ol>
 </div>
 </section>
 <section id="データの例" class="slide level2">
@@ -361,16 +286,64 @@ rkskmt
 </ul>
 </div>
 </section>
+<section id="使うツール" class="slide level2">
+<h2>使うツール</h2>
+<div class="slide-body">
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>やること</th>
+<th>使うもの</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>データを配列にする</td>
+<td><a href="./knn-curse.html#peek-knn-fish" class="peek">魚のデータ</a>と同じ形の <code>X</code>（1 行が 1 個の [特徴量 1, 特徴量 2, …]）と <code>y</code>（ラベル）</td>
+</tr>
+<tr class="even">
+<td>特徴量ごとの ROC 曲線と AUC</td>
+<td><a href="./classification-basics-1d.html#peek-roc-code" class="peek">ROC 曲線のコード</a>と <a href="./classification-basics-1d.html#peek-auc" class="peek">AUC</a>（閾値を当てる値は特徴量の値）</td>
+</tr>
+<tr class="odd">
+<td>分類器の ROC 曲線と AUC</td>
+<td><a href="./classification-2d-boundaries.html#peek-tree-roc" class="peek"><code>roc_points</code> と <code>auc_of</code></a>（閾値を当てる値はスコア）</td>
+</tr>
+<tr class="even">
+<td>決定木</td>
+<td><a href="./classification-2d-boundaries.html#peek-tree-split" class="peek"><code>find_best_split_for_feature</code></a> で分け方を探し、<a href="./knn-curse.html#peek-kd-build" class="peek"><code>build_kdtree</code></a> と同じ再帰で木を作る</td>
+</tr>
+<tr class="odd">
+<td>決定木のスコア</td>
+<td><a href="./classification-2d-boundaries.html#peek-tree-boundary" class="peek">葉に入った訓練データのうち、ラベル 1 の割合</a></td>
+</tr>
+<tr class="even">
+<td>標準化</td>
+<td><a href="./clustering-kmeans.html#peek-scale" class="peek">平均を引いて、標準偏差で割る</a></td>
+</tr>
+<tr class="odd">
+<td>KD-tree を使った k-NN</td>
+<td><a href="./knn-curse.html#peek-kd-build" class="peek"><code>build_kdtree</code></a> と <a href="./knn-curse.html#peek-kd-knn" class="peek"><code>predict_knn_kdtree</code></a></td>
+</tr>
+<tr class="even">
+<td>k-NN のスコア</td>
+<td><a href="./knn-curse.html#peek-knn-score" class="peek"><code>score_knn</code></a>：近い k 点のうち、ラベル 1 の割合（KD-tree で探した k 点に使う）</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
 <section id="提出物" class="slide level2">
 <h2>提出物</h2>
 <div class="slide-body">
 <ul>
-<li>レポート 1 つに、次をまとめる
+<li>以下をPDFにして提出（スライド形式でもよい）
 <ul>
-<li>2 種類のもの、特徴量、集め方の規則と、それを選んだ理由</li>
+<li>そのデータの説明と選定理由</li>
 <li>データ（<code>X</code> と <code>y</code> の配列）と、出どころの URL、または測っている様子の写真</li>
-<li>コードと、その出力（散布図、Accuracy）</li>
-<li>設問 5 の説明</li>
+<li>コード</li>
+<li>出力</li>
+<li>考察</li>
 </ul></li>
 </ul>
 

@@ -248,7 +248,7 @@
   <script src="peek-ui.js" defer=""></script>
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="3e023a166d25512c80033e35f19aed33b8b4d26a">
+  <meta name="qmd-web-source" content="5f66187f43585b31c91deade0d4bff3e57df9b6c">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -358,7 +358,7 @@ rkskmt
 <li>重量計をつけられそうなので、まず重さで識別できないかを考えた</li>
 <li>まずサンプルとして20匹ずつの重さを測定した</li>
 </ul>
-<div id="c3536b84" class="cell" data-execution_count="1">
+<div id="1ccbe4f3" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="co"># Salmon（20匹）の重さ (g)</span></span>
 <span id="cb1-2"><a aria-label="2"></a>salmon_weights <span class="op">=</span> [<span class="dv">2149</span>, <span class="dv">1959</span>, <span class="dv">2194</span>, <span class="dv">2457</span>, <span class="dv">1930</span>, <span class="dv">1930</span>, <span class="dv">2474</span>, <span class="dv">2230</span>, <span class="dv">1859</span>, <span class="dv">2163</span>,</span>
 <span id="cb1-3"><a aria-label="3"></a>                  <span class="dv">1861</span>, <span class="dv">1860</span>, <span class="dv">2073</span>, <span class="dv">1426</span>, <span class="dv">1483</span>, <span class="dv">1831</span>, <span class="dv">1696</span>, <span class="dv">2094</span>, <span class="dv">1728</span>, <span class="dv">1576</span>]</span>
@@ -368,7 +368,7 @@ rkskmt
 <span id="cb1-7"><a aria-label="7"></a>seabass_weights <span class="op">=</span> [<span class="dv">1677</span>, <span class="dv">1327</span>, <span class="dv">1486</span>, <span class="dv">1440</span>, <span class="dv">1857</span>, <span class="dv">1476</span>, <span class="dv">1749</span>, <span class="dv">2203</span>, <span class="dv">1979</span>, <span class="dv">1468</span>,</span>
 <span id="cb1-8"><a aria-label="8"></a>                   <span class="dv">1496</span>, <span class="dv">1737</span>, <span class="dv">1099</span>, <span class="dv">1341</span>, <span class="dv">1748</span>, <span class="dv">1563</span>, <span class="dv">2181</span>, <span class="dv">1414</span>, <span class="dv">1286</span>, <span class="dv">1333</span>]</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="6b11df6f" class="cell" data-execution_count="2">
+<div id="81ac8dd2" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div>
 <figure>
@@ -385,7 +385,7 @@ rkskmt
 <p>pandas, numpy, matplotlib, scikit-learn をインストールする。</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a aria-label="1"></a><span class="ex">pip</span> install pandas numpy matplotlib scikit-learn</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <p>続けて、以下を実行</p>
-<div id="b87f4c1e" class="cell" data-execution_count="3">
+<div id="674cac2d" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb3-2"><a aria-label="2"></a></span>
 <span id="cb3-3"><a aria-label="3"></a><span class="co"># numpy配列にキャスト</span></span>
@@ -397,7 +397,7 @@ rkskmt
 <section id="まずはヒストグラム" class="slide level2">
 <h2>まずはヒストグラム</h2>
 <div class="slide-body">
-<div id="248bd274" class="cell" data-execution_count="5">
+<div id="a6e96fe2" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>（参考）描画コード</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a aria-label="1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -432,7 +432,7 @@ rkskmt
 <section id="統計値を見る" class="slide level2">
 <h2>統計値を見る</h2>
 <div class="slide-body">
-<div id="483b54a6" class="cell" data-execution_count="6">
+<div id="8820c66b" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a aria-label="1"></a><span class="bu">print</span>(<span class="ss">f"Salmon   - 最小: </span><span class="sc">{</span><span class="bu">min</span>(salmon_weights)<span class="sc">}</span><span class="ss">g, 最大: </span><span class="sc">{</span><span class="bu">max</span>(salmon_weights)<span class="sc">}</span><span class="ss">g, 平均: </span><span class="sc">{</span>np<span class="sc">.</span>mean(salmon_weights)<span class="sc">:.0f}</span><span class="ss">g"</span>)</span>
 <span id="cb5-2"><a aria-label="2"></a><span class="bu">print</span>(<span class="ss">f"Sea bass - 最小: </span><span class="sc">{</span><span class="bu">min</span>(seabass_weights)<span class="sc">}</span><span class="ss">g, 最大: </span><span class="sc">{</span><span class="bu">max</span>(seabass_weights)<span class="sc">}</span><span class="ss">g, 平均: </span><span class="sc">{</span>np<span class="sc">.</span>mean(seabass_weights)<span class="sc">:.0f}</span><span class="ss">g"</span>)</span>
 <span id="cb5-3"><a aria-label="3"></a>overlap_min <span class="op">=</span> <span class="bu">max</span>(<span class="bu">min</span>(salmon_weights), <span class="bu">min</span>(seabass_weights))</span>
@@ -468,7 +468,7 @@ Sea bass - 最小: 1099g, 最大: 2203g, 平均: 1593g
 </div>
 </div>
 </section>
-<section id="境界線閾値を考える" class="slide level2">
+<section id="peek-decision-boundary" class="slide level2">
 <h2>境界線（閾値）を考える</h2>
 <div class="slide-body">
 <p>大体でいいので <strong>しきい値（<span class="en">threshold</span>）</strong> を設定する。</p>
@@ -476,12 +476,15 @@ Sea bass - 最小: 1099g, 最大: 2203g, 平均: 1593g
 <p><strong>1800g以上</strong> → Salmon</p>
 <p><strong>1800g未満</strong> → Sea bass</p>
 <p>この判定ルールで分類してみる。</p>
+<div class="takeaway">
+<p>閾値で分かれる境界を<strong>決定境界</strong>（<span class="en">decision boundary</span>）という</p>
+</div>
 </div>
 </section>
 <section id="青の破線で切ったとしたら" class="slide level2">
 <h2>青の破線で切ったとしたら</h2>
 <div class="slide-body">
-<div id="a4496abf" class="cell" data-execution_count="7">
+<div id="40bfcbd7" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -562,7 +565,7 @@ Sea bass - 最小: 1099g, 最大: 2203g, 平均: 1593g
 <li><code>seabass_weights &gt;= threshold</code> は、40匹それぞれの判定を True / False で並べた配列</li>
 <li><a href="./numpy-recipes.html#peek-np-count" class="peek"><code>np.sum</code></a> は True を 1、False を 0 として足すので、条件を満たした<strong>匹数</strong>になる</li>
 </ul>
-<div id="652021aa" class="cell" data-execution_count="8">
+<div id="acc76c0c" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a aria-label="1"></a>threshold <span class="op">=</span> <span class="dv">1800</span></span>
 <span id="cb7-2"><a aria-label="2"></a></span>
 <span id="cb7-3"><a aria-label="3"></a><span class="bu">print</span>(seabass_weights[:<span class="dv">5</span>] <span class="op">&gt;=</span> threshold)   <span class="co"># 先頭5匹の判定</span></span>
@@ -579,10 +582,10 @@ TP=15, FN=5, FP=4, TN=16</code></pre>
 </div>
 </div>
 </section>
-<section id="混同行列confusion-matrix" class="slide level2">
+<section id="peek-confusion-matrix" class="slide level2">
 <h2>混同行列（<span class="en">Confusion Matrix</span>）</h2>
 <div class="slide-body">
-<div id="8786d74e" class="cell" data-execution_count="9">
+<div id="2fc49958" class="cell" data-execution_count="9">
 <details class="code-fold">
 <summary>（参考）描画コード</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a aria-label="1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -716,7 +719,7 @@ TP=15, FN=5, FP=4, TN=16</code></pre>
 <ul>
 <li><a href="#/peek-cm-1800" class="peek">境界線1800gの混同行列</a>の値を計算式に代入する</li>
 </ul>
-<div id="a8837dd9" class="cell" data-execution_count="10">
+<div id="8ff12c2f" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a aria-label="1"></a><span class="co"># Calculate metrics</span></span>
 <span id="cb10-2"><a aria-label="2"></a>accuracy <span class="op">=</span> (TP <span class="op">+</span> TN) <span class="op">/</span> (TP <span class="op">+</span> TN <span class="op">+</span> FP <span class="op">+</span> FN)</span>
 <span id="cb10-3"><a aria-label="3"></a>precision <span class="op">=</span> TP <span class="op">/</span> (TP <span class="op">+</span> FP) <span class="cf">if</span> (TP <span class="op">+</span> FP) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> <span class="dv">0</span></span>
@@ -737,7 +740,7 @@ Recall    = 15 / (15 + 5) = 0.750</code></pre>
 <h2>しきい値を変えると？</h2>
 <div class="slide-body">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a aria-label="1"></a>thresholds <span class="op">=</span> [<span class="dv">1600</span>, <span class="dv">1800</span>, <span class="dv">2000</span>]</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
-<div id="3ee45d9e" class="cell" data-execution_count="11">
+<div id="24b22e2e" class="cell" data-execution_count="11">
 <div class="cell-output cell-output-stdout">
 <pre><code>threshold  TP  FP  FN  TN Precision Recall Accuracy
     1600g  17   8   3  12     68.0%  85.0%    72.5%
@@ -777,7 +780,7 @@ Recall    = 15 / (15 + 5) = 0.750</code></pre>
 <div class="slide-body">
 <div class="columns">
 <div class="column" style="width:50%;">
-<div id="716ddf9e" class="cell" data-execution_count="12">
+<div id="ccaa024e" class="cell" data-execution_count="12">
 <div class="cell-output cell-output-display">
 <div>
 <figure>
@@ -794,7 +797,7 @@ Recall    = 15 / (15 + 5) = 0.750</code></pre>
 <li><strong>Recall</strong>: 85.0% (高い)</li>
 </ul>
 </div><div class="column" style="width:50%;">
-<div id="e9c07464" class="cell" data-execution_count="13">
+<div id="ba335c4a" class="cell" data-execution_count="13">
 <div class="cell-output cell-output-display">
 <div>
 <figure>
@@ -850,7 +853,7 @@ Recall    = 15 / (15 + 5) = 0.750</code></pre>
 &amp;\quad \small{N(x): x\text{の個数},\; \text{Cost}(x): x\text{ 1個あたりのコスト}}
 \end{aligned}
 \]</span></p>
-<div id="b319bd16" class="cell" data-execution_count="14">
+<div id="2029ed93" class="cell" data-execution_count="14">
 <details class="code-fold">
 <summary>code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a aria-label="1"></a><span class="co"># 例：Sea bass混入のクレーム対応コストが高い場合</span></span>
@@ -934,6 +937,151 @@ min cost: 2000g</code></pre>
 </div>
 </div>
 </section>
+<section id="peek-roc" class="slide level2">
+<h2>ROC曲線：分類器の性能を可視化</h2>
+<div class="slide-body">
+<ul>
+<li>Precision と Recall はトレードオフ
+<ul>
+<li>ということは、分類器の性能はこれでは表せない</li>
+<li>それなら、閾値を全通り試した結果を図にしよう</li>
+<li>これが<strong>ROC（<span class="en">Receiver Operating Characteristic</span>）曲線</strong></li>
+</ul></li>
+</ul>
+<div class="takeaway">
+<p>ROC曲線の描き方：全閾値で以下を計算して折れ線グラフにするだけ</p>
+</div>
+<ul>
+<li>縦軸（<strong>Recall</strong>）：<span class="en">TP Rate</span><span class="math inline">\(= \dfrac{TP}{TP + FN}\)</span></li>
+<li>横軸（Precisionの代わり）：<span class="en">FP Rate</span><span class="math inline">\(= \dfrac{FP}{FP + TN}\)</span></li>
+</ul>
+</div>
+</section>
+<section id="roc曲線の見方" class="slide level2">
+<h2>ROC曲線の見方</h2>
+<div class="slide-body">
+<div title="一目瞭然">
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>一目瞭然</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>分布が離れているほど、曲線は左上の角（FP Rate 0、TP Rate 1）に近づく</li>
+<li>分布が重なっているほど、曲線は対角線（ランダムに判定した場合）に近づく</li>
+<li>もし曲線が対角線より下にあるなら、判定したラベルが逆
+<ul>
+<li>値の小さいほうを Salmon と判定すれば対角線の上に移る</li>
+</ul></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div id="d3e28f7f" class="cell" data-execution_count="15">
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="classification-basics-1d_files/figure-revealjs/cell-16-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11"><img data-src="classification-basics-1d_files/figure-revealjs/cell-16-output-1.png" class="quarto-figure quarto-figure-center" width="932" height="708"></a></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-roc-code" class="slide level2">
+<h2>コード（ROC曲線）</h2>
+<div class="slide-body">
+<ul>
+<li>閾値をずらしつつ実行した値をグラフにする
+<ul>
+<li>最小値は全部を Salmon、最大値 + 1 は全部を Sea bass と判定する閾値
+<ul>
+<li>それ以上と以下は明らかに値が同じなので意味がない</li>
+</ul></li>
+</ul></li>
+</ul>
+<div id="b786a6d6" class="cell" data-execution_count="16">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a aria-label="1"></a>weights <span class="op">=</span> np.concatenate([salmon_weights, seabass_weights])     <span class="co"># 40 匹の重さ</span></span>
+<span id="cb16-2"><a aria-label="2"></a>tpr <span class="op">=</span> []   <span class="co"># TP Rate（Recall）</span></span>
+<span id="cb16-3"><a aria-label="3"></a>fpr <span class="op">=</span> []   <span class="co"># FP Rate</span></span>
+<span id="cb16-4"><a aria-label="4"></a><span class="cf">for</span> threshold <span class="kw">in</span> <span class="bu">range</span>(np.<span class="bu">min</span>(weights), np.<span class="bu">max</span>(weights) <span class="op">+</span> <span class="dv">2</span>):   <span class="co"># 最小値から、最大値 + 1 まで 1g ずつ</span></span>
+<span id="cb16-5"><a aria-label="5"></a>    TP <span class="op">=</span> np.<span class="bu">sum</span>(salmon_weights <span class="op">&gt;=</span> threshold)</span>
+<span id="cb16-6"><a aria-label="6"></a>    FN <span class="op">=</span> np.<span class="bu">sum</span>(salmon_weights <span class="op">&lt;</span> threshold)</span>
+<span id="cb16-7"><a aria-label="7"></a>    FP <span class="op">=</span> np.<span class="bu">sum</span>(seabass_weights <span class="op">&gt;=</span> threshold)</span>
+<span id="cb16-8"><a aria-label="8"></a>    TN <span class="op">=</span> np.<span class="bu">sum</span>(seabass_weights <span class="op">&lt;</span> threshold)</span>
+<span id="cb16-9"><a aria-label="9"></a>    tpr.append(TP <span class="op">/</span> (TP <span class="op">+</span> FN))</span>
+<span id="cb16-10"><a aria-label="10"></a>    fpr.append(FP <span class="op">/</span> (FP <span class="op">+</span> TN))</span>
+<span id="cb16-11"><a aria-label="11"></a></span>
+<span id="cb16-12"><a aria-label="12"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">5</span>, <span class="dv">5</span>))</span>
+<span id="cb16-13"><a aria-label="13"></a>plt.plot(fpr, tpr, color<span class="op">=</span><span class="st">"#e74c3c"</span>, label<span class="op">=</span><span class="st">"重さで判定"</span>)</span>
+<span id="cb16-14"><a aria-label="14"></a>plt.plot([<span class="dv">0</span>, <span class="dv">1</span>], [<span class="dv">0</span>, <span class="dv">1</span>], color<span class="op">=</span><span class="st">"gray"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, label<span class="op">=</span><span class="st">"ランダムに判定"</span>)</span>
+<span id="cb16-15"><a aria-label="15"></a>plt.xlabel(<span class="st">"FP Rate"</span>)</span>
+<span id="cb16-16"><a aria-label="16"></a>plt.ylabel(<span class="st">"TP Rate（Recall）"</span>)</span>
+<span id="cb16-17"><a aria-label="17"></a>plt.legend()</span>
+<span id="cb16-18"><a aria-label="18"></a>plt.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb16-19"><a aria-label="19"></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="classification-basics-1d_files/figure-revealjs/cell-17-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-12"><img data-src="classification-basics-1d_files/figure-revealjs/cell-17-output-1.png" class="quarto-figure quarto-figure-center" width="460" height="449"></a></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="peek-auc" class="slide level2">
+<h2>AUC：ROC曲線の下の面積を使った分離性能を表す指標</h2>
+<div class="slide-body">
+<ul>
+<li><strong>AUC</strong>（<span class="en">Area Under the Curve</span>）：ROC 曲線の下の面積
+<ul>
+<li>1.0：完全に分離可能（曲線が左上の角を通る）</li>
+<li>0.5：全く分離不可能（対角線と同じ）</li>
+</ul></li>
+<li>面積は、隣り合う 2 点の間を台形とみなして、その面積を足して求める
+<ul>
+<li><a href="#/peek-roc-code" class="peek">ROC曲線のコード</a>で作った <code>tpr</code> と <code>fpr</code> をそのまま使う</li>
+</ul></li>
+</ul>
+<div id="84ff919d" class="cell" data-execution_count="17">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a aria-label="1"></a>auc <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb17-2"><a aria-label="2"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(fpr) <span class="op">-</span> <span class="dv">1</span>):</span>
+<span id="cb17-3"><a aria-label="3"></a>    width  <span class="op">=</span> fpr[i] <span class="op">-</span> fpr[i <span class="op">+</span> <span class="dv">1</span>]          <span class="co"># 台形の幅（閾値を上げると FP Rate は下がる）</span></span>
+<span id="cb17-4"><a aria-label="4"></a>    height <span class="op">=</span> (tpr[i] <span class="op">+</span> tpr[i <span class="op">+</span> <span class="dv">1</span>]) <span class="op">/</span> <span class="dv">2</span>    <span class="co"># 上底と下底の平均</span></span>
+<span id="cb17-5"><a aria-label="5"></a>    auc <span class="op">+=</span> width <span class="op">*</span> height</span>
+<span id="cb17-6"><a aria-label="6"></a><span class="bu">print</span>(<span class="ss">f"重さの AUC: </span><span class="sc">{</span>auc<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>重さの AUC: 0.805</code></pre>
+</div>
+</div>
+<div title="結果">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>結果</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>重さの AUC は 0.805
+<ul>
+<li>重なってはいるが、ランダムに判定よりはずっと良い結果</li>
+</ul></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
 <section id="重さだけで分類した結論" class="slide level2 scrollable">
 <h2>重さだけで分類した結論</h2>
 <div class="slide-body">
@@ -950,7 +1098,7 @@ min cost: 2000g</code></pre>
 <ol type="1">
 <li><strong>重さだけでは完全な分類は不可能</strong>
 <ul>
-<li>データの分布が重なっている</li>
+<li>データの分布が重なっている（重さの <a href="#/peek-auc" class="peek">AUC</a> は 0.805）</li>
 </ul></li>
 <li><strong>境界線は「方針の選択」</strong>
 <ul>
@@ -972,15 +1120,15 @@ min cost: 2000g</code></pre>
 <h2>練習問題</h2>
 <div class="slide-body">
 <p>下記の新データ（それぞれ20匹ずつ追加した）について、以下の1〜4を実行して分類器をつくれ</p>
-<div id="3bd17c4d" class="cell" data-execution_count="15">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a aria-label="1"></a>salmon_weights <span class="op">=</span> [<span class="dv">2149</span>, <span class="dv">1959</span>, <span class="dv">2194</span>, <span class="dv">2457</span>, <span class="dv">1930</span>, <span class="dv">1930</span>, <span class="dv">2474</span>, <span class="dv">2230</span>, <span class="dv">1859</span>, <span class="dv">2163</span>,</span>
-<span id="cb16-2"><a aria-label="2"></a>                  <span class="dv">1861</span>, <span class="dv">1860</span>, <span class="dv">2073</span>, <span class="dv">1426</span>, <span class="dv">1483</span>, <span class="dv">1831</span>, <span class="dv">1696</span>, <span class="dv">2094</span>, <span class="dv">1728</span>, <span class="dv">1576</span>,</span>
-<span id="cb16-3"><a aria-label="3"></a>                  <span class="dv">2028</span>, <span class="dv">1903</span>, <span class="dv">2057</span>, <span class="dv">2229</span>, <span class="dv">1884</span>, <span class="dv">1884</span>, <span class="dv">2240</span>, <span class="dv">2081</span>, <span class="dv">1838</span>, <span class="dv">2037</span>,</span>
-<span id="cb16-4"><a aria-label="4"></a>                  <span class="dv">1839</span>, <span class="dv">1838</span>, <span class="dv">1978</span>, <span class="dv">1554</span>, <span class="dv">1591</span>, <span class="dv">1820</span>, <span class="dv">1731</span>, <span class="dv">1992</span>, <span class="dv">1752</span>, <span class="dv">1652</span>]</span>
-<span id="cb16-5"><a aria-label="5"></a>seabass_weights <span class="op">=</span> [<span class="dv">1677</span>, <span class="dv">1327</span>, <span class="dv">1486</span>, <span class="dv">1440</span>, <span class="dv">1857</span>, <span class="dv">1476</span>, <span class="dv">1749</span>, <span class="dv">2203</span>, <span class="dv">1979</span>, <span class="dv">1468</span>,</span>
-<span id="cb16-6"><a aria-label="6"></a>                   <span class="dv">1496</span>, <span class="dv">1737</span>, <span class="dv">1099</span>, <span class="dv">1341</span>, <span class="dv">1748</span>, <span class="dv">1563</span>, <span class="dv">2181</span>, <span class="dv">1414</span>, <span class="dv">1286</span>, <span class="dv">1333</span>,</span>
-<span id="cb16-7"><a aria-label="7"></a>                   <span class="dv">1787</span>, <span class="dv">1445</span>, <span class="dv">1505</span>, <span class="dv">1204</span>, <span class="dv">1381</span>, <span class="dv">1513</span>, <span class="dv">1259</span>, <span class="dv">1567</span>, <span class="dv">1370</span>, <span class="dv">1432</span>,</span>
-<span id="cb16-8"><a aria-label="8"></a>                   <span class="dv">1370</span>, <span class="dv">1864</span>, <span class="dv">1488</span>, <span class="dv">1278</span>, <span class="dv">1657</span>, <span class="dv">1245</span>, <span class="dv">1533</span>, <span class="dv">1096</span>, <span class="dv">1223</span>, <span class="dv">1531</span>]</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="5a350d5e" class="cell" data-execution_count="19">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a aria-label="1"></a>salmon_weights <span class="op">=</span> [<span class="dv">2149</span>, <span class="dv">1959</span>, <span class="dv">2194</span>, <span class="dv">2457</span>, <span class="dv">1930</span>, <span class="dv">1930</span>, <span class="dv">2474</span>, <span class="dv">2230</span>, <span class="dv">1859</span>, <span class="dv">2163</span>,</span>
+<span id="cb19-2"><a aria-label="2"></a>                  <span class="dv">1861</span>, <span class="dv">1860</span>, <span class="dv">2073</span>, <span class="dv">1426</span>, <span class="dv">1483</span>, <span class="dv">1831</span>, <span class="dv">1696</span>, <span class="dv">2094</span>, <span class="dv">1728</span>, <span class="dv">1576</span>,</span>
+<span id="cb19-3"><a aria-label="3"></a>                  <span class="dv">2028</span>, <span class="dv">1903</span>, <span class="dv">2057</span>, <span class="dv">2229</span>, <span class="dv">1884</span>, <span class="dv">1884</span>, <span class="dv">2240</span>, <span class="dv">2081</span>, <span class="dv">1838</span>, <span class="dv">2037</span>,</span>
+<span id="cb19-4"><a aria-label="4"></a>                  <span class="dv">1839</span>, <span class="dv">1838</span>, <span class="dv">1978</span>, <span class="dv">1554</span>, <span class="dv">1591</span>, <span class="dv">1820</span>, <span class="dv">1731</span>, <span class="dv">1992</span>, <span class="dv">1752</span>, <span class="dv">1652</span>]</span>
+<span id="cb19-5"><a aria-label="5"></a>seabass_weights <span class="op">=</span> [<span class="dv">1677</span>, <span class="dv">1327</span>, <span class="dv">1486</span>, <span class="dv">1440</span>, <span class="dv">1857</span>, <span class="dv">1476</span>, <span class="dv">1749</span>, <span class="dv">2203</span>, <span class="dv">1979</span>, <span class="dv">1468</span>,</span>
+<span id="cb19-6"><a aria-label="6"></a>                   <span class="dv">1496</span>, <span class="dv">1737</span>, <span class="dv">1099</span>, <span class="dv">1341</span>, <span class="dv">1748</span>, <span class="dv">1563</span>, <span class="dv">2181</span>, <span class="dv">1414</span>, <span class="dv">1286</span>, <span class="dv">1333</span>,</span>
+<span id="cb19-7"><a aria-label="7"></a>                   <span class="dv">1787</span>, <span class="dv">1445</span>, <span class="dv">1505</span>, <span class="dv">1204</span>, <span class="dv">1381</span>, <span class="dv">1513</span>, <span class="dv">1259</span>, <span class="dv">1567</span>, <span class="dv">1370</span>, <span class="dv">1432</span>,</span>
+<span id="cb19-8"><a aria-label="8"></a>                   <span class="dv">1370</span>, <span class="dv">1864</span>, <span class="dv">1488</span>, <span class="dv">1278</span>, <span class="dv">1657</span>, <span class="dv">1245</span>, <span class="dv">1533</span>, <span class="dv">1096</span>, <span class="dv">1223</span>, <span class="dv">1531</span>]</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <ol start="0" type="1">
 <li><p>まず何をするべきかを考えよ</p></li>
@@ -994,11 +1142,11 @@ min cost: 2000g</code></pre>
 <section id="問0の答え可視化" class="slide level2">
 <h2>問0の答え（可視化）</h2>
 <div class="slide-body">
-<div id="2f22395b" class="cell" data-execution_count="16">
+<div id="84d955b7" class="cell" data-execution_count="20">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="classification-basics-1d_files/figure-revealjs/cell-17-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11"><img data-src="classification-basics-1d_files/figure-revealjs/cell-17-output-1.png" class="quarto-figure quarto-figure-center" width="987" height="586"></a></p>
+<p><a href="classification-basics-1d_files/figure-revealjs/cell-21-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-13"><img data-src="classification-basics-1d_files/figure-revealjs/cell-21-output-1.png" class="quarto-figure quarto-figure-center" width="987" height="586"></a></p>
 </figure>
 </div>
 </div>

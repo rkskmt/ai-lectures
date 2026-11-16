@@ -186,7 +186,7 @@
     "href": "pytorch-intro.html#まとめ",
     "title": "PyTorch入門",
     "section": "まとめ",
-    "text": "まとめ\n\n\nautograd：loss.backward() ＝ 連鎖律の自動化。表示した小数第4位まで手計算と一致\nnn の部品は全部、この講義で自作した部品の別名（対応表）\n学習ループは zero_grad → backward → step の3拍子\n中身を知っているから、安心して楽ができる\n\n\n\n\n\n\n\n\n次回予告：最終回\n\n\n道具は完成した。次回、初回に約束した手書き数字を読み取る機械を作る。 入力は 28×28 ピクセル — 784次元。次元の話、覚えてる？"
+    "text": "まとめ\n\n\nautograd：loss.backward() ＝ 連鎖律の自動化。表示した小数第4位まで手計算と一致\nnn の部品は全部、この講義で自作した部品の別名（対応表）\n学習ループは zero_grad → backward → step の3拍子\n中身を知っているから、安心して楽ができる\n\n\n\n\n\n\n\n\n次回予告：最終回\n\n\n道具は完成した。次回、手書き数字を読み取る機械を作る。 入力は 28×28 ピクセル — 784次元。"
   },
   {
     "objectID": "pytorch-intro.html#練習問題",
@@ -2055,7 +2055,7 @@
     "href": "classification-basics-1d.html#重さだけで分類した結論",
     "title": "機械学習 Classification",
     "section": "重さだけで分類した結論",
-    "text": "重さだけで分類した結論\n\n\n\n\n\n\n\n\n重要ポイント\n\n\n\n重さだけでは完全な分類は不可能\n\nデータの分布が重なっている\n\n境界線は「方針の選択」\n\n正解/不正解ではなく、用途に応じた最適化（optimization）\n\n評価指標はトレードオフ\n\n例：Precision ↑ だと Recall ↓\nどちらを重視するかは用途次第"
+    "text": "重さだけで分類した結論\n\n\n\n\n\n\n\n\n重要ポイント\n\n\n\n重さだけでは完全な分類は不可能\n\nデータの分布が重なっている（重さの AUC は 0.805）\n\n境界線は「方針の選択」\n\n正解/不正解ではなく、用途に応じた最適化（optimization）\n\n評価指標はトレードオフ\n\n例：Precision ↑ だと Recall ↓\nどちらを重視するかは用途次第"
   },
   {
     "objectID": "classification-basics-1d.html#練習問題",
@@ -2349,7 +2349,7 @@
     "href": "mnist-project.html#画像は784次元のベクトル",
     "title": "手書き数字分類プロジェクト",
     "section": "画像は784次元のベクトル",
-    "text": "画像は784次元のベクトル\n\n\n28 × 28 = 784個の数字の並び — モデルにとって画像は784次元のベクトル\n魚は2次元（輝度・重さ）だった。次元の呪いの回で扱った高次元が、本物の入力として現れる\nnn.Flatten() が「画像 → ベクトル」の変換をやる\n\n\nimport torch\nimport torch.nn as nn\n\nsample = torch.zeros(1, 1, 28, 28)  # 1枚ぶんのダミー画像\nflat = nn.Flatten()(sample)\nprint(\"変換前:\", tuple(sample.shape))\nprint(\"変換後:\", tuple(flat.shape))\n\n変換前: (1, 1, 28, 28)\n変換後: (1, 784)\n\n\n\n\n\n\n\n\nノート\n\n\n784次元でも、やることは魚の2次元と完全に同じ： 特徴量ベクトル → 変換を重ねる → 確率 → 損失 → 勾配降下。"
+    "text": "画像は784次元のベクトル\n\n\n28 × 28 = 784個の数字の並び — モデルにとって画像は784次元のベクトル\n高次元（次元の呪い）が、本物の入力として現れる\nnn.Flatten() が「画像 → ベクトル」の変換をやる\n\n\nimport torch\nimport torch.nn as nn\n\nsample = torch.zeros(1, 1, 28, 28)  # 1枚ぶんのダミー画像\nflat = nn.Flatten()(sample)\nprint(\"変換前:\", tuple(sample.shape))\nprint(\"変換後:\", tuple(flat.shape))\n\n変換前: (1, 1, 28, 28)\n変換後: (1, 784)\n\n\n\n\n\n\n\n\nノート\n\n\n784次元でも、やることは魚の2次元と完全に同じ： 特徴量ベクトル → 変換を重ねる → 確率 → 損失 → 勾配降下。"
   },
   {
     "objectID": "mnist-project.html#画素は01の数値になる",
@@ -2363,7 +2363,7 @@
     "href": "mnist-project.html#出力層を付け替える10クラス分類",
     "title": "手書き数字分類プロジェクト",
     "section": "出力層を付け替える：10クラス分類",
-    "text": "出力層を付け替える：10クラス分類\n\n\n答えは Salmon / Sea bass の2択ではなく、0〜9 の10択\n「変換を重ねる」の回の表のとおり、出力層を付け替えるだけ\n\n\n\n\n問題\n出力の活性化関数\n\n\n\n\n2クラス分類\nシグモイド（1個の確率）\n\n\n多クラス分類\nソフトマックス（10個の確率分布）\n\n\n\n\\[\\mathrm{softmax}(u_k) = \\frac{e^{u_k}}{\\sum_{j} e^{u_j}}\n\\qquad \\text{10個の出力を「合計1の確率」に変換}\\]\n\n損失は多クラス版の交差エントロピー：正解クラスの確率 \\(p_{\\text{正解}}\\) に対して \\(-\\log p_{\\text{正解}}\\)（あの −log のカーブの10クラス版）\nPyTorch では nn.CrossEntropyLoss がソフトマックスごとやってくれる（打ち消しの恩恵もそのまま）"
+    "text": "出力層を付け替える：10クラス分類\n\n\n答えは Salmon / Sea bass の2択ではなく、0〜9 の10択\n変えるのは出力層だけ\n\n\n\n\n問題\n出力の活性化関数\n\n\n\n\n2クラス分類\nシグモイド（1個の確率）\n\n\n多クラス分類\nソフトマックス（10個の確率分布）\n\n\n\n\\[\\mathrm{softmax}(u_k) = \\frac{e^{u_k}}{\\sum_{j} e^{u_j}}\n\\qquad \\text{10個の出力を「合計1の確率」に変換}\\]\n\n損失は多クラス版の交差エントロピー：正解クラスの確率 \\(p_{\\text{正解}}\\) に対して \\(-\\log p_{\\text{正解}}\\)（あの −log のカーブの10クラス版）\nPyTorch では nn.CrossEntropyLoss がソフトマックスごとやってくれる（打ち消しの恩恵もそのまま）"
   },
   {
     "objectID": "mnist-project.html#スコアを実際にソフトマックスへ入れる",
@@ -2419,7 +2419,7 @@
     "href": "mnist-project.html#peek-mnist-train",
     "title": "手書き数字分類プロジェクト",
     "section": "学習する",
-    "text": "学習する\n\n\nfor epoch in range(1, 4):\n    loss_sum = 0.0\n    for x_batch, y_batch in train_loader:\n        optimizer.zero_grad()\n        loss = loss_fn(model(x_batch), y_batch)\n        loss.backward()\n        optimizer.step()\n        loss_sum += loss.item() * len(x_batch)\n\n    # テストデータ（見ていない1万枚）で採点 — 過学習と汎化の回の鉄則\n    correct = 0\n    with torch.no_grad():\n        for x_batch, y_batch in test_loader:\n            correct += (model(x_batch).argmax(dim=1) == y_batch).sum().item()\n    train_loss = loss_sum / len(train_ds)\n    print(f\"エポック {epoch} | 訓練Loss: {train_loss:.4f} \"\n          f\"| テスト正答率: {correct / len(test_ds):.2%}\")\n\nエポック 1 | 訓練Loss: 0.4125 | テスト正答率: 93.50%\nエポック 2 | 訓練Loss: 0.1968 | テスト正答率: 95.14%\nエポック 3 | 訓練Loss: 0.1431 | テスト正答率: 96.33%\n\n\n\n見たことのない手書き1万枚を、96%以上の精度で読めるようになった"
+    "text": "学習する\n\n\nfor epoch in range(1, 4):\n    loss_sum = 0.0\n    for x_batch, y_batch in train_loader:\n        optimizer.zero_grad()\n        loss = loss_fn(model(x_batch), y_batch)\n        loss.backward()\n        optimizer.step()\n        loss_sum += loss.item() * len(x_batch)\n\n    # テストデータ（見ていない1万枚）で採点\n    correct = 0\n    with torch.no_grad():\n        for x_batch, y_batch in test_loader:\n            correct += (model(x_batch).argmax(dim=1) == y_batch).sum().item()\n    train_loss = loss_sum / len(train_ds)\n    print(f\"エポック {epoch} | 訓練Loss: {train_loss:.4f} \"\n          f\"| テスト正答率: {correct / len(test_ds):.2%}\")\n\nエポック 1 | 訓練Loss: 0.4125 | テスト正答率: 93.50%\nエポック 2 | 訓練Loss: 0.1968 | テスト正答率: 95.14%\nエポック 3 | 訓練Loss: 0.1431 | テスト正答率: 96.33%\n\n\n\n見たことのない手書き1万枚を、96%以上の精度で読めるようになった"
   },
   {
     "objectID": "mnist-project.html#tweak-どこまで賢くできるか",
@@ -2440,7 +2440,7 @@
     "href": "mnist-project.html#読めている様子",
     "title": "手書き数字分類プロジェクト",
     "section": "読めている様子",
-    "text": "読めている様子\n\n\n\n\n\n\n\n\n\n\n\n予測ラベルはモデルの出力。初回に「謎」として見せた光景が、いま手元のコードで起きている"
+    "text": "読めている様子\n\n\n\n\n\n\n\n\n\n\n\n画像の上の数字はモデルが出力した予測ラベル（赤は正解と異なるもの）"
   },
   {
     "objectID": "mnist-project.html#間違いを眺める",
@@ -2454,7 +2454,7 @@
     "href": "mnist-project.html#どの数字とどの数字が混ざるのか",
     "title": "手書き数字分類プロジェクト",
     "section": "どの数字とどの数字が混ざるのか",
-    "text": "どの数字とどの数字が混ざるのか\n\n\n\n\n\n\n\n\n質問\n\n\n0〜9 のうち、この機械がいちばん混同しやすいペアはどれだと思う？\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n過学習と汎化の回の混同行列は2×2だった。これはその10クラス版\n最多は 4→9（22枚）、逆向きの 9→4 も14枚 — 4と9はお互いに紛らわしい。次点は 7→9・5→3\n間違いはランダムに散らばらない。形の似たペアに集中する"
+    "text": "どの数字とどの数字が混ざるのか\n\n\n\n\n\n\n\n\n質問\n\n\n0〜9 のうち、この機械がいちばん混同しやすいペアはどれだと思う？\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n2クラスの混同行列（2×2）の10クラス版\n最多は 4→9（22枚）、逆向きの 9→4 も14枚 — 4と9はお互いに紛らわしい。次点は 7→9・5→3\n間違いはランダムに散らばらない。形の似たペアに集中する"
   },
   {
     "objectID": "mnist-project.html#自信満々の間違い",
@@ -2951,7 +2951,7 @@
     "href": "nn-multilayer.html#peek-curved-boundary",
     "title": "隠れ層とReLUで曲がる境界をつくる",
     "section": "折り目が増えると境界が曲がる",
-    "text": "折り目が増えると境界が曲がる\n\n\n\n\n\n\n\n\n\n\n\nReLU 1本につき折り目が1つ増える\n4本の折れ線で 100%。16本ではほぼ滑らかな曲線に見える\n「曲がる境界」の正体は、たくさんの折り目だった\n\n\n\n\n\n\n\n\n答え\n\n\n講義の初回に見せた「機械が自力で見つけた境界」は、中間の変換16個のネットワーク。 もうブラックボックスではない。"
+    "text": "折り目が増えると境界が曲がる\n\n\n\n\n\n\n\n\n\n\n\nReLU 1本につき折り目が1つ増える\n4本の折れ線で 100%。16本ではほぼ滑らかな曲線に見える\n「曲がる境界」の正体は、たくさんの折り目だった\n\n\n\n\n\n\n\n\n答え\n\n\nデータから学習した境界は、中間の変換16個のネットワーク。 もうブラックボックスではない。"
   },
   {
     "objectID": "nn-multilayer.html#見えているのは曲線ではなく細かな折れ線",
@@ -4174,154 +4174,154 @@
   {
     "objectID": "numpy-recipes.html#section",
     "href": "numpy-recipes.html#section",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "",
-    "text": "array"
+    "text": "Listとの違いと初期化"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-linspace",
     "href": "numpy-recipes.html#peek-np-linspace",
-    "title": "NumPy 逆引き",
-    "section": "関数のために x 軸の点列を用意したい（linspace）",
-    "text": "関数のために x 軸の点列を用意したい（linspace）\n\n\nimport numpy as np\n\nprint(np.linspace(0, 1, 5))     # 0 から 1 までを 5 個に分ける\nprint(np.linspace(-3, 3, 7))    # -3 から 3 までを 7 個に分ける\n\n[0.   0.25 0.5  0.75 1.  ]\n[-3. -2. -1.  0.  1.  2.  3.]\n\n\n\n\n\n\n\n\nノート\n\n\n\n始点と終点の両方を含む\nなめらかな曲線を描くときは、個数を 100 以上にする"
+    "title": "NumPy 用例集",
+    "section": "関数のために x 軸用の点列を用意したい（linspace）",
+    "text": "関数のために x 軸用の点列を用意したい（linspace）\n\n\nimport numpy as np\n\nprint(np.linspace(0, 1, 5))     # 0 から 1 までを 5 個に分ける\nprint(np.linspace(-3, 3, 7))    # -3 から 3 までを 7 個に分ける\n\n[0.   0.25 0.5  0.75 1.  ]\n[-3. -2. -1.  0.  1.  2.  3.]\n\n\n\n\n\n\n\n\nノート\n\n\n\n始点と終点の両方を含む\nなめらかな曲線を描くときは、個数を 100 以上にする"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-zeros",
     "href": "numpy-recipes.html#peek-np-zeros",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "重みのために、初期値 0 の array を準備したい（zeros）",
     "text": "重みのために、初期値 0 の array を準備したい（zeros）\n\n\nimport numpy as np\n\nprint(np.zeros(3))         # 要素 3 個\nprint(np.zeros((2, 3)))    # 2行3列\nprint(np.ones(3))          # 1 で埋めるときは ones\n\n# 0.0 を並べた list から作るようなもの\nprint(np.array([0.0, 0.0, 0.0]))   # 結果は np.zeros(3) と同一\n\n[0. 0. 0.]\n[[0. 0. 0.]\n [0. 0. 0.]]\n[1. 1. 1.]\n[0. 0. 0.]\n\n\n\n\n\n\n\n\nノート\n\n\n2次元にするときは、形を (行数, 列数) と括弧でまとめて渡す"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-rng",
     "href": "numpy-recipes.html#peek-np-rng",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "乱数の array を用意したい（default_rng）",
     "text": "乱数の array を用意したい（default_rng）\n\n\nimport numpy as np\n\nrng = np.random.default_rng(42)\nprint(rng.random(3))          # 0 以上 1 未満の乱数を 3 個\nprint(rng.random((2, 2)))     # 2行2列\nprint(rng.normal(0, 1, 3))    # 平均 0、標準偏差 1 の正規乱数を 3 個\n\n[0.77395605 0.43887844 0.85859792]\n[[0.69736803 0.09417735]\n [0.97562235 0.7611397 ]]\n[-0.31624259 -0.01680116 -0.85304393]\n\n\n\n\n\n\n\n\nノート\n\n\n\n42 は乱数の種（seed）\n\n同じ種なら、何度実行しても同じ乱数になる"
   },
   {
     "objectID": "numpy-recipes.html#section-1",
     "href": "numpy-recipes.html#section-1",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "",
     "text": "形を確かめる・変える"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-shape",
     "href": "numpy-recipes.html#peek-np-shape",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "array の形を確かめたい（shape）",
     "text": "array の形を確かめたい（shape）\n\n\nimport numpy as np\n\nx = np.array([1, 2, 3])\nX = np.array([[1, 2],\n              [3, 4],\n              [5, 6]])\nprint(x.shape)   # (3,) は、[1, 2, 3] のように要素が 3 個並んだ形\nprint(X.shape)   # (3, 2) は、3行2列\nprint(len(X))    # 行数だけなら len\n\n(3,)\n(3, 2)\n3"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-reshape-column",
     "href": "numpy-recipes.html#peek-np-reshape-column",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "scikit-learn 用にarray を N行1列にしたい（reshape(-1, 1)）",
     "text": "scikit-learn 用にarray を N行1列にしたい（reshape(-1, 1)）\n\n\nimport numpy as np\nfrom sklearn.linear_model import LinearRegression\n\n# やりたいこと：入力 x から正解 t を予測する式を、fit で求める\nx = np.array([1, 2, 3])    # 入力（データ 3 個）\nt = np.array([2, 4, 6])    # それぞれの正解\n\nX = x.reshape(-1, 1)       # fit が受け取れる [[1], [2], [3]] の形にする\nprint(X)\n\nreg = LinearRegression().fit(X, t)\nprint(reg.predict(X))\nprint(reg.predict(np.array([4, 5]).reshape(-1, 1)))    # 新しい入力 4 と 5 も、同じ形にして渡す\n\n[[1]\n [2]\n [3]]\n[2. 4. 6.]\n[ 8. 10.]\n\n\n\n\n\n\n\n\nノート\n\n\n\n特徴量が1つでも、[1, 2, 3] の形のままでは fit に渡せない（エラーになる）\nreshape(-1, 1) の 1 は列の数で、-1 と書いた行の数は、要素の数から自動で決まる"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-reshape-flat",
     "href": "numpy-recipes.html#peek-np-reshape-flat",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "array の形を変えたい（reshape）",
     "text": "array の形を変えたい（reshape）\n\n\nimport numpy as np\n\nx = np.arange(6)\nprint(x)\nX = x.reshape(2, 3)      # 2行3列にする\nprint(X)\nprint(X.reshape(-1))     # 1行に\n\n[0 1 2 3 4 5]\n[[0 1 2]\n [3 4 5]]\n[0 1 2 3 4 5]\n\n\n\n\n\n\n\n\nノート\n\n\n-1 を書いた場所は、要素の数から自動で決まる"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-column-stack",
     "href": "numpy-recipes.html#peek-np-column-stack",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "array を横に並べて表にしたい（column_stack）",
     "text": "array を横に並べて表にしたい（column_stack）\n\n\nimport numpy as np\n\na = np.array([1, 2])\nb = np.array([10, 20])\nc = np.array([100, 200])\nprint(np.column_stack([a, b]))       # 2つ並べる\nprint(np.column_stack([a, b, c]))    # 3つ並べる\nprint(np.c_[a, b])                   # 同じ結果になる別の書き方\n\n[[ 1 10]\n [ 2 20]]\n[[  1  10 100]\n [  2  20 200]]\n[[ 1 10]\n [ 2 20]]\n\n\n\n\n\n\n\n\nノート\n\n\nnp.c_ は関数ではないので、( ) ではなく [ ] で囲む"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-concatenate",
     "href": "numpy-recipes.html#peek-np-concatenate",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "array を連結したい（concatenate）",
     "text": "array を連結したい（concatenate）\n\n\nimport numpy as np\n\nl1 = [1, 2, 3]\nl2 = [4, 5]\nl3 = [6]\na = np.array(l1)\nb = np.array(l2)\nc = np.array(l3)\n\nprint(np.concatenate([a, b]))        # 2つ\nprint(np.concatenate([a, b, c]))     # 3つ\n\n# list を + で連結してから変換するようなもの\nprint(np.array(l1 + l2))   # 結果は同一\n\n[1 2 3 4 5]\n[1 2 3 4 5 6]\n[1 2 3 4 5]\n\n\n\n\n\n\n\n\nノート\n\n\nただし、 a + b は連結ではなく、要素ごとの足し算になるのでダメ。"
   },
   {
     "objectID": "numpy-recipes.html#section-2",
     "href": "numpy-recipes.html#section-2",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "",
     "text": "取り出す"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-column",
     "href": "numpy-recipes.html#peek-np-column",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "表から列や行を取り出したい（X[:, 0]）",
     "text": "表から列や行を取り出したい（X[:, 0]）\n\n\nimport numpy as np\n\nX = np.array([[1, 10],\n              [2, 20],\n              [3, 30]])\nprint(X[:, 0])    # 0 列目\nprint(X[:, 1])    # 1 列目\nprint(X[0])       # 0 行目\nprint(X[:2])      # 先頭の 2 行\nprint(X[1, 0])    # 1 行目の 0 列目\n\n[1 2 3]\n[10 20 30]\n[ 1 10]\n[[ 1 10]\n [ 2 20]]\n2\n\n\n\n\n\n\n\n\nノート\n\n\n[行, 列] の順に書き、: は「すべて」を表す"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-mask",
     "href": "numpy-recipes.html#peek-np-mask",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "条件に合う要素だけ取り出したい（x[x >= 5]）",
     "text": "条件に合う要素だけ取り出したい（x[x &gt;= 5]）\n\n\nimport numpy as np\n\nx = np.array([3, 8, 5, 9, 2])\n# x &gt;= 5 は [False, True, True, True, False]\nprint(x[x &gt;= 5])    # 5 以上\nprint(x[x &lt; 5])     # 5 未満\n\n# for で 1 個ずつ調べて、条件に合うものだけ集めるようなもの\nout = []\nfor v in x:\n    if v &gt;= 5:\n        out.append(v)\nprint(np.array(out))   # 結果は x[x &gt;= 5] と同一\n\n[8 5 9]\n[3 2]\n[8 5 9]\n\n\n\n\n\n\n\n\nノート\n\n\n[ ] の中に True / False の array を入れると、True の位置の要素だけが残る"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-mask-label",
     "href": "numpy-recipes.html#peek-np-mask-label",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "ラベルが一致する行だけ取り出したい（X[y == 1]）",
     "text": "ラベルが一致する行だけ取り出したい（X[y == 1]）\n\n\nimport numpy as np\n\nX = np.array([[1, 10],\n              [2, 20],\n              [3, 30],\n              [4, 40]])     # データ 4 個（1行が 1 個のデータ）\ny = np.array([0, 1, 0, 1])    # 各行のラベル\n# y == 1 は [False, True, False, True]\nprint(X[y == 1])       # ラベルが 1 の行\nprint(X[y == 0])       # ラベルが 0 の行\nprint(X[y == 1, 0])    # ラベルが 1 の行の、0 列目\n\n[[ 2 20]\n [ 4 40]]\n[[ 1 10]\n [ 3 30]]\n[2 4]\n\n\n\n\n\n\n\n\nノート\n\n\n条件に合う要素の取り出しと同じ仕組みで、True の位置の行だけが残る"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-where-index",
     "href": "numpy-recipes.html#peek-np-where-index",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "条件に合うインデックスだけを抽出したい（where）",
     "text": "条件に合うインデックスだけを抽出したい（where）\n\n\nimport numpy as np\n\nx = np.array([3, 8, 5, 9, 2])\n# x &gt;= 5 は [False, True, True, True, False]\nprint(np.where(x &gt;= 5)[0])     # 5 以上の要素のインデックス\nprint(np.where(x == 9)[0])     # 9 と等しい要素のインデックス\n\n# for で、条件に合う要素の位置だけ集めるようなもの\nidx = []\nfor i in range(len(x)):\n    if x[i] &gt;= 5:\n        idx.append(i)\nprint(np.array(idx))   # 結果は np.where(x &gt;= 5)[0] と同一\n\n[1 2 3]\n[3]\n[1 2 3]\n\n\n\n\n\n\n\n\nノート\n\n\nnp.where は結果をタプルに入れて返すので、[0] で array を取り出す"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-argsort",
     "href": "numpy-recipes.html#peek-np-argsort",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "小さい順に並べたときのインデックスを取り出したい（argsort）",
     "text": "小さい順に並べたときのインデックスを取り出したい（argsort）\n\n\nimport numpy as np\n\nd = np.array([0.9, 0.2, 0.7, 0.1])\norder = np.argsort(d)\nprint(order)          # 小さい順のインデックス\nprint(order[:2])      # 小さいほうから 2 個\nprint(order[::-1])    # 大きい順のインデックス\nprint(d[order])       # 値を小さい順に並べる\n\n[3 1 2 0]\n[3 1]\n[0 2 1 3]\n[0.1 0.2 0.7 0.9]\n\n\n\n\n\n\n\n\nノート\n\n\n\n値そのものではなく、何番目の要素かが返る\n一番小さい 0.1 は 3 番目にあるので、先頭が 3 になる"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-argmin",
     "href": "numpy-recipes.html#peek-np-argmin",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "最小・最大の要素のインデックスを取り出したい（argmin）",
     "text": "最小・最大の要素のインデックスを取り出したい（argmin）\n\n\nimport numpy as np\n\ncandidates = np.array([2.0, 2.5, 3.0, 3.5])    # 試した値\nerrors     = np.array([0.4, 0.1, 0.3, 0.6])    # それぞれの値を試したときの誤差\nprint(np.argmin(errors))                # 最小の要素のインデックス\nprint(np.argmax(errors))                # 最大の要素のインデックス\nprint(candidates[np.argmin(errors)])    # errors が最小になる候補\n\n1\n3\n2.5"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-unique",
     "href": "numpy-recipes.html#peek-np-unique",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "値の種類を重複なしで取り出したい（unique）",
     "text": "値の種類を重複なしで取り出したい（unique）\n\n\nimport numpy as np\n\ny = np.array([1, 0, 1, 1, 2, 0])\nprint(np.unique(y))         # 現れる値を小さい順に\nprint(len(np.unique(y)))    # 種類の数\n\n[0 1 2]\n3"
   },
   {
     "objectID": "numpy-recipes.html#section-3",
     "href": "numpy-recipes.html#section-3",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "",
     "text": "条件で数える・判定する"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-count",
     "href": "numpy-recipes.html#peek-np-count",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "条件に合う要素の個数を数えたい（sum）",
     "text": "条件に合う要素の個数を数えたい（sum）\n\n\nimport numpy as np\n\nx = np.array([3, 8, 5, 9, 2])\n# x &gt;= 5 は [False, True, True, True, False]\nprint(np.sum(x &gt;= 5))    # 5 以上の個数\nprint(np.sum(x &lt; 5))     # 5 未満の個数\n\n# for で 1 個ずつ調べて数えるようなもの\ncount = 0\nfor v in x:\n    if v &gt;= 5:\n        count += 1\nprint(count)   # 結果は np.sum(x &gt;= 5) と同一\n\n3\n2\n3\n\n\n\n\n\n\n\n\nノート\n\n\nnp.sum は True を 1、False を 0 として足す"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-ratio",
     "href": "numpy-recipes.html#peek-np-ratio",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "条件に合う要素の割合を計算したい（mean）",
     "text": "条件に合う要素の割合を計算したい（mean）\n\n\nimport numpy as np\n\nx = np.array([3, 8, 5, 9, 2])\n# x &gt;= 5 は [False, True, True, True, False]\nprint(np.mean(x &gt;= 5))         # 5 以上の割合\n\ny      = np.array([1, 0, 1, 1, 0])    # 正解\ny_pred = np.array([1, 0, 0, 1, 1])    # 予測\n# y_pred == y は [True, True, False, True, False]\nprint(np.mean(y_pred == y))    # 一致した割合（正解率）\n\n0.6\n0.6\n\n\n\n\n\n\n\n\nノート\n\n\n\nnp.mean は True を 1、False を 0 として平均する\n個数を、要素の数で割った値になる"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-and",
     "href": "numpy-recipes.html#peek-np-and",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "2つの条件を両方満たす要素の個数を数えたい（&）",
     "text": "2つの条件を両方満たす要素の個数を数えたい（&）\n\n\nimport numpy as np\n\ny      = np.array([1, 0, 1, 1, 0])    # 正解\ny_pred = np.array([1, 0, 0, 1, 1])    # 予測\n# (y == 1) & (y_pred == 1) は [True, False, False, True, False]\nprint(np.sum((y == 1) & (y_pred == 1)))    # 正解が 1 で、予測も 1\nprint(np.sum((y == 0) & (y_pred == 1)))    # 正解が 0 で、予測は 1\n\n2\n1\n\n\n\n\n\n\n\n\nノート\n\n\n\n& は「かつ」を表す（array どうしでは and の代わりに & を使う）\n& の両側の条件は、それぞれ ( ) で囲む"
   },
@@ -4335,7 +4335,7 @@
   {
     "objectID": "numpy-recipes.html#peek-np-all",
     "href": "numpy-recipes.html#peek-np-all",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "2つの array が完全に同じか確かめたい（all）",
     "text": "2つの array が完全に同じか確かめたい（all）\n\n\nimport numpy as np\n\na = np.array([1, 2, 3])\nb = np.array([1, 2, 3])\nc = np.array([1, 2, 4])\n# a == c は [True, True, False]\nprint(np.all(a == b))    # 全部同じ\nprint(np.all(a == c))    # 1 つ違う\nprint(np.any(a == c))    # 1 つでも同じ要素があるか\n\nTrue\nFalse\nTrue\n\n\n\n\n\n\n\n\nノート\n\n\narray どうしの a == c は True / False 1個ではなく、要素ごとの比較になる"
   },
@@ -4349,119 +4349,119 @@
   {
     "objectID": "numpy-recipes.html#section-4",
     "href": "numpy-recipes.html#section-4",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "",
     "text": "計算する"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-elementwise",
     "href": "numpy-recipes.html#peek-np-elementwise",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "for を書かずに、array の全要素に同じ演算をしたい（+ - * / **）",
     "text": "for を書かずに、array の全要素に同じ演算をしたい（+ - * / **）\n\n\nimport numpy as np\n\nx = np.array([1.0, 4.0, 9.0])\ny = np.array([1.0, 2.0, 3.0])\nprint(x * 2)         # 全要素を 2 倍\nprint(x ** 2)        # 全要素を 2 乗\nprint(x - y)         # x と y の、同じ位置どうしで引き算\nprint(np.sqrt(x))    # 全要素の平方根\n\n# for で 1 個ずつ 2 倍するようなもの\nout = []\nfor v in x:\n    out.append(v * 2)\nprint(np.array(out))   # 結果は x * 2 と同一\n\n[ 2.  8. 18.]\n[ 1. 16. 81.]\n[0. 2. 6.]\n[1. 2. 3.]\n[ 2.  8. 18.]\n\n\n\n\n\n\n\n\nノート\n\n\nnp.exp、np.log、np.abs も、全要素にまとめてかかる"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-diff",
     "href": "numpy-recipes.html#peek-np-diff",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "2つの array の差の2乗の平均を計算したい（mean）",
     "text": "2つの array の差の2乗の平均を計算したい（mean）\n\n\nimport numpy as np\n\ny      = np.array([1.0, 2.0, 3.0])    # 正解\ny_pred = np.array([1.5, 2.0, 2.0])    # 予測\nprint(y_pred - y)                     # 同じ位置どうしの差\nprint((y_pred - y) ** 2)              # 差の 2 乗\nprint(np.mean((y_pred - y) ** 2))     # 差の 2 乗の平均\nprint(np.mean(np.abs(y_pred - y)))    # 差の絶対値の平均\n\n[ 0.5  0.  -1. ]\n[0.25 0.   1.  ]\n0.4166666666666667\n0.5"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-axis",
     "href": "numpy-recipes.html#peek-np-axis",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "表の列ごと・行ごとに集計したい（axis=）",
     "text": "表の列ごと・行ごとに集計したい（axis=）\n\n\nimport numpy as np\n\nX = np.array([[1, 10],\n              [2, 20],\n              [3, 60]])\nprint(X.sum(axis=1))     # 行ごとの合計\nprint(X.sum(axis=0))     # 列ごとの合計\nprint(X.mean(axis=0))    # 列ごとの平均\nprint(X.sum())           # 全要素の合計\n\n# for で 1 行ずつ足すようなもの\nsums = []\nfor row in X:\n    sums.append(row[0] + row[1])\nprint(np.array(sums))   # 結果は X.sum(axis=1) と同一\n\n[11 22 63]\n[ 6 90]\n[ 2. 30.]\n96\n[11 22 63]\n\n\n\n\n\n\n\n\nノート\n\n\naxis=0 は縦方向にまとめ、axis=1 は横方向にまとめる"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-matmul",
     "href": "numpy-recipes.html#peek-np-matmul",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "表の全部の行に、重みを掛けた和を一度に計算したい（@）",
     "text": "表の全部の行に、重みを掛けた和を一度に計算したい（@）\n\n\nimport numpy as np\n\nX = np.array([[1, 2],\n              [3, 4],\n              [5, 6]])\nw = np.array([10, 1])    # 列ごとの重み（0 列目に 10、1 列目に 1）\nprint(X @ w)        # 行ごとに 0 列目×10 + 1 列目×1\nprint(X @ w + 5)    # その結果の全部に、定数 5 を足す\nprint(w @ w)        # w どうしなら 10×10 + 1×1\n\n# for で 1 行ずつ、重みを掛けて足すようなもの\nout = []\nfor row in X:\n    out.append(row[0] * w[0] + row[1] * w[1])\nprint(np.array(out))   # 結果は X @ w と同一\n\n[12 34 56]\n[17 39 61]\n101\n[12 34 56]\n\n\n\n\n\n\n\n\nノート\n\n\n\n* は同じ位置どうしの掛け算で、行列の積は @ で書く\n行と列を入れ替えた行列は X.T で得られる"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-maximum",
     "href": "numpy-recipes.html#peek-np-maximum",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "負の値だけを 0 に置き換えたい（maximum）",
     "text": "負の値だけを 0 に置き換えたい（maximum）\n\n\nimport numpy as np\n\nz = np.array([-2.0, -0.5, 0.0, 1.5])\nprint(np.maximum(0, z))    # 0 と比べて大きいほうを残す\n\na = np.array([1, 5, 3])\nb = np.array([4, 2, 3])\nprint(np.maximum(a, b))    # a と b の、同じ位置で大きいほうを残す\n\n[0.  0.  0.  1.5]\n[4 5 3]"
   },
   {
     "objectID": "numpy-recipes.html#section-5",
     "href": "numpy-recipes.html#section-5",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "",
     "text": "表示とループ"
   },
   {
     "objectID": "numpy-recipes.html#peek-py-format",
     "href": "numpy-recipes.html#peek-py-format",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "小数の桁数をそろえて表示したい（f\"{x:.2f}\"）",
     "text": "小数の桁数をそろえて表示したい（f\"{x:.2f}\"）\n\n\nimport numpy as np\n\nx = 3.14159\nprint(f\"x = {x:.2f}\")     # 小数点以下 2 桁\nprint(f\"x = {x:.4f}\")     # 小数点以下 4 桁\nprint(f\"x = {x:8.2f}\")    # 全体を 8 文字の幅にそろえる\n\nacc = 0.875               # 割合（0 から 1 の値）\nprint(f\"{acc:.1%}\")       # パーセントに直して、小数点以下 1 桁\n\na = np.array([0.12345, 2.5])\nprint(a.round(2))         # 全要素を小数点以下 2 桁に丸める\n\nx = 3.14\nx = 3.1416\nx =     3.14\n87.5%\n[0.12 2.5 ]"
   },
   {
     "objectID": "numpy-recipes.html#peek-py-zip",
     "href": "numpy-recipes.html#peek-py-zip",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "2つのリストを同時にループしたい（zip）",
     "text": "2つのリストを同時にループしたい（zip）\n\n\nnames  = [\"a\", \"b\", \"c\"]\nscores = [70, 85, 60]\nranks  = [2, 1, 3]\n\nfor name, score in zip(names, scores):                # 2つ\n    print(name, score)\n\nfor name, score, rank in zip(names, scores, ranks):   # 3つ\n    print(name, score, rank)\n\n# インデックスで同じ位置の要素を取り出すようなもの（2つの場合）\nfor i in range(len(names)):\n    print(names[i], scores[i])\n\na 70\nb 85\nc 60\na 70 2\nb 85 1\nc 60 3\na 70\nb 85\nc 60\n\n\n\n\n\n\n\n\nノート\n\n\nリストの代わりに array を渡してもよい"
   },
   {
     "objectID": "numpy-recipes.html#peek-py-enumerate",
     "href": "numpy-recipes.html#peek-py-enumerate",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "何番目かも取り出しながらループしたい（enumerate）",
     "text": "何番目かも取り出しながらループしたい（enumerate）\n\n\nscores = [70, 85, 60]\n\nfor i, score in enumerate(scores):       # 0 から数える\n    print(i, score)\n\nfor i, score in enumerate(scores, 1):    # 1 から数える\n    print(i, score)\n\n# range(len(scores)) でインデックスを作って回すようなもの\nfor i in range(len(scores)):\n    print(i, scores[i])\n\n0 70\n1 85\n2 60\n1 70\n2 85\n3 60\n0 70\n1 85\n2 60"
   },
   {
     "objectID": "numpy-recipes.html#section-6",
     "href": "numpy-recipes.html#section-6",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "",
     "text": "グラフ"
   },
   {
     "objectID": "numpy-recipes.html#peek-plt-plot",
     "href": "numpy-recipes.html#peek-plt-plot",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "関数の形を折れ線グラフで見たい（plot）",
     "text": "関数の形を折れ線グラフで見たい（plot）\n\n\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\n\nx = np.linspace(-3, 3, 100)\nplt.plot(x, x ** 2, label=\"x ** 2\")\nplt.plot(x, np.abs(x), \"--\", label=\"abs(x)\")    # 2本目。\"--\" は破線\nplt.xlabel(\"x\")\nplt.ylabel(\"y\")\nplt.legend()\nplt.grid(True)\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nノート\n\n\nlabel= で付けた名前が、plt.legend() で凡例として表示される"
   },
   {
     "objectID": "numpy-recipes.html#peek-plt-scatter",
     "href": "numpy-recipes.html#peek-plt-scatter",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "クラスごとに色を変えた散布図を描きたい（scatter）",
     "text": "クラスごとに色を変えた散布図を描きたい（scatter）\n\n\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\n\nX = np.array([[1, 2], [2, 3], [3, 1], [6, 5], [7, 7], [8, 6]])    # 点の座標（1行が 1 点）\ny = np.array([0, 0, 0, 1, 1, 1])                                  # 各点のクラス\nplt.scatter(X[y == 0, 0], X[y == 0, 1], c=\"red\", marker=\"s\", label=\"0\")\nplt.scatter(X[y == 1, 0], X[y == 1, 1], c=\"blue\", marker=\"o\", label=\"1\")\nplt.legend()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nノート\n\n\nラベルごとに行を取り出し、クラスの数だけ plt.scatter を呼ぶ"
   },
   {
     "objectID": "numpy-recipes.html#peek-plt-axvline",
     "href": "numpy-recipes.html#peek-plt-axvline",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "グラフに縦線・横線を引きたい（axvline）",
     "text": "グラフに縦線・横線を引きたい（axvline）\n\n\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\n\nx = np.linspace(-3, 3, 100)\nplt.plot(x, x ** 2)\nplt.axvline(x=1, color=\"red\", linestyle=\"--\", label=\"x = 1\")    # 縦線\nplt.axhline(y=4, color=\"gray\", linestyle=\":\", label=\"y = 4\")    # 横線\nplt.legend()\nplt.show()"
   },
   {
     "objectID": "numpy-recipes.html#peek-plt-subplots",
     "href": "numpy-recipes.html#peek-plt-subplots",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "2つのグラフを横に並べたい（subplots）",
     "text": "2つのグラフを横に並べたい（subplots）\n\n\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\n\nx = np.linspace(-3, 3, 100)\nfig, axes = plt.subplots(1, 2, figsize=(8, 3))   # 1行2列\naxes[0].plot(x, x ** 2)\naxes[0].set_title(\"x ** 2\")\naxes[1].plot(x, np.abs(x))\naxes[1].set_title(\"abs(x)\")\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nノート\n\n\n\n3つ並べるときは plt.subplots(1, 3) にして、axes[2] まで使う\n1枚ずつ指定するときは、名前に set_ が付く\n\nplt.title → set_title\nplt.xlabel → set_xlabel"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-meshgrid",
     "href": "numpy-recipes.html#peek-np-meshgrid",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "平面全体の格子点の座標を用意したい（meshgrid）",
     "text": "平面全体の格子点の座標を用意したい（meshgrid）\n\n\nimport numpy as np\n\nxs = np.array([0, 1, 2])\nys = np.array([10, 20])\nxx, yy = np.meshgrid(xs, ys)\nprint(xx)   # 各格子点の x 座標\nprint(yy)   # 各格子点の y 座標\nprint(np.column_stack([xx.reshape(-1), yy.reshape(-1)]))   # 1行＝1個の格子点\n\n# 二重の for で、x と y の全部の組み合わせを作るようなもの\npoints = []\nfor y in ys:\n    for x in xs:\n        points.append([x, y])\nprint(np.array(points))   # 結果は、上の「1行＝1個の格子点」の表と同一\n\n[[0 1 2]\n [0 1 2]]\n[[10 10 10]\n [20 20 20]]\n[[ 0 10]\n [ 1 10]\n [ 2 10]\n [ 0 20]\n [ 1 20]\n [ 2 20]]\n[[ 0 10]\n [ 1 10]\n [ 2 10]\n [ 0 20]\n [ 1 20]\n [ 2 20]]\n\n\n\n\n\n\n\n\nノート\n\n\nxs の 3 個と ys の 2 個を組み合わせた、6 個の格子点ができる"
   },
   {
     "objectID": "numpy-recipes.html#peek-plt-contourf",
     "href": "numpy-recipes.html#peek-plt-contourf",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "予測の値で平面を塗り分けたい（contourf）",
     "text": "予測の値で平面を塗り分けたい（contourf）\n\n\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\n\nxx, yy = np.meshgrid(np.linspace(-2, 2, 200), np.linspace(-2, 2, 200))\ngrid = np.column_stack([xx.reshape(-1), yy.reshape(-1)])   # 1行＝1個の格子点\n\n# 分類器の代わりに「x + y が 0 より大きければ 1、そうでなければ 0」という規則で予測する\nz = (grid[:, 0] + grid[:, 1] &gt; 0).astype(int)              # 格子点ごとの予測\nZ = z.reshape(xx.shape)                                    # 格子の形に戻す\n\nplt.contourf(xx, yy, Z, levels=1, colors=[\"lightcoral\", \"lightblue\"])\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nノート\n\n\n\n格子点を細かく取り、1点ずつ予測して、予測の値ごとに色を塗る\nz を求める行を z = model.predict(grid) に置き換えると、分類器の決定境界の図になる"
   },
@@ -4496,7 +4496,7 @@
   {
     "objectID": "numpy-recipes.html#peek-np-arange",
     "href": "numpy-recipes.html#peek-np-arange",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "range のような数列を array で用意したい（arange）",
     "text": "range のような数列を array で用意したい（arange）\n\n\nimport numpy as np\n\nprint(np.arange(5))                # 0 から 4 まで\nprint(np.arange(2, 6))             # 2 から 5 まで\nprint(np.arange(2.0, 4.0, 0.5))    # 2.0 から 0.5 きざみ（4.0 は含まない）\n\n[0 1 2 3 4]\n[2 3 4 5]\n[2.  2.5 3.  3.5]\n\n\n\n\n\n\n\n\nノート\n\n\nrange と違い、きざみに小数を使える"
   },
@@ -4510,21 +4510,21 @@
   {
     "objectID": "numpy-recipes.html#peek-np-split",
     "href": "numpy-recipes.html#peek-np-split",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "条件に合う側と合わない側に array を分けたい（~）",
     "text": "条件に合う側と合わない側に array を分けたい（~）\n\n\nimport numpy as np\n\nx = np.array([3, 8, 5, 9, 2])\ncond = x &lt; 5\n# cond  は [True, False, False, False, True]\n# ~cond は [False, True, True, True, False]\nprint(x[cond])          # 条件に合う側\nprint(x[~cond])         # 条件に合わない側\nprint(np.sum(~cond))    # 条件に合わない側の個数\n\n[3 2]\n[8 5 9]\n3\n\n\n\n\n\n\n\n\nノート\n\n\n~ は True と False を入れ替える"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-astype",
     "href": "numpy-recipes.html#peek-np-astype",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "True / False の array を 1 / 0 に直したい（astype）",
     "text": "True / False の array を 1 / 0 に直したい（astype）\n\n\nimport numpy as np\n\np = np.array([0.2, 0.7, 0.5, 0.9])\n# p &gt;= 0.5 は [False, True, True, True]\nprint((p &gt;= 0.5).astype(int))      # True を 1、False を 0 に\nprint((p &gt;= 0.8).astype(int))      # 0.8 以上を 1 に\nprint((p &gt;= 0.5).astype(float))    # 小数にする\n\n[0 1 1 1]\n[0 0 0 1]\n[0. 1. 1. 1.]"
   },
   {
     "objectID": "numpy-recipes.html#peek-np-clip",
     "href": "numpy-recipes.html#peek-np-clip",
-    "title": "NumPy 逆引き",
+    "title": "NumPy 用例集",
     "section": "array の値を範囲内に収めたい（clip）",
     "text": "array の値を範囲内に収めたい（clip）\n\n\nimport numpy as np\n\nz = np.array([-2.0, -0.5, 0.3, 1.5])\nprint(np.clip(z, -1, 1))          # -1 から 1 の範囲に収める\n\np = np.array([0.0, 0.3, 1.0])     # 確率（0 と 1 を含む）\nprint(np.clip(p, 0.001, 0.999))   # 0 と 1 を、少し内側の値に直す\n\n[-1.  -0.5  0.3  1. ]\n[0.001 0.3   0.999]\n\n\n\n\n\n\n\n\nノート\n\n\nnp.log(0) は負の無限大になるので、np.log に渡す前に範囲を収める"
   },
@@ -4596,7 +4596,7 @@
     "href": "report-classification.html#提出物",
     "title": "レポート：自分のデータを分類する",
     "section": "提出物",
-    "text": "提出物\n\n\nレポート 1 つに、次をまとめる\n\n2 種類のもの、特徴量、集め方の規則と、それを選んだ理由\nデータ（X と y の配列）と、出どころの URL、または測っている様子の写真\nコードと、その出力（散布図、Accuracy）\n設問 5 の説明"
+    "text": "提出物\n\n\n以下をPDFにして提出（スライド形式でもよい）\n\nそのデータの説明と選定理由\nデータ（X と y の配列）と、出どころの URL、または測っている様子の写真\nコード\n出力\n考察"
   },
   {
     "objectID": "knn-curse.html#peek-kd-build",
@@ -4618,5 +4618,131 @@
     "title": "k-NN と次元の呪い",
     "section": "到達チェック 魚を k-NN で分類する",
     "text": "到達チェック 魚を k-NN で分類する\n\n\n過学習と汎化の回の魚 120 匹（輝度・重さ）を k-NN で分類し、同じ分け方の決定木と、テストデータの Accuracy を比べよ。\n\n\n魚のデータ（下のコード）をコピー\n120 匹をランダムに並べ替え、96 匹を訓練データ、24 匹をテストデータに分割\n訓練データで深さ 3 の決定木を学習し、テストデータの Accuracy を表示\n同じ訓練データとテストデータで、k = 3 の k-NN のテストデータの Accuracy を表示\n輝度と重さを標準化してから 3 をもう一度（平均と標準偏差は訓練データから計算）\n標準化の前後で、距離の大きさを決めている特徴量がどう変わるかを、隣の人に説明\n\n\n\n魚のデータ（クリックして展開）\nimport numpy as np\n\n# 魚 120 匹：1 行が 1 匹の [輝度, 重さ]（前半の 60 匹が Salmon、後半の 60 匹が Sea bass）\nX = np.array([\n    [7.5, 1883], [2.6, 1903], [3.8, 1652], [2.7, 1483], [5.8, 1825], [2.2, 2474],\n    [4.4, 2457], [6.0, 1503], [3.2, 2057], [4.7, 1836], [5.7, 1825], [4.1, 2094],\n    [3.5, 2149], [2.6, 1930], [4.4, 2028], [5.8, 1959], [4.4, 1859], [5.4, 1936],\n    [2.1, 1861], [2.8, 2240], [4.1, 2081], [2.7, 1838], [3.7, 1728], [2.8, 1426],\n    [3.5, 2229], [4.4, 1838], [3.8, 1884], [5.9, 1860], [2.6, 1930], [7.2, 1733],\n    [4.8, 2163], [2.7, 1831], [5.9, 1591], [5.3, 2073], [6.1, 1706], [5.4, 1644],\n    [4.9, 2194], [7.2, 1828], [5.2, 1820], [5.4, 1834], [5.8, 1554], [5.1, 1615],\n    [5.1, 1884], [5.8, 1979], [4.4, 1839], [5.5, 2230], [5.9, 1986], [2.3, 1978],\n    [3.2, 1731], [5.3, 1796], [4.8, 1872], [4.0, 2031], [5.0, 1458], [6.6, 1405],\n    [2.2, 2037], [3.2, 1576], [4.4, 1774], [2.4, 1992], [3.2, 1696], [4.7, 1752],\n    [5.4, 2181], [6.6, 1749], [6.0, 1864], [7.5, 1327], [4.9, 1819], [7.7, 1979],\n    [6.9, 1787], [5.0, 1488], [8.9, 1370], [8.3, 1476], [5.7, 1472], [8.9, 1533],\n    [9.7, 1099], [6.9, 1368], [5.2, 1486], [4.7, 1663], [5.3, 1992], [5.4, 1370],\n    [5.1, 1906], [4.8, 1480], [3.8, 1426], [5.6, 1677], [5.2, 1286], [6.4, 1445],\n    [6.4, 1381], [6.6, 1333], [9.1, 1505], [6.3, 1857], [4.9, 1767], [5.9, 1492],\n    [5.6, 1502], [5.9, 1468], [5.7, 1259], [5.2, 1517], [9.1, 1278], [6.8, 1223],\n    [3.5, 1595], [5.6, 1531], [5.4, 1096], [5.4, 1582], [7.7, 1513], [9.5, 1440],\n    [4.7, 1703], [4.7, 1490], [9.9, 1432], [5.4, 2019], [5.3, 1397], [9.5, 1341],\n    [8.5, 1657], [6.0, 1414], [8.0, 1748], [5.7, 1859], [6.0, 1820], [8.6, 1245],\n    [7.6, 2203], [6.8, 1204], [9.8, 1496], [9.0, 1567], [9.6, 1563], [8.9, 1737],\n])\n# ラベル（X と同じ魚の順）：1 = Salmon、0 = Sea bass\ny = np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,\n              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,\n              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,\n              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])"
+  },
+  {
+    "objectID": "ai-introduction.html#peek-learned-boundary",
+    "href": "ai-introduction.html#peek-learned-boundary",
+    "title": "人工知能概論",
+    "section": "ルールを書く vs データから学ぶ",
+    "text": "ルールを書く vs データから学ぶ\n\n\n2つの数値で位置を表した点を、赤と青に分ける例\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n判定基準の作り方\n\n\n\n正解付きの例を与えて、判定の境界を学ぶ"
+  },
+  {
+    "objectID": "classification-2d-boundaries.html#peek-tree-algorithm",
+    "href": "classification-2d-boundaries.html#peek-tree-algorithm",
+    "title": "2次元の特徴量で分類",
+    "section": "決定木のアルゴリズム（縦横交互バージョン）",
+    "text": "決定木のアルゴリズム（縦横交互バージョン）\n\n\nこの分割を、輝度と重さに対して適切に適用したのが決定木\n\n\nまず輝度に対して最適な閾値で分割\nできた左右それぞれに対して重さで分割（ここまでで4分割）\nこれを繰り返して決めた深さで打ち切る\n各領域は、その中の多数派クラスとする"
+  },
+  {
+    "objectID": "classification-2d-boundaries.html#peek-tree-split",
+    "href": "classification-2d-boundaries.html#peek-tree-split",
+    "title": "2次元の特徴量で分類",
+    "section": "決定木：最適な分割を探索",
+    "text": "決定木：最適な分割を探索\n\n\nweighted_gini_at を、X の列番号で特徴量を指定できる形に書き直す\nついでに最適な閾値も返す\n\n\ndef find_best_split_for_feature(X, y, feature_idx):\n    \"\"\"指定した特徴量で最適な分割点を見つける\"\"\"\n    best_gini = float(\"inf\")\n    best_threshold = None\n    best_left_mask = None\n    \n    # この特徴量のユニークな値を試す\n    values = np.unique(X[:, feature_idx])\n    \n    for threshold in values:\n        # 分割\n        left_mask = X[:, feature_idx] &lt; threshold\n        right_mask = ~left_mask\n        \n        # 左右が空でないことを確認\n        if sum(left_mask) == 0 or sum(right_mask) == 0:\n            continue\n        \n        # 左右のジニ不純度（y が 1 の行 = Salmon、0 の行 = Sea bass）\n        gini_left = gini(np.sum(y[left_mask] == 1), np.sum(y[left_mask] == 0))\n        gini_right = gini(np.sum(y[right_mask] == 1), np.sum(y[right_mask] == 0))\n\n        # 加重平均\n        n_left = sum(left_mask)\n        n_right = sum(right_mask)\n        weighted_gini = (n_left * gini_left + n_right * gini_right) / len(y)\n        \n        if weighted_gini &lt; best_gini:\n            best_gini = weighted_gini\n            best_threshold = threshold\n            best_left_mask = left_mask\n    \n    return best_threshold, best_gini, best_left_mask\n\n# 1回目の分割: 輝度（feature 0）\nfeature_names = [\"Lightness\", \"Weight\"]\nsplit1_feature = 0  # Lightness\nsplit1_threshold, split1_gini, split1_left_mask = find_best_split_for_feature(X, y, split1_feature)\n\nprint(f\"1回目の分割:\")\nprint(f\"  特徴量: {feature_names[split1_feature]}\")\nprint(f\"  閾値: {split1_threshold:.2f}\")\nprint(f\"  ジニ不純度: {split1_gini:.3f}\")\nprint(f\"  左側: {sum(split1_left_mask)}個, 右側: {sum(~split1_left_mask)}個\")\n\n1回目の分割:\n  特徴量: Lightness\n  閾値: 5.00\n  ジニ不純度: 0.167\n  左側: 32個, 右側: 48個"
+  },
+  {
+    "objectID": "classification-2d-boundaries.html#peek-tree-boundary",
+    "href": "classification-2d-boundaries.html#peek-tree-boundary",
+    "title": "2次元の特徴量で分類",
+    "section": "決定境界",
+    "text": "決定境界\n\n\n決定境界：判定が Salmon と Sea bass で切り替わる境目\n決定木では、領域ごとの Salmon の割合を、Salmon らしさを表す値（スコア）にする\n各領域を多数派のクラスとするのは、「スコアが 0.5 以上なら Salmon」と同じ\n\nスコアが 0.5 をまたぐ境目が、決定境界になる\n\n\n\ndef region_of(brightness, weight):\n    \"\"\"交互分割の決定木で、点が入る領域の番号（0〜3）\"\"\"\n    if brightness &lt; split1_threshold:\n        return 0 if weight &lt; split2_left_threshold else 1\n    else:\n        return 2 if weight &lt; split2_right_threshold else 3\n\nregions = np.array([region_of(X[i, 0], X[i, 1]) for i in range(len(X))])\n\nsalmon_share = []                                   # 領域ごとの、Salmon の割合\nfor r in range(4):\n    salmon_share.append(np.mean(y[regions == r]))  # y は 1 = Salmon、0 = Sea bass\n    print(f\"領域 {r}: {np.sum(regions == r)} 匹のうち Salmon の割合 {salmon_share[r]:.2f}\")\n\nscores_tree = np.array([salmon_share[r] for r in regions])   # 各点のスコア：入った領域の Salmon の割合\n\n領域 0: 1 匹のうち Salmon の割合 1.00\n領域 1: 31 匹のうち Salmon の割合 1.00\n領域 2: 37 匹のうち Salmon の割合 0.05\n領域 3: 11 匹のうち Salmon の割合 0.55"
+  },
+  {
+    "objectID": "classification-2d-boundaries.html#peek-tree-roc",
+    "href": "classification-2d-boundaries.html#peek-tree-roc",
+    "title": "2次元の特徴量で分類",
+    "section": "決定木の ROC 曲線と AUC",
+    "text": "決定木の ROC 曲線と AUC\n\n\nスコアの閾値を 0.5 から動かすことは、決定境界を動かすこと\n\nROC 曲線は、閾値を全通り動かしたときの TP Rate と FP Rate\n\nROC 曲線のコードと同じ計算を、重さの代わりに決定木のスコア（領域ごとの Salmon の割合）で行う\n\nスコアに当てる閾値は、スコアに現れる値と、全部を Sea bass と判定する値（最大値 + 1）\n\n面積は、AUCと同じく、隣り合う 2 点の間の台形を足して求める\n\n\ndef roc_points(scores, y):\n    \"\"\"スコアに閾値を当てて、閾値ごとの TP Rate と FP Rate を返す\"\"\"\n    thresholds = list(np.unique(scores)) + [np.max(scores) + 1]   # スコアに現れる値と、全部を 0 と判定する値\n    tpr, fpr = [], []\n    for threshold in thresholds:\n        TP = np.sum((scores &gt;= threshold) & (y == 1))\n        FN = np.sum((scores &lt; threshold) & (y == 1))\n        FP = np.sum((scores &gt;= threshold) & (y == 0))\n        TN = np.sum((scores &lt; threshold) & (y == 0))\n        tpr.append(TP / (TP + FN))\n        fpr.append(FP / (FP + TN))\n    return tpr, fpr\n\ndef auc_of(tpr, fpr):\n    \"\"\"隣り合う 2 点の間の台形の面積を足す\"\"\"\n    auc = 0\n    for i in range(len(fpr) - 1):\n        auc += (fpr[i] - fpr[i + 1]) * (tpr[i] + tpr[i + 1]) / 2\n    return auc\n\ntpr, fpr = roc_points(scores_tree, y)\nauc_tree = auc_of(tpr, fpr)\nprint(f\"交互分割の決定木（深さ 2）の AUC: {auc_tree:.3f}\")\n\nplt.figure(figsize=(5, 5))\nplt.plot(fpr, tpr, color=\"#e74c3c\", marker=\"o\", label=\"交互分割の決定木\")\nplt.plot([0, 1], [0, 1], color=\"gray\", linestyle=\"--\", label=\"ランダムに判定\")\nplt.xlabel(\"FP Rate\")\nplt.ylabel(\"TP Rate（Recall）\")\nplt.legend()\nplt.grid(True, alpha=0.3)\nplt.show()\n\n交互分割の決定木（深さ 2）の AUC: 0.963\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n領域が 4 つなので、スコアは 4 通り以下になり、曲線は数か所で折れるだけの粗い形になる"
+  },
+  {
+    "objectID": "classification-basics-1d.html#peek-decision-boundary",
+    "href": "classification-basics-1d.html#peek-decision-boundary",
+    "title": "機械学習 Classification",
+    "section": "境界線（閾値）を考える",
+    "text": "境界線（閾値）を考える\n\n大体でいいので しきい値（threshold） を設定する。\n方針\n1800g以上 → Salmon\n1800g未満 → Sea bass\nこの判定ルールで分類してみる。\n\n閾値で分かれる境界を決定境界（decision boundary）という"
+  },
+  {
+    "objectID": "classification-basics-1d.html#peek-confusion-matrix",
+    "href": "classification-basics-1d.html#peek-confusion-matrix",
+    "title": "機械学習 Classification",
+    "section": "混同行列（Confusion Matrix）",
+    "text": "混同行列（Confusion Matrix）\n\n\n\n（参考）描画コード\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\nimport matplotlib.patches as mpatches\n\nfig, ax = plt.subplots(figsize=(9, 7))\n\n# Confusion matrix data\ncm_data = np.array([[TP, FP], [FN, TN]])\n\n# Color map: 緑=正解、ピンク=誤り\ncolors = np.array([[\"#90EE90\", \"#FFB6C6\"], [\"#FFB6C6\", \"#90EE90\"]])\n\n# Draw cells\nfor i in range(2):\n    for j in range(2):\n        ax.add_patch(mpatches.Rectangle((j, 1-i), 1, 1, \n                                        facecolor=colors[i, j], \n                                        edgecolor=\"black\", linewidth=2.5))\n        ax.text(j + 0.5, 1.5 - i, str(cm_data[i, j]), \n               ha=\"center\", va=\"center\", fontsize=48, fontweight=\"bold\")\n        \n        # Add label\n        if i == 0 and j == 0:\n            label = \"TP\"\n        elif i == 0 and j == 1:\n            label = \"FP\"\n        elif i == 1 and j == 0:\n            label = \"FN\"\n        else:\n            label = \"TN\"\n        ax.text(j + 0.5, 1.15 - i, label, \n               ha=\"center\", va=\"center\", fontsize=16, style=\"italic\", color=\"gray\")\n\n# Set labels\nax.set_xlim(0, 2)\nax.set_ylim(0, 2)\nax.set_xticks([0.5, 1.5])\nax.set_yticks([0.5, 1.5])\nax.set_xticklabels([\"Actual: Salmon\", \"Actual: Sea bass\"], fontsize=13, fontweight=\"bold\")\nax.set_yticklabels([\"Predict: Sea bass\", \"Predict: Salmon\"], fontsize=13, fontweight=\"bold\")\nax.set_aspect(\"equal\")\nax.tick_params(length=0)\nax.set_title(f\"Confusion Matrix (Threshold = {threshold}g)\", \n            fontsize=16, fontweight=\"bold\", pad=20)\n\nplt.tight_layout()\nplt.show()"
+  },
+  {
+    "objectID": "classification-basics-1d.html#peek-roc",
+    "href": "classification-basics-1d.html#peek-roc",
+    "title": "機械学習 Classification",
+    "section": "ROC曲線：分類器の性能を可視化",
+    "text": "ROC曲線：分類器の性能を可視化\n\n\nPrecision と Recall はトレードオフ\n\nということは、分類器の性能はこれでは表せない\nそれなら、閾値を全通り試した結果を図にしよう\nこれがROC（Receiver Operating Characteristic）曲線\n\n\n\nROC曲線の描き方：全閾値で以下を計算して折れ線グラフにするだけ\n\n\n縦軸（Recall）：TP Rate\\(= \\dfrac{TP}{TP + FN}\\)\n横軸（Precisionの代わり）：FP Rate\\(= \\dfrac{FP}{FP + TN}\\)"
+  },
+  {
+    "objectID": "classification-basics-1d.html#roc曲線の見方",
+    "href": "classification-basics-1d.html#roc曲線の見方",
+    "title": "機械学習 Classification",
+    "section": "ROC曲線の見方",
+    "text": "ROC曲線の見方\n\n\n\n\n\n\n\n\n一目瞭然\n\n\n\n分布が離れているほど、曲線は左上の角（FP Rate 0、TP Rate 1）に近づく\n分布が重なっているほど、曲線は対角線（ランダムに判定した場合）に近づく\nもし曲線が対角線より下にあるなら、判定したラベルが逆\n\n値の小さいほうを Salmon と判定すれば対角線の上に移る"
+  },
+  {
+    "objectID": "classification-basics-1d.html#peek-roc-code",
+    "href": "classification-basics-1d.html#peek-roc-code",
+    "title": "機械学習 Classification",
+    "section": "コード（ROC曲線）",
+    "text": "コード（ROC曲線）\n\n\n閾値をずらしつつ実行した値をグラフにする\n\n最小値は全部を Salmon、最大値 + 1 は全部を Sea bass と判定する閾値\n\nそれ以上と以下は明らかに値が同じなので意味がない\n\n\n\n\nweights = np.concatenate([salmon_weights, seabass_weights])     # 40 匹の重さ\ntpr = []   # TP Rate（Recall）\nfpr = []   # FP Rate\nfor threshold in range(np.min(weights), np.max(weights) + 2):   # 最小値から、最大値 + 1 まで 1g ずつ\n    TP = np.sum(salmon_weights &gt;= threshold)\n    FN = np.sum(salmon_weights &lt; threshold)\n    FP = np.sum(seabass_weights &gt;= threshold)\n    TN = np.sum(seabass_weights &lt; threshold)\n    tpr.append(TP / (TP + FN))\n    fpr.append(FP / (FP + TN))\n\nplt.figure(figsize=(5, 5))\nplt.plot(fpr, tpr, color=\"#e74c3c\", label=\"重さで判定\")\nplt.plot([0, 1], [0, 1], color=\"gray\", linestyle=\"--\", label=\"ランダムに判定\")\nplt.xlabel(\"FP Rate\")\nplt.ylabel(\"TP Rate（Recall）\")\nplt.legend()\nplt.grid(True, alpha=0.3)\nplt.show()"
+  },
+  {
+    "objectID": "classification-basics-1d.html#peek-auc",
+    "href": "classification-basics-1d.html#peek-auc",
+    "title": "機械学習 Classification",
+    "section": "AUC：ROC曲線の下の面積を使った分離性能を表す指標",
+    "text": "AUC：ROC曲線の下の面積を使った分離性能を表す指標\n\n\nAUC（Area Under the Curve）：ROC 曲線の下の面積\n\n1.0：完全に分離可能（曲線が左上の角を通る）\n0.5：全く分離不可能（対角線と同じ）\n\n面積は、隣り合う 2 点の間を台形とみなして、その面積を足して求める\n\nROC曲線のコードで作った tpr と fpr をそのまま使う\n\n\n\nauc = 0\nfor i in range(len(fpr) - 1):\n    width  = fpr[i] - fpr[i + 1]          # 台形の幅（閾値を上げると FP Rate は下がる）\n    height = (tpr[i] + tpr[i + 1]) / 2    # 上底と下底の平均\n    auc += width * height\nprint(f\"重さの AUC: {auc:.3f}\")\n\n重さの AUC: 0.805\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n重さの AUC は 0.805\n\n重なってはいるが、ランダムに判定よりはずっと良い結果"
+  },
+  {
+    "objectID": "knn-curse.html#peek-knn-score",
+    "href": "knn-curse.html#peek-knn-score",
+    "title": "k-NN と次元の呪い",
+    "section": "k-NN の決定境界",
+    "text": "k-NN の決定境界\n\n\nk-NN では、近い k 点のうちラベル 1 の割合を、ラベル 1 らしさを表す値（スコア）にする\n\npredict_knn の最後の行を、多数決から割合に変えるだけ\nk = 3 なら、スコアは 0、1/3、2/3、1 の 4 通り\n\n多数決は、「スコアが 0.5 より大きければラベル 1」と同じ\n\nスコアが 0.5 をまたぐ境目が、決定境界になる\n\n\n\ndef score_knn(X_train, y_train, x, k):\n    dist    = np.sqrt(((X_train - x) ** 2).sum(axis=1))  # x から、訓練データの全部の点までの距離\n    nearest = np.argsort(dist)[:k]                       # 距離が小さい順に並べた番号の、先頭 k 個\n    return np.mean(y_train[nearest])                     # k 個のうち、ラベル 1 の割合\n\nprint(f\"★ のスコア（k = 3）: {score_knn(X_train, y_train, x_new, 3):.3f}\")\n\n★ のスコア（k = 3）: 0.667"
+  },
+  {
+    "objectID": "knn-curse.html#peek-knn-roc",
+    "href": "knn-curse.html#peek-knn-roc",
+    "title": "k-NN と次元の呪い",
+    "section": "k-NN の ROC 曲線と AUC",
+    "text": "k-NN の ROC 曲線と AUC\n\n\nスコアの閾値を 0.5 から動かすことは、決定境界を動かすこと\nテストデータの 100 点のスコアから、k = 1、3、31 の ROC 曲線を描く\nroc_points と auc_of は、決定木の ROC 曲線と同じ関数\n\n\ndef roc_points(scores, y):\n    \"\"\"スコアに閾値を当てて、閾値ごとの TP Rate と FP Rate を返す\"\"\"\n    thresholds = list(np.unique(scores)) + [np.max(scores) + 1]   # スコアに現れる値と、全部を 0 と判定する値\n    tpr, fpr = [], []\n    for threshold in thresholds:\n        TP = np.sum((scores &gt;= threshold) & (y == 1))\n        FN = np.sum((scores &lt; threshold) & (y == 1))\n        FP = np.sum((scores &gt;= threshold) & (y == 0))\n        TN = np.sum((scores &lt; threshold) & (y == 0))\n        tpr.append(TP / (TP + FN))\n        fpr.append(FP / (FP + TN))\n    return tpr, fpr\n\ndef auc_of(tpr, fpr):\n    \"\"\"隣り合う 2 点の間の台形の面積を足す\"\"\"\n    auc = 0\n    for i in range(len(fpr) - 1):\n        auc += (fpr[i] - fpr[i + 1]) * (tpr[i] + tpr[i + 1]) / 2\n    return auc\n\nplt.figure(figsize=(5.5, 5.5))\naucs = []\nfor k in [1, 3, 31]:\n    scores = []\n    for x in X_test:                                     # テストデータの 100 点のスコア\n        scores.append(score_knn(X_train, y_train, x, k))\n    tpr, fpr = roc_points(np.array(scores), y_test)\n    aucs.append(auc_of(tpr, fpr))\n    print(f\"k = {k:2d}: AUC {aucs[-1]:.3f}\")\n    plt.plot(fpr, tpr, marker=\"o\", markersize=3, label=f\"k = {k}\")\nplt.plot([0, 1], [0, 1], color=\"gray\", linestyle=\"--\", label=\"ランダムに判定\")\nplt.xlabel(\"FP Rate\")\nplt.ylabel(\"TP Rate（Recall）\")\nplt.legend()\nplt.grid(True, alpha=0.3)\nplt.show()\n\nk =  1: AUC 0.797\nk =  3: AUC 0.879\nk = 31: AUC 0.844\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\nk = 1 はスコアが 0 か 1 だけなので、曲線は 1 か所で折れるだけ（AUC 0.797）\nk を増やすとスコアの段階が増え、曲線が細かくなる（k = 3 で AUC 0.879、k = 31 で 0.844）"
+  },
+  {
+    "objectID": "report-classification.html#レポート-分類器を作成するに相応しいデータを自分で探せ",
+    "href": "report-classification.html#レポート-分類器を作成するに相応しいデータを自分で探せ",
+    "title": "レポート：自分のデータを分類する",
+    "section": "レポート 分類器を作成するに相応しいデータを自分で探せ",
+    "text": "レポート 分類器を作成するに相応しいデータを自分で探せ\n\n\n2 種類のデータを自分で探して集めて分類せよ\n\n\nデータのルールに合うデータと特徴量を決め、各 30 個以上のデータを収集（選んだ理由と、出どころまたは測り方を記述）\n散布図と、特徴量ごとに閾値で分類した場合の ROC 曲線と AUC を表示\n\n散布図はクラスで色分けすること\n\n決定木で分類し、ROC 曲線と AUC を表示\nk-NN で分類し、ROC 曲線と AUC を表示（特徴量は標準化し、近い k 点は KD-tree で探索）\n決定木と k-NN のどちらが自分のデータに合うかを説明"
+  },
+  {
+    "objectID": "report-classification.html#peek-report-rules",
+    "href": "report-classification.html#peek-report-rules",
+    "title": "レポート：自分のデータを分類する",
+    "section": "ルール",
+    "text": "ルール\n\n\n社会通念上、意味的に 2 種類のものを表すデータであること\nコードはscikit-learnなどのライブラリを使わずnumpyとpltで実装すること\n特徴量は3種類以上とする\n各特徴量単体では、完全に分類できないこと\n\n少なくとも 10% 程度以上には重なっていること\n\n公序良俗に反しないこと\nデータは、自分で計測してもよいし、Web を参照してもよい\n抜き出しうるデータのうち恣意的なピックアップ（チェリーピック, cherry picking）をして、ルールにちょうど合うようにしないこと\n\n例えば、パリーグの選手とセリーグの選手のうち、ちょうど重ならない選手だけ抜き出すなどはNG。ただし、WBCに出場した選手のような客観的な指標であるならばよい"
+  },
+  {
+    "objectID": "report-classification.html#使うツール",
+    "href": "report-classification.html#使うツール",
+    "title": "レポート：自分のデータを分類する",
+    "section": "使うツール",
+    "text": "使うツール\n\n\n\n\nやること\n使うもの\n\n\n\n\nデータを配列にする\n魚のデータと同じ形の X（1 行が 1 個の [特徴量 1, 特徴量 2, …]）と y（ラベル）\n\n\n特徴量ごとの ROC 曲線と AUC\nROC 曲線のコードと AUC（閾値を当てる値は特徴量の値）\n\n\n分類器の ROC 曲線と AUC\nroc_points と auc_of（閾値を当てる値はスコア）\n\n\n決定木\nfind_best_split_for_feature で分け方を探し、build_kdtree と同じ再帰で木を作る\n\n\n決定木のスコア\n葉に入った訓練データのうち、ラベル 1 の割合\n\n\n標準化\n平均を引いて、標準偏差で割る\n\n\nKD-tree を使った k-NN\nbuild_kdtree と predict_knn_kdtree\n\n\nk-NN のスコア\nscore_knn：近い k 点のうち、ラベル 1 の割合（KD-tree で探した k 点に使う）"
+  },
+  {
+    "objectID": "mnist-project.html#手書き数字を読み取る機械を作る",
+    "href": "mnist-project.html#手書き数字を読み取る機械を作る",
+    "title": "手書き数字分類プロジェクト",
+    "section": "手書き数字を読み取る機械を作る",
+    "text": "手書き数字を読み取る機械を作る\n\n\n\n\n\n\n\n\n\n\n\n必要な部品は、ここまでに自作するか手計算で中身を確認してきた"
+  },
+  {
+    "objectID": "mnist-project.html#部品の棚卸し",
+    "href": "mnist-project.html#部品の棚卸し",
+    "title": "手書き数字分類プロジェクト",
+    "section": "部品の棚卸し",
+    "text": "部品の棚卸し\n\nこの機械の中に、説明できない部品が残っていないか確認する。\n\n\n\n部品\n正体\n学んだ回\n\n\n\n\nnn.Linear\n線形変換（傾きと切片の一般化）\nロジスティック回帰／隠れ層とReLUで曲がる境界をつくる\n\n\nnn.ReLU\n空間を折る非線形\n隠れ層とReLUで曲がる境界をつくる\n\n\nソフトマックス＋交差エントロピー\n微分しやすい損失\nロジスティック回帰／今回\n\n\nloss.backward()\n連鎖律の自動化\nバックプロパゲーション\n\n\nAdam\n勾配降下法の改良版\n最適化と勾配降下法\n\n\nテストデータで採点\n汎化を測る鉄則\n過学習と汎化\n\n\n\n\n\n\n\n\n\nノート\n\n\n各部品が、どの数式・微分・更新に対応するかを説明できる。"
   }
 ]

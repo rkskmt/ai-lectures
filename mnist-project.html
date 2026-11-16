@@ -248,7 +248,7 @@
   <script src="peek-ui.js" defer=""></script>
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="408a86b7e8fda3e3bf817e8b730769f20ed4349a">
+  <meta name="qmd-web-source" content="888711a860c13a8a6005c9904913a5232bc89c3d">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -256,7 +256,7 @@
 
 <section id="title-slide" class="quarto-title-block center">
   <h1 class="title">手書き数字分類プロジェクト</h1>
-  <p class="subtitle">約束の回収</p>
+  <p class="subtitle">自分の部品で組み上げる</p>
 
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
@@ -267,11 +267,10 @@ rkskmt
 </div>
 
 </section>
-<section id="初回の約束覚えているか" class="slide level2">
-<h2>初回の約束、覚えているか</h2>
+<section id="手書き数字を読み取る機械を作る" class="slide level2">
+<h2>手書き数字を読み取る機械を作る</h2>
 <div class="slide-body">
-<p>TODO；おぼえてるわけねえだろ。くだらないことかくな</p>
-<div id="b1e33dc5" class="cell" data-execution_count="1">
+<div id="c6f84f73" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -280,11 +279,7 @@ rkskmt
 </div>
 </div>
 </div>
-<blockquote>
-<p>最終回までに、この仕組みを<strong>中身から全部</strong>自分の手で組み立てる。ブラックボックスは残さない。</p>
-</blockquote>
 <ul>
-<li><strong>手書き数字を読み取る機械</strong>を完成させる</li>
 <li>必要な部品は、ここまでに自作するか手計算で中身を確認してきた</li>
 </ul>
 </div>
@@ -295,7 +290,7 @@ rkskmt
 <ul>
 <li>手書き数字の定番データセット。<strong>訓練6万枚・テスト1万枚</strong>、各28×28ピクセル</li>
 </ul>
-<div id="1f61896b" class="cell" data-execution_count="2">
+<div id="3a93502f" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
 <span id="cb1-2"><a aria-label="2"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
 <span id="cb1-3"><a aria-label="3"></a><span class="im">from</span> torchvision <span class="im">import</span> datasets, transforms</span>
@@ -312,7 +307,7 @@ rkskmt
 1枚の形: (1, 28, 28)  正解ラベル: 5</code></pre>
 </div>
 </div>
-<div id="7d74815e" class="cell" data-execution_count="3">
+<div id="e5b3e176" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -367,10 +362,10 @@ rkskmt
 <div class="slide-body">
 <ul>
 <li>28 × 28 = <strong>784個の数字の並び</strong> — モデルにとって画像は784次元のベクトル</li>
-<li>魚は2次元（輝度・重さ）だった。<a href="./knn-curse.html#peek-curse" class="peek">次元の呪いの回で扱った高次元</a>が、<strong>本物の入力</strong>として現れる</li>
+<li>高次元（<a href="./knn-curse.html#peek-curse" class="peek">次元の呪い</a>）が、<strong>本物の入力</strong>として現れる</li>
 <li><code>nn.Flatten()</code> が「画像 → ベクトル」の変換をやる</li>
 </ul>
-<div id="58c587a8" class="cell" data-execution_count="4">
+<div id="64faddec" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
 <span id="cb3-2"><a aria-label="2"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
 <span id="cb3-3"><a aria-label="3"></a></span>
@@ -453,7 +448,7 @@ rkskmt
 <div class="slide-body">
 <ul>
 <li>答えは Salmon / Sea bass の2択ではなく、<strong>0〜9 の10択</strong></li>
-<li><a href="./nn-multilayer.html#peek-output-layer" class="peek">「変換を重ねる」の回の表</a>のとおり、<strong>出力層を付け替える</strong>だけ</li>
+<li>変えるのは<a href="./nn-multilayer.html#peek-output-layer" class="peek">出力層</a>だけ</li>
 </ul>
 <table class="caption-top">
 <thead>
@@ -508,7 +503,7 @@ rkskmt
 <section id="ソフトマックスの仕事ぶり" class="slide level2">
 <h2>ソフトマックスの仕事ぶり</h2>
 <div class="slide-body">
-<div id="68860293" class="cell" data-execution_count="5">
+<div id="e2dfd550" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -526,7 +521,7 @@ rkskmt
 <section id="crossentropyloss-はsoftmax込み" class="slide level2">
 <h2><code>CrossEntropyLoss</code> はsoftmax込み</h2>
 <div class="slide-body">
-<div id="49f645dc" class="cell" data-execution_count="6">
+<div id="4bab4b61" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
 <span id="cb5-2"><a aria-label="2"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
 <span id="cb5-3"><a aria-label="3"></a></span>
@@ -551,7 +546,7 @@ rkskmt
 <section id="モデル784-128-10" class="slide level2">
 <h2>モデル：784 → 128 → 10</h2>
 <div class="slide-body">
-<div id="a06e6890" class="cell" data-execution_count="7">
+<div id="5c5c6331" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a aria-label="1"></a>torch.manual_seed(<span class="dv">0</span>)</span>
 <span id="cb7-2"><a aria-label="2"></a></span>
 <span id="cb7-3"><a aria-label="3"></a>model <span class="op">=</span> nn.Sequential(</span>
@@ -621,7 +616,7 @@ rkskmt
 <li>6万枚まとめて勾配を計算すると重い → <strong>128枚ずつ</strong>取り出して1歩ずつ進む — この一口が<strong>ミニバッチ</strong>（<span class="en">mini-batch</span>）</li>
 <li>データを一巡することを <strong>1エポック</strong>（<span class="en">epoch</span>）と呼ぶ</li>
 </ul>
-<div id="07f480fe" class="cell" data-execution_count="8">
+<div id="4a9464ac" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a aria-label="1"></a>train_loader <span class="op">=</span> torch.utils.data.DataLoader(train_ds, batch_size<span class="op">=</span><span class="dv">128</span>, shuffle<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb10-2"><a aria-label="2"></a>test_loader  <span class="op">=</span> torch.utils.data.DataLoader(test_ds,  batch_size<span class="op">=</span><span class="dv">1000</span>)</span>
 <span id="cb10-3"><a aria-label="3"></a></span>
@@ -675,7 +670,7 @@ rkskmt
 <section id="peek-mnist-train" class="slide level2">
 <h2>学習する</h2>
 <div class="slide-body">
-<div id="a229d506" class="cell" data-execution_count="9">
+<div id="fa17c69e" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a aria-label="1"></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">4</span>):</span>
 <span id="cb12-2"><a aria-label="2"></a>    loss_sum <span class="op">=</span> <span class="fl">0.0</span></span>
 <span id="cb12-3"><a aria-label="3"></a>    <span class="cf">for</span> x_batch, y_batch <span class="kw">in</span> train_loader:</span>
@@ -685,7 +680,7 @@ rkskmt
 <span id="cb12-7"><a aria-label="7"></a>        optimizer.step()</span>
 <span id="cb12-8"><a aria-label="8"></a>        loss_sum <span class="op">+=</span> loss.item() <span class="op">*</span> <span class="bu">len</span>(x_batch)</span>
 <span id="cb12-9"><a aria-label="9"></a></span>
-<span id="cb12-10"><a aria-label="10"></a>    <span class="co"># テストデータ（見ていない1万枚）で採点 — 過学習と汎化の回の鉄則</span></span>
+<span id="cb12-10"><a aria-label="10"></a>    <span class="co"># テストデータ（見ていない1万枚）で採点</span></span>
 <span id="cb12-11"><a aria-label="11"></a>    correct <span class="op">=</span> <span class="dv">0</span></span>
 <span id="cb12-12"><a aria-label="12"></a>    <span class="cf">with</span> torch.no_grad():</span>
 <span id="cb12-13"><a aria-label="13"></a>        <span class="cf">for</span> x_batch, y_batch <span class="kw">in</span> test_loader:</span>
@@ -764,7 +759,7 @@ rkskmt
 <section id="読めている様子" class="slide level2">
 <h2>読めている様子</h2>
 <div class="slide-body">
-<div id="d12a4e15" class="cell" data-execution_count="10">
+<div id="e4b54707" class="cell" data-execution_count="10">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -774,14 +769,14 @@ rkskmt
 </div>
 </div>
 <ul>
-<li>予測ラベルは<strong>モデルの出力</strong>。初回に「謎」として見せた光景が、いま手元のコードで起きている</li>
+<li>画像の上の数字は<strong>モデルが出力した予測ラベル</strong>（赤は正解と異なるもの）</li>
 </ul>
 </div>
 </section>
 <section id="間違いを眺める" class="slide level2">
 <h2>間違いを眺める</h2>
 <div class="slide-body">
-<div id="2fcb6dc3" class="cell" data-execution_count="11">
+<div id="d4d42e6d" class="cell" data-execution_count="11">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -814,7 +809,7 @@ rkskmt
 </div>
 </div>
 </div>
-<div id="18925465" class="cell" data-execution_count="12">
+<div id="5a225a3c" class="cell" data-execution_count="12">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -824,7 +819,7 @@ rkskmt
 </div>
 </div>
 <ul>
-<li>過学習と汎化の回の混同行列は2×2だった。これはその<strong>10クラス版</strong></li>
+<li><a href="./classification-basics-1d.html#peek-confusion-matrix" class="peek">2クラスの混同行列</a>（2×2）の<strong>10クラス版</strong></li>
 <li>最多は <strong>4→9（22枚）</strong>、逆向きの 9→4 も14枚 — <strong>4と9はお互いに紛らわしい</strong>。次点は 7→9・5→3</li>
 <li>間違いはランダムに散らばらない。<strong>形の似たペア</strong>に集中する</li>
 </ul>
@@ -833,7 +828,7 @@ rkskmt
 <section id="自信満々の間違い" class="slide level2">
 <h2>自信満々の間違い</h2>
 <div class="slide-body">
-<div id="effb14ad" class="cell" data-execution_count="13">
+<div id="4aacc961" class="cell" data-execution_count="13">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -855,7 +850,7 @@ rkskmt
 <ul>
 <li>第1層 <code>nn.Linear(784, 128)</code> の各ユニットは、784本の重みを持つ ＝ <strong>28×28の「模様」</strong>として絵にできる</li>
 </ul>
-<div id="1ff1e59b" class="cell" data-execution_count="14">
+<div id="0cdbc841" class="cell" data-execution_count="14">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -901,7 +896,7 @@ rkskmt
 <h2>自分の字は読めるのか（持ち帰りデモ）</h2>
 <div class="slide-body">
 <p>紙に数字を書いて撮影し、この機械に読ませてみよう。 ただし<strong>写真をそのまま28×28に縮めても、まず読めない</strong> — MNISTの画像は「数字を20ピクセル角に収め、重心をど真ん中に置く」ように揃えてあり、撮った写真はそうなっていないから。同じ揃え方を自分でやってから見せる：</p>
-<div id="02c89fc9" class="cell" data-execution_count="15">
+<div id="0577394c" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a aria-label="1"></a><span class="im">from</span> PIL <span class="im">import</span> Image</span>
 <span id="cb14-2"><a aria-label="2"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb14-3"><a aria-label="3"></a><span class="im">import</span> torch</span>
@@ -952,16 +947,11 @@ rkskmt
 </div>
 </div>
 </section>
-<section id="約束は果たされたか部品の棚卸し" class="slide level2">
-<h2>約束は果たされたか：部品の棚卸し</h2>
+<section id="部品の棚卸し" class="slide level2">
+<h2>部品の棚卸し</h2>
 <div class="slide-body">
 <p>この機械の中に、説明できない部品が残っていないか確認する。</p>
 <table class="caption-top">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
 <thead>
 <tr class="header">
 <th>部品</th>
@@ -973,47 +963,45 @@ rkskmt
 <tr class="odd">
 <td><code>nn.Linear</code></td>
 <td>線形変換（傾きと切片の一般化）</td>
-<td>ロジスティック回帰／変換を重ねる</td>
+<td><a href="./logistic-regression.html">ロジスティック回帰</a>／<a href="./nn-multilayer.html">隠れ層とReLUで曲がる境界をつくる</a></td>
 </tr>
 <tr class="even">
 <td><code>nn.ReLU</code></td>
 <td>空間を折る非線形</td>
-<td>変換を重ねる</td>
+<td><a href="./nn-multilayer.html">隠れ層とReLUで曲がる境界をつくる</a></td>
 </tr>
 <tr class="odd">
 <td>ソフトマックス＋交差エントロピー</td>
 <td>微分しやすい損失</td>
-<td>ロジスティック回帰／今回</td>
+<td><a href="./logistic-regression.html">ロジスティック回帰</a>／今回</td>
 </tr>
 <tr class="even">
 <td><code>loss.backward()</code></td>
 <td>連鎖律の自動化</td>
-<td>バックプロパゲーション</td>
+<td><a href="./nn-backprop.html">バックプロパゲーション</a></td>
 </tr>
 <tr class="odd">
 <td><code>Adam</code></td>
 <td>勾配降下法の改良版</td>
-<td>最適化と勾配降下法</td>
+<td><a href="./optimization-gradient-descent.html">最適化と勾配降下法</a></td>
 </tr>
 <tr class="even">
 <td>テストデータで採点</td>
 <td>汎化を測る鉄則</td>
-<td>過学習と汎化</td>
+<td><a href="./classification-evaluation.html">過学習と汎化</a></td>
 </tr>
 </tbody>
 </table>
-<div title="約束の回収">
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>約束の回収</strong></p>
+<p><strong>ノート</strong></p>
 </div>
 <div class="callout-content">
 <p>各部品が、どの数式・微分・更新に対応するかを説明できる。</p>
-</div>
 </div>
 </div>
 </div>
