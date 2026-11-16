@@ -1,63 +1,35 @@
 ---
 title: "レポート：自分のデータを分類する"
-subtitle: "決定木と k-NN を、自分で作ったデータで比べる"
+subtitle: "決定木と k-NN を、自分で見つけたデータで比べる"
 ---
 
-## **レポート** 自分で作ったデータを、決定木と k-NN で分類する {.badge-practice}
+## **レポート** 分類器を作成するに相応しいデータを自分で探せ {.badge-practice}
 
 ::: {.prompt}
-2 種類のものを見分けるデータを自分で作り、決定木と k-NN で分類して、どちらが自分のデータに合うかを説明せよ。
+2 種類のデータを自分で探して集めて分類せよ
 :::
 
-1. 2 種類のものと特徴量 2 つを決め、各 30 個以上のデータを作成（選んだ理由と、出どころまたは測り方を記述）
-2. 散布図を表示し、訓練データとテストデータに分割
-3. 決定木で分類し、テストデータの Accuracy を表示
-4. k-NN で分類し、テストデータの Accuracy を表示（特徴量は標準化し、近い k 点は KD-tree で探索）
-5. 決定木と k-NN のどちらが自分のデータに合うかを、Accuracy と散布図から説明
+1. [データのルール](#peek-report-rules){.peek}に合うデータと特徴量を決め、各 30 個以上のデータを収集（選んだ理由と、出どころまたは測り方を記述）
+2. 散布図と、特徴量ごとに閾値で分類した場合の [ROC 曲線](classification-basics-1d.qmd#peek-roc){.peek}と [AUC](classification-basics-1d.qmd#peek-auc){.peek} を表示
+   - 散布図はクラスで色分けすること
+3. 決定木で分類し、ROC 曲線と AUC を表示
+4. k-NN で分類し、ROC 曲線と AUC を表示（特徴量は標準化し、近い k 点は KD-tree で探索）
+5. 決定木と k-NN のどちらが自分のデータに合うかを説明
 
 
-## 使う道具
+## ルール {#peek-report-rules}
 
-| やること | 使うもの |
-|---|---|
-| データを配列にする | [魚のデータ](knn-curse.qmd#peek-knn-fish){.peek}と同じ形の `X`（1 行が 1 個の [特徴量 1, 特徴量 2]）と `y`（ラベル） |
-| 訓練データとテストデータに分ける | [ランダムに並べ替えてから分ける](classification-evaluation.qmd#peek-split){.peek} |
-| 決定木 | [`DecisionTreeClassifier`](classification-evaluation.qmd#peek-depth-curve){.peek} |
-| 標準化 | [平均を引いて、標準偏差で割る](clustering-kmeans.qmd#peek-scale){.peek}（平均と標準偏差は訓練データから計算） |
-| KD-tree を使った k-NN | [`build_kdtree`](knn-curse.qmd#peek-kd-build){.peek} と [`predict_knn_kdtree`](knn-curse.qmd#peek-kd-knn){.peek} |
-
-
-## データの選び方：はっきり分かれるものは選ばない
-
-- 例：軽自動車と普通車を、全長と車両重量で見分ける
-   - 軽自動車は、規格で全長 3.4 m 以下と決まっている
-   - 全長だけでほぼ分かれるので、決定木でも k-NN でもほぼ満点になり、比べられない
-- 散布図で、2 種類が少し重なるものを選ぶ
-   - 重なりがあると、境界の引き方で結果が変わる
-
-::: {.callout-tip title="チェックポイント"}
-10 個ずつ集めたところで散布図を描き、分かれすぎていないかを確かめる
-:::
+1. 社会通念上、意味的に 2 種類のものを表すデータであること
+2. コードはscikit-learnなどのライブラリを使わずnumpyとpltで実装すること
+3. 特徴量は3種類以上とする
+4. 各特徴量単体では、完全に分類できないこと
+   - 少なくとも 10% 程度以上には重なっていること
+5. 公序良俗に反しないこと
+6. データは、自分で計測してもよいし、Web を参照してもよい
+7. 抜き出しうるデータのうち恣意的なピックアップ（チェリーピック, [cherry picking]{.en}）をして、ルールにちょうど合うようにしないこと
+   - 例えば、パリーグの選手とセリーグの選手のうち、ちょうど重ならない選手だけ抜き出すなどはNG。ただし、WBCに出場した選手のような客観的な指標であるならばよい
 
 
-## データの選び方：集め方の規則を先に決める
-
-- 例：プロ野球選手と J リーグの選手を、身長と体重で見分ける
-   - 好きな選手を 30 人ずつ選ぶと、都合のよい選手だけを選べてしまう
-- 誰が集めても同じデータになる規則を、集める前に決める
-   - 例：去年の優勝チームの、開幕戦のスタメン
-   - 人数が足りなければ、2 位、3 位のチームを順に足す
-- 決めた規則は、レポートに書く
-
-
-## 特徴量の選び方：2 つで見分けられなければ、足していく
-
-- まず 2 つの特徴量（例：身長と体重）で、決定木と k-NN を試す
-- Accuracy が低ければ、特徴量を 1 つずつ足して、Accuracy がどう変わるかを見る
-   - 例：年齢、プロになってからの年数、年俸
-- 桁の違う特徴量（年俸など）を足すと、[標準化しない k-NN は、その特徴量だけで距離が決まる](clustering-kmeans.qmd#peek-scale-mismatch){.peek}
-- 特徴量を足すほど当たるとは限らない（[次元の呪い](knn-curse.qmd#peek-curse){.peek}）
-- 特徴量が 3 つ以上のときも、散布図は 2 つを選んで描く
 
 
 ## データの例
@@ -72,10 +44,25 @@ subtitle: "決定木と k-NN を、自分で作ったデータで比べる"
 - 例から選んでもよいし、自分で決めてもよい
 
 
+## 使うツール
+
+| やること | 使うもの |
+|---|---|
+| データを配列にする | [魚のデータ](knn-curse.qmd#peek-knn-fish){.peek}と同じ形の `X`（1 行が 1 個の [特徴量 1, 特徴量 2, …]）と `y`（ラベル） |
+| 特徴量ごとの ROC 曲線と AUC | [ROC 曲線のコード](classification-basics-1d.qmd#peek-roc-code){.peek}と [AUC](classification-basics-1d.qmd#peek-auc){.peek}（閾値を当てる値は特徴量の値） |
+| 分類器の ROC 曲線と AUC | [`roc_points` と `auc_of`](classification-2d-boundaries.qmd#peek-tree-roc){.peek}（閾値を当てる値はスコア） |
+| 決定木 | [`find_best_split_for_feature`](classification-2d-boundaries.qmd#peek-tree-split){.peek} で分け方を探し、[`build_kdtree`](knn-curse.qmd#peek-kd-build){.peek} と同じ再帰で木を作る |
+| 決定木のスコア | [葉に入った訓練データのうち、ラベル 1 の割合](classification-2d-boundaries.qmd#peek-tree-boundary){.peek} |
+| 標準化 | [平均を引いて、標準偏差で割る](clustering-kmeans.qmd#peek-scale){.peek} |
+| KD-tree を使った k-NN | [`build_kdtree`](knn-curse.qmd#peek-kd-build){.peek} と [`predict_knn_kdtree`](knn-curse.qmd#peek-kd-knn){.peek} |
+| k-NN のスコア | [`score_knn`](knn-curse.qmd#peek-knn-score){.peek}：近い k 点のうち、ラベル 1 の割合（KD-tree で探した k 点に使う） |
+
+
 ## 提出物
 
-- レポート 1 つに、次をまとめる
-   - 2 種類のもの、特徴量、集め方の規則と、それを選んだ理由
+- 以下をPDFにして提出（スライド形式でもよい）
+   - そのデータの説明と選定理由
    - データ（`X` と `y` の配列）と、出どころの URL、または測っている様子の写真
-   - コードと、その出力（散布図、Accuracy）
-   - 設問 5 の説明
+   - コード
+   - 出力
+   - 考察
