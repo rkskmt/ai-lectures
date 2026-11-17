@@ -30,6 +30,7 @@ Quarto-based AI lecture website ("AI Lectures"). Slide decks for machine learnin
 - **English/Japanese mix in slides — intentional, not a defect:**
   - Explanatory prose, annotations, and callouts: **Japanese**. Japanese data/column names stay Japanese where natural. The exception is printed tables, which are ASCII-only (see Conventions).
   - **Key technical terms get English alongside Japanese at first appearance** (e.g. 過学習（overfitting）, 固有値（eigenvalue）). This is a feature — students must learn the English. When auditing, **add the English where a term first appears without it** (this is worth a dedicated inspection pass).
+  - **Capitalisation of the English:** in a slide heading (`##`) or a box headline that names a method, the English is in Title Case (`## 過学習（[Overfitting]{.en}）`, `[k-Nearest Neighbors]{.en}`); in body text it is lowercase like any English common noun (`最近傍（[nearest neighbor]{.en}）`), except expansions of an acronym (`[Area Under the Curve]{.en}`). A variable keeps its case (`k-fold`, `k-Nearest`).
   - **Standard English in matplotlib figures is fine — leave it.** Axis/label/title text that is itself a term a student should know (e.g. `Iteration Trajectory`, `inertia`, `Convergence Point`) is good exposure; do not Japanize it just for uniformity. Use Japanese in figures only when the text is *explanation* aimed at understanding, not a term.
 
 ## Teaching Philosophy
@@ -95,6 +96,7 @@ Apply to every deck:
    - Example: data is defined as lists before the arrays only on a slide that then uses those lists (`l1 + l2` next to `np.concatenate([a, b])`). Elsewhere the array is written directly.
    - A title says what the reader wants to do. It does not restate the syntax, and it does not describe the scene in which some other deck happens to use the function.
    - Symptoms of the failure: the same supplement on every slide; a line that exists only to force a pattern (`np.array(list(a) + list(b))`); a title that reads like a code comment.
+- **The fewer words on a slide, the better.** A projected slide is looked at, not read: let the figure carry the point and keep only the text the figure cannot say. Example: the （参考） slide on nearest-neighbour image enlargement in `knn-curse.qmd` is one line of text, then the original and the enlarged image side by side, with no code and no explanation of the mechanism.
 - **The fish are only the introductory case study.** Salmon / Sea bass introduce classification in the first decks because the setting is easy to picture; after that they have no special status. This is a general machine-learning course, not a course for the fishing industry: state methods and algorithms in general terms (data, label, point), and for each later topic use whatever data shows the concept best (synthetic points, a real dataset, images, text, …). Do not carry the fish into later decks for continuity, and do not phrase titles, explanations or metaphors around fish out of habit.
 - **Do not ration slides.** One concept may use the full 動機（問いかけ）→ 実験/図 → 組み立て → 観察 sequence; "one slide = one idea" works toward **more** slides, not fewer (typical deck: 18–25).
 - **Figures, code, and interactivity are investments that lower explanation cost** — when in doubt, add them. In particular: (1) every function that appears as a formula also gets its **curve** (sigmoid, ReLU, softmax, −log, …); (2) every network gets a **D2 structure diagram** (no code-only or math-only component definitions); (3) interactive versions (explorer, plotly) beat static images.
@@ -118,7 +120,9 @@ quarto preview --port 4321   # local dev server (fixed port)
 quarto render                # build to _site/
 ```
 
-**Heavy render:** `mnist-project.qmd` downloads MNIST (~12MB, cached in gitignored `data/`) and trains an MLP for 3 epochs on CPU — expect a few minutes for that file. `nn-backprop.qmd` and `pytorch-intro.qmd` each train for a few seconds.
+**Rendering never downloads data or trains a model.** A deck whose student code downloads or trains shows that code with `eval: false`; everything it displays comes from one run of that code saved by a tool (`tools/explorer_export.py` → `frozen/mnist-project.npz`, read by the hidden cells of `mnist-project.qmd`; the same run writes the explorer's weights, so the two always agree). Rerun the tool only when the student code it mirrors changes. Reason: a deploy renders the changed decks, and a render that downloads or trains makes every small edit cost minutes.
+
+**Keep the project folder small.** Quarto walks every folder of the project except `_`- and `.`-prefixed ones on each render, even when rendering one file: an unused local MathJax copy (`libs/`, 32,000 files) once added about 18 s to every render. Put downloads and tools outside the project or in a `_`-prefixed folder. `execute: daemon: true` in `_quarto.yml` keeps each deck's kernel alive for 300 s, so rendering the same deck again after an edit skips the kernel start (several seconds on Windows).
 
 ## Self-contained, reproducible builds
 
