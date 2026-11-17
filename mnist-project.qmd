@@ -11,16 +11,16 @@ subtitle: "自分の部品で組み上げる"
 import numpy as np
 import matplotlib.pyplot as plt
 import japanize_matplotlib
-from torchvision import datasets, transforms
 plt.rcParams["font.size"] = 11
 plt.rcParams["figure.dpi"] = 100
 
-transform_preview = transforms.ToTensor()
-mnist_preview = datasets.MNIST(root="data", train=True, download=True,
-                               transform=transform_preview)
+# Everything this deck displays from MNIST or from the trained model comes from one run of the
+# student cells, saved by tools/explorer_export.py: rendering neither downloads MNIST nor trains.
+frozen = np.load("frozen/mnist-project.npz")
+
 fig, axes = plt.subplots(2, 8, figsize=(10, 2.8))
-for ax, (img, label) in zip(axes.flat, mnist_preview):
-    ax.imshow(img.squeeze(), cmap="gray_r")
+for ax, img, label in zip(axes.flat, frozen["first16"], frozen["first16_label"]):
+    ax.imshow(img, cmap="gray_r")
     ax.set_title(str(label), fontsize=10)
     ax.axis("off")
 plt.tight_layout()
@@ -36,6 +36,7 @@ plt.show()
 
 ```{python}
 #| echo: true
+#| eval: false
 import torch
 import torch.nn as nn
 from torchvision import datasets, transforms
@@ -51,11 +52,16 @@ print("1枚の形:", tuple(img.shape), " 正解ラベル:", label)
 
 ```{python}
 #| echo: false
+print("訓練:", frozen["n_train"], "枚 / テスト:", frozen["n_test"], "枚")
+print("1枚の形:", tuple(int(n) for n in frozen["img0_shape"]), " 正解ラベル:", frozen["label0"])
+```
+
+```{python}
+#| echo: false
 #| fig-align: center
 fig, axes = plt.subplots(2, 8, figsize=(10, 2.8))
-for ax, i in zip(axes.flat, range(16)):
-    img, label = train_ds[i]
-    ax.imshow(img.squeeze(), cmap="gray_r")
+for ax, img, label in zip(axes.flat, frozen["first16"], frozen["first16_label"]):
+    ax.imshow(img, cmap="gray_r")
     ax.set_title(str(label), fontsize=10)
     ax.axis("off")
 plt.tight_layout()
@@ -179,7 +185,7 @@ axes[1].bar(labels, p_demo, color="#e74c3c")
 for i, v in enumerate(p_demo):
     axes[1].text(i, v + 0.02, f"{v:.2f}", ha="center", fontsize=10)
 axes[1].set_ylim(0, 0.85)
-axes[1].set_title("出力：softmax(u) — 合計はきっちり 1", fontsize=11)
+axes[1].set_title("出力：softmax(u)", fontsize=11)
 axes[1].grid(axis="y", alpha=0.3)
 plt.tight_layout()
 plt.show()
@@ -277,6 +283,7 @@ $$\underbrace{784\times128+128}_{\text{第1層}}
 
 ```{python}
 #| echo: true
+#| eval: false
 train_loader = torch.utils.data.DataLoader(train_ds, batch_size=128, shuffle=True)
 test_loader  = torch.utils.data.DataLoader(test_ds,  batch_size=1000)
 
@@ -290,6 +297,12 @@ preview_loader = torch.utils.data.DataLoader(
 x_batch, y_batch = next(iter(preview_loader))
 print("画像バッチ:", tuple(x_batch.shape))
 print("ラベルバッチ:", tuple(y_batch.shape))
+```
+
+```{python}
+#| echo: false
+print("画像バッチ:", tuple(int(n) for n in frozen["batch_x_shape"]))
+print("ラベルバッチ:", tuple(int(n) for n in frozen["batch_y_shape"]))
 ```
 
 - [NumPyで2層NNを学習した回](nn-backprop.qmd#peek-full-batch){.peek}では、全200件を1つのバッチにして1回更新した
@@ -316,6 +329,7 @@ $$\left\lceil\frac{60{,}000}{128}\right\rceil=469\ \text{ミニバッチ}$$
 
 ```{python}
 #| echo: true
+#| eval: false
 for epoch in range(1, 4):
     loss_sum = 0.0
     for x_batch, y_batch in train_loader:
@@ -333,6 +347,12 @@ for epoch in range(1, 4):
     train_loss = loss_sum / len(train_ds)
     print(f"エポック {epoch} | 訓練Loss: {train_loss:.4f} "
           f"| テスト正答率: {correct / len(test_ds):.2%}")
+```
+
+```{python}
+#| echo: false
+for line in frozen["epoch_lines"]:
+    print(line)
 ```
 
 - 見たことのない手書き1万枚を、**96%以上**の精度で読めるようになった
@@ -363,17 +383,11 @@ for epoch in range(1, 4):
 ```{python}
 #| echo: false
 #| fig-align: center
-with torch.no_grad():
-    imgs = torch.stack([test_ds[i][0] for i in range(16)])
-    preds = model(imgs).argmax(dim=1)
-
 fig, axes = plt.subplots(2, 8, figsize=(10, 3.0))
-for ax, img, pred, i in zip(axes.flat, imgs, preds, range(16)):
-    true = test_ds[i][1]
-    ok = (pred.item() == true)
-    ax.imshow(img.squeeze(), cmap="gray_r")
-    ax.set_title(f"予測 {pred.item()}", fontsize=10,
-                 color="black" if ok else "red")
+for ax, img, pred, true in zip(axes.flat, frozen["test16"], frozen["test16_pred"], frozen["test16_true"]):
+    ax.imshow(img, cmap="gray_r")
+    ax.set_title(f"予測 {pred}", fontsize=10,
+                 color="black" if pred == true else "red")
     ax.axis("off")
 plt.tight_layout()
 plt.show()
@@ -387,19 +401,9 @@ plt.show()
 ```{python}
 #| echo: false
 #| fig-align: center
-wrong_imgs, wrong_pred, wrong_true = [], [], []
-with torch.no_grad():
-    for x_batch, y_batch in test_loader:
-        pred = model(x_batch).argmax(dim=1)
-        bad = (pred != y_batch).nonzero().squeeze(1)
-        for i in bad:
-            wrong_imgs.append(x_batch[i]); wrong_pred.append(pred[i].item()); wrong_true.append(y_batch[i].item())
-        if len(wrong_imgs) >= 8:
-            break
-
 fig, axes = plt.subplots(1, 8, figsize=(11, 2.0))
-for ax, img, p, t in zip(axes.flat, wrong_imgs, wrong_pred, wrong_true):
-    ax.imshow(img.squeeze(), cmap="gray_r")
+for ax, img, p, t in zip(axes.flat, frozen["wrong8"], frozen["wrong8_pred"], frozen["wrong8_true"]):
+    ax.imshow(img, cmap="gray_r")
     ax.set_title(f"予測{p}（正解{t}）", fontsize=9, color="red")
     ax.axis("off")
 plt.tight_layout()
@@ -419,20 +423,9 @@ plt.show()
 ```{python}
 #| echo: false
 #| fig-align: center
-with torch.no_grad():
-    all_preds, all_true = [], []
-    for x_batch, y_batch in test_loader:
-        all_preds.append(model(x_batch).argmax(dim=1))
-        all_true.append(y_batch)
-    preds_all = torch.cat(all_preds)
-    true_all  = torch.cat(all_true)
-
-conf = torch.zeros(10, 10, dtype=torch.int64)
-for t, pr in zip(true_all, preds_all):
-    conf[t, pr] += 1
-
-off_diag = conf.clone()
-off_diag.fill_diagonal_(0)
+conf = frozen["conf"]
+off_diag = conf.copy()
+np.fill_diagonal(off_diag, 0)
 
 fig, ax = plt.subplots(figsize=(6.2, 5.0))
 im = ax.imshow(off_diag, cmap="Reds")
@@ -441,7 +434,7 @@ ax.set_xlabel("予測"); ax.set_ylabel("正解")
 for i in range(10):
     for j in range(10):
         if i != j and conf[i, j] >= 10:
-            ax.text(j, i, str(conf[i, j].item()), ha="center", va="center", fontsize=9)
+            ax.text(j, i, str(conf[i, j]), ha="center", va="center", fontsize=9)
 ax.set_title("混同行列（間違いのみ着色。10枚以上のマスに枚数）", fontsize=11)
 fig.colorbar(im, ax=ax, shrink=0.8)
 plt.tight_layout()
@@ -449,7 +442,7 @@ plt.show()
 ```
 
 - [2クラスの混同行列](classification-basics-1d.qmd#peek-confusion-matrix){.peek}（2×2）の**10クラス版**
-- 最多は **4→9（22枚）**、逆向きの 9→4 も14枚 — **4と9はお互いに紛らわしい**。次点は 7→9・5→3
+- 最多は **4→9（23枚）**、逆向きの 9→4 も15枚 — **4と9はお互いに紛らわしい**。次点は 7→9・5→3
 - 間違いはランダムに散らばらない。**形の似たペア**に集中する
 
 
@@ -458,19 +451,10 @@ plt.show()
 ```{python}
 #| echo: false
 #| fig-align: center
-with torch.no_grad():
-    X_all = torch.stack([test_ds[i][0] for i in range(len(test_ds))])
-    probs_all = torch.softmax(model(X_all), dim=1)
-conf_top = probs_all.max(dim=1)
-wrong_idx = (conf_top.indices != true_all).nonzero().squeeze(1)
-order = conf_top.values[wrong_idx].argsort(descending=True)[:6]
-
 fig, axes = plt.subplots(1, 6, figsize=(11, 2.4))
-for ax, k in zip(axes.flat, order):
-    i = wrong_idx[k].item()
-    ax.imshow(X_all[i].squeeze(), cmap="gray_r")
-    ax.set_title(f"予測{conf_top.indices[i].item()}（{conf_top.values[i].item():.1%}）\n正解{true_all[i].item()}",
-                 fontsize=9, color="red")
+for ax, img, p, q, t in zip(axes.flat, frozen["top6"], frozen["top6_pred"], frozen["top6_prob"], frozen["top6_true"]):
+    ax.imshow(img, cmap="gray_r")
+    ax.set_title(f"予測{p}（{q:.1%}）\n正解{t}", fontsize=9, color="red")
     ax.axis("off")
 plt.tight_layout()
 plt.show()
@@ -488,10 +472,8 @@ plt.show()
 ```{python}
 #| echo: false
 #| fig-align: center
-torch.manual_seed(0)
-fresh = nn.Sequential(nn.Flatten(), nn.Linear(784, 128), nn.ReLU(), nn.Linear(128, 10))
-W_init    = fresh[1].weight.detach().numpy()
-W_trained = model[1].weight.detach().numpy()
+W_init    = frozen["W_init8"]       # first 8 units of the first layer, before and after training
+W_trained = frozen["W_trained8"]
 
 fig, axes = plt.subplots(2, 8, figsize=(11, 3.1))
 for row, W, label in [(0, W_init, "学習前"), (1, W_trained, "学習後")]:

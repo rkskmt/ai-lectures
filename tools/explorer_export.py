@@ -1,15 +1,23 @@
 # Trains the two course networks exactly as the decks do and dumps weights,
 # training snapshots, and sample images for the interactive NN explorer
 # (explorer/index.html). Also prints the measured facts that go into
-# doc/course-arc.md §実測ログ (never write a number on a slide that was not
+# doc/measured-log.md (never write a number on a slide that was not
 # printed by this script or by the deck itself).
 #
 #   moons : nn-backprop.qmd — 2-16-1 MLP, full batch, lr 0.5, 4000 iters, rng(0)
 #   mnist : mnist-project.qmd — Flatten/Linear(784,128)/ReLU/Linear(128,10),
 #                               Adam lr 1e-3, batch 128 shuffle, 3 epochs, seed 0
 #
+# The same MNIST run also writes frozen/mnist-project.npz: everything
+# mnist-project.qmd displays from MNIST or from the trained model. The deck's
+# data and training cells are `eval: false` and its hidden cells read that
+# file, so rendering the deck neither downloads MNIST nor trains. CPU training
+# is not bit-reproducible across runs, so the explorer weights and the deck's
+# display must come from one run: always regenerate both together.
+#
 # Usage: python tools/explorer_export.py    (from the repo root)
-#        -> writes explorer/data_ai.js, prints measured facts to stdout
+#        -> writes explorer/data_ai.js and frozen/mnist-project.npz,
+#           prints measured facts to stdout
 
 import json
 from pathlib import Path
@@ -22,6 +30,7 @@ from torchvision import datasets, transforms
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "explorer" / "data_ai.js"
+FROZEN = ROOT / "frozen" / "mnist-project.npz"
 
 ND = 4  # decimals kept in the export (accuracy of the rounded net is verified below)
 
@@ -120,10 +129,73 @@ def export_moons():
 # Mirrors mnist-project.qmd: same seed, same construction order, so the
 # exported weights equal the ones the deck trains at render time.
 
+def to_uint8(imgs):
+    """(n, 1, 28, 28) tensor in 0..1 from ToTensor -> (n, 28, 28) uint8, exact."""
+    return (imgs.squeeze(1) * 255).round().to(torch.uint8).numpy()
+
+
+def freeze_mnist_deck(model, train_ds, test_ds, test_loader, first16, first16_label, batch_shapes, epoch_lines):
+    """Save what the hidden cells of mnist-project.qmd display, computed as those cells did."""
+    img0, label0 = train_ds[0]
+
+    # 読めている様子
+    with torch.no_grad():
+        test16 = torch.stack([test_ds[i][0] for i in range(16)])
+        test16_pred = model(test16).argmax(dim=1).numpy()
+    test16_true = np.array([test_ds[i][1] for i in range(16)])
+
+    # 間違いを眺める: the first 8 mistakes in test order
+    wrong_imgs, wrong_pred, wrong_true = [], [], []
+    with torch.no_grad():
+        for x_batch, y_batch in test_loader:
+            pred = model(x_batch).argmax(dim=1)
+            bad = (pred != y_batch).nonzero().squeeze(1)
+            for i in bad:
+                wrong_imgs.append(x_batch[i]); wrong_pred.append(pred[i].item()); wrong_true.append(y_batch[i].item())
+            if len(wrong_imgs) >= 8:
+                break
+
+    # どの数字とどの数字が混ざるのか / 自信満々の間違い
+    with torch.no_grad():
+        X_all = torch.stack([test_ds[i][0] for i in range(len(test_ds))])
+        probs_all = torch.softmax(model(X_all), dim=1)
+    true_all = torch.tensor([test_ds[i][1] for i in range(len(test_ds))])
+    conf_top = probs_all.max(dim=1)
+    conf = torch.zeros(10, 10, dtype=torch.int64)
+    for t, pr in zip(true_all, conf_top.indices):
+        conf[t, pr] += 1
+    wrong_idx = (conf_top.indices != true_all).nonzero().squeeze(1)
+    top6_idx = wrong_idx[conf_top.values[wrong_idx].argsort(descending=True)[:6]]
+
+    # 育った重みを覗く: the first 8 units before (same seed, re-initialised) and after training
+    torch.manual_seed(0)
+    fresh = nn.Sequential(nn.Flatten(), nn.Linear(784, 128), nn.ReLU(), nn.Linear(128, 10))
+
+    FROZEN.parent.mkdir(exist_ok=True)
+    np.savez_compressed(
+        FROZEN,
+        n_train=len(train_ds), n_test=len(test_ds),
+        img0_shape=np.array(img0.shape), label0=label0,
+        first16=to_uint8(first16), first16_label=first16_label,
+        batch_x_shape=np.array(batch_shapes[0]), batch_y_shape=np.array(batch_shapes[1]),
+        epoch_lines=np.array(epoch_lines),
+        test16=to_uint8(test16), test16_pred=test16_pred, test16_true=test16_true,
+        wrong8=to_uint8(torch.stack(wrong_imgs[:8])),
+        wrong8_pred=np.array(wrong_pred[:8]), wrong8_true=np.array(wrong_true[:8]),
+        conf=conf.numpy(),
+        top6=to_uint8(X_all[top6_idx]), top6_pred=conf_top.indices[top6_idx].numpy(),
+        top6_prob=conf_top.values[top6_idx].numpy(), top6_true=true_all[top6_idx].numpy(),
+        W_init8=fresh[1].weight.detach().numpy()[:8], W_trained8=model[1].weight.detach().numpy()[:8],
+    )
+    print(f"[mnist] wrote {FROZEN.relative_to(ROOT)} ({FROZEN.stat().st_size:,} bytes)")
+
+
 def export_mnist():
     transform = transforms.ToTensor()
     train_ds = datasets.MNIST(root=ROOT / "data", train=True, download=True, transform=transform)
     test_ds = datasets.MNIST(root=ROOT / "data", train=False, download=True, transform=transform)
+    first16 = torch.stack([train_ds[i][0] for i in range(16)])
+    first16_label = np.array([train_ds[i][1] for i in range(16)])
 
     torch.manual_seed(0)
     model = nn.Sequential(
@@ -139,17 +211,32 @@ def export_mnist():
     loss_fn = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 
+    # The deck's preview batch uses its own generator, so it draws nothing from the global RNG.
+    preview_generator = torch.Generator().manual_seed(123)
+    preview_loader = torch.utils.data.DataLoader(
+        train_ds, batch_size=128, shuffle=False, generator=preview_generator
+    )
+    x_batch, y_batch = next(iter(preview_loader))
+    batch_shapes = (tuple(x_batch.shape), tuple(y_batch.shape))
+
+    epoch_lines = []   # the deck's printout of its training cell
     for epoch in range(1, 4):
+        loss_sum = 0.0
         for x_batch, y_batch in train_loader:
             optimizer.zero_grad()
             loss = loss_fn(model(x_batch), y_batch)
             loss.backward()
             optimizer.step()
+            loss_sum += loss.item() * len(x_batch)
         correct = 0
         with torch.no_grad():
             for x_batch, y_batch in test_loader:
                 correct += (model(x_batch).argmax(dim=1) == y_batch).sum().item()
-        print(f"[mnist] epoch {epoch} | test acc: {correct / len(test_ds):.2%}")
+        epoch_lines.append(f"エポック {epoch} | 訓練Loss: {loss_sum / len(train_ds):.4f} "
+                           f"| テスト正答率: {correct / len(test_ds):.2%}")
+        print(f"[mnist] {epoch_lines[-1]}")
+
+    freeze_mnist_deck(model, train_ds, test_ds, test_loader, first16, first16_label, batch_shapes, epoch_lines)
 
     # full-precision predictions over the whole test set
     with torch.no_grad():
