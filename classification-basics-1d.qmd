@@ -479,10 +479,8 @@ precision = TP / (TP + FP) if (TP + FP) > 0 else 0
 recall = TP / (TP + FN) if (TP + FN) > 0 else 0
 ```
 
-- FP=`{python} FP`
-- FN=`{python} FN`
-- **Precision**: `{python} f"{precision:.1%}"` (低い)  
-- **Recall**: `{python} f"{recall:.1%}"` (高い)
+- FP が増え、FN が減る
+- **Precision** は低く、**Recall** は高い
 
 :::
 
@@ -518,10 +516,8 @@ precision = TP / (TP + FP) if (TP + FP) > 0 else 0
 recall = TP / (TP + FN) if (TP + FN) > 0 else 0
 ```
 
-- FP=`{python} FP`
-- FN=`{python} FN`
-- **Precision**: `{python} f"{precision:.1%}"` (高い)  
-- **Recall**: `{python} f"{recall:.1%}"` (低い)
+- FP が減り、FN が増える
+- **Precision** は高く、**Recall** は低い
 
 :::
 
@@ -577,7 +573,7 @@ best_threshold = thresholds[costs.index(min(costs))]
 print(f"min cost: {best_threshold}g")
 ```
 
-**このコスト関数での最適なしきい値**: 2000g（総コスト最小）
+**このコスト関数での最適なしきい値**: Sea bass 混入（FP）のコストが高いので、高めのしきい値で総コスト最小
 
 ## **Tweak** しきい値を変更 {.badge-practice}
 
@@ -596,7 +592,7 @@ print(f"min cost: {best_threshold}g")
    - 全部 Salmon と言えばタダで手に入る数字
    - そのとき Precision は 50%でAccuracy も 50%
       - ==単独の指標は当てにならない==
-- コストを入れ替えると、最適しきい値が **2000g から 1600g に反転**する 
+- コストを入れ替えると、最適しきい値が **高い側から低い側に反転**する
 :::
 
 
@@ -717,8 +713,7 @@ assert abs(auc - (-np.trapezoid(tpr, fpr))) < 1e-12 and abs(auc - pairs / 400) <
 ```
 
 ::: {.callout-note title="結果"}
-- 重さの AUC は `{python} f"{auc:.3f}"`
-   - 重なってはいるが、ランダムに判定よりはずっと良い結果
+- 重なってはいるが、ランダムに判定よりはずっと良い結果
 :::
 
 
@@ -726,7 +721,7 @@ assert abs(auc - (-np.trapezoid(tpr, fpr))) < 1e-12 and abs(auc - pairs / 400) <
 
 ::: {.callout-important title="重要ポイント"}
 1. **重さだけでは完全な分類は不可能**
-   - データの分布が重なっている（重さの [AUC](#peek-auc){.peek} は `{python} f"{auc:.3f}"`）
+   - データの分布が重なっている（重さの [AUC](#peek-auc){.peek} は完全分離の 1.0 に届かない）
    
 2. **境界線は「方針の選択」**
    - 正解/不正解ではなく、用途に応じた最適化（[optimization]{.en}）

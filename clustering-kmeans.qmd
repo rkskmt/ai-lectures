@@ -454,8 +454,8 @@ plt.show()
 
 ::: {.callout-note title="要するに"}
 - 点数の分布が**正規分布**（[normal distribution]{.en}）に近ければ、偏差値から「上位何%か」が決まる
-   - 偏差値 60（$z = 1$）は上位 15.9%、およそ 6 人に 1 人
-   - 偏差値 72（$z = 2.2$）は上位 1.4%、およそ 70 人に 1 人
+   - 偏差値 60（$z = 1$）以上は、およそ 6 人に 1 人
+   - 偏差値 72（$z = 2.2$）以上は、およそ 70 人に 1 人
 - この対応は回がちがっても変わらないので、回をまたいで比べられる
 :::
 
@@ -737,7 +737,7 @@ print(f"B の SSE: {sse(bx, by, labels_B, cx_B, cy_B):.1f}")
 ```
 
 ::: {.callout-note title="結果"}
-- B の SSE は A のおよそ 3 分の 1
+- B の SSE は A よりずっと小さい
    - 目で見たとおり B のほうがまとまっている
 :::
 
@@ -1058,13 +1058,13 @@ plt.show()
 | やりたいこと | コード |
 |--|--|
 | 初期値を1回勝負にせよ | `kmeans_best(bx, by, 5)` → `kmeans_best(bx, by, 5, n_init=1)`。何度か実行して SSE と図を見比べよ |
-| やり直しを3回にせよ | `kmeans_best(bx, by, 5)` → `kmeans_best(bx, by, 5, n_init=3)`。何度か実行し、SSE 275.79 が毎回出るか確かめよ |
+| やり直しを3回にせよ | `kmeans_best(bx, by, 5)` → `kmeans_best(bx, by, 5, n_init=3)`。何度か実行し、`n_init=10` のときと同じ SSE が毎回出るか確かめよ |
 :::
 
 ::: {.callout-tip title="チェックポイント"}
 - 1回勝負では、実行するたびに答えが変わる
-   - 山ごとに分けた答え（SSE 275.79）のときも、山を飲み込んだり割ったりした答え（SSE がずっと大きい）のときもある
-- やり直しの回数を増やすほど、SSE 275.79 に着きやすくなる
+   - 山ごとに分けた答えのときも、山を飲み込んだり割ったりした答え（SSE がずっと大きい）のときもある
+- やり直しの回数を増やすほど、山ごとに分けた答えに着きやすくなる
 :::
 
 
@@ -1280,7 +1280,7 @@ print(f"SSE: {km.inertia_:.2f}")                        # scikit-learn は SSE �
 | `sse(z_brightness, z_weights, labels, cx, cy)` | `km.inertia_` |
 
 ::: {.callout-note title="結果"}
-scikit-learn は SSE を `inertia_`（慣性）と呼ぶ。値は自作の `kmeans_best` と同じ 67.79。中で動いているのは今日書いたものと同じ手順
+scikit-learn は SSE を `inertia_`（慣性）と呼ぶ。値は自作の `kmeans_best` で $k = 2$ のときの SSE と同じ。中で動いているのは今日書いたものと同じ手順
 :::
 
 
