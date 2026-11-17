@@ -158,8 +158,7 @@ plt.scatter(salmon_brightness, salmon_weights, c="black", marker="o", s=30, alph
 plt.scatter(seabass_brightness, seabass_weights, c="red", marker="s", s=30, alpha=0.7, label="Sea bass")
 plt.xlabel("輝度"); plt.ylabel("重さ (g)")
 plt.legend(fontsize=9, loc="upper right")
-plt.title(f"max_depth=None（全120匹で学習・採点  Precision {precision_score(y, pred):.3f}  Recall {recall_score(y, pred):.3f}）",
-          fontsize=10)
+plt.title(f"max_depth=None　Precision {precision_score(y, pred):.3f}　Recall {recall_score(y, pred):.3f}", fontsize=10)
 plt.tight_layout()
 plt.show()
 ```
@@ -483,7 +482,7 @@ ax.legend(handles=[
     mpatches.Patch(facecolor=c_val,   label="検証データ"),
     mpatches.Patch(facecolor=c_train, label="学習に使う"),
 ], loc="lower right", fontsize=10)
-ax.set_title("訓練データ96匹の 5-fold 交差検証（5回検証して平均を取る）", fontsize=11)
+ax.set_title("訓練データ96匹の 5-fold 交差検証", fontsize=11)
 plt.tight_layout()
 plt.show()
 ```

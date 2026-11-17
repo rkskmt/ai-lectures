@@ -125,7 +125,7 @@ for i, (col, lbl) in enumerate(zip(["#e74c3c", "#f39c12"],
 
 ax.set_xlabel("体長（標準化）")
 ax.set_ylabel("重さ（標準化）")
-ax.set_title("PCA：分散が最大の方向に軸を取る")
+ax.set_title("PCA の軸")
 ax.set_aspect("equal")
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
@@ -163,7 +163,7 @@ for i, (x, y0) in enumerate(zip(xs_, ys_)):
             lw=2.2 if bold else 0.8, alpha=1.0 if bold else 0.45, zorder=1)
 ax.plot(xr_, a_ls * xr_ + b_ls, color="black", lw=2, zorder=3)
 ax.scatter(xs_, ys_, s=28, c="#5dade2", edgecolors="gray", lw=0.4, zorder=2)
-ax.set_title("最小二乗法（回帰）：縦の足の二乗和を最小化", fontsize=11)
+ax.set_title("最小二乗法（回帰）", fontsize=11)
 ax.set_xlabel("体長（標準化）"); ax.set_ylabel("重さ（標準化）")
 
 ax = axes[1]
@@ -173,7 +173,7 @@ for i, (p, q) in enumerate(zip(X_lw_sc, proj)):
             lw=2.2 if bold else 0.8, alpha=1.0 if bold else 0.45, zorder=1)
 ax.plot(xr_, (u1[1] / u1[0]) * xr_, color="black", lw=2, zorder=3)
 ax.scatter(xs_, ys_, s=28, c="#5dade2", edgecolors="gray", lw=0.4, zorder=2)
-ax.set_title("PCA（PC1）：垂直の足の二乗和を最小化", fontsize=11)
+ax.set_title("PCA（PC1）", fontsize=11)
 ax.set_xlabel("体長（標準化）"); ax.set_ylabel("重さ（標準化）")
 
 for ax in axes:
@@ -273,7 +273,7 @@ ax.annotate("", xy=A_demo @ e_x, xytext=(0, 0),
             arrowprops={"arrowstyle": "->", "color": "#34495e", "lw": 2.2})
 ax.text(1.05, -0.18, "ふつうの矢印", fontsize=9.5, color="#777")
 ax.text(1.55, 1.18, "回って伸びた", fontsize=9.5, color="#34495e")
-ax.set_title("行列 A はベクトルを「回して伸ばす」変換", fontsize=11.5)
+ax.set_title("行列 A による変換", fontsize=11.5)
 ax.legend(fontsize=9, loc="lower right")
 
 # right: flow field v -> Av
@@ -347,7 +347,7 @@ ax.imshow(rgba, extent=extent, transform=tr, zorder=0)
 arrow(ax, eg1 * 0.9 * 3, "#e74c3c", 3)
 arrow(ax, eg2 * 0.9 * 0.5, "#f39c12", 3)
 arrow(ax, A_demo @ np.array([0.9, 0.0]), "#34495e", 2.2)
-ax.set_title("変換後：赤と橙だけ向きが変わらない", fontsize=12)
+ax.set_title("A で変換後", fontsize=12)
 
 for ax in axes:
     ax.set_aspect("equal")

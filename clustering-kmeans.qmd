@@ -118,7 +118,7 @@ plt.show()
 :::
 
 
-## クラスタリング（[clustering]{.en}）とは
+## クラスタリング（[Clustering]{.en}）とは
 
 - データを**似たもの同士のグループ（クラスタ、[cluster]{.en}）**にまとめる
 - 正解ラベルがなくても、**データの分布から自然なグループ**を見つける
@@ -481,7 +481,7 @@ print(z_brightness[:3].round(2), z_weights[:3].round(2))   # 先頭3個。どち
 fig, ax = plt.subplots(figsize=(5.0, 3.6))
 ax.scatter(z_brightness, z_weights, c="gray", s=50, alpha=0.7, edgecolors="dimgray")
 ax.set_xlabel("輝度（標準化）"); ax.set_ylabel("重さ（標準化）")
-ax.set_title("標準化後：横軸と縦軸が同じ尺度")
+ax.set_title("標準化後")
 ax.set_aspect("equal"); ax.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.show()
@@ -889,7 +889,7 @@ for b, v in zip(bars, scores):
     if np.isclose(v, min(scores)):
         b.set_color("#27ae60")
 ax.axhline(min(scores), color="#27ae60", ls="--", lw=1)
-ax.set_title("5つの山データ：初期値を変えた10回の SSE（緑＝最小。この答えを採る）", fontsize=10)
+ax.set_title("初期値を変えた10回の SSE", fontsize=10)
 ax.set_xticks(range(1, 11))
 ax.set_xlabel("何回目"); ax.set_ylabel("SSE")
 plt.tight_layout()
@@ -1068,7 +1068,7 @@ plt.show()
 :::
 
 
-## ハイパパラメータ k の決め方：エルボー法（[elbow method]{.en}）
+## ハイパパラメータ k の決め方：エルボー法（[Elbow Method]{.en}）
 
 - 標準化した80個の点（`z_brightness`, `z_weights`）では、$k = 2$ と決めて進めた
 - $k$ もデータから決めたい
@@ -1131,8 +1131,8 @@ X_moon = np.vstack([np.column_stack([np.cos(t), np.sin(t)]),
 # (tools/measure_clustering_kmeans.py), so the figure is the same on every render.
 fig, axes = plt.subplots(1, 2, figsize=(9, 3.5))
 for ax, (X_ex, init, title) in zip(axes, [
-    (X_circ, [0, 45], "同心円（k-means は苦手）"),
-    (X_moon, [0, 1], "三日月形（k-means は苦手）")
+    (X_circ, [0, 45], "同心円"),
+    (X_moon, [0, 1], "三日月形")
 ]):
     xs, ys = X_ex[:, 0], X_ex[:, 1]
     labs, _, _ = kmeans(xs, ys, xs[init], ys[init])
@@ -1142,7 +1142,6 @@ for ax, (X_ex, init, title) in zip(axes, [
     ax.set_aspect("equal")
     ax.axis("off")
 
-plt.suptitle("k-means は球状クラスタを仮定している", fontsize=11)
 plt.tight_layout()
 plt.show()
 ```
