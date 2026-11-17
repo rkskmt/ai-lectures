@@ -14,7 +14,8 @@ subtitle: "決定木と k-NN を、自分で見つけたデータで比べる"
    - 散布図はクラスで色分けすること
 3. 決定木で分類し、ROC 曲線と AUC を表示
 4. k-NN で分類し、ROC 曲線と AUC を表示（特徴量は標準化し、近い k 点は KD-tree で探索）
-5. 決定木と k-NN のどちらが自分のデータに合うかを説明
+5. 決定木と k-NN を [5-fold 交差検証](classification-evaluation.qmd#peek-cv){.peek}し、学習に使っていない点のスコアで ROC 曲線と AUC を表示（3・4 の ROC 曲線と同じグラフに重ねる）
+6. 決定木と k-NN のどちらが自分のデータに合うかを、5 の結果から説明
 
 
 ## ルール {#peek-report-rules}
@@ -46,8 +47,9 @@ subtitle: "決定木と k-NN を、自分で見つけたデータで比べる"
 
 ## 使うツール
 
+::: {.table-style widths="30%,70%" head-align="center"}
 | やること | 使うもの |
-|---|---|
+|---------------|---|
 | データを配列にする | [魚のデータ](knn-curse.qmd#peek-knn-fish){.peek}と同じ形の `X`（1 行が 1 個の [特徴量 1, 特徴量 2, …]）と `y`（ラベル） |
 | 特徴量ごとの ROC 曲線と AUC | [ROC 曲線のコード](classification-basics-1d.qmd#peek-roc-code){.peek}と [AUC](classification-basics-1d.qmd#peek-auc){.peek}（閾値を当てる値は特徴量の値） |
 | 分類器の ROC 曲線と AUC | [`roc_points` と `auc_of`](classification-2d-boundaries.qmd#peek-tree-roc){.peek}（閾値を当てる値はスコア） |
@@ -56,13 +58,17 @@ subtitle: "決定木と k-NN を、自分で見つけたデータで比べる"
 | 標準化 | [平均を引いて、標準偏差で割る](clustering-kmeans.qmd#peek-scale){.peek} |
 | KD-tree を使った k-NN | [`build_kdtree`](knn-curse.qmd#peek-kd-build){.peek} と [`predict_knn_kdtree`](knn-curse.qmd#peek-kd-knn){.peek} |
 | k-NN のスコア | [`score_knn`](knn-curse.qmd#peek-knn-score){.peek}：近い k 点のうち、ラベル 1 の割合（KD-tree で探した k 点に使う） |
+| 交差検証のスコア | [5-fold 交差検証](classification-evaluation.qmd#peek-cv){.peek}と同じ番号でデータを 5 つのグループに分け、グループ i の点には、グループ i を除いた点だけで学習した決定木（k-NN）のスコアを付ける（5 回分のスコアを集めて ROC 曲線を 1 本描く） |
 
+:::
 
 ## 提出物
 
-- 以下をPDFにして提出（スライド形式でもよい）
+- 以下を１つのPDFにして提出（スライド形式でもよい）
    - そのデータの説明と選定理由
    - データ（`X` と `y` の配列）と、出どころの URL、または測っている様子の写真
    - コード
    - 出力
    - 考察
+- 提出ファイル名
+   - 学生番号-名前-人工知能課題（分類問題）.pdf
