@@ -298,6 +298,8 @@ for name, parameter in model.named_parameters():
 
 ```{python}
 #| echo: true
+#| eval: false
+#| label: frz-linear
 import torch
 import torch.nn as nn
 
@@ -309,6 +311,14 @@ print(lin.bias)                # b（3個）
 x = torch.tensor([[1.0, 2.0]])
 print(lin(x))                  # Linear に通す
 print(x @ lin.weight.T + lin.bias)   # 自分で計算しても、同じ
+```
+
+```{python}
+#| echo: false
+# frozen display: output of the cell above, saved by tools/freeze_cells.py
+import json
+frozen = json.load(open("frozen/pytorch-intro.json", encoding="utf-8"))
+print(frozen["frz-linear"], end="")
 ```
 
 - 中身は本当に**ただの線形変換** — 重みの持ち方が転置（`W.T`）なことだけ流儀が違う
@@ -383,6 +393,8 @@ optimizer = torch.optim.SGD(model.parameters(), lr=0.5)
 
 ```{python}
 #| echo: true
+#| eval: false
+#| label: frz-train
 from sklearn.datasets import make_moons
 
 X, y = make_moons(n_samples=200, noise=0.1, random_state=42)
@@ -407,6 +419,12 @@ for i in range(1, 4001):
             loss_log = loss_fn(logits_log, y_t)
             acc = ((torch.sigmoid(logits_log) >= 0.5).float() == y_t).float().mean()
         print(f"更新 {i:5d}回 | Loss: {loss_log.item():.4f} | 正答率: {acc.item():.1%}")
+```
+
+```{python}
+#| echo: false
+# frozen display: output of the cell above, saved by tools/freeze_cells.py
+print(frozen["frz-train"], end="")
 ```
 
 - NumPy 版と同じく **100%**。`zero_grad → backward → step` の3拍子はどんなネットでも同じ
@@ -465,6 +483,8 @@ print(theta.grad)    # 2θ = 3.2 のはず……が？
 
 ```{python}
 #| echo: true
+#| eval: false
+#| label: frz-boundary
 #| code-fold: true
 #| code-summary: "描画コード"
 import matplotlib.pyplot as plt
@@ -488,6 +508,8 @@ plt.xticks([]); plt.yticks([])
 plt.tight_layout()
 plt.show()
 ```
+
+![](frozen/pytorch-intro-frz-boundary-1.png){fig-align="center"}
 
 - NumPy 版で自分で書いた微分処理を、PyTorchでは `loss.backward()` に任せられる
 - 浮いた労力は、**モデルとデータを考えること**に使う

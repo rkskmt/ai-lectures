@@ -602,6 +602,8 @@ epochは更新回数そのものではない。1 epochに何回更新するか�
 
 ```{python}
 #| echo: true
+#| eval: false
+#| label: frz-train
 import numpy as np
 from sklearn.datasets import make_moons
 
@@ -666,6 +668,13 @@ print(f"Loss: {initial_loss:.4f} -> {final_loss:.4f}")
 print(f"Accuracy: {accuracy:.1%}")
 ```
 
+```{python}
+#| echo: false
+# frozen display: output of the cell above, saved by tools/freeze_cells.py
+import json
+print(json.load(open("frozen/nn-backprop.json", encoding="utf-8"))["frz-train"], end="")
+```
+
 - 多層化の回で書いた `forward` と、この回で書いた `backward` を同じループへ接続した
 - `loss` の値は学習前後の確認用。更新式へ入るのは `dW1, db1, dW2, db2`
 - `W1, W2` は[前回と同じ理由でランダム初期化](nn-multilayer.qmd#peek-random-initialization){.peek}する
@@ -676,8 +685,8 @@ print(f"Accuracy: {accuracy:.1%}")
 
 ```{python}
 #| echo: false
-#| fig-align: center
-#| classes: fig-medium
+#| eval: false
+#| label: frz-boundary
 import numpy as np
 import matplotlib.pyplot as plt
 import japanize_matplotlib
@@ -706,6 +715,10 @@ plt.yticks([])
 plt.tight_layout()
 plt.show()
 ```
+
+::: {.fig-medium}
+![](frozen/nn-backprop-frz-boundary-1.png){fig-align="center"}
+:::
 
 ::: {.callout-note title="ここまでで分かること"}
 - 隠れ層とReLUを持つNNを、NumPyの `forward` と `backward` で学習できた
