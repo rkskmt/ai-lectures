@@ -141,8 +141,7 @@ ax.contour(g0, g1, region, levels=[0.5], colors="#555555", linewidths=1.5)
 draw_points(ax, X_train, y_train, alpha=0.6)
 ax.scatter(*x_new, marker="*", s=420, c="#27ae60", edgecolors="black", zorder=5, label="新しい点 ★")
 square_axes(ax)
-ax.set_title(f"決定木（深さ 3）\n★ は {tree_clf.predict([x_new])[0]} の領域にある → ラベル {tree_clf.predict([x_new])[0]}",
-             fontsize=10.5)
+ax.set_title("決定木（深さ 3）", fontsize=10.5)
 
 ax = axes[1]
 dist = np.sqrt(((X_train - x_new) ** 2).sum(axis=1))
@@ -153,9 +152,7 @@ for j in near:
 ax.scatter(X_train[near, 0], X_train[near, 1], s=230, facecolors="none", edgecolors="#27ae60", lw=2.2, zorder=4)
 ax.scatter(*x_new, marker="*", s=420, c="#27ae60", edgecolors="black", zorder=5)
 square_axes(ax)
-votes = y_train[near]
-ax.set_title(f"境界なし：★ に近い 3 点の投票\nラベル 1 が {votes.sum()} 票、0 が {3 - votes.sum()} 票 → ラベル {int(votes.sum() > 1.5)}",
-             fontsize=10.5)
+ax.set_title("★ に近い 3 点の投票", fontsize=10.5)
 handles, labels = axes[0].get_legend_handles_labels()
 fig.legend(handles, labels, loc="lower center", ncol=3, fontsize=9.5)
 plt.tight_layout(rect=[0, 0.07, 1, 1])
@@ -169,10 +166,10 @@ plt.show()
 :::
 
 
-## 近い k 個のデータの投票で決める（k-nearest neighbors） {#peek-knn-code}
+## 近い k 個のデータの投票で決める（[k-Nearest Neighbors]{.en}） {#peek-knn-code}
 
 ::: {.takeaway .dark}
-**k-nearest neighbors（k-NN / k 近傍法）のアルゴリズム**
+**k-Nearest Neighbors（k-NN / k 近傍法）のアルゴリズム**
 :::
 
 1. 新しい点 $x$ から、訓練データの全部の点までの距離を測る
@@ -182,7 +179,10 @@ plt.show()
 ```{python}
 #| echo: true
 def predict_knn(X_train, y_train, x, k):
-    dist    = np.sqrt(((X_train - x) ** 2).sum(axis=1))  # 1. x から、訓練データの全部の点までの距離
+    dist = []
+    for p in X_train:                                    # 1. 訓練データの点を 1 点ずつ、全部の点について
+        dist.append(np.sqrt(((p - x) ** 2).sum()))       #    x からの距離を測る
+    dist    = np.array(dist)
     nearest = np.argsort(dist)[:k]                       # 2. 距離が小さい順に並べた番号の、先頭 k 個
     votes   = y_train[nearest]                           #    k 個のラベル（0 か 1）
     return int(votes.sum() > k / 2)                      # 3. ラベル 1 が半分より多ければ 1、そうでなければ 0
@@ -216,6 +216,33 @@ print(f"Accuracy: {np.mean(pred == y_test):.3f}")
 - テストデータの 100 点のうち 13 点は、ラベルを逆にした点
    - 規則（座標の合計 > 1）そのもので答えても、当たるのは 87 点
 :::
+
+
+## （参考）NNは画像の拡大でも使うことがある {#peek-knn-image}
+
+- 超高速だがギザギザ（エイリアシング）になる。
+
+```{python}
+#| echo: false
+#| fig-align: center
+# Hokusai, Under the Wave off Kanagawa (The Met, JP1847, public domain; Open Access image DP130155 resized to 1200 px wide).
+# The red box (40 x 30 pixels, spray at the edge of the big wave) is enlarged 12 times by nearest neighbour:
+# every original pixel becomes a 12 x 12 square of its colour.
+wave = plt.imread("imgs/hokusai_great_wave.jpg")
+x0, y0, w, h = 488, 259, 40, 30
+big = wave[y0:y0 + h, x0:x0 + w].repeat(12, axis=0).repeat(12, axis=1)
+fig, axes = plt.subplots(1, 2, figsize=(11, 4.2), gridspec_kw={"width_ratios": [wave.shape[1] / wave.shape[0], w / h]})
+axes[0].imshow(wave)
+axes[0].add_patch(plt.Rectangle((x0 - 0.5, y0 - 0.5), w, h, fill=False, ec="#e74c3c", lw=2))
+axes[0].set_title("元画像", fontsize=10.5)
+axes[1].imshow(big)
+axes[1].set_title("NN で元画像の赤枠を 12 倍拡大", fontsize=10.5)
+for a in axes:
+    a.set_xticks([])
+    a.set_yticks([])
+plt.tight_layout()
+plt.show()
+```
 
 
 ## k で決定境界が変わる
@@ -331,7 +358,10 @@ plt.show()
 ```{python}
 #| echo: true
 def score_knn(X_train, y_train, x, k):
-    dist    = np.sqrt(((X_train - x) ** 2).sum(axis=1))  # x から、訓練データの全部の点までの距離
+    dist = []
+    for p in X_train:                                    # 訓練データの点を 1 点ずつ、全部の点について
+        dist.append(np.sqrt(((p - x) ** 2).sum()))       # x からの距離を測る
+    dist    = np.array(dist)
     nearest = np.argsort(dist)[:k]                       # 距離が小さい順に並べた番号の、先頭 k 個
     return np.mean(y_train[nearest])                     # k 個のうち、ラベル 1 の割合
 
@@ -414,24 +444,6 @@ plt.show()
 :::
 
 
-## 特徴量の数を増やすのが最強か？
-
-- 2 つの特徴量で、k-NN はテストデータの 100 点中 85 点で当たった
-- 特徴量を増やせば、分類の手がかりが増える
-- ならば**特徴量を増やし続ければ**、もっと当たる？
-
-::: {.callout-important title="質問"}
-特徴量（次元）を増やし続けると何が起きるか？
-:::
-
-
-## {background-color="white" .center .break-slide}
-
-::: {.break-title}
-次元の呪い
-:::
-
-
 ## もう一次元特徴量があったとしよう
 
 - 2 次元のデータでは、点 1 つが 2 つの数 [特徴量 1, 特徴量 2] だった
@@ -497,7 +509,583 @@ fig3d.write_html("iframes/knn_points_3d.html", include_plotlyjs="directory")
 :::
 
 ::: {.caption-note .center}
-ドラッグで回せる（灰色の平面が、座標の合計 = 1.5 の境目）
+ドラッグで回せる
+:::
+
+
+## {background-color="white" .center .break-slide}
+
+::: {.break-title}
+近い点を速く探す
+:::
+
+
+## k-NN の弱点：毎回、全部の点までの距離を測る
+
+- k-NN は、予測のたびに、訓練データの全部の点までの距離を測る（**全探索**, [brute-force search]{.en}）
+   - 訓練データが 10 万点なら、テストデータ 1 点の予測に距離の計算が 10 万回、1,000 点で 1 億回
+- 投票に使うのは近い k 個だけなので、遠くの点まで測るのは、ほとんどが無駄
+
+| | 学習でやること | 予測でやること |
+|--|-----|------|
+| 決定木 | データから境界を作る | 境界のどちら側かを見る |
+| k-NN | 訓練データを取っておくだけ | 全部の点までの距離を測り、近い k 個の投票で決める |
+
+::: {.callout-important title="質問"}
+遠くの点を測らずに、近い点だけを見つけるにはどうすればよい？
+:::
+
+
+## 空間を領域に分けておけば、近くの領域だけ測ればよい（Octree）
+
+::: {.takeaway .dark}
+**Octree（八分木）**
+:::
+
+- 立方体を、各軸の中点（端と端のちょうど真ん中の位置）で切って、8 つの領域に分ける
+- 各軸を中点で切っているので、**二分探索**を 3 つの軸でやるだけで、★ の入っている領域にたどり着く
+- いちばん近い点は、その領域の中の点から探す
+   - 全部の点を測らずにすむ（全探索をしなくてよい）
+- その領域の中になければ、1 つ上の領域（分ける前の領域）に戻って探す
+- （参考）点の多い領域は、同じように中点で切って、さらに 8 つに分ける
+
+```{python}
+#| echo: false
+# Octree of the 3-D points X3 (slide もう一次元特徴量があったとしよう); boxes with more than 15 points are split again.
+def octree_leaves(P, idx, lo, hi, max_points, leaves):
+    if len(idx) <= max_points:
+        leaves.append((lo, hi, idx))
+        return
+    mid = (lo + hi) / 2
+    for corner in range(8):
+        upper = np.array([(corner >> a) & 1 for a in range(3)], dtype=bool)
+        clo, chi = np.where(upper, mid, lo), np.where(upper, hi, mid)
+        inside = np.all((P[idx] >= clo) & ((P[idx] < chi) | (chi == 1.0)), axis=1)
+        octree_leaves(P, idx[inside], clo, chi, max_points, leaves)
+
+
+def box_edges(lo, hi):
+    """The 12 edges of the box lo..hi as one line trace (None separates the edges)."""
+    xs, ys, zs = [], [], []
+    for a in range(3):
+        b, c = [k for k in range(3) if k != a]
+        for vb in (lo[b], hi[b]):
+            for vc in (lo[c], hi[c]):
+                p, q = np.zeros(3), np.zeros(3)
+                p[a], q[a] = lo[a], hi[a]
+                p[b] = q[b] = vb
+                p[c] = q[c] = vc
+                xs += [p[0], q[0], None]
+                ys += [p[1], q[1], None]
+                zs += [p[2], q[2], None]
+    return xs, ys, zs
+
+
+star3 = np.array([0.65, 0.4, 0.6])                  # inside a box that was split twice
+leaves3 = []
+octree_leaves(X3, np.arange(len(X3)), np.zeros(3), np.ones(3), 15, leaves3)
+ex, ey, ez = [], [], []
+for lo, hi, idx in leaves3:
+    xs, ys, zs = box_edges(lo, hi)
+    ex += xs
+    ey += ys
+    ez += zs
+home_lo, home_hi = [(lo, hi) for lo, hi, idx in leaves3 if np.all((star3 >= lo) & (star3 < hi))][0]
+
+fig_oct = go.Figure()
+fig_oct.add_trace(go.Scatter3d(x=ex, y=ey, z=ez, mode="lines", line=dict(color="#34495e", width=2),
+                               name="領域の境目", hoverinfo="skip"))
+fig_oct.add_trace(go.Mesh3d(x=[home_lo[0], home_hi[0], home_hi[0], home_lo[0]] * 2,
+                            y=[home_lo[1], home_lo[1], home_hi[1], home_hi[1]] * 2,
+                            z=[home_lo[2]] * 4 + [home_hi[2]] * 4,
+                            alphahull=0, color="#f1c40f", opacity=0.3, name="★ の入っている領域",
+                            showlegend=True, hoverinfo="skip"))
+fig_oct.add_trace(go.Scatter3d(x=X3[:, 0], y=X3[:, 1], z=X3[:, 2], mode="markers",
+                               marker=dict(size=3.5, color="#7f8c8d"), name="点"))
+fig_oct.add_trace(go.Scatter3d(x=[star3[0]], y=[star3[1]], z=[star3[2]], mode="markers",
+                               marker=dict(size=7, color="#27ae60", symbol="diamond"), name="★（新しい点）"))
+fig_oct.update_layout(
+    scene=dict(xaxis=dict(title="特徴量 1", range=[0, 1]), yaxis=dict(title="特徴量 2", range=[0, 1]),
+               zaxis=dict(title="特徴量 3", range=[0, 1]), aspectmode="cube"),
+    margin=dict(l=0, r=0, t=0, b=0), legend=dict(x=0.02, y=0.98), width=880, height=520)
+fig_oct.write_html("iframes/knn_octree_3d.html", include_plotlyjs="directory")
+```
+
+::: {.plotly-iframe src="iframes/knn_octree_3d.html" height="530"}
+:::
+
+::: {.caption-note .center}
+ドラッグで回せる
+:::
+
+
+## Octree の弱点：領域の中の点の数がそろわない
+
+- 点がどこにあるかに関係なく、中点で切る
+- そのため、領域によって中の点の数がばらばらになる（前のスライドの図では 1 点から 14 点まで）
+   - 点の多い領域：★ がそこに入ると、中の点を全部測ることになる
+   - 点の少ない領域：近い点が領域の中になく、まわりの領域まで（1 つ上の領域に戻って）調べることになる
+
+```{python}
+#| echo: false
+#| fig-align: center
+# Points per box of the octree on the previous slide (leaves3), smallest first.
+oct_sizes = sorted(len(idx) for lo, hi, idx in leaves3)
+plt.figure(figsize=(7, 3.0))
+plt.bar(range(1, len(oct_sizes) + 1), oct_sizes, color="#7f8c8d", width=0.7)
+plt.xlabel("領域（中の点が少ない順）")
+plt.ylabel("領域の中の点の数")
+plt.title("Octree の領域ごとの点の数", fontsize=10.5)
+plt.xticks([])
+plt.yticks(range(0, oct_sizes[-1] + 1, 2))
+plt.grid(True, axis="y", alpha=0.4)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-important title="質問"}
+領域の中の点の数をそろえるには、どこで切ればよい？
+:::
+
+
+## 点の数が均等になるように分割（KD-tree）
+
+::: {.takeaway .dark}
+**KD-tree（[k-Dimensional Tree]{.en}）の作り方**
+:::
+
+1. 1 つの軸で点を小さい順に数え、点の数が半々になるところで 2 つに分ける
+   - 点が偶数個の場合：数えて半々になる 2 点の中点で切る
+   - 点が奇数個の場合：中央値となる点のすぐ左で切る
+2. 分けた両側それぞれで、次の軸を使って 1 をくり返す（特徴量 1 → 特徴量 2 → 特徴量 1 → …）
+3. 領域の中の点が 5 点以下になったら、その領域は分けずに止める
+
+- Octree は領域の中点で切るが、KD-tree は点を数えて切るので、両側の点の数がそろう
+   - 図の領域は、どれも 3〜4 点
+- [決定木](classification-2d-boundaries.qmd#peek-overfit-boundary){.peek}と同じく、軸に沿った線で空間を分ける木
+- 図は 2 次元の訓練データ（100 点）で描く（作り方は何次元でも同じ）
+
+```{python}
+#| echo: false
+#| fig-align: center
+def kd_build(X, idx, depth, leaf_size):
+    # Same algorithm as the student's build_kdtree on the next slide.
+    if len(idx) <= leaf_size:
+        return {"points": idx}
+    axis = depth % X.shape[1]
+    idx = idx[np.argsort(X[idx, axis])]
+    mid = len(idx) // 2
+    if len(idx) % 2 == 0:
+        value = (X[idx[mid - 1], axis] + X[idx[mid], axis]) / 2
+    else:
+        value = X[idx[mid], axis]
+    return {"axis": axis, "value": value,
+            "left": kd_build(X, idx[:mid], depth + 1, leaf_size),
+            "right": kd_build(X, idx[mid:], depth + 1, leaf_size)}
+
+
+def draw_splits(ax, node, lo, hi, depth):
+    """Draw the split lines of the subtree inside the box lo..hi."""
+    if "points" in node:
+        return
+    a, v = node["axis"], node["value"]
+    lw = max(3.0 - 0.5 * depth, 0.7)
+    if a == 0:
+        ax.plot([v, v], [lo[1], hi[1]], color="#34495e", lw=lw, zorder=2)
+    else:
+        ax.plot([lo[0], hi[0]], [v, v], color="#34495e", lw=lw, zorder=2)
+    hi_left, lo_right = hi.copy(), lo.copy()
+    hi_left[a], lo_right[a] = v, v
+    draw_splits(ax, node["left"], lo, hi_left, depth + 1)
+    draw_splits(ax, node["right"], lo_right, hi, depth + 1)
+
+
+kd_fig_tree = kd_build(X_train, np.arange(len(X_train)), 0, 5)
+fig, ax = plt.subplots(figsize=(4.8, 4.8))
+draw_splits(ax, kd_fig_tree, np.array([0.0, 0.0]), np.array([1.0, 1.0]), 0)
+ax.scatter(X_train[:, 0], X_train[:, 1], s=22, c="#7f8c8d", zorder=3)
+square_axes(ax)
+ax.set_title("KD-tree で訓練データを分割（太い線ほど先）", fontsize=10.5)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-note title="ただし"}
+k-d の k は特徴量の数（次元）で、k-NN の k とは別
+:::
+
+
+## KD-tree を作る {#peek-kd-build}
+
+- 関数の中で、同じ関数をもう一度呼ぶ（**再帰**, [recursion]{.en}）
+   - 分けた片側を、同じ関数でさらに分ける
+- 木の各部分は辞書で表す
+   - 分ける部分：分ける軸 `axis`、分ける値 `value`、小さい側 `left`、大きい側 `right`
+   - 分けずに止めた領域（**葉**, [leaf]{.en}）：中の点の番号 `points`
+
+```{python}
+#| echo: true
+def build_kdtree(X, idx, depth, leaf_size):
+    if len(idx) <= leaf_size:                        # 点が leaf_size 個以下なら、分けずに止める（葉）
+        return {"points": idx}
+    axis = depth % X.shape[1]                        # 分ける軸：深さ 0 は特徴量 1、深さ 1 は特徴量 2、…
+    idx  = idx[np.argsort(X[idx, axis])]             # その軸の値が小さい順に、点の番号を並べる
+    mid  = len(idx) // 2
+    if len(idx) % 2 == 0:                            # 偶数個：数えて半々になる 2 点の中点
+        value = (X[idx[mid - 1], axis] + X[idx[mid], axis]) / 2
+    else:                                            # 奇数個：中央値となる点（この点は大きい側に入る）
+        value = X[idx[mid], axis]
+    return {"axis":  axis,
+            "value": value,                          # 分ける値
+            "left":  build_kdtree(X, idx[:mid], depth + 1, leaf_size),   # 小さい側を、同じ関数でさらに分ける
+            "right": build_kdtree(X, idx[mid:], depth + 1, leaf_size)}   # 大きい側も同じ
+
+tree = build_kdtree(X_train, np.arange(len(X_train)), 0, 5)
+```
+
+```{python}
+#| echo: false
+# KD-tree of the 3-D points X3 (the points of the octree figure), built by the student's build_kdtree.
+def kd_boxes(node, lo, hi, boxes):
+    """Collect the box lo..hi and the points of every leaf of the subtree."""
+    if "points" in node:
+        boxes.append((lo, hi, node["points"]))
+        return
+    hi_left, lo_right = hi.copy(), lo.copy()
+    hi_left[node["axis"]], lo_right[node["axis"]] = node["value"], node["value"]
+    kd_boxes(node["left"], lo, hi_left, boxes)
+    kd_boxes(node["right"], lo_right, hi, boxes)
+
+
+kd_boxes3 = []
+kd_boxes(build_kdtree(X3, np.arange(len(X3)), 0, 5), np.zeros(3), np.ones(3), kd_boxes3)
+kd_sizes3 = sorted(len(idx) for lo, hi, idx in kd_boxes3)
+assert (len(kd_sizes3), kd_sizes3[0], kd_sizes3[-1]) == (32, 3, 4)   # 32 leaves of 3-4 points, like the 2-D tree (doc/measured-log.md)
+ex, ey, ez = [], [], []
+for lo, hi, idx in kd_boxes3:
+    xs, ys, zs = box_edges(lo, hi)
+    ex += xs
+    ey += ys
+    ez += zs
+
+fig_kd3 = go.Figure()
+fig_kd3.add_trace(go.Scatter3d(x=ex, y=ey, z=ez, mode="lines", line=dict(color="#34495e", width=2),
+                               name="領域の境目", hoverinfo="skip"))
+fig_kd3.add_trace(go.Scatter3d(x=X3[:, 0], y=X3[:, 1], z=X3[:, 2], mode="markers",
+                               marker=dict(size=3.5, color="#7f8c8d"), name="点"))
+fig_kd3.update_layout(
+    scene=dict(xaxis=dict(title="特徴量 1", range=[0, 1]), yaxis=dict(title="特徴量 2", range=[0, 1]),
+               zaxis=dict(title="特徴量 3", range=[0, 1]), aspectmode="cube"),
+    margin=dict(l=0, r=0, t=0, b=0), legend=dict(x=0.02, y=0.98), width=880, height=520)
+fig_kd3.write_html("iframes/knn_kdtree_3d.html", include_plotlyjs="directory")
+```
+
+::: {.plotly-iframe src="iframes/knn_kdtree_3d.html" height="530"}
+:::
+
+::: {.caption-note .center}
+`build_kdtree` で 3 次元の点を分割。ドラッグで回せる
+:::
+
+
+## 近い領域から調べて、遠い側はスキップする {#peek-kd-search}
+
+::: {.takeaway .dark}
+**KD-tree でいちばん近い点を探すアルゴリズム**
+:::
+
+1. 最初の分け目（図のいちばん太い線）から、★ の入っている領域まで下りる
+   - 分け目ごとに、その軸での ★ の座標と分ける値を比べ、★ のある側へ進む
+   - 軸は、木を作ったときと同じく、特徴量 1 → 特徴量 2 → 特徴量 1 → … と交互
+2. ★ の入っている領域の中の点と距離を測り、いちばん近い距離を r とする
+3. 下りてきた分け目を逆にたどって戻り、分け目ごとに反対側を調べるか決める
+   - 分け目までの距離が r より近い：反対側に、もっと近い点があるかもしれないので調べる（もっと近い点が見つかれば、r を更新する）
+   - 分け目までの距離が r 以上：反対側の点は全部 r より遠いので、反対側は調べずにスキップする
+
+```{python}
+#| echo: false
+#| fig-align: center
+def kd_trace(node, x, best, lo, hi, visited):
+    # Same search as the student's search_kdtree on the next slide, also recording the boxes it measures.
+    if "points" in node:
+        visited.append((lo, hi))
+        dist = np.sqrt(((X_train[node["points"]] - x) ** 2).sum(axis=1))
+        best["count"] += len(dist)
+        j = dist.argmin()
+        if dist[j] < best["dist"]:
+            best["index"], best["dist"] = node["points"][j], dist[j]
+        return
+    a, v = node["axis"], node["value"]
+    hi_left, lo_right = hi.copy(), lo.copy()
+    hi_left[a], lo_right[a] = v, v
+    if x[a] - v < 0:
+        sides = [(node["left"], lo, hi_left), (node["right"], lo_right, hi)]
+    else:
+        sides = [(node["right"], lo_right, hi), (node["left"], lo, hi_left)]
+    kd_trace(sides[0][0], x, best, sides[0][1], sides[0][2], visited)
+    if abs(x[a] - v) < best["dist"]:
+        kd_trace(sides[1][0], x, best, sides[1][1], sides[1][2], visited)
+
+
+best_fig = {"index": -1, "dist": np.inf, "count": 0}
+visited = []
+kd_trace(kd_fig_tree, x_new, best_fig, np.array([0.0, 0.0]), np.array([1.0, 1.0]), visited)
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 4.9))
+for ax, (lo_v, hi_v) in zip(axes, [((0, 0), (1, 1)), (x_new - 0.17, x_new + 0.17)]):
+    for lo, hi in visited:
+        ax.add_patch(plt.Rectangle(lo, hi[0] - lo[0], hi[1] - lo[1], fc="#fff3b0", ec="none", zorder=1))
+    draw_splits(ax, kd_fig_tree, np.array([0.0, 0.0]), np.array([1.0, 1.0]), 0)
+    ax.scatter(X_train[:, 0], X_train[:, 1], s=22, c="#7f8c8d", zorder=3)
+    ax.scatter(*X_train[best_fig["index"]], s=200, facecolors="none", edgecolors="#e74c3c", lw=2.2, zorder=4)
+    ax.add_patch(plt.Circle(x_new, best_fig["dist"], fill=False, ls="--", ec="#e74c3c", lw=1.5, zorder=4))
+    ax.scatter(*x_new, marker="*", s=380, c="#27ae60", edgecolors="black", zorder=5)
+    square_axes(ax)
+    ax.set_xlim(lo_v[0], hi_v[0])
+    ax.set_ylim(lo_v[1], hi_v[1])
+axes[0].set_title("距離を測った領域（黄色）", fontsize=10.5)
+axes[1].set_title("左の ★ のまわりを拡大（破線：半径 r の円）", fontsize=10.5)
+plt.tight_layout()
+plt.show()
+```
+
+★ = (0.7, 0.6) の下り方（手順 1）：
+
+| | 分け目 | ★ の座標 | 進む側 |
+|---|---|---|---|
+| 1 回目 | 特徴量 1 = 0.496 | 0.7 | 大きい側 |
+| 2 回目 | 特徴量 2 = 0.556 | 0.6 | 大きい側 |
+| 3 回目 | 特徴量 1 = 0.751 | 0.7 | 小さい側 |
+| 4 回目 | 特徴量 2 = 0.881 | 0.6 | 小さい側 |
+| 5 回目 | 特徴量 1 = 0.642 | 0.7 | 大きい側 |
+
+::: {.callout-note title="一般的な k-NN の実装"}
+- 次元が低いときは、全探索ではなく、この探し方で近い点を探すのが一般的
+   - 次元が高いと、遠い側をスキップできなくなる（[**次元の呪い**](#peek-curse){.peek}と呼ばれる現象の 1 つ）
+- ★ を中心とする半径 r の円は、3 次元では球、4 次元以上では**超球**（[hypersphere]{.en}）
+:::
+
+
+## いちばん近い点を KD-tree で探す
+
+```{python}
+#| echo: true
+def search_kdtree(node, X, x, best):
+    if "points" in node:                             # 葉：領域の中の点だけ、1 点ずつ距離を測る
+        for i in node["points"]:
+            d = np.sqrt(((X[i] - x) ** 2).sum())
+            best["count"] += 1                       # 距離を測った点の数
+            if d < best["dist"]:                     # 今までより近い点があれば、入れ替える
+                best["index"] = i
+                best["dist"]  = d
+        return
+    diff = x[node["axis"]] - node["value"]           # 分け目から x までの、軸に沿った差
+    if diff < 0:                                     # x は分け目より小さい側にある
+        near, far = node["left"], node["right"]
+    else:
+        near, far = node["right"], node["left"]
+    search_kdtree(near, X, x, best)                  # まず x のある側を調べる
+    if abs(diff) < best["dist"]:                     # 分け目までの距離が r より近いときだけ
+        search_kdtree(far, X, x, best)               # 反対側も調べる
+
+def nearest_kdtree(tree, X, x):
+    best = {"index": -1, "dist": np.inf, "count": 0} # r（best["dist"]）は無限大から始める
+    search_kdtree(tree, X, x, best)
+    return best
+
+best = nearest_kdtree(tree, X_train, x_new)
+print(f"KD-tree: いちばん近い点 {best['index']}、距離 {best['dist']:.3f}、距離を測った点 {best['count']} / {len(X_train)}")
+dist = []
+for p in X_train:                                    # 全探索：predict_knn と同じく、全部の点と距離を測る
+    dist.append(np.sqrt(((p - x_new) ** 2).sum()))
+dist = np.array(dist)
+print(f"全探索 : いちばん近い点 {dist.argmin()}、距離 {dist.min():.3f}、距離を測った点 {len(X_train)} / {len(X_train)}")
+```
+
+::: {.callout-note title="結果"}
+- 見つかった点は、全探索と同じ
+- 距離を測ったのは、100 点中 **15 点**
+- ★ の入っている領域の点は 3 点で、いちばん近い点はこの領域の外にあった
+   - 2 回目の分け目（特徴量 2 = 0.556）の反対側を、手順 3 で調べたので見つかった
+:::
+
+
+## 近い k 点を探すように拡張する
+
+- k-NN の投票には、いちばん近い 1 点ではなく、近い k 点が要る
+- `search_kdtree` を 2 か所変える
+   - 覚えておくのは、近い順の k 点（番号と距離）
+   - r は、k 番目に近い距離（k 点そろうまでは、反対側を必ず調べる）
+
+```{python}
+#| echo: true
+def search_kdtree_k(node, X, x, best, k):
+    if "points" in node:                             # 葉：領域の中の点だけ、1 点ずつ距離を測る
+        dist = []
+        for i in node["points"]:
+            dist.append(np.sqrt(((X[i] - x) ** 2).sum()))
+            best["count"] += 1                       # 距離を測った点の数
+        index = np.concatenate([best["index"], node["points"]])   # 今までの k 点に、この領域の点をつなげる
+        dist  = np.concatenate([best["dist"], dist])
+        order = np.argsort(dist)[:k]                 # 近い順に並べ、先頭の k 個だけ残す
+        best["index"] = index[order]
+        best["dist"]  = dist[order]
+        return
+    diff = x[node["axis"]] - node["value"]           # 分け目から x までの、軸に沿った差
+    if diff < 0:                                     # x は分け目より小さい側にある
+        near, far = node["left"], node["right"]
+    else:
+        near, far = node["right"], node["left"]
+    search_kdtree_k(near, X, x, best, k)             # まず x のある側を調べる
+    if len(best["dist"]) < k or abs(diff) < best["dist"][-1]:   # k 点そろっていないか、分け目までの距離が r より近いとき
+        search_kdtree_k(far, X, x, best, k)          # 反対側も調べる
+
+def nearest_k_kdtree(tree, X, x, k):
+    best = {"index": np.array([], dtype=int),        # 近い順の k 点の番号（最初は空）
+            "dist":  np.array([]),                   # その距離（最後の要素が r）
+            "count": 0}
+    search_kdtree_k(tree, X, x, best, k)
+    return best
+
+best3 = nearest_k_kdtree(tree, X_train, x_new, 3)
+print(f"KD-tree: 近い 3 点 {best3['index']}、r = {best3['dist'][-1]:.3f}、距離を測った点 {best3['count']} / {len(X_train)}")
+near3 = np.argsort(dist)[:3]                         # 全探索の距離 dist は、前のスライドで測ったもの
+print(f"全探索 : 近い 3 点 {near3}、r = {dist[near3[2]]:.3f}、距離を測った点 {len(X_train)} / {len(X_train)}")
+```
+
+::: {.callout-note title="結果"}
+- 見つかった 3 点は、全探索と同じ
+- 距離を測ったのは、100 点中 **21 点**（いちばん近い 1 点だけを探したときは 15 点）
+   - r が k 番目に近い距離になって大きくなるので、スキップできる領域が減る
+:::
+
+
+## KD-tree で探した k 点の投票で予測する {#peek-kd-knn}
+
+- 近い k 点が見つかれば、あとは [`predict_knn`](#peek-knn-code){.peek} と同じ多数決
+- テストデータの 100 点を k = 3 で予測し、当たった数と、距離を測った点の数（1 点あたりの平均）を出す
+
+```{python}
+#| echo: true
+def predict_knn_kdtree(tree, X_train, y_train, x, k):
+    best  = nearest_k_kdtree(tree, X_train, x, k)    # 全探索の代わりに、KD-tree で近い k 点を探す
+    votes = y_train[best["index"]]                   # k 個のラベル（0 か 1）
+    return int(votes.sum() > k / 2)                  # ラベル 1 が半分より多ければ 1、そうでなければ 0
+
+pred, count = [], []
+for x in X_test:                                     # テストデータの 100 点を、1 点ずつ予測する
+    pred.append(predict_knn_kdtree(tree, X_train, y_train, x, 3))
+    count.append(nearest_k_kdtree(tree, X_train, x, 3)["count"])   # 距離を測った点の数
+pred = np.array(pred)
+
+print(f"当たった数 {np.sum(pred == y_test)} / {len(y_test)}")
+print(f"距離を測った点の数（1 点あたりの平均）: {np.mean(count):.1f} / {len(X_train)}")
+```
+
+```{python}
+#| echo: false
+#| output: false
+# The statements of the two result callouts (this slide and the previous one).
+full3 = np.array([predict_knn(X_train, y_train, x, 3) for x in X_test])
+assert np.array_equal(pred, full3) and np.sum(pred == y_test) == 85 and round(float(np.mean(count)), 1) == 13.6
+assert np.array_equal(best3["index"], near3) and best3["count"] == 21 and best["count"] == 15
+```
+
+::: {.callout-note title="結果"}
+- 100 点中 **85 点**で当たる（予測は、全探索の `predict_knn` と 100 点とも同じ）
+- 距離を測ったのは、1 点あたり平均 **13.6 点**（全探索なら 100 点）
+:::
+
+
+## 点を増やしても、測る点の数はほとんど増えない {#peek-kd-count}
+
+- 2 次元の 0〜1 の範囲に点をばらまき、新しい点 100 個で、いちばん近い点を探す
+- 点の数を 1,000 → 1 万 → 10 万点に増やし、距離を測った点の数（平均）を比べる
+
+```{python}
+#| echo: true
+#| eval: false
+rng = np.random.default_rng()                        # 乱数の生成器（実行するたびに違う点になる）
+
+print("points       all  KD-tree")
+for n in [1000, 10000, 100000]:
+    X    = rng.random((n, 2))                        # n 点を 2 次元にばらまく
+    tree = build_kdtree(X, np.arange(n), 0, 5)
+    count = []
+    for q in rng.random((100, 2)):                   # 新しい点 100 個で、いちばん近い点を探す
+        count.append(nearest_kdtree(tree, X, q)["count"])
+    print(f"{n:<8d}  {n:6d}  {np.mean(count):7.1f}")
+```
+
+```{python}
+#| echo: false
+# Frozen result of one run of the cell above (tools/measure_knn_curse.py, default_rng(0)).
+# The student cell is unseeded; the slide shows these values.
+kd_n = [1000, 10000, 100000]
+kd_count = [9.7, 11.4, 7.6]
+
+print("points       all  KD-tree")
+for n, c in zip(kd_n, kd_count):
+    print(f"{n:<8d}  {n:6d}  {c:7.1f}")
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
+plt.figure(figsize=(6.5, 3.4))
+plt.loglog(kd_n, kd_n, "o-", color="#7f8c8d", label="全探索（全部の点を測る）")
+plt.loglog(kd_n, kd_count, "s-", color="#e74c3c", label="KD-tree")
+plt.xticks(kd_n, ["1,000", "10,000", "100,000"])
+plt.minorticks_off()
+plt.xlabel("点の数")
+plt.ylabel("距離を測った点の数（平均）")
+plt.legend(fontsize=9)
+plt.grid(True, alpha=0.4, which="both")
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-note title="結果"}
+- 全探索では、点の数と同じ回数だけ距離を測る
+- KD-tree では、10 万点でも平均 **7.6 点**（1,000 点で 9.7 点、1 万点で 11.4 点）
+:::
+
+
+## （参考）scikit-learn では
+
+- k-NN は `KNeighborsClassifier` に入っている
+- `algorithm="kd_tree"` を指定すると、`fit` で KD-tree を作り、`predict` で KD-tree を使って近い点を探す
+   - 既定の `"auto"` では、データに合わせて探し方を選ぶ
+
+```{python}
+#| echo: true
+from sklearn.neighbors import KNeighborsClassifier
+
+knn = KNeighborsClassifier(n_neighbors=3, algorithm="kd_tree").fit(X_train, y_train)
+print(f"当たった数: {np.sum(knn.predict(X_test) == y_test)} / {len(y_test)}")
+```
+
+| 今日書いたもの | scikit-learn |
+|---|---|
+| `build_kdtree` で木を作る | `KNeighborsClassifier(n_neighbors=3, algorithm="kd_tree").fit(X_train, y_train)` |
+| `predict_knn_kdtree(tree, X_train, y_train, x, 3)` を 1 点ずつ | `knn.predict(X_test)` |
+
+
+## 特徴量の数を増やすのが最強か？
+
+- 2 つの特徴量で、k-NN はテストデータの 100 点中 85 点で当たった
+- 特徴量を増やせば、分類の手がかりが増える
+- ならば**特徴量を増やし続ければ**、もっと当たる？
+
+::: {.callout-important title="質問"}
+特徴量（次元）を増やし続けると何が起きるか？
+:::
+
+
+## {background-color="white" .center .break-slide}
+
+::: {.break-title}
+次元の呪い
 :::
 
 
@@ -513,8 +1101,6 @@ fig3d.write_html("iframes/knn_points_3d.html", include_plotlyjs="directory")
 ```{python}
 #| echo: true
 #| eval: false
-rng = np.random.default_rng()                        # 乱数の生成器（実行するたびに違う点になる）
-
 def make_data(n, d):
     X = rng.random((n, d))                           # n 点を、d 次元の 0〜1 の範囲にばらまく
     y = (X.sum(axis=1) > d / 2).astype(int)          # 座標の合計が d/2 より大きければ 1
@@ -585,9 +1171,11 @@ plt.show()
 ```{python}
 #| echo: true
 def nearest_distance(P, i):
-    dist = np.sqrt(((P - P[i]) ** 2).sum(axis=1))    # 点 i から全部の点までの距離
-    dist[i] = np.inf                                 # 自分自身は除外
-    return dist.min()                                # いちばん近い点までの距離
+    dist = []
+    for j in range(len(P)):                          # 点 i から、全部の点までの距離を 1 点ずつ測る
+        if j != i:                                   # 自分自身は除外
+            dist.append(np.sqrt(((P[j] - P[i]) ** 2).sum()))
+    return min(dist)                                 # いちばん近い点までの距離
 
 print(f"点 0 からいちばん近い点まで: {nearest_distance(X_train, 0):.3f}")
 
@@ -615,7 +1203,7 @@ plt.ylabel("特徴量 2")
 plt.xlim(0, 1)
 plt.ylim(0, 1)
 plt.gca().set_aspect("equal")
-plt.title(f"点 0（赤い丸）から全部の点への距離\n赤い線がいちばん近い点（距離 {d0.min():.3f}）", fontsize=10.5)
+plt.title("点 0 から全部の点への距離（赤い線：いちばん近い点）", fontsize=10.5)
 plt.tight_layout()
 plt.show()
 ```
@@ -713,7 +1301,7 @@ ax.text(0.5, 0.5, "両方の軸で\n中央寄り\n（25%）", ha="center", va="c
         fontsize=9.5, color="#7d4f0e")
 ax.set_xlim(-0.05, 1.05); ax.set_ylim(-0.05, 1.05)
 ax.set_aspect("equal"); ax.axis("off")
-ax.set_title("2 次元：両方の軸で中央寄りの点は 4 分の 1", fontsize=10.5)
+ax.set_title("2 次元", fontsize=10.5)
 
 ax = axes[1]
 dd = np.arange(1, 21)
@@ -796,7 +1384,10 @@ cv_list = []   # 変動係数 = std / mean
 for d in dims:
     pts   = rng.random((2000, d))
     query = rng.random(d)
-    dists = np.sqrt(((pts - query) ** 2).sum(axis=1))
+    dists = []
+    for p in pts:                                    # query から 2000 点までの距離を 1 点ずつ測る
+        dists.append(np.sqrt(((p - query) ** 2).sum()))
+    dists = np.array(dists)
     cv_list.append(dists.std() / dists.mean())
 
 plt.figure(figsize=(7, 3.5))
@@ -863,7 +1454,6 @@ axes[1].set_aspect("equal")
 axes[1].set_title("2 次元（20 点）", fontsize=11)
 axes[1].axis("off")
 
-plt.suptitle("同じ 20 点でも次元が増えると空間がスカスカになる", fontsize=10)
 plt.tight_layout()
 plt.show()
 ```
@@ -933,554 +1523,6 @@ plt.show()
 :::
 
 
-## 実用への影響
-
-| 問題 | 原因 |
-|---|---|
-| モデルの精度が上がらない | データが疎でパターンが見えない |
-| 過学習しやすくなる | 特徴量が多いと、訓練データだけにたまたま合う規則ができやすい |
-| 計算コストが増大 | 距離計算などが次元数に比例して重くなる |
-| 可視化できない | 4 次元以上は図に描けない |
-
-::: {.callout-tip title="次元の呪いへの対処"}
-1. **特徴量選択（[feature selection]{.en}）**：重要な特徴量だけを残す
-2. **次元削減（[dimensionality reduction]{.en}）**：情報を保ったまま次元を圧縮する
-3. **正則化（[regularization]{.en}）**：過学習を防ぐ（線形回帰の回で扱う）
-:::
-
-
-## {background-color="white" .center .break-slide}
-
-::: {.break-title}
-近い点を速く探す
-:::
-
-
-## k-NN の弱点：毎回、全部の点までの距離を測る
-
-- k-NN は、予測のたびに、訓練データの全部の点までの距離を測る（**全探索**, [brute-force search]{.en}）
-   - [10 万点の実験](#peek-more-points){.peek}では、テストデータ 1 点の予測に距離の計算が 10 万回、1,000 点で 1 億回
-- 投票に使うのは近い k 個だけなので、遠くの点まで測るのは、ほとんどが無駄
-
-| | 学習でやること | 予測でやること |
-|--|-----|------|
-| 決定木 | データから境界を作る | 境界のどちら側かを見る |
-| k-NN | 訓練データを取っておくだけ | 全部の点までの距離を測り、近い k 個の投票で決める |
-
-::: {.callout-important title="質問"}
-遠くの点を測らずに、近い点だけを見つけるにはどうすればよい？
-:::
-
-
-## 空間を領域に分けておけば、近くの領域だけ測ればよい（Octree）
-
-::: {.takeaway .dark}
-**Octree（八分木）**
-:::
-
-- 立方体を、各軸の中点（端と端のちょうど真ん中の位置）で切って、8 つの領域に分ける
-- 各軸を中点で切っているので、**二分探索**を 3 つの軸でやるだけで、★ の入っている領域にたどり着く
-- いちばん近い点は、その領域の中の点から探す
-   - 全部の点を測らずにすむ（全探索をしなくてよい）
-- その領域の中になければ、1 つ上の領域（分ける前の領域）に戻って探す
-- （参考）点の多い領域は、同じように中点で切って、さらに 8 つに分ける
-
-```{python}
-#| echo: false
-# Octree of the 3-D points X3 (slide もう一次元特徴量があったとしよう); boxes with more than 15 points are split again.
-def octree_leaves(P, idx, lo, hi, max_points, leaves):
-    if len(idx) <= max_points:
-        leaves.append((lo, hi, idx))
-        return
-    mid = (lo + hi) / 2
-    for corner in range(8):
-        upper = np.array([(corner >> a) & 1 for a in range(3)], dtype=bool)
-        clo, chi = np.where(upper, mid, lo), np.where(upper, hi, mid)
-        inside = np.all((P[idx] >= clo) & ((P[idx] < chi) | (chi == 1.0)), axis=1)
-        octree_leaves(P, idx[inside], clo, chi, max_points, leaves)
-
-
-def box_edges(lo, hi):
-    """The 12 edges of the box lo..hi as one line trace (None separates the edges)."""
-    xs, ys, zs = [], [], []
-    for a in range(3):
-        b, c = [k for k in range(3) if k != a]
-        for vb in (lo[b], hi[b]):
-            for vc in (lo[c], hi[c]):
-                p, q = np.zeros(3), np.zeros(3)
-                p[a], q[a] = lo[a], hi[a]
-                p[b] = q[b] = vb
-                p[c] = q[c] = vc
-                xs += [p[0], q[0], None]
-                ys += [p[1], q[1], None]
-                zs += [p[2], q[2], None]
-    return xs, ys, zs
-
-
-star3 = np.array([0.65, 0.4, 0.6])                  # inside a box that was split twice
-leaves3 = []
-octree_leaves(X3, np.arange(len(X3)), np.zeros(3), np.ones(3), 15, leaves3)
-ex, ey, ez = [], [], []
-for lo, hi, idx in leaves3:
-    xs, ys, zs = box_edges(lo, hi)
-    ex += xs
-    ey += ys
-    ez += zs
-home_lo, home_hi = [(lo, hi) for lo, hi, idx in leaves3 if np.all((star3 >= lo) & (star3 < hi))][0]
-
-fig_oct = go.Figure()
-fig_oct.add_trace(go.Scatter3d(x=ex, y=ey, z=ez, mode="lines", line=dict(color="#34495e", width=2),
-                               name="領域の境目", hoverinfo="skip"))
-fig_oct.add_trace(go.Mesh3d(x=[home_lo[0], home_hi[0], home_hi[0], home_lo[0]] * 2,
-                            y=[home_lo[1], home_lo[1], home_hi[1], home_hi[1]] * 2,
-                            z=[home_lo[2]] * 4 + [home_hi[2]] * 4,
-                            alphahull=0, color="#f1c40f", opacity=0.3, name="★ の入っている領域",
-                            showlegend=True, hoverinfo="skip"))
-fig_oct.add_trace(go.Scatter3d(x=X3[:, 0], y=X3[:, 1], z=X3[:, 2], mode="markers",
-                               marker=dict(size=3.5, color="#7f8c8d"), name="点"))
-fig_oct.add_trace(go.Scatter3d(x=[star3[0]], y=[star3[1]], z=[star3[2]], mode="markers",
-                               marker=dict(size=7, color="#27ae60", symbol="diamond"), name="★（新しい点）"))
-fig_oct.update_layout(
-    scene=dict(xaxis=dict(title="特徴量 1", range=[0, 1]), yaxis=dict(title="特徴量 2", range=[0, 1]),
-               zaxis=dict(title="特徴量 3", range=[0, 1]), aspectmode="cube"),
-    margin=dict(l=0, r=0, t=0, b=0), legend=dict(x=0.02, y=0.98), width=880, height=520)
-fig_oct.write_html("iframes/knn_octree_3d.html", include_plotlyjs="directory")
-```
-
-::: {.plotly-iframe src="iframes/knn_octree_3d.html" height="530"}
-:::
-
-::: {.caption-note .center}
-ドラッグで回せる（黄色の領域が、★ の入っている領域）
-:::
-
-
-## Octree の弱点：領域の中の点の数がそろわない
-
-- 点がどこにあるかに関係なく、中点で切る
-- そのため、領域によって中の点の数がばらばらになる（前のスライドの図では 1 点から 14 点まで）
-   - 点の多い領域：★ がそこに入ると、中の点を全部測ることになる
-   - 点の少ない領域：近い点が領域の中になく、まわりの領域まで（1 つ上の領域に戻って）調べることになる
-
-```{python}
-#| echo: false
-#| fig-align: center
-# Points per box of the octree on the previous slide (leaves3), smallest first.
-oct_sizes = sorted(len(idx) for lo, hi, idx in leaves3)
-plt.figure(figsize=(7, 3.0))
-plt.bar(range(1, len(oct_sizes) + 1), oct_sizes, color="#7f8c8d", width=0.7)
-plt.xlabel("領域（中の点が少ない順）")
-plt.ylabel("領域の中の点の数")
-plt.title(f"Octree の {len(oct_sizes)} 個の領域：中の点は {oct_sizes[0]} 点から {oct_sizes[-1]} 点まで", fontsize=10.5)
-plt.xticks([])
-plt.yticks(range(0, oct_sizes[-1] + 1, 2))
-plt.grid(True, axis="y", alpha=0.4)
-plt.tight_layout()
-plt.show()
-```
-
-::: {.callout-important title="質問"}
-領域の中の点の数をそろえるには、どこで切ればよい？
-:::
-
-
-## 点の数が均等になるように分割（KD-tree）
-
-::: {.takeaway .dark}
-**KD-tree（[k-dimensional tree]{.en}）の作り方**
-:::
-
-1. 1 つの軸で点を小さい順に数え、点の数が半々になるところで 2 つに分ける
-   - 点が偶数個の場合：数えて半々になる 2 点の中点で切る
-   - 点が奇数個の場合：中央値となる点のすぐ左で切る
-2. 分けた両側それぞれで、次の軸を使って 1 をくり返す（特徴量 1 → 特徴量 2 → 特徴量 1 → …）
-3. 領域の中の点が 5 点以下になったら、その領域は分けずに止める
-
-- Octree は領域の中点で切るが、KD-tree は点を数えて切るので、両側の点の数がそろう
-   - 図の領域は、どれも 3〜4 点
-- [決定木](classification-2d-boundaries.qmd#peek-overfit-boundary){.peek}と同じく、軸に沿った線で空間を分ける木
-- 図は 2 次元の訓練データ（100 点）で描く（作り方は何次元でも同じ）
-
-```{python}
-#| echo: false
-#| fig-align: center
-def kd_build(X, idx, depth, leaf_size):
-    # Same algorithm as the student's build_kdtree on the next slide.
-    if len(idx) <= leaf_size:
-        return {"points": idx}
-    axis = depth % X.shape[1]
-    idx = idx[np.argsort(X[idx, axis])]
-    mid = len(idx) // 2
-    if len(idx) % 2 == 0:
-        value = (X[idx[mid - 1], axis] + X[idx[mid], axis]) / 2
-    else:
-        value = X[idx[mid], axis]
-    return {"axis": axis, "value": value,
-            "left": kd_build(X, idx[:mid], depth + 1, leaf_size),
-            "right": kd_build(X, idx[mid:], depth + 1, leaf_size)}
-
-
-def draw_splits(ax, node, lo, hi, depth):
-    """Draw the split lines of the subtree inside the box lo..hi."""
-    if "points" in node:
-        return
-    a, v = node["axis"], node["value"]
-    lw = max(3.0 - 0.5 * depth, 0.7)
-    if a == 0:
-        ax.plot([v, v], [lo[1], hi[1]], color="#34495e", lw=lw, zorder=2)
-    else:
-        ax.plot([lo[0], hi[0]], [v, v], color="#34495e", lw=lw, zorder=2)
-    hi_left, lo_right = hi.copy(), lo.copy()
-    hi_left[a], lo_right[a] = v, v
-    draw_splits(ax, node["left"], lo, hi_left, depth + 1)
-    draw_splits(ax, node["right"], lo_right, hi, depth + 1)
-
-
-kd_fig_tree = kd_build(X_train, np.arange(len(X_train)), 0, 5)
-fig, ax = plt.subplots(figsize=(4.8, 4.8))
-draw_splits(ax, kd_fig_tree, np.array([0.0, 0.0]), np.array([1.0, 1.0]), 0)
-ax.scatter(X_train[:, 0], X_train[:, 1], s=22, c="#7f8c8d", zorder=3)
-square_axes(ax)
-ax.set_title("訓練データ 100 点を、領域の点が 5 点以下になるまで分ける\n（太い線ほど先に分けた線）", fontsize=10.5)
-plt.tight_layout()
-plt.show()
-```
-
-::: {.callout-note title="ただし"}
-k-d の k は特徴量の数（次元）で、k-NN の k とは別
-:::
-
-
-## KD-tree を作る {#peek-kd-build}
-
-- 関数の中で、同じ関数をもう一度呼ぶ（**再帰**, [recursion]{.en}）
-   - 分けた片側を、同じ関数でさらに分ける
-- 木の各部分は辞書で表す
-   - 分ける部分：分ける軸 `axis`、分ける値 `value`、小さい側 `left`、大きい側 `right`
-   - 分けずに止めた領域（**葉**, [leaf]{.en}）：中の点の番号 `points`
-
-```{python}
-#| echo: true
-def build_kdtree(X, idx, depth, leaf_size):
-    if len(idx) <= leaf_size:                        # 点が leaf_size 個以下なら、分けずに止める（葉）
-        return {"points": idx}
-    axis = depth % X.shape[1]                        # 分ける軸：深さ 0 は特徴量 1、深さ 1 は特徴量 2、…
-    idx  = idx[np.argsort(X[idx, axis])]             # その軸の値が小さい順に、点の番号を並べる
-    mid  = len(idx) // 2
-    if len(idx) % 2 == 0:                            # 偶数個：数えて半々になる 2 点の中点
-        value = (X[idx[mid - 1], axis] + X[idx[mid], axis]) / 2
-    else:                                            # 奇数個：中央値となる点（この点は大きい側に入る）
-        value = X[idx[mid], axis]
-    return {"axis":  axis,
-            "value": value,                          # 分ける値
-            "left":  build_kdtree(X, idx[:mid], depth + 1, leaf_size),   # 小さい側を、同じ関数でさらに分ける
-            "right": build_kdtree(X, idx[mid:], depth + 1, leaf_size)}   # 大きい側も同じ
-
-tree = build_kdtree(X_train, np.arange(len(X_train)), 0, 5)
-```
-
-```{python}
-#| echo: false
-# KD-tree of the 3-D points X3 (the points of the octree figure), built by the student's build_kdtree.
-def kd_boxes(node, lo, hi, boxes):
-    """Collect the box lo..hi and the points of every leaf of the subtree."""
-    if "points" in node:
-        boxes.append((lo, hi, node["points"]))
-        return
-    hi_left, lo_right = hi.copy(), lo.copy()
-    hi_left[node["axis"]], lo_right[node["axis"]] = node["value"], node["value"]
-    kd_boxes(node["left"], lo, hi_left, boxes)
-    kd_boxes(node["right"], lo_right, hi, boxes)
-
-
-kd_boxes3 = []
-kd_boxes(build_kdtree(X3, np.arange(len(X3)), 0, 5), np.zeros(3), np.ones(3), kd_boxes3)
-kd_sizes3 = sorted(len(idx) for lo, hi, idx in kd_boxes3)
-assert (len(kd_sizes3), kd_sizes3[0], kd_sizes3[-1]) == (32, 3, 4)   # the numbers in the caption below
-ex, ey, ez = [], [], []
-for lo, hi, idx in kd_boxes3:
-    xs, ys, zs = box_edges(lo, hi)
-    ex += xs
-    ey += ys
-    ez += zs
-
-fig_kd3 = go.Figure()
-fig_kd3.add_trace(go.Scatter3d(x=ex, y=ey, z=ez, mode="lines", line=dict(color="#34495e", width=2),
-                               name="領域の境目", hoverinfo="skip"))
-fig_kd3.add_trace(go.Scatter3d(x=X3[:, 0], y=X3[:, 1], z=X3[:, 2], mode="markers",
-                               marker=dict(size=3.5, color="#7f8c8d"), name="点"))
-fig_kd3.update_layout(
-    scene=dict(xaxis=dict(title="特徴量 1", range=[0, 1]), yaxis=dict(title="特徴量 2", range=[0, 1]),
-               zaxis=dict(title="特徴量 3", range=[0, 1]), aspectmode="cube"),
-    margin=dict(l=0, r=0, t=0, b=0), legend=dict(x=0.02, y=0.98), width=880, height=520)
-fig_kd3.write_html("iframes/knn_kdtree_3d.html", include_plotlyjs="directory")
-```
-
-::: {.plotly-iframe src="iframes/knn_kdtree_3d.html" height="530"}
-:::
-
-::: {.caption-note .center}
-同じ関数で 3 次元の 100 点を分けた領域（32 個、どれも 3〜4 点）。ドラッグで回せる
-:::
-
-
-## 近い領域から調べて、遠い側はスキップする {#peek-kd-search}
-
-::: {.takeaway .dark}
-**KD-tree でいちばん近い点を探すアルゴリズム**
-:::
-
-1. 最初の分け目（図のいちばん太い線）から、★ の入っている領域まで下りる
-   - 分け目ごとに、その軸での ★ の座標と分ける値を比べ、★ のある側へ進む
-   - 軸は、木を作ったときと同じく、特徴量 1 → 特徴量 2 → 特徴量 1 → … と交互
-2. ★ の入っている領域の中の点と距離を測り、いちばん近い距離を r とする
-3. 下りてきた分け目を逆にたどって戻り、分け目ごとに反対側を調べるか決める
-   - 分け目までの距離が r より近い：反対側に、もっと近い点があるかもしれないので調べる（もっと近い点が見つかれば、r を更新する）
-   - 分け目までの距離が r 以上：反対側の点は全部 r より遠いので、反対側は調べずにスキップする
-
-```{python}
-#| echo: false
-#| fig-align: center
-def kd_trace(node, x, best, lo, hi, visited):
-    # Same search as the student's search_kdtree on the next slide, also recording the boxes it measures.
-    if "points" in node:
-        visited.append((lo, hi))
-        dist = np.sqrt(((X_train[node["points"]] - x) ** 2).sum(axis=1))
-        best["count"] += len(dist)
-        j = dist.argmin()
-        if dist[j] < best["dist"]:
-            best["index"], best["dist"] = node["points"][j], dist[j]
-        return
-    a, v = node["axis"], node["value"]
-    hi_left, lo_right = hi.copy(), lo.copy()
-    hi_left[a], lo_right[a] = v, v
-    if x[a] - v < 0:
-        sides = [(node["left"], lo, hi_left), (node["right"], lo_right, hi)]
-    else:
-        sides = [(node["right"], lo_right, hi), (node["left"], lo, hi_left)]
-    kd_trace(sides[0][0], x, best, sides[0][1], sides[0][2], visited)
-    if abs(x[a] - v) < best["dist"]:
-        kd_trace(sides[1][0], x, best, sides[1][1], sides[1][2], visited)
-
-
-best_fig = {"index": -1, "dist": np.inf, "count": 0}
-visited = []
-kd_trace(kd_fig_tree, x_new, best_fig, np.array([0.0, 0.0]), np.array([1.0, 1.0]), visited)
-
-fig, axes = plt.subplots(1, 2, figsize=(10, 4.9))
-for ax, (lo_v, hi_v) in zip(axes, [((0, 0), (1, 1)), (x_new - 0.17, x_new + 0.17)]):
-    for lo, hi in visited:
-        ax.add_patch(plt.Rectangle(lo, hi[0] - lo[0], hi[1] - lo[1], fc="#fff3b0", ec="none", zorder=1))
-    draw_splits(ax, kd_fig_tree, np.array([0.0, 0.0]), np.array([1.0, 1.0]), 0)
-    ax.scatter(X_train[:, 0], X_train[:, 1], s=22, c="#7f8c8d", zorder=3)
-    ax.scatter(*X_train[best_fig["index"]], s=200, facecolors="none", edgecolors="#e74c3c", lw=2.2, zorder=4)
-    ax.add_patch(plt.Circle(x_new, best_fig["dist"], fill=False, ls="--", ec="#e74c3c", lw=1.5, zorder=4))
-    ax.scatter(*x_new, marker="*", s=380, c="#27ae60", edgecolors="black", zorder=5)
-    square_axes(ax)
-    ax.set_xlim(lo_v[0], hi_v[0])
-    ax.set_ylim(lo_v[1], hi_v[1])
-axes[0].set_title(f"黄色の領域だけ、点との距離を測る（100 点中 {best_fig['count']} 点）", fontsize=10.5)
-axes[1].set_title("★ のまわりを拡大：赤い破線の円の半径が r\n円が分け目を越えた側だけを調べる", fontsize=10.5)
-plt.tight_layout()
-plt.show()
-```
-
-★ = (0.7, 0.6) の下り方（手順 1）：
-
-| | 分け目 | ★ の座標 | 進む側 |
-|---|---|---|---|
-| 1 回目 | 特徴量 1 = 0.496 | 0.7 | 大きい側 |
-| 2 回目 | 特徴量 2 = 0.556 | 0.6 | 大きい側 |
-| 3 回目 | 特徴量 1 = 0.751 | 0.7 | 小さい側 |
-| 4 回目 | 特徴量 2 = 0.881 | 0.6 | 小さい側 |
-| 5 回目 | 特徴量 1 = 0.642 | 0.7 | 大きい側 |
-
-::: {.callout-note title="一般的な k-NN の実装"}
-- 次元が低いときは、全探索ではなく、この探し方で近い点を探すのが一般的
-   - 次元が高いと、遠い側をスキップできなくなる（これも[**次元の呪い**](#peek-curse){.peek}）
-- ★ を中心とする半径 r の円は、3 次元では球、4 次元以上では**超球**（[hypersphere]{.en}）
-:::
-
-
-## いちばん近い点を KD-tree で探す
-
-```{python}
-#| echo: true
-def search_kdtree(node, X, x, best):
-    if "points" in node:                             # 葉：領域の中の点と距離を測る
-        dist = np.sqrt(((X[node["points"]] - x) ** 2).sum(axis=1))
-        best["count"] += len(dist)                   # 距離を測った点の数
-        j = dist.argmin()
-        if dist[j] < best["dist"]:                   # 今までより近い点があれば、入れ替える
-            best["index"] = node["points"][j]
-            best["dist"]  = dist[j]
-        return
-    diff = x[node["axis"]] - node["value"]           # 分け目から x までの、軸に沿った差
-    if diff < 0:                                     # x は分け目より小さい側にある
-        near, far = node["left"], node["right"]
-    else:
-        near, far = node["right"], node["left"]
-    search_kdtree(near, X, x, best)                  # まず x のある側を調べる
-    if abs(diff) < best["dist"]:                     # 分け目までの距離が r より近いときだけ
-        search_kdtree(far, X, x, best)               # 反対側も調べる
-
-def nearest_kdtree(tree, X, x):
-    best = {"index": -1, "dist": np.inf, "count": 0} # r（best["dist"]）は無限大から始める
-    search_kdtree(tree, X, x, best)
-    return best
-
-best = nearest_kdtree(tree, X_train, x_new)
-print(f"KD-tree: いちばん近い点 {best['index']}、距離 {best['dist']:.3f}、距離を測った点 {best['count']} / {len(X_train)}")
-dist = np.sqrt(((X_train - x_new) ** 2).sum(axis=1))
-print(f"全探索 : いちばん近い点 {dist.argmin()}、距離 {dist.min():.3f}、距離を測った点 {len(X_train)} / {len(X_train)}")
-```
-
-::: {.callout-note title="結果"}
-- 見つかった点は、全探索と同じ
-- 距離を測ったのは、100 点中 **15 点**
-- ★ の入っている領域の点は 3 点で、いちばん近い点はこの領域の外にあった
-   - 2 回目の分け目（特徴量 2 = 0.556）の反対側を、手順 3 で調べたので見つかった
-:::
-
-
-## 近い k 点を探すように拡張する
-
-- k-NN の投票には、いちばん近い 1 点ではなく、近い k 点が要る
-- `search_kdtree` を 2 か所変える
-   - 覚えておくのは、近い順の k 点（番号と距離）
-   - r は、k 番目に近い距離（k 点そろうまでは、反対側を必ず調べる）
-
-```{python}
-#| echo: true
-def search_kdtree_k(node, X, x, best, k):
-    if "points" in node:                             # 葉：領域の中の点と距離を測る
-        dist = np.sqrt(((X[node["points"]] - x) ** 2).sum(axis=1))
-        best["count"] += len(dist)                   # 距離を測った点の数
-        index = np.concatenate([best["index"], node["points"]])   # 今までの k 点に、この領域の点をつなげる
-        dist  = np.concatenate([best["dist"], dist])
-        order = np.argsort(dist)[:k]                 # 近い順に並べ、先頭の k 個だけ残す
-        best["index"] = index[order]
-        best["dist"]  = dist[order]
-        return
-    diff = x[node["axis"]] - node["value"]           # 分け目から x までの、軸に沿った差
-    if diff < 0:                                     # x は分け目より小さい側にある
-        near, far = node["left"], node["right"]
-    else:
-        near, far = node["right"], node["left"]
-    search_kdtree_k(near, X, x, best, k)             # まず x のある側を調べる
-    if len(best["dist"]) < k or abs(diff) < best["dist"][-1]:   # k 点そろっていないか、分け目までの距離が r より近いとき
-        search_kdtree_k(far, X, x, best, k)          # 反対側も調べる
-
-def nearest_k_kdtree(tree, X, x, k):
-    best = {"index": np.array([], dtype=int),        # 近い順の k 点の番号（最初は空）
-            "dist":  np.array([]),                   # その距離（最後の要素が r）
-            "count": 0}
-    search_kdtree_k(tree, X, x, best, k)
-    return best
-
-best3 = nearest_k_kdtree(tree, X_train, x_new, 3)
-print(f"KD-tree: 近い 3 点 {best3['index']}、r = {best3['dist'][-1]:.3f}、距離を測った点 {best3['count']} / {len(X_train)}")
-dist  = np.sqrt(((X_train - x_new) ** 2).sum(axis=1))
-near3 = np.argsort(dist)[:3]
-print(f"全探索 : 近い 3 点 {near3}、r = {dist[near3[2]]:.3f}、距離を測った点 {len(X_train)} / {len(X_train)}")
-```
-
-::: {.callout-note title="結果"}
-- 見つかった 3 点は、全探索と同じ
-- 距離を測ったのは、100 点中 **21 点**（いちばん近い 1 点だけを探したときは 15 点）
-   - r が k 番目に近い距離になって大きくなるので、スキップできる領域が減る
-:::
-
-
-## KD-tree で探した k 点の投票で予測する {#peek-kd-knn}
-
-- 近い k 点が見つかれば、あとは [`predict_knn`](#peek-knn-code){.peek} と同じ多数決
-- テストデータの 100 点を k = 3 で予測し、当たった数と、距離を測った点の数（1 点あたりの平均）を出す
-
-```{python}
-#| echo: true
-def predict_knn_kdtree(tree, X_train, y_train, x, k):
-    best  = nearest_k_kdtree(tree, X_train, x, k)    # 全探索の代わりに、KD-tree で近い k 点を探す
-    votes = y_train[best["index"]]                   # k 個のラベル（0 か 1）
-    return int(votes.sum() > k / 2)                  # ラベル 1 が半分より多ければ 1、そうでなければ 0
-
-pred, count = [], []
-for x in X_test:                                     # テストデータの 100 点を、1 点ずつ予測する
-    pred.append(predict_knn_kdtree(tree, X_train, y_train, x, 3))
-    count.append(nearest_k_kdtree(tree, X_train, x, 3)["count"])   # 距離を測った点の数
-pred = np.array(pred)
-
-print(f"当たった数 {np.sum(pred == y_test)} / {len(y_test)}")
-print(f"距離を測った点の数（1 点あたりの平均）: {np.mean(count):.1f} / {len(X_train)}")
-```
-
-```{python}
-#| echo: false
-#| output: false
-# The statements of the two result callouts (this slide and the previous one).
-full3 = np.array([predict_knn(X_train, y_train, x, 3) for x in X_test])
-assert np.array_equal(pred, full3) and np.sum(pred == y_test) == 85 and round(float(np.mean(count)), 1) == 13.6
-assert np.array_equal(best3["index"], near3) and best3["count"] == 21 and best["count"] == 15
-```
-
-::: {.callout-note title="結果"}
-- 100 点中 **85 点**で当たる（予測は、全探索の `predict_knn` と 100 点とも同じ）
-- 距離を測ったのは、1 点あたり平均 **13.6 点**（全探索なら 100 点）
-:::
-
-
-## 点を増やしても、測る点の数はほとんど増えない {#peek-kd-count}
-
-- 2 次元の 0〜1 の範囲に点をばらまき、新しい点 100 個で、いちばん近い点を探す
-- 点の数を 1,000 → 1 万 → 10 万点に増やし、距離を測った点の数（平均）を比べる
-
-```{python}
-#| echo: true
-#| eval: false
-print("points       all  KD-tree")
-for n in [1000, 10000, 100000]:
-    X    = rng.random((n, 2))                        # n 点を 2 次元にばらまく
-    tree = build_kdtree(X, np.arange(n), 0, 5)
-    count = []
-    for q in rng.random((100, 2)):                   # 新しい点 100 個で、いちばん近い点を探す
-        count.append(nearest_kdtree(tree, X, q)["count"])
-    print(f"{n:<8d}  {n:6d}  {np.mean(count):7.1f}")
-```
-
-```{python}
-#| echo: false
-# Frozen result of one run of the cell above (tools/measure_knn_curse.py, default_rng(0)).
-# The student cell is unseeded; the slide shows these values.
-kd_n = [1000, 10000, 100000]
-kd_count = [9.7, 11.4, 7.6]
-
-print("points       all  KD-tree")
-for n, c in zip(kd_n, kd_count):
-    print(f"{n:<8d}  {n:6d}  {c:7.1f}")
-```
-
-```{python}
-#| echo: false
-#| fig-align: center
-plt.figure(figsize=(6.5, 3.4))
-plt.loglog(kd_n, kd_n, "o-", color="#7f8c8d", label="全探索（全部の点を測る）")
-plt.loglog(kd_n, kd_count, "s-", color="#e74c3c", label="KD-tree")
-plt.xticks(kd_n, ["1,000", "10,000", "100,000"])
-plt.minorticks_off()
-plt.xlabel("点の数")
-plt.ylabel("距離を測った点の数（平均）")
-plt.legend(fontsize=9)
-plt.grid(True, alpha=0.4, which="both")
-plt.tight_layout()
-plt.show()
-```
-
-::: {.callout-note title="結果"}
-- 全探索では、点の数と同じ回数だけ距離を測る
-- KD-tree では、10 万点でも平均 **7.6 点**（1,000 点で 9.7 点、1 万点で 11.4 点）
-:::
-
-
 ## 次元が高いと、KD-tree でもスキップできない
 
 - 1 万点で、特徴量を 2, 5, 10, 20 個に増やし、同じように探す
@@ -1534,24 +1576,20 @@ plt.show()
 :::
 
 
-## （参考）scikit-learn では
+## 実用への影響
 
-- k-NN は `KNeighborsClassifier` に入っている
-- `algorithm="kd_tree"` を指定すると、`fit` で KD-tree を作り、`predict` で KD-tree を使って近い点を探す
-   - 既定の `"auto"` では、データに合わせて探し方を選ぶ
-
-```{python}
-#| echo: true
-from sklearn.neighbors import KNeighborsClassifier
-
-knn = KNeighborsClassifier(n_neighbors=3, algorithm="kd_tree").fit(X_train, y_train)
-print(f"当たった数: {np.sum(knn.predict(X_test) == y_test)} / {len(y_test)}")
-```
-
-| 今日書いたもの | scikit-learn |
+| 問題 | 原因 |
 |---|---|
-| `build_kdtree` で木を作る | `KNeighborsClassifier(n_neighbors=3, algorithm="kd_tree").fit(X_train, y_train)` |
-| `predict_knn_kdtree(tree, X_train, y_train, x, 3)` を 1 点ずつ | `knn.predict(X_test)` |
+| モデルの精度が上がらない | データが疎でパターンが見えない |
+| 過学習しやすくなる | 特徴量が多いと、訓練データだけにたまたま合う規則ができやすい |
+| 計算コストが増大 | 距離計算などが次元数に比例して重くなる |
+| 可視化できない | 4 次元以上は図に描けない |
+
+::: {.callout-tip title="次元の呪いへの対処"}
+1. **特徴量選択（[feature selection]{.en}）**：重要な特徴量だけを残す
+2. **次元削減（[dimensionality reduction]{.en}）**：情報を保ったまま次元を圧縮する
+3. **正則化（[regularization]{.en}）**：過学習を防ぐ（線形回帰の回で扱う）
+:::
 
 
 ## （参考）次元を減らす：PCA
@@ -1567,11 +1605,11 @@ print(f"当たった数: {np.sum(knn.predict(X_test) == y_test)} / {len(y_test)}
 - **k-NN**：新しい点のラベルを、近い k 点のラベルの多数決で決める
   - 学習では境界を作らず、訓練データをそのまま取っておく
 - **k はハイパパラメータ**：k = 1 は訓練データで必ず当たるが、テストデータでは下がる（過学習）
-- **次元の呪い**：特徴量を増やすと空間が広くなり、いちばん近い点も遠くなる
-  - k-NN は当たらなくなり、点を増やしても追いつかない
 - **KD-tree**：点の数が均等になるように空間を領域に分け、遠い領域をスキップして、いちばん近い点を探す
   - 全部の点までの距離を測らずにすむ（全探索をしなくてよい）
-  - 次元が高いと、スキップできる領域がなくなる（これも次元の呪い）
+- **次元の呪い**：特徴量を増やすと空間が広くなり、いちばん近い点も遠くなる
+  - k-NN は当たらなくなり、点を増やしても追いつかない
+  - KD-tree でも、スキップできる領域がなくなる
 
 ::: {.callout-note title="分類問題と特徴量のまとめ"}
 1D → 2D の分類、評価と汎化、教師なし学習（k-means）、k-NN と次元の呪い。
