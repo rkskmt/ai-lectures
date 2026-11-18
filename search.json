@@ -179,7 +179,7 @@
     "href": "pytorch-intro.html#ここで観察",
     "title": "PyTorch入門",
     "section": "ここで観察",
-    "text": "ここで観察\n\n\n\n\n\n\n\nヒント\n\n\n\n変換2個：「変換を重ねる」の回では2個でも分けられたのに、ここでは87%止まり（torch.manual_seed(3) だと50%まで転落）。表現力はあっても、良い谷にたどり着けるかは別問題 — 16個の「余裕」は学習の保険でもある（ローカルミニマムの罠）\nnn.Identity()：折り目ゼロ — 境界が直線に戻り、87%で頭打ち。「線形は重ねても線形」を PyTorch でも再確認\nどれを変えても、学習ループの3拍子は一切書き換えないで済む — それが部品化の威力"
+    "text": "ここで観察\n\n\n\n\n\n\n\nヒント\n\n\n\n変換2個：正答率が上がりきらず、seed によってはもっと悪いところで止まる。良い谷にたどり着けるかは初期値しだい — 16個の「余裕」は学習の保険でもある（ローカルミニマムの罠）\nnn.Identity()：折り目ゼロ — 境界が直線に戻り、そこで頭打ち。「線形は重ねても線形」を PyTorch でも再確認\nどれを変えても、学習ループの3拍子は一切書き換えないで済む — それが部品化の威力"
   },
   {
     "objectID": "pytorch-intro.html#まとめ",
@@ -718,7 +718,7 @@
     "href": "newton-method-appendix.html#比較まとめ",
     "title": "Newton法",
     "section": "比較まとめ",
-    "text": "比較まとめ\n\n\n数値比較\n\n\n\n\n手法\n反復回数\n最終結果\n誤差\n\n\n\n\n勾配降下法（α=0.3）\n10回\nx=1.9926\n0.0074\n\n\nNewton法\n1回\nx=2.0000\n0.0000\n\n\n\n特徴比較\n\n\n\n項目\n勾配降下法\nNewton法\n\n\n\n\n使う情報\n1次微分のみ\n1次微分 + 2次微分\n\n\n学習率\n必要（α）\n不要\n\n\n収束速度\n遅い\n非常に速い\n\n\n1回の計算量\n小\n大\n\n\nパラメータ調整\n必要\n不要\n\n\n適用場面\n大規模問題\n小〜中規模問題\n\n\n実例\nPyTorch、TensorFlow\nscikit-learn"
+    "text": "比較まとめ\n\n\n\n\n項目\n勾配降下法\nNewton法\n\n\n\n\n使う情報\n1次微分のみ\n1次微分 + 2次微分\n\n\n学習率\n必要（α）\n不要\n\n\n収束速度\n遅い\n非常に速い\n\n\n1回の計算量\n小\n大\n\n\nパラメータ調整\n必要\n不要\n\n\n適用場面\n大規模問題\n小〜中規模問題\n\n\n実例\nPyTorch、TensorFlow\nscikit-learn"
   },
   {
     "objectID": "newton-method-appendix.html#なぜnewton法は速いのか",
@@ -1369,7 +1369,7 @@
     "href": "classification-evaluation.html#peek-split",
     "title": "過学習と汎化",
     "section": "ランダムに並べ替えてから分ける",
-    "text": "ランダムに並べ替えてから分ける\n\n\nまずデータをランダムに並べ替えて、そのあとスライスすればOK\n\n\nidx = np.arange(len(y))              # 0〜119 の配列\nprint(idx[:10])\nnp.random.shuffle(idx)               # ランダムに並べ替え（idx そのものが書き換わる）\nprint(idx[:10])\n\nX_shuffled = X[idx]                  # データを idx の順に並べ替え\ny_shuffled = y[idx]                  # y も同じ順なので、特徴量とラベルの組は崩れない\n\nn_train = 96                         # 訓練に回す匹数（全体の8割）\nX_train, y_train = X_shuffled[:n_train], y_shuffled[:n_train]   # 先頭96匹を訓練データに\nX_test,  y_test  = X_shuffled[n_train:], y_shuffled[n_train:]   # 残り24匹をテストデータに\n\nprint(f\"訓練データ {len(X_train)} 匹\")\nprint(f\"テストデータ {len(X_test)} 匹\")\nprint(f\"テストデータの内訳: Salmon {np.sum(y_test == 1)} 匹, Sea bass {np.sum(y_test == 0)} 匹\")\n\n[0 1 2 3 4 5 6 7 8 9]\n[ 63  16  13 115 116  33  91  85  90  50]\n訓練データ 96 匹\nテストデータ 24 匹\nテストデータの内訳: Salmon 12 匹, Sea bass 12 匹\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n先頭で切っても、テストデータには Salmon と Sea bass の両方が入る\nもう一度実行すると並べ替えが変わり、内訳も変わる\n\nこのスライドの数字と、自分で実行した数字は一致しない"
+    "text": "ランダムに並べ替えてから分ける\n\n\nまずデータをランダムに並べ替えて、そのあとスライスすればOK\n\n\nidx = np.arange(len(y))              # 0〜119 の配列\nprint(idx[:10])\nnp.random.shuffle(idx)               # ランダムに並べ替え（idx そのものが書き換わる）\nprint(idx[:10])\n\nX_shuffled = X[idx]                  # データを idx の順に並べ替え\ny_shuffled = y[idx]                  # y も同じ順なので、特徴量とラベルの組は崩れない\n\nn_train = 96                         # 訓練に回す匹数（全体の8割）\nX_train, y_train = X_shuffled[:n_train], y_shuffled[:n_train]   # 先頭96匹を訓練データに\nX_test,  y_test  = X_shuffled[n_train:], y_shuffled[n_train:]   # 残り24匹をテストデータに\n\nprint(f\"訓練データ {len(X_train)} 匹\")\nprint(f\"テストデータ {len(X_test)} 匹\")\nprint(f\"テストデータの内訳: Salmon {np.sum(y_test == 1)} 匹, Sea bass {np.sum(y_test == 0)} 匹\")\n\n\n\n[0 1 2 3 4 5 6 7 8 9]\n[ 85  41  62  40 108 103  50   9  35  15]\n訓練データ 96 匹\nテストデータ 24 匹\nテストデータの内訳: Salmon 13 匹, Sea bass 11 匹\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n先頭で切っても、テストデータには Salmon と Sea bass の両方が入る\nもう一度実行すると並べ替えが変わり、内訳も変わる\n\nこのスライドの数字と、自分で実行した数字は一致しない"
   },
   {
     "objectID": "classification-evaluation.html#テストデータで評価する",
@@ -1439,7 +1439,7 @@
     "href": "classification-evaluation.html#peek-cv",
     "title": "過学習と汎化",
     "section": "5-fold 交差検証で採点する",
-    "text": "5-fold 交差検証で採点する\n\n\n訓練データに、順に 0〜4 のグループ番号を振る（訓練データはすでにランダムな順）\nグループ i を検証データ、残りを学習に使い、5回採点する\n5回の成績を平均する\n\n\nimport numpy as np\nfrom sklearn.tree import DecisionTreeClassifier\nfrom sklearn.metrics import precision_score, recall_score\n\nk = 5\ngroup = np.arange(len(y_train)) % k        # 0, 1, 2, 3, 4, 0, 1, ... と番号を振る\n\nprecisions, recalls = [], []\nfor i in range(k):\n    tree = DecisionTreeClassifier(max_depth=3)\n    tree.fit(X_train[group != i], y_train[group != i])     # グループ i 以外で学習\n    pred = tree.predict(X_train[group == i])               # グループ i（検証データ）で採点\n    precisions.append(precision_score(y_train[group == i], pred))\n    recalls.append(recall_score(y_train[group == i], pred))\n    print(f\"group {i}  Precision: {precisions[-1]:.3f}  Recall: {recalls[-1]:.3f}\")\n\nprint(f\"平均 Precision: {np.mean(precisions):.3f}\")\nprint(f\"平均 Recall:    {np.mean(recalls):.3f}\")\n\ngroup 0  Precision: 0.769  Recall: 1.000\ngroup 1  Precision: 0.917  Recall: 0.917\ngroup 2  Precision: 0.889  Recall: 0.889\ngroup 3  Precision: 0.700  Recall: 1.000\ngroup 4  Precision: 0.692  Recall: 0.900\n平均 Precision: 0.793\n平均 Recall:    0.941\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n5回の平均なので、1回の分割よりも偶然に左右されにくい"
+    "text": "5-fold 交差検証で採点する\n\n\n訓練データに、順に 0〜4 のグループ番号を振る（訓練データはすでにランダムな順）\nグループ i を検証データ、残りを学習に使い、5回採点する\n5回の成績を平均する\n\n\nimport numpy as np\nfrom sklearn.tree import DecisionTreeClassifier\nfrom sklearn.metrics import precision_score, recall_score\n\nk = 5\ngroup = np.arange(len(y_train)) % k        # 0, 1, 2, 3, 4, 0, 1, ... と番号を振る\n\nprecisions, recalls = [], []\nfor i in range(k):\n    tree = DecisionTreeClassifier(max_depth=3)\n    tree.fit(X_train[group != i], y_train[group != i])     # グループ i 以外で学習\n    pred = tree.predict(X_train[group == i])               # グループ i（検証データ）で採点\n    precisions.append(precision_score(y_train[group == i], pred))\n    recalls.append(recall_score(y_train[group == i], pred))\n    print(f\"group {i}  Precision: {precisions[-1]:.3f}  Recall: {recalls[-1]:.3f}\")\n\nprint(f\"平均 Precision: {np.mean(precisions):.3f}\")\nprint(f\"平均 Recall:    {np.mean(recalls):.3f}\")\n\n\n\ngroup 0  Precision: 0.900  Recall: 0.818\ngroup 1  Precision: 0.833  Recall: 0.833\ngroup 2  Precision: 1.000  Recall: 0.545\ngroup 3  Precision: 0.714  Recall: 0.833\ngroup 4  Precision: 0.778  Recall: 1.000\n平均 Precision: 0.845\n平均 Recall:    0.806\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n5回の平均なので、1回の分割よりも偶然に左右されにくい"
   },
   {
     "objectID": "classification-evaluation.html#深さを変えた場合の-precision-と-recall",
@@ -1460,14 +1460,14 @@
     "href": "classification-evaluation.html#訓練データの中で交差検証して深さを選ぶ",
     "title": "過学習と汎化",
     "section": "訓練データの中で交差検証して深さを選ぶ",
-    "text": "訓練データの中で交差検証して深さを選ぶ\n\n\n深さを比べる指標は用途で決める（レストラン向けは Precision、缶詰工場向けは Recall）\nここでは高級レストラン向け（Sea bass の混入を避けたい）として、Precision で選ぶ\n交差検証のコードを関数にまとめ、深さ 1〜10 で1回ずつ呼ぶ\n\n\ndef kfold_precision(depth, X, y, k):\n    \"\"\"深さ depth の木を k-fold 交差検証し、平均 Precision を返す\"\"\"\n    group = np.arange(len(y)) % k      # 訓練データはすでにランダムな順なので、そのまま番号を振る\n    precisions = []\n    for i in range(k):\n        tree = DecisionTreeClassifier(max_depth=depth)\n        tree.fit(X[group != i], y[group != i])\n        pred = tree.predict(X[group == i])\n        precisions.append(precision_score(y[group == i], pred))\n    return np.mean(precisions)\n\nsel_depths = list(range(1, 11))\ncv_precisions = []\nfor d in sel_depths:\n    cv_precisions.append(kfold_precision(d, X_train, y_train, 5))   # 訓練データだけで交差検証\n\nbest_depth = sel_depths[int(np.argmax(cv_precisions))]   # 最大値の位置（0始まり）を深さ（1始まり）に直す\nprint(f\"平均 Precision が最大の深さ: {best_depth}\")\n\n平均 Precision が最大の深さ: 3"
+    "text": "訓練データの中で交差検証して深さを選ぶ\n\n\n深さを比べる指標は用途で決める（レストラン向けは Precision、缶詰工場向けは Recall）\nここでは高級レストラン向け（Sea bass の混入を避けたい）として、Precision で選ぶ\n交差検証のコードを関数にまとめ、深さ 1〜10 で1回ずつ呼ぶ\n\n\ndef kfold_precision(depth, X, y, k):\n    \"\"\"深さ depth の木を k-fold 交差検証し、平均 Precision を返す\"\"\"\n    group = np.arange(len(y)) % k      # 訓練データはすでにランダムな順なので、そのまま番号を振る\n    precisions = []\n    for i in range(k):\n        tree = DecisionTreeClassifier(max_depth=depth)\n        tree.fit(X[group != i], y[group != i])\n        pred = tree.predict(X[group == i])\n        precisions.append(precision_score(y[group == i], pred))\n    return np.mean(precisions)\n\nsel_depths = list(range(1, 11))\ncv_precisions = []\nfor d in sel_depths:\n    cv_precisions.append(kfold_precision(d, X_train, y_train, 5))   # 訓練データだけで交差検証\n\nbest_depth = sel_depths[int(np.argmax(cv_precisions))]   # 最大値の位置（0始まり）を深さ（1始まり）に直す\nprint(f\"平均 Precision が最大の深さ: {best_depth}\")\n\n\n\n平均 Precision が最大の深さ: 2"
   },
   {
     "objectID": "classification-evaluation.html#選んだ深さでテストデータを採点",
     "href": "classification-evaluation.html#選んだ深さでテストデータを採点",
     "title": "過学習と汎化",
     "section": "選んだ深さでテストデータを採点",
-    "text": "選んだ深さでテストデータを採点\n\n\n# 選んだ深さで、訓練データ全体を学習し直す\nbest_tree = DecisionTreeClassifier(max_depth=best_depth).fit(X_train, y_train)\npred_test = best_tree.predict(X_test)\nprint(f\"Precision {precision_score(y_test, pred_test):.3f}  Recall {recall_score(y_test, pred_test):.3f}\")\n\nPrecision 0.727  Recall 0.667"
+    "text": "選んだ深さでテストデータを採点\n\n\n# 選んだ深さで、訓練データ全体を学習し直す\nbest_tree = DecisionTreeClassifier(max_depth=best_depth).fit(X_train, y_train)\npred_test = best_tree.predict(X_test)\nprint(f\"Precision {precision_score(y_test, pred_test):.3f}  Recall {recall_score(y_test, pred_test):.3f}\")\n\n\n\nPrecision 0.667  Recall 0.769"
   },
   {
     "objectID": "classification-evaluation.html#tweak-分割を変えて成績の揺れを見る",
@@ -1502,7 +1502,7 @@
     "href": "classification-evaluation.html#問題2の解答例",
     "title": "過学習と汎化",
     "section": "問題2の解答例",
-    "text": "問題2の解答例\n\n\n\n解答例を見る\nimport numpy as np\nfrom sklearn.tree import DecisionTreeClassifier\nfrom sklearn.metrics import precision_score, recall_score\n\ndef kfold_recall(depth, X, y, k):\n    \"\"\"深さ depth の木を k-fold 交差検証し、平均 Recall を返す\"\"\"\n    group = np.arange(len(y)) % k      # 訓練データはすでにランダムな順なので、そのまま番号を振る\n    recalls = []\n    for i in range(k):\n        tree = DecisionTreeClassifier(max_depth=depth)\n        tree.fit(X[group != i], y[group != i])\n        pred = tree.predict(X[group == i])\n        recalls.append(recall_score(y[group == i], pred))\n    return np.mean(recalls)\n\ndepths = list(range(1, 11))\ncv_recalls = []\nfor d in depths:\n    cv_recalls.append(kfold_recall(d, X_train, y_train, 5))\n    print(f\"depth {d:2d}: mean Recall {cv_recalls[-1]:.3f}\")\n\nbest_depth_r = depths[int(np.argmax(cv_recalls))]\ntree_r = DecisionTreeClassifier(max_depth=best_depth_r).fit(X_train, y_train)\npred_test = tree_r.predict(X_test)\nprint(f\"test Precision {precision_score(y_test, pred_test):.3f}  Recall {recall_score(y_test, pred_test):.3f}\")\nprint(f\"Recall で選んだ深さ: {best_depth_r}\")\nprint(f\"Precision で選んだ深さ（本編）: {best_depth}\")\n\n\ndepth  1: mean Recall 0.837\ndepth  2: mean Recall 0.874\ndepth  3: mean Recall 0.941\ndepth  4: mean Recall 0.777\ndepth  5: mean Recall 0.743\ndepth  6: mean Recall 0.814\ndepth  7: mean Recall 0.805\ndepth  8: mean Recall 0.797\ndepth  9: mean Recall 0.825\ndepth 10: mean Recall 0.837\ntest Precision 0.727  Recall 0.667\nRecall で選んだ深さ: 3\nPrecision で選んだ深さ（本編）: 3\n\n\n\nRecall で選んだ深さと Precision で選んだ深さは、違うことが多い\n\n選ぶ指標が変わると選ばれる深さも変わるので、どの指標で選ぶかは用途で決める"
+    "text": "問題2の解答例\n\n\n\n解答例を見る\nimport numpy as np\nfrom sklearn.tree import DecisionTreeClassifier\nfrom sklearn.metrics import precision_score, recall_score\n\ndef kfold_recall(depth, X, y, k):\n    \"\"\"深さ depth の木を k-fold 交差検証し、平均 Recall を返す\"\"\"\n    group = np.arange(len(y)) % k      # 訓練データはすでにランダムな順なので、そのまま番号を振る\n    recalls = []\n    for i in range(k):\n        tree = DecisionTreeClassifier(max_depth=depth)\n        tree.fit(X[group != i], y[group != i])\n        pred = tree.predict(X[group == i])\n        recalls.append(recall_score(y[group == i], pred))\n    return np.mean(recalls)\n\ndepths = list(range(1, 11))\ncv_recalls = []\nfor d in depths:\n    cv_recalls.append(kfold_recall(d, X_train, y_train, 5))\n    print(f\"depth {d:2d}: mean Recall {cv_recalls[-1]:.3f}\")\n\nbest_depth_r = depths[int(np.argmax(cv_recalls))]\ntree_r = DecisionTreeClassifier(max_depth=best_depth_r).fit(X_train, y_train)\npred_test = tree_r.predict(X_test)\nprint(f\"test Precision {precision_score(y_test, pred_test):.3f}  Recall {recall_score(y_test, pred_test):.3f}\")\nprint(f\"Recall で選んだ深さ: {best_depth_r}\")\nprint(f\"Precision で選んだ深さ（本編）: {best_depth}\")\n\n\n\n\ndepth  1: mean Recall 0.768\ndepth  2: mean Recall 0.752\ndepth  3: mean Recall 0.806\ndepth  4: mean Recall 0.806\ndepth  5: mean Recall 0.829\ndepth  6: mean Recall 0.772\ndepth  7: mean Recall 0.755\ndepth  8: mean Recall 0.722\ndepth  9: mean Recall 0.755\ndepth 10: mean Recall 0.722\ntest Precision 0.714  Recall 0.769\nRecall で選んだ深さ: 5\nPrecision で選んだ深さ（本編）: 2\n\n\n\nRecall で選んだ深さと Precision で選んだ深さは、違うことが多い\n\n選ぶ指標が変わると選ばれる深さも変わるので、どの指標で選ぶかは用途で決める"
   },
   {
     "objectID": "classification-evaluation.html#参考train_test_split-で分割する",
@@ -3287,7 +3287,7 @@
     "href": "nn-multilayer.html#peek-random-initialization",
     "title": "隠れ層とReLUで曲がる境界をつくる",
     "section": "ランダム初期化で役割を分ける",
-    "text": "ランダム初期化で役割を分ける\n\n同じ入力 \\(x=(1.0,0.5)\\) を2つの中間変換へ入れる場合：\n\n\n\n初期化\n\\(z_1\\)\n\\(z_2\\)\n学習開始時の状態\n\n\n\n\n重みもバイアスも全部0\n\\(0\\)\n\\(0\\)\n2人が同じ出力・同じ勾配\n\n\n重みを別々の乱数にする\n\\(0.30\\)\n\\(0.10\\)\n最初から別の反応\n\n\n\n\n違う反応をすれば、受け取る勾配も変わり、別々の折り目へ育っていける\n乱数は完成形を決める答えではない。分業を始めるきっかけ\n\n\n対称性を破るために必要なのは、並んだ変換の重みを同じ値にしないこと"
+    "text": "ランダム初期化で役割を分ける\n\n同じ入力 \\(x=(1.0,0.5)\\) を2つの中間変換へ入れる場合：\n\n\n\n\n\n\n\n\n初期化\n\\(z_1\\) と \\(z_2\\)\n学習開始時の状態\n\n\n\n\n重みもバイアスも全部0\n同じ（どちらも \\(0\\)）\n2人が同じ出力・同じ勾配\n\n\n重みを別々の乱数にする\n別々の値\n最初から別の反応\n\n\n\n\n違う反応をすれば、受け取る勾配も変わり、別々の折り目へ育っていける\n乱数は完成形を決める答えではない。分業を始めるきっかけ\n\n\n対称性を破るために必要なのは、並んだ変換の重みを同じ値にしないこと"
   },
   {
     "objectID": "nn-multilayer.html#peek-output-layer",
@@ -3574,7 +3574,7 @@
     "href": "optimization-local-minima-appendix.html#検査1その方向本当に下り",
     "title": "ローカルミニマムの罠",
     "section": "検査1：その方向、本当に「下り」？",
-    "text": "検査1：その方向、本当に「下り」？\n\n\nNewton法の一歩 \\(d = -f'/f''\\) は提案として扱う\n踏む前にチェック：\\(f' \\cdot d \\geq 0\\) なら、提案は傾きと同じ向き＝登りなので却下\n却下したら、確実に下る最急降下方向 \\(d = -f'\\) に差し替える\n登り提案が出るのは、ちょうど \\(f'' &lt; 0\\)（上に凸）の場所 — 実験3とカタパルトの現場そのもの\n\n実験3の現場検証：\\(x = 1.5\\) では提案 \\(d = +0.26\\)。 \\(f\" \\cdot d = 0.6 \\times 0.26 &gt; 0\\) → 登りなので却下 → \\(d = -f\" = -0.6\\)（左の下りへ）"
+    "text": "検査1：その方向、本当に「下り」？\n\n\nNewton法の一歩 \\(d = -f'/f''\\) は提案として扱う\n踏む前にチェック：\\(f' \\cdot d \\geq 0\\) なら、提案は傾きと同じ向き＝登りなので却下\n却下したら、確実に下る最急降下方向 \\(d = -f'\\) に差し替える\n登り提案が出るのは、ちょうど \\(f'' &lt; 0\\)（上に凸）の場所 — 実験3とカタパルトの現場そのもの\n\n実験3の現場検証：\\(x = 1.5\\) では提案 \\(d = +0.26\\)。 \\(f' \\cdot d = 0.6 \\times 0.26 &gt; 0\\) → 登りなので却下 → \\(d = -f' = -0.6\\)（左の下りへ）"
   },
   {
     "objectID": "optimization-local-minima-appendix.html#検査2その一歩実測で下がってる",
@@ -3644,7 +3644,7 @@
     "href": "classification-evaluation.html#参考train_test_split-で分割",
     "title": "過学習と汎化",
     "section": "（参考）train_test_split で分割",
-    "text": "（参考）train_test_split で分割\n\n\n訓練データとテストデータの分離をしてくれる関数がscikit-learnにある\n\ntrain_test_split\n\n引数test_size=0.2：テストに回す割合\n返り値：X_train, X_test, y_train, y_test\n\n\n\n\nfrom sklearn.model_selection import train_test_split\n\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)\n\nprint(f\"訓練データ {len(X_train)} 匹\")\nprint(f\"テストデータ {len(X_test)} 匹: Salmon {np.sum(y_test == 1)} 匹, Sea bass {np.sum(y_test == 0)} 匹\")\n\n訓練データ 96 匹\nテストデータ 24 匹: Salmon 10 匹, Sea bass 14 匹"
+    "text": "（参考）train_test_split で分割\n\n\n訓練データとテストデータの分離をしてくれる関数がscikit-learnにある\n\ntrain_test_split\n\n引数test_size=0.2：テストに回す割合\n返り値：X_train, X_test, y_train, y_test\n\n\n\n\nfrom sklearn.model_selection import train_test_split\n\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)\n\nprint(f\"訓練データ {len(X_train)} 匹\")\nprint(f\"テストデータ {len(X_test)} 匹: Salmon {np.sum(y_test == 1)} 匹, Sea bass {np.sum(y_test == 0)} 匹\")\n\n\n\n訓練データ 96 匹\nテストデータ 24 匹: Salmon 15 匹, Sea bass 9 匹"
   },
   {
     "objectID": "classification-evaluation.html#k-fold-交差検証k-fold-cross-validation",
@@ -3658,7 +3658,7 @@
     "href": "classification-evaluation.html#参考cross_val_score-で交差検証",
     "title": "過学習と汎化",
     "section": "（参考）cross_val_score で交差検証",
-    "text": "（参考）cross_val_score で交差検証\n\n\nk-fold 交差検証をしてくれる関数がscikit-learnにある\n\ncross_val_score\n\n引数cv=5：グループの数 k\n引数scoring=\"precision\"：測る指標\n返り値：k 個の成績\n\n\n\n\nfrom sklearn.model_selection import cross_val_score\nfrom sklearn.tree import DecisionTreeClassifier\n\nscores = cross_val_score(DecisionTreeClassifier(max_depth=3), X_train, y_train, cv=5, scoring=\"precision\")\nprint(scores)\nprint(f\"平均 Precision: {scores.mean():.3f}\")\n\n[0.55555556 0.81818182 0.76923077 0.75       0.83333333]\n平均 Precision: 0.745"
+    "text": "（参考）cross_val_score で交差検証\n\n\nk-fold 交差検証をしてくれる関数がscikit-learnにある\n\ncross_val_score\n\n引数cv=5：グループの数 k\n引数scoring=\"precision\"：測る指標\n返り値：k 個の成績\n\n\n\n\nfrom sklearn.model_selection import cross_val_score\nfrom sklearn.tree import DecisionTreeClassifier\n\nscores = cross_val_score(DecisionTreeClassifier(max_depth=3), X_train, y_train, cv=5, scoring=\"precision\")\nprint(scores)\nprint(f\"平均 Precision: {scores.mean():.3f}\")\n\n\n\n[0.58333333 0.66666667 0.85714286 0.64285714 0.875     ]\n平均 Precision: 0.725"
   },
   {
     "objectID": "classification-evaluation.html#peek-hyperparameter",
@@ -3686,14 +3686,14 @@
     "href": "classification-evaluation.html#回分けるだけでは揺れる",
     "title": "過学習と汎化",
     "section": "1回分けるだけでは揺れる",
-    "text": "1回分けるだけでは揺れる\n\n\n訓練データ96匹を、学習用76匹と検証データ20匹にランダムに分ける\n深さ3の木を検証データで採点し、分け方を変えて5回くり返す\n\n\ntree = DecisionTreeClassifier(max_depth=3)\nidx = np.arange(len(y_train))\nfor i in range(5):\n    np.random.shuffle(idx)                                  # 毎回ちがう並べ替えで分け直す\n    X_fit, y_fit = X_train[idx][:76], y_train[idx][:76]     # 先頭76匹で学習\n    X_val, y_val = X_train[idx][76:], y_train[idx][76:]     # 残り20匹が検証データ\n    pred = tree.fit(X_fit, y_fit).predict(X_val)   # fit の戻り値は学習済みモデルなので、続けて predict できる\n    print(f\"split {i + 1}  Precision: {precision_score(y_val, pred):.3f}  Recall: {recall_score(y_val, pred):.3f}\")\n\nsplit 1  Precision: 0.800  Recall: 0.800\nsplit 2  Precision: 0.636  Recall: 0.875\nsplit 3  Precision: 0.636  Recall: 0.875\nsplit 4  Precision: 0.667  Recall: 0.500\nsplit 5  Precision: 0.538  Recall: 1.000\n\n\n\n\n\n\n\n\n\nデータが少ないほど揺れが大きい\n\n\n\n検証データは20匹で、そのうち Salmon は10匹前後\n\nSalmon 1匹の見逃しで Recall が約 10% 変わる\n\nこれでは深さを変えて成績が変わっても、深さのせいか分け方のせいか分からない"
+    "text": "1回分けるだけでは揺れる\n\n\n訓練データ96匹を、学習用76匹と検証データ20匹にランダムに分ける\n深さ3の木を検証データで採点し、分け方を変えて5回くり返す\n\n\ntree = DecisionTreeClassifier(max_depth=3)\nidx = np.arange(len(y_train))\nfor i in range(5):\n    np.random.shuffle(idx)                                  # 毎回ちがう並べ替えで分け直す\n    X_fit, y_fit = X_train[idx][:76], y_train[idx][:76]     # 先頭76匹で学習\n    X_val, y_val = X_train[idx][76:], y_train[idx][76:]     # 残り20匹が検証データ\n    pred = tree.fit(X_fit, y_fit).predict(X_val)   # fit の戻り値は学習済みモデルなので、続けて predict できる\n    print(f\"split {i + 1}  Precision: {precision_score(y_val, pred):.3f}  Recall: {recall_score(y_val, pred):.3f}\")\n\n\n\nsplit 1  Precision: 0.778  Recall: 0.875\nsplit 2  Precision: 0.818  Recall: 0.818\nsplit 3  Precision: 0.750  Recall: 0.818\nsplit 4  Precision: 1.000  Recall: 0.909\nsplit 5  Precision: 0.917  Recall: 1.000\n\n\n\n\n\n\n\n\n\nデータが少ないほど揺れが大きい\n\n\n\n検証データは20匹で、そのうち Salmon は10匹前後\n\nSalmon 1匹の見逃しで Recall が約 10% 変わる\n\nこれでは深さを変えて成績が変わっても、深さのせいか分け方のせいか分からない"
   },
   {
     "objectID": "classification-evaluation.html#peek-depth-curve",
     "href": "classification-evaluation.html#peek-depth-curve",
     "title": "過学習と汎化",
     "section": "深さを変えて、訓練データとテストデータで採点する",
-    "text": "深さを変えて、訓練データとテストデータで採点する\n\n\n訓練データだけで学習し、訓練データとテストデータの両方で採点する\n深さ 1〜12 で繰り返す\n\n\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\nfrom sklearn.tree import DecisionTreeClassifier\nfrom sklearn.metrics import precision_score, recall_score\n\ndepths = list(range(1, 13))\ntrain_p, train_r, test_p, test_r = [], [], [], []\n\nfor d in depths:\n    m = DecisionTreeClassifier(max_depth=d).fit(X_train, y_train)   # 訓練データだけで学習\n    pred_train, pred_test = m.predict(X_train), m.predict(X_test)\n    train_p.append(precision_score(y_train, pred_train))\n    train_r.append(recall_score(y_train, pred_train))\n    test_p.append(precision_score(y_test, pred_test))\n    test_r.append(recall_score(y_test, pred_test))\n\nfig, axes = plt.subplots(1, 2, figsize=(11, 3.8), sharey=True)\nfor ax, name, tr, te in zip(axes, [\"Precision\", \"Recall\"], [train_p, train_r], [test_p, test_r]):\n    ax.plot(depths, tr, \"o-\", color=\"#2980b9\", label=\"訓練データ\")\n    ax.plot(depths, te, \"s-\", color=\"#e74c3c\", label=\"テストデータ\")\n    ax.set_title(name); ax.set_xlabel(\"決定木の深さ\"); ax.grid(True, alpha=0.4)\naxes[0].set_ylabel(\"成績\"); axes[0].legend()\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n訓練の成績は、深くするほど満点に近づく\nテストの成績は満点に届かず、深い木ほど2本の線の差（ギャップ）が広がる"
+    "text": "深さを変えて、訓練データとテストデータで採点する\n\n\n訓練データだけで学習し、訓練データとテストデータの両方で採点する\n深さ 1〜12 で繰り返す\n\n\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\nfrom sklearn.tree import DecisionTreeClassifier\nfrom sklearn.metrics import precision_score, recall_score\n\ndepths = list(range(1, 13))\ntrain_p, train_r, test_p, test_r = [], [], [], []\n\nfor d in depths:\n    m = DecisionTreeClassifier(max_depth=d).fit(X_train, y_train)   # 訓練データだけで学習\n    pred_train, pred_test = m.predict(X_train), m.predict(X_test)\n    train_p.append(precision_score(y_train, pred_train))\n    train_r.append(recall_score(y_train, pred_train))\n    test_p.append(precision_score(y_test, pred_test))\n    test_r.append(recall_score(y_test, pred_test))\n\nfig, axes = plt.subplots(1, 2, figsize=(11, 3.8), sharey=True)\nfor ax, name, tr, te in zip(axes, [\"Precision\", \"Recall\"], [train_p, train_r], [test_p, test_r]):\n    ax.plot(depths, tr, \"o-\", color=\"#2980b9\", label=\"訓練データ\")\n    ax.plot(depths, te, \"s-\", color=\"#e74c3c\", label=\"テストデータ\")\n    ax.set_title(name); ax.set_xlabel(\"決定木の深さ\"); ax.grid(True, alpha=0.4)\naxes[0].set_ylabel(\"成績\"); axes[0].legend()\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n訓練の成績は、深くするほど満点に近づく\nテストの成績は満点に届かず、深い木ほど2本の線の差（ギャップ）が広がる"
   },
   {
     "objectID": "classification-evaluation.html#深さを変えて決定木で分ける",
@@ -4680,7 +4680,7 @@
     "href": "classification-evaluation.html#peek-refit-all",
     "title": "過学習と汎化",
     "section": "最後にテストのあとは全データで学習し直す",
-    "text": "最後にテストのあとは全データで学習し直す\n\n\nテストデータの採点で、成績の見積もりは終わった\n本番で使うモデルは、選んだ深さのまま、全120匹で学習し直す\n\n\n# 選んだ深さのまま、全データ（訓練データ＋テストデータ）で学習し直す\nfinal_tree = DecisionTreeClassifier(max_depth=best_depth).fit(X, y)\nprint(f\"深さ {best_depth}、{len(y)} 匹で学習\")\n\n深さ 3、120 匹で学習\n\n\n\n\n\n\n\n\n\n全データ（テストデータ含む）でもOK\n\n\n\nハイパパラメータ（深さ）：交差検証で選んだまま変えない\nパラメータ：全データで決め直してよい\n\n学習に使えるデータは多いほうがよい\n\nこのモデルの成績は、もう測れない（採点に使えるデータが残っていない）\n\nテストデータでの成績を、その見積もりとして使う"
+    "text": "最後にテストのあとは全データで学習し直す\n\n\nテストデータの採点で、成績の見積もりは終わった\n本番で使うモデルは、選んだ深さのまま、全120匹で学習し直す\n\n\n# 選んだ深さのまま、全データ（訓練データ＋テストデータ）で学習し直す\nfinal_tree = DecisionTreeClassifier(max_depth=best_depth).fit(X, y)\nprint(f\"深さ {best_depth}、{len(y)} 匹で学習\")\n\n\n\n深さ 2、120 匹で学習\n\n\n\n\n\n\n\n\n\n全データ（テストデータ含む）でもOK\n\n\n\nハイパパラメータ（深さ）：交差検証で選んだまま変えない\nパラメータ：全データで決め直してよい\n\n学習に使えるデータは多いほうがよい\n\nこのモデルの成績は、もう測れない（採点に使えるデータが残っていない）\n\nテストデータでの成績を、その見積もりとして使う"
   },
   {
     "objectID": "clustering-kmeans.html#今回は教師ナシ学習",

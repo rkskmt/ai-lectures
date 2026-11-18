@@ -248,7 +248,7 @@
   <script src="peek-ui.js" defer=""></script>
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="da8201a93e380e307bd43c8c70be744ac9ed3621 7ee7d17c13225fa4da9cebd4b2bc7f0c178175a9">
+  <meta name="qmd-web-source" content="79e7d43a7f1675ca1e39376e1fa5a9d33e296bde cc6268168b651d3b110bf415110dc45604cff6e2">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -369,7 +369,7 @@ rkskmt
 <section id="tensornumpy-配列の親戚" class="slide level2">
 <h2>tensor：NumPy 配列の親戚</h2>
 <div class="slide-body">
-<div id="8392c2d8" class="cell" data-execution_count="1">
+<div id="62d2b024" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
 <span id="cb1-2"><a aria-label="2"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a aria-label="3"></a></span>
@@ -389,7 +389,7 @@ rkskmt
 <section id="tensor-は形型置き場所を持つ" class="slide level2">
 <h2>tensor は形・型・置き場所を持つ</h2>
 <div class="slide-body">
-<div id="1c584269" class="cell" data-execution_count="2">
+<div id="afd958dc" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
 <span id="cb3-2"><a aria-label="2"></a></span>
 <span id="cb3-3"><a aria-label="3"></a>x <span class="op">=</span> torch.tensor([[<span class="fl">1.0</span>, <span class="fl">2.0</span>], [<span class="fl">3.0</span>, <span class="fl">4.0</span>]], dtype<span class="op">=</span>torch.float32)</span>
@@ -440,7 +440,7 @@ device: cpu</code></pre>
 <ul>
 <li>まず<strong>いちばん小さな例</strong>で挙動を見る。<span class="math inline">\(y = x^2\)</span> の <span class="math inline">\(x = 3\)</span> での微分は、高校の答えなら <span class="math inline">\(2x = 6\)</span></li>
 </ul>
-<div id="a3c0846b" class="cell" data-execution_count="3">
+<div id="c75e7401" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
 <span id="cb5-2"><a aria-label="2"></a></span>
 <span id="cb5-3"><a aria-label="3"></a>x <span class="op">=</span> torch.tensor(<span class="fl">3.0</span>, requires_grad<span class="op">=</span><span class="va">True</span>)   <span class="co"># 「勾配を追跡せよ」の印</span></span>
@@ -488,7 +488,7 @@ device: cpu</code></pre>
 <ul>
 <li>バックプロパゲーションの回と<strong>まったく同じ</strong>ネットワーク・同じ数値を流す</li>
 </ul>
-<div id="a7fb8a36" class="cell" data-execution_count="4">
+<div id="708c5e4e" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a aria-label="1"></a>w <span class="op">=</span> torch.tensor([<span class="fl">0.3</span>, <span class="op">-</span><span class="fl">0.2</span>], requires_grad<span class="op">=</span><span class="va">True</span>)   <span class="co"># w1, w2</span></span>
 <span id="cb7-2"><a aria-label="2"></a>b <span class="op">=</span> torch.tensor(<span class="fl">0.1</span>,  requires_grad<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb7-3"><a aria-label="3"></a>v <span class="op">=</span> torch.tensor(<span class="fl">0.5</span>,  requires_grad<span class="op">=</span><span class="va">True</span>)</span>
@@ -603,7 +603,7 @@ device: cpu</code></pre>
 </ul>
 <p><span class="math display">\[u \xrightarrow{\;\sigma\;} p
 \xrightarrow{\;\text{交差エントロピー}\;} L\]</span></p>
-<div id="6e53618d" class="cell" data-execution_count="5">
+<div id="338ac47b" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
 <span id="cb9-2"><a aria-label="2"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
 <span id="cb9-3"><a aria-label="3"></a></span>
@@ -653,7 +653,7 @@ device: cpu</code></pre>
 <section id="nn部品には全部見覚えがある" class="slide level2">
 <h2>nn：部品には全部、見覚えがある</h2>
 <div class="slide-body">
-<div id="724bc7d0" class="cell" data-execution_count="6">
+<div id="70136233" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a aria-label="1"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
 <span id="cb12-2"><a aria-label="2"></a></span>
 <span id="cb12-3"><a aria-label="3"></a>model <span class="op">=</span> nn.Sequential(</span>
@@ -758,7 +758,7 @@ device: cpu</code></pre>
 <span id="cb16-10"><a aria-label="10"></a><span class="bu">print</span>(lin(x))                  <span class="co"># Linear に通す</span></span>
 <span id="cb16-11"><a aria-label="11"></a><span class="bu">print</span>(x <span class="op">@</span> lin.weight.T <span class="op">+</span> lin.bias)   <span class="co"># 自分で計算しても、同じ</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="a2381a18" class="cell" data-execution_count="8">
+<div id="9289caa2" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-stdout">
 <pre><code>Parameter containing:
 tensor([[-0.0053,  0.3793],
@@ -794,7 +794,7 @@ tensor([[ 0.7393, -1.0621,  0.0441]], grad_fn=&lt;AddBackward0&gt;)</code></pre>
 <section id="optimizer.step-が勾配降下の1歩" class="slide level2">
 <h2><code>optimizer.step()</code> が勾配降下の1歩</h2>
 <div class="slide-body">
-<div id="fa40ea98" class="cell" data-execution_count="9">
+<div id="7d4e4e1d" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
 <span id="cb20-2"><a aria-label="2"></a></span>
 <span id="cb20-3"><a aria-label="3"></a>theta <span class="op">=</span> torch.tensor(<span class="fl">2.0</span>, requires_grad<span class="op">=</span><span class="va">True</span>)</span>
@@ -888,7 +888,7 @@ tensor([[ 0.7393, -1.0621,  0.0441]], grad_fn=&lt;AddBackward0&gt;)</code></pre>
 <span id="cb23-23"><a aria-label="23"></a>            acc <span class="op">=</span> ((torch.sigmoid(logits_log) <span class="op">&gt;=</span> <span class="fl">0.5</span>).<span class="bu">float</span>() <span class="op">==</span> y_t).<span class="bu">float</span>().mean()</span>
 <span id="cb23-24"><a aria-label="24"></a>        <span class="bu">print</span>(<span class="ss">f"更新 </span><span class="sc">{</span>i<span class="sc">:5d}</span><span class="ss">回 | Loss: </span><span class="sc">{</span>loss_log<span class="sc">.</span>item()<span class="sc">:.4f}</span><span class="ss"> | 正答率: </span><span class="sc">{</span>acc<span class="sc">.</span>item()<span class="sc">:.1%}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="c6d5a717" class="cell" data-execution_count="11">
+<div id="baf2ab3d" class="cell" data-execution_count="11">
 <div class="cell-output cell-output-stdout">
 <pre><code>更新     1回 | Loss: 0.6516 | 正答率: 84.5%
 更新   100回 | Loss: 0.2647 | 正答率: 85.5%
@@ -970,7 +970,7 @@ tensor([[ 0.7393, -1.0621,  0.0441]], grad_fn=&lt;AddBackward0&gt;)</code></pre>
 </div>
 </div>
 </div>
-<div id="4dad82a7" class="cell" data-execution_count="12">
+<div id="7ea639e2" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
 <span id="cb26-2"><a aria-label="2"></a></span>
 <span id="cb26-3"><a aria-label="3"></a>theta <span class="op">=</span> torch.tensor(<span class="fl">2.0</span>, requires_grad<span class="op">=</span><span class="va">True</span>)</span>
@@ -1137,8 +1137,8 @@ tensor(7.2000)</code></pre>
 </div>
 <div class="callout-content">
 <ul>
-<li>変換2個：「変換を重ねる」の回では2個でも分けられたのに、ここでは<strong>87%止まり</strong>（<code>torch.manual_seed(3)</code> だと50%まで転落）。表現力はあっても、<strong>良い谷にたどり着けるかは別問題</strong> — 16個の「余裕」は学習の保険でもある（<a href="./optimization-local-minima-appendix.html">ローカルミニマムの罠</a>）</li>
-<li><code>nn.Identity()</code>：折り目ゼロ — <strong>境界が直線に戻り、87%で頭打ち</strong>。「線形は重ねても線形」を PyTorch でも再確認</li>
+<li>変換2個：正答率が上がりきらず、seed によってはもっと悪いところで止まる。<strong>良い谷にたどり着けるかは初期値しだい</strong> — 16個の「余裕」は学習の保険でもある（<a href="./optimization-local-minima-appendix.html">ローカルミニマムの罠</a>）</li>
+<li><code>nn.Identity()</code>：折り目ゼロ — <strong>境界が直線に戻り、そこで頭打ち</strong>。「線形は重ねても線形」を PyTorch でも再確認</li>
 <li>どれを変えても、学習ループの3拍子は<strong>一切書き換えない</strong>で済む — それが部品化の威力</li>
 </ul>
 </div>
@@ -1189,7 +1189,7 @@ tensor(7.2000)</code></pre>
 <section id="解答例" class="slide level2">
 <h2>解答例</h2>
 <div class="slide-body">
-<div id="48a3d110" class="cell" data-execution_count="14">
+<div id="0b8e0ed5" class="cell" data-execution_count="14">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
