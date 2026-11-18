@@ -260,6 +260,8 @@ print(f"訓練データ: Salmon {np.sum(y_train_head == 1)} 匹, Sea bass {np.su
 
 ```{python}
 #| echo: true
+#| eval: false
+#| label: frz-split
 idx = np.arange(len(y))              # 0〜119 の配列
 print(idx[:10])
 np.random.shuffle(idx)               # ランダムに並べ替え（idx そのものが書き換わる）
@@ -275,6 +277,15 @@ X_test,  y_test  = X_shuffled[n_train:], y_shuffled[n_train:]   # 残り24匹を
 print(f"訓練データ {len(X_train)} 匹")
 print(f"テストデータ {len(X_test)} 匹")
 print(f"テストデータの内訳: Salmon {np.sum(y_test == 1)} 匹, Sea bass {np.sum(y_test == 0)} 匹")
+```
+
+```{python}
+#| echo: false
+# frozen display: output of the cell above, saved by tools/freeze_cells.py (one run of the shuffle;
+# every cell after it that depends on the split is frozen from the same run)
+import json
+frozen = json.load(open("frozen/classification-evaluation.json", encoding="utf-8"))
+print(frozen["frz-split"], end="")
 ```
 
 ::: {.callout-note title="結果"}
@@ -294,7 +305,8 @@ print(f"テストデータの内訳: Salmon {np.sum(y_test == 1)} 匹, Sea bass 
 
 ```{python}
 #| echo: true
-#| fig-align: center
+#| eval: false
+#| label: frz-depth-curve
 import matplotlib.pyplot as plt
 import japanize_matplotlib
 from sklearn.tree import DecisionTreeClassifier
@@ -320,6 +332,8 @@ axes[0].set_ylabel("成績"); axes[0].legend()
 plt.tight_layout()
 plt.show()
 ```
+
+![](frozen/classification-evaluation-frz-depth-curve-1.png){fig-align="center"}
 
 ::: {.callout-note title="結果"}
 - 訓練の成績は、深くするほど満点に近づく
@@ -427,6 +441,8 @@ plt.show()
 
 ```{python}
 #| echo: true
+#| eval: false
+#| label: frz-five-splits
 tree = DecisionTreeClassifier(max_depth=3)
 idx = np.arange(len(y_train))
 for i in range(5):
@@ -435,6 +451,12 @@ for i in range(5):
     X_val, y_val = X_train[idx][76:], y_train[idx][76:]     # 残り20匹が検証データ
     pred = tree.fit(X_fit, y_fit).predict(X_val)   # fit の戻り値は学習済みモデルなので、続けて predict できる
     print(f"split {i + 1}  Precision: {precision_score(y_val, pred):.3f}  Recall: {recall_score(y_val, pred):.3f}")
+```
+
+```{python}
+#| echo: false
+# frozen display: output of the cell above, saved by tools/freeze_cells.py
+print(frozen["frz-five-splits"], end="")
 ```
 
 ::: {.callout-warning title="データが少ないほど揺れが大きい"}
@@ -496,6 +518,8 @@ plt.show()
 
 ```{python}
 #| echo: true
+#| eval: false
+#| label: frz-cv
 import numpy as np
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import precision_score, recall_score
@@ -516,6 +540,12 @@ print(f"平均 Precision: {np.mean(precisions):.3f}")
 print(f"平均 Recall:    {np.mean(recalls):.3f}")
 ```
 
+```{python}
+#| echo: false
+# frozen display: output of the cell above, saved by tools/freeze_cells.py
+print(frozen["frz-cv"], end="")
+```
+
 ::: {.callout-note title="結果"}
 - 5回の平均なので、1回の分割よりも偶然に左右されにくい
 :::
@@ -529,6 +559,8 @@ print(f"平均 Recall:    {np.mean(recalls):.3f}")
 
 ```{python}
 #| echo: true
+#| eval: false
+#| label: frz-select
 def kfold_precision(depth, X, y, k):
     """深さ depth の木を k-fold 交差検証し、平均 Precision を返す"""
     group = np.arange(len(y)) % k      # 訓練データはすでにランダムな順なので、そのまま番号を振る
@@ -551,7 +583,14 @@ print(f"平均 Precision が最大の深さ: {best_depth}")
 
 ```{python}
 #| echo: false
-#| fig-align: center
+# frozen display: output of the cell above, saved by tools/freeze_cells.py
+print(frozen["frz-select"], end="")
+```
+
+```{python}
+#| echo: false
+#| eval: false
+#| label: frz-select-curve
 plt.figure(figsize=(6.5, 3.4))
 plt.plot(sel_depths, cv_precisions, "o-", color="#2980b9", label="訓練データ内の 5-fold 平均 Precision")
 plt.scatter([best_depth], [max(cv_precisions)], s=220, facecolors="none", edgecolors="orange",
@@ -563,15 +602,25 @@ plt.tight_layout()
 plt.show()
 ```
 
+![](frozen/classification-evaluation-frz-select-curve-1.png){fig-align="center"}
+
 
 ## 選んだ深さでテストデータを採点
 
 ```{python}
 #| echo: true
+#| eval: false
+#| label: frz-test
 # 選んだ深さで、訓練データ全体を学習し直す
 best_tree = DecisionTreeClassifier(max_depth=best_depth).fit(X_train, y_train)
 pred_test = best_tree.predict(X_test)
 print(f"Precision {precision_score(y_test, pred_test):.3f}  Recall {recall_score(y_test, pred_test):.3f}")
+```
+
+```{python}
+#| echo: false
+# frozen display: output of the cell above, saved by tools/freeze_cells.py
+print(frozen["frz-test"], end="")
 ```
 
 
@@ -582,9 +631,17 @@ print(f"Precision {precision_score(y_test, pred_test):.3f}  Recall {recall_score
 
 ```{python}
 #| echo: true
+#| eval: false
+#| label: frz-refit
 # 選んだ深さのまま、全データ（訓練データ＋テストデータ）で学習し直す
 final_tree = DecisionTreeClassifier(max_depth=best_depth).fit(X, y)
 print(f"深さ {best_depth}、{len(y)} 匹で学習")
+```
+
+```{python}
+#| echo: false
+# frozen display: output of the cell above, saved by tools/freeze_cells.py
+print(frozen["frz-refit"], end="")
 ```
 
 ::: {.callout-note title="全データ（テストデータ含む）でもOK"}
@@ -602,7 +659,8 @@ print(f"深さ {best_depth}、{len(y)} 匹で学習")
 
 ```{python}
 #| echo: true
-#| fig-align: center
+#| eval: false
+#| label: frz-confusion
 import matplotlib.pyplot as plt
 import japanize_matplotlib
 from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
@@ -624,6 +682,8 @@ plt.title("混同行列（テストデータ24匹）")
 plt.tight_layout()
 plt.show()
 ```
+
+![](frozen/classification-evaluation-frz-confusion-1.png){fig-align="center"}
 
 
 ## **Tweak** 分割を変えて成績の揺れを見る {.badge-practice}
@@ -708,6 +768,8 @@ Salmon は10匹中8匹を正しく Salmon と判定、Sea bass は10匹中9匹�
 
 ```{python}
 #| echo: true
+#| eval: false
+#| label: frz-answer-recall
 #| code-fold: true
 #| code-summary: "解答例を見る"
 import numpy as np
@@ -739,6 +801,12 @@ print(f"Recall で選んだ深さ: {best_depth_r}")
 print(f"Precision で選んだ深さ（本編）: {best_depth}")
 ```
 
+```{python}
+#| echo: false
+# frozen display: output of the cell above, saved by tools/freeze_cells.py
+print(frozen["frz-answer-recall"], end="")
+```
+
 - Recall で選んだ深さと Precision で選んだ深さは、違うことが多い
    - 選ぶ指標が変わると選ばれる深さも変わるので、どの指標で選ぶかは用途で決める
 
@@ -752,12 +820,20 @@ print(f"Precision で選んだ深さ（本編）: {best_depth}")
 
 ```{python}
 #| echo: true
+#| eval: false
+#| label: frz-train-test-split
 from sklearn.model_selection import train_test_split
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
 print(f"訓練データ {len(X_train)} 匹")
 print(f"テストデータ {len(X_test)} 匹: Salmon {np.sum(y_test == 1)} 匹, Sea bass {np.sum(y_test == 0)} 匹")
+```
+
+```{python}
+#| echo: false
+# frozen display: output of the cell above, saved by tools/freeze_cells.py
+print(frozen["frz-train-test-split"], end="")
 ```
 
 
@@ -771,10 +847,18 @@ print(f"テストデータ {len(X_test)} 匹: Salmon {np.sum(y_test == 1)} 匹, 
 
 ```{python}
 #| echo: true
+#| eval: false
+#| label: frz-cross-val-score
 from sklearn.model_selection import cross_val_score
 from sklearn.tree import DecisionTreeClassifier
 
 scores = cross_val_score(DecisionTreeClassifier(max_depth=3), X_train, y_train, cv=5, scoring="precision")
 print(scores)
 print(f"平均 Precision: {scores.mean():.3f}")
+```
+
+```{python}
+#| echo: false
+# frozen display: output of the cell above, saved by tools/freeze_cells.py
+print(frozen["frz-cross-val-score"], end="")
 ```
