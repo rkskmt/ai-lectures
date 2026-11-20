@@ -168,6 +168,15 @@
             config.math.config = config.math.config.replace("_HTML", "_CHTML");
             config.math.CommonHTML = { scale: 127, matchFontHeight: false };
           }
+          // A ruled lecture index (.lectures.ruled) lays itself out at
+          // the window's width (custom.css). reveal.js's slide view
+          // fixes every slide at 1280x720 and scales it, and reveal.js
+          // switches to the scroll view only below 435px, so open such
+          // a page in the scroll view at every width. Quarto calls
+          // initialize at the end of <body>, so the page is parsed.
+          if (config && document.querySelector(".lectures.ruled")) {
+            config.view = "scroll";
+          }
           return initialize.call(this, config);
         };
       }
@@ -179,7 +188,7 @@
   <script src="peek-ui.js" defer=""></script>
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="8138ca02e0f5f3dc5d3f767ae8a25ca1e167577a dc28cc05964f9699ab37295a2bfc6500a1b3b97c">
+  <meta name="qmd-web-source" content="d3864a97646f7e054903fd91ec11ebccc6df7153">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -189,13 +198,16 @@
 <section id="人工知能" class="slide level2">
 <h2>人工知能</h2>
 <div class="slide-body">
+<p><a href="./handouts.html" class="pdf-gate" title="配布資料（PDF）">PDF</a></p>
 <div id="lecture-search">
 <input id="search-input" type="search" placeholder="全文検索 — どの回に出てきたか探せる（例：MSE、過学習、シグモイド）" autocomplete="off">
 <div id="search-results" class="search-ui-results">
 
 </div>
 </div>
-<div class="lectures">
+<style>.reveal{--ruled-accent:#ffe14a;--ruled-accent-ink:#000}</style>
+<div class="lectures ruled">
+<div class="lec-group">
 <div id="導入" class="sec cat1">
 導入
 </div>
@@ -205,6 +217,8 @@
 <li><a href="./numpy-recipes.html">NumPy 逆引き</a></li>
 </ul>
 </div>
+</div>
+<div class="lec-group">
 <div id="分類問題と特徴量" class="sec cat2">
 分類問題と特徴量
 </div>
@@ -218,6 +232,8 @@
 <li><a href="./report-classification.html" class="report">自分のデータを分類する</a></li>
 </ul>
 </div>
+</div>
+<div class="lec-group">
 <div id="fit-の中身を開ける" class="sec cat3">
 fit() の中身を開ける
 </div>
@@ -228,6 +244,8 @@ fit() の中身を開ける
 <li><a href="./logistic-regression.html">ロジスティック回帰</a></li>
 </ul>
 </div>
+</div>
+<div class="lec-group">
 <div id="ニューラルネットワーク" class="sec cat4">
 ニューラルネットワーク
 </div>
@@ -240,6 +258,8 @@ fit() の中身を開ける
 <li><a href="./mnist-project.html">手書き数字分類プロジェクト</a></li>
 </ul>
 </div>
+</div>
+<div class="lec-group">
 <div id="参考資料-回数外" class="sec">
 参考資料 <span class="sub">回数外</span>
 </div>
@@ -252,10 +272,11 @@ fit() の中身を開ける
 </ul>
 </div>
 </div>
+</div>
 <style>
-/* A report card: no lecture number, the chip shows レ (レポート). */
+/* A report: no lecture number; its number cell shows レ (レポート). */
 .reveal .lectures .grid li:has(> a.report){counter-increment:none}
-.reveal .lectures .grid li > a.report::before{content:"レ"!important;color:#e0503f!important;background:#fdeae7!important}
+.reveal .lectures .grid li > a.report::before{content:"レ"!important}
 </style>
 <script>
 document.addEventListener('keydown', function(e) {

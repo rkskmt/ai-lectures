@@ -237,6 +237,15 @@
             config.math.config = config.math.config.replace("_HTML", "_CHTML");
             config.math.CommonHTML = { scale: 127, matchFontHeight: false };
           }
+          // A ruled lecture index (.lectures.ruled) lays itself out at
+          // the window's width (custom.css). reveal.js's slide view
+          // fixes every slide at 1280x720 and scales it, and reveal.js
+          // switches to the scroll view only below 435px, so open such
+          // a page in the scroll view at every width. Quarto calls
+          // initialize at the end of <body>, so the page is parsed.
+          if (config && document.querySelector(".lectures.ruled")) {
+            config.view = "scroll";
+          }
           return initialize.call(this, config);
         };
       }
@@ -248,7 +257,7 @@
   <script src="peek-ui.js" defer=""></script>
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="32e330515c33f7c7048a21a585237f3ba46ae04e 56f25ca8ee5eec4525159c507e152801add10b51">
+  <meta name="qmd-web-source" content="32e330515c33f7c7048a21a585237f3ba46ae04e">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -380,11 +389,11 @@ rkskmt
 </ul></li>
 </ul></li>
 </ul>
-<div id="0a06ffce" class="cell" data-execution_count="1">
+<div id="0dae93e0" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-2-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-2-output-1.png" class="quarto-figure quarto-figure-center" width="1091" height="367"></a></p>
+<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-2-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-2-output-1.png" class="quarto-figure quarto-figure-center" width="1087" height="367"></a></p>
 </figure>
 </div>
 </div>
@@ -470,11 +479,11 @@ rkskmt
 <section id="パラメータの可視化例" class="slide level2">
 <h2>パラメータの可視化例</h2>
 <div class="slide-body">
-<div id="4bb76906" class="cell" data-execution_count="2">
+<div id="6acd4b5c" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-3-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-3-output-1.png" class="quarto-figure quarto-figure-center" width="1089" height="367"></a></p>
+<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-3-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-3-output-1.png" class="quarto-figure quarto-figure-center" width="1087" height="367"></a></p>
 </figure>
 </div>
 </div>
@@ -626,11 +635,11 @@ rkskmt
 <li>傾きが<strong>負</strong> ＝ この場所では、右へ少し動くと <span class="math inline">\(f(x)\)</span> が下がる（下り坂は右）</li>
 <li>谷底に近づくには、傾きの<strong>逆方向</strong>（傾きが負なら右）へ少し進めばよい</li>
 </ul>
-<div id="3d2f3b76" class="cell fig-small" data-execution_count="3">
+<div id="5014a7ad" class="cell fig-small" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-4-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-4-output-1.png" class="quarto-figure quarto-figure-center" width="638" height="307"></a></p>
+<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-4-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-4-output-1.png" class="quarto-figure quarto-figure-center" width="637" height="307"></a></p>
 </figure>
 </div>
 </div>
@@ -753,11 +762,11 @@ rkskmt
 </div>
 </div>
 </div>
-<div id="be3210ce" class="cell" data-execution_count="5">
+<div id="35b6d6aa" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-6-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-6-output-1.png" class="quarto-figure quarto-figure-center" width="608" height="287"></a></p>
+<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-6-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-6-output-1.png" class="quarto-figure quarto-figure-center" width="606" height="287"></a></p>
 </figure>
 </div>
 </div>
@@ -785,11 +794,11 @@ rkskmt
 </div>
 </div>
 </div>
-<div id="1dfab1da" class="cell" data-execution_count="6">
+<div id="9a126f6d" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-7-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-7-output-1.png" class="quarto-figure quarto-figure-center" width="608" height="287"></a></p>
+<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-7-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-7-output-1.png" class="quarto-figure quarto-figure-center" width="606" height="287"></a></p>
 </figure>
 </div>
 </div>
@@ -812,11 +821,11 @@ rkskmt
 <p><span class="math display">\[f'(1.68) = 2 \times 1.68 - 4 = 3.36 - 4 = -0.64\]</span></p>
 <h4 id="更新">更新</h4>
 <p><span class="math display">\[x_{\text{new}} = 1.68 - 0.3 \times (-0.64) = 1.68 + 0.192 = 1.872\]</span></p>
-<div id="106a22b6" class="cell" data-execution_count="7">
+<div id="2c15a160" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-8-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-8-output-1.png" class="quarto-figure quarto-figure-center" width="608" height="287"></a></p>
+<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-8-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-8-output-1.png" class="quarto-figure quarto-figure-center" width="606" height="287"></a></p>
 </figure>
 </div>
 </div>
@@ -829,11 +838,11 @@ rkskmt
 <p><span class="math display">\[f'(1.872) = 2 \times 1.872 - 4 = 3.744 - 4 = -0.256\]</span></p>
 <h4 id="更新-1">更新</h4>
 <p><span class="math display">\[x_{\text{new}} = 1.872 - 0.3 \times (-0.256) = 1.872 + 0.0768 = 1.9488\]</span></p>
-<div id="994556c8" class="cell" data-execution_count="8">
+<div id="d7b75532" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-9-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-9-output-1.png" class="quarto-figure quarto-figure-center" width="608" height="287"></a></p>
+<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-9-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-9-output-1.png" class="quarto-figure quarto-figure-center" width="606" height="287"></a></p>
 </figure>
 </div>
 </div>
@@ -888,11 +897,11 @@ rkskmt
 </tr>
 </tbody>
 </table>
-<div id="7edd7bd9" class="cell" data-execution_count="9">
+<div id="1f38c5e1" class="cell" data-execution_count="9">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-10-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-10-output-1.png" class="quarto-figure quarto-figure-center" width="638" height="307"></a></p>
+<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-10-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-10-output-1.png" class="quarto-figure quarto-figure-center" width="637" height="307"></a></p>
 </figure>
 </div>
 </div>
@@ -921,7 +930,7 @@ rkskmt
 <ul>
 <li>手計算で使った更新式を、そのまま <code>for</code> 文で繰り返す</li>
 </ul>
-<div id="b654c5ba" class="cell" data-execution_count="10">
+<div id="a77c65d7" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a><span class="kw">def</span> f(x):</span>
 <span id="cb2-2"><a aria-label="2"></a>    <span class="cf">return</span> x<span class="op">**</span><span class="dv">2</span> <span class="op">-</span> <span class="dv">4</span><span class="op">*</span>x <span class="op">+</span> <span class="dv">3</span></span>
 <span id="cb2-3"><a aria-label="3"></a></span>
@@ -962,11 +971,11 @@ rkskmt
 <section id="学習率で挙動が変わる" class="slide level2">
 <h2>学習率で挙動が変わる</h2>
 <div class="slide-body">
-<div id="44bbdc3f" class="cell fig-medium" data-execution_count="11">
+<div id="2666e84e" class="cell fig-medium" data-execution_count="11">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-12-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-12-output-1.png" class="quarto-figure quarto-figure-center" width="988" height="587"></a></p>
+<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-12-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-12-output-1.png" class="quarto-figure quarto-figure-center" width="986" height="588"></a></p>
 </figure>
 </div>
 </div>
@@ -1166,11 +1175,11 @@ f(w_1,w_2)=w_1^2+3w_2^2,
 </div>
 </div>
 </div>
-<div id="4cb6e5bb" class="cell" data-execution_count="13">
+<div id="abd52d3a" class="cell" data-execution_count="13">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-14-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-14-output-1.png" class="quarto-figure quarto-figure-center" width="608" height="287"></a></p>
+<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-14-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-14-output-1.png" class="quarto-figure quarto-figure-center" width="606" height="287"></a></p>
 </figure>
 </div>
 </div>

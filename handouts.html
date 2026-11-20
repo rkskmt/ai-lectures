@@ -168,6 +168,15 @@
             config.math.config = config.math.config.replace("_HTML", "_CHTML");
             config.math.CommonHTML = { scale: 127, matchFontHeight: false };
           }
+          // A ruled lecture index (.lectures.ruled) lays itself out at
+          // the window's width (custom.css). reveal.js's slide view
+          // fixes every slide at 1280x720 and scales it, and reveal.js
+          // switches to the scroll view only below 435px, so open such
+          // a page in the scroll view at every width. Quarto calls
+          // initialize at the end of <body>, so the page is parsed.
+          if (config && document.querySelector(".lectures.ruled")) {
+            config.view = "scroll";
+          }
           return initialize.call(this, config);
         };
       }
@@ -179,7 +188,7 @@
   <script src="peek-ui.js" defer=""></script>
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="d38ee434c360613a3d22cab76b16398f5b399d63 9b49ef232db7a78fc6322af02ef685a9d9cb09fe">
+  <meta name="qmd-web-source" content="f85cf6ebf26200c0f74590a81712bf10b14eeff5">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -193,27 +202,35 @@
 <div class="idx-lead">
 <p>各回スライドの配布用 PDF。クリックで開く。番号は講義一覧と対応。</p>
 </div>
-<div class="lectures">
+<style>.reveal{--ruled-accent:#ffe14a;--ruled-accent-ink:#000}</style>
+<div class="lectures ruled">
+<div class="lec-group">
 <div id="導入" class="sec cat1">
 導入
 </div>
 <div class="grid cat1 dl">
 <ul>
 <li><a href="pdf/ai-introduction.pdf" target="_blank">人工知能概論</a></li>
+<li><a href="pdf/numpy-recipes.pdf" target="_blank">NumPy 逆引き</a></li>
 </ul>
 </div>
+</div>
+<div class="lec-group">
 <div id="分類問題と特徴量" class="sec cat2">
 分類問題と特徴量
 </div>
 <div class="grid cat2 dl">
 <ul>
-<li><a href="pdf/classification-basics-1d.pdf" target="_blank">1次元分類の基礎</a></li>
+<li><a href="pdf/classification-basics-1d.pdf" target="_blank">２クラス分類</a></li>
 <li><a href="pdf/classification-2d-boundaries.pdf" target="_blank">2次元の決定境界</a></li>
 <li><a href="pdf/classification-evaluation.pdf" target="_blank">過学習と汎化</a></li>
 <li><a href="pdf/clustering-kmeans.pdf" target="_blank">教師なし学習・クラスタリング</a></li>
-<li><a href="pdf/dimensionality-pca.pdf" target="_blank">次元の呪いと次元削減</a></li>
+<li><a href="pdf/knn-curse.pdf" target="_blank">k-NN と次元の呪い</a></li>
+<li><a href="pdf/report-classification.pdf" class="report" target="_blank">自分のデータを分類する</a></li>
 </ul>
 </div>
+</div>
+<div class="lec-group">
 <div id="fit-の中身を開ける" class="sec cat3">
 fit() の中身を開ける
 </div>
@@ -224,6 +241,8 @@ fit() の中身を開ける
 <li><a href="pdf/logistic-regression.pdf" target="_blank">ロジスティック回帰</a></li>
 </ul>
 </div>
+</div>
+<div class="lec-group">
 <div id="ニューラルネットワーク" class="sec cat4">
 ニューラルネットワーク
 </div>
@@ -236,17 +255,26 @@ fit() の中身を開ける
 <li><a href="pdf/mnist-project.pdf" target="_blank">手書き数字分類プロジェクト</a></li>
 </ul>
 </div>
+</div>
+<div class="lec-group">
 <div id="参考資料-回数外" class="sec">
 参考資料 <span class="sub">回数外</span>
 </div>
 <div class="grid app dl">
 <ul>
+<li><a href="pdf/dimensionality-pca.pdf" target="_blank">次元削減と PCA</a></li>
 <li><a href="pdf/robust-regression.pdf" target="_blank">外れ値に強い回帰</a></li>
 <li><a href="pdf/newton-method-appendix.pdf" target="_blank">Newton法</a></li>
 <li><a href="pdf/optimization-local-minima-appendix.pdf" target="_blank">ローカルミニマムの罠</a></li>
 </ul>
 </div>
 </div>
+</div>
+<style>
+/* A report: no lecture number; its number cell shows レ (レポート), as on the index. */
+.reveal .lectures .grid li:has(> a.report){counter-increment:none}
+.reveal .lectures .grid li > a.report::before{content:"レ"!important}
+</style>
 
 
 <div id="3ade8a4a-fb1d-4a6c-8409-ac45482d5fc9" class="hidden">

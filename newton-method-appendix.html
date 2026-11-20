@@ -237,6 +237,15 @@
             config.math.config = config.math.config.replace("_HTML", "_CHTML");
             config.math.CommonHTML = { scale: 127, matchFontHeight: false };
           }
+          // A ruled lecture index (.lectures.ruled) lays itself out at
+          // the window's width (custom.css). reveal.js's slide view
+          // fixes every slide at 1280x720 and scales it, and reveal.js
+          // switches to the scroll view only below 435px, so open such
+          // a page in the scroll view at every width. Quarto calls
+          // initialize at the end of <body>, so the page is parsed.
+          if (config && document.querySelector(".lectures.ruled")) {
+            config.view = "scroll";
+          }
           return initialize.call(this, config);
         };
       }
@@ -248,7 +257,7 @@
   <script src="peek-ui.js" defer=""></script>
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="d8db10d4b4158bbbcd7e33e6dccdb852a8b99e4c ef400ed1dda21b3aca92ebde5f44dc6ee7fef04a">
+  <meta name="qmd-web-source" content="d8db10d4b4158bbbcd7e33e6dccdb852a8b99e4c">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -275,7 +284,7 @@ rkskmt
 <li>勾配降下法の弱点（学習率の手動調整・収束の遅さ）を、<strong>2次微分</strong>で解決する手法</li>
 <li>ディープラーニングでは使われないが、<code>scikit-learn</code> のロジスティック回帰などの中で現役</li>
 </ul>
-<div id="0d8f7505" class="cell" data-execution_count="1">
+<div id="2c92f21e" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-3"><a aria-label="3"></a><span class="im">import</span> japanize_matplotlib</span>
@@ -481,7 +490,7 @@ rkskmt
 <section id="newton法python実装" class="slide level2">
 <h2>Newton法：Python実装</h2>
 <div class="slide-body">
-<div id="e7c9e00f" class="cell" data-execution_count="2">
+<div id="c7ae8656" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a><span class="co"># 初期値</span></span>
 <span id="cb2-2"><a aria-label="2"></a>x <span class="op">=</span> <span class="fl">0.0</span></span>
 <span id="cb2-3"><a aria-label="3"></a></span>
@@ -582,11 +591,11 @@ f''(x) = 2.0000
 <section id="可視化で比較" class="slide level2">
 <h2>可視化で比較</h2>
 <div class="slide-body">
-<div id="98e62068" class="cell" data-execution_count="3">
+<div id="2d8dd70d" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="newton-method-appendix_files/figure-revealjs/cell-4-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img data-src="newton-method-appendix_files/figure-revealjs/cell-4-output-1.png" class="quarto-figure quarto-figure-center" width="1188" height="387"></a></p>
+<p><a href="newton-method-appendix_files/figure-revealjs/cell-4-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img data-src="newton-method-appendix_files/figure-revealjs/cell-4-output-1.png" class="quarto-figure quarto-figure-center" width="1186" height="387"></a></p>
 </figure>
 </div>
 </div>
@@ -650,11 +659,11 @@ f''(x) = 2.0000
 <div id="視覚的説明" class="slide-body-heading">
 視覚的説明
 </div>
-<div id="440c9bda" class="cell" data-execution_count="4">
+<div id="478868fc" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="newton-method-appendix_files/figure-revealjs/cell-5-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img data-src="newton-method-appendix_files/figure-revealjs/cell-5-output-1.png" class="quarto-figure quarto-figure-center" width="988" height="587"></a></p>
+<p><a href="newton-method-appendix_files/figure-revealjs/cell-5-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img data-src="newton-method-appendix_files/figure-revealjs/cell-5-output-1.png" class="quarto-figure quarto-figure-center" width="986" height="588"></a></p>
 </figure>
 </div>
 </div>
