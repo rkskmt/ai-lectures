@@ -1279,6 +1279,126 @@ a.lightbox[href]::after {
 .reveal .lectures .grid.cat5 li:hover{border-color:#eeb6c6!important;background:#fdf4f7!important}
 
 /* =========================================================================
+   Ruled lecture index — opt-in variant: `:::: {.lectures .ruled}`
+   Heavy black rules and one accent colour (yellow unless the metadata key
+   `ruled-accent` sets another; card-grid.lua) instead of cards. The slide title, the
+   search box (or the .idx-lead line on a handouts page) and the PDF gate
+   (or the backlink) form one framed bar; each category is a framed box with
+   a black header band; each lecture is a ruled row with its number in a
+   cell of its own. Category colours (.catN) are ignored.
+   card-grid.lua wraps each `.sec` with its grid in `.lec-group` (only under
+   .ruled), so a category box never splits across the two columns.
+   The slide-level parts (bar layout, phone layout) key off
+   `section:has(.lectures.ruled)`, so the page needs no other class.
+   ========================================================================= */
+.reveal .slides section:has(.lectures.ruled){display:grid!important;grid-template-columns:auto minmax(0,1fr) auto;
+  grid-template-areas:"t s p" "b b b";align-content:start;padding:28px 36px 48px!important;box-sizing:border-box!important}
+.reveal .slides section:has(.lectures.ruled) > .slide-body,
+.reveal .slides section:has(.lectures.ruled) > .slide-body > p{display:contents!important}
+/* bar: title cell */
+.reveal .slides section:has(.lectures.ruled) > h2{grid-area:t;display:flex;align-items:center;min-height:58px;box-sizing:border-box;
+  margin:0 0 22px!important;padding:0 22px!important;background:#000;color:#fff!important;border:3px solid #000!important;
+  font-size:28px!important;font-weight:900!important;letter-spacing:.06em;line-height:1.2}
+/* bar: middle cell (search box on the index, lead line on handouts) */
+.reveal .slides section:has(.lectures.ruled) #lecture-search,
+.reveal .slides section:has(.lectures.ruled) .idx-lead{grid-area:s;position:relative;min-width:0;min-height:58px;box-sizing:border-box;
+  margin:0 0 22px!important;border:3px solid #000;border-left:0}
+.reveal .slides section:has(.lectures.ruled) #search-input{display:block;width:100%;height:100%;min-height:52px;box-sizing:border-box;
+  margin:0;padding:0 18px!important;border:0!important;border-radius:0!important;background:var(--ruled-accent,#ffe14a)!important;color:var(--ruled-accent-ink,#000);
+  font-size:16px!important;font-weight:700;outline:0}
+.reveal .slides section:has(.lectures.ruled) #search-input::placeholder{color:var(--ruled-accent-ink,#000);opacity:.6}
+.reveal .slides section:has(.lectures.ruled) #search-input:focus-visible{box-shadow:inset 0 0 0 3px var(--ruled-accent-ink,#000)}
+/* A native placeholder never wraps, so on a narrow window a long one is cut
+   off. search-ui.js copies it into .search-hint, which wraps; both sit in
+   the same grid cell, so the field grows to the hint's height. The native
+   placeholder is hidden only when the hint exists. */
+.reveal .slides section:has(.lectures.ruled) #lecture-search{display:grid}
+.reveal .slides section:has(.lectures.ruled) #search-input,
+.reveal .slides section:has(.lectures.ruled) #lecture-search .search-hint{grid-area:1/1}
+.reveal .slides section:has(.lectures.ruled) #search-input{height:auto;align-self:stretch}
+.reveal .slides section:has(.lectures.ruled) #lecture-search:has(.search-hint) #search-input::placeholder{color:transparent}
+.reveal .slides section:has(.lectures.ruled) #lecture-search .search-hint{z-index:1;align-self:center;padding:8px 18px;pointer-events:none;
+  color:var(--ruled-accent-ink,#000);opacity:.6;font-size:16px;font-weight:700;line-height:1.4}
+.reveal .slides section:has(.lectures.ruled) #lecture-search .search-hint[hidden]{display:none}
+/* results drop down over the list instead of pushing it; :has(*) because
+   the empty container still holds whitespace from the page source */
+.reveal .slides section:has(.lectures.ruled) #search-results{margin:0!important}
+.reveal .slides section:has(.lectures.ruled) #search-results:has(*){position:absolute;left:-3px;right:-3px;top:100%;z-index:30;
+  max-height:460px;overflow-y:auto;background:#fff;border:3px solid #000;border-top:0}
+.reveal .slides section:has(.lectures.ruled) .idx-lead{display:flex;align-items:center;padding:0 18px;
+  color:#000!important;font-size:15px!important;font-weight:700}
+.reveal .slides section:has(.lectures.ruled) .idx-lead p{margin:0}
+/* bar: right cell (PDF gate on the index, backlink on handouts). The -3px
+   overlaps the middle cell's right border, so the bar stays closed when
+   card-grid.lua drops the gate (no pdf/ yet). */
+.reveal .slides section:has(.lectures.ruled) a.pdf-gate,
+.reveal .slides section:has(.lectures.ruled) a.backlink{grid-area:p;position:static!important;display:flex!important;align-items:center;
+  min-height:58px;box-sizing:border-box;margin:0 0 22px -3px!important;padding:0 24px!important;border:3px solid #000!important;
+  border-radius:0!important;background:#fff!important;color:#000!important;
+  font:700 16px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace!important;letter-spacing:.04em}
+.reveal .slides section:has(.lectures.ruled) a.pdf-gate::before,
+.reveal .slides section:has(.lectures.ruled) a.backlink::after{content:none!important}
+.reveal .slides section:has(.lectures.ruled) a.pdf-gate:hover,
+.reveal .slides section:has(.lectures.ruled) a.backlink:hover{background:var(--ruled-accent,#ffe14a)!important;color:var(--ruled-accent-ink,#000)!important}
+/* body: two columns of framed category boxes */
+.reveal .slides section:has(.lectures.ruled) .lectures.ruled{grid-area:b;min-width:0;columns:2;column-gap:22px}
+.reveal .lectures.ruled .lec-group{break-inside:avoid;margin:0 0 22px;border:3px solid #000;background:#fff}
+.reveal .lectures.ruled .sec{margin:0!important;padding:6px 14px!important;border:0!important;background:#000!important;
+  color:#fff!important;font-size:15px!important;font-weight:900;letter-spacing:.04em;line-height:1.5}
+.reveal .lectures.ruled .sec .sub{color:#fff;opacity:.7;font-size:.8em}
+.reveal .lectures.ruled .grid ul{display:block!important}
+.reveal .lectures.ruled .grid li{border:0!important;border-radius:0!important;background:#fff!important;transition:none}
+.reveal .lectures.ruled .grid li + li{border-top:2px solid #000!important}
+.reveal .lectures.ruled .grid li:hover{background:#fff!important;border-color:#000!important}
+.reveal .lectures.ruled .grid li>a{position:relative;align-items:center;gap:10px;min-height:46px;box-sizing:border-box;
+  padding:9px 14px 9px 72px;color:#000!important;font-size:18px;font-weight:700;line-height:1.4}
+.reveal .lectures.ruled .grid li>a:hover{background:var(--ruled-accent,#ffe14a);color:var(--ruled-accent-ink,#000)!important}
+.reveal .lectures.ruled .grid li>a:focus-visible{outline:3px solid #000;outline-offset:-6px}
+/* number cell: the counter chip of the card grid, as a ruled column */
+.reveal .lectures.ruled .grid li>a::before{position:absolute;left:0;top:0;bottom:0;width:58px!important;height:auto!important;
+  border-right:2px solid #000;border-radius:0!important;background:none!important;color:#000!important;
+  font:700 16px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace!important;letter-spacing:0}
+.reveal .lectures.ruled .grid.app li>a::before{content:"+"!important}
+/* handouts: the PDF doc icon in black, like the rest of the page */
+.reveal .lectures.ruled .grid.dl li>a::after{margin-left:auto!important;opacity:1;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpath d='M14 2v6h6'/%3E%3C/svg%3E") no-repeat center/contain!important}
+/* Responsive layout. In reveal.js's slide view every slide is laid out at
+   1280×720 and scaled to the window (`transform: scale(var(--slide-scale))`),
+   so no layout can follow the window's width there. A page with
+   `.lectures.ruled` therefore opens in reveal.js's scroll view at every
+   width (the `view: "scroll"` hook in _extension.yml); the scroll view scales
+   the slide the same way, and the rules below undo that for this page only,
+   so it is laid out at the window's real width. If the hook did not run, the
+   page stays in slide view with the 1280×720 layout above.
+   reveal.js makes .scroll-page-content position:absolute inside a page of
+   fixed height (one screen); it must join the flow so the page grows to the
+   list's height. Otherwise the list overflows the page and the document
+   opens scrolled to its bottom. */
+.reveal-viewport.reveal-scroll .reveal .scroll-page:has(.lectures.ruled){height:auto!important}
+.reveal-viewport.reveal-scroll .reveal .scroll-page:has(.lectures.ruled) .scroll-page-sticky{position:relative!important;top:auto!important;height:auto!important}
+.reveal-viewport.reveal-scroll .reveal .scroll-page:has(.lectures.ruled) .scroll-page-content{position:relative!important;height:auto!important;overflow:visible!important}
+.reveal-viewport.reveal-scroll .reveal .slides section:has(.lectures.ruled){position:relative!important;left:0!important;top:0!important;
+  width:100%!important;max-width:1280px;height:auto!important;margin:0 auto!important;transform:none!important}
+/* narrow windows (phones, tablets in portrait, a narrowed browser): title +
+   gate on the first row, the search box under them, one column */
+@media (max-width: 799px) {
+  .reveal-viewport.reveal-scroll .reveal .slides section:has(.lectures.ruled){
+    grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"t p" "s s" "b b";padding:14px 14px 40px!important}
+  .reveal-viewport.reveal-scroll .reveal .slides section:has(.lectures.ruled) > h2{min-height:48px;margin:0!important;padding:0 16px!important;font-size:22px!important}
+  .reveal-viewport.reveal-scroll .reveal .slides section:has(.lectures.ruled) a.pdf-gate,
+  .reveal-viewport.reveal-scroll .reveal .slides section:has(.lectures.ruled) a.backlink{min-height:48px;margin:0 0 0 -3px!important;padding:0 16px!important;font-size:14px!important}
+  .reveal-viewport.reveal-scroll .reveal .slides section:has(.lectures.ruled) #lecture-search,
+  .reveal-viewport.reveal-scroll .reveal .slides section:has(.lectures.ruled) .idx-lead{min-height:0;margin:0 0 14px!important;border:3px solid #000;border-top:0}
+  .reveal-viewport.reveal-scroll .reveal .slides section:has(.lectures.ruled) #search-input{min-height:44px;padding:0 12px!important;font-size:14px!important}
+  .reveal-viewport.reveal-scroll .reveal .slides section:has(.lectures.ruled) #lecture-search .search-hint{padding:8px 12px;font-size:14px}
+  .reveal-viewport.reveal-scroll .reveal .slides section:has(.lectures.ruled) .idx-lead{padding:10px 12px;font-size:13px!important}
+  .reveal-viewport.reveal-scroll .reveal .slides section:has(.lectures.ruled) .lectures.ruled{columns:1}
+  .reveal-viewport.reveal-scroll .reveal .lectures.ruled .lec-group{margin-bottom:14px}
+  .reveal-viewport.reveal-scroll .reveal .lectures.ruled .grid li>a{min-height:42px;padding:9px 12px 9px 60px;font-size:16px}
+  .reveal-viewport.reveal-scroll .reveal .lectures.ruled .grid li>a::before{width:48px!important;font-size:14px!important}
+}
+
+/* =========================================================================
    Compact tabset — restyles Quarto's native .panel-tabset (works in reveal
    decks via Tabby) into a small segmented control, so alternate views
    (e.g. an index split into 前期/後期) don't stack on one slide.

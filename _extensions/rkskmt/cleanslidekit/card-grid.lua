@@ -21,6 +21,71 @@ local function has_class(el, class_name)
   return false
 end
 
+-- The `.ruled` variant draws each category as one framed box (header band
+-- + rows) and flows the boxes in two columns, so a header and its grid need
+-- a common parent that the column layout can keep in one piece. Wrap each
+-- `.sec` and the blocks after it, up to the next `.sec`, in `.lec-group`.
+-- Only under `.ruled`: the card grid needs no wrapper, and leaving its
+-- output untouched keeps every other index page byte-for-byte the same.
+local function group_categories(blocks)
+  local out = {}
+  local current = nil
+  local function flush()
+    if current then
+      table.insert(out, pandoc.Div(current, pandoc.Attr("", {"lec-group"})))
+    end
+  end
+  for _, block in ipairs(blocks) do
+    if block.t == "Div" and has_class(block, "sec") then
+      flush()
+      current = {block}
+    elseif current then
+      table.insert(current, block)
+    else
+      table.insert(out, block)
+    end
+  end
+  flush()
+  return out
+end
+
+-- `ruled-accent` (front matter, or a course's _metadata.yaml) sets the one
+-- colour of the `.ruled` index: the search box and the hover fill. The text
+-- drawn on it is black or white, whichever contrasts more (WCAG relative
+-- luminance), so a dark accent stays readable. Unset, custom.css keeps its
+-- yellow. A value that is not a hex colour stops the render: an invalid
+-- colour would only make the box silently transparent.
+local accent = nil
+local accent_ink = nil
+
+local function channel(hex2)
+  local c = tonumber(hex2, 16) / 255
+  if c <= 0.04045 then
+    return c / 12.92
+  end
+  return ((c + 0.055) / 1.055) ^ 2.4
+end
+
+local function read_accent(meta)
+  local value = meta["ruled-accent"]
+  if value == nil then
+    return nil
+  end
+  local s = pandoc.utils.stringify(value)
+  local r, g, b = s:match("^#(%x)(%x)(%x)$")
+  if r then
+    s = "#" .. r .. r .. g .. g .. b .. b
+  end
+  r, g, b = s:match("^#(%x%x)(%x%x)(%x%x)$")
+  if not r then
+    error("[cleanslidekit] ruled-accent must be a hex colour such as \"#ffe14a\", got: " .. s)
+  end
+  local l = 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b)
+  accent = s
+  accent_ink = ((l + 0.05) / 0.05 >= 1.05 / (l + 0.05)) and "#000" or "#fff"
+  return nil
+end
+
 function Div(el)
   if not has_class(el, "lectures") then
     return nil
@@ -37,6 +102,17 @@ function Div(el)
     else
       table.insert(out, block)
     end
+  end
+  if has_class(el, "ruled") then
+    el.content = pandoc.Blocks(group_categories(out))
+    if accent then
+      return {
+        pandoc.RawBlock("html", "<style>.reveal{--ruled-accent:" .. accent
+          .. ";--ruled-accent-ink:" .. accent_ink .. "}</style>"),
+        el,
+      }
+    end
+    return el
   end
   if changed then
     el.content = pandoc.Blocks(out)
@@ -77,3 +153,10 @@ function Link(el)
     .. quarto.doc.input_file .. " — badge omitted\n")
   return {}
 end
+
+-- Read the metadata in a pass of its own: within one filter pandoc visits
+-- Meta only after the blocks, and Div needs the accent.
+return {
+  {Meta = read_accent},
+  {Div = Div, Link = Link},
+}
