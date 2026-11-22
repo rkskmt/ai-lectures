@@ -42,28 +42,41 @@
 
   // Node geometry in the root's own (unscaled) coordinates. The number
   // circle is the link's ::before, so its size comes from computed style.
-  // An output node stacks its circle over the label (flex column).
-  function measure(link, box, k, edge) {
+  // A node may stack its circle over the label (flex column): the output
+  // node always, every node in the compact layout. There a line runs level
+  // with the circle across its own column, so it stays above the labels:
+  // `inEdge` is where an incoming line reaches the column. The output node
+  // is alone in its column and takes its lines directly.
+  function measure(link, box, k, group, groupRect) {
     var r = link.getBoundingClientRect();
     var left = (r.left - box.left) / k;
     var top = (r.top - box.top) / k;
     var width = r.width / k;
     var height = r.height / k;
+    var edge = (groupRect.right - box.left) / k;
     var inX = left;
     var y = top + height / 2;
+    var start = left + width + 4;
+    var inEdge = null;
     if (getComputedStyle(link).flexDirection === 'column') {
       var dot = getComputedStyle(link, '::before');
-      inX = left + (width - parseFloat(dot.width)) / 2;
+      var dotWidth = parseFloat(dot.width);
+      inX = left + (width - dotWidth) / 2;
       y = top + parseFloat(dot.height) / 2;
+      start = inX + dotWidth + 4;
+      if (!group.querySelector('.sec.output')) inEdge = (groupRect.left - box.left) / k;
     }
-    var start = left + width + 4;
-    return { link: link, inX: inX, y: y, start: start, fanX: Math.max(start, edge) };
+    return { link: link, inX: inX, inEdge: inEdge, y: y, start: start, fanX: Math.max(start, edge) };
   }
 
   function edgePath(a, b) {
+    var end = (b.inX - 3).toFixed(1);
+    var y = b.y.toFixed(1);
+    var arrival = b.inEdge === null
+      ? 'L' + end + ' ' + y
+      : 'L' + b.inEdge.toFixed(1) + ' ' + y + 'H' + end;
     return 'M' + a.start.toFixed(1) + ' ' + a.y.toFixed(1) +
-      'H' + a.fanX.toFixed(1) +
-      'L' + (b.inX - 3).toFixed(1) + ' ' + b.y.toFixed(1);
+      'H' + a.fanX.toFixed(1) + arrival;
   }
 
   function setUp(root) {
@@ -134,10 +147,10 @@
       var k = box.width / root.offsetWidth;
 
       layers = numberedGroups(root).map(function (group, layer) {
-        var edge = (group.getBoundingClientRect().right - box.left) / k;
+        var groupRect = group.getBoundingClientRect();
         var links = group.querySelectorAll('.grid li > a');
         return Array.prototype.map.call(links, function (link) {
-          var node = measure(link, box, k, edge);
+          var node = measure(link, box, k, group, groupRect);
           where.set(link, { layer: layer, node: node });
           return node;
         });

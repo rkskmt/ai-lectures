@@ -1465,14 +1465,16 @@ a.lightbox[href]::after {
 .reveal .lectures.network.net-firing > .net-lines .net-base{opacity:.3}
 @keyframes net-flow{to{stroke-dashoffset:-12}}
 .reveal .lectures.network .lec-group{position:relative;z-index:1;display:grid;grid-template-rows:auto 1fr;min-width:0}
+/* Category names in heavy black. Common Japanese system fonts stop at Bold,
+   so a thin stroke keeps weight 900 visibly heavier on every platform. */
 .reveal .lectures.network .sec{margin:0 0 16px!important;padding:0!important;border:0!important;background:none!important;
-  color:var(--network-accent,#0b5cab)!important;font-size:13px!important;font-weight:900;letter-spacing:.04em;line-height:1.4}
-.reveal .lectures.network .sec .sub{color:#5b6773;font-size:.85em}
+  color:#000!important;font-size:17px!important;font-weight:900;letter-spacing:.02em;line-height:1.35;-webkit-text-stroke:.35px currentColor}
+.reveal .lectures.network .sec .sub{color:#5b6773;font-size:.72em;font-weight:700;-webkit-text-stroke:0}
 .reveal .lectures.network .grid{align-self:center}
 .reveal .lectures.network .grid ul{display:flex!important;flex-direction:column;gap:18px}
 .reveal .lectures.network .grid li{border:0!important;border-radius:0!important;background:none!important;transition:none}
 .reveal .lectures.network .grid li:hover{border-color:transparent!important;background:none!important}
-.reveal .lectures.network .grid li>a{flex:0 1 auto;gap:10px;padding:0;color:#14202b!important;font-size:14.5px;font-weight:700;line-height:1.3;text-wrap:pretty}
+.reveal .lectures.network .grid li>a{flex:0 1 auto;gap:10px;padding:0;color:#14202b!important;font-size:14.5px;font-weight:700;line-height:1.3;text-wrap:pretty;line-break:strict}
 .reveal .lectures.network .grid li>a{transition:opacity .16s ease,color .16s ease}
 .reveal .lectures.network .grid li>a:hover{color:color-mix(in srgb,var(--network-active,#e2731c) 72%,#000)!important}
 .reveal .lectures.network .grid li>a:focus-visible{outline:2px solid var(--network-accent,#0b5cab);outline-offset:3px;border-radius:21px}
@@ -1511,17 +1513,35 @@ a.lightbox[href]::after {
   width:calc(var(--network-node-size,42px)*1.52)!important;height:calc(var(--network-node-size,42px)*1.52)!important;font-size:calc(var(--network-node-size,42px)*.57)}
 /* appendix: small dashed nodes in a row under the layers */
 .reveal .lectures.network .lec-group:has(.grid.app){grid-column:1/-1;display:flex;align-items:center;gap:26px;margin-top:26px;padding-top:14px;border-top:1px dashed #9aa5b1}
-.reveal .lectures.network .lec-group:has(.grid.app) .sec{flex:0 0 auto;margin:0!important;color:#5b6773!important}
+.reveal .lectures.network .lec-group:has(.grid.app) .sec{flex:0 0 auto;margin:0!important}
 .reveal .lectures.network .grid.app{align-self:auto;min-width:0}
 .reveal .lectures.network .grid.app ul{flex-direction:row;flex-wrap:wrap;gap:10px 26px}
 .reveal .lectures.network .grid.app li>a{font-size:14px}
 .reveal .lectures.network .grid.app li>a::before{content:""!important;flex-basis:24px;width:24px!important;height:24px!important;box-sizing:border-box;
   border:2px dashed #9aa5b1;background:#fff!important}
 .reveal .lectures.network .grid.app li>a:hover::before{border-color:var(--network-active,#e2731c);background:#fff!important}
-/* Below 1120px the labels of the layers wrap into three lines or more: stack
-   the layers, with a strip of crossing lines between them in place of the
-   drawn connections. The output node stays larger and centred. */
-@media (max-width: 1119px) {
+/* 720-1119px (a 6:4 window, a split screen, a tablet): keep the network, with
+   each label under its node so a column needs only a label's width.
+   network-ui.js runs the lines at the height of the circles, above the labels. */
+@media (min-width: 720px) and (max-width: 1119px) {
+  .reveal-viewport.reveal-scroll .reveal .slides section:has(.lectures.network){padding:20px 20px 36px!important}
+  .reveal-viewport.reveal-scroll .reveal .slides section:has(.lectures.network) .lectures.network{--net-node:calc(var(--network-node-size,42px)*.8);
+    grid-template-columns:repeat(var(--net-layers),minmax(auto,1fr));justify-content:stretch;column-gap:clamp(18px,3vw,34px)}
+  /* A category name stays on one line and sets its column's minimum width. */
+  .reveal-viewport.reveal-scroll .reveal .lectures.network .sec{margin:0 0 14px!important;font-size:14px!important;text-align:center;white-space:nowrap}
+  .reveal-viewport.reveal-scroll .reveal .lectures.network .lec-group:has(.grid.app) .sec{margin:0!important;text-align:left}
+  .reveal-viewport.reveal-scroll .reveal .lectures.network .grid:not(.app) ul{gap:12px}
+  .reveal-viewport.reveal-scroll .reveal .lectures.network .grid:not(.app) li>a{flex:1 1 auto;flex-direction:column;gap:4px;
+    font-size:12.5px;text-align:center}
+  .reveal-viewport.reveal-scroll .reveal .lectures.network .grid:not(.app) li>a::before{flex-basis:var(--net-node);width:var(--net-node)!important;
+    height:var(--net-node)!important;font-size:calc(var(--net-node)*.42)}
+  .reveal-viewport.reveal-scroll .reveal .lectures.network .lec-group:has(> .sec.output) .grid li>a::before{flex-basis:calc(var(--net-node)*1.5);
+    width:calc(var(--net-node)*1.5)!important;height:calc(var(--net-node)*1.5)!important;font-size:calc(var(--net-node)*.62)}
+}
+/* Below 720px the columns are too narrow for a label: stack the layers, with
+   a strip of crossing lines between them in place of the drawn connections.
+   The output node stays larger and centred. */
+@media (max-width: 719px) {
   .reveal .slides section:has(.lectures.network):has(#lecture-search):has(.idx-lead){grid-template-areas:"t p" "s s" "l l" "b b"}
   .reveal-viewport.reveal-scroll .reveal .slides section:has(.lectures.network){
     grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"t p" "s s" "b b";padding:16px 16px 40px!important}
@@ -1569,6 +1589,17 @@ a.lightbox[href]::after {
 .reveal .panel-tabset [role=tab][aria-selected=true]{background:#fff!important;border:none!important;
   color:#2a6fd6!important;box-shadow:0 1px 3px rgba(25,45,80,.18)}
 .reveal .panel-tabset .tab-content{padding:0!important;border:none!important}
+
+/* WORKAROUND: reveal.js 5.1 computes the scroll progress as
+   scrollTop / (scrollHeight - viewportHeight). A one-slide deck in the scroll
+   view (any index page on a phone, a ruled or network index at every width)
+   can fit the window, which makes that 0/0 = NaN: no slide becomes current
+   and Quarto's `ready` handler throws on the undefined slide. Keeping the
+   only page 1px taller than the window avoids the division by zero. The
+   proper fix is in reveal.js's syncScrollPosition; remove this rule once it
+   handles a page with no overflow. The selector counts .scroll-page instead
+   of using :only-child because slide-ui.js may add #scroll-hint to .slides. */
+.reveal-viewport.reveal-scroll .reveal .slides:not(:has(> .scroll-page ~ .scroll-page)) > .scroll-page{min-height:calc(100vh + 1px)}
 
 /* Standalone images center on slides. Quarto wraps captioned figures in
    .quarto-figure-center, but a bare image alone in its own paragraph — e.g.
