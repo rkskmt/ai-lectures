@@ -1374,11 +1374,27 @@ a.lightbox[href]::after {
    fixed height (one screen); it must join the flow so the page grows to the
    list's height. Otherwise the list overflows the page and the document
    opens scrolled to its bottom. */
-.reveal-viewport.reveal-scroll .reveal .scroll-page:has(.lectures.ruled){height:auto!important}
-.reveal-viewport.reveal-scroll .reveal .scroll-page:has(.lectures.ruled) .scroll-page-sticky{position:relative!important;top:auto!important;height:auto!important}
-.reveal-viewport.reveal-scroll .reveal .scroll-page:has(.lectures.ruled) .scroll-page-content{position:relative!important;height:auto!important;overflow:visible!important}
-.reveal-viewport.reveal-scroll .reveal .slides section:has(.lectures.ruled){position:relative!important;left:0!important;top:0!important;
+.reveal-viewport.reveal-scroll .reveal .scroll-page:has(.lectures:is(.ruled,.network)){height:auto!important}
+.reveal-viewport.reveal-scroll .reveal .scroll-page:has(.lectures:is(.ruled,.network)) .scroll-page-sticky{position:relative!important;top:auto!important;height:auto!important}
+.reveal-viewport.reveal-scroll .reveal .scroll-page:has(.lectures:is(.ruled,.network)) .scroll-page-content{position:relative!important;height:auto!important;overflow:visible!important}
+.reveal-viewport.reveal-scroll .reveal .slides section:has(.lectures:is(.ruled,.network)){position:relative!important;left:0!important;top:0!important;
   width:100%!important;max-width:1280px;height:auto!important;margin:0 auto!important;transform:none!important}
+/* An index with both a search box and a lead line keeps the lead in a row of
+   its own under the bar, and a term tabset takes the body's place. */
+.reveal .slides section:has(.lectures:is(.ruled,.network)):has(#lecture-search):has(.idx-lead){grid-template-areas:"t s p" "l l l" "b b b"}
+.reveal .slides section:has(.lectures:is(.ruled,.network)):has(#lecture-search) .idx-lead{grid-area:l;min-height:0;margin:-10px 0 14px!important;
+  padding:0;border:0;font-size:14px!important;font-weight:500}
+.reveal .slides section:has(.lectures:is(.ruled,.network)) .panel-tabset{grid-area:b;min-width:0}
+.reveal .panel-tabset:has(.lectures.ruled) [role=tablist],
+.reveal .panel-tabset:has(.lectures.ruled) .panel-tabset-tabby{gap:0;margin:0 0 14px!important;padding:0!important;
+  background:none;border:3px solid #000!important;border-radius:0}
+.reveal .panel-tabset:has(.lectures.ruled) [role=tab],
+.reveal .panel-tabset:has(.lectures.ruled) .panel-tabset-tabby a{border-radius:0;padding:8px 22px!important;font-size:15px;font-weight:900;color:#000!important}
+.reveal .panel-tabset:has(.lectures.ruled) [role=tab]:hover:not([aria-selected=true]){background:var(--ruled-accent,#ffe14a);color:var(--ruled-accent-ink,#000)!important}
+.reveal .panel-tabset:has(.lectures.ruled) [role=tab][aria-selected=true]{background:#000!important;color:#fff!important;box-shadow:none}
+@media (max-width: 799px) {
+  .reveal .slides section:has(.lectures.ruled):has(#lecture-search):has(.idx-lead){grid-template-areas:"t p" "s s" "l l" "b b"}
+}
 /* narrow windows (phones, tablets in portrait, a narrowed browser): title +
    gate on the first row, the search box under them, one column */
 @media (max-width: 799px) {
@@ -1396,6 +1412,135 @@ a.lightbox[href]::after {
   .reveal-viewport.reveal-scroll .reveal .lectures.ruled .lec-group{margin-bottom:14px}
   .reveal-viewport.reveal-scroll .reveal .lectures.ruled .grid li>a{min-height:42px;padding:9px 12px 9px 60px;font-size:16px}
   .reveal-viewport.reveal-scroll .reveal .lectures.ruled .grid li>a::before{width:48px!important;font-size:14px!important}
+}
+
+/* =========================================================================
+   Network lecture index — `lecture-index: network` in _metadata.yaml
+   Each numbered category is a layer: a column of round nodes (the number
+   chip of the card grid), fully connected to the next column by lines that
+   network-ui.js draws in .net-lines. `.app` items sit under a dashed rule. A
+   `.sec.output` category is drawn as the output layer. One accent colour
+   (blue unless `network-accent` sets another; card-grid.lua). Scroll view
+   and the window-width layout are shared with the ruled index above.
+   ========================================================================= */
+.reveal-viewport.reveal-scroll .reveal .slides section:has(.lectures.network){max-width:1440px}
+.reveal .slides section:has(.lectures.network){display:grid!important;grid-template-columns:auto minmax(0,1fr) auto;
+  grid-template-areas:"t s p" "b b b";column-gap:24px;align-content:start;padding:24px 44px 40px!important;box-sizing:border-box!important}
+.reveal .slides section:has(.lectures.network) > .slide-body,
+.reveal .slides section:has(.lectures.network) > .slide-body > p{display:contents!important}
+.reveal .slides section:has(.lectures.network) > h2{grid-area:t;align-self:center;margin:0 0 18px!important;padding:0!important;border:0!important;
+  background:none!important;color:#14202b!important;font-size:30px!important;font-weight:900!important;line-height:1.2}
+/* bar: search box (or the lead line on a handouts page) */
+.reveal .slides section:has(.lectures.network) #lecture-search{grid-area:s;justify-self:end;position:relative;display:grid;
+  width:min(100%,540px);margin:0 0 18px!important}
+.reveal .slides section:has(.lectures.network) #search-input{grid-area:1/1;display:block;width:100%;height:auto;min-height:42px;box-sizing:border-box;
+  margin:0;padding:0 14px!important;border:0!important;border-radius:0!important;background:#edf0f3!important;color:#14202b;font-size:15px!important;outline:0}
+.reveal .slides section:has(.lectures.network) #search-input:focus-visible{box-shadow:inset 0 0 0 2px var(--network-accent,#0b5cab)}
+.reveal .slides section:has(.lectures.network) #lecture-search:has(.search-hint) #search-input::placeholder{color:transparent}
+.reveal .slides section:has(.lectures.network) #lecture-search .search-hint{grid-area:1/1;z-index:1;align-self:center;padding:6px 14px;
+  pointer-events:none;color:#6b7683;font-size:14px;line-height:1.4}
+.reveal .slides section:has(.lectures.network) #lecture-search .search-hint[hidden]{display:none}
+.reveal .slides section:has(.lectures.network) #search-results{margin:0!important}
+.reveal .slides section:has(.lectures.network) #search-results:has(*){position:absolute;left:0;right:0;top:100%;z-index:30;
+  max-height:460px;overflow-y:auto;background:#fff;border:1px solid #c6ced6;box-shadow:0 6px 18px rgba(20,32,43,.16)}
+.reveal .slides section:has(.lectures.network) .idx-lead{grid-area:s;align-self:center;min-width:0;margin:0 0 18px;color:#5b6773!important;font-size:14px!important}
+.reveal .slides section:has(.lectures.network) .idx-lead p{margin:0}
+/* bar: PDF gate (or the backlink) */
+.reveal .slides section:has(.lectures.network) a.pdf-gate,
+.reveal .slides section:has(.lectures.network) a.backlink{grid-area:p;position:static!important;display:flex!important;align-items:center;align-self:center;
+  margin:0 0 18px!important;padding:0!important;border:0!important;border-radius:0!important;background:none!important;color:#14202b!important;
+  font-size:14px!important;font-weight:700;line-height:1;text-decoration:underline!important;text-underline-offset:4px}
+.reveal .slides section:has(.lectures.network) a.pdf-gate::before,
+.reveal .slides section:has(.lectures.network) a.backlink::after{content:none!important}
+.reveal .slides section:has(.lectures.network) a.pdf-gate:hover,
+.reveal .slides section:has(.lectures.network) a.backlink:hover{color:var(--network-accent,#0b5cab)!important}
+/* body: one column per numbered category, as wide as its longest label */
+.reveal .slides section:has(.lectures.network) .lectures.network{grid-area:b;position:relative;display:grid;min-width:0;
+  grid-template-columns:repeat(var(--net-layers),minmax(0,max-content));justify-content:space-between;column-gap:clamp(28px,3.4vw,56px)}
+.reveal .lectures.network > .net-lines{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;fill:none}
+.reveal .lectures.network > .net-lines .net-base{stroke:var(--network-line,#bcc5cf);stroke-width:var(--network-line-width,1px);transition:opacity .16s ease}
+.reveal .lectures.network > .net-lines .net-lit{stroke:var(--network-active,#e2731c);stroke-width:calc(var(--network-line-width,1px) + .6px);opacity:.42}
+.reveal .lectures.network > .net-lines .net-flow{stroke:var(--network-active,#e2731c);stroke-width:calc(var(--network-line-width,1px) + 1.6px);
+  stroke-linecap:round;stroke-dasharray:1 11;animation:net-flow .55s linear infinite}
+.reveal .lectures.network.net-firing > .net-lines .net-base{opacity:.3}
+@keyframes net-flow{to{stroke-dashoffset:-12}}
+.reveal .lectures.network .lec-group{position:relative;z-index:1;display:grid;grid-template-rows:auto 1fr;min-width:0}
+.reveal .lectures.network .sec{margin:0 0 16px!important;padding:0!important;border:0!important;background:none!important;
+  color:var(--network-accent,#0b5cab)!important;font-size:13px!important;font-weight:900;letter-spacing:.04em;line-height:1.4}
+.reveal .lectures.network .sec .sub{color:#5b6773;font-size:.85em}
+.reveal .lectures.network .grid{align-self:center}
+.reveal .lectures.network .grid ul{display:flex!important;flex-direction:column;gap:18px}
+.reveal .lectures.network .grid li{border:0!important;border-radius:0!important;background:none!important;transition:none}
+.reveal .lectures.network .grid li:hover{border-color:transparent!important;background:none!important}
+.reveal .lectures.network .grid li>a{flex:0 1 auto;gap:10px;padding:0;color:#14202b!important;font-size:14.5px;font-weight:700;line-height:1.3;text-wrap:pretty}
+.reveal .lectures.network .grid li>a{transition:opacity .16s ease,color .16s ease}
+.reveal .lectures.network .grid li>a:hover{color:color-mix(in srgb,var(--network-active,#e2731c) 72%,#000)!important}
+.reveal .lectures.network .grid li>a:focus-visible{outline:2px solid var(--network-accent,#0b5cab);outline-offset:3px;border-radius:21px}
+.reveal .lectures.network .grid li>a::before{flex:0 0 var(--network-node-size,42px);width:var(--network-node-size,42px)!important;height:var(--network-node-size,42px)!important;
+  border-radius:50%!important;background:var(--network-accent,#0b5cab)!important;color:var(--network-accent-ink,#fff)!important;
+  font-size:calc(var(--network-node-size,42px)*.405);font-weight:700;letter-spacing:0;font-variant-numeric:tabular-nums;
+  transition:background-color .16s ease,color .16s ease,transform .22s cubic-bezier(.34,1.56,.64,1)}
+.reveal .lectures.network .grid li>a:hover::before{background:var(--network-active,#e2731c)!important;color:var(--network-active-ink,#000)!important}
+/* hover signal (network-ui.js): the node under the pointer fires, the nodes
+   of the two neighbouring layers light up in turn, everything else recedes */
+.reveal .lectures.network.net-firing .grid:not(.app) li>a:not(.net-hot):not(.net-on){opacity:.3}
+.reveal .lectures.network .grid li>a.net-hot{color:color-mix(in srgb,var(--network-active,#e2731c) 72%,#000)!important}
+.reveal .lectures.network .grid li>a.net-hot::before{background:var(--network-active,#e2731c)!important;color:var(--network-active-ink,#000)!important;
+  transform:scale(1.26);animation:net-pulse 1s ease-out infinite}
+.reveal .lectures.network .grid li>a.net-on::before{background:var(--network-active,#e2731c)!important;color:var(--network-active-ink,#000)!important;
+  transform:scale(1.07);transition-delay:var(--net-delay,0ms)}
+@keyframes net-pulse{
+  0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--network-active,#e2731c) 60%,transparent),0 0 16px 3px color-mix(in srgb,var(--network-active,#e2731c) 45%,transparent)}
+  100%{box-shadow:0 0 0 13px transparent,0 0 16px 3px color-mix(in srgb,var(--network-active,#e2731c) 45%,transparent)}
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal .lectures.network .grid li>a,
+  .reveal .lectures.network .grid li>a::before,
+  .reveal .lectures.network > .net-lines .net-base{transition:none}
+  .reveal .lectures.network .grid li>a.net-hot::before{animation:none;box-shadow:0 0 0 4px color-mix(in srgb,var(--network-active,#e2731c) 40%,transparent)}
+  .reveal .lectures.network > .net-lines .net-flow{animation:none;stroke-dasharray:none;stroke-width:calc(var(--network-line-width,1px) + .6px)}
+}
+/* handouts: the PDF icon takes width from every label, so tighten the layers */
+.reveal .slides section:has(.lectures.network) .lectures.network:has(.grid.dl){column-gap:32px}
+.reveal .lectures.network .grid.dl li>a{gap:8px;font-size:13.5px}
+/* output layer: a larger node with its label underneath */
+.reveal .lectures.network .lec-group:has(> .sec.output) .sec{text-align:center}
+.reveal .lectures.network .lec-group:has(> .sec.output) .grid ul{align-items:center}
+.reveal .lectures.network .lec-group:has(> .sec.output) .grid li>a{flex-direction:column;gap:8px;max-width:7.6em;text-align:center}
+.reveal .lectures.network .lec-group:has(> .sec.output) .grid li>a::before{flex-basis:calc(var(--network-node-size,42px)*1.52);
+  width:calc(var(--network-node-size,42px)*1.52)!important;height:calc(var(--network-node-size,42px)*1.52)!important;font-size:calc(var(--network-node-size,42px)*.57)}
+/* appendix: small dashed nodes in a row under the layers */
+.reveal .lectures.network .lec-group:has(.grid.app){grid-column:1/-1;display:flex;align-items:center;gap:26px;margin-top:26px;padding-top:14px;border-top:1px dashed #9aa5b1}
+.reveal .lectures.network .lec-group:has(.grid.app) .sec{flex:0 0 auto;margin:0!important;color:#5b6773!important}
+.reveal .lectures.network .grid.app{align-self:auto;min-width:0}
+.reveal .lectures.network .grid.app ul{flex-direction:row;flex-wrap:wrap;gap:10px 26px}
+.reveal .lectures.network .grid.app li>a{font-size:14px}
+.reveal .lectures.network .grid.app li>a::before{content:""!important;flex-basis:24px;width:24px!important;height:24px!important;box-sizing:border-box;
+  border:2px dashed #9aa5b1;background:#fff!important}
+.reveal .lectures.network .grid.app li>a:hover::before{border-color:var(--network-active,#e2731c);background:#fff!important}
+/* Below 1120px the labels of the layers wrap into three lines or more: stack
+   the layers, with a strip of crossing lines between them in place of the
+   drawn connections. The output node stays larger and centred. */
+@media (max-width: 1119px) {
+  .reveal .slides section:has(.lectures.network):has(#lecture-search):has(.idx-lead){grid-template-areas:"t p" "s s" "l l" "b b"}
+  .reveal-viewport.reveal-scroll .reveal .slides section:has(.lectures.network){
+    grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"t p" "s s" "b b";padding:16px 16px 40px!important}
+  .reveal-viewport.reveal-scroll .reveal .slides section:has(.lectures.network) > h2{margin:0 0 10px!important;font-size:24px!important}
+  .reveal-viewport.reveal-scroll .reveal .slides section:has(.lectures.network) a.pdf-gate,
+  .reveal-viewport.reveal-scroll .reveal .slides section:has(.lectures.network) a.backlink{margin:0 0 10px!important}
+  .reveal-viewport.reveal-scroll .reveal .slides section:has(.lectures.network) #lecture-search{justify-self:stretch;width:100%;margin:0 0 16px!important}
+  .reveal-viewport.reveal-scroll .reveal .slides section:has(.lectures.network) .idx-lead{margin:0 0 14px}
+  .reveal-viewport.reveal-scroll .reveal .slides section:has(.lectures.network) .lectures.network{display:block}
+  .reveal-viewport.reveal-scroll .reveal .lectures.network > .net-lines{display:none}
+  .reveal-viewport.reveal-scroll .reveal .lectures.network .lec-group{display:block}
+  .reveal-viewport.reveal-scroll .reveal .lectures.network .sec{margin:0 0 10px!important}
+  .reveal-viewport.reveal-scroll .reveal .lectures.network .lec-group + .lec-group:not(:has(.grid.app))::before{content:"";display:block;height:28px;margin:12px 0;
+    background:repeating-linear-gradient(60deg,transparent 0 7px,#c6ced6 7px 8px),repeating-linear-gradient(-60deg,transparent 0 7px,#c6ced6 7px 8px)}
+  .reveal-viewport.reveal-scroll .reveal .lectures.network .grid ul{gap:10px}
+  .reveal-viewport.reveal-scroll .reveal .lectures.network .grid li>a{font-size:16px}
+  .reveal-viewport.reveal-scroll .reveal .lectures.network .lec-group:has(.grid.app){display:block;margin-top:22px;padding-top:16px}
+  .reveal-viewport.reveal-scroll .reveal .lectures.network .lec-group:has(.grid.app) .sec{margin:0 0 10px!important}
+  .reveal-viewport.reveal-scroll .reveal .lectures.network .grid.app ul{flex-direction:column}
 }
 
 /* =========================================================================
