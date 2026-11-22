@@ -37,10 +37,11 @@ execute:
 :::
 
 
-## NNの丸はすべて「ノード」と呼ぶ
+## ノード（[Node]{.en}）
 
-- ノード（[node]{.en}）：NNの図に出てくる丸の総称
-- 入力値を置くノードを**入力ノード**、届いた値から新しい値を計算するノードを**ニューロン**と呼ぶ
+- NNの図に出てくる丸の総称
+- **入力ノード**：入力値を置くノード
+- **ニューロン**：届いた値から新しい値を計算するノード
 
 ```{.d2 sketch="true" width="76%"}
 direction: right
@@ -421,7 +422,7 @@ F -> P
 - 式は[前回の予測の計算](logistic-regression.qmd#peek-logistic-structure){.peek}と同じ。NNでは、同じ計算が図の上の値の受け渡しとして見える
 
 
-## 予測：入力から出力までの計算をForwardと呼ぶ
+## 予測：Forward
 
 ```{.d2 sketch="true" width="78%"}
 direction: right
@@ -565,7 +566,7 @@ DZ -> B
 :::
 
 
-## 勾配：この逆向きの計算をBackwardと呼ぶ
+## 勾配：Backward
 
 - Backward（[backward pass]{.en}、逆向きの計算）：出力側から連鎖律をたどり、各パラメータの勾配を求める工程
 - 誤差逆伝播法（[backpropagation]{.en}、BP）：ネットワークの接続を出力側から逆向きにたどることで、Backwardを行う方法
@@ -754,7 +755,7 @@ F -> L -> B -> U
 U -> F: "更新後のw,b"
 ```
 
-- Forward → Loss → Backward → Update の一周を、学習の1ステップと呼ぶ
+- 学習の1ステップ：Forward → Loss → Backward → Update の一周
 - 次のステップでは、更新後の $w,b$ から再びForwardを始める
 
 

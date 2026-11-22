@@ -91,11 +91,10 @@ plt.show()
 
 ## 損失関数：二乗誤差（MSE） {#peek-mse}
 
-- 各魚について「予測と実際のズレ」を測り、二乗して平均する
+- **MSE（[**Mean Squared Error**]{.en} / 平均二乗誤差）**：各魚の「予測と実際のズレ」を二乗して平均した値
 
 $$L(a, b) = \frac{1}{N} \sum_{i} \left( \underbrace{a x_i + b}_{\text{予測}} - \underbrace{t_i}_{\text{実際}} \right)^2$$
 
-- **MSE（[**Mean Squared Error**]{.en} / 平均二乗誤差）**と呼ぶ
 - [クラスタリングの回の SSE](clustering-kmeans.qmd#peek-sse){.peek} と同じ発想で、誤差を 2 乗して集めたものを点の数で割った平均
 - 全魚のズレを1本のベクトルと見ると、MSE はその**ノルム（[norm]{.en}・ベクトルの長さ）**の2乗を $N$ で割ったもの
 
@@ -410,7 +409,7 @@ plt.show()
 - $\lambda \sum_j w_j^2$ の形の罰金：**L2正則化**（[L2 regularization]{.en}）
 - L2正則化つきの線形回帰：**リッジ回帰**（[Ridge regression]{.en}）
    - `sklearn` には `Ridge` として入っている
-- NN でも同じ道具がそのまま使われる（[weight decay]{.en} と呼ぶ）
+- NN でも同じ道具がそのまま使われる（NN での名前は [weight decay]{.en}）
 
 
 ## 深さの制限も、広い意味での正則化 {#peek-regularization-broad}

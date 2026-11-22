@@ -132,11 +132,10 @@ MAE
 ## 対策：ズレを二乗せずに測る（MAE） {#peek-mae}
 
 - 外れ値に引っ張られる原因は二乗なので、二乗をやめる
-- ズレの**絶対値**を平均する
+- **MAE（[**Mean Absolute Error**]{.en} / 平均絶対誤差）**：ズレの**絶対値**の平均
 
 $$L(a, b) = \frac{1}{N} \sum_{i} \left| \underbrace{a x_i + b}_{\text{予測}} - \underbrace{t_i}_{\text{実際}} \right|$$
 
-- **MAE（[**Mean Absolute Error**]{.en} / 平均絶対誤差）**と呼ぶ
 - [MSE](linear-regression.qmd#peek-mse){.peek} との違いは、二乗が絶対値に変わったことだけ
 - 正しい 80 枚の直線からのズレを、絶対値で比べる
 
@@ -370,7 +369,7 @@ RANSAC
    3. 直線から 300 g 以内にある伝票（**賛同者**、インライア、[inlier]{.en}）を数える
    4. 1〜3 を 200 回繰り返し、賛同者が最多だった直線を残す
    5. その賛同者だけで最小二乗法をやり直す
-- この手法を **RANSAC（[**Random Sample Consensus**]{.en} / ランダムに選んだ標本の合意）** と呼ぶ
+- **RANSAC（[**Random Sample Consensus**]{.en} / ランダムに選んだ標本の合意）**：ランダムに選んだ 2 点で直線を引くことを繰り返し、賛同者が最多の直線を残す手法
 
 ::: {.caption-note}
 300 g の根拠：[正しい伝票のズレの最大](#peek-outlier-squares){.peek}より少し広くとる
