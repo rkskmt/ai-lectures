@@ -753,7 +753,7 @@
     "href": "logistic-regression.html#ここまでの道具",
     "title": "ロジスティック回帰",
     "section": "ここまでの道具",
-    "text": "ここまでの道具\n\n\n勾配降下法：傾きの逆方向に少しずつ進んで最小値を探す（最適化の回）\n回帰：体長→重さの直線を勾配降下で当て、sklearn と一致した（前回）\n分類 — 決定境界の回では、直線を目で見て引いた\n\n\n\n\n\n\n\n\n今回のテーマ\n\n\n\n「斜めの直線で分けられそう」と言いながら、引けたのは縦線だけだった。\n斜めの決定境界の最適な直線を、データから求められるか？"
+    "text": "ここまでの道具\n\n\n勾配降下法：傾きの逆方向に少しずつ進んで最小値を探す（最適化の回）\n回帰：体長→重さの直線を勾配降下で当て、厳密解と一致した\n分類 — 決定境界の回では、直線を目で見て引いた\n\n\n\n\n\n\n\n\n今回のテーマ\n\n\n\n「斜めの直線で分けられそう」と言いながら、引けたのは縦線だけだった。\n斜めの決定境界の最適な直線を、データから求められるか？"
   },
   {
     "objectID": "logistic-regression.html#分類問題で出てきた閾値の縦線",
@@ -2671,7 +2671,7 @@
     "href": "linear-regression.html#次数を上げてみる",
     "title": "線形回帰と正則化",
     "section": "次数を上げてみる",
-    "text": "次数を上げてみる\n\n\n\ncode\n# 先頭の10匹を訓練データ、残りの5匹をテストデータにする\nx_train, t_train = lengths[:10], weights[:10]\nx_test, t_test = lengths[10:], weights[10:]\n\n# 体長を標準化してから多項式を当てはめる（そのまま9乗すると計算が不安定になる）\nx_mean, x_std = x_train.mean(), x_train.std()\nz_train = (x_train - x_mean) / x_std\nz_test = (x_test - x_mean) / x_std\n\ngrid = np.linspace(lengths.min() - 0.5, lengths.max() + 0.5, 300)\nz_grid = (grid - x_mean) / x_std\n\nfig, axes = plt.subplots(1, 3, figsize=(12, 3.6))\nfor ax, deg in zip(axes, [1, 3, 9]):\n    coef = np.polyfit(z_train, t_train, deg)   # 訓練データに最も合う deg 次式の係数\n    ax.scatter(x_train, t_train, c=\"#2980b9\", s=45, label=\"訓練\")\n    ax.scatter(x_test, t_test, c=\"#e74c3c\", marker=\"s\", s=45, label=\"テスト\")\n    ax.plot(grid, np.polyval(coef, z_grid), \"k-\", lw=2)\n    ax.set_ylim(800, 2900)\n    ax.set_title(f\"次数 {deg}\", fontsize=11)\n    ax.set_xlabel(\"体長 (cm)\")\naxes[0].set_ylabel(\"重さ (g)\"); axes[0].legend(fontsize=8)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n次数9は訓練の点をすべて通る\n代わりに点のあいだで大きく振れ、小さい魚の重さをマイナスと予測している"
+    "text": "次数を上げてみる\n\n\n\ncode\n# 先頭の10匹を訓練データ、残りの5匹をテストデータにする\nx_train, t_train = lengths[:10], weights[:10]\nx_test, t_test = lengths[10:], weights[10:]\n\n# 体長を標準化してから多項式を当てはめる（そのまま9乗すると計算が不安定になる）\nx_mean, x_std = x_train.mean(), x_train.std()\nz_train = (x_train - x_mean) / x_std\nz_test = (x_test - x_mean) / x_std\n\ngrid = np.linspace(lengths.min() - 0.5, lengths.max() + 0.5, 300)\nz_grid = (grid - x_mean) / x_std\n\nfig, axes = plt.subplots(1, 3, figsize=(12, 3.6))\nfor ax, deg in zip(axes, [1, 3, 9]):\n    coef = np.polyfit(z_train, t_train, deg)   # 訓練データに最も合う deg 次式の係数\n    ax.scatter(x_train, t_train, c=\"#2980b9\", s=45, label=\"訓練\")\n    ax.scatter(x_test, t_test, c=\"#e74c3c\", marker=\"s\", s=45, label=\"テスト\")\n    ax.plot(grid, np.polyval(coef, z_grid), \"k-\", lw=2)   # 求めた多項式に z_grid を代入\n    ax.set_ylim(800, 2900)\n    ax.set_title(f\"次数 {deg}\", fontsize=11)\n    ax.set_xlabel(\"体長 (cm)\")\naxes[0].set_ylabel(\"重さ (g)\"); axes[0].legend(fontsize=8)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n次数9は訓練の点をすべて通る\n代わりに点のあいだで大きく振れ、小さい魚の重さをマイナスと予測している"
   },
   {
     "objectID": "linear-regression.html#数字で見るまた会ったな過学習",
@@ -2776,7 +2776,7 @@
     "href": "linear-regression.html#まとめ",
     "title": "線形回帰と正則化",
     "section": "まとめ",
-    "text": "まとめ\n\n\n回帰：\\(t = f(x) + \\varepsilon\\) の \\(f\\) をデータから推定する手法\n\n損失は二乗誤差（MSE）（微分しやすさで選ぶ）\n\n勾配降下法で求めた傾きと切片は、sklearn の結果と一致\n多項式回帰：特徴量に \\(x^2, x^3, \\ldots\\) を足せば道具は線形回帰のまま\n過学習は回帰でも起きる：次数を上げると訓練誤差は下がり、テスト誤差は桁違いに増える\n正則化（regularization）：大きい係数に罰金を課し、曲線の振れを抑える"
+    "text": "まとめ\n\n\n回帰：\\(t = f(x) + \\varepsilon\\) の \\(f\\) をデータから推定する手法\n\n損失は二乗誤差（MSE）（微分しやすさで選ぶ）\n\n勾配降下法で求めた傾きと切片は、最小二乗法の厳密解と一致\n多項式回帰：特徴量に \\(x^2, x^3, \\ldots\\) を足せば道具は線形回帰のまま\n過学習は回帰でも起きる：次数を上げると訓練誤差は下がり、テスト誤差は桁違いに増える\n正則化（regularization）：大きい係数に罰金を課し、曲線の振れを抑える"
   },
   {
     "objectID": "linear-regression.html#問題1魚2匹だけの世界で-fit-する",
@@ -4757,7 +4757,7 @@
     "href": "linear-regression.html#peek-l2-ridge",
     "title": "線形回帰と正則化",
     "section": "L2正則化とリッジ回帰",
-    "text": "L2正則化とリッジ回帰\n\n\n\\(\\lambda \\sum_j w_j^2\\) の形の罰金：L2正則化（L2 regularization）\nL2正則化つきの線形回帰：リッジ回帰（Ridge regression）\n\nsklearn には Ridge として入っている\n\nNN でも同じ道具がそのまま使われる（NN での名前は weight decay）"
+    "text": "L2正則化とリッジ回帰\n\n\n\\(\\lambda \\sum_j w_j^2\\) の形の罰金：L2正則化（L2 regularization）\nL2正則化を加えた線形回帰は、歴史的な経緯でリッジ回帰（Ridge regression）と呼ばれる\n\nモデルは線形回帰のままで、変わるのは損失だけ\n\nNN でも同じ道具がそのまま使われる（NN での名前は weight decay）"
   },
   {
     "objectID": "linear-regression.html#peek-regularization-broad",
@@ -5086,14 +5086,14 @@
     "href": "linear-regression.html#練習問題2点のデータから直線を求める",
     "title": "線形回帰と正則化",
     "section": "練習問題：2点のデータから直線を求める",
-    "text": "練習問題：2点のデータから直線を求める\n\nデータは2点だけ：\\((x_1, t_1) = (-1, 0)\\)、\\((x_2, t_2) = (1, 2)\\)。 直線 \\(ax + b\\) を勾配降下法で求める。初期値 \\(a = 0, b = 0\\)、学習率 \\(\\alpha = 0.1\\)。手計算とPythonコードの両方で解け。\n\n勾配の式に代入して、\\(\\dfrac{\\partial L}{\\partial a}\\) と \\(\\dfrac{\\partial L}{\\partial b}\\) を求めよ\n更新を3回、手計算で示せ\n同じ更新をコードで100回繰り返し、sklearn の答えと比較せよ\n\nヒント：2点を通る直線は \\(y = x + 1\\)。つまり答えは \\(a = 1, b = 1\\) になるはず。"
+    "text": "練習問題：2点のデータから直線を求める\n\nデータは2点だけ：\\((x_1, t_1) = (-1, 0)\\)、\\((x_2, t_2) = (1, 2)\\)。 直線 \\(ax + b\\) を勾配降下法で求める。初期値 \\(a = 0, b = 0\\)、学習率 \\(\\alpha = 0.1\\)。手計算とPythonコードの両方で解け。\n\n勾配の式に代入して、\\(\\dfrac{\\partial L}{\\partial a}\\) と \\(\\dfrac{\\partial L}{\\partial b}\\) を求めよ\n更新を3回、手計算で示せ\n同じ更新をコードで100回繰り返し、np.polyfit の答えと比較せよ\n\nヒント：2点を通る直線は \\(y = x + 1\\)。つまり答えは \\(a = 1, b = 1\\) になるはず。"
   },
   {
     "objectID": "linear-regression.html#練習問題の解答例",
     "href": "linear-regression.html#練習問題の解答例",
     "title": "線形回帰と正則化",
     "section": "練習問題の解答例",
-    "text": "練習問題の解答例\n\n\n準備（\\(a = 0, b = 0\\) での勾配）\n\n予測は2点とも 0。差（予測 − 実際）は \\((0 - 0, 0 - 2) = (0, -2)\\)：\n\\[\\frac{\\partial L}{\\partial a} = \\frac{2}{2}\\left[ 0 \\times (-1) + (-2) \\times 1 \\right] = -2\\] \\[\\frac{\\partial L}{\\partial b} = \\frac{2}{2}\\left[ 0 + (-2) \\right] = -2\\]\n\n反復1反復2反復3\n\n\n\\[a = 0 - 0.1 \\times (-2) = 0.2, \\qquad b = 0 - 0.1 \\times (-2) = 0.2\\]\n\n\n差は \\((b - a,\\; a + b - 2) = (0, -1.6)\\)：\n\\[\\frac{\\partial L}{\\partial a} = \\frac{2}{2}\\left[0 + (-1.6)\\right] = -1.6, \\qquad\na = 0.2 + 0.16 = 0.36\\]\n\\(b\\) もまったく同じ計算で \\(b = 0.36\\)。\n\n\n差は \\((0, -1.28)\\)、勾配はどちらも \\(-1.28\\)：\n\\[a = 0.36 + 0.128 = 0.488, \\qquad b = 0.488\\]\n\\(a\\) と \\(b\\) が揃って \\(1\\) に近づいていく。\n\n\n\nコードで確認\n\n\n解答例を見る\nimport numpy as np\nfrom sklearn.linear_model import LinearRegression\n\nx = np.array([-1.0, 1.0])\nt = np.array([0.0, 2.0])\n\na, b = 0.0, 0.0\nlr = 0.1\nfor i in range(1, 101):\n    pred   = a * x + b\n    grad_a = 2 * np.mean((pred - t) * x)\n    grad_b = 2 * np.mean(pred - t)\n    a -= lr * grad_a\n    b -= lr * grad_b\n    if i in (1, 2, 3, 100):\n        print(f\"更新 {i:3d}回 | a={a:.4f} b={b:.4f}\")\n\nreg = LinearRegression().fit(x.reshape(-1, 1), t)\nprint(f\"\\nsklearn の fit: a={reg.coef_[0]:.4f}, b={reg.intercept_:.4f}\")\n\n\n更新   1回 | a=0.2000 b=0.2000\n更新   2回 | a=0.3600 b=0.3600\n更新   3回 | a=0.4880 b=0.4880\n更新 100回 | a=1.0000 b=1.0000\n\nsklearn の fit: a=1.0000, b=1.0000\n\n\n手計算の3回（0.2 → 0.36 → 0.488）とコードの出力が一致し、100回で \\(a = b = 1\\)（sklearn と同じ）に収束する。"
+    "text": "練習問題の解答例\n\n\n準備（\\(a = 0, b = 0\\) での勾配）\n\n予測は2点とも 0。差（予測 − 実際）は \\((0 - 0, 0 - 2) = (0, -2)\\)：\n\\[\\frac{\\partial L}{\\partial a} = \\frac{2}{2}\\left[ 0 \\times (-1) + (-2) \\times 1 \\right] = -2\\] \\[\\frac{\\partial L}{\\partial b} = \\frac{2}{2}\\left[ 0 + (-2) \\right] = -2\\]\n\n反復1反復2反復3\n\n\n\\[a = 0 - 0.1 \\times (-2) = 0.2, \\qquad b = 0 - 0.1 \\times (-2) = 0.2\\]\n\n\n差は \\((b - a,\\; a + b - 2) = (0, -1.6)\\)：\n\\[\\frac{\\partial L}{\\partial a} = \\frac{2}{2}\\left[0 + (-1.6)\\right] = -1.6, \\qquad\na = 0.2 + 0.16 = 0.36\\]\n\\(b\\) もまったく同じ計算で \\(b = 0.36\\)。\n\n\n差は \\((0, -1.28)\\)、勾配はどちらも \\(-1.28\\)：\n\\[a = 0.36 + 0.128 = 0.488, \\qquad b = 0.488\\]\n\\(a\\) と \\(b\\) が揃って \\(1\\) に近づいていく。\n\n\n\nコードで確認\n\n\n解答例を見る\nimport numpy as np\n\nx = np.array([-1.0, 1.0])\nt = np.array([0.0, 2.0])\n\na, b = 0.0, 0.0\nlr = 0.1\nfor i in range(1, 101):\n    pred   = a * x + b\n    grad_a = 2 * np.mean((pred - t) * x)\n    grad_b = 2 * np.mean(pred - t)\n    a -= lr * grad_a\n    b -= lr * grad_b\n    if i in (1, 2, 3, 100):\n        print(f\"更新 {i:3d}回 | a={a:.4f} b={b:.4f}\")\n\na_exact, b_exact = np.polyfit(x, t, 1)\nprint(f\"\\nnp.polyfit: a={a_exact:.4f}, b={b_exact:.4f}\")\n\n\n更新   1回 | a=0.2000 b=0.2000\n更新   2回 | a=0.3600 b=0.3600\n更新   3回 | a=0.4880 b=0.4880\n更新 100回 | a=1.0000 b=1.0000\n\nnp.polyfit: a=1.0000, b=1.0000\n\n\n手計算の3回（0.2 → 0.36 → 0.488）とコードの出力が一致し、100回で \\(a = b = 1\\)（np.polyfit と同じ）に収束する。"
   },
   {
     "objectID": "linear-regression.html#演習4点の回帰と正則化",
@@ -5122,5 +5122,12 @@
     "title": "最適化と勾配降下法",
     "section": "演習：2変数関数を更新する",
     "text": "演習：2変数関数を更新する\n\n\\(f(w_1, w_2) = w_1^2 + 2w_2^2 - 2w_1 + 4w_2\\) を、初期値 \\((w_1, w_2) = (0, 0)\\)、学習率 \\(\\alpha = 0.2\\) の勾配降下法で最小化する過程を、紙に書いて求めよ。\n\n\\(\\dfrac{\\partial f}{\\partial w_1}\\) と \\(\\dfrac{\\partial f}{\\partial w_2}\\) の導出\n3回の更新（各回の勾配と \\((w_1, w_2)\\) を記載）\n両方の偏微分を \\(0\\) とおいて求めた、\\(f\\) が最小になる \\((w_1, w_2)\\)\n\\(w_1\\) と \\(w_2\\) のどちらが速く最小点に近づくかの比較"
+  },
+  {
+    "objectID": "linear-regression.html#peek-exact-line",
+    "href": "linear-regression.html#peek-exact-line",
+    "title": "線形回帰と正則化",
+    "section": "答え合わせ：厳密解と比べる",
+    "text": "答え合わせ：厳密解と比べる\n\n\nnp.polyfit(x, t, d)：二乗誤差が最小になる \\(d\\) 次式の係数を求める関数\n\n更新を繰り返さず、最小二乗法（least squares）で直接求める\n係数は次数の高い順に返る（d = 1 なら \\(a, b\\) の順）\n\n\n\na_exact, b_exact = np.polyfit(x, t, 1)\nprint(f\"gradient descent: a={a:.4f}, b={b:.4f}\")\nprint(f\"np.polyfit      : a={a_exact:.4f}, b={b_exact:.4f}\")\n\ngradient descent: a=0.9854, b=0.0000\nnp.polyfit      : a=0.9854, b=0.0000\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n自作の勾配降下法と厳密解が一致\n元の単位に戻すと「体長 1cm あたり約 97g」という意味のある数字になる"
   }
 ]

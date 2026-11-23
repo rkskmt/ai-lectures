@@ -258,7 +258,7 @@
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
   <script src="network-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="a2f125fee74600009af62109f5042d286ef3b0fc">
+  <meta name="qmd-web-source" content="c4a0cf5558b0be710b31ae87df94b49af6f84623">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -421,7 +421,7 @@ rkskmt
 <li>魚の<strong>体長</strong>（cm）を、新しい特徴量として使う</li>
 <li>体長を測るだけで重さが分かれば、<strong>秤に乗せる手間が省ける</strong></li>
 </ul>
-<div id="340a962d" class="cell" data-execution_count="1">
+<div id="27a0c0f2" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>魚データの定義（クリックして展開）</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -438,7 +438,7 @@ rkskmt
 <span id="cb1-12"><a aria-label="12"></a>                    <span class="dv">2230</span>, <span class="dv">1445</span>, <span class="dv">1838</span>, <span class="dv">1370</span>, <span class="dv">1096</span>], dtype<span class="op">=</span><span class="bu">float</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="67bb88f7" class="cell" data-execution_count="2">
+<div id="f94b0f92" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -554,7 +554,7 @@ rkskmt
 <li>学習率を1つで済ませるため</li>
 </ul></li>
 </ul>
-<div id="9cd847d1" class="cell" data-execution_count="3">
+<div id="0557f012" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a>x <span class="op">=</span> (lengths <span class="op">-</span> lengths.mean()) <span class="op">/</span> lengths.std()   <span class="co"># 標準化した体長</span></span>
 <span id="cb2-2"><a aria-label="2"></a>t <span class="op">=</span> (weights <span class="op">-</span> weights.mean()) <span class="op">/</span> weights.std()   <span class="co"># 標準化した重さ</span></span>
 <span id="cb2-3"><a aria-label="3"></a></span>
@@ -597,7 +597,7 @@ rkskmt
 <section id="直線が合っていく様子" class="slide level2">
 <h2>直線が合っていく様子</h2>
 <div class="slide-body">
-<div id="d4584b9e" class="cell" data-execution_count="4">
+<div id="e07fb9aa" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -672,18 +672,23 @@ rkskmt
 </div>
 </div>
 </section>
-<section id="答え合わせsklearn-と比べる" class="slide level2">
-<h2>答え合わせ：sklearn と比べる</h2>
+<section id="peek-exact-line" class="slide level2">
+<h2>答え合わせ：厳密解と比べる</h2>
 <div class="slide-body">
-<div id="14292996" class="cell" data-execution_count="5">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a aria-label="1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
-<span id="cb4-2"><a aria-label="2"></a></span>
-<span id="cb4-3"><a aria-label="3"></a>reg <span class="op">=</span> LinearRegression().fit(x.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), t)</span>
-<span id="cb4-4"><a aria-label="4"></a><span class="bu">print</span>(<span class="ss">f"自作の勾配降下: a=</span><span class="sc">{</span>a<span class="sc">:.4f}</span><span class="ss">, b=</span><span class="sc">{</span>b<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb4-5"><a aria-label="5"></a><span class="bu">print</span>(<span class="ss">f"sklearn の fit: a=</span><span class="sc">{</span>reg<span class="sc">.</span>coef_[<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss">, b=</span><span class="sc">{</span>reg<span class="sc">.</span>intercept_<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<ul>
+<li><code>np.polyfit(x, t, d)</code>：二乗誤差が最小になる <span class="math inline">\(d\)</span> 次式の係数を求める関数
+<ul>
+<li>更新を繰り返さず、<strong>最小二乗法（<span class="en">least squares</span>）</strong>で直接求める</li>
+<li>係数は次数の高い順に返る（<code>d = 1</code> なら <span class="math inline">\(a, b\)</span> の順）</li>
+</ul></li>
+</ul>
+<div id="833cfa61" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a aria-label="1"></a>a_exact, b_exact <span class="op">=</span> np.polyfit(x, t, <span class="dv">1</span>)</span>
+<span id="cb4-2"><a aria-label="2"></a><span class="bu">print</span>(<span class="ss">f"gradient descent: a=</span><span class="sc">{</span>a<span class="sc">:.4f}</span><span class="ss">, b=</span><span class="sc">{</span>b<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb4-3"><a aria-label="3"></a><span class="bu">print</span>(<span class="ss">f"np.polyfit      : a=</span><span class="sc">{</span>a_exact<span class="sc">:.4f}</span><span class="ss">, b=</span><span class="sc">{</span>b_exact<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>自作の勾配降下: a=0.9854, b=0.0000
-sklearn の fit: a=0.9854, b=0.0000</code></pre>
+<pre><code>gradient descent: a=0.9854, b=0.0000
+np.polyfit      : a=0.9854, b=0.0000</code></pre>
 </div>
 </div>
 <div title="結果">
@@ -697,7 +702,7 @@ sklearn の fit: a=0.9854, b=0.0000</code></pre>
 </div>
 <div class="callout-content">
 <ul>
-<li>自作の勾配降下法と sklearn の結果が<strong>一致</strong></li>
+<li>自作の勾配降下法と厳密解が<strong>一致</strong></li>
 <li>元の単位に戻すと「体長 1cm あたり約 97g」という意味のある数字になる</li>
 </ul>
 </div>
@@ -743,7 +748,7 @@ sklearn の fit: a=0.9854, b=0.0000</code></pre>
 <section id="次数を上げてみる" class="slide level2">
 <h2>次数を上げてみる</h2>
 <div class="slide-body">
-<div id="7022ab3b" class="cell" data-execution_count="6">
+<div id="164d8934" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a aria-label="1"></a><span class="co"># 先頭の10匹を訓練データ、残りの5匹をテストデータにする</span></span>
@@ -763,7 +768,7 @@ sklearn の fit: a=0.9854, b=0.0000</code></pre>
 <span id="cb6-15"><a aria-label="15"></a>    coef <span class="op">=</span> np.polyfit(z_train, t_train, deg)   <span class="co"># 訓練データに最も合う deg 次式の係数</span></span>
 <span id="cb6-16"><a aria-label="16"></a>    ax.scatter(x_train, t_train, c<span class="op">=</span><span class="st">"#2980b9"</span>, s<span class="op">=</span><span class="dv">45</span>, label<span class="op">=</span><span class="st">"訓練"</span>)</span>
 <span id="cb6-17"><a aria-label="17"></a>    ax.scatter(x_test, t_test, c<span class="op">=</span><span class="st">"#e74c3c"</span>, marker<span class="op">=</span><span class="st">"s"</span>, s<span class="op">=</span><span class="dv">45</span>, label<span class="op">=</span><span class="st">"テスト"</span>)</span>
-<span id="cb6-18"><a aria-label="18"></a>    ax.plot(grid, np.polyval(coef, z_grid), <span class="st">"k-"</span>, lw<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb6-18"><a aria-label="18"></a>    ax.plot(grid, np.polyval(coef, z_grid), <span class="st">"k-"</span>, lw<span class="op">=</span><span class="dv">2</span>)   <span class="co"># 求めた多項式に z_grid を代入</span></span>
 <span id="cb6-19"><a aria-label="19"></a>    ax.set_ylim(<span class="dv">800</span>, <span class="dv">2900</span>)</span>
 <span id="cb6-20"><a aria-label="20"></a>    ax.set_title(<span class="ss">f"次数 </span><span class="sc">{</span>deg<span class="sc">}</span><span class="ss">"</span>, fontsize<span class="op">=</span><span class="dv">11</span>)</span>
 <span id="cb6-21"><a aria-label="21"></a>    ax.set_xlabel(<span class="st">"体長 (cm)"</span>)</span>
@@ -802,7 +807,7 @@ sklearn の fit: a=0.9854, b=0.0000</code></pre>
 <section id="数字で見る回帰でも過学習が起きる" class="slide level2">
 <h2>数字で見る：回帰でも過学習が起きる</h2>
 <div class="slide-body">
-<div id="2ab24566" class="cell" data-execution_count="7">
+<div id="d10e017d" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a aria-label="1"></a>degrees <span class="op">=</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">9</span>)</span>
 <span id="cb7-2"><a aria-label="2"></a>train_mse, test_mse <span class="op">=</span> [], []</span>
 <span id="cb7-3"><a aria-label="3"></a><span class="cf">for</span> deg <span class="kw">in</span> degrees:</span>
@@ -858,7 +863,7 @@ sklearn の fit: a=0.9854, b=0.0000</code></pre>
 <ul>
 <li>曲線が大きく振れる原因は、<strong>巨大な係数</strong></li>
 </ul>
-<div id="ef822291" class="cell" data-execution_count="8">
+<div id="fcb18701" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a aria-label="1"></a>coef1 <span class="op">=</span> np.polyfit(z_train, t_train, <span class="dv">1</span>)</span>
 <span id="cb8-2"><a aria-label="2"></a>coef9 <span class="op">=</span> np.polyfit(z_train, t_train, <span class="dv">9</span>)</span>
 <span id="cb8-3"><a aria-label="3"></a><span class="bu">print</span>(<span class="st">"次数1の係数の最大絶対値:"</span>, <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">abs</span>(coef1[:<span class="op">-</span><span class="dv">1</span>])<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss">"</span>)   <span class="co"># [:-1] は切片を除く</span></span>
@@ -892,7 +897,7 @@ sklearn の fit: a=0.9854, b=0.0000</code></pre>
 <li>各係数の勾配に足せばよい</li>
 </ul></li>
 </ul>
-<div id="804ede38" class="cell" data-execution_count="9">
+<div id="5f789578" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a aria-label="1"></a><span class="co"># 特徴量 x, x², …, x⁹ も自分で作る（列が x^1 〜 x^9 の配列）</span></span>
 <span id="cb10-2"><a aria-label="2"></a>P_train <span class="op">=</span> x_train.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>) <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)   <span class="co"># 形 (10, 9)</span></span>
 <span id="cb10-3"><a aria-label="3"></a>P_test  <span class="op">=</span> x_test.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)  <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)</span>
@@ -952,7 +957,7 @@ sklearn の fit: a=0.9854, b=0.0000</code></pre>
 <section id="罰金ありなしを見比べる" class="slide level2">
 <h2>罰金あり・なしを見比べる</h2>
 <div class="slide-body">
-<div id="25f1074e" class="cell" data-execution_count="10">
+<div id="c2748df8" class="cell" data-execution_count="10">
 <details class="code-fold">
 <summary>描画コード</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a aria-label="1"></a>P_grid    <span class="op">=</span> ((grid.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>) <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)) <span class="op">-</span> mu) <span class="op">/</span> sd</span>
@@ -1007,9 +1012,9 @@ sklearn の fit: a=0.9854, b=0.0000</code></pre>
 <div class="slide-body">
 <ul>
 <li><span class="math inline">\(\lambda \sum_j w_j^2\)</span> の形の罰金：<strong>L2正則化</strong>（<span class="en">L2 regularization</span>）</li>
-<li>L2正則化つきの線形回帰：<strong>リッジ回帰</strong>（<span class="en">Ridge regression</span>）
+<li>L2正則化を加えた線形回帰は、歴史的な経緯で<strong>リッジ回帰</strong>（<span class="en">Ridge regression</span>）と呼ばれる
 <ul>
-<li><code>sklearn</code> には <code>Ridge</code> として入っている</li>
+<li>モデルは線形回帰のままで、変わるのは損失だけ</li>
 </ul></li>
 <li>NN でも同じ道具がそのまま使われる（NN での名前は <span class="en">weight decay</span>）</li>
 </ul>
@@ -1132,7 +1137,7 @@ sklearn の fit: a=0.9854, b=0.0000</code></pre>
 <ul>
 <li>損失は<strong>二乗誤差（MSE）</strong>（微分しやすさで選ぶ）</li>
 </ul></li>
-<li>勾配降下法で求めた傾きと切片は、<code>sklearn</code> の結果と<strong>一致</strong></li>
+<li>勾配降下法で求めた傾きと切片は、最小二乗法の厳密解と<strong>一致</strong></li>
 <li><strong>多項式回帰</strong>：特徴量に <span class="math inline">\(x^2, x^3, \ldots\)</span> を足せば道具は線形回帰のまま</li>
 <li><strong>過学習は回帰でも起きる</strong>：次数を上げると訓練誤差は下がり、テスト誤差は桁違いに増える</li>
 <li><strong>正則化（<span class="en">regularization</span>）</strong>：大きい係数に罰金を課し、曲線の振れを抑える</li>
@@ -1146,7 +1151,7 @@ sklearn の fit: a=0.9854, b=0.0000</code></pre>
 <ol type="1">
 <li>勾配の式に代入して、<span class="math inline">\(\dfrac{\partial L}{\partial a}\)</span> と <span class="math inline">\(\dfrac{\partial L}{\partial b}\)</span> を求めよ</li>
 <li>更新を3回、手計算で示せ</li>
-<li>同じ更新をコードで100回繰り返し、<code>sklearn</code> の答えと比較せよ</li>
+<li>同じ更新をコードで100回繰り返し、<code>np.polyfit</code> の答えと比較せよ</li>
 </ol>
 <p>ヒント：2点を通る直線は <span class="math inline">\(y = x + 1\)</span>。つまり答えは <span class="math inline">\(a = 1, b = 1\)</span> になるはず。</p>
 </div>
@@ -1179,28 +1184,27 @@ a = 0.2 + 0.16 = 0.36\]</span></p>
 </div>
 </div>
 <h3 id="コードで確認">コードで確認</h3>
-<div id="c8351540" class="cell" data-execution_count="11">
+<div id="46c3c634" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb13-2"><a aria-label="2"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
-<span id="cb13-3"><a aria-label="3"></a></span>
-<span id="cb13-4"><a aria-label="4"></a>x <span class="op">=</span> np.array([<span class="op">-</span><span class="fl">1.0</span>, <span class="fl">1.0</span>])</span>
-<span id="cb13-5"><a aria-label="5"></a>t <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">2.0</span>])</span>
-<span id="cb13-6"><a aria-label="6"></a></span>
-<span id="cb13-7"><a aria-label="7"></a>a, b <span class="op">=</span> <span class="fl">0.0</span>, <span class="fl">0.0</span></span>
-<span id="cb13-8"><a aria-label="8"></a>lr <span class="op">=</span> <span class="fl">0.1</span></span>
-<span id="cb13-9"><a aria-label="9"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">101</span>):</span>
-<span id="cb13-10"><a aria-label="10"></a>    pred   <span class="op">=</span> a <span class="op">*</span> x <span class="op">+</span> b</span>
-<span id="cb13-11"><a aria-label="11"></a>    grad_a <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> np.mean((pred <span class="op">-</span> t) <span class="op">*</span> x)</span>
-<span id="cb13-12"><a aria-label="12"></a>    grad_b <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> np.mean(pred <span class="op">-</span> t)</span>
-<span id="cb13-13"><a aria-label="13"></a>    a <span class="op">-=</span> lr <span class="op">*</span> grad_a</span>
-<span id="cb13-14"><a aria-label="14"></a>    b <span class="op">-=</span> lr <span class="op">*</span> grad_b</span>
-<span id="cb13-15"><a aria-label="15"></a>    <span class="cf">if</span> i <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">100</span>):</span>
-<span id="cb13-16"><a aria-label="16"></a>        <span class="bu">print</span>(<span class="ss">f"更新 </span><span class="sc">{</span>i<span class="sc">:3d}</span><span class="ss">回 | a=</span><span class="sc">{</span>a<span class="sc">:.4f}</span><span class="ss"> b=</span><span class="sc">{</span>b<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb13-17"><a aria-label="17"></a></span>
-<span id="cb13-18"><a aria-label="18"></a>reg <span class="op">=</span> LinearRegression().fit(x.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), t)</span>
-<span id="cb13-19"><a aria-label="19"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">sklearn の fit: a=</span><span class="sc">{</span>reg<span class="sc">.</span>coef_[<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss">, b=</span><span class="sc">{</span>reg<span class="sc">.</span>intercept_<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb13-2"><a aria-label="2"></a></span>
+<span id="cb13-3"><a aria-label="3"></a>x <span class="op">=</span> np.array([<span class="op">-</span><span class="fl">1.0</span>, <span class="fl">1.0</span>])</span>
+<span id="cb13-4"><a aria-label="4"></a>t <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">2.0</span>])</span>
+<span id="cb13-5"><a aria-label="5"></a></span>
+<span id="cb13-6"><a aria-label="6"></a>a, b <span class="op">=</span> <span class="fl">0.0</span>, <span class="fl">0.0</span></span>
+<span id="cb13-7"><a aria-label="7"></a>lr <span class="op">=</span> <span class="fl">0.1</span></span>
+<span id="cb13-8"><a aria-label="8"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">101</span>):</span>
+<span id="cb13-9"><a aria-label="9"></a>    pred   <span class="op">=</span> a <span class="op">*</span> x <span class="op">+</span> b</span>
+<span id="cb13-10"><a aria-label="10"></a>    grad_a <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> np.mean((pred <span class="op">-</span> t) <span class="op">*</span> x)</span>
+<span id="cb13-11"><a aria-label="11"></a>    grad_b <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> np.mean(pred <span class="op">-</span> t)</span>
+<span id="cb13-12"><a aria-label="12"></a>    a <span class="op">-=</span> lr <span class="op">*</span> grad_a</span>
+<span id="cb13-13"><a aria-label="13"></a>    b <span class="op">-=</span> lr <span class="op">*</span> grad_b</span>
+<span id="cb13-14"><a aria-label="14"></a>    <span class="cf">if</span> i <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">100</span>):</span>
+<span id="cb13-15"><a aria-label="15"></a>        <span class="bu">print</span>(<span class="ss">f"更新 </span><span class="sc">{</span>i<span class="sc">:3d}</span><span class="ss">回 | a=</span><span class="sc">{</span>a<span class="sc">:.4f}</span><span class="ss"> b=</span><span class="sc">{</span>b<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb13-16"><a aria-label="16"></a></span>
+<span id="cb13-17"><a aria-label="17"></a>a_exact, b_exact <span class="op">=</span> np.polyfit(x, t, <span class="dv">1</span>)</span>
+<span id="cb13-18"><a aria-label="18"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">np.polyfit: a=</span><span class="sc">{</span>a_exact<span class="sc">:.4f}</span><span class="ss">, b=</span><span class="sc">{</span>b_exact<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>更新   1回 | a=0.2000 b=0.2000
@@ -1208,10 +1212,10 @@ a = 0.2 + 0.16 = 0.36\]</span></p>
 更新   3回 | a=0.4880 b=0.4880
 更新 100回 | a=1.0000 b=1.0000
 
-sklearn の fit: a=1.0000, b=1.0000</code></pre>
+np.polyfit: a=1.0000, b=1.0000</code></pre>
 </div>
 </div>
-<p>手計算の3回（0.2 → 0.36 → 0.488）とコードの出力が一致し、100回で <span class="math inline">\(a = b = 1\)</span>（<code>sklearn</code> と同じ）に収束する。</p>
+<p>手計算の3回（0.2 → 0.36 → 0.488）とコードの出力が一致し、100回で <span class="math inline">\(a = b = 1\)</span>（<code>np.polyfit</code> と同じ）に収束する。</p>
 </div>
 </section>
 <section id="演習4点の回帰と正則化" class="slide level2 badge-practice scrollable">
