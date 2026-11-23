@@ -1,6 +1,6 @@
 ---
 title: "PyTorch入門"
-subtitle: "自分で書けるから、楽をしていい"
+subtitle: "NumPy の計算を PyTorch に任せる"
 ---
 
 ## ここまでの実装
@@ -31,7 +31,7 @@ subtitle: "自分で書けるから、楽をしていい"
 | 勾配（[gradient]{.en}）配列の管理 | 各パラメータの `.grad` |
 
 - モデルの計算内容は変わらない
-- 手で書いていた定型処理を、検証済みの部品へ任せる
+- 定型処理を、検証済みの部品へ任せる
 
 ::: {.takeaway}
 PyTorchは別の学習原理ではなく、NumPyで書いた**同じ計算を管理してくれる道具**
@@ -132,7 +132,7 @@ X -> M -> A -> S -> Y
 - `y = ((x * 3) + 1) ** 2` を実行すると、演算のつながりも記録される
 - `y.backward()` は「掛け算 → 足し算 → 2乗」の逆順に局所微分を適用する
 - Pythonで書いた実際のforwardに応じて、その場でグラフが作られる
-   - 層を組み替えても、PyTorchが新しい計算グラフを記録するため、backwardを手で書き直さなくてよい
+   - 層を組み替えても、PyTorchが新しい計算グラフを記録するため、backwardを書き直さなくてよい
 :::
 
 
@@ -279,7 +279,7 @@ X -> L1 -> R -> L2 -> O
 | `loss.backward()` | バックプロパゲーション（[backpropagation]{.en}） |
 
 ::: {.takeaway}
-どの部品も、ここまでに自作・手計算したものと対応する
+どの部品も、NumPy のコードや手計算と対応する
 :::
 
 
@@ -542,7 +542,7 @@ plt.show()
 ![](frozen/pytorch-intro-frz-boundary-1.png){fig-align="center"}
 
 ::: {.callout-note}
-- NumPy 版で自分で書いた微分処理を、PyTorchでは `loss.backward()` に任せられる
+- NumPy 版の微分処理を、PyTorchでは `loss.backward()` に任せられる
 - 浮いた労力は、**モデルとデータを考えること**に使う
 :::
 
@@ -616,7 +616,7 @@ with torch.no_grad():
 
 - **autograd**：`loss.backward()` ＝ 連鎖律の自動化
    - 表示した小数第4位まで手計算と一致
-- **`nn` と `torch.optim` の部品**は全部、この講義で自作した部品の別名
+- **`nn` と `torch.optim` の部品**は全部、NumPy 版の部品の別名
 - 学習ループは `zero_grad → backward → step` の3拍子
 - 中身を知っているから、安心して楽ができる
 

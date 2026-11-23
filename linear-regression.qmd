@@ -312,7 +312,7 @@ plt.show()
 :::
 
 
-## 正則化：大きい係数に罰金を払わせる
+## 正則化：大きい係数にペナルティを与える
 
 - 曲線が大きく振れる原因は、**巨大な係数**
 
@@ -328,17 +328,17 @@ print("次数9の係数の最大絶対値:", f"{np.abs(coef9[:-1]).max():,.0f}")
 
 $$L = \mathrm{MSE} + \lambda \sum_j w_j^2$$
 
-- **正則化（[regularization]{.en}）**：モデルの複雑さを抑える罰則を損失に足す手法
+- **正則化（[regularization]{.en}）**：モデルの複雑さを抑えるペナルティを損失に足す手法
 - MSE だけではなく、係数の大きさも loss に入れ込む
-- $\lambda$（ラムダ）：罰金の強さ
+- $\lambda$（ラムダ）：ペナルティの強さ
    - $\lambda = 0$ なら今までどおりの MSE
    - 学習のしかたを決める[ハイパーパラメータ](clustering-kmeans.qmd#peek-parameter){.peek}
 
 
-## 正則化の実装：勾配降下法に罰金を足す {#peek-ridge-code}
+## 正則化の実装：勾配降下法にペナルティを足す {#peek-ridge-code}
 
-- [勾配降下法](#peek-gdfit-code){.peek}に、**罰金の項を足す**
-- 罰金 $\lambda \sum w^2$ の微分は $2\lambda w$
+- [勾配降下法](#peek-gdfit-code){.peek}に、**ペナルティの項を足す**
+- ペナルティ $\lambda \sum w^2$ の微分は $2\lambda w$
    - 各係数の勾配に足せばよい
 
 ```{python}
@@ -352,13 +352,13 @@ P_test  = (P_test  - mu) / sd
 t_mean, t_std = t_train.mean(), t_train.std()
 tt = (t_train - t_mean) / t_std                # 重さも標準化
 
-lam  = 0.1        # 罰金の強さ λ
+lam  = 0.1        # ペナルティの強さ λ
 w, b = np.zeros(9), 0.0
 lr   = 0.01
 for i in range(10_000):
     pred   = P_train @ w + b
     grad_w = np.array([2 * np.mean((pred - tt) * P_train[:, d]) for d in range(9)]) \
-             + 2 * lam * w                     # ← MSEの勾配 ＋ 罰金の勾配
+             + 2 * lam * w                     # ← MSEの勾配 ＋ ペナルティの勾配
     grad_b = 2 * np.mean(pred - tt)
     w -= lr * grad_w
     b -= lr * grad_b
@@ -372,13 +372,13 @@ print("テストMSE:", f"{np.mean((test_pred - t_test) ** 2):,.0f}")
 
 ::: {.callout-note title="結果"}
 - 係数の最大絶対値が**桁違いに小さく**なった
-   - 罰金が係数の増大を抑えた
+   - ペナルティが係数の増大を抑えた
 - 勾配降下法のループは[正則化なしのコード](#peek-gdfit-code){.peek}と同じ形
    - 増えたのは `+ 2 * lam * w` の項だけ
 :::
 
 
-## 罰金あり・なしを見比べる
+## ペナルティあり・なしを見比べる
 
 ```{python}
 #| echo: true
@@ -405,14 +405,14 @@ plt.show()
 ```
 
 ::: {.callout-note title="結果"}
-- 同じ次数9なのに、罰金の項を足しただけで素直な曲線に戻った
+- 同じ次数9なのに、ペナルティの項を足しただけで素直な曲線に戻った
 - テストMSEは**桁違いに**改善（図のタイトル）
 :::
 
 
 ## L2正則化とリッジ回帰 {#peek-l2-ridge}
 
-- $\lambda \sum_j w_j^2$ の形の罰金：**L2正則化**（[L2 regularization]{.en}）
+- $\lambda \sum_j w_j^2$ の形のペナルティ：**L2正則化**（[L2 regularization]{.en}）
 - L2正則化を加えた線形回帰は、歴史的な経緯で**リッジ回帰**（[Ridge regression]{.en}）と呼ばれる
    - モデルは線形回帰のままで、変わるのは損失だけ
 - NN でも同じ道具がそのまま使われる（NN での名前は [weight decay]{.en}）
@@ -420,29 +420,29 @@ plt.show()
 
 ## 深さの制限も、広い意味での正則化 {#peek-regularization-broad}
 
-- 次数9の曲線の MSE を、罰金のあり・なしで比べる
+- 次数9の曲線の MSE を、ペナルティのあり・なしで比べる
 
 | | 訓練MSE | テストMSE |
 |---|---:|---:|
-| 罰金なし | 0 | $4.4 \times 10^{14}$ |
-| 罰金あり（$\lambda = 0.1$） | 3,585 | 3,427 |
+| ペナルティなし | 0 | $4.4 \times 10^{14}$ |
+| ペナルティあり（$\lambda = 0.1$） | 3,585 | 3,427 |
 
 ::: {.callout-note title="広い意味での正則化"}
 - 訓練誤差を犠牲にして、[汎化誤差](classification-evaluation.qmd#peek-generalization-gap){.peek}を下げる工夫
-   - 罰金：訓練MSEは上がり、テストMSEは下がった
+   - ペナルティ：訓練MSEは上がり、テストMSEは下がった
    - [決定木の深さの制限](classification-evaluation.qmd#peek-depth-curve){.peek}：訓練データでの成績は満点でなくなる
 :::
 
 
-## **Tweak** 罰金の強さで曲線が変わる {.badge-practice}
+## **Tweak** ペナルティの強さで曲線が変わる {.badge-practice}
 
 - [さっきのコード](#peek-ridge-code){.peek} の `lam = 0.1` を**書き換えて実行**（比較の図まで続けて実行すると形の変化が見える）
 
 ::: {.tweak}
 | やりたいこと | コード |
 |--|--|
-| 罰金をゼロにする | `lam = 0.0` |
-| 罰金を強烈にする | `lam = 10` |
+| ペナルティをゼロにする | `lam = 0.0` |
+| ペナルティを強烈にする | `lam = 10` |
 :::
 
 ::: {.callout-tip title="チェックポイント"}
@@ -450,7 +450,7 @@ plt.show()
    - ただし正則化なしの厳密解ほどは大きく外れない
    - 勾配降下法を1万回で打ち切ること自体が、係数の増大を抑える弱いブレーキになる
 - `10`：曲線はほぼ**まっすぐ寝て**、訓練MSEまで悪化する
-   - 罰金が強すぎて、訓練データに合わなくなる
+   - ペナルティが強すぎて、訓練データに合わなくなる
 - ちょうど良い $\lambda$ は問題ごとに違う
    - 訓練MSEでは選べない（$\lambda$ を小さくするほど下がるので、必ず $\lambda = 0$ が選ばれる）
    - テストMSEでも選ばない（[テストデータを確認してからモデルを調整しない](classification-evaluation.qmd#peek-test-data-rule){.peek}）
@@ -465,7 +465,7 @@ plt.show()
 - 勾配降下法で求めた傾きと切片は、最小二乗法の厳密解と**一致**
 - **多項式回帰**：特徴量に $x^2, x^3, \ldots$ を足せば道具は線形回帰のまま
 - **過学習は回帰でも起きる**：次数を上げると訓練誤差は下がり、テスト誤差は桁違いに増える
-- **正則化（[regularization]{.en}）**：大きい係数に罰金を課し、曲線の振れを抑える
+- **正則化（[regularization]{.en}）**：大きい係数にペナルティを与え、曲線の振れを抑える
 
 
 ## 練習問題：2点のデータから直線を求める
@@ -548,5 +548,5 @@ print(f"\nnp.polyfit: a={a_exact:.4f}, b={b_exact:.4f}")
 1. このデータの値を代入して整理した $\dfrac{\partial L}{\partial a}$ と $\dfrac{\partial L}{\partial b}$ の式
 2. 3回の更新（各回の勾配と $a,\ b$ を記載）
 3. 勾配が $0$ になる $a,\ b$ の値
-4. 損失に罰金 $\lambda a^2$（$\lambda = 1.25$）を足したときの、2 と 3 の再計算
-5. 罰金の有無による傾き $a$ の比較
+4. 損失にペナルティ $\lambda a^2$（$\lambda = 1.25$）を足したときの、2 と 3 の再計算
+5. ペナルティの有無による傾き $a$ の比較
