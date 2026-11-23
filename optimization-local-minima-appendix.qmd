@@ -27,8 +27,8 @@ subtitle: "初期値しだいで答えが変わる"
 谷が2つ以上ある関数では、勾配降下法はどうなるのか
 :::
 
-- 実際の機械学習（[machine learning]{.en}）の問題では、谷が1つだけということはほとんどない
-- パラメータが多くなると、**たくさんの谷**が存在する
+- 機械学習（[machine learning]{.en}）でも、線形回帰やロジスティック回帰の損失は谷が1つ
+- ニューラルネットワーク（[neural network]{.en}）のようにパラメータが多いモデルでは、**たくさんの谷**が存在する
 - 谷が2つある関数で、勾配降下法の動きを確かめる
 
 ## {background-color="white" .center .break-slide}
@@ -754,7 +754,7 @@ plt.show()
 :::
 
 ::: {.callout-important title="ステップ4：2次微分で確認する"}
-- 収束した点で $f''(x) > 0$ なら谷（最小値）
+- 収束した点で $f''(x) > 0$ なら谷（ローカルミニマム）
 - $f''(x) < 0$ なら山なので捨てる
 - 勾配降下法が山で止まることはほとんどないが、確認は1行で済むので**保険として常に入れておく**
    - [Newton法](#peek-newton-hilltop){.peek}では必須
@@ -806,7 +806,7 @@ def robust_optimization(f, fp, fpp, x0_list, lr=0.1, max_iter=10000):
             "is_minimum": fpp(x) > 0   # ステップ4：谷の検品
         })
 
-    # 谷（最小値）だけを残して、一番良いのを選ぶ
+    # 谷（ローカルミニマム）だけを残して、一番良いのを選ぶ
     minima = [r for r in all_results if r["is_minimum"]]
     if minima:
         best_result = min(minima, key=lambda r: r["f_final"])

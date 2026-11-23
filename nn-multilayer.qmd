@@ -126,11 +126,13 @@ $$w_1x_1+w_2x_2+b=0$$
 ::: {.callout-important title="質問"}
 線形変換（線形結合（[linear combination]{.en}）＋バイアス）を**2回**重ねたら、曲がった境界になる？
 
-$$z_2 = w_2 (w_1 x + b_1) + b_2$$
+$$z^{(2)} = w^{(2)} (w^{(1)} x + b^{(1)}) + b^{(2)}$$
+
+右肩の $(1),(2)$：何回目の変換か
 :::
 
 ::: {.fragment}
-$$z_2 = \underbrace{(w_2 w_1)}_{\text{新しい傾き}} x + \underbrace{(w_2 b_1 + b_2)}_{\text{新しい切片}}$$
+$$z^{(2)} = \underbrace{(w^{(2)} w^{(1)})}_{\text{新しい傾き}} x + \underbrace{(w^{(2)} b^{(1)} + b^{(2)})}_{\text{新しい切片}}$$
 
 - 展開すると**ただの線形変換1回分**になる
    - 何回重ねても同じ
@@ -436,11 +438,15 @@ A2 -> A1: "∂ℓ/∂w, ∂ℓ/∂b は\nどう求める？" { style.stroke: "#c
 
 $$
 \begin{aligned}
-z_1 &= w_1^{\mathsf T} x + b_1, \quad h_1 = \mathrm{ReLU}(z_1)\\
-z_2 &= w_2^{\mathsf T} x + b_2, \quad h_2 = \mathrm{ReLU}(z_2)\\
+z_1 &= \mathbf{w}_1^{\mathsf T} x + b_1, \quad h_1 = \mathrm{ReLU}(z_1)\\
+z_2 &= \mathbf{w}_2^{\mathsf T} x + b_2, \quad h_2 = \mathrm{ReLU}(z_2)\\
 u &= v_1 h_1 + v_2 h_2 + c, \quad p = \sigma(u)
 \end{aligned}
 $$
+
+::: {.caption-note .center}
+太字の $\mathbf{w}_1,\mathbf{w}_2$：各隠れニューロンの重みベクトル
+:::
 
 ```{.d2 sketch="true" width="80%"}
 direction: right
@@ -473,19 +479,19 @@ O -> S -> P
 
 $$
 \begin{aligned}
-Z_1 &= XW_1+b_1 & (N,2)\\
+Z_1 &= XW_1+\mathbf{b}_1 & (N,2)\\
 H &= \mathrm{ReLU}(Z_1) & (N,2)\\
-Z_2 &= HW_2+b_2 & (N,1)\\
+Z_2 &= HW_2+\mathbf{b}_2 & (N,1)\\
 P &= \sigma(Z_2) & (N,1)
 \end{aligned}
 $$
 
 | スカラー式 | 行列のどこに入るか | shape |
 |---|---|---|
-| 2個の $w^{(1)},w^{(2)}$ | `W1` の2列 | `(2, 2)` |
-| 2個のバイアス $b^{(1)},b^{(2)}$ | `b1` の2要素 | `(2,)` |
+| 2個の $\mathbf{w}_1,\mathbf{w}_2$ | `W1` の2列 | `(2, 2)` |
+| 2個のバイアス $b_1,b_2$ | $\mathbf{b}_1$（`b1`）の2要素 | `(2,)` |
 | 出力の $v_1,v_2$ | `W2` の2行 | `(2, 1)` |
-| 出力のバイアス $c$ | `b2` | `(1,)` |
+| 出力のバイアス $c$ | $\mathbf{b}_2$（`b2`） | `(1,)` |
 
 ::: {.takeaway}
 - `X, H, P` の行：魚
@@ -644,7 +650,7 @@ plt.show()
 - 折り目が多いと滑らかな曲線のように見える
 
 $$
-u(x)=w_1\mathrm{ReLU}(z_1)+\cdots+w_m\mathrm{ReLU}(z_m)+c
+u(x)=v_1\mathrm{ReLU}(z_1)+\cdots+v_m\mathrm{ReLU}(z_m)+c
 $$
 
 ::: {.callout-note}
