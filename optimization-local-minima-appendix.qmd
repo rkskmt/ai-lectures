@@ -717,9 +717,9 @@ plt.show()
 
 ## k-means のランダムリスタート
 
-::: {.callout-tip title="`kmeans_best(X, k, n_init=10)` はランダムリスタート"}
+::: {.callout-tip title="`kmeans_best(xs, ys, k, n_init=10)` はランダムリスタート"}
 - k-means も、**クラスタ中心の初期値**しだいで変な分け方に落ち着く
-- [`kmeans_best(X, k, n_init=10)`](clustering-kmeans.qmd#初期値を変えて何度も回しsse-最小の答えを採る){.peek} は、初期値を変えて10回実行し、[SSE](clustering-kmeans.qmd#peek-sse){.peek} が最小の結果を採用する
+- [`kmeans_best(xs, ys, k, n_init=10)`](clustering-kmeans.qmd#初期値を変えて何度も回しsse-最小の答えを採る){.peek} は、初期値を変えて10回実行し、[SSE](clustering-kmeans.qmd#peek-sse){.peek} が最小の結果を採用する
 :::
 
 - 「初期値を変えて何回も試し、一番良いものを選ぶ」という考え方は、初期値の用意のしかた（手動・ランダム・グリッド）によらず同じ
@@ -1324,7 +1324,7 @@ plt.show()
 
 3. **対策は「複数の初期値から試して、一番良い結果を選ぶ」**
    - ランダムリスタートやグリッドサーチで初期値を用意する
-   - k-means の `kmeans_best(X, k, n_init=10)` も同じ方法
+   - k-means の `kmeans_best(xs, ys, k, n_init=10)` も同じ方法
    - 2次微分の確認（$f'' > 0$ なら谷）は保険として常に入れる
 
 4. **Newton法は速いが、山頂で止まる・反対側へ飛ぶという失敗も起こす**

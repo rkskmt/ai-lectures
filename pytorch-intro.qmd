@@ -43,7 +43,7 @@ PyTorchは別の学習原理ではなく、NumPyで書いた**同じ計算を管
 - ディープラーニング（[deep learning]{.en}）で広く使われるライブラリのひとつ
 - 中心となる機能は2つ
   - **autograd**：backward を自動で計算する機能（自動微分、[automatic differentiation]{.en}）
-  - **nn**：層・損失・最適化の部品セット
+  - **nn**：層と損失の部品セット（最適化の部品は `torch.optim`）
 
 ::: {.callout-note}
 この講義の環境にはインストール済み（`environment.yml` の pytorch-cpu / torchvision）。
@@ -130,7 +130,7 @@ X -> M -> A -> S -> Y
 
 ::: {.callout-note title="要するに"}
 - `y = ((x * 3) + 1) ** 2` を実行すると、演算のつながりも記録される
-- `y.backward()` は「2乗 → 足し算 → 掛け算」の逆順に局所微分を適用する
+- `y.backward()` は「掛け算 → 足し算 → 2乗」の逆順に局所微分を適用する
 - Pythonで書いた実際のforwardに応じて、その場でグラフが作られる
    - 層を組み替えても、PyTorchが新しい計算グラフを記録するため、backwardを手で書き直さなくてよい
 :::
@@ -616,7 +616,7 @@ with torch.no_grad():
 
 - **autograd**：`loss.backward()` ＝ 連鎖律の自動化
    - 表示した小数第4位まで手計算と一致
-- **nn の部品**は全部、この講義で自作した部品の別名
+- **`nn` と `torch.optim` の部品**は全部、この講義で自作した部品の別名
 - 学習ループは `zero_grad → backward → step` の3拍子
 - 中身を知っているから、安心して楽ができる
 
