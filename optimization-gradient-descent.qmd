@@ -5,11 +5,93 @@ subtitle: "最適化問題と損失"
 
 ## どの手法も、ある値が最小になるパラメータを探していた
 
-| 手法 | パラメータ | 小さくしたい値 | 探し方 |
-|---|---|---|---|
-| しきい値で分類 | 重さのしきい値 | [総コスト](classification-basics-1d.qmd#peek-cost){.peek} | 候補を全部試す（総当たり） |
-| 決定木 | 分岐のしきい値 | [加重平均ジニ不純度](classification-2d-boundaries.qmd#最適化ジニ不純度が最小になる閾値を探索){.peek} | 候補を全部試す |
-| k-means | 重心の位置 | [SSE](clustering-kmeans.qmd#peek-sse){.peek} | assign と update の繰り返し |
+```{python}
+#| echo: false
+#| fig-align: center
+import numpy as np
+import matplotlib.pyplot as plt
+import japanize_matplotlib
+plt.rcParams["font.size"] = 11
+plt.rcParams["figure.dpi"] = 100
+
+# Same fish data as the classification lectures
+salmon_weights     = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,
+                               1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,
+                               2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,
+                               1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652])
+salmon_brightness  = np.array([3.5, 5.8, 4.9, 4.4, 2.6, 2.6, 2.2, 5.5, 4.4, 4.8, 2.1,
+                               5.9, 5.3, 2.8, 2.7, 2.7, 3.2, 4.1, 3.7, 3.2, 4.4, 2.6,
+                               3.2, 3.5, 3.8, 5.1, 2.8, 4.1, 4.4, 2.2, 4.4, 2.7, 2.3,
+                               5.8, 5.9, 5.2, 3.2, 2.4, 4.7, 3.8])
+seabass_weights    = np.array([1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,
+                               1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,
+                               1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,
+                               1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531])
+seabass_brightness = np.array([5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8,
+                               8.9, 9.7, 9.5, 8.0, 9.6, 5.4, 6.0, 5.2, 6.6, 6.9, 6.4,
+                               9.1, 6.8, 6.4, 7.7, 5.7, 9.0, 5.4, 9.9, 8.9, 6.0, 5.0,
+                               9.1, 8.5, 8.6, 8.9, 5.4, 6.8, 5.6])
+
+# Total cost over the weight threshold, with the costs of the 1D-classification lecture
+C_FP, C_FN = 10000, 500
+cost_ts = np.arange(1100, 2480, 5)
+cost_vals = np.array([((seabass_weights >= t).sum() * C_FP
+                       + (salmon_weights < t).sum() * C_FN) / 10000 for t in cost_ts])
+
+# Weighted Gini over the brightness threshold; both sides stay non-empty in this range
+def gini_of(a, b):
+    return 1 - (a / (a + b))**2 - (b / (a + b))**2
+
+def weighted_gini(t):
+    ls, lb = (salmon_brightness < t).sum(), (seabass_brightness < t).sum()
+    rs, rb = len(salmon_brightness) - ls, len(seabass_brightness) - lb
+    return ((ls + lb) * gini_of(ls, lb) + (rs + rb) * gini_of(rs, rb)) / (ls + lb + rs + rb)
+
+gini_ts = np.arange(2.2, 9.85, 0.05)
+gini_vals = np.array([weighted_gini(t) for t in gini_ts])
+
+# SSE over one coordinate of one centroid: k = 2 on the standardized data
+X = np.column_stack([np.r_[salmon_brightness, seabass_brightness],
+                     np.r_[salmon_weights, seabass_weights]]).astype(float)
+X = (X - X.mean(axis=0)) / X.std(axis=0)
+
+def nearest(centers):
+    return ((X[:, None] - centers[None])**2).sum(axis=2).argmin(axis=1)
+
+centers = X[[0, 40]].copy()
+labels = nearest(centers)
+while True:
+    centers = np.array([X[labels == j].mean(axis=0) for j in range(2)])
+    new_labels = nearest(centers)
+    if (new_labels == labels).all():
+        break
+    labels = new_labels
+
+def sse_at(v):
+    moved = centers.copy()
+    moved[0, 0] = v
+    return ((X[:, None] - moved[None])**2).sum(axis=2).min(axis=1).sum()
+
+sse_xs = np.linspace(centers[0, 0] - 2, centers[0, 0] + 2, 300)
+sse_vals = np.array([sse_at(v) for v in sse_xs])
+
+panels = [
+    ("しきい値で分類", "重さのしきい値 (g)", "総コスト（万円）", cost_ts, cost_vals, "steps-post"),
+    ("決定木", "輝度のしきい値", "加重平均ジニ不純度", gini_ts, gini_vals, "steps-post"),
+    ("k-means", "片方の重心の横座標（他は固定）", "SSE", sse_xs, sse_vals, "default"),
+]
+fig, axes = plt.subplots(1, 3, figsize=(12, 3.5))
+for ax, (title, xlabel, ylabel, xs, ys, style) in zip(axes, panels):
+    ax.plot(xs, ys, color="#8e44ad", lw=2, drawstyle=style)
+    i = int(np.argmin(ys))
+    ax.scatter(xs[i], ys[i], marker="*", c="green", s=220, zorder=5)
+    ax.set_title(title, fontsize=12)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
 
 ::: {.callout-important title="今回の主題"}
 候補を全部試さずに、多くの手法に共通して使える探し方はあるか
@@ -30,12 +112,17 @@ subtitle: "最適化問題と損失"
 | k-means | [SSE](clustering-kmeans.qmd#peek-sse){.peek} | 各点から自分の重心までの距離の2乗の合計 |
 
 
-## パラメータ
+## パラメータとハイパーパラメータ
 
-- [パラメータ](clustering-kmeans.qmd#peek-parameter){.peek}：学習がデータから決める値
-   - 学習が終われば固定
-- **学習**：データからパラメータを決めること
+| | [ハイパーパラメータ](clustering-kmeans.qmd#peek-parameter){.peek}（[hyperparameter]{.en}） | [パラメータ](clustering-kmeans.qmd#peek-parameter){.peek}（[parameter]{.en}） |
+|---|---|---|
+| 決め方 | 学習の前に人が決める | 学習がデータから決める |
+| 決定木 | 木の深さ | 分岐のしきい値 |
+| k-means | クラスタ数 $k$ | 重心 $k$ 個の位置 |
+
+- **学習**：ハイパーパラメータを固定して、データからパラメータを決めること
    - 多くのモデルでは、最適化でパラメータを決める
+   - 学習が終われば、パラメータも固定
 
 ::: {.callout-note title="「パラメータ」の呼び分け"}
 - プログラミングでは、関数に渡す値もパラメータと呼ぶ
@@ -53,22 +140,6 @@ subtitle: "最適化問題と損失"
 ```{python}
 #| echo: false
 #| fig-align: center
-import numpy as np
-import matplotlib.pyplot as plt
-import japanize_matplotlib
-plt.rcParams["font.size"] = 11
-plt.rcParams["figure.dpi"] = 100
-
-# Same fish weights as the 1D-classification lecture (redefined identically in a later cell)
-salmon_weights  = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,
-                            1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,
-                            2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,
-                            1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652])
-seabass_weights = np.array([1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,
-                            1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,
-                            1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,
-                            1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531])
-
 def n_errors(t):
     # predict salmon when weight >= t
     return int((salmon_weights < t).sum() + (seabass_weights >= t).sum())
@@ -127,29 +198,6 @@ plt.show()
 ```{python}
 #| echo: false
 #| fig-align: center
-import numpy as np
-import matplotlib.pyplot as plt
-import japanize_matplotlib
-plt.rcParams["font.size"] = 11
-plt.rcParams["figure.dpi"] = 100
-
-salmon_weights     = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,
-                               1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,
-                               2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,
-                               1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652])
-salmon_brightness  = np.array([3.5, 5.8, 4.9, 4.4, 2.6, 2.6, 2.2, 5.5, 4.4, 4.8, 2.1,
-                               5.9, 5.3, 2.8, 2.7, 2.7, 3.2, 4.1, 3.7, 3.2, 4.4, 2.6,
-                               3.2, 3.5, 3.8, 5.1, 2.8, 4.1, 4.4, 2.2, 4.4, 2.7, 2.3,
-                               5.8, 5.9, 5.2, 3.2, 2.4, 4.7, 3.8])
-seabass_weights    = np.array([1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,
-                               1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,
-                               1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,
-                               1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531])
-seabass_brightness = np.array([5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8,
-                               8.9, 9.7, 9.5, 8.0, 9.6, 5.4, 6.0, 5.2, 6.6, 6.9, 6.4,
-                               9.1, 6.8, 6.4, 7.7, 5.7, 9.0, 5.4, 9.9, 8.9, 6.0, 5.0,
-                               9.1, 8.5, 8.6, 8.9, 5.4, 6.8, 5.6])
-
 fig, axes = plt.subplots(1, 2, figsize=(11, 3.8))
 
 # 1D: threshold is the parameter
