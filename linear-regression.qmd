@@ -200,7 +200,7 @@ print(f"np.polyfit      : a={a_exact:.4f}, b={b_exact:.4f}")
 ```
 
 ::: {.callout-note title="結果"}
-- 自作の勾配降下法と厳密解が**一致**
+- 勾配降下法と厳密解が**一致**
 - 元の単位に戻すと「体長 1cm あたり約 97g」という意味のある数字になる
 :::
 
@@ -335,15 +335,15 @@ $$L = \mathrm{MSE} + \lambda \sum_j w_j^2$$
    - 学習のしかたを決める[ハイパーパラメータ](clustering-kmeans.qmd#peek-parameter){.peek}
 
 
-## 正則化の実装：自作の勾配降下法に罰金を足す {#peek-ridge-code}
+## 正則化の実装：勾配降下法に罰金を足す {#peek-ridge-code}
 
-- [自作した勾配降下法](#peek-gdfit-code){.peek}に、**罰金の項を足す**
+- [勾配降下法](#peek-gdfit-code){.peek}に、**罰金の項を足す**
 - 罰金 $\lambda \sum w^2$ の微分は $2\lambda w$
    - 各係数の勾配に足せばよい
 
 ```{python}
 #| echo: true
-# 特徴量 x, x², …, x⁹ も自分で作る（列が x^1 〜 x^9 の配列）
+# 特徴量 x, x², …, x⁹ を作る（列が x^1 〜 x^9 の配列）
 P_train = x_train.reshape(-1, 1) ** np.arange(1, 10)   # 形 (10, 9)
 P_test  = x_test.reshape(-1, 1)  ** np.arange(1, 10)
 mu, sd  = P_train.mean(axis=0), P_train.std(axis=0)
@@ -373,7 +373,7 @@ print("テストMSE:", f"{np.mean((test_pred - t_test) ** 2):,.0f}")
 ::: {.callout-note title="結果"}
 - 係数の最大絶対値が**桁違いに小さく**なった
    - 罰金が係数の増大を抑えた
-- 勾配降下法のループは[自作のコード](#peek-gdfit-code){.peek}と同じ形
+- 勾配降下法のループは[正則化なしのコード](#peek-gdfit-code){.peek}と同じ形
    - 増えたのは `+ 2 * lam * w` の項だけ
 :::
 
@@ -391,7 +391,7 @@ fig, axes = plt.subplots(1, 2, figsize=(9.5, 3.6))
 for ax, curve, name, mse in [
         (axes[0], np.polyval(coef9, z_grid), "次数9（正則化なし）",
          np.mean((np.polyval(coef9, z_test) - t_test) ** 2)),
-        (axes[1], own_curve, "次数9 + 正則化（自作の勾配降下法）",
+        (axes[1], own_curve, "次数9 + 正則化（勾配降下法）",
          np.mean((test_pred - t_test) ** 2))]:
     ax.scatter(x_train, t_train, c="#2980b9", s=45)
     ax.scatter(x_test, t_test, c="#e74c3c", marker="s", s=45)
