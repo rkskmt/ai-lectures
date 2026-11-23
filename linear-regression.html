@@ -258,7 +258,7 @@
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
   <script src="network-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="b7578a78988d50d25ada3c04759e4901e19b9867">
+  <meta name="qmd-web-source" content="fbcf97d3dac9c5bbc51bf7688951c958887d1550">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -345,7 +345,7 @@ rkskmt
 <li>魚の<strong>体長</strong>（cm）を、新しい特徴量として使う</li>
 <li>体長を測るだけで重さが分かれば、<strong>秤に乗せる手間が省ける</strong></li>
 </ul>
-<div id="8578e8e5" class="cell" data-execution_count="1">
+<div id="596749d7" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>魚データの定義（クリックして展開）</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -362,7 +362,7 @@ rkskmt
 <span id="cb1-12"><a aria-label="12"></a>                    <span class="dv">2230</span>, <span class="dv">1445</span>, <span class="dv">1838</span>, <span class="dv">1370</span>, <span class="dv">1096</span>], dtype<span class="op">=</span><span class="bu">float</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="0fbb1162" class="cell" data-execution_count="2">
+<div id="9c119eac" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -446,7 +446,7 @@ rkskmt
 \frac{\partial L}{\partial b} = \frac{2}{N} \sum_i (a x_i + b - t_i)\]</span></p>
 <ul>
 <li>構造は単純：<strong>「予測と正解の差」を入力の大きさに応じて配る</strong></li>
-<li>あとは勾配降下法に渡すだけ：</li>
+<li>あとは勾配降下法に渡すだけ</li>
 </ul>
 <p><span class="math display">\[a \leftarrow a - \alpha \frac{\partial L}{\partial a}, \qquad b \leftarrow b - \alpha \frac{\partial L}{\partial b}\]</span></p>
 <div title="数式とコードの名前">
@@ -478,7 +478,7 @@ rkskmt
 <li>学習率を1つで済ませるため</li>
 </ul></li>
 </ul>
-<div id="f5ba4bd2" class="cell" data-execution_count="3">
+<div id="a6aa9f20" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a>x <span class="op">=</span> (lengths <span class="op">-</span> lengths.mean()) <span class="op">/</span> lengths.std()   <span class="co"># 標準化した体長</span></span>
 <span id="cb2-2"><a aria-label="2"></a>t <span class="op">=</span> (weights <span class="op">-</span> weights.mean()) <span class="op">/</span> weights.std()   <span class="co"># 標準化した重さ</span></span>
 <span id="cb2-3"><a aria-label="3"></a></span>
@@ -521,7 +521,7 @@ rkskmt
 <section id="直線が合っていく様子" class="slide level2">
 <h2>直線が合っていく様子</h2>
 <div class="slide-body">
-<div id="714a6119" class="cell" data-execution_count="4">
+<div id="c6cb40b3" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -555,7 +555,7 @@ rkskmt
 <ul>
 <li>秤に乗せなくてよい</li>
 </ul></li>
-<li>「数値から数値を予測する」問題は、身の回りにいくらでもある：</li>
+<li>「数値から数値を予測する」問題は、身の回りにいくらでもある</li>
 </ul>
 <table class="caption-top">
 <thead>
@@ -597,7 +597,7 @@ rkskmt
 <li>係数は次数の高い順に返る（<code>d = 1</code> なら <span class="math inline">\(a, b\)</span> の順）</li>
 </ul></li>
 </ul>
-<div id="cb4632b9" class="cell" data-execution_count="5">
+<div id="2ce577db" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a aria-label="1"></a>a_exact, b_exact <span class="op">=</span> np.polyfit(x, t, <span class="dv">1</span>)</span>
 <span id="cb4-2"><a aria-label="2"></a><span class="bu">print</span>(<span class="ss">f"gradient descent: a=</span><span class="sc">{</span>a<span class="sc">:.4f}</span><span class="ss">, b=</span><span class="sc">{</span>b<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
 <span id="cb4-3"><a aria-label="3"></a><span class="bu">print</span>(<span class="ss">f"np.polyfit      : a=</span><span class="sc">{</span>a_exact<span class="sc">:.4f}</span><span class="ss">, b=</span><span class="sc">{</span>b_exact<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
@@ -683,7 +683,10 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <p><span class="math display">\[\text{予測} = w_1 x + w_2 x^2 + \cdots + w_d x^d + b\]</span></p>
 <ul>
 <li><span class="math inline">\(x^2, x^3, \ldots\)</span> を新しい特徴量として作れば、<strong>道具は線形回帰のまま</strong></li>
-<li>次数 <span class="math inline">\(d\)</span> がモデルの複雑さを決める</li>
+<li>モデルの複雑さを決める次数 <span class="math inline">\(d\)</span>
+<ul>
+<li><a href="./clustering-kmeans.html#peek-parameter" class="peek">ハイパーパラメータ</a></li>
+</ul></li>
 </ul>
 <div title="質問">
 <div class="callout callout-important callout-titled callout-style-default">
@@ -705,7 +708,7 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <section id="次数を上げてみる" class="slide level2">
 <h2>次数を上げてみる</h2>
 <div class="slide-body">
-<div id="eb302c93" class="cell" data-execution_count="6">
+<div id="0d7f5ac6" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a aria-label="1"></a><span class="co"># 先頭の10匹を訓練データ、残りの5匹をテストデータにする</span></span>
@@ -764,7 +767,7 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <section id="テストデータで過学習を確認" class="slide level2">
 <h2>テストデータで過学習を確認</h2>
 <div class="slide-body">
-<div id="dab07e6b" class="cell" data-execution_count="7">
+<div id="5c77c1c5" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a aria-label="1"></a>degrees <span class="op">=</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">9</span>)</span>
 <span id="cb7-2"><a aria-label="2"></a>train_mse, test_mse <span class="op">=</span> [], []</span>
 <span id="cb7-3"><a aria-label="3"></a><span class="cf">for</span> deg <span class="kw">in</span> degrees:</span>
@@ -820,7 +823,7 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <ul>
 <li>曲線が大きく振れる原因は、<strong>巨大な係数</strong></li>
 </ul>
-<div id="90b8b8a9" class="cell" data-execution_count="8">
+<div id="a17e71f7" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a aria-label="1"></a>coef1 <span class="op">=</span> np.polyfit(z_train, t_train, <span class="dv">1</span>)</span>
 <span id="cb8-2"><a aria-label="2"></a>coef9 <span class="op">=</span> np.polyfit(z_train, t_train, <span class="dv">9</span>)</span>
 <span id="cb8-3"><a aria-label="3"></a><span class="bu">print</span>(<span class="st">"次数1の係数の最大絶対値:"</span>, <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">abs</span>(coef1[:<span class="op">-</span><span class="dv">1</span>])<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss">"</span>)   <span class="co"># [:-1] は切片を除く</span></span>
@@ -831,7 +834,7 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 </div>
 </div>
 <ul>
-<li>そこで、損失に「係数の大きさ」への<strong>ペナルティ</strong>を課すことを考える：</li>
+<li>そこで、損失に「係数の大きさ」への<strong>ペナルティ</strong>を課すことを考える</li>
 </ul>
 <p><span class="math display">\[L = \mathrm{MSE} + \lambda \sum_j w_j^2\]</span></p>
 <ul>
@@ -855,7 +858,7 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <li>各係数の勾配に足せばよい</li>
 </ul></li>
 </ul>
-<div id="f133ee25" class="cell" data-execution_count="9">
+<div id="63688e90" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a aria-label="1"></a><span class="co"># 特徴量 x, x², …, x⁹ を作る（列が x^1 〜 x^9 の配列）</span></span>
 <span id="cb10-2"><a aria-label="2"></a>P_train <span class="op">=</span> x_train.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>) <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)   <span class="co"># 形 (10, 9)</span></span>
 <span id="cb10-3"><a aria-label="3"></a>P_test  <span class="op">=</span> x_test.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)  <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)</span>
@@ -915,7 +918,7 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <section id="ペナルティありなしを見比べる" class="slide level2">
 <h2>ペナルティあり・なしを見比べる</h2>
 <div class="slide-body">
-<div id="ebd245b6" class="cell" data-execution_count="10">
+<div id="323886a0" class="cell" data-execution_count="10">
 <details class="code-fold">
 <summary>描画コード</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a aria-label="1"></a>P_grid    <span class="op">=</span> ((grid.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>) <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)) <span class="op">-</span> mu) <span class="op">/</span> sd</span>
@@ -1142,7 +1145,7 @@ a = 0.2 + 0.16 = 0.36\]</span></p>
 </div>
 </div>
 <h3 id="コードで確認">コードで確認</h3>
-<div id="63328c2b" class="cell" data-execution_count="11">
+<div id="844116d5" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>

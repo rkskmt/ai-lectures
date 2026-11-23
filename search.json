@@ -67,7 +67,7 @@
     "href": "pytorch-intro.html#なぜ自動でできるのか",
     "title": "PyTorch入門",
     "section": "なぜ自動でできるのか",
-    "text": "なぜ自動でできるのか\n\n\nforward の間、PyTorch は計算の履歴（計算グラフ）を記録している\nbackward() は、その履歴を逆順にたどって連鎖律を適用するだけ\nやっていることは手計算の1往復と同じ：\n\n往路の途中の値を保存（そのぶんメモリを使う）\n\\(\\delta\\) を出力側から掛けて貯める\n\n\n\n\n\n\n\n\nヒント\n\n\nブラックボックスとして使うのと、中身を知って使うのは別物。 われわれは中身を手で再現済みなので、堂々と楽をしてよい。"
+    "text": "なぜ自動でできるのか\n\n\nforward の間、PyTorch は計算の履歴（計算グラフ）を記録している\nbackward() は、その履歴を逆順にたどって連鎖律を適用するだけ\nやっていることは手計算の1往復と同じ\n\n往路の途中の値を保存（そのぶんメモリを使う）\n\\(\\delta\\) を出力側から掛けて貯める\n\n\n\n\n\n\n\n\nヒント\n\n\nブラックボックスとして使うのと、中身を知って使うのは別物。 われわれは中身を手で再現済みなので、堂々と楽をしてよい。"
   },
   {
     "objectID": "pytorch-intro.html#bcewithlogitsloss-は2部品をまとめる",
@@ -81,7 +81,7 @@
     "href": "pytorch-intro.html#なぜ確率ではなくlogitを直接渡すのか",
     "title": "PyTorch入門",
     "section": "なぜ確率ではなくlogitを直接渡すのか",
-    "text": "なぜ確率ではなくlogitを直接渡すのか\n\n数式上は、次の2通りは同じ：\nu → sigmoid → BCELoss\nu ─────────→ BCEWithLogitsLoss\n\n\\(|u|\\) が大きいと、シグモイドの結果は計算機上で0や1へ極端に近づく\nその後に log(p) や log(1-p) を計算すると、丸め誤差や log(0) が起きやすい\nBCEWithLogitsLoss は同じ式を、数値的に安定する形へまとめて計算する\n\n\n\n\n\n\n\n重要\n\n\n\n学習時は raw logits を損失へ渡す\n確率が必要な表示・判定時だけ torch.sigmoid を使う"
+    "text": "なぜ確率ではなくlogitを直接渡すのか\n\n数式上は、次の2通りは同じ\nu → sigmoid → BCELoss\nu ─────────→ BCEWithLogitsLoss\n\n\\(|u|\\) が大きいと、シグモイドの結果は計算機上で0や1へ極端に近づく\nその後に log(p) や log(1-p) を計算すると、丸め誤差や log(0) が起きやすい\nBCEWithLogitsLoss は同じ式を、数値的に安定する形へまとめて計算する\n\n\n\n\n\n\n\n重要\n\n\n\n学習時は raw logits を損失へ渡す\n確率が必要な表示・判定時だけ torch.sigmoid を使う"
   },
   {
     "objectID": "pytorch-intro.html#nn部品には全部見覚えがある",
@@ -109,7 +109,7 @@
     "href": "pytorch-intro.html#このモデルの学習対象は65個",
     "title": "PyTorch入門",
     "section": "このモデルの学習対象は65個",
-    "text": "このモデルの学習対象は65個\n\nLinear(2 → 16) : 2×16 個の重み + 16 個のバイアス = 48\nLinear(16 → 1) : 16×1 個の重み +  1 個のバイアス = 17\n----------------------------------------------------------\n合計                                                  65\nPythonでも確認できる：\nsum(p.numel() for p in model.parameters())  # 65\n\n\n\n\n\n\nノート\n\n\n\nmodel.parameters() で、この65個をまとめてoptimizerへ渡せる\nネットワークを組み替えると、登録される数も自動で変わる"
+    "text": "このモデルの学習対象は65個\n\nLinear(2 → 16) : 2×16 個の重み + 16 個のバイアス = 48\nLinear(16 → 1) : 16×1 個の重み +  1 個のバイアス = 17\n----------------------------------------------------------\n合計                                                  65\nPythonでも確認できる\nsum(p.numel() for p in model.parameters())  # 65\n\n\n\n\n\n\nノート\n\n\n\nmodel.parameters() で、この65個をまとめてoptimizerへ渡せる\nネットワークを組み替えると、登録される数も自動で変わる"
   },
   {
     "objectID": "pytorch-intro.html#optimizer.step-が勾配降下の1歩",
@@ -536,7 +536,7 @@
     "href": "nn-logistic.html#peek-one-layer-loss",
     "title": "ロジスティック回帰をNNとして実装する",
     "section": "採点：損失関数は二値交差エントロピー（Binary Cross-Entropy）",
-    "text": "採点：損失関数は二値交差エントロピー（Binary Cross-Entropy）\n\n\nロジスティック回帰の損失関数をそのまま使う\n\n\\[\n\\ell(y,p)\n=-\\left[y\\log p+(1-y)\\log(1-p)\\right]\n\\]\n\n\\(\\ell\\)：この魚の予測に対する損失（loss）\nこの魚は \\(y=1\\) なので、第1項だけが残る：\n\n\\[\n\\ell(1,0.4013)\n=-\\log(0.4013)\n\\approx0.913\n\\]\n\n損失関数はネットワークの図には入らない\n\nForwardの出力 \\(p\\) と正解 \\(y\\) を受け取って採点する関数\n\n\n\n\n\n\n\n\nノート\n\n\n\\(p=0.4\\) と丸めて計算した \\(0.92\\)と同じ魚の、丸める前の損失"
+    "text": "採点：損失関数は二値交差エントロピー（Binary Cross-Entropy）\n\n\nロジスティック回帰の損失関数をそのまま使う\n\n\\[\n\\ell(y,p)\n=-\\left[y\\log p+(1-y)\\log(1-p)\\right]\n\\]\n\n\\(\\ell\\)：この魚の予測に対する損失（loss）\nこの魚は \\(y=1\\) なので、第1項だけが残る\n\n\\[\n\\ell(1,0.4013)\n=-\\log(0.4013)\n\\approx0.913\n\\]\n\n損失関数はネットワークの図には入らない\n\nForwardの出力 \\(p\\) と正解 \\(y\\) を受け取って採点する関数\n\n\n\n\n\n\n\n\nノート\n\n\n\\(p=0.4\\) と丸めて計算した \\(0.92\\)と同じ魚の、丸める前の損失"
   },
   {
     "objectID": "nn-logistic.html#採点binary_cross_entropy-として実装する",
@@ -578,7 +578,7 @@
     "href": "nn-logistic.html#peek-one-layer-backward",
     "title": "ロジスティック回帰をNNとして実装する",
     "section": "勾配：3つの計算を backward にまとめる",
-    "text": "勾配：3つの計算を backward にまとめる\n\n\n2本分の重みの微分値は、NumPyでまとめて計算できる：\n\n\\[\n\\begin{bmatrix}d_{w_1}\\\\d_{w_2}\\end{bmatrix}\n=d_z\n\\begin{bmatrix}x_1\\\\x_2\\end{bmatrix}\n\\]\ndef backward(x, y, p):\n    # ① 損失関数をzで微分した値\n    d_z = p - y\n\n    # ② 損失関数を2本の重みで偏微分した値\n    d_w = d_z * x\n\n    # ③ 損失関数をバイアスで偏微分した値\n    d_b = d_z\n    return d_w, d_b\n\nd_w, d_b = backward(x, y, p)\nd_w: [-1.19737532 -0.29934383]\nd_b: -0.598687660112452\n\nbackward の入力：Forwardで使った x、正解 y、Forwardの出力 p\nbackward の出力：更新に使う d_w, d_b\n\nd_w[0]：\\(w_1\\) の微分値\nd_w[1]：\\(w_2\\) の微分値\n\nbackward は勾配の3行をそのまま関数にしたもの"
+    "text": "勾配：3つの計算を backward にまとめる\n\n\n2本分の重みの微分値は、NumPyでまとめて計算できる\n\n\\[\n\\begin{bmatrix}d_{w_1}\\\\d_{w_2}\\end{bmatrix}\n=d_z\n\\begin{bmatrix}x_1\\\\x_2\\end{bmatrix}\n\\]\ndef backward(x, y, p):\n    # ① 損失関数をzで微分した値\n    d_z = p - y\n\n    # ② 損失関数を2本の重みで偏微分した値\n    d_w = d_z * x\n\n    # ③ 損失関数をバイアスで偏微分した値\n    d_b = d_z\n    return d_w, d_b\n\nd_w, d_b = backward(x, y, p)\nd_w: [-1.19737532 -0.29934383]\nd_b: -0.598687660112452\n\nbackward の入力：Forwardで使った x、正解 y、Forwardの出力 p\nbackward の出力：更新に使う d_w, d_b\n\nd_w[0]：\\(w_1\\) の微分値\nd_w[1]：\\(w_2\\) の微分値\n\nbackward は勾配の3行をそのまま関数にしたもの"
   },
   {
     "objectID": "nn-logistic.html#演習-1匹の魚でforwardとbackwardを実行する",
@@ -599,7 +599,7 @@
     "href": "nn-logistic.html#更新勾配と逆向きに-wb-を動かす",
     "title": "ロジスティック回帰をNNとして実装する",
     "section": "更新：勾配と逆向きに \\(w,b\\) を動かす",
-    "text": "更新：勾配と逆向きに \\(w,b\\) を動かす\n\n\n更新式は1匹ずつ学習したときの勾配降下法と同じ：\n\n\\[\nw_j\\leftarrow w_j-\\alpha d_{w_j},\n\\qquad\nb\\leftarrow b-\\alpha d_b\n\\]\n\n\\(\\alpha\\)：学習率（learning rate）\n\n1回に動かす大きさを決める\nここでは \\(\\alpha=0.1\\) とする\n\nこの魚では \\(d_{w_1}\\approx-1.1974\\) が負なので、\\(-\\alpha d_{w_1}\\) は正：\n\n\\[\nw_1\\leftarrow-0.2\n-0.1\\times(-1.1974)\n\\approx-0.0803\n\\]\n\n「勾配と逆向き」に動かす処理は、勾配を引く更新式に含まれている"
+    "text": "更新：勾配と逆向きに \\(w,b\\) を動かす\n\n\n更新式は1匹ずつ学習したときの勾配降下法と同じ\n\n\\[\nw_j\\leftarrow w_j-\\alpha d_{w_j},\n\\qquad\nb\\leftarrow b-\\alpha d_b\n\\]\n\n\\(\\alpha\\)：学習率（learning rate）\n\n1回に動かす大きさを決める\nここでは \\(\\alpha=0.1\\) とする\n\nこの魚では \\(d_{w_1}\\approx-1.1974\\) が負なので、\\(-\\alpha d_{w_1}\\) は正\n\n\\[\nw_1\\leftarrow-0.2\n-0.1\\times(-1.1974)\n\\approx-0.0803\n\\]\n\n「勾配と逆向き」に動かす処理は、勾配を引く更新式に含まれている"
   },
   {
     "objectID": "nn-logistic.html#更新update-を実装して1回動かす",
@@ -739,7 +739,7 @@
     "href": "newton-method-appendix.html#練習問題",
     "title": "Newton法",
     "section": "練習問題",
-    "text": "練習問題\n\n勾配降下法の練習問題と同じ関数 \\(f(x) = x^2 + 6x + 5\\) について：\n\n2次微分を求めよ\n初期値 \\(x_0 = 0\\) でNewton法を実行せよ\n反復1、反復2を手計算で示せ\n勾配降下法の解答例（\\(\\alpha = 0.2\\)）の結果と比較して、何回で収束したか、どちらが速かったかを述べよ"
+    "text": "練習問題\n\n勾配降下法の練習問題と同じ関数 \\(f(x) = x^2 + 6x + 5\\) について、次の問いに答えよ\n\n2次微分を求めよ\n初期値 \\(x_0 = 0\\) でNewton法を実行せよ\n反復1、反復2を手計算で示せ\n勾配降下法の解答例（\\(\\alpha = 0.2\\)）の結果と比較して、何回で収束したか、どちらが速かったかを述べよ"
   },
   {
     "objectID": "newton-method-appendix.html#解答例",
@@ -816,21 +816,21 @@
     "href": "logistic-regression.html#z-1-を実際に確率へ変換する",
     "title": "ロジスティック回帰",
     "section": "\\(z = 1\\) を実際に確率へ変換する",
-    "text": "\\(z = 1\\) を実際に確率へ変換する\n\n\n\\(z = 1\\) をロジスティック関数に代入する：\n\n\\[p = \\sigma(1) = \\frac{1}{1 + e^{-1}} \\approx 0.731\\]\n\n\\(z=1\\) の魚は、Salmon である確率が \\(73.1\\%\\) と解釈できる"
+    "text": "\\(z = 1\\) を実際に確率へ変換する\n\n\n\\(z = 1\\) をロジスティック関数に代入する\n\n\\[p = \\sigma(1) = \\frac{1}{1 + e^{-1}} \\approx 0.731\\]\n\n\\(z=1\\) の魚は、Salmon である確率が \\(73.1\\%\\) と解釈できる"
   },
   {
     "objectID": "logistic-regression.html#peek-chain-rule",
     "href": "logistic-regression.html#peek-chain-rule",
     "title": "ロジスティック回帰",
     "section": "ロジスティック関数を微分する",
-    "text": "ロジスティック関数を微分する\n\n\nロジスティック関数の傾きを、先に求めておく\n\n勾配降下法で学習するには微分（傾き）が必要\n\n合成関数（composite function）の微分は、外側の微分 × 内側の微分：\n\n\\[\n\\frac{d}{dx}f(g(x))=f'(g(x))\\,g'(x),\n\\qquad\n\\frac{dy}{dx}=\\frac{dy}{du}\\frac{du}{dx}\n\\]\n\n\\(p=(1+e^{-z})^{-1}\\) を合成関数として微分する：\n\n外側：\\((\\;)^{-1}\\)\n内側：\\(1+e^{-z}\\)（指数関数（exponential function）の微分）\n\n\n\\[\\begin{aligned}\n\\frac{dp}{dz}\n&=\\underbrace{-(1+e^{-z})^{-2}}_{\\text{外側の微分}}\n  \\underbrace{(-e^{-z})}_{\\text{内側の微分}} \\\\\n&=\\frac{e^{-z}}{(1+e^{-z})^2}\n\\end{aligned}\\]"
+    "text": "ロジスティック関数を微分する\n\n\nロジスティック関数の傾きを、先に求めておく\n\n勾配降下法で学習するには微分（傾き）が必要\n\n合成関数（composite function）の微分は、外側の微分 × 内側の微分\n\n\\[\n\\frac{d}{dx}f(g(x))=f'(g(x))\\,g'(x),\n\\qquad\n\\frac{dy}{dx}=\\frac{dy}{du}\\frac{du}{dx}\n\\]\n\n\\(p=(1+e^{-z})^{-1}\\) を合成関数として微分する\n\n外側：\\((\\;)^{-1}\\)\n内側：\\(1+e^{-z}\\)（指数関数（exponential function）の微分）\n\n\n\\[\\begin{aligned}\n\\frac{dp}{dz}\n&=\\underbrace{-(1+e^{-z})^{-2}}_{\\text{外側の微分}}\n  \\underbrace{(-e^{-z})}_{\\text{内側の微分}} \\\\\n&=\\frac{e^{-z}}{(1+e^{-z})^2}\n\\end{aligned}\\]"
   },
   {
     "objectID": "logistic-regression.html#実は微分結果は-p-だけで表せる",
     "href": "logistic-regression.html#実は微分結果は-p-だけで表せる",
     "title": "ロジスティック回帰",
     "section": "実は、微分結果は \\(p\\) だけで表せる",
-    "text": "実は、微分結果は \\(p\\) だけで表せる\n\n\n微分した直後は、次の形になっている：\n\n\\[\n\\frac{dp}{dz}=\\frac{e^{-z}}{(1+e^{-z})^2}\n\\tag{1}\n\\]\n\n一方、ロジスティック関数の出力は \\(p=\\dfrac{1}{1+e^{-z}}\\)\n\\(p(1-p)\\) を計算すると、微分した直後と同じ形になる：\n\n\\[p(1-p)\n=\\frac{1}{1+e^{-z}}\n\\left(1-\\frac{1}{1+e^{-z}}\\right)\n=\\frac{e^{-z}}{(1+e^{-z})^2}\n\\tag{2}\\]\n\n(1)と(2)の右辺が同じなので、ロジスティック関数の微分は \\(p\\) だけで書ける：\n\n\\[\\therefore \\qquad \\frac{dp}{dz}=p(1-p)\\]\n\n\\[\n\\text{出力： }p=\\sigma(z)\n\\quad\\Longrightarrow\\quad\n\\text{傾き： }\\frac{dp}{dz}=p(1-p)\n\\]"
+    "text": "実は、微分結果は \\(p\\) だけで表せる\n\n\n微分した直後は、次の形になっている\n\n\\[\n\\frac{dp}{dz}=\\frac{e^{-z}}{(1+e^{-z})^2}\n\\tag{1}\n\\]\n\n一方、ロジスティック関数の出力は \\(p=\\dfrac{1}{1+e^{-z}}\\)\n\\(p(1-p)\\) を計算すると、微分した直後と同じ形になる\n\n\\[p(1-p)\n=\\frac{1}{1+e^{-z}}\n\\left(1-\\frac{1}{1+e^{-z}}\\right)\n=\\frac{e^{-z}}{(1+e^{-z})^2}\n\\tag{2}\\]\n\n(1)と(2)の右辺が同じなので、ロジスティック関数の微分は \\(p\\) だけで書ける\n\n\\[\\therefore \\qquad \\frac{dp}{dz}=p(1-p)\\]\n\n\\[\n\\text{出力： }p=\\sigma(z)\n\\quad\\Longrightarrow\\quad\n\\text{傾き： }\\frac{dp}{dz}=p(1-p)\n\\]"
   },
   {
     "objectID": "logistic-regression.html#section-1",
@@ -851,21 +851,21 @@
     "href": "logistic-regression.html#分類の確率",
     "title": "ロジスティック回帰",
     "section": "分類の確率",
-    "text": "分類の確率\n\n\n2クラスに属する確率はそれぞれ \\(p\\) と \\(1-p\\)\n\n\n\\(p\\)：Salmon（\\(y=1\\)）になる確率\n2クラスしかないので、Sea bass（\\(y=0\\)）になる確率は残りの \\(1-p\\)\n\n\\[P(y=1)=p, \\qquad P(y=0)=1-p\\]\n\n例えば \\(p=0.4\\) なら：\n\nSalmon の確率は \\(0.4\\)\nSea bass の確率は \\(1-0.4=0.6\\)\n\n\n\n1つの出力 \\(p\\) は 両方のクラスの確率 \\((p,\\,1-p)\\) を示している"
+    "text": "分類の確率\n\n\n2クラスに属する確率はそれぞれ \\(p\\) と \\(1-p\\)\n\n\n\\(p\\)：Salmon（\\(y=1\\)）になる確率\n2クラスしかないので、Sea bass（\\(y=0\\)）になる確率は残りの \\(1-p\\)\n\n\\[P(y=1)=p, \\qquad P(y=0)=1-p\\]\n\n例えば \\(p=0.4\\) なら\n\nSalmon の確率は \\(0.4\\)\nSea bass の確率は \\(1-0.4=0.6\\)\n\n\n\n1つの出力 \\(p\\) は 両方のクラスの確率 \\((p,\\,1-p)\\) を示している"
   },
   {
     "objectID": "logistic-regression.html#peek-cross-entropy",
     "href": "logistic-regression.html#peek-cross-entropy",
     "title": "ロジスティック回帰",
     "section": "予測を採点する損失関数：交差エントロピー（Cross Entropy）",
-    "text": "予測を採点する損失関数：交差エントロピー（Cross Entropy）\n\n\nクラス \\(c\\) ごとに、正解ラベル \\(y_c\\) と予測確率 \\(p_c\\) を用意する\n\n正解クラスだけ \\(y_c=1\\)、それ以外は \\(y_c=0\\)\n\n\n\\[\n\\ell(\\mathbf{y},\\mathbf{p})\n=-\\sum_c y_c\\log p_c\n\\]\n\n\\(y_c=0\\) の項は消えるので、正解クラスの項だけが残る\n正解クラスに出した確率を \\(q\\) と置けば：\n\n\\[\\ell=-\\log q\\]\n\n交差エントロピー：正解クラスに出した確率 \\(q\\) を \\(-\\log q\\) で採点する損失関数（loss function）"
+    "text": "予測を採点する損失関数：交差エントロピー（Cross Entropy）\n\n\nクラス \\(c\\) ごとに、正解ラベル \\(y_c\\) と予測確率 \\(p_c\\) を用意する\n\n正解クラスだけ \\(y_c=1\\)、それ以外は \\(y_c=0\\)\n\n\n\\[\n\\ell(\\mathbf{y},\\mathbf{p})\n=-\\sum_c y_c\\log p_c\n\\]\n\n\\(y_c=0\\) の項は消えるので、正解クラスの項だけが残る\n正解クラスに出した確率を \\(q\\) と置けば\n\n\\[\\ell=-\\log q\\]\n\n交差エントロピー：正解クラスに出した確率 \\(q\\) を \\(-\\log q\\) で採点する損失関数（loss function）"
   },
   {
     "objectID": "logistic-regression.html#peek-binary-cross-entropy",
     "href": "logistic-regression.html#peek-binary-cross-entropy",
     "title": "ロジスティック回帰",
     "section": "2クラス版：二値交差エントロピー（Binary Cross-Entropy）",
-    "text": "2クラス版：二値交差エントロピー（Binary Cross-Entropy）\n\n\nクラスの順を（Salmon、Sea bass）とする\nSalmon の確率を \\(p\\)、正解ラベルを \\(y\\) とすると：\n\n\\[\\mathbf{y}=(y,\\,1-y),\\qquad \\mathbf{p}=(p,\\,1-p)\\]\n\nこの2つを一般の交差エントロピーへ代入すると：\n\n\\[\\ell(y,p)=-\\left[y\\log p+(1-y)\\log(1-p)\\right]\\]\n\n\\(y\\) と \\(1-y\\) は 0/1 のスイッチ\n\n正解側の項だけが残る\n\n\n\n二値交差エントロピー：2クラス用の交差エントロピー"
+    "text": "2クラス版：二値交差エントロピー（Binary Cross-Entropy）\n\n\nクラスの順を（Salmon、Sea bass）とする\nSalmon の確率を \\(p\\)、正解ラベルを \\(y\\) とすると\n\n\\[\\mathbf{y}=(y,\\,1-y),\\qquad \\mathbf{p}=(p,\\,1-p)\\]\n\nこの2つを一般の交差エントロピーへ代入すると\n\n\\[\\ell(y,p)=-\\left[y\\log p+(1-y)\\log(1-p)\\right]\\]\n\n\\(y\\) と \\(1-y\\) は 0/1 のスイッチ\n\n正解側の項だけが残る\n\n\n\n二値交差エントロピー：2クラス用の交差エントロピー"
   },
   {
     "objectID": "logistic-regression.html#peek-loss-value",
@@ -893,21 +893,21 @@
     "href": "logistic-regression.html#peek-logistic-p-minus-y",
     "title": "ロジスティック回帰",
     "section": "2つの微分を掛けると \\(p-y\\) になる",
-    "text": "2つの微分を掛けると \\(p-y\\) になる\n\n\n\\(p\\) は \\(z\\) から計算されるので、連鎖律（chain rule）で2つの微分を掛ける：\n\n\\[\n\\frac{\\partial\\ell}{\\partial z}\n=\\frac{\\partial\\ell}{\\partial p}\\frac{dp}{dz}\n\\]\n\nロジスティック関数の微分は、どちらの正解でも同じ：\n\n\\[\\frac{\\partial p}{\\partial z}=p(1-p)\\]\n\n正解が \\(y=1\\) のとき：\n\n\\[\\frac{\\partial \\ell}{\\partial z}\n=\\underbrace{\\left(-\\frac{1}{p}\\right)}_{\\partial\\ell/\\partial p}\n\\underbrace{p(1-p)}_{dp/dz}\n=-(1-p)=p-1=p-y \\qquad (y=1)\\]\n\n正解が \\(y=0\\) のとき：\n\n\\[\\frac{\\partial \\ell}{\\partial z}\n=\\underbrace{\\frac{1}{1-p}}_{\\partial\\ell/\\partial p}\n\\underbrace{p(1-p)}_{dp/dz}\n=p=p-0=p-y \\qquad (y=0)\\]\n\nどちらの正解でも \\[\\frac{\\partial \\ell}{\\partial z}=p-y\\]"
+    "text": "2つの微分を掛けると \\(p-y\\) になる\n\n\n\\(p\\) は \\(z\\) から計算されるので、連鎖律（chain rule）で2つの微分を掛ける\n\n\\[\n\\frac{\\partial\\ell}{\\partial z}\n=\\frac{\\partial\\ell}{\\partial p}\\frac{dp}{dz}\n\\]\n\nロジスティック関数の微分は、どちらの正解でも同じ\n\n\\[\\frac{\\partial p}{\\partial z}=p(1-p)\\]\n\n正解が \\(y=1\\) のとき：\n\n\\[\\frac{\\partial \\ell}{\\partial z}\n=\\underbrace{\\left(-\\frac{1}{p}\\right)}_{\\partial\\ell/\\partial p}\n\\underbrace{p(1-p)}_{dp/dz}\n=-(1-p)=p-1=p-y \\qquad (y=1)\\]\n\n正解が \\(y=0\\) のとき：\n\n\\[\\frac{\\partial \\ell}{\\partial z}\n=\\underbrace{\\frac{1}{1-p}}_{\\partial\\ell/\\partial p}\n\\underbrace{p(1-p)}_{dp/dz}\n=p=p-0=p-y \\qquad (y=0)\\]\n\nどちらの正解でも \\[\\frac{\\partial \\ell}{\\partial z}=p-y\\]"
   },
   {
     "objectID": "logistic-regression.html#peek-parameter-gradients",
     "href": "logistic-regression.html#peek-parameter-gradients",
     "title": "ロジスティック回帰",
     "section": "1匹分の入力からパラメータの勾配が決まる",
-    "text": "1匹分の入力からパラメータの勾配が決まる\n\n\n\\(z=w_1x_1+w_2x_2+b\\) なので：\n\n\\[\\frac{\\partial z}{\\partial w_j}=x_j, \\qquad\n\\frac{\\partial z}{\\partial b}=1\\]\n\nいま求めた \\(\\dfrac{\\partial \\ell}{\\partial z}=p-y\\) を使い、連鎖律で更新に必要な \\(w_j\\) と \\(b\\) の勾配を求める：\n\n\\[\\frac{\\partial \\ell}{\\partial w_j}\n=\\frac{\\partial \\ell}{\\partial z}\\frac{\\partial z}{\\partial w_j}\n=(p-y)x_j, \\qquad\n\\frac{\\partial \\ell}{\\partial b}=p-y\\]\n\n先ほどの \\(p=0.4\\)、\\(y=1\\)（Salmon）の例なら、\\(p-y=0.4-1=-0.6\\)\nある魚の入力を \\(x=(2,\\,0.5)\\) とすると：\n\n\\(\\dfrac{\\partial \\ell}{\\partial w_1}=-0.6\\times2=-1.2\\)\n\\(\\dfrac{\\partial \\ell}{\\partial w_2}=-0.6\\times0.5=-0.3\\)\n\\(|x_1|\\) が \\(|x_2|\\) の4倍なので、\\(w_1\\) の勾配も4倍\n\n学習率 \\(\\alpha\\) を掛けて更新：\n\n\\[w_j \\leftarrow w_j-\\alpha(p-y)x_j, \\qquad\nb \\leftarrow b-\\alpha(p-y)\\]\n\n\n\n\n\n\n\n損失値そのものから勾配を求めたわけではない\n\n\n\n先ほど計算した \\(0.92\\) は、現在の予測がどれくらい悪いかを表す目安\n\nこの値から勾配を求めるわけではない\n\n更新に使うのは、現在のパラメータ位置における損失関数の傾き（＝勾配）"
+    "text": "1匹分の入力からパラメータの勾配が決まる\n\n\n\\(z=w_1x_1+w_2x_2+b\\) なので\n\n\\[\\frac{\\partial z}{\\partial w_j}=x_j, \\qquad\n\\frac{\\partial z}{\\partial b}=1\\]\n\nいま求めた \\(\\dfrac{\\partial \\ell}{\\partial z}=p-y\\) を使い、連鎖律で更新に必要な \\(w_j\\) と \\(b\\) の勾配を求める\n\n\\[\\frac{\\partial \\ell}{\\partial w_j}\n=\\frac{\\partial \\ell}{\\partial z}\\frac{\\partial z}{\\partial w_j}\n=(p-y)x_j, \\qquad\n\\frac{\\partial \\ell}{\\partial b}=p-y\\]\n\n先ほどの \\(p=0.4\\)、\\(y=1\\)（Salmon）の例なら、\\(p-y=0.4-1=-0.6\\)\nある魚の入力を \\(x=(2,\\,0.5)\\) とすると\n\n\\(\\dfrac{\\partial \\ell}{\\partial w_1}=-0.6\\times2=-1.2\\)\n\\(\\dfrac{\\partial \\ell}{\\partial w_2}=-0.6\\times0.5=-0.3\\)\n\\(|x_1|\\) が \\(|x_2|\\) の4倍なので、\\(w_1\\) の勾配も4倍\n\n学習率 \\(\\alpha\\) を掛けて更新\n\n\\[w_j \\leftarrow w_j-\\alpha(p-y)x_j, \\qquad\nb \\leftarrow b-\\alpha(p-y)\\]\n\n\n\n\n\n\n\n損失値そのものから勾配を求めたわけではない\n\n\n\n先ほど計算した \\(0.92\\) は、現在の予測がどれくらい悪いかを表す目安\n\nこの値から勾配を求めるわけではない\n\n更新に使うのは、現在のパラメータ位置における損失関数の傾き（＝勾配）"
   },
   {
     "objectID": "logistic-regression.html#peek-gradient-code",
     "href": "logistic-regression.html#peek-gradient-code",
     "title": "ロジスティック回帰",
     "section": "1匹分の勾配をコードに置き換える",
-    "text": "1匹分の勾配をコードに置き換える\n\n\n数式の各部分に、そのまま変数名を付ける：\n\ndelta = p - y\nd_w = delta * x\nd_b = delta\n\n\n\n\n\n\n\n\nコード\n数式\n意味\n\n\n\n\ndelta\n\\(p-y=\\dfrac{\\partial \\ell}{\\partial z}\\)\n1匹分の損失の、\\(z\\) に対する勾配\n\n\nd_w[j]\n\\((p-y)x_j=\\dfrac{\\partial \\ell}{\\partial w_j}\\)\n重み \\(w_j\\) の勾配\n\n\nd_b\n\\(p-y=\\dfrac{\\partial \\ell}{\\partial b}\\)\nバイアス \\(b\\) の勾配\n\n\n\n\n\n\n\n\n\nノート\n\n\nbackward：ニューラルネットワーク（neural network、NN）の実装で、出力側から各パラメータの勾配を求める関数"
+    "text": "1匹分の勾配をコードに置き換える\n\n\n数式の各部分に、そのまま変数名を付ける\n\ndelta = p - y\nd_w = delta * x\nd_b = delta\n\n\n\n\n\n\n\n\nコード\n数式\n意味\n\n\n\n\ndelta\n\\(p-y=\\dfrac{\\partial \\ell}{\\partial z}\\)\n1匹分の損失の、\\(z\\) に対する勾配\n\n\nd_w[j]\n\\((p-y)x_j=\\dfrac{\\partial \\ell}{\\partial w_j}\\)\n重み \\(w_j\\) の勾配\n\n\nd_b\n\\(p-y=\\dfrac{\\partial \\ell}{\\partial b}\\)\nバイアス \\(b\\) の勾配\n\n\n\n\n\n\n\n\n\nノート\n\n\nbackward：ニューラルネットワーク（neural network、NN）の実装で、出力側から各パラメータの勾配を求める関数"
   },
   {
     "objectID": "logistic-regression.html#peek-forward",
@@ -1040,7 +1040,7 @@
     "href": "logistic-regression.html#peek-exp-derivative",
     "title": "ロジスティック回帰",
     "section": "【参考】\\(e^x\\) は微分しても \\(e^x\\)",
-    "text": "【参考】\\(e^x\\) は微分しても \\(e^x\\)\n\n\n一般の指数関数（exponential function）\\(a^x\\) を微分すると：\n\n\\[\\frac{d}{dx}a^x=(\\log a)a^x\\]\n\n\\(\\log a=1\\) になる特別な底が \\(e\\approx2.718\\)：\n\n\\[\\frac{d}{dx}e^x=e^x\\]\n\n\n\n\n\n\n\n\n\n\n指数が \\(-z\\) なら、連鎖律で内側の微分 \\(-1\\) が掛かる：\n\n\\[\\frac{d}{dz}e^{-z}=e^{-z}\\frac{d(-z)}{dz}=-e^{-z}\\]\n\n\\(e\\) は、指数関数の値と傾きが同じになるように選ばれた数"
+    "text": "【参考】\\(e^x\\) は微分しても \\(e^x\\)\n\n\n一般の指数関数（exponential function）\\(a^x\\) を微分すると\n\n\\[\\frac{d}{dx}a^x=(\\log a)a^x\\]\n\n\\(\\log a=1\\) になる特別な底が \\(e\\approx2.718\\)\n\n\\[\\frac{d}{dx}e^x=e^x\\]\n\n\n\n\n\n\n\n\n\n\n指数が \\(-z\\) なら、連鎖律で内側の微分 \\(-1\\) が掛かる\n\n\\[\\frac{d}{dz}e^{-z}=e^{-z}\\frac{d(-z)}{dz}=-e^{-z}\\]\n\n\\(e\\) は、指数関数の値と傾きが同じになるように選ばれた数"
   },
   {
     "objectID": "index.html#人工知能",
@@ -1173,7 +1173,7 @@
     "href": "dimensionality-pca.html#分散が最大の方向を式にする",
     "title": "次元削減と PCA",
     "section": "「分散が最大の方向」を式にする",
-    "text": "「分散が最大の方向」を式にする\n\n\n探している直線の向きを、単位ベクトル（unit vector） \\(\\mathbf{v}\\)（\\(\\|\\mathbf{v}\\| = 1\\)）で表す\n中心化（centering）した点 \\(\\tilde{\\mathbf{x}}_i\\) の、この直線への影（射影, projection）：内積（inner product）\\(z_i = \\tilde{\\mathbf{x}}_i^{\\mathsf T} \\mathbf{v}\\)\n\n\\(z_i\\) はただの数\n\n80匹ぶんの影は、行列とベクトルの積で一度に求められる：\\(\\mathbf{z} = \\tilde{X} \\mathbf{v}\\)\n\n「影の分散」を式変形する：\n\\[\\text{影の分散} = \\frac{1}{n-1} \\sum_i z_i^2\n= \\frac{1}{n-1} \\mathbf{z}^{\\mathsf T} \\mathbf{z}\n\\qquad \\text{（2乗和は「自分との内積」）}\\]\n\\[= \\frac{1}{n-1} (\\tilde{X}\\mathbf{v})^{\\mathsf T} (\\tilde{X}\\mathbf{v})\n= \\frac{1}{n-1} \\mathbf{v}^{\\mathsf T} \\tilde{X}^{\\mathsf T} \\tilde{X} \\mathbf{v}\n\\qquad \\text{（転置の規則 } (AB)^{\\mathsf T} = B^{\\mathsf T} A^{\\mathsf T} \\text{）}\\]\n\\[= \\mathbf{v}^{\\mathsf T} \\underbrace{\\left( \\frac{1}{n-1} \\tilde{X}^{\\mathsf T} \\tilde{X} \\right)}_{C\\;（共分散行列）} \\mathbf{v}\n\\qquad \\text{（真ん中のかたまりに名前をつける）}\\]\n\n共分散行列（covariance matrix）\\(C\\)：影の分散を変形すると現れる行列\nPCA の探しものは次の形で書ける：\n\n\n\n\n\n\n\nノート\n\n\n\\(\\|\\mathbf{v}\\| = 1\\) のもとで \\(\\mathbf{v}^{\\mathsf T} C \\mathbf{v}\\)（＝ \\(\\mathbf{v}\\) 方向の分散）を最大にする \\(\\mathbf{v}\\) を探せ"
+    "text": "「分散が最大の方向」を式にする\n\n\n探している直線の向きを、単位ベクトル（unit vector） \\(\\mathbf{v}\\)（\\(\\|\\mathbf{v}\\| = 1\\)）で表す\n中心化（centering）した点 \\(\\tilde{\\mathbf{x}}_i\\) の、この直線への影（射影, projection）：内積（inner product）\\(z_i = \\tilde{\\mathbf{x}}_i^{\\mathsf T} \\mathbf{v}\\)\n\n\\(z_i\\) はただの数\n\n80匹ぶんの影は、行列とベクトルの積で一度に求められる：\\(\\mathbf{z} = \\tilde{X} \\mathbf{v}\\)\n\n「影の分散」を式変形する：\n\\[\\text{影の分散} = \\frac{1}{n-1} \\sum_i z_i^2\n= \\frac{1}{n-1} \\mathbf{z}^{\\mathsf T} \\mathbf{z}\n\\qquad \\text{（2乗和は「自分との内積」）}\\]\n\\[= \\frac{1}{n-1} (\\tilde{X}\\mathbf{v})^{\\mathsf T} (\\tilde{X}\\mathbf{v})\n= \\frac{1}{n-1} \\mathbf{v}^{\\mathsf T} \\tilde{X}^{\\mathsf T} \\tilde{X} \\mathbf{v}\n\\qquad \\text{（転置の規則 } (AB)^{\\mathsf T} = B^{\\mathsf T} A^{\\mathsf T} \\text{）}\\]\n\\[= \\mathbf{v}^{\\mathsf T} \\underbrace{\\left( \\frac{1}{n-1} \\tilde{X}^{\\mathsf T} \\tilde{X} \\right)}_{C\\;（共分散行列）} \\mathbf{v}\n\\qquad \\text{（真ん中のかたまりに名前をつける）}\\]\n\n共分散行列（covariance matrix）\\(C\\)：影の分散を変形すると現れる行列\nPCA の探しものは次の形で書ける\n\n\n\n\n\n\n\nノート\n\n\n\\(\\|\\mathbf{v}\\| = 1\\) のもとで \\(\\mathbf{v}^{\\mathsf T} C \\mathbf{v}\\)（＝ \\(\\mathbf{v}\\) 方向の分散）を最大にする \\(\\mathbf{v}\\) を探せ"
   },
   {
     "objectID": "dimensionality-pca.html#ところで固有ベクトルと固有値とは",
@@ -1481,7 +1481,7 @@
     "href": "classification-evaluation.html#練習問題1どちらのモデルを仕入れる",
     "title": "過学習と汎化",
     "section": "練習問題1：どちらのモデルを仕入れる？",
-    "text": "練習問題1：どちらのモデルを仕入れる？\n\n手計算で解け\n新しい魚20匹（Salmon 10・Sea bass 10）で、モデルAを試したら： Salmon は10匹中8匹を正しく Salmon と判定、Sea bass は10匹中9匹を正しく Sea bass と判定した。\n\nモデルAの混同行列を書け（各セルに TP・FN・FP・TN の名前も書く）\nモデルAの Precision と Recall を求めよ\nモデルBが訓練データで Precision・Recall ともに 100%、この20匹でともに 70%だったとき、高級レストランに納品するならどちらのモデルか、理由とともに答えよ"
+    "text": "練習問題1：どちらのモデルを仕入れる？\n\n手計算で解け\n新しい魚20匹（Salmon 10・Sea bass 10）でモデルAを試すと、Salmon は10匹中8匹を正しく Salmon と判定、Sea bass は10匹中9匹を正しく Sea bass と判定した。\n\nモデルAの混同行列を書け（各セルに TP・FN・FP・TN の名前も書く）\nモデルAの Precision と Recall を求めよ\nモデルBが訓練データで Precision・Recall ともに 100%、この20匹でともに 70%だったとき、高級レストランに納品するならどちらのモデルか、理由とともに答えよ"
   },
   {
     "objectID": "classification-evaluation.html#練習問題2recall-で深さを選び直す",
@@ -2643,7 +2643,7 @@
     "href": "linear-regression.html#回帰直線でできること",
     "title": "線形回帰と正則化",
     "section": "回帰直線でできること",
-    "text": "回帰直線でできること\n\n\n新しい魚は、体長を測って式に入れるだけで重さを予測できる\n\n秤に乗せなくてよい\n\n「数値から数値を予測する」問題は、身の回りにいくらでもある：\n\n\n\n\n入力\n予測したい数値\n\n\n\n\n気温\nアイスクリームの売り上げ\n\n\n部屋の広さ・駅からの距離\n家賃\n\n\n広告費\n商品の売り上げ\n\n\n\n\nどれも、予測の式と損失を決めれば、勾配降下法でパラメータを求められる"
+    "text": "回帰直線でできること\n\n\n新しい魚は、体長を測って式に入れるだけで重さを予測できる\n\n秤に乗せなくてよい\n\n「数値から数値を予測する」問題は、身の回りにいくらでもある\n\n\n\n\n入力\n予測したい数値\n\n\n\n\n気温\nアイスクリームの売り上げ\n\n\n部屋の広さ・駅からの距離\n家賃\n\n\n広告費\n商品の売り上げ\n\n\n\n\nどれも、予測の式と損失を決めれば、勾配降下法でパラメータを求められる"
   },
   {
     "objectID": "linear-regression.html#答え合わせsklearn-と比べる",
@@ -2664,7 +2664,7 @@
     "href": "linear-regression.html#モデルを曲線にする",
     "title": "線形回帰と正則化",
     "section": "モデルを曲線にする",
-    "text": "モデルを曲線にする\n\n\n回帰式は直線だけでなく、曲線でもよい：多項式回帰（polynomial regression）\n\n\\[\\text{予測} = w_1 x + w_2 x^2 + \\cdots + w_d x^d + b\\]\n\n\\(x^2, x^3, \\ldots\\) を新しい特徴量として作れば、道具は線形回帰のまま\n次数 \\(d\\) がモデルの複雑さを決める\n\n\n\n\n\n\n\n\n質問\n\n\n次数を 1 → 3 → 9 と上げていくと、訓練誤差とテスト誤差はそれぞれどうなる？"
+    "text": "モデルを曲線にする\n\n\n回帰式は直線だけでなく、曲線でもよい：多項式回帰（polynomial regression）\n\n\\[\\text{予測} = w_1 x + w_2 x^2 + \\cdots + w_d x^d + b\\]\n\n\\(x^2, x^3, \\ldots\\) を新しい特徴量として作れば、道具は線形回帰のまま\nモデルの複雑さを決める次数 \\(d\\)\n\nハイパーパラメータ\n\n\n\n\n\n\n\n\n\n質問\n\n\n次数を 1 → 3 → 9 と上げていくと、訓練誤差とテスト誤差はそれぞれどうなる？"
   },
   {
     "objectID": "linear-regression.html#次数を上げてみる",
@@ -2853,7 +2853,7 @@
     "href": "mnist-project.html#スコアを実際にソフトマックスへ入れる",
     "title": "手書き数字分類プロジェクト",
     "section": "スコアを実際にソフトマックスへ入れる",
-    "text": "スコアを実際にソフトマックスへ入れる\n\n\n3クラスのスコアを \\(u=(2.0,\\,1.0,\\,0.1)\\) とする：\n\n\\[e^u=(e^2,e^1,e^{0.1})\\approx(7.389,\\,2.718,\\,1.105)\\]\n\n分母は3つの合計：\n\n\\[e^2+e^1+e^{0.1}\\approx 11.213\\]\n\nそれぞれを合計で割る：\n\n\\[\\mathrm{softmax}(u)\n\\approx\\left(\\frac{7.389}{11.213},\n             \\frac{2.718}{11.213},\n             \\frac{1.105}{11.213}\\right)\n\\approx(0.66,\\,0.24,\\,0.10)\\]\n\n指数関数で全スコアを正にし、合計で割って「合計1の確率分布」にする"
+    "text": "スコアを実際にソフトマックスへ入れる\n\n\n3クラスのスコアを \\(u=(2.0,\\,1.0,\\,0.1)\\) とする\n\n\\[e^u=(e^2,e^1,e^{0.1})\\approx(7.389,\\,2.718,\\,1.105)\\]\n\n分母は3つの合計\n\n\\[e^2+e^1+e^{0.1}\\approx 11.213\\]\n\nそれぞれを合計で割る\n\n\\[\\mathrm{softmax}(u)\n\\approx\\left(\\frac{7.389}{11.213},\n             \\frac{2.718}{11.213},\n             \\frac{1.105}{11.213}\\right)\n\\approx(0.66,\\,0.24,\\,0.10)\\]\n\n指数関数で全スコアを正にし、合計で割って「合計1の確率分布」にする"
   },
   {
     "objectID": "mnist-project.html#ソフトマックスの仕事ぶり",
@@ -2972,7 +2972,7 @@
     "href": "mnist-project.html#自分の字は読めるのか持ち帰りデモ",
     "title": "手書き数字分類プロジェクト",
     "section": "自分の字は読めるのか（持ち帰りデモ）",
-    "text": "自分の字は読めるのか（持ち帰りデモ）\n\n紙に数字を書いて撮影し、この機械に読ませてみよう。\n\nただし写真をそのまま28×28に縮めても、まず読めない\n\nMNISTの画像は「数字を20ピクセル角に収め、重心を中央に置く」ように揃えてある\n撮った写真はそうなっていない\n\n同じ揃え方を行ってからモデルへ入力する：\n\n\nfrom PIL import Image\nimport numpy as np\nimport torch\n\n# 1. 読み込み：グレースケール化して「インク=1、紙=0」に正規化\na = np.array(Image.open(\"my_digit.png\").convert(\"L\"), dtype=np.float32)\na = (a.max() - a) / (a.max() - a.min())\n\n# 2. MNISTと同じ揃え方：数字を切り出し → 長辺20pxに縮小 → 重心を中央へ\nrows, cols = np.where(a &gt; 0.3)\na = a[rows.min():rows.max()+1, cols.min():cols.max()+1]\nh, w = a.shape\ns = 20.0 / max(h, w)\nimg = Image.fromarray((a * 255).astype(np.uint8)).resize((round(w*s), round(h*s)))\na = np.array(img, dtype=np.float32) / 255.0\nx28 = np.zeros((28, 28), dtype=np.float32)\nh, w = a.shape\nx28[(28-h)//2:(28-h)//2+h, (28-w)//2:(28-w)//2+w] = a\nys, xs = np.mgrid[0:28, 0:28]\ncy, cx = (x28*ys).sum()/x28.sum(), (x28*xs).sum()/x28.sum()\nx28 = np.roll(x28, (round(14-cy), round(14-cx)), axis=(0, 1))\n\n# 3. 推論\nx = torch.tensor(x28).unsqueeze(0).unsqueeze(0)\nprint(\"予測:\", model(x).argmax(dim=1).item())"
+    "text": "自分の字は読めるのか（持ち帰りデモ）\n\n紙に数字を書いて撮影し、この機械に読ませてみよう。\n\nただし写真をそのまま28×28に縮めても、まず読めない\n\nMNISTの画像は「数字を20ピクセル角に収め、重心を中央に置く」ように揃えてある\n撮った写真はそうなっていない\n\n同じ揃え方を行ってからモデルへ入力する\n\n\nfrom PIL import Image\nimport numpy as np\nimport torch\n\n# 1. 読み込み：グレースケール化して「インク=1、紙=0」に正規化\na = np.array(Image.open(\"my_digit.png\").convert(\"L\"), dtype=np.float32)\na = (a.max() - a) / (a.max() - a.min())\n\n# 2. MNISTと同じ揃え方：数字を切り出し → 長辺20pxに縮小 → 重心を中央へ\nrows, cols = np.where(a &gt; 0.3)\na = a[rows.min():rows.max()+1, cols.min():cols.max()+1]\nh, w = a.shape\ns = 20.0 / max(h, w)\nimg = Image.fromarray((a * 255).astype(np.uint8)).resize((round(w*s), round(h*s)))\na = np.array(img, dtype=np.float32) / 255.0\nx28 = np.zeros((28, 28), dtype=np.float32)\nh, w = a.shape\nx28[(28-h)//2:(28-h)//2+h, (28-w)//2:(28-w)//2+w] = a\nys, xs = np.mgrid[0:28, 0:28]\ncy, cx = (x28*ys).sum()/x28.sum(), (x28*xs).sum()/x28.sum()\nx28 = np.roll(x28, (round(14-cy), round(14-cx)), axis=(0, 1))\n\n# 3. 推論\nx = torch.tensor(x28).unsqueeze(0).unsqueeze(0)\nprint(\"予測:\", model(x).argmax(dim=1).item())"
   },
   {
     "objectID": "mnist-project.html#うまく読めないとき",
@@ -3028,14 +3028,14 @@
     "href": "nn-backprop.html#匹分の損失を直接微分すると長くなる",
     "title": "バックプロパゲーション",
     "section": "1匹分の損失を直接微分すると長くなる",
-    "text": "1匹分の損失を直接微分すると長くなる\n\n\n\nこのあと使う魚の正解は \\(y=1\\) なので、\\(\\ell=-\\log p\\)\n図の各箱の式を1本にまとめると、\\(w_1\\) の勾配は長い入れ子になる：\n\n\\[\\frac{\\partial \\ell}{\\partial w_1} = \\frac{\\partial}{\\partial w_1} \\left[ -\\log \\sigma\\!\\Big( v \\cdot \\mathrm{ReLU}(w_1 x_1 + w_2 x_2 + b) + c \\Big) \\right]\\]\n\n\n\n\n\n\n\n質問\n\n\n\nパラメータごとに、この長い入れ子を最初から微分するのか\n100層・100万パラメータでも同じ方法を使えるか\n\n\n\n\n\n\n\n各箱の簡単な微分を使い回せばよい\n鍵は合成関数の微分（連鎖律、chain rule）"
+    "text": "1匹分の損失を直接微分すると長くなる\n\n\n\nこのあと使う魚の正解は \\(y=1\\) なので、\\(\\ell=-\\log p\\)\n図の各箱の式を1本にまとめると、\\(w_1\\) の勾配は長い入れ子になる\n\n\\[\\frac{\\partial \\ell}{\\partial w_1} = \\frac{\\partial}{\\partial w_1} \\left[ -\\log \\sigma\\!\\Big( v \\cdot \\mathrm{ReLU}(w_1 x_1 + w_2 x_2 + b) + c \\Big) \\right]\\]\n\n\n\n\n\n\n\n質問\n\n\n\nパラメータごとに、この長い入れ子を最初から微分するのか\n100層・100万パラメータでも同じ方法を使えるか\n\n\n\n\n\n\n\n各箱の簡単な微分を使い回せばよい\n鍵は合成関数の微分（連鎖律、chain rule）"
   },
   {
     "objectID": "nn-backprop.html#連鎖律微分は掛け算でつなげる",
     "href": "nn-backprop.html#連鎖律微分は掛け算でつなげる",
     "title": "バックプロパゲーション",
     "section": "連鎖律：微分は掛け算でつなげる",
-    "text": "連鎖律：微分は掛け算でつなげる\n\n\n連鎖律を、NNの全計算へ広げる\n関数が数珠つなぎなら、微分も数珠つなぎ：\n\n\\[y = f(g(x)) \\quad \\Rightarrow \\quad \\frac{dy}{dx} = \\frac{dy}{dg} \\cdot \\frac{dg}{dx}\\]\n\n\n\n\n\n\n\n質問（高校の範囲）\n\n\n\\(y = (3x+1)^2\\) を、展開せずに微分すると？\n\n\n\n\n\n\n途中の値を \\(g=3x+1\\) と置くと、\\(y=g^2\\)\n\\(\\dfrac{dy}{dg}=2g\\)、\\(\\dfrac{dg}{dx}=3\\)\n掛けて \\(\\dfrac{dy}{dx}=2g\\times3=2(3x+1)\\times3=18x+6\\)\n展開してから微分した結果（\\(9x^2 + 6x + 1 \\to 18x + 6\\)）と一致\n\n部品ごとの微分を掛ければ、元の式を展開する必要はない\n\nNNの全パラメータの勾配も、連鎖律だけで求められる"
+    "text": "連鎖律：微分は掛け算でつなげる\n\n\n連鎖律を、NNの全計算へ広げる\n関数が数珠つなぎなら、微分も数珠つなぎ\n\n\\[y = f(g(x)) \\quad \\Rightarrow \\quad \\frac{dy}{dx} = \\frac{dy}{dg} \\cdot \\frac{dg}{dx}\\]\n\n\n\n\n\n\n\n質問（高校の範囲）\n\n\n\\(y = (3x+1)^2\\) を、展開せずに微分すると？\n\n\n\n\n\n\n途中の値を \\(g=3x+1\\) と置くと、\\(y=g^2\\)\n\\(\\dfrac{dy}{dg}=2g\\)、\\(\\dfrac{dg}{dx}=3\\)\n掛けて \\(\\dfrac{dy}{dx}=2g\\times3=2(3x+1)\\times3=18x+6\\)\n展開してから微分した結果（\\(9x^2 + 6x + 1 \\to 18x + 6\\)）と一致\n\n部品ごとの微分を掛ければ、元の式を展開する必要はない\n\nNNの全パラメータの勾配も、連鎖律だけで求められる"
   },
   {
     "objectID": "nn-backprop.html#微分値は少し動かしたときの変化量",
@@ -3098,28 +3098,28 @@
     "href": "nn-backprop.html#peek-handcalc",
     "title": "バックプロパゲーション",
     "section": "復路：まず出力層の勾配",
-    "text": "復路：まず出力層の勾配\n\n\nロジスティック回帰で求めた結果を、出力ニューロンへそのまま使う\nロジスティック回帰のスコア \\(z=w^\\mathsf{T}x+b\\) にあたるものが、ここでは出力層のスコア \\(u=vh+c\\)：\n\n\\[\\delta_{\\text{out}} = \\frac{\\partial \\ell}{\\partial u} = p - y = 0.5125 - 1 = -0.4875\\]\n\\[\\frac{\\partial \\ell}{\\partial v} = \\delta_{\\text{out}} \\cdot h = -0.4875 \\times 0.30 = -0.1463\n\\qquad\n\\frac{\\partial \\ell}{\\partial c} = \\delta_{\\text{out}} = -0.4875\\]\n\n\\(u=vh+c\\) なので \\(\\dfrac{\\partial u}{\\partial v}=h\\)、\\(\\dfrac{\\partial u}{\\partial c}=1\\)\n出力層の2つの勾配は、連鎖律の掛け算だけで求まった"
+    "text": "復路：まず出力層の勾配\n\n\nロジスティック回帰で求めた結果を、出力ニューロンへそのまま使う\nロジスティック回帰のスコア \\(z=w^\\mathsf{T}x+b\\) にあたるものが、ここでは出力層のスコア \\(u=vh+c\\)\n\n\\[\\delta_{\\text{out}} = \\frac{\\partial \\ell}{\\partial u} = p - y = 0.5125 - 1 = -0.4875\\]\n\\[\\frac{\\partial \\ell}{\\partial v} = \\delta_{\\text{out}} \\cdot h = -0.4875 \\times 0.30 = -0.1463\n\\qquad\n\\frac{\\partial \\ell}{\\partial c} = \\delta_{\\text{out}} = -0.4875\\]\n\n\\(u=vh+c\\) なので \\(\\dfrac{\\partial u}{\\partial v}=h\\)、\\(\\dfrac{\\partial u}{\\partial c}=1\\)\n出力層の2つの勾配は、連鎖律の掛け算だけで求まった"
   },
   {
     "objectID": "nn-backprop.html#勾配の符号から動かす向きを読める",
     "href": "nn-backprop.html#勾配の符号から動かす向きを読める",
     "title": "バックプロパゲーション",
     "section": "勾配の符号から「動かす向き」を読める",
-    "text": "勾配の符号から「動かす向き」を読める\n\n今回の正解は \\(y=1\\)、予測は \\(p=0.5125\\)：\n\\[\\frac{\\partial \\ell}{\\partial c}=-0.4875\\]\n勾配降下法では負の勾配を引くため：\n\\[c\\leftarrow c-\\alpha(-0.4875)=c+0.4875\\alpha\\]\n\n\\(c\\) は増える → \\(u=vh+c\\) も増える\n\\(u\\) が増える → \\(p=\\sigma(u)\\) も増える\n正解1へ近づく方向なので、損失は下がる\n\n\n勾配は単なる計算結果ではなく、各パラメータをどちらへ動かすべきかを示す"
+    "text": "勾配の符号から「動かす向き」を読める\n\n今回の正解は \\(y=1\\)、予測は \\(p=0.5125\\) なので\n\\[\\frac{\\partial \\ell}{\\partial c}=-0.4875\\]\n勾配降下法では負の勾配を引くため：\n\\[c\\leftarrow c-\\alpha(-0.4875)=c+0.4875\\alpha\\]\n\n\\(c\\) は増える → \\(u=vh+c\\) も増える\n\\(u\\) が増える → \\(p=\\sigma(u)\\) も増える\n正解1へ近づく方向なので、損失は下がる\n\n\n勾配は単なる計算結果ではなく、各パラメータをどちらへ動かすべきかを示す"
   },
   {
     "objectID": "nn-backprop.html#relu-の場所で復路が分かれる",
     "href": "nn-backprop.html#relu-の場所で復路が分かれる",
     "title": "バックプロパゲーション",
     "section": "ReLU の場所で復路が分かれる",
-    "text": "ReLU の場所で復路が分かれる\n\nReLUの微分を、中間層の復路で使う：\n\\[\\delta_{\\rm mid}=\\delta_{\\rm out}\\cdot v\\cdot\\mathrm{ReLU}'(z)\\]\n\n\n\n往路の \\(z\\)\n\\(\\mathrm{ReLU}'(z)\\)\n中間より前へ届く勾配\n\n\n\n\n\\(z&gt;0\\)\n\\(1\\)\nそのまま通る\n\n\n\\(z&lt;0\\)\n\\(0\\)\nここで0になる\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n今回は \\(z=0.30&gt;0\\) なので、微分は1\nしたがって \\(\\delta_{\\rm out}\\) に \\(v=0.5\\) を掛けた値が中間へ進む"
+    "text": "ReLU の場所で復路が分かれる\n\n中間層の復路でReLUの微分を使う\n\\[\\delta_{\\rm mid}=\\delta_{\\rm out}\\cdot v\\cdot\\mathrm{ReLU}'(z)\\]\n\n\n\n往路の \\(z\\)\n\\(\\mathrm{ReLU}'(z)\\)\n中間より前へ届く勾配\n\n\n\n\n\\(z&gt;0\\)\n\\(1\\)\nそのまま通る\n\n\n\\(z&lt;0\\)\n\\(0\\)\nここで0になる\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n今回は \\(z=0.30&gt;0\\) なので、微分は1\nしたがって \\(\\delta_{\\rm out}\\) に \\(v=0.5\\) を掛けた値が中間へ進む"
   },
   {
     "objectID": "nn-backprop.html#復路中間層まで連鎖律をつなぐ",
     "href": "nn-backprop.html#復路中間層まで連鎖律をつなぐ",
     "title": "バックプロパゲーション",
     "section": "復路：中間層まで連鎖律をつなぐ",
-    "text": "復路：中間層まで連鎖律をつなぐ\n\n\n\\(u\\) から \\(z\\) までの局所的な微分を掛ける：\n\n\\[\\delta_{\\text{mid}} = \\delta_{\\text{out}} \\cdot v \\cdot \\mathrm{ReLU}'(z)\n= -0.4875 \\times 0.5 \\times 1 = -0.2438\\]\n\n\\(z=w_1x_1+w_2x_2+b\\) なので、最後に入力を掛ける：\n\n\\[\\frac{\\partial \\ell}{\\partial w_1} = \\delta_{\\text{mid}} \\cdot x_1 = -0.2438\n\\qquad\n\\frac{\\partial \\ell}{\\partial w_2} = \\delta_{\\text{mid}} \\cdot x_2 = -0.1219\n\\qquad\n\\frac{\\partial \\ell}{\\partial b} = \\delta_{\\text{mid}} = -0.2438\\]\n\nこれで5個すべての勾配が出揃った\n\n\n\n\n\n\n\n\nノート\n\n\n\n黒い矢印：往路\n赤い矢印：復路\n\\(\\delta\\)：その場所の値を少し変えたとき、\\(\\ell\\) がどれだけ変わるか\n\n右から左へ連鎖律をつないで求める"
+    "text": "復路：中間層まで連鎖律をつなぐ\n\n\n\\(u\\) から \\(z\\) までの局所的な微分を掛ける\n\n\\[\\delta_{\\text{mid}} = \\delta_{\\text{out}} \\cdot v \\cdot \\mathrm{ReLU}'(z)\n= -0.4875 \\times 0.5 \\times 1 = -0.2438\\]\n\n\\(z=w_1x_1+w_2x_2+b\\) なので、最後に入力を掛ける\n\n\\[\\frac{\\partial \\ell}{\\partial w_1} = \\delta_{\\text{mid}} \\cdot x_1 = -0.2438\n\\qquad\n\\frac{\\partial \\ell}{\\partial w_2} = \\delta_{\\text{mid}} \\cdot x_2 = -0.1219\n\\qquad\n\\frac{\\partial \\ell}{\\partial b} = \\delta_{\\text{mid}} = -0.2438\\]\n\nこれで5個すべての勾配が出揃った\n\n\n\n\n\n\n\n\nノート\n\n\n\n黒い矢印：往路\n赤い矢印：復路\n\\(\\delta\\)：その場所の値を少し変えたとき、\\(\\ell\\) がどれだけ変わるか\n\n右から左へ連鎖律をつないで求める"
   },
   {
     "objectID": "nn-backprop.html#個の勾配を同じ表で見る",
@@ -3133,7 +3133,7 @@
     "href": "nn-backprop.html#勾配降下法で1ステップ更新する",
     "title": "バックプロパゲーション",
     "section": "勾配降下法で1ステップ更新する",
-    "text": "勾配降下法で1ステップ更新する\n\n\n学習率（learning rate）\\(\\alpha=0.1\\) で、\\(\\theta\\leftarrow\\theta-\\alpha\\dfrac{\\partial \\ell}{\\partial\\theta}\\) を実行：\n\n\n\n\nパラメータ\n更新前\n勾配\n更新後\n\n\n\n\n\\(w_1\\)\n\\(0.3000\\)\n\\(-0.2438\\)\n\\(0.3244\\)\n\n\n\\(w_2\\)\n\\(-0.2000\\)\n\\(-0.1219\\)\n\\(-0.1878\\)\n\n\n\\(b\\)\n\\(0.1000\\)\n\\(-0.2438\\)\n\\(0.1244\\)\n\n\n\\(v\\)\n\\(0.5000\\)\n\\(-0.1463\\)\n\\(0.5146\\)\n\n\n\\(c\\)\n\\(-0.1000\\)\n\\(-0.4875\\)\n\\(-0.0513\\)\n\n\n\n\n更新後のパラメータでもう一度、往路を計算する：\n\n\\[p: 0.5125 \\longrightarrow 0.5328, \\qquad\n\\ell: 0.6685 \\longrightarrow 0.6296\\]\n\n\n\n\n\n\n\n損失の値と勾配を混同しない\n\n\n\n\\(\\ell=0.6685\\) という数値は更新式へ代入しない\n更新に使うのは、更新前のパラメータで計算した5個の勾配 \\(\\partial\\ell/\\partial\\theta\\)\n\\(\\ell\\) の値は、更新前後を比べて学習が進んだか確認するために使う\n\n\n\n\n\n\n\nbackprop：勾配を求める手順\n勾配降下法：求めた勾配でパラメータを動かす手順"
+    "text": "勾配降下法で1ステップ更新する\n\n\n学習率（learning rate）\\(\\alpha=0.1\\) で、\\(\\theta\\leftarrow\\theta-\\alpha\\dfrac{\\partial \\ell}{\\partial\\theta}\\) を実行\n\n\n\n\nパラメータ\n更新前\n勾配\n更新後\n\n\n\n\n\\(w_1\\)\n\\(0.3000\\)\n\\(-0.2438\\)\n\\(0.3244\\)\n\n\n\\(w_2\\)\n\\(-0.2000\\)\n\\(-0.1219\\)\n\\(-0.1878\\)\n\n\n\\(b\\)\n\\(0.1000\\)\n\\(-0.2438\\)\n\\(0.1244\\)\n\n\n\\(v\\)\n\\(0.5000\\)\n\\(-0.1463\\)\n\\(0.5146\\)\n\n\n\\(c\\)\n\\(-0.1000\\)\n\\(-0.4875\\)\n\\(-0.0513\\)\n\n\n\n\n更新後のパラメータでもう一度、往路を計算する\n\n\\[p: 0.5125 \\longrightarrow 0.5328, \\qquad\n\\ell: 0.6685 \\longrightarrow 0.6296\\]\n\n\n\n\n\n\n\n損失の値と勾配を混同しない\n\n\n\n\\(\\ell=0.6685\\) という数値は更新式へ代入しない\n更新に使うのは、更新前のパラメータで計算した5個の勾配 \\(\\partial\\ell/\\partial\\theta\\)\n\\(\\ell\\) の値は、更新前後を比べて学習が進んだか確認するために使う\n\n\n\n\n\n\n\nbackprop：勾配を求める手順\n勾配降下法：求めた勾配でパラメータを動かす手順"
   },
   {
     "objectID": "nn-backprop.html#個は同じ時点の勾配で更新する",
@@ -3175,7 +3175,7 @@
     "href": "nn-backprop.html#全データ全ニューロンへ広げる",
     "title": "バックプロパゲーション",
     "section": "全データ・全ニューロンへ広げる",
-    "text": "全データ・全ニューロンへ広げる\n\n\nForwardで確認した行列の形を保ったまま、1匹分の式を全魚へ広げる\n1匹では \\(\\delta_{\\rm out}=p-y\\)\n\n\\(N\\) 匹の平均損失 \\(L\\) では、同じ計算が \\(dZ_2=(P-y)/N\\) になる\n\n隠れ層の幅を \\(m\\)、データ数を \\(N\\) とすると：\n\n\n\n\n復路の計算\n形\n\n\n\n\n\\(dZ_2=(P-y)/N\\)\n\\((N,1)\\)\n\n\n\\(dW_2=H^{\\mathsf T}dZ_2\\)\n\\((m,1)\\)\n\n\n\\(db_2=\\sum_i dZ_{2i}\\)\n\\((1,)\\)\n\n\n\\(dH=dZ_2W_2^{\\mathsf T}\\)\n\\((N,m)\\)\n\n\n\\(dZ_1=dH\\odot\\mathbf{1}[Z_1&gt;0]\\)\n\\((N,m)\\)\n\n\n\\(dW_1=X^{\\mathsf T}dZ_1\\)\n\\((2,m)\\)\n\n\n\\(db_1=\\sum_i dZ_{1i}\\)\n\\((m,)\\)\n\n\n\n\n\n\n\n\n\nノート\n\n\n\n行列積で、すべてのデータとニューロンの勾配を一度に計算する\n\\(\\odot\\)：同じ位置どうしの掛け算\n各勾配の形は、対応するパラメータの形と一致する"
+    "text": "全データ・全ニューロンへ広げる\n\n\nForwardで確認した行列の形を保ったまま、1匹分の式を全魚へ広げる\n1匹では \\(\\delta_{\\rm out}=p-y\\)\n\n\\(N\\) 匹の平均損失 \\(L\\) では、同じ計算が \\(dZ_2=(P-y)/N\\) になる\n\n隠れ層の幅を \\(m\\)、データ数を \\(N\\) とすると\n\n\n\n\n復路の計算\n形\n\n\n\n\n\\(dZ_2=(P-y)/N\\)\n\\((N,1)\\)\n\n\n\\(dW_2=H^{\\mathsf T}dZ_2\\)\n\\((m,1)\\)\n\n\n\\(db_2=\\sum_i dZ_{2i}\\)\n\\((1,)\\)\n\n\n\\(dH=dZ_2W_2^{\\mathsf T}\\)\n\\((N,m)\\)\n\n\n\\(dZ_1=dH\\odot\\mathbf{1}[Z_1&gt;0]\\)\n\\((N,m)\\)\n\n\n\\(dW_1=X^{\\mathsf T}dZ_1\\)\n\\((2,m)\\)\n\n\n\\(db_1=\\sum_i dZ_{1i}\\)\n\\((m,)\\)\n\n\n\n\n\n\n\n\n\nノート\n\n\n\n行列積で、すべてのデータとニューロンの勾配を一度に計算する\n\\(\\odot\\)：同じ位置どうしの掛け算\n各勾配の形は、対応するパラメータの形と一致する"
   },
   {
     "objectID": "nn-backprop.html#peek-matrix-backward",
@@ -3238,7 +3238,7 @@
     "href": "nn-backprop.html#練習問題",
     "title": "バックプロパゲーション",
     "section": "練習問題",
-    "text": "練習問題\n\n以下の問題を手計算で解き、数値微分で検算せよ。\nネットワークは手計算と同じ5パラメータとし、値だけを次のように差し替える：\n\n\n\n記号\n値\n\n\n\n\n入力 \\(x_1, x_2\\)\n\\(0.5,\\; 1.0\\)\n\n\n正解 \\(y\\)\n\\(0\\)（Sea bass）\n\n\n\\(w_1, w_2, b\\)\n\\(0.4,\\; 0.3,\\; -0.1\\)\n\n\n\\(v, c\\)\n\\(-0.5,\\; 0.2\\)\n\n\n\n問題1：1往復せよ\n\n往路：\\(z, h, u, p, \\ell\\) を順に求めよ（正解が \\(y=0\\) なので \\(\\ell = -\\log(1-p)\\)）\n復路：\\(\\delta_{\\text{out}}\\) と \\(\\delta_{\\text{mid}}\\)、そして5つの勾配をすべて求めよ\n数値微分のコードの値を差し替えて検算せよ\n\n問題2：入力を \\(x_1 = -1.0,\\; x_2 = 0.5\\) に変えて、もう1往復せよ\nヒント：\\(\\sigma(0) = 0.5\\)、\\(\\sigma(0.2) \\approx 0.5498\\)。この2つしか使わない。\n\n\n\n\n\n\nヒント\n\n\n手計算の答えは捨てずに残しておくこと"
+    "text": "練習問題\n\n以下の問題を手計算で解き、数値微分で検算せよ。\nネットワークは手計算と同じ5パラメータとし、値だけを次のように差し替える\n\n\n\n記号\n値\n\n\n\n\n入力 \\(x_1, x_2\\)\n\\(0.5,\\; 1.0\\)\n\n\n正解 \\(y\\)\n\\(0\\)（Sea bass）\n\n\n\\(w_1, w_2, b\\)\n\\(0.4,\\; 0.3,\\; -0.1\\)\n\n\n\\(v, c\\)\n\\(-0.5,\\; 0.2\\)\n\n\n\n問題1：1往復せよ\n\n往路：\\(z, h, u, p, \\ell\\) を順に求めよ（正解が \\(y=0\\) なので \\(\\ell = -\\log(1-p)\\)）\n復路：\\(\\delta_{\\text{out}}\\) と \\(\\delta_{\\text{mid}}\\)、そして5つの勾配をすべて求めよ\n数値微分のコードの値を差し替えて検算せよ\n\n問題2：入力を \\(x_1 = -1.0,\\; x_2 = 0.5\\) に変えて、もう1往復せよ\nヒント：\\(\\sigma(0) = 0.5\\)、\\(\\sigma(0.2) \\approx 0.5498\\)。この2つしか使わない。\n\n\n\n\n\n\nヒント\n\n\n手計算の答えは捨てずに残しておくこと"
   },
   {
     "objectID": "nn-backprop.html#問題1の解答例",
@@ -3301,7 +3301,7 @@
     "href": "nn-multilayer.html#変えるべきはパラメータではなくモデル",
     "title": "隠れ層とReLUで曲がる境界をつくる",
     "section": "変えるべきは「パラメータ」ではなく「モデル」",
-    "text": "変えるべきは「パラメータ」ではなく「モデル」\n\n\n隠れ層なしNNが学習するのは、重み（weight）\\(w_1,w_2\\) とバイアス（bias）\\(b\\) の値\nどんな値になっても、境界は次の式が表す直線のまま：\n\n\\[w_1x_1+w_2x_2+b=0\\]\n\n\\(w_1,w_2\\) を変えると直線が回転する\n\\(b\\) を変えると直線が平行移動する\n\n\n\n\n\n\n\nノート\n\n\n必要なのは「よりよい直線」ではなく、直線ではない境界も表せる新しい式の形"
+    "text": "変えるべきは「パラメータ」ではなく「モデル」\n\n\n隠れ層なしNNが学習するのは、重み（weight）\\(w_1,w_2\\) とバイアス（bias）\\(b\\) の値\nどんな値になっても、境界は次の式が表す直線のまま\n\n\\[w_1x_1+w_2x_2+b=0\\]\n\n\\(w_1,w_2\\) を変えると直線が回転する\n\\(b\\) を変えると直線が平行移動する\n\n\n\n\n\n\n\nノート\n\n\n必要なのは「よりよい直線」ではなく、直線ではない境界も表せる新しい式の形"
   },
   {
     "objectID": "nn-multilayer.html#入れ子にするか",
@@ -3385,7 +3385,7 @@
     "href": "nn-multilayer.html#updateで動かすパラメータが5個になった",
     "title": "隠れ層とReLUで曲がる境界をつくる",
     "section": "Updateで動かすパラメータが5個になった",
-    "text": "Updateで動かすパラメータが5個になった\n\n\n学習するパラメータは \\(\\theta=(w_1,w_2,b,v,c)\\)\n1匹分の更新式は隠れ層なしNNと同じ：\n\n\\[\\theta \\leftarrow \\theta-\\alpha\\frac{\\partial \\ell}{\\partial\\theta}\\]\n\n出力側の \\(v,c\\) と損失の間には、シグモイドだけが挟まる\n中間側の \\(w_1,w_2,b\\) と損失の間には、ReLU・出力層・シグモイドが挟まる\n\n\n\n\n\n\n\n\n\n答え\n\n\nバックプロパゲーション（backpropagation）：途中の関数を1つずつ微分し、連鎖律（chain rule）で出力側からつないで全パラメータの勾配を求める方法"
+    "text": "Updateで動かすパラメータが5個になった\n\n\n学習するパラメータは \\(\\theta=(w_1,w_2,b,v,c)\\)\n1匹分の更新式は隠れ層なしNNと同じ\n\n\\[\\theta \\leftarrow \\theta-\\alpha\\frac{\\partial \\ell}{\\partial\\theta}\\]\n\n出力側の \\(v,c\\) と損失の間には、シグモイドだけが挟まる\n中間側の \\(w_1,w_2,b\\) と損失の間には、ReLU・出力層・シグモイドが挟まる\n\n\n\n\n\n\n\n\n\n答え\n\n\nバックプロパゲーション（backpropagation）：途中の関数を1つずつ微分し、連鎖律（chain rule）で出力側からつないで全パラメータの勾配を求める方法"
   },
   {
     "objectID": "nn-multilayer.html#peek-width-two-structure",
@@ -3420,7 +3420,7 @@
     "href": "nn-multilayer.html#幅を変えてもforwardは同じ",
     "title": "隠れ層とReLUで曲がる境界をつくる",
     "section": "幅を変えてもForwardは同じ",
-    "text": "幅を変えてもForwardは同じ\n\n中間の幅を \\(m\\) とすると：\n\n\n\n配列\n形\n役割\n\n\n\n\nW1\n(2, m)\n入力2個から中間 \\(m\\) 個へ\n\n\nb1\n(m,)\n中間 \\(m\\) 個のバイアス\n\n\nW2\n(m, 1)\n中間 \\(m\\) 個から出力1個へ\n\n\nb2\n(1,)\n出力のバイアス\n\n\n\n\n\n\n\n\n\nノート\n\n\n\n幅2から幅16へ変えるときも forward の4行は変わらない\n変わるのはパラメータ配列の形だけ"
+    "text": "幅を変えてもForwardは同じ\n\n中間の幅を \\(m\\) とすると\n\n\n\n配列\n形\n役割\n\n\n\n\nW1\n(2, m)\n入力2個から中間 \\(m\\) 個へ\n\n\nb1\n(m,)\n中間 \\(m\\) 個のバイアス\n\n\nW2\n(m, 1)\n中間 \\(m\\) 個から出力1個へ\n\n\nb2\n(1,)\n出力のバイアス\n\n\n\n\n\n\n\n\n\nノート\n\n\n\n幅2から幅16へ変えるときも forward の4行は変わらない\n変わるのはパラメータ配列の形だけ"
   },
   {
     "objectID": "nn-multilayer.html#横に並べる変換の数を幅と呼ぶ",
@@ -3469,7 +3469,7 @@
     "href": "nn-multilayer.html#peek-random-initialization",
     "title": "隠れ層とReLUで曲がる境界をつくる",
     "section": "ランダム初期化で役割を分ける",
-    "text": "ランダム初期化で役割を分ける\n\n同じ入力 \\(x=(1.0,0.5)\\) を2つの中間変換へ入れる場合：\n\n\n\n\n\n\n\n\n初期化\n\\(z_1\\) と \\(z_2\\)\n学習開始時の状態\n\n\n\n\n重みもバイアスも全部0\n同じ（どちらも \\(0\\)）\n2人が同じ出力・同じ勾配\n\n\n重みを別々の乱数にする\n別々の値\n最初から別の反応\n\n\n\n\n\n\n\n\n\nノート\n\n\n\n違う反応をすれば受け取る勾配も変わり、別々の折り目へ育っていく\n乱数は完成形を決める答えではない\n\n分業を始めるきっかけ\n\n\n\n\n\n\n対称性を破る（symmetry breaking）ために必要なのは、並んだ変換の重みを同じ値にしないこと"
+    "text": "ランダム初期化で役割を分ける\n\n同じ入力 \\(x=(1.0,0.5)\\) を2つの中間変換へ入れる場合\n\n\n\n\n\n\n\n\n初期化\n\\(z_1\\) と \\(z_2\\)\n学習開始時の状態\n\n\n\n\n重みもバイアスも全部0\n同じ（どちらも \\(0\\)）\n2人が同じ出力・同じ勾配\n\n\n重みを別々の乱数にする\n別々の値\n最初から別の反応\n\n\n\n\n\n\n\n\n\nノート\n\n\n\n違う反応をすれば受け取る勾配も変わり、別々の折り目へ育っていく\n乱数は完成形を決める答えではない\n\n分業を始めるきっかけ\n\n\n\n\n\n\n対称性を破る（symmetry breaking）ために必要なのは、並んだ変換の重みを同じ値にしないこと"
   },
   {
     "objectID": "nn-multilayer.html#peek-output-layer",
@@ -3546,7 +3546,7 @@
     "href": "optimization-local-minima-appendix.html#関数の定義",
     "title": "ローカルミニマムの罠",
     "section": "関数の定義",
-    "text": "関数の定義\n\n今回使う関数：\n\\[f(x) = 0.1x^4 - x^3 + 2x^2 + 1\\]\n微分を手で計算しておく。\n1次微分（first derivative、傾き）: \\[f'(x) = 0.4x^3 - 3x^2 + 4x\\]\n2次微分（second derivative、曲がり具合）: \\[f''(x) = 1.2x^2 - 6x + 4\\]"
+    "text": "関数の定義\n\n今回使う関数：\n\\[f(x) = 0.1x^4 - x^3 + 2x^2 + 1\\]\n微分を手で計算しておく。\n1次微分（first derivative、傾き）： \\[f'(x) = 0.4x^3 - 3x^2 + 4x\\]\n2次微分（second derivative、曲がり具合）： \\[f''(x) = 1.2x^2 - 6x + 4\\]"
   },
   {
     "objectID": "optimization-local-minima-appendix.html#pythonでの定義",
@@ -3812,7 +3812,7 @@
     "href": "optimization-local-minima-appendix.html#練習問題",
     "title": "ローカルミニマムの罠",
     "section": "練習問題",
-    "text": "練習問題\n\n以下の問題をPythonコードで解け（導関数だけ手計算）。\n問題1：新しい地形で複数の初期値から試す\n関数 \\(g(x) = x^4 - 8x^2 + 3x\\) について：\n\n\\(-3.5 \\leq x \\leq 3.5\\) の範囲でグラフを描き、谷の数を確認せよ\n導関数 \\(g'(x)\\) を手計算で求めよ\n初期値 \\(x_0 = -3, 0, 3\\) の3つから勾配降下法を実行せよ（学習率 \\(\\alpha = 0.01\\)、到着地点と \\(g(x)\\) を表示）\nグローバルミニマムはどちらの谷か、\\(g(x)\\) の値で判定せよ\n\nヒント：この資料の関数とは、深い谷の位置が違うかもしれない。"
+    "text": "練習問題\n\n以下の問題をPythonコードで解け（導関数だけ手計算）。\n問題1：新しい地形で複数の初期値から試す\n関数 \\(g(x) = x^4 - 8x^2 + 3x\\) について、次の問いに答えよ\n\n\\(-3.5 \\leq x \\leq 3.5\\) の範囲でグラフを描き、谷の数を確認せよ\n導関数 \\(g'(x)\\) を手計算で求めよ\n初期値 \\(x_0 = -3, 0, 3\\) の3つから勾配降下法を実行せよ（学習率 \\(\\alpha = 0.01\\)、到着地点と \\(g(x)\\) を表示）\nグローバルミニマムはどちらの谷か、\\(g(x)\\) の値で判定せよ\n\nヒント：この資料の関数とは、深い谷の位置が違うかもしれない。"
   },
   {
     "objectID": "optimization-local-minima-appendix.html#問題1の解答例",
@@ -4554,14 +4554,14 @@
     "href": "knn-curse.html#理由-1全部の軸で中央寄りの点はほとんどない",
     "title": "k-NN と次元の呪い",
     "section": "理由 1：全部の軸で中央寄りの点は、ほとんどない",
-    "text": "理由 1：全部の軸で中央寄りの点は、ほとんどない\n\n\nある点が、ある軸で「中央寄り」（その軸の中央 50%）に入る確率は \\(\\dfrac{1}{2}\\)\n\\(d\\) 次元で「全部の軸で中央寄り」でいられる確率は：\n\n\\[\\left(\\frac{1}{2}\\right)^d \\qquad\n\\text{1 次元: } 50\\% \\quad \\text{3 次元: } 12.5\\% \\quad \\text{10 次元: } 0.1\\% \\quad \\text{20 次元: } 100 万分の 1\\]\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\nほぼすべての点が、どこかの軸では中央から外れている\n各軸を半分に切ると、空間は \\(2^d\\) 個の区画に分かれる（20 次元で約 105 万個）\n\n100 個の点は、ほぼ 1 個ずつ別の区画に入る\nほとんどの区画には、点が 1 個もない"
+    "text": "理由 1：全部の軸で中央寄りの点は、ほとんどない\n\n\nある点が、ある軸で「中央寄り」（その軸の中央 50%）に入る確率は \\(\\dfrac{1}{2}\\)\n\\(d\\) 次元で「全部の軸で中央寄り」でいられる確率は\n\n\\[\\left(\\frac{1}{2}\\right)^d \\qquad\n\\text{1 次元: } 50\\% \\quad \\text{3 次元: } 12.5\\% \\quad \\text{10 次元: } 0.1\\% \\quad \\text{20 次元: } 100 万分の 1\\]\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\nほぼすべての点が、どこかの軸では中央から外れている\n各軸を半分に切ると、空間は \\(2^d\\) 個の区画に分かれる（20 次元で約 105 万個）\n\n100 個の点は、ほぼ 1 個ずつ別の区画に入る\nほとんどの区画には、点が 1 個もない"
   },
   {
     "objectID": "knn-curse.html#理由-2ご近所の箱が各軸の大半にまたがる",
     "href": "knn-curse.html#理由-2ご近所の箱が各軸の大半にまたがる",
     "title": "k-NN と次元の呪い",
     "section": "理由 2：「ご近所」の箱が各軸の大半にまたがる",
-    "text": "理由 2：「ご近所」の箱が各軸の大半にまたがる\n\n\nある点のまわりのデータの 1%を「ご近所」として集めたい\n各軸を割合 \\(s\\) だけ切り取った箱は、全体の体積の \\(s^d\\) を占める（点が一様なら、データの割合も \\(s^d\\)）\n1% を集めるのに必要な \\(s\\) は：\n\n\\[s = 0.01^{1/d}\\]\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n10 次元では、1%の「ご近所」を集めるのに各軸の 63%を見渡す必要がある\nそれはもう「近所」ではない\n\n「近い点どうしは似ている」を前提にする手法（k-NN や k-means など）は、前提が成り立ちにくくなる"
+    "text": "理由 2：「ご近所」の箱が各軸の大半にまたがる\n\n\nある点のまわりのデータの 1%を「ご近所」として集めたい\n各軸を割合 \\(s\\) だけ切り取った箱は、全体の体積の \\(s^d\\) を占める（点が一様なら、データの割合も \\(s^d\\)）\n1% を集めるのに必要な \\(s\\) は\n\n\\[s = 0.01^{1/d}\\]\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n10 次元では、1%の「ご近所」を集めるのに各軸の 63%を見渡す必要がある\nそれはもう「近所」ではない\n\n「近い点どうしは似ている」を前提にする手法（k-NN や k-means など）は、前提が成り立ちにくくなる"
   },
   {
     "objectID": "knn-curse.html#近いと遠いの区別が弱くなる",
@@ -4750,7 +4750,7 @@
     "href": "linear-regression.html#peek-mse-grad",
     "title": "線形回帰と正則化",
     "section": "勾配を手で出す",
-    "text": "勾配を手で出す\n\n\\(L\\) を \\(a\\) と \\(b\\) でそれぞれ微分する（合成関数の微分）：\n\\[\\frac{\\partial L}{\\partial a} = \\frac{2}{N} \\sum_i (a x_i + b - t_i) \\, x_i\n\\qquad\n\\frac{\\partial L}{\\partial b} = \\frac{2}{N} \\sum_i (a x_i + b - t_i)\\]\n\n構造は単純：「予測と正解の差」を入力の大きさに応じて配る\nあとは勾配降下法に渡すだけ：\n\n\\[a \\leftarrow a - \\alpha \\frac{\\partial L}{\\partial a}, \\qquad b \\leftarrow b - \\alpha \\frac{\\partial L}{\\partial b}\\]\n\n\n\n\n\n\n\n数式とコードの名前\n\n\n\n数式では学習率を \\(\\alpha\\) と書く\nコードでは、learning rateを略して lr と書く"
+    "text": "勾配を手で出す\n\n\\(L\\) を \\(a\\) と \\(b\\) でそれぞれ微分する（合成関数の微分）：\n\\[\\frac{\\partial L}{\\partial a} = \\frac{2}{N} \\sum_i (a x_i + b - t_i) \\, x_i\n\\qquad\n\\frac{\\partial L}{\\partial b} = \\frac{2}{N} \\sum_i (a x_i + b - t_i)\\]\n\n構造は単純：「予測と正解の差」を入力の大きさに応じて配る\nあとは勾配降下法に渡すだけ\n\n\\[a \\leftarrow a - \\alpha \\frac{\\partial L}{\\partial a}, \\qquad b \\leftarrow b - \\alpha \\frac{\\partial L}{\\partial b}\\]\n\n\n\n\n\n\n\n数式とコードの名前\n\n\n\n数式では学習率を \\(\\alpha\\) と書く\nコードでは、learning rateを略して lr と書く"
   },
   {
     "objectID": "linear-regression.html#peek-l2-ridge",
@@ -4883,7 +4883,7 @@
     "href": "nn-multilayer.html#幅横に並べる変換の数",
     "title": "隠れ層とReLUで曲がる境界をつくる",
     "section": "幅：横に並べる変換の数",
-    "text": "幅：横に並べる変換の数\n\n\n中間の変換が2個なら幅2、16個なら幅16\n2次元入力・中間幅 \\(m\\)・2クラス出力なら、パラメータ数は：\n\n\\[\n\\underbrace{2m}_{\\text{中間の重み}}\n+\\underbrace{m}_{\\text{中間のバイアス}}\n+\\underbrace{m}_{\\text{出力の重み}}\n+\\underbrace{1}_{\\text{出力のバイアス}}\n=4m+1\n\\]\n\n\n\n幅 \\(m\\)\n折り目の候補\nパラメータ数\n\n\n\n\n2\n2本\n9\n\n\n4\n4本\n17\n\n\n16\n16本\n65\n\n\n\n\n幅を増やすほど、境界を細かく折る余地が増える"
+    "text": "幅：横に並べる変換の数\n\n\n中間の変換が2個なら幅2、16個なら幅16\n2次元入力・中間幅 \\(m\\)・2クラス出力なら、パラメータ数は\n\n\\[\n\\underbrace{2m}_{\\text{中間の重み}}\n+\\underbrace{m}_{\\text{中間のバイアス}}\n+\\underbrace{m}_{\\text{出力の重み}}\n+\\underbrace{1}_{\\text{出力のバイアス}}\n=4m+1\n\\]\n\n\n\n幅 \\(m\\)\n折り目の候補\nパラメータ数\n\n\n\n\n2\n2本\n9\n\n\n4\n4本\n17\n\n\n16\n16本\n65\n\n\n\n\n幅を増やすほど、境界を細かく折る余地が増える"
   },
   {
     "objectID": "optimization-gradient-descent.html#今回の対象",
@@ -4932,7 +4932,7 @@
     "href": "logistic-regression.html#ロジスティック回帰も勾配降下法で学習する",
     "title": "ロジスティック回帰",
     "section": "ロジスティック回帰も勾配降下法で学習する",
-    "text": "ロジスティック回帰も勾配降下法で学習する\n\n\n\n1匹分の損失（loss）を \\(\\ell\\)、全魚の平均損失を \\(L\\) と書き分ける\n直線を求めたときと同じ形の更新式を使う：\n\n\\[w_j \\leftarrow w_j-\\alpha\\frac{\\partial L}{\\partial w_j},\n\\qquad b \\leftarrow b-\\alpha\\frac{\\partial L}{\\partial b}\\]\n\n\\(\\alpha\\)（アルファ）：学習率（learning rate）\n\nコードでは learning rate を略して lr と書く\n\n\\(j\\)：どの特徴量の重みかを表す添字\n\nここでは \\(j=1\\)（輝度）、\\(j=2\\)（重さ）\n\nロジスティック回帰で必要なのは：\n\n予測をどう採点するか：損失 \\(L\\)\n採点結果をどう微分するか：勾配（gradient）"
+    "text": "ロジスティック回帰も勾配降下法で学習する\n\n\n\n1匹分の損失（loss）を \\(\\ell\\)、全魚の平均損失を \\(L\\) と書き分ける\n直線を求めたときと同じ形の更新式を使う\n\n\\[w_j \\leftarrow w_j-\\alpha\\frac{\\partial L}{\\partial w_j},\n\\qquad b \\leftarrow b-\\alpha\\frac{\\partial L}{\\partial b}\\]\n\n\\(\\alpha\\)（アルファ）：学習率（learning rate）\n\nコードでは learning rate を略して lr と書く\n\n\\(j\\)：どの特徴量の重みかを表す添字\n\nここでは \\(j=1\\)（輝度）、\\(j=2\\)（重さ）\n\nロジスティック回帰で必要なもの\n\n予測をどう採点するか：損失 \\(L\\)\n採点結果をどう微分するか：勾配（gradient）"
   },
   {
     "objectID": "optimization-gradient-descent.html#これまである値が最小になる数字を手法ごとに探してきた",
@@ -5156,7 +5156,7 @@
     "href": "optimization-gradient-descent.html#傾きが0になると止まる",
     "title": "最適化と勾配降下法",
     "section": "傾きが0になると止まる",
-    "text": "傾きが0になると止まる\n\n更新式 \\(x_{\\text{new}} = x - \\alpha \\cdot f'(x)\\) を、傾きの符号で場合分けする：\n\n\n\n傾き \\(f'(x)\\)\n移動量 \\(-\\alpha \\cdot f'(x)\\)\n動き\n\n\n\n\n負（下り坂は右）\n正\n右へ進む\n\n\n正（下り坂は左）\n負\n左へ進む\n\n\n\\(0\\)\n\\(0\\)\n止まる\n\n\n\n\n\n\n\n\n\n\n傾きが0でも谷底とは限らない\n\n\n\n山頂でも傾きは \\(0\\) になる\n下りながら進むので途中で山頂に止まることはまずないが、初期値が山頂だとそこから動かない"
+    "text": "傾きが0になると止まる\n\n傾きの符号で更新式 \\(x_{\\text{new}} = x - \\alpha \\cdot f'(x)\\) を場合分けする\n\n\n\n傾き \\(f'(x)\\)\n移動量 \\(-\\alpha \\cdot f'(x)\\)\n動き\n\n\n\n\n負（下り坂は右）\n正\n右へ進む\n\n\n正（下り坂は左）\n負\n左へ進む\n\n\n\\(0\\)\n\\(0\\)\n止まる\n\n\n\n\n\n\n\n\n\n\n傾きが0でも谷底とは限らない\n\n\n\n山頂でも傾きは \\(0\\) になる\n下りながら進むので途中で山頂に止まることはまずないが、初期値が山頂だとそこから動かない"
   },
   {
     "objectID": "optimization-gradient-descent.html#勾配降下法手計算で反復を続ける",
@@ -5275,14 +5275,14 @@
     "href": "dimensionality-pca.html#peek-eigen-why",
     "title": "次元削減と PCA",
     "section": "答えが「固有ベクトル」になる理由",
-    "text": "答えが「固有ベクトル」になる理由\n\n\n\\(\\|\\mathbf{v}\\| = 1\\) は「\\(\\mathbf{v}\\) の先端は半径1の球面の上」という意味\n\\(\\mathbf{v}\\) を少しだけ \\(\\boldsymbol{\\varepsilon}\\) 動かすと、分散 \\(\\mathbf{v}^{\\mathsf T} C \\mathbf{v}\\) はこう変わる：\n\n\\[(\\mathbf{v} + \\boldsymbol{\\varepsilon})^{\\mathsf T} C\\, (\\mathbf{v} + \\boldsymbol{\\varepsilon})\n= \\mathbf{v}^{\\mathsf T} C \\mathbf{v} + 2\\, \\boldsymbol{\\varepsilon}^{\\mathsf T} (C \\mathbf{v}) + \\boldsymbol{\\varepsilon}^{\\mathsf T} C \\boldsymbol{\\varepsilon}\\]\n\n\\(C\\) は対称なので \\(\\mathbf{v}^{\\mathsf T} C \\boldsymbol{\\varepsilon}\\) と \\(\\boldsymbol{\\varepsilon}^{\\mathsf T} C \\mathbf{v}\\) は同じ値。\\(\\boldsymbol{\\varepsilon}\\) が小さければ最後の項は無視できる\n\n\n増える量は \\(2\\, \\boldsymbol{\\varepsilon}^{\\mathsf T} (C \\mathbf{v})\\)、つまり \\(\\boldsymbol{\\varepsilon}\\) と \\(C\\mathbf{v}\\) の内積の2倍\n\n内積は向きがそろうほど大きいので、分散がいちばん増える向きは \\(C\\mathbf{v}\\)\n\n球面に沿って動くとき、\\(\\boldsymbol{\\varepsilon}\\) は \\(\\mathbf{v}\\) と直交する\n球面上のてっぺんでは、球面に沿ってどちらへ動いても分散は増えない\n\n\\(\\mathbf{v}\\) と直交するどの \\(\\boldsymbol{\\varepsilon}\\) とも \\(C\\mathbf{v}\\) の内積が 0 になるので、\\(C\\mathbf{v}\\) は \\(\\mathbf{v}\\) と平行になるしかない：\n\n\n\\[C \\mathbf{v} = \\lambda \\mathbf{v} \\quad \\text{（固有ベクトルの定義式そのもの！）}\\]\n\nこのときの分散は \\(\\mathbf{v}^{\\mathsf T} C \\mathbf{v} = \\lambda \\mathbf{v}^{\\mathsf T} \\mathbf{v} = \\lambda\\)\n\n固有値＝その方向の分散\n\n\n\n\n\n\n\n\nヒント\n\n\n\n固有ベクトル：「球面上でこれ以上増やせない方向」の候補\n固有値：その候補での分散の値\n\\(\\lambda_1 \\geq \\lambda_2 \\geq \\cdots\\) と並べて、一番大きい候補から順に PC1, PC2, …\n\n対称行列の固有ベクトルは互いに直交するので、PC2 は「PC1 と直交する方向の中で分散が最大」の軸"
+    "text": "答えが「固有ベクトル」になる理由\n\n\n\\(\\|\\mathbf{v}\\| = 1\\) は「\\(\\mathbf{v}\\) の先端は半径1の球面の上」という意味\n\\(\\mathbf{v}\\) を少しだけ \\(\\boldsymbol{\\varepsilon}\\) 動かすと、分散 \\(\\mathbf{v}^{\\mathsf T} C \\mathbf{v}\\) はこう変わる\n\n\\[(\\mathbf{v} + \\boldsymbol{\\varepsilon})^{\\mathsf T} C\\, (\\mathbf{v} + \\boldsymbol{\\varepsilon})\n= \\mathbf{v}^{\\mathsf T} C \\mathbf{v} + 2\\, \\boldsymbol{\\varepsilon}^{\\mathsf T} (C \\mathbf{v}) + \\boldsymbol{\\varepsilon}^{\\mathsf T} C \\boldsymbol{\\varepsilon}\\]\n\n\\(C\\) は対称なので \\(\\mathbf{v}^{\\mathsf T} C \\boldsymbol{\\varepsilon}\\) と \\(\\boldsymbol{\\varepsilon}^{\\mathsf T} C \\mathbf{v}\\) は同じ値。\\(\\boldsymbol{\\varepsilon}\\) が小さければ最後の項は無視できる\n\n\n増える量は \\(2\\, \\boldsymbol{\\varepsilon}^{\\mathsf T} (C \\mathbf{v})\\)、つまり \\(\\boldsymbol{\\varepsilon}\\) と \\(C\\mathbf{v}\\) の内積の2倍\n\n内積は向きがそろうほど大きいので、分散がいちばん増える向きは \\(C\\mathbf{v}\\)\n\n球面に沿って動くとき、\\(\\boldsymbol{\\varepsilon}\\) は \\(\\mathbf{v}\\) と直交する\n球面上のてっぺんでは、球面に沿ってどちらへ動いても分散は増えない\n\n\\(\\mathbf{v}\\) と直交するどの \\(\\boldsymbol{\\varepsilon}\\) とも \\(C\\mathbf{v}\\) の内積が 0 になるので、\\(C\\mathbf{v}\\) は \\(\\mathbf{v}\\) と平行になるしかない\n\n\n\\[C \\mathbf{v} = \\lambda \\mathbf{v} \\quad \\text{（固有ベクトルの定義式そのもの！）}\\]\n\nこのときの分散は \\(\\mathbf{v}^{\\mathsf T} C \\mathbf{v} = \\lambda \\mathbf{v}^{\\mathsf T} \\mathbf{v} = \\lambda\\)\n\n固有値＝その方向の分散\n\n\n\n\n\n\n\n\nヒント\n\n\n\n固有ベクトル：「球面上でこれ以上増やせない方向」の候補\n固有値：その候補での分散の値\n\\(\\lambda_1 \\geq \\lambda_2 \\geq \\cdots\\) と並べて、一番大きい候補から順に PC1, PC2, …\n\n対称行列の固有ベクトルは互いに直交するので、PC2 は「PC1 と直交する方向の中で分散が最大」の軸"
   },
   {
     "objectID": "logistic-regression.html#peek-logistic-line",
     "href": "logistic-regression.html#peek-logistic-line",
     "title": "ロジスティック回帰",
     "section": "\\(z = 0\\) と置くと直線の式になる",
-    "text": "\\(z = 0\\) と置くと直線の式になる\n\n\n\\(z = 0\\) と置くと：\n\n\\[\\underbrace{w_1}_{A}\\, x_1 + \\underbrace{w_2}_{B}\\, x_2 + \\underbrace{\\;b\\;}_{C} = 0\\]\n\n直線の式 \\(Ax_1 + Bx_2 + C = 0\\) そのもの\n\nこの直線を決定境界とする\n\n\\(z\\) の符号：線の上か下か\n\\(z\\) の大きさ：線からの遠さ\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n最適化の対象\n\n\n\n\\(A, B, C\\)（ここでは \\(w_1, w_2, b\\)） をパラメータとして最適化する"
+    "text": "\\(z = 0\\) と置くと直線の式になる\n\n\n\\(z = 0\\) と置くと\n\n\\[\\underbrace{w_1}_{A}\\, x_1 + \\underbrace{w_2}_{B}\\, x_2 + \\underbrace{\\;b\\;}_{C} = 0\\]\n\n直線の式 \\(Ax_1 + Bx_2 + C = 0\\) そのもの\n\nこの直線を決定境界とする\n\n\\(z\\) の符号：線の上か下か\n\\(z\\) の大きさ：線からの遠さ\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n最適化の対象\n\n\n\n\\(A, B, C\\)（ここでは \\(w_1, w_2, b\\)） をパラメータとして最適化する"
   },
   {
     "objectID": "logistic-regression.html#peek-logistic-params",
@@ -5317,7 +5317,7 @@
     "href": "logistic-regression.html#b-を入力の1つと読み替えると線形になる",
     "title": "ロジスティック回帰",
     "section": "\\(+b\\) を入力の1つと読み替えると線形になる",
-    "text": "\\(+b\\) を入力の1つと読み替えると線形になる\n\n\n\\(b\\) を「常に 1 が入っている入力 \\(x_0\\) への重み \\(w_0\\)」と読み替える：\n\n\\[z = w_0 \\underbrace{x_0}_{=\\,1} + w_1 x_1 + w_2 x_2\\]\n\n入力を \\((1, x_1, x_2)\\) の3次元と見れば、\\(f(0,0,0) = 0\\)\n\nこれは線形結合\n\n統計学では、データ表に「全部 1 の列」を足すのが定番の手法（切片項、intercept）\n実装でも広く使われる\nアフィン変換（affine transformation）：\\(+b\\) の形（線形＋平行移動）\n\n\n\n\n\n\n\n\n重要ポイント\n\n\n\n世の中の説明の多くは \\(+b\\) 込みでも「線形」と書く\n\n\\(x_0 = 1\\) を補って読めば、その呼び方でも辻褄が合う"
+    "text": "\\(+b\\) を入力の1つと読み替えると線形になる\n\n\n\\(b\\) を「常に 1 が入っている入力 \\(x_0\\) への重み \\(w_0\\)」と読み替える\n\n\\[z = w_0 \\underbrace{x_0}_{=\\,1} + w_1 x_1 + w_2 x_2\\]\n\n入力を \\((1, x_1, x_2)\\) の3次元と見れば、\\(f(0,0,0) = 0\\)\n\nこれは線形結合\n\n統計学では、データ表に「全部 1 の列」を足すのが定番の手法（切片項、intercept）\n実装でも広く使われる\nアフィン変換（affine transformation）：\\(+b\\) の形（線形＋平行移動）\n\n\n\n\n\n\n\n\n重要ポイント\n\n\n\n世の中の説明の多くは \\(+b\\) 込みでも「線形」と書く\n\n\\(x_0 = 1\\) を補って読めば、その呼び方でも辻褄が合う"
   },
   {
     "objectID": "mnist-project.html#チェックポイント",
@@ -5380,7 +5380,7 @@
     "href": "nn-backprop.html#手計算に使う1匹と5パラメータ",
     "title": "バックプロパゲーション",
     "section": "手計算に使う1匹と5パラメータ",
-    "text": "手計算に使う1匹と5パラメータ\n\n\\[x \\xrightarrow{\\;z = w_1 x_1 + w_2 x_2 + b\\;} z\n\\xrightarrow{\\;\\mathrm{ReLU}\\;} h\n\\xrightarrow{\\;u = v h + c\\;} u\n\\xrightarrow{\\;\\sigma\\;} p\n\\xrightarrow{\\;-\\log\\;} \\ell\\]\n\nForwardで手計算した1匹を、同じパラメータのまま1往復する：\n\n\n\n\n記号\n値\n\n\n\n\n入力 \\(x_1, x_2\\)\n\\(1.0,\\; 0.5\\)\n\n\n正解 \\(y\\)\n\\(1\\)（Salmon）\n\n\n\\(w_1, w_2, b\\)\n\\(0.3,\\; -0.2,\\; 0.1\\)\n\n\n\\(v, c\\)\n\\(0.5,\\; -0.1\\)"
+    "text": "手計算に使う1匹と5パラメータ\n\n\\[x \\xrightarrow{\\;z = w_1 x_1 + w_2 x_2 + b\\;} z\n\\xrightarrow{\\;\\mathrm{ReLU}\\;} h\n\\xrightarrow{\\;u = v h + c\\;} u\n\\xrightarrow{\\;\\sigma\\;} p\n\\xrightarrow{\\;-\\log\\;} \\ell\\]\n\nForwardで手計算した1匹を、同じパラメータのまま1往復する\n\n\n\n\n記号\n値\n\n\n\n\n入力 \\(x_1, x_2\\)\n\\(1.0,\\; 0.5\\)\n\n\n正解 \\(y\\)\n\\(1\\)（Salmon）\n\n\n\\(w_1, w_2, b\\)\n\\(0.3,\\; -0.2,\\; 0.1\\)\n\n\n\\(v, c\\)\n\\(0.5,\\; -0.1\\)"
   },
   {
     "objectID": "nn-backprop.html#検算微分の定義で勾配を計算する",
@@ -5394,7 +5394,7 @@
     "href": "nn-backprop.html#何層でも同じ漸化式recurrence-relationを繰り返す",
     "title": "バックプロパゲーション",
     "section": "何層でも同じ漸化式（Recurrence Relation）を繰り返す",
-    "text": "何層でも同じ漸化式（Recurrence Relation）を繰り返す\n\n\n1ユニットずつ書くと、復路は同じ形の繰り返し：\n\n\\[\\delta^{(k)} = \\delta^{(k+1)} \\cdot w^{(k+1)} \\cdot f'(z^{(k)})\\]\n\n次の層の \\(\\delta\\) に、重みと活性化関数の微分を掛ける\n各層のパラメータの勾配は \\(\\delta^{(k)} \\times\\)（その層への入力）\nNumPyでは、データ数とニューロン数を行列の軸に並べて同時に計算する\n\n\n\n\n\n\n\n\n名前の由来\n\n\n\n誤差逆伝播法（backpropagation）：損失に対する勾配（\\(\\delta\\)）を、出力側から入力側へ順に計算する方法\n\n仕組みは連鎖律の使い回し"
+    "text": "何層でも同じ漸化式（Recurrence Relation）を繰り返す\n\n\n1ユニットずつ書くと、復路は同じ形の繰り返し\n\n\\[\\delta^{(k)} = \\delta^{(k+1)} \\cdot w^{(k+1)} \\cdot f'(z^{(k)})\\]\n\n次の層の \\(\\delta\\) に、重みと活性化関数の微分を掛ける\n各層のパラメータの勾配は \\(\\delta^{(k)} \\times\\)（その層への入力）\nNumPyでは、データ数とニューロン数を行列の軸に並べて同時に計算する\n\n\n\n\n\n\n\n\n名前の由来\n\n\n\n誤差逆伝播法（backpropagation）：損失に対する勾配（\\(\\delta\\)）を、出力側から入力側へ順に計算する方法\n\n仕組みは連鎖律の使い回し"
   },
   {
     "objectID": "nn-backprop.html#復路の都合で決まる設計",
@@ -5429,7 +5429,7 @@
     "href": "nn-logistic.html#勾配更新に使う3つの微分値",
     "title": "ロジスティック回帰をNNとして実装する",
     "section": "勾配：更新に使う3つの微分値",
-    "text": "勾配：更新に使う3つの微分値\n\n\n損失関数の偏微分（partial derivative）の値から、\\(w_1,w_2,b\\) をどちらへ動かせば損失が下がるかが分かる\n式は連鎖律で導いた結果をそのまま使う：\n\n\\[\n\\frac{\\partial\\ell}{\\partial z}=p-y,\n\\qquad\n\\frac{\\partial\\ell}{\\partial w_j}=(p-y)\\,x_j,\n\\qquad\n\\frac{\\partial\\ell}{\\partial b}=p-y\n\\]\n\n\\(p-y\\) になる導出：ロジスティック関数と損失関数の微分\n更新式へ入れるのは、損失値 \\(0.913\\) ではなくこの偏微分値\nNNでは、接続を逆向きにたどる値の受け渡しとしてこの計算を行う"
+    "text": "勾配：更新に使う3つの微分値\n\n\n損失関数の偏微分（partial derivative）の値から、\\(w_1,w_2,b\\) をどちらへ動かせば損失が下がるかが分かる\n式は連鎖律で導いた結果をそのまま使う\n\n\\[\n\\frac{\\partial\\ell}{\\partial z}=p-y,\n\\qquad\n\\frac{\\partial\\ell}{\\partial w_j}=(p-y)\\,x_j,\n\\qquad\n\\frac{\\partial\\ell}{\\partial b}=p-y\n\\]\n\n\\(p-y\\) になる導出：ロジスティック関数と損失関数の微分\n更新式へ入れるのは、損失値 \\(0.913\\) ではなくこの偏微分値\nNNでは、接続を逆向きにたどる値の受け渡しとしてこの計算を行う"
   },
   {
     "objectID": "nn-logistic.html#入力層と出力層の間には隠れ層を追加できる",
@@ -5492,7 +5492,7 @@
     "href": "optimization-local-minima-appendix.html#スタート地点だけを変える",
     "title": "ローカルミニマムの罠",
     "section": "スタート地点だけを変える",
-    "text": "スタート地点だけを変える\n\n\n勾配降下法の更新式をそのまま使う：\n\n\\[x_{\\text{new}} = x - \\alpha \\cdot f'(x)\\]\n\n学習率は \\(\\alpha = 0.1\\) に固定する\nスタート地点（初期値、initial value）だけを変えて2回実験する\n\n\ndef gradient_descent(f, fp, x0, lr=0.1, tol=1e-6, max_iter=10000):\n    \"\"\"勾配降下法：収束した場所・そこでの f(x)・通り道を返す\"\"\"\n    x = x0\n    history = [x]\n    for i in range(max_iter):\n        grad = fp(x)\n        if abs(grad) &lt; tol:      # 傾きほぼゼロ → 収束\n            break\n        x = x - lr * grad     # Move a little against the gradient\n        history.append(x)\n    return x, f(x), history"
+    "text": "スタート地点だけを変える\n\n\n勾配降下法の更新式をそのまま使う\n\n\\[x_{\\text{new}} = x - \\alpha \\cdot f'(x)\\]\n\n学習率は \\(\\alpha = 0.1\\) に固定する\nスタート地点（初期値、initial value）だけを変えて2回実験する\n\n\ndef gradient_descent(f, fp, x0, lr=0.1, tol=1e-6, max_iter=10000):\n    \"\"\"勾配降下法：収束した場所・そこでの f(x)・通り道を返す\"\"\"\n    x = x0\n    history = [x]\n    for i in range(max_iter):\n        grad = fp(x)\n        if abs(grad) &lt; tol:      # 傾きほぼゼロ → 収束\n            break\n        x = x - lr * grad     # Move a little against the gradient\n        history.append(x)\n    return x, f(x), history"
   },
   {
     "objectID": "optimization-local-minima-appendix.html#つの実験を並べる",
@@ -5569,14 +5569,14 @@
     "href": "optimization-local-minima-appendix.html#検査2実際に-f-が下がるか",
     "title": "ローカルミニマムの罠",
     "section": "検査2：実際に \\(f\\) が下がるか",
-    "text": "検査2：実際に \\(f\\) が下がるか\n\n\n向きが正しくても、歩幅が大きすぎると谷を飛び越えて高い場所に着くことがある\n踏む前に、着地点の \\(f\\) の値を実際に計算する：\n\n十分下がっていれば採用\n下がっていなければ歩幅を半分にしてやり直す（バックトラッキング、backtracking）\n\n放物線の予測ではなく、実際の \\(f\\) の値を確かめてから進む"
+    "text": "検査2：実際に \\(f\\) が下がるか\n\n\n向きが正しくても、歩幅が大きすぎると谷を飛び越えて高い場所に着くことがある\n踏む前に、着地点の \\(f\\) の値を実際に計算する\n\n十分下がっていれば採用\n下がっていなければ歩幅を半分にしてやり直す（バックトラッキング、backtracking）\n\n放物線の予測ではなく、実際の \\(f\\) の値を確かめてから進む"
   },
   {
     "objectID": "optimization-local-minima-appendix.html#ライブラリには検査が組み込まれている",
     "href": "optimization-local-minima-appendix.html#ライブラリには検査が組み込まれている",
     "title": "ローカルミニマムの罠",
     "section": "ライブラリには検査が組み込まれている",
-    "text": "ライブラリには検査が組み込まれている\n\n\nscipy などの実用ソルバーは、この種の検査を毎回の更新に組み込んでいる：\n\nBFGS：常に下り向きの提案が出るように作った近似 \\(f''\\) を使う\nNewton-CG：負の曲率（negative curvature、上に凸）を検出すると計算を打ち切り、勾配方向へ切り替える\n信頼領域法（trust region method）：放物線を「信じる半径」の中でだけ使う\n\n実測：\\(x_0 = 1.5\\) から scipy.optimize.minimize を呼ぶと、BFGS / Newton-CG / trust-exact のすべてが山頂に登らず \\(x=0\\) の谷に降りる\n方法は違っても、考え方は同じ：\\(f\\) が下がらない一歩は踏まない\n\n\n\n\n\n\n\nノート\n\n\n\n教科書の Newton法は、もともと「\\(f'=0\\) を解く」方法\n\n最小化に使うための検査は含まれていない\n\nライブラリには、その検査が組み込まれている"
+    "text": "ライブラリには検査が組み込まれている\n\n\nscipy などの実用ソルバーは、この種の検査を毎回の更新に組み込んでいる\n\nBFGS：常に下り向きの提案が出るように作った近似 \\(f''\\) を使う\nNewton-CG：負の曲率（negative curvature、上に凸）を検出すると計算を打ち切り、勾配方向へ切り替える\n信頼領域法（trust region method）：放物線を「信じる半径」の中でだけ使う\n\n実測：\\(x_0 = 1.5\\) から scipy.optimize.minimize を呼ぶと、BFGS / Newton-CG / trust-exact のすべてが山頂に登らず \\(x=0\\) の谷に降りる\n方法は違っても、考え方は同じ：\\(f\\) が下がらない一歩は踏まない\n\n\n\n\n\n\n\nノート\n\n\n\n教科書の Newton法は、もともと「\\(f'=0\\) を解く」方法\n\n最小化に使うための検査は含まれていない\n\nライブラリには、その検査が組み込まれている"
   },
   {
     "objectID": "optimization-local-minima-appendix.html#newton法のまとめ検査で直るのは2種類の失敗だけ",
@@ -5625,7 +5625,7 @@
     "href": "pytorch-intro.html#推論inferenceでは計算グラフを作らない",
     "title": "PyTorch入門",
     "section": "推論（Inference）では計算グラフを作らない",
-    "text": "推論（Inference）では計算グラフを作らない\n\n学習後に予測するだけなら、復路は不要：\nmodel.eval()\nwith torch.no_grad():\n    logits = model(grid)\n    probabilities = torch.sigmoid(logits)\n\n\n\nモード\nforwardの履歴\nbackward\nパラメータ更新\n\n\n\n\n学習\n記録する\nする\nする\n\n\n推論\nno_grad()で記録しない\nしない\nしない\n\n\n\n\n履歴を作らないぶん、推論はメモリを節約できる\nmodel.eval() は Dropout などを推論用の動作へ切り替える\n\nLinear＋ReLU のこのモデルでは出力は変わらないが、習慣にしてよい"
+    "text": "推論（Inference）では計算グラフを作らない\n\n学習後に予測するだけなら、復路は不要\nmodel.eval()\nwith torch.no_grad():\n    logits = model(grid)\n    probabilities = torch.sigmoid(logits)\n\n\n\nモード\nforwardの履歴\nbackward\nパラメータ更新\n\n\n\n\n学習\n記録する\nする\nする\n\n\n推論\nno_grad()で記録しない\nしない\nしない\n\n\n\n\n履歴を作らないぶん、推論はメモリを節約できる\nmodel.eval() は Dropout などを推論用の動作へ切り替える\n\nLinear＋ReLU のこのモデルでは出力は変わらないが、習慣にしてよい"
   },
   {
     "objectID": "pytorch-intro.html#チェックポイント",
@@ -5765,7 +5765,7 @@
     "href": "linear-regression.html#正則化大きい係数にペナルティを与える",
     "title": "線形回帰と正則化",
     "section": "正則化：大きい係数にペナルティを与える",
-    "text": "正則化：大きい係数にペナルティを与える\n\n\n曲線が大きく振れる原因は、巨大な係数\n\n\ncoef1 = np.polyfit(z_train, t_train, 1)\ncoef9 = np.polyfit(z_train, t_train, 9)\nprint(\"次数1の係数の最大絶対値:\", f\"{np.abs(coef1[:-1]).max():,.0f}\")   # [:-1] は切片を除く\nprint(\"次数9の係数の最大絶対値:\", f\"{np.abs(coef9[:-1]).max():,.0f}\")\n\n次数1の係数の最大絶対値: 336\n次数9の係数の最大絶対値: 36,757\n\n\n\nそこで、損失に「係数の大きさ」へのペナルティを課すことを考える：\n\n\\[L = \\mathrm{MSE} + \\lambda \\sum_j w_j^2\\]\n\n正則化（regularization）：モデルの複雑さを抑えるペナルティを損失に足す手法\nMSE だけではなく、係数の大きさも loss に入れ込む\n\\(\\lambda\\)（ラムダ）：ペナルティの強さ\n\n\\(\\lambda = 0\\) なら今までどおりの MSE\n学習のしかたを決めるハイパーパラメータ"
+    "text": "正則化：大きい係数にペナルティを与える\n\n\n曲線が大きく振れる原因は、巨大な係数\n\n\ncoef1 = np.polyfit(z_train, t_train, 1)\ncoef9 = np.polyfit(z_train, t_train, 9)\nprint(\"次数1の係数の最大絶対値:\", f\"{np.abs(coef1[:-1]).max():,.0f}\")   # [:-1] は切片を除く\nprint(\"次数9の係数の最大絶対値:\", f\"{np.abs(coef9[:-1]).max():,.0f}\")\n\n次数1の係数の最大絶対値: 336\n次数9の係数の最大絶対値: 36,757\n\n\n\nそこで、損失に「係数の大きさ」へのペナルティを課すことを考える\n\n\\[L = \\mathrm{MSE} + \\lambda \\sum_j w_j^2\\]\n\n正則化（regularization）：モデルの複雑さを抑えるペナルティを損失に足す手法\nMSE だけではなく、係数の大きさも loss に入れ込む\n\\(\\lambda\\)（ラムダ）：ペナルティの強さ\n\n\\(\\lambda = 0\\) なら今までどおりの MSE\n学習のしかたを決めるハイパーパラメータ"
   },
   {
     "objectID": "linear-regression.html#ペナルティありなしを見比べる",
