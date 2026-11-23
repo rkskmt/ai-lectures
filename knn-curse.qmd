@@ -190,8 +190,8 @@ def predict_knn(X_train, y_train, x, k):
 x_new = np.array([0.7, 0.6])                             # 前のスライドの ★
 print(f"★ の予測（k = 3）: {predict_knn(X_train, y_train, x_new, 3)}")
 ```
-::: {.callout-note title="ただし"}
-k は奇数（偶数だと同数で決まらないことがあるため）
+::: {.callout-note title="重要ポイント"}
+k は奇数にする（偶数だと同数で決まらないことがあるため）
 :::
 
 
@@ -218,9 +218,9 @@ print(f"Accuracy: {np.mean(pred == y_test):.3f}")
 :::
 
 
-## （参考）NNは画像の拡大でも使うことがある {#peek-knn-image}
+## （参考）最近傍（NN, [Nearest Neighbor]{.en}）は画像の拡大でも使う {#peek-knn-image}
 
-- 超高速だがギザギザ（エイリアシング）になる。
+- 高速だがギザギザ（エイリアシング, [aliasing]{.en}）になる
 
 ```{python}
 #| echo: false
@@ -543,7 +543,7 @@ fig3d.write_html("iframes/knn_points_3d.html", include_plotlyjs="directory")
 :::
 
 - 立方体を、各軸の中点（端と端のちょうど真ん中の位置）で切って、8 つの領域に分ける
-- 各軸を中点で切っているので、**二分探索**を 3 つの軸でやるだけで、★ の入っている領域にたどり着く
+- 各軸を中点で切っているので、**二分探索**（[binary search]{.en}）を 3 つの軸でやるだけで、★ の入っている領域にたどり着く
 - いちばん近い点は、その領域の中の点から探す
    - 全部の点を測らずにすむ（全探索をしなくてよい）
 - その領域の中になければ、1 つ上の領域（分ける前の領域）に戻って探す
@@ -710,7 +710,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-::: {.callout-note title="ただし"}
+::: {.callout-note title="重要ポイント"}
 k-d の k は特徴量の数（次元）で、k-NN の k とは別
 :::
 
@@ -1066,7 +1066,7 @@ knn = KNeighborsClassifier(n_neighbors=3, algorithm="kd_tree").fit(X_train, y_tr
 print(f"当たった数: {np.sum(knn.predict(X_test) == y_test)} / {len(y_test)}")
 ```
 
-| 今日書いたもの | scikit-learn |
+| 自作のコード | scikit-learn |
 |---|---|
 | `build_kdtree` で木を作る | `KNeighborsClassifier(n_neighbors=3, algorithm="kd_tree").fit(X_train, y_train)` |
 | `predict_knn_kdtree(tree, X_train, y_train, x, 3)` を 1 点ずつ | `knn.predict(X_test)` |
@@ -1263,7 +1263,6 @@ plt.show()
 - 次元が増えるほど遠くなり、20 次元では各軸の長さ 1 より遠い
 - 点の数は 100 点のままなのに、近くに点がなくなる
    - k-NN が投票させる「近い点」が、実際には遠い点になっている
-- なぜこうなるのか、2 つの理由を見る
 :::
 
 
@@ -1358,7 +1357,7 @@ plt.show()
 ```
 
 ::: {.callout-note title="要するに"}
-- 10 次元では、たった 1%の「ご近所」を集めるのに**各軸の 63%**を見渡す必要がある
+- 10 次元では、1%の「ご近所」を集めるのに**各軸の 63%**を見渡す必要がある
 - それはもう「近所」ではない
    - **「近い点どうしは似ている」を前提にする手法（k-NN や k-means など）は、前提が成り立ちにくくなる**
 :::
@@ -1588,7 +1587,7 @@ plt.show()
 ::: {.callout-tip title="次元の呪いへの対処"}
 1. **特徴量選択（[feature selection]{.en}）**：重要な特徴量だけを残す
 2. **次元削減（[dimensionality reduction]{.en}）**：情報を保ったまま次元を圧縮する
-3. **正則化（[regularization]{.en}）**：過学習を防ぐ（線形回帰の回で扱う）
+3. **[正則化](linear-regression.qmd#peek-regularization-broad){.peek}（[regularization]{.en}）**：過学習を防ぐ
 :::
 
 
@@ -1597,7 +1596,7 @@ plt.show()
 - 特徴量どうしが似た動きをしていれば、情報をほとんど失わずに、特徴量の数を減らせる
    - 例：魚の体長と重さは、ほぼ同じ情報
 - **主成分分析（PCA, [**Principal Component Analysis**]{.en}）**：データのばらつきが大きい方向を、新しい軸に取り直す方法
-- [次元削減と PCA](dimensionality-pca.qmd)で扱う
+- 詳しくは[次元削減と PCA](dimensionality-pca.qmd)
 
 
 ## まとめ
@@ -1611,19 +1610,11 @@ plt.show()
   - k-NN は当たらなくなり、点を増やしても追いつかない
   - KD-tree でも、スキップできる領域がなくなる
 
-::: {.callout-note title="分類問題と特徴量のまとめ"}
-1D → 2D の分類、評価と汎化、教師なし学習（k-means）、k-NN と次元の呪い。
-**機械学習の基本的な問いと道具が揃った。**
-
-ここまで、パラメータは手法ごとの探し方で見つけてきた。
-次の「最適化」では、**多くの手法で使える探し方**を作る。
-:::
-
 
 ## **到達チェック** 魚を k-NN で分類する {#peek-knn-fish .badge-practice}
 
 ::: {.prompt}
-過学習と汎化の回の魚 120 匹（輝度・重さ）を k-NN で分類し、同じ分け方の決定木と、テストデータの Accuracy を比べよ。
+魚 120 匹（輝度・重さ）を k-NN で分類し、同じ分け方の決定木と、テストデータの Accuracy を比べよ。
 :::
 
 0. 魚のデータ（下のコード）をコピー

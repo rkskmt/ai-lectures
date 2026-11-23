@@ -8,14 +8,14 @@ subtitle: "２クラス分類"
 ## 分類問題
 
 ### 今回の目標
-- 分類問題(Data Classification)：データを分類するタスクを理解する
+- 分類問題（[data classification]{.en}）：データを分類するタスクを理解する
     - 2クラス分類
-- データ可視化
+- データの可視化（[visualization]{.en}）
 - **決定境界（[decision boundary]{.en}）** の概念を学ぶ
 
-::: {.callout-note title="ポイント"}
+::: {.callout-note title="重要ポイント"}
 - 完全な分類は困難であることを知る
-- 境界決定のトレードオフとコスト
+- 境界決定のトレードオフ（[trade-off]{.en}）とコスト
 :::
 
 
@@ -30,8 +30,8 @@ subtitle: "２クラス分類"
 - ２種類の魚がベルトコンベアで大量に流れてくるとする
   - **サケ**（Salmon）
   - **スズキ**（Sea bass）
-- これを自動的に瞬間的に識別したい
-- 分類対象の項目を**クラス（[class]{.en}）**という
+- これを自動で瞬時に識別したい
+- **クラス（[class]{.en}）**：分類先の項目
    - この場合は２クラス 
 
 :::
@@ -42,7 +42,7 @@ subtitle: "２クラス分類"
 
 
 ::: {.takeaway .center}
-Salmon と Sea bass の**2クラス分類問題(2-class classification)**
+Salmon と Sea bass の**2クラス分類問題（[2-class classification]{.en}）**
 :::
 
 
@@ -74,7 +74,7 @@ D -> F: Sea bass
 ### アプローチ
 
 - 重量計をつけられそうなので、まず重さで識別できないかを考えた
-- まずサンプルとして20匹ずつの重さを測定した
+- サンプルとして20匹ずつの重さを測定した
 
 
 ```{python}
@@ -189,8 +189,8 @@ if overlap_max >= overlap_min:
 ```
 
 ::: {.callout-warning title="ここまでで分かること"}
-- **双峰型の分布**：2つの山が見える
-  -  **かなり重なっている** が、まあ分けてみましょう
+- **双峰型の分布（[bimodal distribution]{.en}）**：2つの山が見える
+  - **かなり重なっている**が、まあ分けてみましょう
 :::
 
 ## 境界線（閾値）を考える {#peek-decision-boundary}
@@ -208,7 +208,7 @@ if overlap_max >= overlap_min:
 
 
 ::: {.takeaway}
-閾値で分かれる境界を**決定境界**（[decision boundary]{.en}）という
+**決定境界**（[decision boundary]{.en}）：閾値で分かれる境界
 :::
 
 ## 青の破線で切ったとしたら
@@ -371,7 +371,8 @@ Accuracy（正解率）を指す場合と、Precision（適合率）を指す場
 :::
 
 ::: {.callout-note title="Accuracyだけではダメな理由"}
-クラス間の偏り（[class imbalance]{.en}）に影響されるため。例えば、100匹のうちSalmonが5匹なら、すべてを「Salmonではない」と判定するだけでAccuracyは95%になってしまう。
+- クラス間の偏り（[class imbalance]{.en}）に影響される
+   - 例：100匹のうちSalmonが5匹なら、すべてを「Salmonではない」と判定するだけでAccuracyは95%になる
 :::
 
 ## 境界線1800gの判定器を評価する
@@ -431,15 +432,15 @@ print(df.to_string(index=False))
 
 :::{.callout-important}
 - **決定境界の閾値を下げる（1600g）** → Recall ↑、Precision ↓  
-  - Salmonを逃さない（FN減）が、Sea bassの誤判定（FP増）
+  - Salmonの見逃しは減る（FN減）が、Sea bassの誤判定が増える（FP増）
   
 - **決定境界の閾値を上げる（2000g）** → Precision ↑、Recall ↓  
-  - Salmon判定の信頼性は高いが、Salmonを見逃す（FN増）
+  - Salmon判定の信頼性は上がるが、Salmonの見逃しが増える（FN増）
 :::
 
 
 ::: {.takeaway}
-**Precision と Recall は トレードオフの関係**
+**Precision と Recall はトレードオフの関係**
 :::
 
 
@@ -479,8 +480,10 @@ precision = TP / (TP + FP) if (TP + FP) > 0 else 0
 recall = TP / (TP + FN) if (TP + FN) > 0 else 0
 ```
 
+::: {.callout-note title="結果"}
 - FP が増え、FN が減る
 - **Precision** は低く、**Recall** は高い
+:::
 
 :::
 
@@ -516,8 +519,10 @@ precision = TP / (TP + FP) if (TP + FP) > 0 else 0
 recall = TP / (TP + FN) if (TP + FN) > 0 else 0
 ```
 
+::: {.callout-note title="結果"}
 - FP が減り、FN が増える
 - **Precision** は高く、**Recall** は低い
+:::
 
 :::
 
@@ -536,13 +541,13 @@ recall = TP / (TP + FN) if (TP + FN) > 0 else 0
 - **Recall重視**（FNを避ける）
 - 低めの閾値（1600g）
 - Salmonの取りこぼしを最小化
-   - シャケなら余すことなく全部入れるマン。混入は知らね。
+   - シャケなら余すことなく全部入れるマン（混入は知らね）
 
 ## コストを考慮した最適化 {#peek-cost}
 
 
 ::: {.takeaway}
-誤分類のコストが異なる場合は総コストを最小化する閾値にすべき
+誤分類のコストが異なる場合は、総コストが最小になる閾値を選ぶ
 :::
 $$
 \begin{aligned}
@@ -573,7 +578,9 @@ best_threshold = thresholds[costs.index(min(costs))]
 print(f"min cost: {best_threshold}g")
 ```
 
-**このコスト関数での最適なしきい値**: Sea bass 混入（FP）のコストが高いので、高めのしきい値で総コスト最小
+::: {.callout-note title="結果"}
+Sea bass 混入（FP）のコストが高いので、高めのしきい値で総コストが最小になる
+:::
 
 ## **Tweak** しきい値を変更 {.badge-practice}
 
@@ -582,15 +589,15 @@ print(f"min cost: {best_threshold}g")
 ::: {.tweak}
 | やりたいこと | コード |
 |--|--|
-| 全部 Salmon と言い張る | `threshold = 1000` |
-| 全部 Sea bass と言い張る | `threshold = 2500` |
-| 再選別のほうが高くつく世界 | `C_FP = 500`、`C_FN = 10000` |
+| 全部 Salmon と判定せよ | `threshold = 1000` |
+| 全部 Sea bass と判定せよ | `threshold = 2500` |
+| 再選別のコストのほうを高くせよ | `C_FP = 500`、`C_FN = 10000` |
 :::
 
-::: {.callout-tip}
+::: {.callout-tip title="チェックポイント"}
 - `threshold = 1000` で **Recall は 100%** になる
-   - 全部 Salmon と言えばタダで手に入る数字
-   - そのとき Precision は 50%でAccuracy も 50%
+   - 全部 Salmon と判定するだけで得られる値
+   - そのとき Precision は 50%、Accuracy も 50%
       - ==単独の指標は当てにならない==
 - コストを入れ替えると、最適しきい値が **高い側から低い側に反転**する
 :::
@@ -599,20 +606,19 @@ print(f"min cost: {best_threshold}g")
 ## ROC曲線：分類器の性能を可視化 {#peek-roc}
 
 - Precision と Recall はトレードオフ
-   - ということは、分類器の性能はこれでは表せない
-   - それなら、閾値を全通り試した結果を図にしよう
-   - これが**ROC（[Receiver Operating Characteristic]{.en}）曲線**
+   - 1つの閾値での値だけでは、分類器の性能を表せない
+- **ROC（[Receiver Operating Characteristic]{.en}）曲線**：閾値を全通り試した結果を描いた図
 
 
 ::: {.takeaway}
-ROC曲線の描き方：全閾値で以下を計算して折れ線グラフにするだけ
+ROC曲線の描き方：全閾値で以下を計算して折れ線グラフにする
 :::
 - 縦軸（**Recall**）：[TP Rate]{.en}$= \dfrac{TP}{TP + FN}$
 - 横軸（Precisionの代わり）：[FP Rate]{.en}$= \dfrac{FP}{FP + TN}$
 
 ## ROC曲線の見方
 
-::: {.callout-tip title="一目瞭然"}
+::: {.callout-tip title="重要ポイント"}
 - 分布が離れているほど、曲線は左上の角（FP Rate 0、TP Rate 1）に近づく
 - 分布が重なっているほど、曲線は対角線（ランダムに判定した場合）に近づく
 - もし曲線が対角線より下にあるなら、判定したラベルが逆
@@ -656,9 +662,9 @@ plt.show()
 
 ## コード（ROC曲線） {#peek-roc-code}
 
-- 閾値をずらしつつ実行した値をグラフにする
+- 閾値をずらしながら TP Rate と FP Rate を計算し、グラフにする
    - 最小値は全部を Salmon、最大値 + 1 は全部を Sea bass と判定する閾値
-      - それ以上と以下は明らかに値が同じなので意味がない
+      - この範囲の外では結果が変わらないので、調べる必要はない
 
 ```{python}
 #| echo: true
@@ -685,7 +691,7 @@ plt.show()
 ```
 
 
-## AUC：ROC曲線の下の面積を使った分離性能を表す指標 {#peek-auc}
+## AUC：ROC曲線の下の面積で分離性能を表す指標 {#peek-auc}
 
 - **AUC**（[Area Under the Curve]{.en}）：ROC 曲線の下の面積
    - 1.0：完全に分離可能（曲線が左上の角を通る）
@@ -713,7 +719,7 @@ assert abs(auc - (-np.trapezoid(tpr, fpr))) < 1e-12 and abs(auc - pairs / 400) <
 ```
 
 ::: {.callout-note title="結果"}
-- 重なってはいるが、ランダムに判定よりはずっと良い結果
+- 重なってはいるが、ランダムに判定するよりずっと良い
 :::
 
 
@@ -754,9 +760,9 @@ seabass_weights = [1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,
 
 1. 閾値を1800gにした場合の TP, FP, FN, TN を計算せよ
 
-2. 1800gの場合の **Accuracy, Precision, Recall** を求めよ。
+2. 1800gの場合の **Accuracy, Precision, Recall** を求めよ
 
-3. 1700gの場合の **Accuracy, Precision, Recall** を求めよ。
+3. 1700gの場合の **Accuracy, Precision, Recall** を求めよ
 
 4. $C_{FP}=5000$円、$C_{FN}=1000$円としたとき、総コストを最小にするしきい値を求めよ
 

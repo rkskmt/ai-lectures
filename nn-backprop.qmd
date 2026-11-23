@@ -3,28 +3,29 @@ title: "バックプロパゲーション"
 subtitle: "勾配を全パラメータに届ける仕組み"
 ---
 
-## 前回の振り返り
+## ここまでに実装した2層NN
 
 - [隠れ層とReLUを追加した2層NN](nn-multilayer.qmd#peek-two-layer-structure){.peek}の `forward` をNumPyで実装した
 - [4行のForward](nn-multilayer.qmd#peek-multilayer-forward){.peek}は `Z1, H, Z2, P` を保存する
-- 学習に必要なのは、**全パラメータの勾配** $\partial L / \partial \theta$
+- 学習に必要なのは、**全パラメータの勾配（[gradient]{.en}）** $\partial L / \partial \theta$
 
-::: {.callout-note title="この回の記号"}
-まず1匹分の損失を $\ell$ と書いて手計算し、後半で全魚の平均損失 $L$ へ広げる。
+::: {.callout-note title="記号"}
+- $\ell$：1匹分の損失（手計算で使う）
+- $L$：全魚の平均損失
 :::
 
 ::: {.callout-note title="今回の主題"}
 - パラメータが5個、100個、100万個と増えても、**全部の勾配**を計算できるか
-- 導いた計算を `backward` として実装し、2層NNを実際に学習させる
+- 導いた計算を `backward` として実装し、2層NNを学習する
 :::
 
 
-## この回で1往復する道筋
+## 1往復の道筋
 
 1. **Forward（往路）**：入力から予測と損失を計算し、途中の値を保存する
 2. **Backward（復路）**：出力側から入力側へ、局所的な微分を掛けて勾配を計算する
 3. 各パラメータの勾配を取り出す
-4. 勾配降下法で全パラメータを1ステップ更新する
+4. 勾配降下法（[gradient descent]{.en}）で全パラメータを1ステップ更新する
 5. もう一度往路を計算し、損失が下がったか確認する
 
 ```{.d2 sketch="true" width="92%"}
@@ -37,7 +38,8 @@ X -> F -> B -> U
 ```
 
 ::: {.takeaway}
-backpropだけで学習が終わるわけではない。**forward → loss → backward → update**で1ステップ
+- 学習の1ステップ：**forward → loss → backward → update**
+   - バックプロパゲーション（[backpropagation]{.en}、略して backprop）が担当するのは backward だけ
 :::
 
 
@@ -55,7 +57,7 @@ X -> Z -> H -> U -> P -> L
 ```
 
 - このあと使う魚の正解は $y=1$ なので、$\ell=-\log p$
-- 図の各箱を1本の式へ代入すると、$w_1$ の勾配は長い入れ子になる：
+- 図の各箱の式を1本にまとめると、$w_1$ の勾配は長い入れ子になる：
 
 $$\frac{\partial \ell}{\partial w_1} = \frac{\partial}{\partial w_1} \left[ -\log \sigma\!\Big( v \cdot \mathrm{ReLU}(w_1 x_1 + w_2 x_2 + b) + c \Big) \right]$$
 
@@ -66,13 +68,13 @@ $$\frac{\partial \ell}{\partial w_1} = \frac{\partial}{\partial w_1} \left[ -\lo
 
 ::: {.fragment}
 - 各箱の簡単な微分を使い回せばよい
-- 鍵は**合成関数の微分（連鎖律）**
+- 鍵は**合成関数の微分（連鎖律、[chain rule]{.en}）**
 :::
 
 
 ## 連鎖律：微分は掛け算でつなげる
 
-- [ロジスティック関数の微分でも使った連鎖律](logistic-regression.qmd#peek-chain-rule){.peek}を、NNの全計算へ広げる
+- [連鎖律](logistic-regression.qmd#peek-chain-rule){.peek}を、NNの全計算へ広げる
 - 関数が数珠つなぎなら、微分も数珠つなぎ：
 
 $$y = f(g(x)) \quad \Rightarrow \quad \frac{dy}{dx} = \frac{dy}{dg} \cdot \frac{dg}{dx}$$
@@ -86,9 +88,9 @@ $y = (3x+1)^2$ を、**展開せずに**微分すると？
 - 途中の値を $g=3x+1$ と置くと、$y=g^2$
 - $\dfrac{dy}{dg}=2g$、$\dfrac{dg}{dx}=3$
 - 掛けて $\dfrac{dy}{dx}=2g\times3=2(3x+1)\times3=18x+6$
-- 展開して微分（$9x^2 + 6x + 1 \to 18x + 6$）と一致
+- 展開してから微分した結果（$9x^2 + 6x + 1 \to 18x + 6$）と一致
   - 部品ごとの微分を掛ければ、元の式を展開する必要はない
-- 連鎖律だけでNNの全パラメータの勾配を出せる
+- NNの全パラメータの勾配も、連鎖律だけで求められる
 
 :::
 
@@ -108,7 +110,7 @@ $\partial \ell/\partial w$ は「重み $w$ を少し動かすと、1匹分の�
 :::
 
 
-## 1匹分の損失を各パラメータで偏微分する
+## 1匹分の損失を各パラメータで偏微分（[Partial Derivative]{.en}）する
 
 1匹分の損失 $\ell$ は、5個すべてのパラメータに依存する：
 
@@ -116,7 +118,7 @@ $$\ell=\ell(w_1,w_2,b,v,c)$$
 
 - $\dfrac{\partial \ell}{\partial w_1}$：ほかの4個を固定し、$w_1$ だけ少し動かしたときの変化
 - $\dfrac{\partial \ell}{\partial v}$：ほかの4個を固定し、$v$ だけ少し動かしたときの変化
-- 5個をまとめたものが勾配 $\nabla \ell$
+- 勾配 $\nabla \ell$：5個の偏微分をまとめたもの
 
 $$
 \nabla \ell=
@@ -132,16 +134,16 @@ $$
 
 ## NN は数珠つなぎそのもの
 
-- 「線形 → ReLU → 線形 → シグモイド → 損失」— NN は関数の**数珠つなぎ**
+- NN は関数の**数珠つなぎ**：線形 → ReLU → 線形 → シグモイド → 損失
 
 $$\frac{\partial \ell}{\partial w_1}
 = \frac{\partial \ell}{\partial p} \cdot \frac{\partial p}{\partial u} \cdot \frac{\partial u}{\partial h} \cdot \frac{\partial h}{\partial z} \cdot \frac{\partial z}{\partial w_1}$$
 
-- 各カケラは**どれも1行で書ける簡単な微分**
+- 右辺の各カケラは**局所的な微分**で、どれも1行で書ける
 - カケラを**出力側から順に**掛けて貯めていけば、途中の計算を**使い回せる**
 
 
-## 計算グラフにすると順番が見える
+## 計算グラフ（[Computational Graph]{.en}）にすると順番が見える
 
 ```{.d2 sketch="true" width="100%"}
 direction: right
@@ -154,16 +156,19 @@ L: "ℓ(y,p)" { style.fill: "#f5b7b1" }
 X -> Z -> H -> U -> P -> L
 ```
 
-- 箱は計算した値、矢印は値どうしの依存関係
-- 往路は左から右、復路は右から左
+::: {.callout-tip title="チェックポイント"}
+- 箱：計算した値
+- 矢印：値どうしの依存関係
+- 往路は左から右へ、復路は右から左へ計算する
 - 復路では各矢印の**局所的な微分**だけ計算すればよい
+:::
 
 ::: {.takeaway}
 長い合成式を丸ごと見る代わりに、計算を小さな箱へ分解する
 :::
 
 
-## 前回と同じ1匹・同じ5パラメータを使う
+## 手計算に使う1匹と5パラメータ
 
 $$x \xrightarrow{\;z = w_1 x_1 + w_2 x_2 + b\;} z
 \xrightarrow{\;\mathrm{ReLU}\;} h
@@ -171,7 +176,7 @@ $$x \xrightarrow{\;z = w_1 x_1 + w_2 x_2 + b\;} z
 \xrightarrow{\;\sigma\;} p
 \xrightarrow{\;-\log\;} \ell$$
 
-- [前回Forwardした1匹](nn-multilayer.qmd#peek-scalar-two-layer-forward){.peek}を、同じパラメータのまま1往復する：
+- [Forwardで手計算した1匹](nn-multilayer.qmd#peek-scalar-two-layer-forward){.peek}を、同じパラメータのまま1往復する：
 
 | 記号 | 値 |
 |---|---|
@@ -200,8 +205,12 @@ L: "1匹分の損失\nℓ = 0.6685" { style.fill: "#f5b7b1" }
 X -> A1 -> R -> A2 -> S -> L
 ```
 
-- 予測は 0.5125 —「ほぼコイン投げ」。正解は 1 なので、もっと上げたい
-- **途中の値（$z, h, u, p$）は捨てずに取っておく** — 復路で全部使う
+::: {.callout-note title="結果"}
+- 予測は 0.5125 で、ほぼコイン投げ
+   - 正解は 1 なので、もっと上げたい
+- **途中の値（$z, h, u, p$）は捨てずに取っておく**
+   - 復路で全部使う
+:::
 
 
 ## 往路で保存する値は復路の材料
@@ -214,13 +223,15 @@ X -> A1 -> R -> A2 -> S -> L
 | 出力スコア $u$ | $0.05$ | シグモイドを通った位置 |
 | 確率 $p$ | $0.5125$ | $\delta_{\rm out}=p-y$ |
 
+::: {.callout-note title="要するに"}
 - パラメータだけ保存しても復路は計算できない
 - 入力ごとの途中結果も必要なので、深いネットワークほど学習時のメモリを使う
+:::
 
 
 ## Backwardは1匹分の損失 $\ell$ から始める
 
-自分自身を自分で微分すると1：
+$\ell$ を $\ell$ 自身で微分すると1：
 
 $$\frac{\partial \ell}{\partial \ell}=1$$
 
@@ -275,7 +286,7 @@ $$c\leftarrow c-\alpha(-0.4875)=c+0.4875\alpha$$
 
 ## ReLU の場所で復路が分かれる
 
-[前回確認したReLUの微分](nn-multilayer.qmd#peek-relu-derivative){.peek}を、中間層の復路で使う：
+[ReLUの微分](nn-multilayer.qmd#peek-relu-derivative){.peek}を、中間層の復路で使う：
 
 $$\delta_{\rm mid}=\delta_{\rm out}\cdot v\cdot\mathrm{ReLU}'(z)$$
 
@@ -284,8 +295,10 @@ $$\delta_{\rm mid}=\delta_{\rm out}\cdot v\cdot\mathrm{ReLU}'(z)$$
 | $z>0$ | $1$ | そのまま通る |
 | $z<0$ | $0$ | ここで0になる |
 
+::: {.callout-note title="結果"}
 - 今回は $z=0.30>0$ なので、微分は1
 - したがって $\delta_{\rm out}$ に $v=0.5$ を掛けた値が中間へ進む
+:::
 
 
 ## 復路：中間層まで連鎖律をつなぐ
@@ -318,8 +331,12 @@ L -> A2: "δ_out = −0.4875" { style.stroke: "#c0392b"; style.font-color: "#c03
 A2 -> A1: "δ_mid = −0.2438" { style.stroke: "#c0392b"; style.font-color: "#c0392b"; style.font-size: 24; style.stroke-width: 3 }
 ```
 
-- 黒い矢印が**往路**、赤い矢印が**復路**
-- $\delta$ は「その場所の値を少し変えたとき、$\ell$ がどれだけ変わるか」。右から左へ連鎖律をつないだ値
+::: {.callout-note title="要するに"}
+- 黒い矢印：**往路**
+- 赤い矢印：**復路**
+- $\delta$：その場所の値を少し変えたとき、$\ell$ がどれだけ変わるか
+   - 右から左へ連鎖律をつないで求める
+:::
 
 
 ## 5個の勾配を同じ表で見る
@@ -332,8 +349,10 @@ A2 -> A1: "δ_mid = −0.2438" { style.stroke: "#c0392b"; style.font-color: "#c0
 | $w_2$ | $-0.1219$ | $\delta_{\rm mid}\,x_2$ |
 | $b$ | $-0.2438$ | $\delta_{\rm mid}\cdot1$ |
 
+::: {.callout-note title="結果"}
 - 線形変換の重みの勾配は、いつも **その場所の $\delta$ × 往路で入ってきた値**
 - バイアスへの入力は常に1なので、バイアスの勾配はその場所の $\delta$ と同じ
+:::
 
 ::: {.takeaway}
 出力層でも中間層でも、勾配を作る規則は同じ
@@ -342,7 +361,7 @@ A2 -> A1: "δ_mid = −0.2438" { style.stroke: "#c0392b"; style.font-color: "#c0
 
 ## 勾配降下法で1ステップ更新する
 
-- 学習率 $\alpha=0.1$ で、$\theta\leftarrow\theta-\alpha\dfrac{\partial \ell}{\partial\theta}$ を実行：
+- 学習率（[learning rate]{.en}）$\alpha=0.1$ で、$\theta\leftarrow\theta-\alpha\dfrac{\partial \ell}{\partial\theta}$ を実行：
 
 | パラメータ | 更新前 | 勾配 | 更新後 |
 |---|---:|---:|---:|
@@ -358,13 +377,14 @@ $$p: 0.5125 \longrightarrow 0.5328, \qquad
 \ell: 0.6685 \longrightarrow 0.6296$$
 
 ::: {.callout-note title="損失の値と勾配を混同しない"}
-$\ell=0.6685$ という数値を更新式へ代入したわけではない。
-更新に使ったのは、その時点のパラメータで計算した5個の勾配 $\partial\ell/\partial\theta$。
-$\ell$ の値は、更新前後を比べて学習が進んだか確認するために使う。
+- $\ell=0.6685$ という数値は更新式へ代入しない
+- 更新に使うのは、更新前のパラメータで計算した5個の勾配 $\partial\ell/\partial\theta$
+- $\ell$ の値は、更新前後を比べて学習が進んだか確認するために使う
 :::
 
 ::: {.takeaway}
-backprop は勾配を求める手順。求めた勾配を使ってパラメータを動かすのは**勾配降下法**
+- backprop：勾配を求める手順
+- **勾配降下法**：求めた勾配でパラメータを動かす手順
 :::
 
 
@@ -385,7 +405,7 @@ backprop は勾配を求める手順。求めた勾配を使ってパラメー�
 ```
 
 ::: {.callout-note}
-表の「更新前」列は全行で同じ時点、「更新後」列も全行で同じ時点
+前のスライドの表では、「更新前」の列も「更新後」の列も全行が同じ時点の値
 :::
 
 
@@ -428,14 +448,17 @@ print(f"grad_v: {grad_v:.4f}")
 print(f"grad_c: {grad_c:.4f}")
 ```
 
-- 手計算の5個の勾配を、そのまま `backward` の各行へ対応させた
+::: {.callout-note title="要するに"}
+- 手計算の5個の勾配が、`backward` の各行に対応する
 - `(z > 0)` が $\mathrm{ReLU}'(z)$
 - 往路で保存した `z, h, p` を復路で再利用する
+:::
 
 
-## 検算：機械に「微分の定義」でやらせる
+## 検算：微分の定義で勾配を計算する
 
-- 微分の定義 $\dfrac{\ell(\theta + \varepsilon) - \ell(\theta)}{\varepsilon}$ で、手計算を検算できる（**数値微分**）
+- **数値微分（[numerical differentiation]{.en}）**：微分の定義 $\dfrac{\ell(\theta + \varepsilon) - \ell(\theta)}{\varepsilon}$ で勾配を近似する
+   - 手計算の検算に使える
 
 ```{python}
 #| echo: true
@@ -463,8 +486,11 @@ for name in params:
 ```
 
 ::: {.fragment}
+::: {.callout-note title="結果"}
 - 表示した小数第4位まで、手計算の5個の勾配と一致
-- ではなぜ実用で数値微分を使わない？ — パラメータ100万個なら loss を**100万回**計算することになる。backprop は**1往復**で全部出る
+- 実用で数値微分を使わない理由：パラメータ100万個なら loss を**100万回**計算することになる
+   - backprop は**1往復**で全部求まる
+:::
 :::
 
 
@@ -475,35 +501,39 @@ for name in params:
 | 数値微分 | パラメータごとに往路を再計算 | 少数の勾配の検算 |
 | backprop | 往路1回＋復路1回 | 実際の学習 |
 
+::: {.callout-note title="要するに"}
 - パラメータが5個なら数値微分でも困らない
-- 100万個なら、1ステップごとに約100万回の往路は現実的でない
-- backprop は途中の計算を使い回すため、全パラメータを一度の復路で扱える
+- 100万個なら、1ステップごとに約100万回の往路が必要になり現実的でない
+- backprop は途中の計算を使い回すので、全パラメータを一度の復路で扱える
+:::
 
 ::: {.takeaway}
-数値微分は「答え合わせ」、backprop は「毎回の学習」に使う
+- 数値微分：答え合わせに使う
+- backprop：毎回の学習に使う
 :::
 
 
-## 何層でも同じ漸化式を繰り返す
+## 何層でも同じ漸化式（[Recurrence Relation]{.en}）を繰り返す
 
 - 1ユニットずつ書くと、復路は**同じ形の繰り返し**：
 
 $$\delta^{(k)} = \delta^{(k+1)} \cdot w^{(k+1)} \cdot f'(z^{(k)})$$
 
-- 「次の層の $\delta$ に、重みと活性化の微分を掛ける」
+- 次の層の $\delta$ に、重みと活性化関数の微分を掛ける
 - 各層のパラメータの勾配は $\delta^{(k)} \times$（その層への入力）
 - NumPyでは、データ数とニューロン数を行列の軸に並べて同時に計算する
 
 ::: {.callout-note title="名前の由来"}
-損失に対する勾配（$\delta$）を、出力側から入力側へ順に計算していく —
-これが**誤差逆伝播法（[backpropagation]{.en}）**。仕組みの正体は連鎖律の使い回し。
+- **誤差逆伝播法（[backpropagation]{.en}）**：損失に対する勾配（$\delta$）を、出力側から入力側へ順に計算する方法
+   - 仕組みは連鎖律の使い回し
 :::
 
 
 ## 全データ・全ニューロンへ広げる
 
 - [Forwardで確認した行列の形](nn-multilayer.qmd#peek-two-layer-shapes){.peek}を保ったまま、1匹分の式を全魚へ広げる
-- 1匹では $\delta_{\rm out}=p-y$。$N$ 匹の平均損失 $L$ では、同じ計算が $dZ_2=(P-y)/N$ になる
+- 1匹では $\delta_{\rm out}=p-y$
+   - $N$ 匹の平均損失 $L$ では、同じ計算が $dZ_2=(P-y)/N$ になる
 - 隠れ層の幅を $m$、データ数を $N$ とすると：
 
 | 復路の計算 | 形 |
@@ -516,9 +546,11 @@ $$\delta^{(k)} = \delta^{(k+1)} \cdot w^{(k+1)} \cdot f'(z^{(k)})$$
 | $dW_1=X^{\mathsf T}dZ_1$ | $(2,m)$ |
 | $db_1=\sum_i dZ_{1i}$ | $(m,)$ |
 
-- 行列積で、すべてのデータとニューロンの勾配を一度に計算
-- $\odot$ は同じ位置どうしの掛け算
+::: {.callout-note title="要するに"}
+- 行列積で、すべてのデータとニューロンの勾配を一度に計算する
+- $\odot$：同じ位置どうしの掛け算
 - 各勾配の形は、対応するパラメータの形と一致する
+:::
 
 
 ## 2層NNのBackwardをNumPyで実装する {#peek-matrix-backward}
@@ -541,7 +573,7 @@ def backward(X, y, Z1, H, P, W2):
 X = np.array([[1.0, 0.5], [0.0, 1.0], [2.0, 1.0]])
 y = np.array([[1.0], [0.0], [1.0]])
 
-# 前回のforwardで保存した値（同じ3匹・同じパラメータ）
+# 2層NNの forward で保存した値（同じ3匹・同じパラメータ）
 Z1 = np.array([[0.3, -0.1], [-0.1, 0.6], [0.5, -0.2]])
 H = np.maximum(0, Z1)
 Z2 = np.array([[0.05], [-0.28], [0.15]])
@@ -554,9 +586,11 @@ print("dW1:", dW1.shape, " db1:", db1.shape)
 print("dW2:", dW2.shape, " db2:", db2.shape)
 ```
 
-- 出力側の `dZ2` から始め、コードも上から下へ入力側へ戻る
-- `Z1, H, Z2, P` は[前回のForward](nn-multilayer.qmd#peek-multilayer-forward){.peek}で出した値と同じ
-- `P` は都合のよい別の値ではなく、保存した `Z2` へシグモイドを適用して再現している
+::: {.callout-note title="要するに"}
+- 出力側の `dZ2` から始め、上から下へ入力側の勾配まで計算する
+- `Z1, H, Z2, P` は[2層NNのForward](nn-multilayer.qmd#peek-multilayer-forward){.peek}で出した値と同じ
+- `P` は、保存した `Z2` へシグモイドを適用して再現している
+:::
 
 
 ## バッチ（[Batch]{.en}） {#peek-full-batch}
@@ -571,10 +605,12 @@ U: "Update\n1回" { style.fill: "#d5f5e3" }
 X -> F -> L -> B -> U
 ```
 
-- 1回の勾配計算とパラメータ更新に使うデータのまとまり
-- 次の学習で使う `X` には学習データ200件をすべて入れるため、バッチサイズは200
+::: {.callout-note title="要するに"}
+- **バッチ**：1回の勾配計算とパラメータ更新に使うデータのまとまり
+- このあとの学習で使う `X` には学習データ200件をすべて入れるため、バッチサイズ（[batch size]{.en}）は200
 - フルバッチ（[full batch]{.en}）：全学習データを1つのバッチにする方法
-- `dZ2 = (P - y) / len(X)` で200件の影響を平均し、その勾配で1回更新する
+- `dZ2 = (P - y) / len(X)` で200件の影響を平均し、得られた勾配で1回更新する
+:::
 
 
 ## エポック（[Epoch]{.en}） {#peek-epoch}
@@ -586,14 +622,15 @@ X -> F -> L -> B -> U
 | 学習方法 | 1回の更新に使うデータ | 1 epochの更新回数 |
 |---|---:|---:|
 | 今回のフルバッチ | 200件 | 1回 |
-| 後で使うミニバッチ | 全データの一部 | 複数回 |
+| ミニバッチ（[mini-batch]{.en}） | 全データの一部 | 複数回 |
 
 ::: {.callout-note}
-epochは更新回数そのものではない。1 epochに何回更新するかは、バッチの分け方で変わる
+- epochは更新回数そのものではない
+   - 1 epochに何回更新するかは、バッチの分け方で変わる
 :::
 
 
-## NumPyだけで2層NNを学習させる {#peek-numpy-nn-train}
+## NumPyだけで2層NNを学習する {#peek-numpy-nn-train}
 
 - 損失は隠れ層なしNNと同じ[二値交差エントロピー](nn-logistic.qmd#peek-one-layer-loss){.peek}
 - 学習ループも同じ[forward → loss → backward → update](nn-logistic.qmd#peek-nn-learning-cycle){.peek}
@@ -675,10 +712,13 @@ import json
 print(json.load(open("frozen/nn-backprop.json", encoding="utf-8"))["frz-train"], end="")
 ```
 
-- 多層化の回で書いた `forward` と、この回で書いた `backward` を同じループへ接続した
-- `loss` の値は学習前後の確認用。更新式へ入るのは `dW1, db1, dW2, db2`
-- `W1, W2` は[前回と同じ理由でランダム初期化](nn-multilayer.qmd#peek-random-initialization){.peek}する
+::: {.callout-note title="要するに"}
+- [2層NNの `forward`](nn-multilayer.qmd#peek-multilayer-forward){.peek}と[行列版の `backward`](#peek-matrix-backward){.peek}を同じループへ接続した
+- `loss` の値は学習前後の確認用
+   - 更新式へ入るのは `dW1, db1, dW2, db2`
+- `W1, W2` は[対称性を破るためにランダム初期化](nn-multilayer.qmd#peek-random-initialization){.peek}する
 - NumPy以外が担当したのは、練習用データの生成だけ
+:::
 
 
 ## 学習したNNの決定境界
@@ -741,17 +781,18 @@ $$
 $$
 
 - 直列につながる経路では**掛け算**
-- 枝分かれして同じ値へ戻る経路では**足し算**
+- 枝分かれして同じ値へ合流する経路では**足し算**
 - 複数ユニットや複雑なネットワークも、この2規則で処理できる
 
 
-## 復路で効いてくる設計たち
+## 復路の都合で決まる設計
 
 - **往路の途中の値（$z, h$）を保存しておく**のは復路で使うため
   - ディープラーニングがメモリを食う理由のひとつ
-- **$\mathrm{ReLU}'(z)$ は 1 か 0**。正側の経路では活性化関数による縮小がない
-  - シグモイドを中間に使うと微分が最大 0.25 — 層を重ねるたびに勾配が薄まる（**勾配消失（[vanishing gradient]{.en}）**）
-  - 中間層に ReLU が選ばれる大きな理由
+- **$\mathrm{ReLU}'(z)$ は 1 か 0**
+  - 正側の経路では活性化関数による縮小がない
+  - シグモイドを中間に使うと微分が最大 0.25 なので、層を重ねるたびに勾配が薄まる（**勾配消失（[vanishing gradient]{.en}）**）
+  - これが、中間層に ReLU が選ばれる大きな理由
 
 ```{python}
 #| echo: false
@@ -791,26 +832,28 @@ plt.tight_layout()
 plt.show()
 ```
 
-::: {.callout-tip}
-右の図は**活性化関数の微分だけ**を掛け続けた比較。実際の勾配には各層の重みも掛かる。
-それでも、シグモイドを中間層で重ねると勾配が小さくなりやすいことが分かる。
+::: {.callout-tip title="チェックポイント"}
+- 右の図は**活性化関数の微分だけ**を掛け続けた比較
+   - 実際の勾配には各層の重みも掛かる
+- それでも、シグモイドを中間層で重ねると勾配は小さくなりやすい
 :::
 
 
 ## まとめ
 
-- 勾配の計算は、**連鎖律で出力側から掛けて貯める** — 展開不要、微分は部品ごと
-- 手計算1往復：forward の値を保存 → $\delta$ を逆流させて各勾配
-- **数値微分**は検算には最高、実用には遅すぎる
+- 勾配の計算：**連鎖律で出力側から掛けて貯める**
+   - 式の展開は不要で、微分は部品ごとに行う
+- 手計算の1往復：forward の値を保存し、$\delta$ を出力側から入力側へ伝えて各勾配を求める
+- **数値微分**は検算に使えるが、実用には遅すぎる
 - 何層でも同じ漸化式 $\delta^{(k)} = \delta^{(k+1)} w^{(k+1)} f'(z^{(k)})$ を繰り返す
-- 行列版 `backward` を実装し、NumPyだけで2層NNを学習させた
+- 行列版 `backward` を実装し、NumPyだけで2層NNを学習した
 
 
 ## 練習問題
 
 以下の問題を**手計算**で解き、**数値微分**で検算せよ。
 
-ネットワークは本編と同じ5パラメータ。値だけ差し替える：
+ネットワークは[手計算](#peek-handcalc){.peek}と同じ5パラメータとし、値だけを次のように差し替える：
 
 | 記号 | 値 |
 |---|---|
@@ -823,14 +866,14 @@ plt.show()
 
 1. 往路：$z, h, u, p, \ell$ を順に求めよ（正解が $y=0$ なので $\ell = -\log(1-p)$）
 2. 復路：$\delta_{\text{out}}$ と $\delta_{\text{mid}}$、そして5つの勾配をすべて求めよ
-3. 本編の数値微分のコードに値を差し替えて、検算せよ
+3. 数値微分のコードの値を差し替えて検算せよ
 
 ### 問題2：入力を $x_1 = -1.0,\; x_2 = 0.5$ に変えて、もう1往復せよ
 
 ヒント：$\sigma(0) = 0.5$、$\sigma(0.2) \approx 0.5498$。この2つしか使わない。
 
 ::: {.callout-tip}
-手計算の答えは捨てないこと。**PyTorch入門の練習問題で、この数値がそのまま再登場する。**
+手計算の答えは捨てずに残しておくこと
 :::
 
 
@@ -842,7 +885,7 @@ $$z = 0.4 \times 0.5 + 0.3 \times 1.0 - 0.1 = 0.4$$
 $$h = \mathrm{ReLU}(0.4) = 0.4, \qquad u = -0.5 \times 0.4 + 0.2 = 0$$
 $$p = \sigma(0) = 0.5, \qquad \ell = -\log(0.5) = 0.6931$$
 
-ちょうどコイン投げ。正解は 0 なので、$p$ をもっと**下げたい**。
+$p=0.5$ はコイン投げと同じ。正解は 0 なので、$p$ をもっと**下げたい**。
 
 ### 復路
 
@@ -856,7 +899,8 @@ $$\frac{\partial \ell}{\partial w_1} = -0.25 \times 0.5 = -0.125, \qquad
 \frac{\partial \ell}{\partial w_2} = -0.25, \qquad
 \frac{\partial \ell}{\partial b} = -0.25$$
 
-- $v$ が負なので、中間層へ戻る $\delta$ は符号が反転する。重みが復路の向きと大きさも決める。
+- $v$ が負なので、中間層へ進む $\delta$ は符号が反転する
+   - 重みは、復路の $\delta$ の符号と大きさも決める
 
 ### 数値微分で検算
 
@@ -905,11 +949,10 @@ $$\delta_{\text{mid}} = 0.5498 \times (-0.5) \times \mathrm{ReLU}'(-0.35) = 0$$
 $$\Rightarrow\quad
 \frac{\partial \ell}{\partial w_1} = \frac{\partial \ell}{\partial w_2} = \frac{\partial \ell}{\partial b} = 0$$
 
-## この魚は、ネットの左半分に何も教えない
+## この魚の勾配は、ReLU より入力側へ届かない
 
 ::: {.callout-important}
-$z < 0$ では $\mathrm{ReLU}'(z) = 0$ なので、そこより前の勾配はすべて 0 になる。
-勾配が届くのは $c$ だけ（$v$ も $h = 0$ に掛けられて消えた）。
-
-前回の「折られた側には誤差が流れない」を、自分の手で確認できた。
+- $z < 0$ では $\mathrm{ReLU}'(z) = 0$ なので、そこより前の勾配はすべて 0 になる
+- 勾配が届くのは $c$ だけ（$v$ の勾配も $h = 0$ が掛かるので 0）
+- [ReLU の負の側では勾配が 0 になる](nn-multilayer.qmd#peek-relu-derivative){.peek}ことを手計算で確認した
 :::

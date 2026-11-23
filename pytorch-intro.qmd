@@ -3,20 +3,20 @@ title: "PyTorch入門"
 subtitle: "自分で書けるから、楽をしていい"
 ---
 
-## 前回の振り返り
+## ここまでの実装
 
-- 多層化の回でNumPyの `forward`、backpropの回で `backward` を実装した
-- 2つを学習ループへ接続し、NumPyだけで曲がる境界を学習させた
+- NumPyで [`forward`](nn-multilayer.qmd#peek-multilayer-forward){.peek} と [`backward`](nn-backprop.qmd#peek-matrix-backward){.peek} を実装した
+- 2つを[学習ループへ接続](nn-backprop.qmd#peek-numpy-nn-train){.peek}し、NumPyだけで曲がる境界を学習した
 - ただし `backward` は**自分で導出して書いた**
 
 ::: {.callout-important title="質問"}
-層の数や活性化関数を変えるたびに、backward を**書き直す**ことになる。
+層の数や活性化関数（[activation function]{.en}）を変えるたびに、backward を**書き直す**ことになる。
 100層のネットで、1ヶ所も間違えずに書ける？
 :::
 
 ::: {.fragment}
 - 書けるかもしれないが、**人間がやるべき仕事ではない**
-- 連鎖律は機械的な作業 — 機械的な作業は機械にやらせる
+- 連鎖律（[chain rule]{.en}）の適用は機械的な作業なので、機械に任せる
 :::
 
 
@@ -28,21 +28,21 @@ subtitle: "自分で書けるから、楽をしていい"
 | `forward(...)` | `model(X)` |
 | `backward(...)` | `loss.backward()` |
 | `parameter -= lr * gradient` | `optimizer.step()` |
-| 勾配配列の管理 | 各パラメータの `.grad` |
+| 勾配（[gradient]{.en}）配列の管理 | 各パラメータの `.grad` |
 
 - モデルの計算内容は変わらない
 - 手で書いていた定型処理を、検証済みの部品へ任せる
 
 ::: {.takeaway}
-PyTorchは別の学習原理ではない。NumPyで書いた**同じ計算を管理してくれる道具**
+PyTorchは別の学習原理ではなく、NumPyで書いた**同じ計算を管理してくれる道具**
 :::
 
 
 ## PyTorch とは
 
-- ディープラーニングで広く使われるライブラリのひとつ
-- このデッキで使う中心機能は2つ
-  - **autograd**：backward を自動でやってくれる
+- ディープラーニング（[deep learning]{.en}）で広く使われるライブラリのひとつ
+- 中心となる機能は2つ
+  - **autograd**：backward を自動で計算する機能（自動微分、[automatic differentiation]{.en}）
   - **nn**：層・損失・最適化の部品セット
 
 ::: {.callout-note}
@@ -63,7 +63,11 @@ print(t * 2)          # 演算は NumPy とほぼ同じ感覚
 print(t.numpy())      # NumPy 配列との相互変換も簡単
 ```
 
-- 違いは2つ：**GPU に載せられる**こと、そして**勾配を覚えられる**こと
+::: {.callout-note title="要するに"}
+- NumPy 配列との違いは2つ
+   - **GPU に載せられる**
+   - **勾配を覚えられる**
+:::
 
 
 ## tensor は形・型・置き場所を持つ
@@ -84,13 +88,16 @@ print("device:", x.device)
 | `dtype` | `float32` | 数値の型 |
 | `device` | `cpu` | 計算する装置 |
 
+::: {.callout-important title="重要ポイント"}
 - モデルの重みと入力は、原則として同じ `dtype`・同じ `device` に置く
-- ニューラルネットワークの入力と重みには通常 `float32` を使う
+- ニューラルネットワーク（[neural network]{.en}）の入力と重みには通常 `float32` を使う
+:::
 
 
 ## requires_grad：勾配を覚える印
 
-- まず**いちばん小さな例**で挙動を見る。$y = x^2$ の $x = 3$ での微分は、高校の答えなら $2x = 6$
+- **いちばん小さな例**で挙動を見る
+   - $y = x^2$ の $x = 3$ での微分は、高校数学なら $2x = 6$
 
 ```{python}
 #| echo: true
@@ -98,16 +105,18 @@ import torch
 
 x = torch.tensor(3.0, requires_grad=True)   # 「勾配を追跡せよ」の印
 y = x ** 2
-y.backward()                                # ← 微分はこの1行
+y.backward()                                # ← この行で微分する
 print(x.grad)
 ```
 
+::: {.callout-note title="要するに"}
 - `requires_grad=True` を付けた tensor は、**自分が関わった計算をすべて記録**する
 - `backward()` を呼ぶと、記録を逆にたどって微分が計算され、`x.grad` に入る
-- $x^2$ で当たるのは当たり前？ — 次で、**前回1往復ぶん手計算したネットワーク**に同じことをやらせる
+- $x^2$ では簡単すぎるので、後で[1往復ぶん手計算したネットワーク](nn-backprop.qmd#peek-handcalc){.peek}でも照合する
+:::
 
 
-## forward中に計算グラフが作られる
+## forward中に計算グラフ（[Computational Graph]{.en}）が作られる
 
 ```{.d2 sketch="true" width="92%"}
 direction: right
@@ -119,18 +128,17 @@ Y: "y" { style.fill: "#d5f5e3" }
 X -> M -> A -> S -> Y
 ```
 
+::: {.callout-note title="要するに"}
 - `y = ((x * 3) + 1) ** 2` を実行すると、演算のつながりも記録される
 - `y.backward()` は「2乗 → 足し算 → 掛け算」の逆順に局所微分を適用する
 - Pythonで書いた実際のforwardに応じて、その場でグラフが作られる
-
-::: {.callout-note}
-層を組み替えても、PyTorchが新しい計算グラフを記録するため、backwardを手で書き直さなくてよい
+   - 層を組み替えても、PyTorchが新しい計算グラフを記録するため、backwardを手で書き直さなくてよい
 :::
 
 
 ## autograd を手計算と照合する
 
-- バックプロパゲーションの回と**まったく同じ**ネットワーク・同じ数値を流す
+- [手計算したネットワークと数値](nn-backprop.qmd#peek-handcalc){.peek}をそのまま使う
 
 ```{python}
 #| echo: true
@@ -146,7 +154,7 @@ u = v * h + c          # 出力層
 p = torch.sigmoid(u)   # シグモイド
 L = -torch.log(p)      # 交差エントロピー（正解1）
 
-L.backward()           # ← 復路はこの1行
+L.backward()           # ← この行で復路を計算する
 
 print(f"L = {L.item():.4f}")
 print(f"∂L/∂w = {w.grad.numpy().round(4)}")
@@ -155,9 +163,10 @@ print(f"∂L/∂v = {v.grad.item():.4f}")
 print(f"∂L/∂c = {c.grad.item():.4f}")
 ```
 
-::: {.callout-note title="答え合わせ"}
-手計算（とNumPy検算）の答えは $w$: $(-0.2438, -0.1219)$、$b$: $-0.2438$、$v$: $-0.1463$、$c$: $-0.4875$。
-**表示した小数第4位まで一致。** `loss.backward()` の中身は、前回自分の手でやった連鎖律の機械化。
+::: {.callout-note title="結果"}
+- 手計算（とNumPy検算）の答え：$w$: $(-0.2438, -0.1219)$、$b$: $-0.2438$、$v$: $-0.1463$、$c$: $-0.4875$
+- **表示した小数第4位まで一致**
+- `loss.backward()` の中身は、手計算で適用した連鎖律の自動化
 :::
 
 
@@ -165,7 +174,7 @@ print(f"∂L/∂c = {c.grad.item():.4f}")
 
 - `w, b, v, c`：人が用意したパラメータで `requires_grad=True`
 - `z, h, u, p, L`：forward中に作られた途中の値
-- `L.backward()` 後、学習に使う勾配は `w.grad`, `b.grad`, `v.grad`, `c.grad` に保存される
+- `L.backward()` の後、学習に使う勾配は `w.grad`, `b.grad`, `v.grad`, `c.grad` に保存される
 
 | 種類 | 例 | 通常 `.grad` を残すか |
 |---|---|---|
@@ -173,7 +182,7 @@ print(f"∂L/∂c = {c.grad.item():.4f}")
 | 中間結果 | `z`, `h`, `u`, `p` | 計算には使うが通常は残さない |
 
 ::: {.takeaway}
-計算グラフは全勾配を計算するために使い、optimizerが必要とするパラメータの `.grad` を残す
+計算グラフで途中の勾配まで計算し、optimizerが使うパラメータの `.grad` だけを残す
 :::
 
 
@@ -181,8 +190,8 @@ print(f"∂L/∂c = {c.grad.item():.4f}")
 
 - forward の間、PyTorch は**計算の履歴（計算グラフ）**を記録している
 - `backward()` は、その履歴を**逆順にたどって連鎖律を適用**するだけ
-- やっていることは[前回の手計算1往復](nn-backprop.qmd#peek-handcalc){.peek}と同じ：
-  - 往路の途中の値を保存（だからメモリを食う）
+- やっていることは[手計算の1往復](nn-backprop.qmd#peek-handcalc){.peek}と同じ：
+  - 往路の途中の値を保存（そのぶんメモリを使う）
   - $\delta$ を出力側から掛けて貯める
 
 ::: {.callout-tip}
@@ -193,8 +202,8 @@ print(f"∂L/∂c = {c.grad.item():.4f}")
 
 ## `BCEWithLogitsLoss` は2部品をまとめる
 
-- **logit（ロジット）** $u$：シグモイドへ入れる前の、範囲制限のないスコア
-- `BCEWithLogitsLoss`：シグモイドと2クラス交差エントロピーを1つにした損失関数
+- **logit（ロジット）** $u$：シグモイド（[sigmoid]{.en}）へ入れる前の、範囲制限のないスコア
+- `BCEWithLogitsLoss`：シグモイドと2クラス交差エントロピー（[binary cross entropy]{.en}）を1つにした損失関数（[loss function]{.en}）
 
 $$u \xrightarrow{\;\sigma\;} p
 \xrightarrow{\;\text{交差エントロピー}\;} L$$
@@ -212,8 +221,10 @@ print("確率:", torch.sigmoid(logits))
 print("損失:", loss_each(logits, targets))
 ```
 
-- モデルは $u$ をそのまま損失関数へ渡す
+::: {.callout-note title="要するに"}
+- モデルの出力 $u$ をそのまま損失関数へ渡す
 - 確率を表示・判定するときだけ `torch.sigmoid(u)` を使う
+:::
 
 
 ## なぜ確率ではなくlogitを直接渡すのか
@@ -230,11 +241,12 @@ u ─────────→ BCEWithLogitsLoss
 - `BCEWithLogitsLoss` は同じ式を、数値的に安定する形へまとめて計算する
 
 ::: {.callout-important}
-学習時は **raw logitsを損失へ**。確率が必要な表示・判定時だけ `torch.sigmoid`
+- 学習時は **raw logits を損失へ渡す**
+- 確率が必要な表示・判定時だけ `torch.sigmoid` を使う
 :::
 
 
-## nn：部品には全部、見覚えがある
+## nn：部品と自作コードの対応
 
 ```{python}
 #| echo: true
@@ -262,11 +274,13 @@ X -> L1 -> R -> L2 -> O
 |---|---|
 | `nn.Linear` | 線形変換（`X @ W1 + b1`） |
 | `nn.ReLU` | $\max(0, z)$ |
-| `nn.BCEWithLogitsLoss` | シグモイド＋交差エントロピー（打ち消しもやってくれる） |
-| `torch.optim.SGD` | 勾配降下法（`θ -= lr * grad`） |
-| `loss.backward()` | バックプロパゲーション |
+| `nn.BCEWithLogitsLoss` | シグモイド＋交差エントロピー（数値的に安定する形で計算） |
+| `torch.optim.SGD` | 勾配降下法（[gradient descent]{.en}、`θ -= lr * grad`） |
+| `loss.backward()` | バックプロパゲーション（[backpropagation]{.en}） |
 
-- どの部品も、ここまでに自作・手計算したものと対応する
+::: {.callout-note title="要するに"}
+どの部品も、ここまでに自作・手計算したものと対応する
+:::
 
 
 ## `nn.Module` がパラメータを登録する
@@ -288,13 +302,14 @@ for name, parameter in model.named_parameters():
 ```
 
 ::: {.callout-note}
-名前の `0` と `2` は `Sequential` 内の位置。`1` はパラメータを持たない ReLU
+- 名前の `0` と `2` は `Sequential` 内の位置
+   - 位置 `1` は、パラメータを持たない ReLU
 :::
 
 
 ## nn.Linear の中身を覗く
 
-- 部品を1個だけ取り出して、素性を確認する
+- `nn.Linear` を単体で作り、中身を確認する
 
 ```{python}
 #| echo: true
@@ -321,8 +336,11 @@ frozen = json.load(open("frozen/pytorch-intro.json", encoding="utf-8"))
 print(frozen["frz-linear"], end="")
 ```
 
-- 中身は本当に**ただの線形変換** — 重みの持ち方が転置（`W.T`）なことだけ流儀が違う
+::: {.callout-note title="結果"}
+- 中身は**ただの線形変換**
+   - 自作コードとの違いは、重みの持ち方が転置（`W.T`）なことだけ
 - `requires_grad=True` も最初から付いている（`nn` の部品は学習される前提）
+:::
 
 
 ## このモデルの学習対象は65個
@@ -340,8 +358,10 @@ Pythonでも確認できる：
 sum(p.numel() for p in model.parameters())  # 65
 ```
 
-- `model.parameters()` は、この65個をまとめてoptimizerへ渡す
+::: {.callout-note title="要するに"}
+- `model.parameters()` で、この65個をまとめてoptimizerへ渡せる
 - ネットワークを組み替えると、登録される数も自動で変わる
+:::
 
 
 ## `optimizer.step()` が勾配降下の1歩
@@ -364,8 +384,10 @@ print("更新後:", theta)          # 2 − 0.1 × 4 = 1.6
 $$\theta \leftarrow \theta-0.1\frac{dL}{d\theta}
 =2-0.1\times4=1.6$$
 
+::: {.callout-note title="要するに"}
 - `loss.backward()`：勾配を計算して `.grad` に入れる
 - `optimizer.step()`：その勾配を使ってパラメータを更新する
+:::
 
 
 ## optimizerはパラメータへの参照を持つ
@@ -375,7 +397,7 @@ optimizer = torch.optim.SGD(model.parameters(), lr=0.5)
 ```
 
 - `model.parameters()`：更新対象をoptimizerへ渡す
-- `lr=0.5`：学習率 $\alpha$
+- `lr=0.5`：学習率（[learning rate]{.en}）$\alpha$
 - `step()`：各パラメータについて `parameter -= lr * parameter.grad`
 
 | 呼び出し | パラメータ | `.grad` |
@@ -385,7 +407,7 @@ optimizer = torch.optim.SGD(model.parameters(), lr=0.5)
 | `optimizer.zero_grad()` | 変えない | 0に戻す |
 
 ::: {.takeaway}
-微分・更新・リセットは別の仕事。3つの命令を順番に呼ぶ
+微分・更新・リセットは別の仕事なので、3つの命令を順番に呼ぶ
 :::
 
 
@@ -427,22 +449,26 @@ for i in range(1, 4001):
 print(frozen["frz-train"], end="")
 ```
 
-- NumPy 版と同じ結果になる。`zero_grad → backward → step` の3拍子はどんなネットでも同じ
+::: {.callout-note title="結果"}
+- NumPy 版と同じ結果になる
+- `zero_grad → backward → step` の3拍子はどんなネットでも同じ
+:::
 
 
 ## 入力・出力・正解の形をそろえる
 
 | tensor | 形 | 意味 |
 |---|---|---|
-| `X_t` | `(200,2)` | 200匹 × 2特徴量 |
-| `logits` | `(200,1)` | 200匹 × 出力スコア1個 |
-| `y_t` | `(200,1)` | 200匹 × 正解1個 |
+| `X_t` | `(200,2)` | 200件 × 2特徴量 |
+| `logits` | `(200,1)` | 200件 × 出力スコア1個 |
+| `y_t` | `(200,1)` | 200件 × 正解1個 |
 
 ```python
 y_t = torch.tensor(y, dtype=torch.float32).unsqueeze(1)
 ```
 
-- 元の `y` は `(200,)`。`unsqueeze(1)` で列を1本追加する
+- 元の `y` は `(200,)`
+   - `unsqueeze(1)` で列を1本追加する
 - `BCEWithLogitsLoss` へ渡す `logits` と `y_t` は同じ形にする
 - 2クラスBCEの正解は0/1の**浮動小数点数**として渡す
 
@@ -451,7 +477,7 @@ y_t = torch.tensor(y, dtype=torch.float32).unsqueeze(1)
 :::
 
 
-## 3拍子の①は、なぜ要る？
+## 3拍子の①：勾配のリセット
 
 ::: {.callout-important title="質問"}
 `optimizer.zero_grad()` を消したら、何が起きると思う？
@@ -472,11 +498,15 @@ print(theta)         # 2 − 0.1 × 4 = 1.6（step は勾配降下そのもの�
 
 loss = theta ** 2    # zero_grad しないで、もう1周
 loss.backward()
-print(theta.grad)    # 2θ = 3.2 のはず……が？
+print(theta.grad)    # 2θ = 3.2 のはずだが、表示される値は？
 ```
 
-- `grad` は上書きではなく**足し込み**（4 + 3.2 = 7.2）— 前回の勾配が残ったまま歩くと方向を誤る
-- だから毎周リセットが①。`step()` が③（`θ -= lr * grad` そのもの）
+::: {.callout-note title="答え"}
+- `grad` は上書きではなく**足し込み**（4 + 3.2 = 7.2）
+   - 1周前の勾配が残ったまま更新すると、方向を誤る
+- だから毎周 ① でリセットする
+- `step()` が ③（`θ -= lr * grad` そのもの）
+:::
 
 
 ## 境界も同じものが出る
@@ -511,11 +541,13 @@ plt.show()
 
 ![](frozen/pytorch-intro-frz-boundary-1.png){fig-align="center"}
 
+::: {.callout-note title="要するに"}
 - NumPy 版で自分で書いた微分処理を、PyTorchでは `loss.backward()` に任せられる
 - 浮いた労力は、**モデルとデータを考えること**に使う
+:::
 
 
-## 推論では計算グラフを作らない
+## 推論（[Inference]{.en}）では計算グラフを作らない
 
 学習後に予測するだけなら、復路は不要：
 
@@ -532,20 +564,26 @@ with torch.no_grad():
 | 推論 | `no_grad()`で記録しない | しない | しない |
 
 - 履歴を作らないぶん、推論はメモリを節約できる
-- `model.eval()` は Dropout などを推論用の動作へ切り替える。今回の Linear＋ReLU では出力は変わらないが、習慣にしてよい
+- `model.eval()` は Dropout などを推論用の動作へ切り替える
+   - Linear＋ReLU のこのモデルでは出力は変わらないが、習慣にしてよい
 
 
 ## 学習後の16人の票を読む
 
-学習が終わった中間の変換16個は、それぞれ**どちらのクラスに票を投じる係**になったのか — 実物で確認：
+学習が終わった中間の変換16個が、それぞれ**どちらのクラスに票を投じる係**になったのかを確認する：
 
 <iframe src="explorer/index.html#view=boundary" width="100%" height="560" loading="lazy" style="border: 1px solid #ccc; border-radius: 6px; background: white;"></iframe>
 
 [エクスプローラを別タブで開く](explorer/index.html#view=boundary){target="_blank"}
 
-- マスの下の色棒＝出力層の重み（票）。**赤に押す係10人・青に押す係6人**に自然と分業している
-- 票の大きさは係ごとにまるで違う（最大 6.05、ほぼ無票の 0.22 も）— 無票の係の折り目はどこに立っている？　クリックして確かめる
-- この分業、誰も指示していない。損失と勾配降下だけでこうなった
+::: {.callout-tip title="チェックポイント"}
+- マスの下の色棒：出力層の重み（票）
+   - **赤に押す係10人・青に押す係6人**に分業している
+- 票の大きさは係ごとに大きく違う（最大 6.05、ほぼ無票の 0.22 も）
+   - ほぼ無票の係の折り目はどこに立っているか、クリックして確かめよう
+- この分業は誰も指示していない
+   - 損失と勾配降下だけでこうなった
+:::
 
 
 ## **Tweak** ネットワークを組み替えて再学習 {.badge-practice}
@@ -560,19 +598,25 @@ with torch.no_grad():
 | 学習率を下げる | `lr=0.05` |
 :::
 
-## ここで観察
+## チェックポイント
 
 ::: {.callout-tip}
-- 変換2個：正答率が上がりきらず、seed によってはもっと悪いところで止まる。**良い谷にたどり着けるかは初期値しだい** — 16個の「余裕」は学習の保険でもある（[ローカルミニマムの罠](optimization-local-minima-appendix.qmd)）
-- `nn.Identity()`：折り目ゼロ — **境界が直線に戻り、そこで頭打ち**。「線形は重ねても線形」を PyTorch でも再確認
-- どれを変えても、学習ループの3拍子は**一切書き換えない**で済む — それが部品化の威力
+- 変換2個：正答率が上がりきらない
+   - seed によってはもっと悪いところで止まる
+   - **良い谷にたどり着けるかは初期値しだい**（[ローカルミニマム（[local minimum]{.en}）の罠](optimization-local-minima-appendix.qmd)）
+   - 16個の「余裕」は学習の保険でもある
+- `nn.Identity()`：折り目がなくなる
+   - **境界が直線に戻り、そこで頭打ち**
+   - 線形変換は重ねても線形のまま
+- 部品化されているので、どれを変えても学習ループの3拍子は**書き換えなくてよい**
 :::
 
 
 ## まとめ
 
-- **autograd**：`loss.backward()` ＝ 連鎖律の自動化。表示した小数第4位まで手計算と一致
-- **nn の部品**は全部、この講義で自作した部品の別名（対応表）
+- **autograd**：`loss.backward()` ＝ 連鎖律の自動化
+   - 表示した小数第4位まで手計算と一致
+- **nn の部品**は全部、この講義で自作した部品の別名
 - 学習ループは `zero_grad → backward → step` の3拍子
 - 中身を知っているから、安心して楽ができる
 
@@ -586,17 +630,17 @@ with torch.no_grad():
 
 以下の問題を**Pythonコード**で解け。
 
-### 問題1：autograd に自分の手計算を言い当てさせる
+### 問題1：autograd で自分の手計算を確かめる
 
-バックプロパゲーションの回の**練習問題1**（$x = (0.5, 1.0)$、$y = 0$、$w = (0.4, 0.3)$、$b = -0.1$、$v = -0.5$、$c = 0.2$）を PyTorch で組み、`loss.backward()` の勾配が自分の手計算と一致することを確かめよ。
+[バックプロパゲーションの**練習問題1**](nn-backprop.qmd#練習問題){.peek}（$x = (0.5, 1.0)$、$y = 0$、$w = (0.4, 0.3)$、$b = -0.1$、$v = -0.5$、$c = 0.2$）を PyTorch で組み、`loss.backward()` の勾配が自分の手計算と一致することを確かめよ。
 
-1. 本編の「autograd を手計算と照合する」のコードを、上の数値に差し替える（正解が $y = 0$ なので損失は $L = -\log(1-p)$）
-2. 5つの勾配を表示し、手計算の答え $(-0.125, -0.25)$、$-0.25$、$0.2$、$0.5$ と照合せよ
+1. [「autograd を手計算と照合する」のコード](#autograd-を手計算と照合する){.peek}を上の数値に差し替え（正解が $y = 0$ なので損失は $L = -\log(1-p)$）
+2. 5つの勾配を表示し、手計算の答え $(-0.125, -0.25)$、$-0.25$、$0.2$、$0.5$ と照合
 
 ### 問題2：ReLU に折られた入力でも試す
 
 入力を $x = (-1.0, 0.5)$ に変えて実行し、$w, b, v$ の勾配が**ちょうどゼロ**になることを確かめよ。
-（バックプロパゲーションの回の練習問題2 — autograd も、折られた経路には勾配を流さない）
+（[バックプロパゲーションの練習問題2](nn-backprop.qmd#練習問題){.peek}と同じ入力。autograd も、折られた経路には勾配を流さない）
 
 
 ## 解答例
@@ -629,5 +673,8 @@ hand_check(0.5, 1.0)    # 問題1：手計算 (-0.125, -0.25), -0.25, 0.2, 0.5 �
 hand_check(-1.0, 0.5)   # Problem 2: gradients for w, b, and v should be zero
 ```
 
-- 問題1：表示した小数第4位まで一致。autograd は連鎖律を自動で適用している
-- 問題2：$\mathrm{ReLU}'(z) = 0$ の「ゼロで潰す」まで、忠実に再現される
+::: {.callout-note title="結果"}
+- 問題1：表示した小数第4位まで一致
+   - autograd は連鎖律を自動で適用している
+- 問題2：$\mathrm{ReLU}'(z) = 0$ で勾配が消える点まで再現される
+:::
