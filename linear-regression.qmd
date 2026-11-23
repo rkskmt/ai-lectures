@@ -37,7 +37,12 @@ subtitle: "勾配降下法で直線を求める"
 ## 回帰問題とは
 
 ::: {.callout-note title="回帰（Regression）"}
-**教師あり学習**のうち、**連続値（[continuous value]{.en}）**を出力するモデルを学習する問題
+目的変数（[target variable]{.en}）$t$ と説明変数（[explanatory variable]{.en}）$x$ の関係を関数（モデル）で表し、その関数をデータから推定する手法
+
+$$t = f(x) + \varepsilon \qquad (\varepsilon \text{：誤差})$$
+
+- 目的変数は通常、**連続値（[continuous value]{.en}）**
+- 統計的には、$x$ が与えられたときの $t$ の**条件付き期待値（[conditional expectation]{.en}）** $E[t \mid x]$ を推定することにあたる（二乗誤差の場合）
 :::
 
 | | 分類 | 回帰 |
@@ -255,25 +260,27 @@ $$\text{予測} = w_1 x + w_2 x^2 + \cdots + w_d x^d + b$$
 #| echo: true
 #| code-fold: true
 #| code-summary: "code"
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import PolynomialFeatures, StandardScaler
-from sklearn.pipeline import make_pipeline
-from sklearn.metrics import mean_squared_error
+# 新しい仕入れ先の15匹（訓練10匹、テスト5匹）
+train_idx = [24, 32, 14, 56, 20, 45, 17, 55, 6, 57]
+test_idx = [7, 61, 28, 70, 77]
+x_train, t_train = lengths[train_idx], weights[train_idx]
+x_test, t_test = lengths[test_idx], weights[test_idx]
 
-idx = np.random.default_rng(2).choice(80, 15, replace=False)   # 新しい仕入れ先の15匹
-xs, ts = lengths[idx], weights[idx]
-X_train, X_test, y_train, y_test = train_test_split(
-    xs.reshape(-1, 1), ts, test_size=5, random_state=2
-)
+# 体長を標準化してから多項式を当てはめる（そのまま9乗すると計算が不安定になる）
+x_mean, x_std = x_train.mean(), x_train.std()
+z_train = (x_train - x_mean) / x_std
+z_test = (x_test - x_mean) / x_std
 
-grid = np.linspace(xs.min() - 0.5, xs.max() + 0.5, 300).reshape(-1, 1)
+all_x = np.concatenate([x_train, x_test])
+grid = np.linspace(all_x.min() - 0.5, all_x.max() + 0.5, 300)
+z_grid = (grid - x_mean) / x_std
+
 fig, axes = plt.subplots(1, 3, figsize=(12, 3.6))
 for ax, deg in zip(axes, [1, 3, 9]):
-    model = make_pipeline(PolynomialFeatures(deg), StandardScaler(), LinearRegression())
-    model.fit(X_train, y_train)
-    ax.scatter(X_train, y_train, c="#2980b9", s=45, label="訓練")
-    ax.scatter(X_test, y_test, c="#e74c3c", marker="s", s=45, label="テスト")
-    ax.plot(grid, model.predict(grid), "k-", lw=2)
+    coef = np.polyfit(z_train, t_train, deg)   # 訓練データに最も合う deg 次式の係数
+    ax.scatter(x_train, t_train, c="#2980b9", s=45, label="訓練")
+    ax.scatter(x_test, t_test, c="#e74c3c", marker="s", s=45, label="テスト")
+    ax.plot(grid, np.polyval(coef, z_grid), "k-", lw=2)
     ax.set_ylim(800, 2900)
     ax.set_title(f"次数 {deg}", fontsize=11)
     ax.set_xlabel("体長 (cm)")
@@ -283,8 +290,8 @@ plt.show()
 ```
 
 ::: {.callout-note title="結果"}
-- 次数9は訓練の点を**ほぼ完璧に貫く**
-- 代わりに左端で大きく外れ、小さい魚にありえないほど重い値を予測している
+- 次数9は訓練の点を**すべて通る**
+- 代わりに点のあいだで大きく振れ、小さい魚の重さを**マイナス**と予測している
 :::
 
 
@@ -293,13 +300,12 @@ plt.show()
 ```{python}
 #| echo: true
 #| fig-align: center
-degrees = range(1, 10)
+degrees = range(1, 9)
 train_mse, test_mse = [], []
 for deg in degrees:
-    model = make_pipeline(PolynomialFeatures(deg), StandardScaler(), LinearRegression())
-    model.fit(X_train, y_train)
-    train_mse.append(mean_squared_error(y_train, model.predict(X_train)))
-    test_mse.append(mean_squared_error(y_test, model.predict(X_test)))
+    coef = np.polyfit(z_train, t_train, deg)
+    train_mse.append(np.mean((np.polyval(coef, z_train) - t_train) ** 2))
+    test_mse.append(np.mean((np.polyval(coef, z_test) - t_test) ** 2))
 
 plt.figure(figsize=(6.5, 3.6))
 plt.semilogy(degrees, train_mse, "o-", color="#2980b9", label="訓練MSE")
@@ -309,6 +315,10 @@ plt.legend(); plt.grid(True, alpha=0.4)
 plt.tight_layout()
 plt.show()
 ```
+
+::: {.caption-note .center}
+次数9は訓練の10点をすべて通り、訓練MSEが0になるので対数目盛には描けない
+:::
 
 ::: {.callout-note title="要するに"}
 - 訓練誤差は下がり続け、テスト誤差は**桁違いに増える**（縦軸は対数）
@@ -324,9 +334,10 @@ plt.show()
 
 ```{python}
 #| echo: true
-plain = make_pipeline(PolynomialFeatures(9), StandardScaler(), LinearRegression())
-plain.fit(X_train, y_train)
-print("次数9の係数の最大絶対値:", f"{np.abs(plain[-1].coef_).max():,.0f}")
+coef1 = np.polyfit(z_train, t_train, 1)
+coef9 = np.polyfit(z_train, t_train, 9)
+print("次数1の係数の最大絶対値:", f"{np.abs(coef1[:-1]).max():,.0f}")   # [:-1] は切片を除く
+print("次数9の係数の最大絶対値:", f"{np.abs(coef9[:-1]).max():,.0f}")
 ```
 
 - そこで、損失に「係数の大きさ」への**ペナルティ**を課すことを考える：
@@ -348,13 +359,13 @@ $$L = \mathrm{MSE} + \lambda \sum_j w_j^2$$
 ```{python}
 #| echo: true
 # 特徴量 x, x², …, x⁹ も自分で作る（列が x^1 〜 x^9 の配列）
-P_train = X_train ** np.arange(1, 10)          # 形 (10, 9)
-P_test  = X_test  ** np.arange(1, 10)
+P_train = x_train.reshape(-1, 1) ** np.arange(1, 10)   # 形 (10, 9)
+P_test  = x_test.reshape(-1, 1)  ** np.arange(1, 10)
 mu, sd  = P_train.mean(axis=0), P_train.std(axis=0)
 P_train = (P_train - mu) / sd                  # スケールを揃える（いつもの）
 P_test  = (P_test  - mu) / sd
-t_mean, t_std = y_train.mean(), y_train.std()
-tt = (y_train - t_mean) / t_std                # 重さも標準化
+t_mean, t_std = t_train.mean(), t_train.std()
+tt = (t_train - t_mean) / t_std                # 重さも標準化
 
 lam  = 0.1        # 罰金の強さ λ
 w, b = np.zeros(9), 0.0
@@ -368,8 +379,10 @@ for i in range(10_000):
     b -= lr * grad_b
 
 test_pred = (P_test @ w + b) * t_std + t_mean  # 元の単位（g）に戻す
-print("係数の最大絶対値:", f"{np.abs(w * t_std).max():,.0f}")
-print("テストMSE:", f"{np.mean((test_pred - y_test) ** 2):,.0f}")
+train_pred = (P_train @ w + b) * t_std + t_mean
+coef_own = np.polyfit(z_train, train_pred, 9)  # 前のスライドと同じ多項式の係数に直す
+print("係数の最大絶対値:", f"{np.abs(coef_own[:-1]).max():,.0f}")
+print("テストMSE:", f"{np.mean((test_pred - t_test) ** 2):,.0f}")
 ```
 
 ::: {.callout-note title="結果"}
@@ -386,20 +399,20 @@ print("テストMSE:", f"{np.mean((test_pred - y_test) ** 2):,.0f}")
 #| echo: true
 #| code-fold: true
 #| code-summary: "描画コード"
-P_grid    = ((grid ** np.arange(1, 10)) - mu) / sd
+P_grid    = ((grid.reshape(-1, 1) ** np.arange(1, 10)) - mu) / sd
 own_curve = (P_grid @ w + b) * t_std + t_mean
 
 fig, axes = plt.subplots(1, 2, figsize=(9.5, 3.6))
 for ax, curve, name, mse in [
-        (axes[0], plain.predict(grid), "次数9（正則化なし）",
-         mean_squared_error(y_test, plain.predict(X_test))),
+        (axes[0], np.polyval(coef9, z_grid), "次数9（正則化なし）",
+         np.mean((np.polyval(coef9, z_test) - t_test) ** 2)),
         (axes[1], own_curve, "次数9 + 正則化（自作の勾配降下法）",
-         np.mean((test_pred - y_test) ** 2))]:
-    ax.scatter(X_train, y_train, c="#2980b9", s=45)
-    ax.scatter(X_test, y_test, c="#e74c3c", marker="s", s=45)
+         np.mean((test_pred - t_test) ** 2))]:
+    ax.scatter(x_train, t_train, c="#2980b9", s=45)
+    ax.scatter(x_test, t_test, c="#e74c3c", marker="s", s=45)
     ax.plot(grid, curve, "k-", lw=2)
     ax.set_ylim(800, 2900)
-    ax.set_title(f"{name}　テストMSE {mse:,.0f}", fontsize=10)
+    ax.set_title(f"{name}\nテストMSE {mse:,.0f}", fontsize=10)
     ax.set_xlabel("体長 (cm)")
 axes[0].set_ylabel("重さ (g)")
 plt.tight_layout()
@@ -426,7 +439,7 @@ plt.show()
 
 | | 訓練MSE | テストMSE |
 |---|---:|---:|
-| 罰金なし | 1,294 | 9,286,680 |
+| 罰金なし | 0 | $4.4 \times 10^{14}$ |
 | 罰金あり（$\lambda = 0.1$） | 3,585 | 3,427 |
 
 ::: {.callout-note title="広い意味での正則化"}
@@ -462,7 +475,7 @@ plt.show()
 
 ## まとめ
 
-- **回帰**：連続値を出力するモデルを学習する問題
+- **回帰**：$t = f(x) + \varepsilon$ の $f$ をデータから推定する手法
    - 損失は**二乗誤差（MSE）**（微分しやすさで選ぶ）
 - 勾配降下法で求めた傾きと切片は、`sklearn` の結果と**一致**
 - **多項式回帰**：特徴量に $x^2, x^3, \ldots$ を足せば道具は線形回帰のまま
@@ -470,7 +483,7 @@ plt.show()
 - **正則化（[regularization]{.en}）**：大きい係数に罰金を課し、曲線の振れを抑える
 
 
-## 問題1：2点のデータから直線を求める
+## 練習問題：2点のデータから直線を求める
 
 データは2点だけ：$(x_1, t_1) = (-1, 0)$、$(x_2, t_2) = (1, 2)$。
 直線 $ax + b$ を勾配降下法で求める。初期値 $a = 0, b = 0$、学習率 $\alpha = 0.1$。**手計算**と**Pythonコード**の両方で解け。
@@ -481,7 +494,7 @@ plt.show()
 
 ヒント：2点を通る直線は $y = x + 1$。つまり答えは $a = 1, b = 1$ になるはず。
 
-## 問題1の解答例
+## 練習問題の解答例
 
 ### 準備（$a = 0, b = 0$ での勾配）
 
@@ -543,3 +556,13 @@ print(f"\nsklearn の fit: a={reg.coef_[0]:.4f}, b={reg.intercept_:.4f}")
 ```
 
 手計算の3回（0.2 → 0.36 → 0.488）とコードの出力が一致し、100回で $a = b = 1$（`sklearn` と同じ）に収束する。
+
+## 演習：4点の回帰と正則化 {.badge-practice}
+
+4点 $(x, t) = (-2, 0),\ (-1, 2),\ (1, 3),\ (2, 7)$ に直線 $ax + b$ を、MSE を損失とし、初期値 $a = 0,\ b = 0$、学習率 $\alpha = 0.1$ の勾配降下法で当てはめる過程を、紙に書いて求めよ。
+
+1. このデータの値を代入して整理した $\dfrac{\partial L}{\partial a}$ と $\dfrac{\partial L}{\partial b}$ の式
+2. 3回の更新（各回の勾配と $a,\ b$ を記載）
+3. 勾配が $0$ になる $a,\ b$ の値
+4. 損失に罰金 $\lambda a^2$（$\lambda = 1.25$）を足したときの、2 と 3 の再計算
+5. 罰金の有無による傾き $a$ の比較
