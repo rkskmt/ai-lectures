@@ -258,7 +258,7 @@
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
   <script src="network-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="50f8d7bcda2e48edce5cadfddc6232ccfa72a71e">
+  <meta name="qmd-web-source" content="c9ddb18795fe75082cf6bc2b23957392698599f2">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -308,7 +308,7 @@ rkskmt
 <section id="分類問題で出てきた閾値の縦線" class="slide level2">
 <h2>分類問題で出てきた閾値の縦線</h2>
 <div class="slide-body">
-<div id="22f75071" class="cell fig-medium" data-execution_count="1">
+<div id="8b569607" class="cell fig-medium" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -326,7 +326,7 @@ rkskmt
 <section id="このような直線を求めたい" class="slide level2">
 <h2>このような直線を求めたい</h2>
 <div class="slide-body">
-<div id="46484497" class="cell fig-medium" data-execution_count="2">
+<div id="47855ef5" class="cell fig-medium" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -357,7 +357,7 @@ rkskmt
 <section id="注意決定境界は回帰直線ではない" class="slide level2">
 <h2>【注意】決定境界は回帰直線ではない</h2>
 <div class="slide-body">
-<div id="58edba7e" class="cell" data-execution_count="3">
+<div id="46ac42e7" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -462,7 +462,7 @@ rkskmt
 <li><span class="math inline">\(z\)</span> の<strong>符号</strong>が「線の上か下か」を表現</li>
 <li><span class="math inline">\(z\)</span> の<strong>大きさ</strong>が「線からの遠さ」を表現</li>
 </ul>
-<div id="313deb39" class="cell fig-small" data-execution_count="4">
+<div id="1a9a6028" class="cell fig-small" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -499,7 +499,7 @@ rkskmt
 </ul>
 <p><span class="math display">\[p = \sigma(w_1 x_1 + w_2 x_2 + b)
 = \frac{1}{1 + e^{-(w_1 x_1 + w_2 x_2 + b)}}\]</span></p>
-<div id="e2f3f057" class="cell" data-execution_count="5">
+<div id="0ea7d7ee" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -724,7 +724,7 @@ rkskmt
 <section id="peek-neglog" class="slide level2">
 <h2>−log の形</h2>
 <div class="slide-body">
-<div id="36586250" class="cell" data-execution_count="6">
+<div id="f5c58611" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -883,7 +883,7 @@ b \leftarrow b-\alpha(p-y)\]</span></p>
 <p><strong>ノート</strong></p>
 </div>
 <div class="callout-content">
-<p><code>backward</code>：次回の NN 実装でこの<strong>出力側から各パラメータの勾配を求める処理</strong>を担う関数</p>
+<p><a href="./nn-logistic.html#peek-one-layer-backward" class="peek"><code>backward</code></a>：NN の実装で、この<strong>出力側から各パラメータの勾配を求める処理</strong>を担う関数</p>
 </div>
 </div>
 </div>
@@ -892,7 +892,7 @@ b \leftarrow b-\alpha(p-y)\]</span></p>
 <section id="peek-forward" class="slide level2">
 <h2>実装</h2>
 <div class="slide-body">
-<div id="17d280cb" class="cell" data-execution_count="7">
+<div id="0932cdb1" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>魚データの定義（クリックして展開）</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -931,7 +931,7 @@ b \leftarrow b-\alpha(p-y)\]</span></p>
 <span id="cb2-34"><a aria-label="34"></a>y      <span class="op">=</span> y[order]</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="8c1062e2" class="cell" data-execution_count="8">
+<div id="b9aae69e" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a aria-label="1"></a><span class="kw">def</span> sigmoid(z):</span>
 <span id="cb3-2"><a aria-label="2"></a>    <span class="cf">return</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>z))</span>
 <span id="cb3-3"><a aria-label="3"></a></span>
@@ -994,7 +994,7 @@ b \leftarrow b-\alpha(p-y)\]</span></p>
 <li>全データの平均損失 <span class="math inline">\(L\)</span> を一度に使わない</li>
 </ul></li>
 </ul>
-<div id="d78b177a" class="cell" data-execution_count="9">
+<div id="3645a721" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a aria-label="1"></a>w <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">0.0</span>])   <span class="co"># Weights start at zero</span></span>
 <span id="cb4-2"><a aria-label="2"></a>b  <span class="op">=</span> <span class="fl">0.0</span></span>
 <span id="cb4-3"><a aria-label="3"></a>lr <span class="op">=</span> <span class="fl">0.5</span>                       <span class="co"># 学習率</span></span>
@@ -1052,7 +1052,7 @@ b \leftarrow b-\alpha(p-y)\]</span></p>
 <section id="境界が動く様子を見る" class="slide level2">
 <h2>境界が動く様子を見る</h2>
 <div class="slide-body">
-<div id="f78247e0" class="cell" data-execution_count="10">
+<div id="351f50c5" class="cell" data-execution_count="10">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1120,7 +1120,7 @@ b \leftarrow b-\alpha(p-y)\]</span></p>
 <section id="z-を高さとして見る" class="slide level2">
 <h2><span class="math inline">\(z\)</span> を高さとして見る</h2>
 <div class="slide-body">
-<div id="94edff8b" class="cell" data-execution_count="11">
+<div id="c9bab6ce" class="cell" data-execution_count="11">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1514,25 +1514,8 @@ b \leftarrow b-\alpha(p-y)\]</span></p>
 <li>勾配は <span class="math inline">\((p - y) x\)</span> — ロジスティック関数＋交差エントロピーの組み合わせの妙</li>
 </ul></li>
 <li>学習の中身は「予測 → 差を測る → 境界を少し動かす」の繰り返し</li>
+<li>「線形結合 → ロジスティック関数」は、すでに最小構成のニューラルネットワーク</li>
 </ul>
-<div title="次回予告">
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>次回予告</strong></p>
-</div>
-<div class="callout-content">
-<ul>
-<li>今回の「線形結合 → ロジスティック関数」は、すでに最小構成のニューラルネットワーク</li>
-<li>次は同じ計算をNNの形と名前で書き直し、NumPyで学習まで実装する</li>
-</ul>
-</div>
-</div>
-</div>
-</div>
 </div>
 </section>
 <section id="練習問題" class="slide level2 scrollable">
@@ -1596,7 +1579,7 @@ b \leftarrow b-\alpha(p-y)\]</span></p>
 </div>
 </div>
 <h3 id="コードで確認">コードで確認</h3>
-<div id="c15f4d16" class="cell" data-execution_count="12">
+<div id="c645d526" class="cell" data-execution_count="12">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a aria-label="1"></a>funcs <span class="op">=</span> {</span>
@@ -1643,7 +1626,7 @@ b \leftarrow b-\alpha(p-y)\]</span></p>
 </div>
 </div>
 <h3 id="コードで確認-1">コードで確認</h3>
-<div id="6a635583" class="cell" data-execution_count="13">
+<div id="57eba47c" class="cell" data-execution_count="13">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -1685,7 +1668,7 @@ b \leftarrow b-\alpha(p-y)\]</span></p>
 <li><span class="math inline">\(\log a=1\)</span> になる特別な底が <span class="math inline">\(e\approx2.718\)</span>：</li>
 </ul>
 <p><span class="math display">\[\frac{d}{dx}e^x=e^x\]</span></p>
-<div id="320f8666" class="cell fig-small" data-execution_count="14">
+<div id="62d4e45f" class="cell fig-small" data-execution_count="14">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>

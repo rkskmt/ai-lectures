@@ -258,7 +258,7 @@
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
   <script src="network-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="993c51ff06c15927d507b10095f752bfdf867e68">
+  <meta name="qmd-web-source" content="6baa1917315a3484cca70a0b7aa740c49c559783">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -320,7 +320,7 @@ rkskmt
 <section id="直線では分けきれないデータ" class="slide level2">
 <h2>直線では分けきれないデータ</h2>
 <div class="slide-body">
-<div id="f797ceef" class="cell" data-execution_count="1">
+<div id="2e2098cd" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -349,7 +349,7 @@ rkskmt
 <section id="直線の限界" class="slide level2">
 <h2>直線の限界</h2>
 <div class="slide-body">
-<div id="e506cca3" class="cell" data-execution_count="2">
+<div id="cb9553c7" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -414,7 +414,7 @@ rkskmt
 <li>展開すると<strong>ただの線形変換1回分</strong>。何回重ねても同じ</li>
 <li>線形変換は、重ねても線形のまま — <strong>境界は直線のまま</strong></li>
 </ul>
-<div id="21db1505" class="cell" data-execution_count="3">
+<div id="3e3d699a" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -447,7 +447,7 @@ rkskmt
 <h2>間に入れる非線形関数：ReLU</h2>
 <div class="slide-body">
 <p><span class="math display">\[h = \mathrm{ReLU}(z) = \max(0, z)\]</span></p>
-<div id="e1c4a261" class="cell" data-execution_count="4">
+<div id="5f89ac71" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -484,7 +484,7 @@ rkskmt
 <section id="peek-relu-code" class="slide level2">
 <h2>ReLUをNumPyで実装する</h2>
 <div class="slide-body">
-<div id="b97c97af" class="cell" data-execution_count="5">
+<div id="cc69b35e" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb2-2"><a aria-label="2"></a></span>
 <span id="cb2-3"><a aria-label="3"></a><span class="kw">def</span> relu(Z):</span>
@@ -615,7 +615,7 @@ H: [[0. 0. 3.]]
 <section id="直線の片側だけ値が残る" class="slide level2">
 <h2>直線の片側だけ値が残る</h2>
 <div class="slide-body">
-<div id="8b5a16f1" class="cell fig-medium" data-execution_count="6">
+<div id="23eda446" class="cell fig-medium" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -713,7 +713,7 @@ p &amp;= \sigma(0.05)=0.5125
 \]</span></p>
 <ul>
 <li><code>forward</code> は左から右へ：<strong>Linear → ReLU → Linear → シグモイド</strong></li>
-<li>次回は同じ数値を使い、<span class="math inline">\(p\)</span> から逆向きに5個の勾配を求める</li>
+<li><a href="./nn-backprop.html#peek-handcalc" class="peek"><span class="math inline">\(p\)</span> から逆向きに5個の勾配を求める計算</a>でも、同じ数値を使う</li>
 </ul>
 </div>
 </section>
@@ -835,7 +835,7 @@ P &amp;= \sigma(Z_2) &amp; (N,1)
 <li><a href="./nn-logistic.html#peek-one-fish-forward" class="peek">前回の2行のForward</a>へ、隠れ層の <code>Z1</code> と <code>H</code> を追加する</li>
 <li>1匹ずつの計算を行列でまとめ、複数の魚と複数のニューロンを同時に計算する</li>
 </ul>
-<div id="24948423" class="cell" data-execution_count="7">
+<div id="93e151df" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb4-2"><a aria-label="2"></a></span>
 <span id="cb4-3"><a aria-label="3"></a><span class="kw">def</span> sigmoid(Z):</span>
@@ -1030,7 +1030,7 @@ P : (3, 1)
 <section id="peek-curved-boundary" class="slide level2">
 <h2>折り目が増えると境界が曲がる</h2>
 <div class="slide-body">
-<div id="3cd966ac" class="cell" data-execution_count="8">
+<div id="21a85ddc" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1290,24 +1290,6 @@ u(x)=w_1\mathrm{ReLU}(z_1)+\cdots+w_m\mathrm{ReLU}(z_m)+c
 <li>変換を並べるときは<strong>ランダム初期化</strong>で対称性を破る</li>
 <li>出力層は問題（分類・回帰）に合わせた活性化関数に取り替える</li>
 </ul>
-<div title="次回予告">
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>次回予告</strong></p>
-</div>
-<div class="callout-content">
-<ul>
-<li>層が増えると、勾配を<strong>全パラメータに</strong>届ける必要がある</li>
-<li>次は連鎖律から <code>backward</code> を実装し、この <code>forward</code> と接続して学習させる</li>
-</ul>
-</div>
-</div>
-</div>
-</div>
 </div>
 </section>
 <section id="練習問題" class="slide level2 scrollable">
@@ -1381,7 +1363,7 @@ u(x)=w_1\mathrm{ReLU}(z_1)+\cdots+w_m\mathrm{ReLU}(z_m)+c
 </table>
 <p>折り目は <strong><span class="math inline">\(x = 0\)</span>（<span class="math inline">\(h_1\)</span> の入り口がゼロ）</strong> と <strong><span class="math inline">\(x = 1\)</span>（<span class="math inline">\(h_2\)</span> の入り口がゼロ）</strong> の2箇所。</p>
 <h3 id="コードで確認">コードで確認</h3>
-<div id="5eb1c2f4" class="cell" data-execution_count="9">
+<div id="35fb74b0" class="cell" data-execution_count="9">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
