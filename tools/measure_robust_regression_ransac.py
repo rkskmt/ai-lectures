@@ -4,8 +4,8 @@
 # from memory. The MAE part of the deck is measured by
 # tools/measure_robust_regression.py.
 #
-#   data : the 80 fish defined in the deck (weights listed in the .qmd, lengths
-#          synthesised with default_rng(42) exactly as the deck does)
+#   data : the 80 fish defined in the deck (the literal `lengths` and `weights`
+#          vectors read straight out of the .qmd)
 #   bad  : the deck multiplies the weight of the two largest fish (indices BAD)
 #          by 10: "an extra zero typed on two slips"
 #   runs : the deck's RANSAC cell is unseeded, so every claim is checked over
@@ -37,13 +37,11 @@ def load_fish():
     src = DECK.read_text(encoding="utf-8")
 
     def arr(name):
-        m = re.search(name + r"\s*=\s*np\.array\(\[(.*?)\]", src, re.S)
+        m = re.search(r"^" + name + r"\s*=\s*np\.array\(\[(.*?)\]", src, re.S | re.M)
         return np.array([float(v) for v in re.findall(r"[-\d.]+", m.group(1))])
 
-    weights = np.concatenate([arr("salmon_weights"), arr("seabass_weights")]).astype(float)
-    assert len(weights) == 80
-    rng = np.random.default_rng(42)
-    lengths = np.round(np.cbrt(weights) * 4.5 + rng.normal(0, 1.0, len(weights)), 1)
+    lengths, weights = arr("lengths"), arr("weights")
+    assert len(lengths) == len(weights) == 80
     return lengths, weights
 
 

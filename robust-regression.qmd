@@ -5,12 +5,12 @@ subtitle: "損失を変える・データを選ぶ"
 
 ## ここまでの道具
 
-- **線形回帰**：[MSE を勾配降下法で小さくして](linear-regression.qmd#peek-gdfit-code){.peek}、体長から重さを予測する直線を fit した
-- **MSE**：予測と実際のズレを二乗して平均した損失
+- **線形回帰（[linear regression]{.en}）**：[勾配降下法](linear-regression.qmd#peek-gdfit-code){.peek}（[gradient descent]{.en}）で MSE を小さくして、体長から重さを予測する直線を fit した
+- **MSE（[**Mean Squared Error**]{.en} / 平均二乗誤差）**：予測と実際のズレを二乗して平均した損失（[loss]{.en}）
 
 ::: {.callout-note title="今回の主題"}
 - データに間違った記録が混ざっていたら、fit した直線はどうなるか
-- 間違った記録に引っ張られない fit の方法を 2 つ作る
+- 間違った記録に引っ張られない fit の方法を作る
 :::
 
 
@@ -26,20 +26,24 @@ import japanize_matplotlib
 plt.rcParams["font.size"] = 11
 plt.rcParams["figure.dpi"] = 100
 
-salmon_weights     = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,
-                               1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,
-                               2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,
-                               1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652])
-seabass_weights    = np.array([1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,
-                               1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,
-                               1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,
-                               1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531])
-
-weights = np.concatenate([salmon_weights, seabass_weights]).astype(float)
-
-# 体長の測定値（cm）
-rng     = np.random.default_rng(42)
-lengths = np.round(np.cbrt(weights) * 4.5 + rng.normal(0, 1.0, len(weights)), 1)
+# 説明変数：体長（cm）
+lengths = np.array([58.4, 55.3, 59.2, 61.7, 54.1, 54.7, 61.0, 58.5, 55.3, 57.3,
+                    56.2, 56.1, 57.4, 51.8, 51.8, 54.2, 54.0, 56.6, 54.9, 52.3,
+                    56.8, 55.1, 58.5, 58.6, 55.2, 55.2, 59.4, 57.8, 55.5, 57.5,
+                    57.3, 54.7, 56.0, 51.3, 53.1, 56.1, 53.9, 55.8, 53.4, 53.8,
+                    54.2, 50.0, 50.7, 51.0, 55.4, 51.5, 55.1, 58.8, 57.2, 51.2,
+                    51.8, 54.7, 45.0, 49.3, 53.7, 51.6, 58.1, 52.0, 48.1, 50.5,
+                    52.9, 50.5, 51.7, 48.5, 50.8, 52.5, 48.2, 51.8, 50.8, 50.5,
+                    48.7, 54.2, 50.5, 49.3, 53.4, 49.1, 51.5, 46.6, 48.7, 51.6])
+# 目的変数：重さ（g）
+weights = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,
+                    1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,
+                    2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,
+                    1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652,
+                    1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,
+                    1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,
+                    1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,
+                    1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531], dtype=float)
 ```
 
 
@@ -48,20 +52,18 @@ lengths = np.round(np.cbrt(weights) * 4.5 + rng.normal(0, 1.0, len(weights)), 1)
 
 - 魚市場の伝票（1匹につき1枚、体長と重さ）80 枚のうち 2 枚で、重さの欄に 0 が1つ多く打たれていた
 - 間違っていたのは、いちばん大きい 2 匹（2,457 g → 24,570 g、2,474 g → 24,740 g）
-- この 80 枚で直線を fit し直す
+- [最小二乗法](linear-regression.qmd#peek-exact-line){.peek}（[least squares]{.en}）でこの 80 枚に直線を fit し直す
 
 ```{python}
 #| echo: true
-from sklearn.linear_model import LinearRegression
-
 bad = [3, 6]                                       # 打ち間違えた2枚（いちばん大きい2匹）
 weights_typo = weights.copy()
 weights_typo[bad] *= 10                            # 0 が1つ多い ＝ 10倍
 
-reg_ok   = LinearRegression().fit(lengths.reshape(-1, 1), weights)        # 正しい80枚
-reg_typo = LinearRegression().fit(lengths.reshape(-1, 1), weights_typo)   # 2枚が間違った80枚
-print(f"正しい80枚で fit  : 体長 1cm あたり {reg_ok.coef_[0]:.1f} g")
-print(f"2枚が間違った80枚 : 体長 1cm あたり {reg_typo.coef_[0]:.1f} g")
+a_ok, b_ok     = np.polyfit(lengths, weights, 1)        # 正しい80枚
+a_typo, b_typo = np.polyfit(lengths, weights_typo, 1)   # 2枚が間違った80枚
+print(f"正しい80枚で fit  : 体長 1cm あたり {a_ok:.1f} g")
+print(f"2枚が間違った80枚 : 体長 1cm あたり {a_typo:.1f} g")
 ```
 
 ```{python}
@@ -74,8 +76,8 @@ fig, axes = plt.subplots(1, 2, figsize=(10.5, 3.8))
 for ax, title in zip(axes, ["全体", "魚のまわりを拡大"]):
     ax.scatter(lengths[ok], weights[ok], s=30, alpha=0.6, c="#5dade2", edgecolors="gray", lw=0.4, label="正しい伝票（78枚）")
     ax.scatter(lengths[bad], weights_typo[bad], s=70, c="#e74c3c", marker="s", label="打ち間違い（2枚）")
-    ax.plot(grid_cm, reg_ok.predict(grid_cm.reshape(-1, 1)), "--", color="gray", lw=1.5, label="正しい80枚で fit")
-    ax.plot(grid_cm, reg_typo.predict(grid_cm.reshape(-1, 1)), "-", color="#e74c3c", lw=2, label="2枚が間違った80枚で fit")
+    ax.plot(grid_cm, a_ok * grid_cm + b_ok, "--", color="gray", lw=1.5, label="正しい80枚で fit")
+    ax.plot(grid_cm, a_typo * grid_cm + b_typo, "-", color="#e74c3c", lw=2, label="2枚が間違った80枚で fit")
     ax.set_title(title, fontsize=10); ax.set_xlabel("体長 (cm)"); ax.grid(True, alpha=0.3)
 axes[0].set_ylabel("重さ (g)"); axes[0].legend(fontsize=8, loc="upper left")
 axes[1].set_ylim(-2500, 6500)
@@ -86,11 +88,11 @@ plt.show()
 ```
 
 ::: {.callout-note title="結果"}
-- たった 2 枚で、傾きが大きく跳ね上がった
+- 打ち間違いの 2 枚で、傾きが跳ね上がった
 - 直線は魚の群れから離れた
    - 小さい魚の予測は、マイナスの重さになる
    - 大きい魚の予測は、実際の重さを大きく超える
-- 間違った 2 枚が、正しい 78 枚の予測を全部壊している
+- 間違った 2 枚のせいで、正しい 78 枚の予測までずれている
 :::
 
 
@@ -101,7 +103,7 @@ plt.show()
 
 ```{python}
 #| echo: true
-pred_ok = reg_ok.predict(lengths.reshape(-1, 1))        # 正しい80枚の直線による予測
+pred_ok = a_ok * lengths + b_ok                         # 正しい80枚の直線による予測
 error   = weights_typo - pred_ok                        # 各伝票のズレ（g）
 ok      = np.ones(80, dtype=bool)
 ok[bad] = False                                         # 正しい78枚だけ True
@@ -130,7 +132,7 @@ MAE
 ## 対策：ズレを二乗せずに測る（MAE） {#peek-mae}
 
 - 外れ値に引っ張られる原因は二乗なので、二乗をやめる
-- **MAE（[**Mean Absolute Error**]{.en} / 平均絶対誤差）**：ズレの**絶対値**の平均
+- **MAE（[**Mean Absolute Error**]{.en} / 平均絶対誤差）**：ズレの**絶対値**（[absolute value]{.en}）の平均
 
 $$L(a, b) = \frac{1}{N} \sum_{i} \left| \underbrace{a x_i + b}_{\text{予測}} - \underbrace{t_i}_{\text{実際}} \right|$$
 
@@ -152,7 +154,8 @@ print(f"打ち間違い2枚のズレ: 絶対値の合計 {np.sum(np.abs(error[ba
 ## 絶対値の微分は、符号だけになる
 
 - 勾配降下法には、損失の微分が要る
-- $u^2$ の微分は $2u$、$|u|$ の微分は $u$ の符号
+   - $u^2$ の微分：$2u$
+   - $|u|$ の微分：$u$ の符号
 
 ```{python}
 #| echo: false
@@ -201,7 +204,7 @@ $$\frac{\partial L}{\partial a} = \frac{1}{N} \sum_i \mathrm{sign}(a x_i + b - t
 ## MAE で fit する {#peek-mae-code}
 
 - [線形回帰の勾配降下法](linear-regression.qmd#peek-gdfit-code){.peek}の、勾配の 2 行を書き換える
-- 学習率 0.1 と更新 100 回は変えない
+- 学習率（[learning rate]{.en}）0.1 と更新 100 回は変えない
 
 ```{python}
 #| echo: true
@@ -277,7 +280,7 @@ plt.show()
 
 - 学習率 0.1 の 1 歩を、重さ（g）に直す
    - 直線の高さ $b$ の 1 歩は「学習率 × 勾配」で、MAE の勾配は最大 1
-   - 標準化した重さの 1 は、標準偏差 1 つ分の重さ
+   - 標準化（[standardization]{.en}）した重さの 1 は、標準偏差（[standard deviation]{.en}）1 つ分の重さ
 
 ```{python}
 #| echo: true
@@ -333,7 +336,7 @@ print(f"62 cm の予測: {to_gram(a, b, 62):,.0f} g")
 grid_cm = np.linspace(44, 63, 50)
 plt.figure(figsize=(6.5, 3.6))
 plt.scatter(lengths[ok], weights[ok], s=30, alpha=0.6, c="#5dade2", edgecolors="gray", lw=0.4, label="正しい伝票（78枚）")
-plt.plot(grid_cm, reg_typo.predict(grid_cm.reshape(-1, 1)), "--", color="#e74c3c", lw=1.5, label="MSE（最小二乗法）")
+plt.plot(grid_cm, a_typo * grid_cm + b_typo, "--", color="#e74c3c", lw=1.5, label="MSE（最小二乗法）")
 plt.plot(grid_cm, to_gram(a, b, grid_cm), "-", color="#27ae60", lw=2, label="MAE")
 plt.ylim(-2500, 6500)                                   # 打ち間違いの2枚（24,000 g 台）は図の外
 plt.axhline(0, color="black", lw=0.8)
@@ -370,7 +373,7 @@ RANSAC
 - **RANSAC（[**Random Sample Consensus**]{.en} / ランダムに選んだ標本の合意）**：ランダムに選んだ 2 点で直線を引くことを繰り返し、賛同者が最多の直線を残す手法
 
 ::: {.caption-note}
-300 g の根拠：[正しい伝票のズレの最大](#peek-outlier-squares){.peek}より少し広くとる
+しきい値（[threshold]{.en}）300 g の根拠：[正しい伝票のズレの最大](#peek-outlier-squares){.peek}より少し広くとる
 :::
 
 
@@ -408,7 +411,12 @@ plt.show()
 ```
 
 ::: {.caption-note}
-帯の幅が ±300 g。賛同者の数がその直線の点数。外れ値を引いた回は点数が低く、自然に捨てられる
+帯：直線から ±300 g の範囲
+:::
+
+::: {.callout-tip title="要するに"}
+- 直線の良さは、賛同者の数で測る
+- 外れ値を引いた回は賛同者が少ないので、自然に捨てられる
 :::
 
 
@@ -428,8 +436,8 @@ def ransac_line(x, t, threshold, n_trials=200):
         inliers = np.abs(a * x + b - t) < threshold             # 手順3：直線から threshold 以内なら True（賛同者）
         if inliers.sum() > best_count:                          # 手順4：賛同者が最多の直線を覚えておく
             best_count, best_inliers = inliers.sum(), inliers
-    reg = LinearRegression().fit(x[best_inliers].reshape(-1, 1), t[best_inliers])   # 手順5：賛同者だけで fit し直す
-    return reg.coef_[0], reg.intercept_, best_inliers
+    a, b = np.polyfit(x[best_inliers], t[best_inliers], 1)      # 手順5：賛同者だけで fit し直す
+    return a, b, best_inliers
 
 a_r, b_r, inliers = ransac_line(lengths, weights_typo, threshold=300)
 print(f"賛同者 {inliers.sum()} 枚、除外 {(~inliers).sum()} 枚")
@@ -450,8 +458,8 @@ def ransac_line_fixed(x, t, threshold, pairs):
         inliers = np.abs(a * x + b - t) < threshold
         if inliers.sum() > best_count:
             best_count, best_inliers = inliers.sum(), inliers
-    reg = LinearRegression().fit(x[best_inliers].reshape(-1, 1), t[best_inliers])
-    return reg.coef_[0], reg.intercept_, best_inliers
+    a, b = np.polyfit(x[best_inliers], t[best_inliers], 1)
+    return a, b, best_inliers
 
 a_r, b_r, inliers = ransac_line_fixed(lengths, weights_typo, 300, [(0, 3), (49, 22)])
 print(f"賛同者 {inliers.sum()} 枚、除外 {(~inliers).sum()} 枚")
@@ -466,7 +474,7 @@ grid_cm = np.linspace(44, 63, 50)
 plt.figure(figsize=(6.5, 3.6))
 plt.scatter(lengths[inliers], weights_typo[inliers], s=36, alpha=0.7, c="#2980b9", label=f"賛同者（{inliers.sum()}枚）")
 plt.scatter(lengths[~inliers], weights_typo[~inliers], s=70, c="#e74c3c", marker="x", label=f"除外（{(~inliers).sum()}枚、図の外）")
-plt.plot(grid_cm, reg_typo.predict(grid_cm.reshape(-1, 1)), "--", color="#e74c3c", lw=1.5, label="最小二乗法（80枚全部）")
+plt.plot(grid_cm, a_typo * grid_cm + b_typo, "--", color="#e74c3c", lw=1.5, label="最小二乗法（80枚全部）")
 plt.plot(grid_cm, a_r * grid_cm + b_r, "-", color="#2980b9", lw=2, label="RANSAC")
 plt.ylim(-2500, 6500)                                   # 除外した2枚（24,000 g 台）は図の外
 plt.axhline(0, color="black", lw=0.8)
@@ -496,7 +504,7 @@ plt.show()
 ## **Tweak** しきい値と回数を変える {.badge-practice}
 
 - [さっきのコード](#peek-ransac-code){.peek} の引数を**書き換えて実行**（描画コードまで続けて実行すると図で確認できる）
-- `bad` を変える行は、伝票のセルから実行し直す
+- `bad` を変える行は、[`bad` を定義したコード](#peek-typo-slips){.peek}から実行し直す
 
 ::: {.tweak}
 | やりたいこと | コード |
@@ -518,17 +526,17 @@ plt.show()
    - 賛同者が大きく減った回ほど、傾きが正しい 78 枚の直線から大きくずれる
    - 回数を増やすほど、78 枚そろいやすくなる
 - 打ち間違い 20 枚：最小二乗法の傾きは大きく狂うが、RANSAC の傾きは正しい直線の近くに残る
-   - 外れ値が多数派にならない限り、RANSAC は壊れない
+   - 外れ値が多数派にならない限り、RANSAC は正しい直線を見つけられる
 :::
 
 
 ## （参考）scikit-learn では
 
-- 今日書いた `ransac_line` は、ライブラリでは `RANSACRegressor` に入っている
+- `ransac_line` と同じことをしてくれる `RANSACRegressor` が scikit-learn にある
 
 ```{python}
 #| echo: true
-from sklearn.linear_model import RANSACRegressor
+from sklearn.linear_model import LinearRegression, RANSACRegressor
 
 ransac = RANSACRegressor(LinearRegression(), residual_threshold=300, random_state=0)
 ransac.fit(lengths.reshape(-1, 1), weights_typo)
@@ -537,14 +545,15 @@ print(f"賛同者 {ransac.inlier_mask_.sum()} 枚")
 print(f"体長 1cm あたり {ransac.estimator_.coef_[0]:.1f} g")
 ```
 
-| 今日書いたもの | scikit-learn |
+| 自作のコード | scikit-learn |
 |---|---|
 | `ransac_line(x, t, threshold=300)` | `RANSACRegressor(LinearRegression(), residual_threshold=300).fit(X, t)` |
 | `inliers` | `ransac.inlier_mask_` |
 | `a_r`, `b_r` | `ransac.estimator_.coef_[0]`, `ransac.estimator_.intercept_` |
 
-::: {.callout-note title="（参考）RANSAC の出番"}
-直線に限らず、平面・円・2枚の写真の対応関係など「少数の点で決まるモデル」なら同じ手順で使える。画像処理では、写真どうしの対応点から変換を推定するとき（パノラマ合成など）の定番
+::: {.callout-note title="（参考）RANSAC の応用"}
+- 直線に限らず、平面・円・2枚の写真の対応関係など「少数の点で決まるモデル」なら同じ手順で使える
+- 画像処理では、写真どうしの対応点から変換を推定するとき（パノラマ合成など）の定番
 :::
 
 
@@ -577,7 +586,7 @@ print(f"体長 1cm あたり {ransac.estimator_.coef_[0]:.1f} g")
 1. $A$ と $B$ を通る直線を求め、直線からのズレが 0.5 未満の点（賛同者）を数えよ
 2. $A$ と $E$ を通る直線で同じことをせよ
 3. RANSAC が最終的に選ぶ直線と、その賛同者を答えよ
-4. Python：5 点に MSE の勾配降下法で直線を fit し（標準化なし、学習率 0.1、100 回）、本編の `ransac_line` の直線と比較せよ（傾きと切片を表示）
+4. Python：5 点に MSE の勾配降下法で直線を fit し（標準化なし、学習率 0.1、100 回）、[`ransac_line`](#peek-ransac-code){.peek} の直線と比較せよ（傾きと切片を表示）
 5. Python：4 の勾配を MAE の勾配に書き換えて fit せよ（学習率 0.001、10000 回、傾きと切片を表示）
 
 
@@ -602,7 +611,6 @@ print(f"体長 1cm あたり {ransac.estimator_.coef_[0]:.1f} g")
 #| code-summary: "解答例を見る"
 #| eval: false
 import numpy as np
-from sklearn.linear_model import LinearRegression
 
 P_x = np.array([0.0, 1.0, 2.0, 3.0, 2.0])   # A, B, C, D, E の x
 P_t = np.array([0.0, 1.0, 2.0, 3.0, 8.0])   # A, B, C, D, E の t
