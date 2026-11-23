@@ -102,7 +102,8 @@ plt.show()
 
 - **損失**：結果の**ダメさ**を測る物差し
    - 小さいほど良い
-- **最適化（[optimization]{.en}）**：損失が最小になるパラメータを探すこと
+- **最適化（[optimization]{.en}）**：損失が最小になる[パラメータ](clustering-kmeans.qmd#peek-parameter){.peek}を探すこと
+   - [ハイパーパラメータ](clustering-kmeans.qmd#peek-parameter){.peek}は固定したまま
    - 本当の最小値に届かなくても、十分に小さい値が見つかれば最適化と呼ぶことが多い
 
 | 手法 | 損失 | 測っているダメさ |
@@ -110,26 +111,6 @@ plt.show()
 | しきい値で分類 | [総コスト](classification-basics-1d.qmd#peek-cost){.peek} | 誤分類にかかる費用の合計 |
 | 決定木 | [加重平均ジニ不純度](classification-2d-boundaries.qmd#最適化ジニ不純度が最小になる閾値を探索){.peek} | 分けた左右にクラスが混ざっている度合い |
 | k-means | [SSE](clustering-kmeans.qmd#peek-sse){.peek} | 各点から自分の重心までの距離の2乗の合計 |
-
-
-## パラメータとハイパーパラメータ
-
-| | [ハイパーパラメータ](clustering-kmeans.qmd#peek-parameter){.peek}（[hyperparameter]{.en}） | [パラメータ](clustering-kmeans.qmd#peek-parameter){.peek}（[parameter]{.en}） |
-|---|---|---|
-| 決め方 | 学習の前に人が決める | 学習がデータから決める |
-| 決定木 | 木の深さ | 分岐のしきい値 |
-| k-means | クラスタ数 $k$ | 重心 $k$ 個の位置 |
-
-- **学習**：ハイパーパラメータを固定して、データからパラメータを決めること
-   - 多くのモデルでは、最適化でパラメータを決める
-   - 学習が終われば、パラメータも固定
-
-::: {.callout-note title="「パラメータ」の呼び分け"}
-- プログラミングでは、関数に渡す値もパラメータと呼ぶ
-   - k-means の k はこの意味ではパラメータだが、機械学習ではハイパーパラメータ
-- 学習で決まる側は、学習可能パラメータ（[trainable parameter]{.en} / [learnable parameter]{.en}）やモデルパラメータ（[model parameter]{.en}）とも呼ばれる
-   - 普通は単にパラメータと呼ぶ
-:::
 
 
 ## 損失関数（[Loss Function]{.en}） {#peek-loss-function}
@@ -186,7 +167,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-::: {.callout-note title="要するに"}
+::: {.takeaway}
 損失の最小化は、損失関数のグラフの**谷底探し**
 :::
 
@@ -236,7 +217,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-::: {.callout-note title="要するに"}
+::: {.takeaway}
 パラメータを変えると**境界線が動き**、正答率が変わる
 :::
 
@@ -358,9 +339,8 @@ plt.tight_layout()
 plt.show()
 ```
 
-::: {.callout-note title="要するに"}
-- 進んだ先でまた傾きを測れば、次の一歩も決まる
-- **繰り返せば谷底に近づく**
+::: {.takeaway}
+傾きを測って進むことを繰り返せば、**谷底に近づく**
 :::
 
 
@@ -826,10 +806,9 @@ fig3d.write_html("iframes/gd_bowl_3d.html", include_plotlyjs="directory")
 ::: {.plotly-iframe src="iframes/gd_bowl_3d.html" height="520"}
 :::
 
-::: {.callout-note title="要するに"}
+::: {.callout-note title="結果"}
 - $w_1$ は谷の同じ側から近づく
 - $w_2$ は谷をまたぎ、**振動しながら収束**する
-- 実際の機械学習はパラメータがさらに多いが、更新のしかたは同じ
 :::
 
 
