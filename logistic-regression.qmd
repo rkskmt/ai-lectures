@@ -184,7 +184,7 @@ $$z = w_1 x_1 + w_2 x_2 + b$$
 
 ## $z = 0$ と置くと直線の式になる {#peek-logistic-line}
 
-- $z = 0$ と置くと：
+- $z = 0$ と置くと
 
 $$\underbrace{w_1}_{A}\, x_1 + \underbrace{w_2}_{B}\, x_2 + \underbrace{\;b\;}_{C} = 0$$
 
@@ -263,7 +263,7 @@ plt.show()
 
 ## $z = 1$ を実際に確率へ変換する
 
-- $z = 1$ をロジスティック関数に代入する：
+- $z = 1$ をロジスティック関数に代入する
 
 $$p = \sigma(1) = \frac{1}{1 + e^{-1}} \approx 0.731$$
 
@@ -274,7 +274,7 @@ $$p = \sigma(1) = \frac{1}{1 + e^{-1}} \approx 0.731$$
 
 - ロジスティック関数の傾きを、先に求めておく
    - 勾配降下法で学習するには微分（傾き）が必要
-- 合成関数（[composite function]{.en}）の微分は、**外側の微分 × 内側の微分**：
+- 合成関数（[composite function]{.en}）の微分は、**外側の微分 × 内側の微分**
 
 $$
 \frac{d}{dx}f(g(x))=f'(g(x))\,g'(x),
@@ -282,7 +282,7 @@ $$
 \frac{dy}{dx}=\frac{dy}{du}\frac{du}{dx}
 $$
 
-- $p=(1+e^{-z})^{-1}$ を合成関数として微分する：
+- $p=(1+e^{-z})^{-1}$ を合成関数として微分する
    - 外側：$(\;)^{-1}$
    - 内側：$1+e^{-z}$（指数関数（[exponential function]{.en}）の[微分](#peek-exp-derivative){.peek}）
 
@@ -296,7 +296,7 @@ $$\begin{aligned}
 
 ## 実は、微分結果は $p$ だけで表せる
 
-- 微分した直後は、次の形になっている：
+- 微分した直後は、次の形になっている
 
 $$
 \frac{dp}{dz}=\frac{e^{-z}}{(1+e^{-z})^2}
@@ -304,7 +304,7 @@ $$
 $$
 
 - 一方、ロジスティック関数の出力は $p=\dfrac{1}{1+e^{-z}}$
-- $p(1-p)$ を計算すると、微分した直後と同じ形になる：
+- $p(1-p)$ を計算すると、微分した直後と同じ形になる
 
 $$p(1-p)
 =\frac{1}{1+e^{-z}}
@@ -312,7 +312,7 @@ $$p(1-p)
 =\frac{e^{-z}}{(1+e^{-z})^2}
 \tag{2}$$
 
-- (1)と(2)の右辺が同じなので、ロジスティック関数の微分は $p$ だけで書ける：
+- (1)と(2)の右辺が同じなので、ロジスティック関数の微分は $p$ だけで書ける
 
 $$\therefore \qquad \frac{dp}{dz}=p(1-p)$$
 
@@ -349,7 +349,7 @@ E -> A: "繰り返す"
 ```
 
 - 1匹分の損失（[loss]{.en}）を $\ell$、全魚の平均損失を $L$ と書き分ける
-- [直線を求めたとき](linear-regression.qmd#peek-mse-grad){.peek}と同じ形の更新式を使う：
+- [直線を求めたとき](linear-regression.qmd#peek-mse-grad){.peek}と同じ形の更新式を使う
 
 $$w_j \leftarrow w_j-\alpha\frac{\partial L}{\partial w_j},
 \qquad b \leftarrow b-\alpha\frac{\partial L}{\partial b}$$
@@ -358,7 +358,7 @@ $$w_j \leftarrow w_j-\alpha\frac{\partial L}{\partial w_j},
    - コードでは learning rate を略して `lr` と書く
 - $j$：どの特徴量の重みかを表す添字
    - ここでは $j=1$（輝度）、$j=2$（重さ）
-- ロジスティック回帰で必要なのは：
+- ロジスティック回帰で必要なもの
    - 予測をどう採点するか：**損失 $L$**
    - 採点結果をどう微分するか：**勾配（[gradient]{.en}）**
 
@@ -373,7 +373,7 @@ $$w_j \leftarrow w_j-\alpha\frac{\partial L}{\partial w_j},
 
 $$P(y=1)=p, \qquad P(y=0)=1-p$$
 
-- 例えば $p=0.4$ なら：
+- 例えば $p=0.4$ なら
    - Salmon の確率は $0.4$
    - Sea bass の確率は $1-0.4=0.6$
 
@@ -393,7 +393,7 @@ $$
 $$
 
 - $y_c=0$ の項は消えるので、正解クラスの項だけが残る
-- 正解クラスに出した確率を $q$ と置けば：
+- 正解クラスに出した確率を $q$ と置けば
 
 $$\ell=-\log q$$
 
@@ -405,11 +405,11 @@ $$\ell=-\log q$$
 ## 2クラス版：二値交差エントロピー（[Binary Cross-Entropy]{.en}） {#peek-binary-cross-entropy}
 
 - クラスの順を（Salmon、Sea bass）とする
-- Salmon の確率を $p$、正解ラベルを $y$ とすると：
+- Salmon の確率を $p$、正解ラベルを $y$ とすると
 
 $$\mathbf{y}=(y,\,1-y),\qquad \mathbf{p}=(p,\,1-p)$$
 
-- この2つを一般の交差エントロピーへ代入すると：
+- この2つを一般の交差エントロピーへ代入すると
 
 $$\ell(y,p)=-\left[y\log p+(1-y)\log(1-p)\right]$$
 
@@ -478,25 +478,25 @@ $$\frac{\partial\ell}{\partial p}=\frac{1}{1-p}$$
 
 ## 2つの微分を掛けると $p-y$ になる {#peek-logistic-p-minus-y}
 
-- $p$ は $z$ から計算されるので、連鎖律（[chain rule]{.en}）で2つの微分を掛ける：
+- $p$ は $z$ から計算されるので、連鎖律（[chain rule]{.en}）で2つの微分を掛ける
 
 $$
 \frac{\partial\ell}{\partial z}
 =\frac{\partial\ell}{\partial p}\frac{dp}{dz}
 $$
 
-- ロジスティック関数の微分は、どちらの正解でも同じ：
+- ロジスティック関数の微分は、どちらの正解でも同じ
 
 $$\frac{\partial p}{\partial z}=p(1-p)$$
 
-- **正解が $y=1$ のとき**：
+- **正解が $y=1$ のとき**
 
 $$\frac{\partial \ell}{\partial z}
 =\underbrace{\left(-\frac{1}{p}\right)}_{\partial\ell/\partial p}
  \underbrace{p(1-p)}_{dp/dz}
 =-(1-p)=p-1=p-y \qquad (y=1)$$
 
-- **正解が $y=0$ のとき**：
+- **正解が $y=0$ のとき**
 
 $$\frac{\partial \ell}{\partial z}
 =\underbrace{\frac{1}{1-p}}_{\partial\ell/\partial p}
@@ -511,12 +511,12 @@ $$\frac{\partial \ell}{\partial z}=p-y$$
 
 ## 1匹分の入力からパラメータの勾配が決まる {#peek-parameter-gradients}
 
-- $z=w_1x_1+w_2x_2+b$ なので：
+- $z=w_1x_1+w_2x_2+b$ なので
 
 $$\frac{\partial z}{\partial w_j}=x_j, \qquad
 \frac{\partial z}{\partial b}=1$$
 
-- [いま求めた](#peek-logistic-p-minus-y){.peek} $\dfrac{\partial \ell}{\partial z}=p-y$ を使い、連鎖律で更新に必要な $w_j$ と $b$ の勾配を求める：
+- [いま求めた](#peek-logistic-p-minus-y){.peek} $\dfrac{\partial \ell}{\partial z}=p-y$ を使い、連鎖律で更新に必要な $w_j$ と $b$ の勾配を求める
 
 $$\frac{\partial \ell}{\partial w_j}
 =\frac{\partial \ell}{\partial z}\frac{\partial z}{\partial w_j}
@@ -524,12 +524,12 @@ $$\frac{\partial \ell}{\partial w_j}
 \frac{\partial \ell}{\partial b}=p-y$$
 
 - 先ほどの $p=0.4$、$y=1$（Salmon）の例なら、$p-y=0.4-1=-0.6$
-- ある魚の入力を $x=(2,\,0.5)$ とすると：
+- ある魚の入力を $x=(2,\,0.5)$ とすると
    - $\dfrac{\partial \ell}{\partial w_1}=-0.6\times2=-1.2$
    - $\dfrac{\partial \ell}{\partial w_2}=-0.6\times0.5=-0.3$
    - $|x_1|$ が $|x_2|$ の4倍なので、$w_1$ の勾配も4倍
 
-- 学習率 $\alpha$ を掛けて更新：
+- 学習率 $\alpha$ を掛けて更新
 
 $$w_j \leftarrow w_j-\alpha(p-y)x_j, \qquad
 b \leftarrow b-\alpha(p-y)$$
@@ -543,7 +543,7 @@ b \leftarrow b-\alpha(p-y)$$
 
 ## 1匹分の勾配をコードに置き換える {#peek-gradient-code}
 
-- 数式の各部分に、そのまま変数名を付ける：
+- 数式の各部分に、そのまま変数名を付ける
 
 ```python
 delta = p - y
@@ -906,7 +906,7 @@ $b$ の分だけズレるので加法性を満たさない
 
 ## $+b$ を入力の1つと読み替えると線形になる
 
-- $b$ を「**常に 1 が入っている入力** $x_0$ への重み $w_0$」と読み替える：
+- $b$ を「**常に 1 が入っている入力** $x_0$ への重み $w_0$」と読み替える
 
 $$z = w_0 \underbrace{x_0}_{=\,1} + w_1 x_1 + w_2 x_2$$
 
@@ -1125,11 +1125,11 @@ for i, (xi, yi) in enumerate(fishes, 1):
 
 ## 【参考】$e^x$ は微分しても $e^x$ {#peek-exp-derivative}
 
-- 一般の指数関数（[exponential function]{.en}）$a^x$ を微分すると：
+- 一般の指数関数（[exponential function]{.en}）$a^x$ を微分すると
 
 $$\frac{d}{dx}a^x=(\log a)a^x$$
 
-- $\log a=1$ になる特別な底が $e\approx2.718$：
+- $\log a=1$ になる特別な底が $e\approx2.718$
 
 $$\frac{d}{dx}e^x=e^x$$
 
@@ -1153,7 +1153,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-- 指数が $-z$ なら、連鎖律で内側の微分 $-1$ が掛かる：
+- 指数が $-z$ なら、連鎖律で内側の微分 $-1$ が掛かる
 
 $$\frac{d}{dz}e^{-z}=e^{-z}\frac{d(-z)}{dz}=-e^{-z}$$
 

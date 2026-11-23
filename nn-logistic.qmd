@@ -492,7 +492,7 @@ $$
 $$
 
 - $\ell$：この魚の予測に対する損失（[loss]{.en}）
-- この魚は $y=1$ なので、第1項だけが残る：
+- この魚は $y=1$ なので、第1項だけが残る
 
 $$
 \ell(1,0.4013)
@@ -533,7 +533,7 @@ loss: 0.9130152523999526
 ## 勾配：更新に使う3つの微分値
 
 - 損失関数の偏微分（[partial derivative]{.en}）の値から、$w_1,w_2,b$ をどちらへ動かせば損失が下がるかが分かる
-- 式は[連鎖律で導いた結果](logistic-regression.qmd#peek-parameter-gradients){.peek}をそのまま使う：
+- 式は[連鎖律で導いた結果](logistic-regression.qmd#peek-parameter-gradients){.peek}をそのまま使う
 
 $$
 \frac{\partial\ell}{\partial z}=p-y,
@@ -603,7 +603,7 @@ Backward :       d_w, d_b ←── d_z ←── ℓ
 
 ## 勾配：3つの計算を `backward` にまとめる {#peek-one-layer-backward}
 
-- 2本分の重みの微分値は、NumPyでまとめて計算できる：
+- 2本分の重みの微分値は、NumPyでまとめて計算できる
 
 $$
 \begin{bmatrix}d_{w_1}\\d_{w_2}\end{bmatrix}
@@ -702,7 +702,7 @@ print("d_b:", d_b)
 
 ## 更新：勾配と逆向きに $w,b$ を動かす
 
-- 更新式は[1匹ずつ学習したときの勾配降下法](logistic-regression.qmd#peek-one-at-a-time){.peek}と同じ：
+- 更新式は[1匹ずつ学習したときの勾配降下法](logistic-regression.qmd#peek-one-at-a-time){.peek}と同じ
 
 $$
 w_j\leftarrow w_j-\alpha d_{w_j},
@@ -713,7 +713,7 @@ $$
 - $\alpha$：学習率（[learning rate]{.en}）
    - 1回に動かす大きさを決める
    - ここでは $\alpha=0.1$ とする
-- この魚では $d_{w_1}\approx-1.1974$ が負なので、$-\alpha d_{w_1}$ は正：
+- この魚では $d_{w_1}\approx-1.1974$ が負なので、$-\alpha d_{w_1}$ は正
 
 $$
 w_1\leftarrow-0.2
