@@ -104,7 +104,7 @@
     code span.vs { color: #032f62; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-e69bca93ec9d1486cefcf16a785f5ce6.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-f73900642b947ff7c946332e8eb6f3e3.css">
   <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -258,7 +258,7 @@
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
   <script src="network-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="6ff9d89527717885f6df917679670c8e059fa130">
+  <meta name="qmd-web-source" content="3d60eece6b9da6493f22b0fbd52d4cef7ca74379">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -277,28 +277,36 @@ rkskmt
 </div>
 
 </section>
-<section id="今回のテーマ" class="slide level2">
-<h2>今回のテーマ</h2>
+<section id="どの手法もある値が最小になるパラメータを探していた" class="slide level2">
+<h2>どの手法も、ある値が最小になるパラメータを探していた</h2>
 <div class="slide-body">
 <table class="caption-top">
-<colgroup>
-<col style="width: 50%">
-<col style="width: 50%">
-</colgroup>
 <thead>
 <tr class="header">
-<th>前回まで</th>
-<th>今回から</th>
+<th>手法</th>
+<th>パラメータ</th>
+<th>小さくしたい値</th>
+<th>探し方</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>境界・重心を、手法ごとの探し方で見つけた</td>
-<td><span class="hl">多くの手法で使える探し方を作る</span></td>
+<td>しきい値で分類</td>
+<td>重さのしきい値</td>
+<td><a href="./classification-basics-1d.html#peek-cost" class="peek">総コスト</a></td>
+<td>候補を全部試す（総当たり）</td>
 </tr>
 <tr class="even">
-<td>学習後のモデルを観察した</td>
-<td>数字が学習される途中を追う</td>
+<td>決定木</td>
+<td>分岐のしきい値</td>
+<td><a href="./classification-2d-boundaries.html#最適化ジニ不純度が最小になる閾値を探索" class="peek">加重平均ジニ不純度</a></td>
+<td>候補を全部試す</td>
+</tr>
+<tr class="odd">
+<td>k-means</td>
+<td>重心の位置</td>
+<td><a href="./clustering-kmeans.html#peek-sse" class="peek">SSE</a></td>
+<td>assign と update の繰り返し</td>
 </tr>
 </tbody>
 </table>
@@ -312,63 +320,24 @@ rkskmt
 <p><strong>今回の主題</strong></p>
 </div>
 <div class="callout-content">
-<p>候補を全部試さずに、小さくしたい値が最小になる数字を見つける</p>
+<p>候補を全部試さずに、多くの手法に共通して使える探し方はあるか</p>
 </div>
 </div>
 </div>
 </div>
-</div>
-</section>
-<section id="これまである値が最小になるパラメータを探してきた" class="slide level2">
-<h2>これまで、ある値が最小になるパラメータを探してきた</h2>
-<div class="slide-body">
-<table class="caption-top">
-<thead>
-<tr class="header">
-<th>手法</th>
-<th>パラメータ</th>
-<th>小さくしたい値</th>
-<th>方法</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>しきい値で分類</td>
-<td>重さの閾値</td>
-<td><a href="./classification-basics-1d.html#peek-cost" class="peek">総コスト</a></td>
-<td>候補を全部試す（総当たり）</td>
-</tr>
-<tr class="even">
-<td>決定木</td>
-<td>分岐の閾値</td>
-<td><a href="./classification-2d-boundaries.html#最適化ジニ不純度が最小になる閾値を探索" class="peek">加重平均ジニ不純度</a></td>
-<td>候補を全部試す</td>
-</tr>
-<tr class="odd">
-<td>k-means</td>
-<td>重心の位置</td>
-<td><a href="./clustering-kmeans.html#peek-sse" class="peek">SSE</a></td>
-<td>assign と update の繰り返し</td>
-</tr>
-</tbody>
-</table>
 </div>
 </section>
 <section id="損失loss" class="slide level2">
 <h2>損失（<span class="en">Loss</span>）</h2>
 <div class="slide-body">
 <ul>
-<li><strong>ダメさ</strong>を測る物差し
+<li><strong>損失</strong>：結果の<strong>ダメさ</strong>を測る物差し
 <ul>
-<li>低いほど良い</li>
+<li>小さいほど良い</li>
 </ul></li>
-<li>使い方
+<li><strong>最適化（<span class="en">optimization</span>）</strong>：損失が最小になるパラメータを探すこと
 <ul>
-<li>2つの結果を比べる（損失が低いほうが良い）</li>
-<li>損失が最小になるパラメータを探す（<strong>最適化</strong>, <span class="en">optimization</span>）
-<ul>
-<li>最適や最小化とはいっているが、本当に最も適した<strong>最もよい値ではなく</strong>、それっぽい値でも最適化と呼ぶ</li>
-</ul></li>
+<li>本当の最小値に届かなくても、十分に小さい値が見つかれば最適化と呼ぶことが多い</li>
 </ul></li>
 </ul>
 <table class="caption-top">
@@ -409,7 +378,7 @@ rkskmt
 </ul></li>
 <li><strong>学習</strong>：データからパラメータを決めること
 <ul>
-<li>多くのモデルでは最適化によって実現される</li>
+<li>多くのモデルでは、最適化でパラメータを決める</li>
 </ul></li>
 </ul>
 <div title="「パラメータ」の呼び分け">
@@ -438,21 +407,16 @@ rkskmt
 </div>
 </div>
 </section>
-<section id="損失関数を図で見る" class="slide level2">
-<h2>損失関数を図で見る</h2>
+<section id="peek-loss-function" class="slide level2">
+<h2>損失関数（<span class="en">Loss Function</span>）</h2>
 <div class="slide-body">
 <ul>
-<li><strong>損失関数（<span class="en">loss function</span>）</strong>：パラメータを入力したらlossを返す関数</li>
-<li>以下は、サケとスズキの分類のパラメータを変えた場合の損失関数の推移
+<li><strong>損失関数</strong>：パラメータを入力すると損失を返す関数
 <ul>
-<li>横軸：パラメータ（しきい値）</li>
-<li>縦軸：損失（誤分類の数）
-<ul>
-<li>しきい値を1つ決めると、<strong>損失</strong>が1つ決まる</li>
-</ul></li>
+<li>例：Salmon と Sea bass の分類では、しきい値を決めると誤分類の数が決まる</li>
 </ul></li>
 </ul>
-<div id="5a2d300d" class="cell" data-execution_count="1">
+<div id="6b8d1bff" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -471,9 +435,7 @@ rkskmt
 <p><strong>要するに</strong></p>
 </div>
 <div class="callout-content">
-<ul>
-<li>最小化する最適化問題は、グラフの<strong>谷底探し</strong>として考えられる</li>
-</ul>
+<p>損失の最小化は、損失関数のグラフの<strong>谷底探し</strong></p>
 </div>
 </div>
 </div>
@@ -486,7 +448,7 @@ rkskmt
 <ul>
 <li><a href="./classification-2d-boundaries.html#peek-diagonal" class="peek">斜めの直線で分けられそう</a>に見えた境界は、傾きと切片で決まる</li>
 </ul>
-<div id="048b7250" class="cell" data-execution_count="2">
+<div id="6b2c5332" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -505,10 +467,7 @@ rkskmt
 <p><strong>要するに</strong></p>
 </div>
 <div class="callout-content">
-<ul>
-<li>パラメータを変える ＝ <strong>図の境界線が変わる</strong></li>
-<li>値によって正答率が大きく変わる</li>
-</ul>
+<p>パラメータを変えると<strong>境界線が動き</strong>、正答率が変わる</p>
 </div>
 </div>
 </div>
@@ -521,7 +480,7 @@ rkskmt
 <ul>
 <li>パラメータ1個につき、候補を100個試すとする</li>
 </ul>
-<div id="14f0b2fb" class="cell fig-small" data-execution_count="3">
+<div id="2b0120c5" class="cell fig-small" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -560,11 +519,23 @@ rkskmt
 <p>勾配降下法</p>
 </div>
 </section>
-<section id="今回はこの関数を最小化しよう目的関数objective-function" class="slide level2">
-<h2>今回はこの関数を最小化しよう：目的関数（objective function)</h2>
+<section id="目的関数objective-function" class="slide level2">
+<h2>目的関数（<span class="en">Objective Function</span>）</h2>
 <div class="slide-body">
+<ul>
+<li><strong>目的関数</strong>：最適化で最小化または最大化する関数
+<ul>
+<li>損失関数は、最小化する目的関数</li>
+</ul></li>
+<li>今回は <span class="math inline">\(x\)</span> をパラメータ、<span class="math inline">\(f(x)\)</span> を損失として、次の関数を最小化する</li>
+</ul>
 <p><span class="math display">\[f(x) = x^2 - 4x + 3\]</span></p>
-<p>数学的には簡単だが、今回は<strong>数値的に</strong>（コンピュータのアプローチ）解く（数値的解法、<span class="en">numerical method</span>）</p>
+<ul>
+<li>数学的には簡単だが、今回は<strong>数値的解法（<span class="en">numerical method</span>）</strong>で解く
+<ul>
+<li>コンピュータが計算を繰り返して答えに近づく方法</li>
+</ul></li>
+</ul>
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -574,45 +545,7 @@ rkskmt
 <p><strong>ノート</strong></p>
 </div>
 <div class="callout-content">
-<p>数値的解法の逆は、解析的解法（<span class="en">analytical method</span>）</p>
-</div>
-</div>
-</div>
-<div class="takeaway dark">
-<p>目的関数は最小化する場合と最大化する場合がある</p>
-</div>
-</div>
-</section>
-<section id="勾配降下法には滑らかな損失関数が必要" class="slide level2">
-<h2>勾配降下法には滑らかな損失関数が必要</h2>
-<div class="slide-body">
-<ul>
-<li>今回は、<strong>目的関数 <span class="math inline">\(f(x)\)</span> ＝ 損失関数</strong>
-<ul>
-<li><span class="math inline">\(x\)</span>：パラメータ</li>
-<li><span class="math inline">\(f(x)\)</span>：損失関数</li>
-</ul></li>
-<li>勾配降下法では、傾きを計算できる<strong>滑らかな損失関数</strong>を使う
-<ul>
-<li>滑らか = 微分ができるという意味</li>
-</ul></li>
-</ul>
-<div title="参考：分類で使う代理損失">
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>参考：分類で使う代理損失</strong></p>
-</div>
-<div class="callout-content">
-<ul>
-<li>分類の学習では、予測の外れ方を連続的に測る滑らかな関数を使う</li>
-<li><strong>代理損失（<span class="en">surrogate loss</span>）</strong>：誤分類数などの評価基準の代わりに最小化する損失</li>
-<li>学習では代理損失を最小化し、評価には誤分類数や正答率を使える</li>
-</ul>
-</div>
+<p>数値的解法の逆は、<strong>解析的解法（<span class="en">analytical method</span>）</strong>：式変形で答えを直接求める方法</p>
 </div>
 </div>
 </div>
@@ -622,25 +555,25 @@ rkskmt
 <h2>基本方針：今いる位置から徐々に谷底を目指す</h2>
 <div class="slide-body">
 <ul>
-<li>今回の <span class="math inline">\(f(x) = x^2 - 4x + 3\)</span> なら、グラフを描けば最小値は <span class="math inline">\(x = 2\)</span> と一目で分かる</li>
-<li>しかし実際の機械学習では、パラメータが多数ある。損失関数のグラフは<strong>描けない</strong></li>
-<li>グラフ全体が見えなくても、いまの位置 <span class="math inline">\(x\)</span> で<strong>計算できる値</strong>はある：
+<li><span class="math inline">\(f(x) = x^2 - 4x + 3\)</span> なら、グラフを描けば最小値は <span class="math inline">\(x = 2\)</span> と一目で分かる</li>
+<li>実際の機械学習はパラメータが多く、損失関数のグラフを<strong>描けない</strong></li>
+<li>グラフ全体が見えなくても、いまの位置 <span class="math inline">\(x\)</span> で<strong>計算できる値</strong>はある
 <ul>
 <li>関数の値 <span class="math inline">\(f(x)\)</span></li>
 <li>傾き <span class="math inline">\(f'(x) = 2x - 4\)</span></li>
 </ul></li>
 </ul>
-<div title="今回の主題">
+<div title="勾配降下法（Gradient Descent）">
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>今回の主題</strong></p>
+<p><strong>勾配降下法（Gradient Descent）</strong></p>
 </div>
 <div class="callout-content">
-<p>足元の<strong>傾き（勾配, <span class="en">gradient</span>）</strong>だけを頼りに、一歩ずつ谷底へ降りるのが<strong>勾配降下法</strong></p>
+<p>足元の<strong>傾き（勾配, <span class="en">gradient</span>）</strong>だけを手がかりに、一歩ずつ谷底へ降りる手法</p>
 </div>
 </div>
 </div>
@@ -651,12 +584,12 @@ rkskmt
 <h2>傾きの符号で進む方向が決まる</h2>
 <div class="slide-body">
 <ul>
-<li><span class="math inline">\(x = 0\)</span> から出発する（別にどこからでもいい。今回はたまたま0）</li>
+<li>出発点を <span class="math inline">\(x = 0\)</span> とする（どこから始めてもよい）</li>
 <li>ここでの傾きは <span class="math inline">\(f'(0) = 2 \cdot 0 - 4 = -4\)</span></li>
-<li>傾きが<strong>負</strong> ＝ この場所では、右へ少し動くと <span class="math inline">\(f(x)\)</span> が下がる（下り坂は右）</li>
-<li>谷底に近づくには、傾きの<strong>逆方向</strong>（傾きが負なら右）へ少し進めばよい</li>
+<li>傾きが<strong>負</strong>なので、右へ少し動くと <span class="math inline">\(f(x)\)</span> が下がる</li>
+<li>谷底に近づくには、傾きの<strong>逆方向</strong>へ少し進めばよい</li>
 </ul>
-<div id="ca68d5e0" class="cell fig-small" data-execution_count="4">
+<div id="47351d22" class="cell fig-small" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -675,7 +608,10 @@ rkskmt
 <p><strong>要するに</strong></p>
 </div>
 <div class="callout-content">
-<p>進んだ先でまた傾きを測れば、次の一歩も決まる。<strong>繰り返せば谷底に近づく</strong></p>
+<ul>
+<li>進んだ先でまた傾きを測れば、次の一歩も決まる</li>
+<li><strong>繰り返せば谷底に近づく</strong></li>
+</ul>
 </div>
 </div>
 </div>
@@ -688,10 +624,10 @@ rkskmt
 <p>「傾きの逆方向に、少し進む」を式で書く：</p>
 <p><span class="math display">\[x_{\text{new}} = x - \alpha \cdot f'(x)\]</span></p>
 <ul>
-<li><span class="math inline">\(x\)</span>: 現在の位置</li>
-<li><span class="math inline">\(f'(x)\)</span>: 傾き（勾配）</li>
-<li><span class="math inline">\(\alpha\)</span>: <strong>学習率</strong>。1歩の大きさを決める正の数</li>
-<li><span class="math inline">\(x_{\text{new}}\)</span>: 次の位置</li>
+<li><span class="math inline">\(x\)</span>：現在の位置</li>
+<li><span class="math inline">\(f'(x)\)</span>：傾き（勾配）</li>
+<li><span class="math inline">\(\alpha\)</span>：<strong>学習率（<span class="en">learning rate</span>）</strong>（1歩の大きさを決める正の数）</li>
+<li><span class="math inline">\(x_{\text{new}}\)</span>：次の位置</li>
 </ul>
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
@@ -702,38 +638,56 @@ rkskmt
 <p><strong>ノート</strong></p>
 </div>
 <div class="callout-content">
-<p><strong>学習率 <span class="math inline">\(\alpha\)</span> は自分で決める必要がある</strong>（これが難しい）</p>
+<p>学習率 <span class="math inline">\(\alpha\)</span> はデータからは決まらず、人間が決める<a href="./clustering-kmeans.html#peek-parameter" class="peek">ハイパーパラメータ</a></p>
 </div>
 </div>
 </div>
 </div>
 </section>
-<section id="一旦傾き0を目指す" class="slide level2">
-<h2>一旦、傾き0を目指す</h2>
+<section id="傾きが0になると止まる" class="slide level2">
+<h2>傾きが0になると止まる</h2>
 <div class="slide-body">
 <p>更新式 <span class="math inline">\(x_{\text{new}} = x - \alpha \cdot f'(x)\)</span> を、傾きの符号で場合分けする：</p>
-<ul>
-<li>傾きが<strong>負</strong>（下り坂は右）→ <span class="math inline">\(-\alpha \cdot f'(x)\)</span> は<strong>正</strong> → 右へ進む</li>
-<li>傾きが<strong>正</strong>（下り坂は左）→ <span class="math inline">\(-\alpha \cdot f'(x)\)</span> は<strong>負</strong> → 左へ進む</li>
-<li>傾きが<strong>0</strong>（谷底）→ <span class="math inline">\(-\alpha \cdot f'(x)\)</span> も <span class="math inline">\(0\)</span> → 動かない
-<ul>
-<li>傾き0は山頂の可能性もあるが、下がってきて山頂は内という前提
-<ul>
-<li>ただ、初期値がいきなり山頂だと詰むので注意</li>
-</ul></li>
-</ul></li>
-</ul>
-<div title="要するに">
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>傾き <span class="math inline">\(f'(x)\)</span></th>
+<th>移動量 <span class="math inline">\(-\alpha \cdot f'(x)\)</span></th>
+<th>動き</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>負（下り坂は右）</td>
+<td>正</td>
+<td>右へ進む</td>
+</tr>
+<tr class="even">
+<td>正（下り坂は左）</td>
+<td>負</td>
+<td>左へ進む</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(0\)</span></td>
+<td>止まる</td>
+</tr>
+</tbody>
+</table>
+<div title="傾きが0でも谷底とは限らない">
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>要するに</strong></p>
+<p><strong>傾きが0でも谷底とは限らない</strong></p>
 </div>
 <div class="callout-content">
-<p><strong>同じ式を繰り返すだけ</strong>で谷底に近づいていく</p>
+<ul>
+<li>山頂でも傾きは <span class="math inline">\(0\)</span> になる</li>
+<li>下りながら進むので途中で山頂に止まることはまずないが、初期値が山頂だとそこから動かない</li>
+</ul>
 </div>
 </div>
 </div>
@@ -748,10 +702,11 @@ rkskmt
 <div class="tab-content">
 <div id="tabset-1-1">
 <ul>
-<li>関数: <span class="math inline">\(f(x) = x^2 - 4x + 3\)</span></li>
-<li>1次微分: <span class="math inline">\(f'(x) = 2x - 4\)</span></li>
-<li>初期値: <span class="math inline">\(x_0 = 0\)</span></li>
-<li><strong>学習率: <span class="math inline">\(\alpha = 0.3\)</span></strong></li>
+<li>関数：<span class="math inline">\(f(x) = x^2 - 4x + 3\)</span></li>
+<li>1次微分：<span class="math inline">\(f'(x) = 2x - 4\)</span></li>
+<li>初期値：<span class="math inline">\(x_0 = 0\)</span></li>
+<li>学習率：<span class="math inline">\(\alpha = 0.3\)</span></li>
+<li><strong>反復（<span class="en">iteration</span>）</strong>：更新を繰り返すこと（反復1は1回目の更新）</li>
 </ul>
 </div>
 <div id="tabset-1-2">
@@ -761,11 +716,11 @@ rkskmt
 <p><span class="math display">\[f(0) = 0^2 - 4 \times 0 + 3 = 3\]</span></p>
 <h4 id="ステップ3勾配を計算">ステップ3：勾配を計算</h4>
 <p><span class="math display">\[f'(0) = 2 \times 0 - 4 = -4\]</span></p>
-<p><strong>意味</strong>: 傾きが<span class="math inline">\(-4\)</span>（負）なので、右に行くほど値が小さくなる</p>
+<p>傾きが <span class="math inline">\(-4\)</span>（負）なので、右へ進むと値が小さくなる</p>
 <h4 id="ステップ4更新">ステップ4：更新</h4>
-<p><strong>更新式:</strong> <span class="math display">\[x_{\text{new}} = x - \alpha \cdot f'(x)\]</span></p>
-<p><strong>代入:</strong> <span class="math display">\[x_{\text{new}} = 0 - 0.3 \times (-4)\]</span></p>
-<p><strong>計算:</strong> <span class="math display">\[\begin{align}
+<p><strong>更新式：</strong> <span class="math display">\[x_{\text{new}} = x - \alpha \cdot f'(x)\]</span></p>
+<p><strong>代入：</strong> <span class="math display">\[x_{\text{new}} = 0 - 0.3 \times (-4)\]</span></p>
+<p><strong>計算：</strong> <span class="math display">\[\begin{align}
 &amp;= 0 - (-1.2) \\
 &amp;= 0 + 1.2 \\
 &amp;= 1.2
@@ -779,11 +734,11 @@ rkskmt
 <p><strong>重要</strong></p>
 </div>
 <div class="callout-content">
-<p><strong>反復1の結果</strong>: <span class="math inline">\(x = 0 \rightarrow x = 1.2\)</span></p>
+<p><strong>反復1の結果</strong>：<span class="math inline">\(x = 0 \rightarrow x = 1.2\)</span></p>
 </div>
 </div>
 </div>
-<div id="1d1d6c85" class="cell" data-execution_count="6">
+<div id="e1a9c06d" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -811,11 +766,11 @@ rkskmt
 <p><strong>重要</strong></p>
 </div>
 <div class="callout-content">
-<p><strong>反復2の結果</strong>: <span class="math inline">\(x = 1.2 \rightarrow x = 1.68\)</span></p>
+<p><strong>反復2の結果</strong>：<span class="math inline">\(x = 1.2 \rightarrow x = 1.68\)</span></p>
 </div>
 </div>
 </div>
-<div id="3136f79f" class="cell" data-execution_count="7">
+<div id="0fb9c5fa" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -829,8 +784,8 @@ rkskmt
 </div>
 </div>
 </section>
-<section id="手計算で実行反復を続ける" class="slide level2">
-<h2>手計算で実行：反復を続ける</h2>
+<section id="勾配降下法手計算で反復を続ける" class="slide level2">
+<h2>勾配降下法：手計算で反復を続ける</h2>
 <div class="slide-body">
 <div class="panel-tabset">
 <ul id="tabset-2" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-2-1">反復3</a></li><li><a href="#tabset-2-2">反復4</a></li><li><a href="#tabset-2-3">進捗まとめ</a></li></ul>
@@ -842,7 +797,7 @@ rkskmt
 <p><span class="math display">\[f'(1.68) = 2 \times 1.68 - 4 = 3.36 - 4 = -0.64\]</span></p>
 <h4 id="更新">更新</h4>
 <p><span class="math display">\[x_{\text{new}} = 1.68 - 0.3 \times (-0.64) = 1.68 + 0.192 = 1.872\]</span></p>
-<div id="c91e134a" class="cell" data-execution_count="8">
+<div id="425232a7" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -859,7 +814,7 @@ rkskmt
 <p><span class="math display">\[f'(1.872) = 2 \times 1.872 - 4 = 3.744 - 4 = -0.256\]</span></p>
 <h4 id="更新-1">更新</h4>
 <p><span class="math display">\[x_{\text{new}} = 1.872 - 0.3 \times (-0.256) = 1.872 + 0.0768 = 1.9488\]</span></p>
-<div id="2bacb616" class="cell" data-execution_count="9">
+<div id="a7349f1a" class="cell" data-execution_count="9">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -918,7 +873,7 @@ rkskmt
 </tr>
 </tbody>
 </table>
-<div id="723b32a8" class="cell" data-execution_count="10">
+<div id="c2466ca6" class="cell" data-execution_count="10">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -936,7 +891,7 @@ rkskmt
 <p><strong>ノート</strong></p>
 </div>
 <div class="callout-content">
-<p>徐々に正解（<span class="math inline">\(x=2\)</span>）に近づいているが、<strong>まだ到達していない</strong></p>
+<p>最小値 <span class="math inline">\(x=2\)</span> に少しずつ近づいているが、<strong>まだ到達していない</strong></p>
 </div>
 </div>
 </div>
@@ -951,22 +906,22 @@ rkskmt
 <ul>
 <li>手計算で使った更新式を、そのまま <code>for</code> 文で繰り返す</li>
 </ul>
-<div id="4fc6b505" class="cell" data-execution_count="11">
+<div id="7e01780b" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="kw">def</span> f(x):</span>
 <span id="cb1-2"><a aria-label="2"></a>    <span class="cf">return</span> x<span class="op">**</span><span class="dv">2</span> <span class="op">-</span> <span class="dv">4</span><span class="op">*</span>x <span class="op">+</span> <span class="dv">3</span></span>
 <span id="cb1-3"><a aria-label="3"></a></span>
 <span id="cb1-4"><a aria-label="4"></a><span class="kw">def</span> f_prime(x):</span>
 <span id="cb1-5"><a aria-label="5"></a>    <span class="cf">return</span> <span class="dv">2</span><span class="op">*</span>x <span class="op">-</span> <span class="dv">4</span></span>
 <span id="cb1-6"><a aria-label="6"></a></span>
-<span id="cb1-7"><a aria-label="7"></a>x <span class="op">=</span> <span class="fl">0.0</span></span>
-<span id="cb1-8"><a aria-label="8"></a>lr <span class="op">=</span> <span class="fl">0.3</span></span>
-<span id="cb1-9"><a aria-label="9"></a>max_iter <span class="op">=</span> <span class="dv">10</span></span>
-<span id="cb1-10"><a aria-label="10"></a>tolerance <span class="op">=</span> <span class="fl">0.01</span></span>
+<span id="cb1-7"><a aria-label="7"></a>x <span class="op">=</span> <span class="fl">0.0</span>            <span class="co"># 初期値</span></span>
+<span id="cb1-8"><a aria-label="8"></a>lr <span class="op">=</span> <span class="fl">0.3</span>           <span class="co"># 学習率</span></span>
+<span id="cb1-9"><a aria-label="9"></a>max_iter <span class="op">=</span> <span class="dv">10</span>      <span class="co"># 最大反復回数</span></span>
+<span id="cb1-10"><a aria-label="10"></a>tolerance <span class="op">=</span> <span class="fl">0.01</span>   <span class="co"># 傾きの大きさがこれ未満になったら止める</span></span>
 <span id="cb1-11"><a aria-label="11"></a></span>
 <span id="cb1-12"><a aria-label="12"></a><span class="cf">for</span> iteration <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, max_iter <span class="op">+</span> <span class="dv">1</span>):</span>
 <span id="cb1-13"><a aria-label="13"></a>    gradient <span class="op">=</span> f_prime(x)</span>
 <span id="cb1-14"><a aria-label="14"></a>    x <span class="op">=</span> x <span class="op">-</span> lr <span class="op">*</span> gradient</span>
-<span id="cb1-15"><a aria-label="15"></a>    <span class="bu">print</span>(<span class="ss">f"反復</span><span class="sc">{</span>iteration<span class="sc">}</span><span class="ss">: x = </span><span class="sc">{</span>x<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb1-15"><a aria-label="15"></a>    <span class="bu">print</span>(<span class="ss">f"iter </span><span class="sc">{</span>iteration<span class="sc">:2d}</span><span class="ss">: x = </span><span class="sc">{</span>x<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
 <span id="cb1-16"><a aria-label="16"></a></span>
 <span id="cb1-17"><a aria-label="17"></a>    <span class="cf">if</span> <span class="bu">abs</span>(f_prime(x)) <span class="op">&lt;</span> tolerance:</span>
 <span id="cb1-18"><a aria-label="18"></a>        <span class="bu">print</span>(<span class="st">"ほぼ収束（|f'(x)| &lt; 0.01）"</span>)</span>
@@ -975,16 +930,31 @@ rkskmt
 <span id="cb1-21"><a aria-label="21"></a><span class="bu">print</span>(<span class="ss">f"最終 x = </span><span class="sc">{</span>x<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
 <span id="cb1-22"><a aria-label="22"></a><span class="bu">print</span>(<span class="ss">f"最終 f(x) = </span><span class="sc">{</span>f(x)<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>反復1: x = 1.2000
-反復2: x = 1.6800
-反復3: x = 1.8720
-反復4: x = 1.9488
-反復5: x = 1.9795
-反復6: x = 1.9918
-反復7: x = 1.9967
+<pre><code>iter  1: x = 1.2000
+iter  2: x = 1.6800
+iter  3: x = 1.8720
+iter  4: x = 1.9488
+iter  5: x = 1.9795
+iter  6: x = 1.9918
+iter  7: x = 1.9967
 ほぼ収束（|f'(x)| &lt; 0.01）
 最終 x = 1.9967
 最終 f(x) = -1.0000</code></pre>
+</div>
+</div>
+<div title="結果">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>結果</strong></p>
+</div>
+<div class="callout-content">
+<p><span class="math inline">\(x\)</span> が最小値 <span class="math inline">\(x = 2\)</span> に近づき、ほとんど動かなくなった：<strong>収束（<span class="en">convergence</span>）</strong></p>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -1046,7 +1016,7 @@ rkskmt
 <section id="peek-lr" class="slide level2">
 <h2>学習率で挙動が変わる</h2>
 <div class="slide-body">
-<div id="e3c3071d" class="cell fig-medium" data-execution_count="12">
+<div id="022d84f9" class="cell fig-medium" data-execution_count="12">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1066,8 +1036,8 @@ rkskmt
 </div>
 <div class="callout-content">
 <ul>
-<li><span class="math inline">\(\alpha=0.75\)</span>：谷をまたいで振動するが、振幅は小さくなり<strong>収束する</strong></li>
-<li><span class="math inline">\(\alpha=1.1\)</span>：谷をまたぐたびに振幅が大きくなり<strong>発散する</strong></li>
+<li><span class="math inline">\(\alpha=0.75\)</span>：谷をまたいで<strong>振動（<span class="en">oscillation</span>）</strong>するが、振幅は小さくなり収束する</li>
+<li><span class="math inline">\(\alpha=1.1\)</span>：谷をまたぐたびに振幅が大きくなり<strong>発散（<span class="en">divergence</span>）</strong>する</li>
 </ul>
 </div>
 </div>
@@ -1084,17 +1054,32 @@ rkskmt
 <li><strong>最大反復回数</strong>：終わらない場合に何回で打ち切るか</li>
 <li><strong>停止条件</strong>：<span class="math inline">\(|f'(x)| &lt; 0.01\)</span> など、いつ収束したと判断するか</li>
 </ul>
-<div title="今回注目する値">
+</div>
+</section>
+<section id="勾配降下法には滑らかな損失関数が必要" class="slide level2">
+<h2>勾配降下法には滑らかな損失関数が必要</h2>
+<div class="slide-body">
+<ul>
+<li>勾配降下法は傾きを手がかりにするので、<strong>滑らかな</strong>損失関数を使う
+<ul>
+<li>滑らか：微分できること</li>
+</ul></li>
+<li><a href="#/peek-loss-function" class="peek">誤分類の数</a>は階段状で、傾きが手がかりにならない</li>
+</ul>
+<div title="（参考）分類で使う代理損失">
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>今回注目する値</strong></p>
+<p><strong>（参考）分類で使う代理損失</strong></p>
 </div>
 <div class="callout-content">
-<p>勾配降下法の動きを大きく変える<strong>学習率</strong>を中心に比較する</p>
+<ul>
+<li><strong>代理損失（<span class="en">surrogate loss</span>）</strong>：誤分類数などの評価基準の代わりに最小化する、滑らかな損失</li>
+<li>学習では代理損失を最小化し、評価には誤分類数や正答率を使う</li>
+</ul>
 </div>
 </div>
 </div>
@@ -1105,8 +1090,8 @@ rkskmt
 <h2>2変数では軸ごとの傾きを並べた勾配ベクトルを使う</h2>
 <div class="slide-body">
 <ul>
-<li>2変数では、それぞれの方向の傾きを<strong>偏微分（<span class="en">partial derivative</span>）</strong>で求める</li>
-<li>偏微分を並べたベクトルが<strong>勾配</strong></li>
+<li>パラメータが <span class="math inline">\(w_1, w_2\)</span> の2個なら、それぞれの方向の傾きを<strong>偏微分（<span class="en">partial derivative</span>）</strong>で求める</li>
+<li><strong>勾配 <span class="math inline">\(\nabla f\)</span></strong>（<span class="math inline">\(\nabla\)</span> はナブラ）：偏微分を並べたベクトル</li>
 </ul>
 <p><span class="math display">\[
 f(w_1,w_2)=w_1^2+3w_2^2,
@@ -1133,7 +1118,7 @@ f(w_1,w_2)=w_1^2+3w_2^2,
 <p><strong>1変数との共通点</strong></p>
 </div>
 <div class="callout-content">
-<p>パラメータが増えても、各パラメータを個別に計算するだけ。１次元と変わらない。</p>
+<p>パラメータが増えても、各パラメータの更新は1変数のときと同じ</p>
 </div>
 </div>
 </div>
@@ -1148,7 +1133,7 @@ f(w_1,w_2)=w_1^2+3w_2^2,
 <li>初期値：<span class="math inline">\((w_1,w_2)=(-4,2)\)</span></li>
 <li>学習率：<span class="math inline">\(\alpha=0.25\)</span></li>
 </ul>
-<p><strong>勾配:</strong></p>
+<p><strong>勾配：</strong></p>
 <p><span class="math display">\[
 \underbrace{\frac{\partial f}{\partial w_1}=2w_1}_{w_2\text{ を定数と見て微分}}
 \qquad
@@ -1160,7 +1145,7 @@ f(w_1,w_2)=w_1^2+3w_2^2,
 =
 \begin{pmatrix}-8\\12\end{pmatrix}
 \]</span></p>
-<p><strong>更新:</strong></p>
+<p><strong>更新：</strong></p>
 <p><span class="math display">\[
 \begin{pmatrix}w_1\\w_2\end{pmatrix}_{\mathrm{new}}
 =
@@ -1192,7 +1177,7 @@ f(w_1,w_2)=w_1^2+3w_2^2,
 <ul>
 <li><a href="#/peek-gd-code" class="peek">1変数の実装</a>と同様に、<span class="math inline">\(w_1\)</span> と <span class="math inline">\(w_2\)</span> をそれぞれ更新する</li>
 </ul>
-<div id="e9f9cca8" class="cell" data-execution_count="13">
+<div id="61f741f0" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a aria-label="1"></a><span class="kw">def</span> f2(w1, w2):</span>
 <span id="cb3-2"><a aria-label="2"></a>    <span class="cf">return</span> w1<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> <span class="dv">3</span> <span class="op">*</span> w2<span class="op">**</span><span class="dv">2</span></span>
 <span id="cb3-3"><a aria-label="3"></a></span>
@@ -1221,27 +1206,40 @@ iter 6: w1=-0.0625 w2= 0.0312 f=0.0068</code></pre>
 </div>
 </div>
 </section>
-<section id="fw_1w_2w_123w_22-最適化の可視化" class="slide level2">
-<h2><span class="math inline">\(f(w_1,w_2)=w_1^2+3w_2^2\)</span> 最適化の可視化</h2>
+<section id="変数の勾配降下法の軌跡" class="slide level2">
+<h2>2変数の勾配降下法の軌跡</h2>
 <div class="slide-body">
-<ul>
-<li><span class="math inline">\(w_1\)</span> は谷の同じ側から近づき、<span class="math inline">\(w_2\)</span> は谷をまたいで<strong>振動しながら収束</strong>する</li>
-<li>実際の機械学習の損失地形はこのさらに高次元版
-<ul>
-<li>グラフでは描けなくても、勾配ベクトルを使って各パラメータを地道に更新する</li>
-</ul></li>
-</ul>
+<p><span class="math display">\[f(w_1,w_2)=w_1^2+3w_2^2\]</span></p>
 <div style="display:flex; justify-content:center;">
 <iframe src="iframes/gd_bowl_3d.html" width="900" height="520" style="border:none;" onload="try{var d=this.contentDocument;if(d){d.documentElement.style.margin='0';d.documentElement.style.padding='0';d.body.style.margin='0';d.body.style.padding='0';}}catch(e){}"></iframe>
 </div>
+<div title="要するに">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>要するに</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li><span class="math inline">\(w_1\)</span> は谷の同じ側から近づく</li>
+<li><span class="math inline">\(w_2\)</span> は谷をまたぎ、<strong>振動しながら収束</strong>する</li>
+<li>実際の機械学習はパラメータがさらに多いが、更新のしかたは同じ</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
 </div>
 </section>
-<section id="勾配降下法は主力アルゴリズム" class="slide level2">
-<h2>勾配降下法は主力アルゴリズム</h2>
+<section id="勾配降下法は機械学習の主力" class="slide level2">
+<h2>勾配降下法は機械学習の主力</h2>
 <div class="slide-body">
 <ul>
-<li>弱点（学習率の調整・遅さ）があるのに、<strong>勾配降下法はメインウェポン</strong></li>
-<li>理由：パラメータが多数あっても、勾配を計算できれば更新できる</li>
+<li><strong>強み</strong>：パラメータが多くても、勾配を計算できれば更新できる</li>
+<li><strong>弱点</strong>：学習率の調整が必要で、収束が遅いことがある</li>
 <li>実用では、パラメータごとに更新幅を調整する改良法（Adam など）も使われる</li>
 </ul>
 <div title="参考資料">
@@ -1255,8 +1253,8 @@ iter 6: w1=-0.0625 w2= 0.0312 f=0.0068</code></pre>
 </div>
 <div class="callout-content">
 <ul>
-<li>もっと賢く進む手法もある → <strong><a href="./newton-method-appendix.html">Newton法</a></strong>（2次微分で一気にジャンプ）</li>
-<li>谷が複数あるとき、どの谷に落ちるかは初期値しだい → <strong><a href="./optimization-local-minima-appendix.html">ローカルミニマムの罠</a></strong></li>
+<li><strong><a href="./newton-method-appendix.html">Newton法</a></strong>：2次微分を使い、少ない反復で最小値に近づく</li>
+<li><strong><a href="./optimization-local-minima-appendix.html">ローカルミニマムの罠</a></strong>：谷が複数あると、どの谷に着くかは初期値で決まる</li>
 </ul>
 </div>
 </div>
@@ -1272,27 +1270,26 @@ iter 6: w1=-0.0625 w2= 0.0312 f=0.0068</code></pre>
 <ul>
 <li>候補を全部試す探し方は、パラメータが増えると使えない</li>
 </ul></li>
-<li><strong>勾配降下法</strong>：傾きを測り、逆方向に少し進む、を繰り返す</li>
+<li><strong>勾配降下法</strong>：傾きの逆方向へ少し進むことを繰り返す手法</li>
 </ul>
 <p><span class="math display">\[x_{\text{new}} = x - \alpha \cdot f'(x)\]</span></p>
 <ul>
-<li><strong>学習率 <span class="math inline">\(\alpha\)</span></strong> は主な調整値：小さいと遅く、大きすぎると発散する</li>
-<li>初期値・最大反復回数・停止条件も決める必要がある</li>
-<li>シンプルで軽く、<strong>大規模問題（ディープラーニング）の標準エンジン</strong>となっている</li>
+<li><strong>学習率 <span class="math inline">\(\alpha\)</span></strong>：小さいと収束が遅く、大きすぎると発散する</li>
+<li>初期値、最大反復回数、停止条件も決める必要がある</li>
+<li>パラメータが増えても、偏微分を並べた<strong>勾配</strong>で同じように更新する</li>
+<li>計算が軽く、<strong>ディープラーニング</strong>のような大規模な問題でも標準的に使われる</li>
 </ul>
 </div>
 </section>
 <section id="練習問題" class="slide level2 scrollable">
 <h2>練習問題</h2>
 <div class="slide-body">
-<p>以下の問題を<strong>紙で</strong>解け。</p>
-<p>関数 <span class="math inline">\(f(x) = x^2 + 6x + 5\)</span> について：</p>
+<p><span class="math inline">\(f(x) = x^2 + 6x + 5\)</span> を、初期値 <span class="math inline">\(x_0 = 0\)</span>、学習率 <span class="math inline">\(\alpha = 0.2\)</span> の勾配降下法で最小化する過程を、紙に書いて求めよ。</p>
 <ol type="1">
-<li>1次微分を求めよ</li>
-<li>初期値 <span class="math inline">\(x_0 = 0\)</span>、学習率 <span class="math inline">\(\alpha = 0.2\)</span> で勾配降下法を実行せよ</li>
-<li>反復1、反復2、反復3を手計算で示せ</li>
+<li><span class="math inline">\(f'(x)\)</span> の導出</li>
+<li>3回の更新（各回の <span class="math inline">\(f'(x)\)</span> と <span class="math inline">\(x\)</span> を記載）</li>
 </ol>
-<p>発展課題：<a href="./newton-method-appendix.html">Newton法（参考資料）</a>の練習問題で、同じ関数を別の手法で解いて速さを比較する。</p>
+<p>（参考）<a href="./newton-method-appendix.html">Newton法</a>の練習問題では、同じ関数を別の手法で解いて速さを比べる</p>
 </div>
 </section>
 <section id="練習問題の解答例" class="slide level2">
@@ -1302,28 +1299,28 @@ iter 6: w1=-0.0625 w2= 0.0312 f=0.0068</code></pre>
 準備
 </div>
 <p><span class="math display">\[f(x) = x^2 + 6x + 5\]</span></p>
-<p><strong>1次微分:</strong> <span class="math display">\[f'(x) = 2x + 6\]</span></p>
+<p><strong>1次微分：</strong> <span class="math display">\[f'(x) = 2x + 6\]</span></p>
 <div class="panel-tabset">
 <ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-3-1">反復1</a></li><li><a href="#tabset-3-2">反復2</a></li><li><a href="#tabset-3-3">反復3</a></li></ul>
 <div class="tab-content">
 <div id="tabset-3-1">
-<p><strong>現在</strong>: <span class="math inline">\(x = 0\)</span></p>
+<p><strong>現在</strong>：<span class="math inline">\(x = 0\)</span></p>
 <p><span class="math display">\[f'(0) = 2(0) + 6 = 6\]</span></p>
-<p><strong>更新:</strong> <span class="math display">\[x_{\text{new}} = 0 - 0.2 \times 6 = 0 - 1.2 = -1.2\]</span></p>
+<p><strong>更新：</strong> <span class="math display">\[x_{\text{new}} = 0 - 0.2 \times 6 = 0 - 1.2 = -1.2\]</span></p>
 </div>
 <div id="tabset-3-2">
-<p><strong>現在</strong>: <span class="math inline">\(x = -1.2\)</span></p>
+<p><strong>現在</strong>：<span class="math inline">\(x = -1.2\)</span></p>
 <p><span class="math display">\[f'(-1.2) = 2(-1.2) + 6 = -2.4 + 6 = 3.6\]</span></p>
-<p><strong>更新:</strong> <span class="math display">\[x_{\text{new}} = -1.2 - 0.2 \times 3.6 = -1.2 - 0.72 = -1.92\]</span></p>
+<p><strong>更新：</strong> <span class="math display">\[x_{\text{new}} = -1.2 - 0.2 \times 3.6 = -1.2 - 0.72 = -1.92\]</span></p>
 </div>
 <div id="tabset-3-3">
-<p><strong>現在</strong>: <span class="math inline">\(x = -1.92\)</span></p>
+<p><strong>現在</strong>：<span class="math inline">\(x = -1.92\)</span></p>
 <p><span class="math display">\[f'(-1.92) = 2(-1.92) + 6 = -3.84 + 6 = 2.16\]</span></p>
-<p><strong>更新:</strong> <span class="math display">\[x_{\text{new}} = -1.92 - 0.2 \times 2.16 = -1.92 - 0.432 = -2.352\]</span></p>
+<p><strong>更新：</strong> <span class="math display">\[x_{\text{new}} = -1.92 - 0.2 \times 2.16 = -1.92 - 0.432 = -2.352\]</span></p>
 </div>
 </div>
 </div>
-<div id="513a6c77" class="cell" data-execution_count="15">
+<div id="7dc05b18" class="cell" data-execution_count="15">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1332,7 +1329,21 @@ iter 6: w1=-0.0625 w2= 0.0312 f=0.0068</code></pre>
 </div>
 </div>
 </div>
-<p>まだ収束していない（理論値は<span class="math inline">\(x=-3\)</span>）</p>
+<div title="結果">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>結果</strong></p>
+</div>
+<div class="callout-content">
+<p><span class="math inline">\(x\)</span> は最小値 <span class="math inline">\(x=-3\)</span> に近づいているが、まだ収束していない</p>
+</div>
+</div>
+</div>
+</div>
 </div>
 </section>
 <section id="演習4次関数で初期値を変える" class="slide level2 badge-practice scrollable">

@@ -104,7 +104,7 @@
     code span.vs { color: #032f62; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-e69bca93ec9d1486cefcf16a785f5ce6.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-f73900642b947ff7c946332e8eb6f3e3.css">
   <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -237,6 +237,15 @@
             config.math.config = config.math.config.replace("_HTML", "_CHTML");
             config.math.CommonHTML = { scale: 127, matchFontHeight: false };
           }
+          // A ruled or network lecture index lays itself out at the
+          // window's width (custom.css). reveal.js's slide view
+          // fixes every slide at 1280x720 and scales it, and reveal.js
+          // switches to the scroll view only below 435px, so open such
+          // a page in the scroll view at every width. Quarto calls
+          // initialize at the end of <body>, so the page is parsed.
+          if (config && document.querySelector(".lectures.ruled, .lectures.network")) {
+            config.view = "scroll";
+          }
           return initialize.call(this, config);
         };
       }
@@ -248,7 +257,8 @@
   <script src="peek-ui.js" defer=""></script>
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="ec4965cca3c36d5a67a7387e2702f9ce41e611b7">
+  <script src="network-ui.js" defer=""></script>
+  <meta name="qmd-web-source" content="b281f1857a15e504025a02221d76d6da7c242813">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -276,7 +286,7 @@ rkskmt
 <section id="peek-np-linspace" class="slide level2">
 <h2>関数のために x 軸用の点列を用意したい（<code>linspace</code>）</h2>
 <div class="slide-body">
-<div id="ecd9efe3" class="cell" data-execution_count="1">
+<div id="9b9be781" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a aria-label="2"></a></span>
 <span id="cb1-3"><a aria-label="3"></a><span class="bu">print</span>(np.linspace(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">5</span>))     <span class="co"># 0 から 1 までを 5 個に分ける</span></span>
@@ -307,7 +317,7 @@ rkskmt
 <section id="peek-np-arange" class="slide level2">
 <h2>range のような数列を array で用意したい（<code>arange</code>）</h2>
 <div class="slide-body">
-<div id="af1b7b30" class="cell" data-execution_count="2">
+<div id="0253e82f" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb3-2"><a aria-label="2"></a></span>
 <span id="cb3-3"><a aria-label="3"></a><span class="bu">print</span>(np.arange(<span class="dv">5</span>))                <span class="co"># 0 から 4 まで</span></span>
@@ -337,7 +347,7 @@ rkskmt
 <section id="peek-np-zeros" class="slide level2">
 <h2>重みのために、初期値 0 の array を準備したい（<code>zeros</code>）</h2>
 <div class="slide-body">
-<div id="57dfa0c4" class="cell" data-execution_count="3">
+<div id="c35038eb" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb5-2"><a aria-label="2"></a></span>
 <span id="cb5-3"><a aria-label="3"></a><span class="bu">print</span>(np.zeros(<span class="dv">3</span>))         <span class="co"># 要素 3 個</span></span>
@@ -372,7 +382,7 @@ rkskmt
 <section id="peek-np-rng" class="slide level2">
 <h2>乱数の array を用意したい（<code>default_rng</code>）</h2>
 <div class="slide-body">
-<div id="e766505b" class="cell" data-execution_count="4">
+<div id="94634cf6" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb7-2"><a aria-label="2"></a></span>
 <span id="cb7-3"><a aria-label="3"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">42</span>)</span>
@@ -415,7 +425,7 @@ rkskmt
 <section id="peek-np-shape" class="slide level2">
 <h2>array の形を確かめたい（<code>shape</code>）</h2>
 <div class="slide-body">
-<div id="56fc93fc" class="cell" data-execution_count="5">
+<div id="92939806" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb9-2"><a aria-label="2"></a></span>
 <span id="cb9-3"><a aria-label="3"></a>x <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>])</span>
@@ -436,7 +446,7 @@ rkskmt
 <section id="peek-np-column-stack" class="slide level2">
 <h2>array を横に並べて表にしたい（<code>column_stack</code>）</h2>
 <div class="slide-body">
-<div id="3ea315d7" class="cell" data-execution_count="6">
+<div id="ea508272" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb11-2"><a aria-label="2"></a></span>
 <span id="cb11-3"><a aria-label="3"></a>a <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">2</span>])</span>
@@ -472,7 +482,7 @@ rkskmt
 <section id="peek-np-concatenate" class="slide level2">
 <h2>array を連結したい（<code>concatenate</code>）</h2>
 <div class="slide-body">
-<div id="db33bf78" class="cell" data-execution_count="7">
+<div id="c11291d0" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb13-2"><a aria-label="2"></a></span>
 <span id="cb13-3"><a aria-label="3"></a>l1 <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]</span>
@@ -502,7 +512,7 @@ rkskmt
 <p><strong>ノート</strong></p>
 </div>
 <div class="callout-content">
-<p>ただし、 <code>a + b</code> は連結ではなく、要素ごとの足し算になるのでダメ。</p>
+<p><code>a + b</code> は連結にならない（長さが同じなら要素ごとの足し算、違えばエラー）</p>
 </div>
 </div>
 </div>
@@ -511,7 +521,7 @@ rkskmt
 <section id="peek-np-reshape-flat" class="slide level2">
 <h2>array の形を変えたい（<code>reshape</code>）</h2>
 <div class="slide-body">
-<div id="7d8e1e28" class="cell" data-execution_count="8">
+<div id="a823b357" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb15-2"><a aria-label="2"></a></span>
 <span id="cb15-3"><a aria-label="3"></a>x <span class="op">=</span> np.arange(<span class="dv">6</span>)</span>
@@ -544,7 +554,7 @@ rkskmt
 <section id="peek-np-reshape-column" class="slide level2">
 <h2>scikit-learn 用にarray を N行1列にしたい（<code>reshape(-1, 1)</code>）</h2>
 <div class="slide-body">
-<div id="e3df3b0b" class="cell" data-execution_count="9">
+<div id="c1fb6339" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb17-2"><a aria-label="2"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
 <span id="cb17-3"><a aria-label="3"></a></span>
@@ -576,7 +586,7 @@ rkskmt
 </div>
 <div class="callout-content">
 <ul>
-<li>特徴量が1つでも、<code>[1, 2, 3]</code> の形のままでは <code>fit</code> に渡せない（エラーになる）</li>
+<li>特徴量（<span class="en">feature</span>）が1つでも、<code>[1, 2, 3]</code> の形のままでは <code>fit</code> に渡せない（エラーになる）</li>
 <li><code>reshape(-1, 1)</code> の <code>1</code> は列の数で、<code>-1</code> と書いた行の数は、要素の数から自動で決まる</li>
 </ul>
 </div>
@@ -593,7 +603,7 @@ rkskmt
 <section id="peek-np-column" class="slide level2">
 <h2>表から列や行を取り出したい（<code>X[:, 0]</code>）</h2>
 <div class="slide-body">
-<div id="f20ab353" class="cell" data-execution_count="10">
+<div id="6fb62ae6" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb19-2"><a aria-label="2"></a></span>
 <span id="cb19-3"><a aria-label="3"></a>X <span class="op">=</span> np.array([[<span class="dv">1</span>, <span class="dv">10</span>],</span>
@@ -631,7 +641,7 @@ rkskmt
 <section id="peek-np-mask" class="slide level2">
 <h2>条件に合う要素だけ取り出したい（<code>x[x &gt;= 5]</code>）</h2>
 <div class="slide-body">
-<div id="77b9fd76" class="cell" data-execution_count="11">
+<div id="ac7d3671" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb21-2"><a aria-label="2"></a></span>
 <span id="cb21-3"><a aria-label="3"></a>x <span class="op">=</span> np.array([<span class="dv">3</span>, <span class="dv">8</span>, <span class="dv">5</span>, <span class="dv">9</span>, <span class="dv">2</span>])</span>
@@ -669,7 +679,7 @@ rkskmt
 <section id="peek-np-mask-label" class="slide level2">
 <h2>ラベルが一致する行だけ取り出したい（<code>X[y == 1]</code>）</h2>
 <div class="slide-body">
-<div id="bb0c96a9" class="cell" data-execution_count="12">
+<div id="334b7043" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb23-2"><a aria-label="2"></a></span>
 <span id="cb23-3"><a aria-label="3"></a>X <span class="op">=</span> np.array([[<span class="dv">1</span>, <span class="dv">10</span>],</span>
@@ -707,7 +717,7 @@ rkskmt
 <section id="peek-np-where-index" class="slide level2">
 <h2>条件に合うインデックスだけを抽出したい（<code>where</code>）</h2>
 <div class="slide-body">
-<div id="b37213a9" class="cell" data-execution_count="13">
+<div id="62177fd1" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb25-2"><a aria-label="2"></a></span>
 <span id="cb25-3"><a aria-label="3"></a>x <span class="op">=</span> np.array([<span class="dv">3</span>, <span class="dv">8</span>, <span class="dv">5</span>, <span class="dv">9</span>, <span class="dv">2</span>])</span>
@@ -745,7 +755,7 @@ rkskmt
 <section id="peek-np-argsort" class="slide level2">
 <h2>小さい順に並べたときのインデックスを取り出したい（<code>argsort</code>）</h2>
 <div class="slide-body">
-<div id="dc6155c4" class="cell" data-execution_count="14">
+<div id="9ce287bc" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb27-2"><a aria-label="2"></a></span>
 <span id="cb27-3"><a aria-label="3"></a>d <span class="op">=</span> np.array([<span class="fl">0.9</span>, <span class="fl">0.2</span>, <span class="fl">0.7</span>, <span class="fl">0.1</span>])</span>
@@ -782,7 +792,7 @@ rkskmt
 <section id="peek-np-argmin" class="slide level2">
 <h2>最小・最大の要素のインデックスを取り出したい（<code>argmin</code>）</h2>
 <div class="slide-body">
-<div id="577e21cd" class="cell" data-execution_count="15">
+<div id="8e45a776" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb29-2"><a aria-label="2"></a></span>
 <span id="cb29-3"><a aria-label="3"></a>candidates <span class="op">=</span> np.array([<span class="fl">2.0</span>, <span class="fl">2.5</span>, <span class="fl">3.0</span>, <span class="fl">3.5</span>])    <span class="co"># 試した値</span></span>
@@ -801,7 +811,7 @@ rkskmt
 <section id="peek-np-unique" class="slide level2">
 <h2>値の種類を重複なしで取り出したい（<code>unique</code>）</h2>
 <div class="slide-body">
-<div id="0ad95325" class="cell" data-execution_count="16">
+<div id="818f3ca8" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb31-2"><a aria-label="2"></a></span>
 <span id="cb31-3"><a aria-label="3"></a>y <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">0</span>])</span>
@@ -823,7 +833,7 @@ rkskmt
 <section id="peek-np-count" class="slide level2">
 <h2>条件に合う要素の個数を数えたい（<code>sum</code>）</h2>
 <div class="slide-body">
-<div id="fe4a0c27" class="cell" data-execution_count="17">
+<div id="47f8ae43" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb33-2"><a aria-label="2"></a></span>
 <span id="cb33-3"><a aria-label="3"></a>x <span class="op">=</span> np.array([<span class="dv">3</span>, <span class="dv">8</span>, <span class="dv">5</span>, <span class="dv">9</span>, <span class="dv">2</span>])</span>
@@ -861,7 +871,7 @@ rkskmt
 <section id="peek-np-ratio" class="slide level2">
 <h2>条件に合う要素の割合を計算したい（<code>mean</code>）</h2>
 <div class="slide-body">
-<div id="22cccafc" class="cell" data-execution_count="18">
+<div id="23ed490d" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb35-2"><a aria-label="2"></a></span>
 <span id="cb35-3"><a aria-label="3"></a>x <span class="op">=</span> np.array([<span class="dv">3</span>, <span class="dv">8</span>, <span class="dv">5</span>, <span class="dv">9</span>, <span class="dv">2</span>])</span>
@@ -898,7 +908,7 @@ rkskmt
 <section id="peek-np-and" class="slide level2">
 <h2>2つの条件を両方満たす要素の個数を数えたい（<code>&amp;</code>）</h2>
 <div class="slide-body">
-<div id="4bf1f0d4" class="cell" data-execution_count="19">
+<div id="e1451b58" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb37-2"><a aria-label="2"></a></span>
 <span id="cb37-3"><a aria-label="3"></a>y      <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>])    <span class="co"># 正解</span></span>
@@ -932,7 +942,7 @@ rkskmt
 <section id="peek-np-split" class="slide level2">
 <h2>条件に合う側と合わない側に array を分けたい（<code>~</code>）</h2>
 <div class="slide-body">
-<div id="108bd5a2" class="cell" data-execution_count="20">
+<div id="87fbf97f" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb39-2"><a aria-label="2"></a></span>
 <span id="cb39-3"><a aria-label="3"></a>x <span class="op">=</span> np.array([<span class="dv">3</span>, <span class="dv">8</span>, <span class="dv">5</span>, <span class="dv">9</span>, <span class="dv">2</span>])</span>
@@ -966,7 +976,7 @@ rkskmt
 <section id="peek-np-all" class="slide level2">
 <h2>2つの array が完全に同じか確かめたい（<code>all</code>）</h2>
 <div class="slide-body">
-<div id="918964bc" class="cell" data-execution_count="21">
+<div id="b8ef4c27" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb41-2"><a aria-label="2"></a></span>
 <span id="cb41-3"><a aria-label="3"></a>a <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>])</span>
@@ -1000,7 +1010,7 @@ True</code></pre>
 <section id="peek-np-astype" class="slide level2">
 <h2>True / False の array を 1 / 0 に直したい（<code>astype</code>）</h2>
 <div class="slide-body">
-<div id="ab31426a" class="cell" data-execution_count="22">
+<div id="8f4dcacf" class="cell" data-execution_count="22">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb43-2"><a aria-label="2"></a></span>
 <span id="cb43-3"><a aria-label="3"></a>p <span class="op">=</span> np.array([<span class="fl">0.2</span>, <span class="fl">0.7</span>, <span class="fl">0.5</span>, <span class="fl">0.9</span>])</span>
@@ -1025,7 +1035,7 @@ True</code></pre>
 <section id="peek-np-elementwise" class="slide level2">
 <h2>for を書かずに、array の全要素に同じ演算をしたい（<code>+ - * / **</code>）</h2>
 <div class="slide-body">
-<div id="a7e5411f" class="cell" data-execution_count="23">
+<div id="91baa846" class="cell" data-execution_count="23">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb45-2"><a aria-label="2"></a></span>
 <span id="cb45-3"><a aria-label="3"></a>x <span class="op">=</span> np.array([<span class="fl">1.0</span>, <span class="fl">4.0</span>, <span class="fl">9.0</span>])</span>
@@ -1066,7 +1076,7 @@ True</code></pre>
 <section id="peek-np-diff" class="slide level2">
 <h2>2つの array の差の2乗の平均を計算したい（<code>mean</code>）</h2>
 <div class="slide-body">
-<div id="844dadad" class="cell" data-execution_count="24">
+<div id="3e4230a9" class="cell" data-execution_count="24">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb47-2"><a aria-label="2"></a></span>
 <span id="cb47-3"><a aria-label="3"></a>y      <span class="op">=</span> np.array([<span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>])    <span class="co"># 正解</span></span>
@@ -1087,7 +1097,7 @@ True</code></pre>
 <section id="peek-np-axis" class="slide level2">
 <h2>表の列ごと・行ごとに集計したい（<code>axis=</code>）</h2>
 <div class="slide-body">
-<div id="f5b2c87d" class="cell" data-execution_count="25">
+<div id="bdf04141" class="cell" data-execution_count="25">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb49-2"><a aria-label="2"></a></span>
 <span id="cb49-3"><a aria-label="3"></a>X <span class="op">=</span> np.array([[<span class="dv">1</span>, <span class="dv">10</span>],</span>
@@ -1129,7 +1139,7 @@ True</code></pre>
 <section id="peek-np-matmul" class="slide level2">
 <h2>表の全部の行に、重みを掛けた和を一度に計算したい（<code>@</code>）</h2>
 <div class="slide-body">
-<div id="0838ba1d" class="cell" data-execution_count="26">
+<div id="7295882b" class="cell" data-execution_count="26">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb51-2"><a aria-label="2"></a></span>
 <span id="cb51-3"><a aria-label="3"></a>X <span class="op">=</span> np.array([[<span class="dv">1</span>, <span class="dv">2</span>],</span>
@@ -1162,7 +1172,7 @@ True</code></pre>
 </div>
 <div class="callout-content">
 <ul>
-<li><code>*</code> は同じ位置どうしの掛け算で、行列の積は <code>@</code> で書く</li>
+<li><code>*</code> は同じ位置どうしの掛け算で、行列の積（<span class="en">matrix product</span>）は <code>@</code> で書く</li>
 <li>行と列を入れ替えた行列は <code>X.T</code> で得られる</li>
 </ul>
 </div>
@@ -1173,7 +1183,7 @@ True</code></pre>
 <section id="peek-np-maximum" class="slide level2">
 <h2>負の値だけを 0 に置き換えたい（<code>maximum</code>）</h2>
 <div class="slide-body">
-<div id="9374cb04" class="cell" data-execution_count="27">
+<div id="815deb60" class="cell" data-execution_count="27">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb53-2"><a aria-label="2"></a></span>
 <span id="cb53-3"><a aria-label="3"></a>z <span class="op">=</span> np.array([<span class="op">-</span><span class="fl">2.0</span>, <span class="op">-</span><span class="fl">0.5</span>, <span class="fl">0.0</span>, <span class="fl">1.5</span>])</span>
@@ -1192,7 +1202,7 @@ True</code></pre>
 <section id="peek-np-clip" class="slide level2">
 <h2>array の値を範囲内に収めたい（<code>clip</code>）</h2>
 <div class="slide-body">
-<div id="4e3be432" class="cell" data-execution_count="28">
+<div id="1433671f" class="cell" data-execution_count="28">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb55-2"><a aria-label="2"></a></span>
 <span id="cb55-3"><a aria-label="3"></a>z <span class="op">=</span> np.array([<span class="op">-</span><span class="fl">2.0</span>, <span class="op">-</span><span class="fl">0.5</span>, <span class="fl">0.3</span>, <span class="fl">1.5</span>])</span>
@@ -1229,7 +1239,7 @@ True</code></pre>
 <section id="peek-py-format" class="slide level2">
 <h2>小数の桁数をそろえて表示したい（<code>f"{x:.2f}"</code>）</h2>
 <div class="slide-body">
-<div id="8885d9f9" class="cell" data-execution_count="29">
+<div id="025b0a24" class="cell" data-execution_count="29">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb57-2"><a aria-label="2"></a></span>
 <span id="cb57-3"><a aria-label="3"></a>x <span class="op">=</span> <span class="fl">3.14159</span></span>
@@ -1255,7 +1265,7 @@ x =     3.14
 <section id="peek-py-zip" class="slide level2">
 <h2>2つのリストを同時にループしたい（<code>zip</code>）</h2>
 <div class="slide-body">
-<div id="19669834" class="cell" data-execution_count="30">
+<div id="ba6f5c38" class="cell" data-execution_count="30">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb59"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a aria-label="1"></a>names  <span class="op">=</span> [<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>]</span>
 <span id="cb59-2"><a aria-label="2"></a>scores <span class="op">=</span> [<span class="dv">70</span>, <span class="dv">85</span>, <span class="dv">60</span>]</span>
 <span id="cb59-3"><a aria-label="3"></a>ranks  <span class="op">=</span> [<span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">3</span>]</span>
@@ -1299,7 +1309,7 @@ c 60</code></pre>
 <section id="peek-py-enumerate" class="slide level2">
 <h2>何番目かも取り出しながらループしたい（<code>enumerate</code>）</h2>
 <div class="slide-body">
-<div id="da20f247" class="cell" data-execution_count="31">
+<div id="944cb071" class="cell" data-execution_count="31">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb61"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb61-1"><a aria-label="1"></a>scores <span class="op">=</span> [<span class="dv">70</span>, <span class="dv">85</span>, <span class="dv">60</span>]</span>
 <span id="cb61-2"><a aria-label="2"></a></span>
 <span id="cb61-3"><a aria-label="3"></a><span class="cf">for</span> i, score <span class="kw">in</span> <span class="bu">enumerate</span>(scores):       <span class="co"># 0 から数える</span></span>
@@ -1334,7 +1344,7 @@ c 60</code></pre>
 <section id="peek-plt-plot" class="slide level2">
 <h2>関数の形を折れ線グラフで見たい（<code>plot</code>）</h2>
 <div class="slide-body">
-<div id="1e5db9f2" class="cell fig-medium" data-execution_count="32">
+<div id="01d4c575" class="cell fig-medium" data-execution_count="32">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb63"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb63-2"><a aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb63-3"><a aria-label="3"></a><span class="im">import</span> japanize_matplotlib</span>
@@ -1373,7 +1383,7 @@ c 60</code></pre>
 <section id="peek-plt-scatter" class="slide level2">
 <h2>クラスごとに色を変えた散布図を描きたい（<code>scatter</code>）</h2>
 <div class="slide-body">
-<div id="4659f8fb" class="cell fig-medium" data-execution_count="33">
+<div id="6489b723" class="cell fig-medium" data-execution_count="33">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb64"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb64-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb64-2"><a aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb64-3"><a aria-label="3"></a><span class="im">import</span> japanize_matplotlib</span>
@@ -1410,7 +1420,7 @@ c 60</code></pre>
 <section id="peek-plt-axvline" class="slide level2">
 <h2>グラフに縦線・横線を引きたい（<code>axvline</code>）</h2>
 <div class="slide-body">
-<div id="7036d5b1" class="cell fig-medium" data-execution_count="34">
+<div id="1837b088" class="cell fig-medium" data-execution_count="34">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb65"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb65-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb65-2"><a aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb65-3"><a aria-label="3"></a><span class="im">import</span> japanize_matplotlib</span>
@@ -1434,7 +1444,7 @@ c 60</code></pre>
 <section id="peek-plt-subplots" class="slide level2">
 <h2>2つのグラフを横に並べたい（<code>subplots</code>）</h2>
 <div class="slide-body">
-<div id="777d4ddb" class="cell fig-medium" data-execution_count="35">
+<div id="39cf61a5" class="cell fig-medium" data-execution_count="35">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb66"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb66-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb66-2"><a aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb66-3"><a aria-label="3"></a><span class="im">import</span> japanize_matplotlib</span>
@@ -1480,7 +1490,7 @@ c 60</code></pre>
 <section id="peek-np-meshgrid" class="slide level2">
 <h2>平面全体の格子点の座標を用意したい（<code>meshgrid</code>）</h2>
 <div class="slide-body">
-<div id="e5eed978" class="cell" data-execution_count="36">
+<div id="d43177a4" class="cell" data-execution_count="36">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb67"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb67-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb67-2"><a aria-label="2"></a></span>
 <span id="cb67-3"><a aria-label="3"></a>xs <span class="op">=</span> np.array([<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>])</span>
@@ -1524,7 +1534,7 @@ c 60</code></pre>
 <p><strong>ノート</strong></p>
 </div>
 <div class="callout-content">
-<p><code>xs</code> の 3 個と <code>ys</code> の 2 個を組み合わせた、6 個の格子点ができる</p>
+<p><code>xs</code> の 3 個と <code>ys</code> の 2 個を組み合わせた、6 個の格子点（<span class="en">grid point</span>）ができる</p>
 </div>
 </div>
 </div>
@@ -1533,7 +1543,7 @@ c 60</code></pre>
 <section id="peek-plt-contourf" class="slide level2">
 <h2>予測の値で平面を塗り分けたい（<code>contourf</code>）</h2>
 <div class="slide-body">
-<div id="350aee77" class="cell fig-medium" data-execution_count="37">
+<div id="1dbc89de" class="cell fig-medium" data-execution_count="37">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb69"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb69-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb69-2"><a aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb69-3"><a aria-label="3"></a><span class="im">import</span> japanize_matplotlib</span>
@@ -1566,7 +1576,7 @@ c 60</code></pre>
 <div class="callout-content">
 <ul>
 <li><a href="#/peek-np-meshgrid" class="peek">格子点</a>を細かく取り、1点ずつ予測して、予測の値ごとに色を塗る</li>
-<li><code>z</code> を求める行を <code>z = model.predict(grid)</code> に置き換えると、分類器の決定境界の図になる</li>
+<li><code>z</code> を求める行を <code>z = model.predict(grid)</code> に置き換えると、分類器（<span class="en">classifier</span>）の決定境界（<span class="en">decision boundary</span>）の図になる</li>
 </ul>
 </div>
 </div>

@@ -104,7 +104,7 @@
     code span.vs { color: #032f62; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-e69bca93ec9d1486cefcf16a785f5ce6.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-f73900642b947ff7c946332e8eb6f3e3.css">
   <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -258,7 +258,7 @@
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
   <script src="network-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="3d1e8f232379cea995e250e29f8aa3fda53037ad">
+  <meta name="qmd-web-source" content="a1dd8b81168f3c34e811576c95a3b4dfd51ef6e1">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -329,7 +329,7 @@ rkskmt
 </ul></li>
 <li>訓練データ 100 点と、テストデータ 100 点</li>
 </ul>
-<div id="0b262378" class="cell" data-execution_count="1">
+<div id="820b0275" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>データの定義（クリックして展開）</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -392,7 +392,7 @@ rkskmt
 <span id="cb1-58"><a aria-label="58"></a>                   <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>])</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="57d08cfe" class="cell" data-execution_count="2">
+<div id="ecd91fe9" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -406,7 +406,7 @@ rkskmt
 <section id="境界で決めるか近い点の投票で決めるか" class="slide level2">
 <h2>境界で決めるか、近い点の投票で決めるか</h2>
 <div class="slide-body">
-<div id="4340283b" class="cell" data-execution_count="3">
+<div id="32dfc31a" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -449,7 +449,7 @@ rkskmt
 <li>距離が小さい順に、k 個を選ぶ</li>
 <li>k 個のラベルのうち、多いほうを <span class="math inline">\(x\)</span> のラベルとする</li>
 </ol>
-<div id="6a2f33ef" class="cell" data-execution_count="4">
+<div id="af3b2dad" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a><span class="kw">def</span> predict_knn(X_train, y_train, x, k):</span>
 <span id="cb2-2"><a aria-label="2"></a>    dist <span class="op">=</span> []</span>
 <span id="cb2-3"><a aria-label="3"></a>    <span class="cf">for</span> p <span class="kw">in</span> X_train:                                    <span class="co"># 1. 訓練データの点を 1 点ずつ、全部の点について</span></span>
@@ -465,17 +465,17 @@ rkskmt
 <pre><code>★ の予測（k = 3）: 1</code></pre>
 </div>
 </div>
-<div title="ただし">
+<div title="重要ポイント">
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>ただし</strong></p>
+<p><strong>重要ポイント</strong></p>
 </div>
 <div class="callout-content">
-<p>k は奇数（偶数だと同数で決まらないことがあるため）</p>
+<p>k は奇数にする（偶数だと同数で決まらないことがあるため）</p>
 </div>
 </div>
 </div>
@@ -488,7 +488,7 @@ rkskmt
 <ul>
 <li>テストデータの 100 点を、k = 3 の k-NN で 1 点ずつ予測し、当たった数を数える</li>
 </ul>
-<div id="bb6ed522" class="cell" data-execution_count="5">
+<div id="0ae4b37e" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a aria-label="1"></a>k <span class="op">=</span> <span class="dv">3</span></span>
 <span id="cb4-2"><a aria-label="2"></a>pred <span class="op">=</span> []</span>
 <span id="cb4-3"><a aria-label="3"></a><span class="cf">for</span> x <span class="kw">in</span> X_test:                                         <span class="co"># テストデータの 100 点を、1 点ずつ予測する</span></span>
@@ -526,12 +526,12 @@ Accuracy: 0.850</code></pre>
 </div>
 </section>
 <section id="peek-knn-image" class="slide level2">
-<h2>（参考）NNは画像の拡大でも使うことがある</h2>
+<h2>（参考）最近傍（NN, <span class="en">Nearest Neighbor</span>）は画像の拡大でも使う</h2>
 <div class="slide-body">
 <ul>
-<li>超高速だがギザギザ（エイリアシング）になる。</li>
+<li>高速だがギザギザ（エイリアシング, <span class="en">aliasing</span>）になる</li>
 </ul>
-<div id="a0e79899" class="cell" data-execution_count="6">
+<div id="e15ec61f" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -545,7 +545,7 @@ Accuracy: 0.850</code></pre>
 <section id="k-で決定境界が変わる" class="slide level2">
 <h2>k で決定境界が変わる</h2>
 <div class="slide-body">
-<div id="2cbb2105" class="cell" data-execution_count="7">
+<div id="254e50f7" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -584,7 +584,7 @@ Accuracy: 0.850</code></pre>
 <ul>
 <li>k を変えながら、訓練データとテストデータの両方で <strong>Accuracy</strong>（正解率）を出す</li>
 </ul>
-<div id="837ada53" class="cell" data-execution_count="8">
+<div id="a7621523" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a aria-label="1"></a><span class="kw">def</span> accuracy_knn(X_train, y_train, X, y, k):</span>
 <span id="cb6-2"><a aria-label="2"></a>    <span class="co">"""X の点を 1 点ずつ k-NN で予測し、当たった割合を返す"""</span></span>
 <span id="cb6-3"><a aria-label="3"></a>    pred <span class="op">=</span> []</span>
@@ -731,7 +731,7 @@ k = 71: train 0.830  test 0.790</code></pre>
 <li>スコアが 0.5 をまたぐ境目が、<a href="./classification-2d-boundaries.html#peek-tree-boundary" class="peek">決定境界</a>になる</li>
 </ul></li>
 </ul>
-<div id="07fe9673" class="cell" data-execution_count="9">
+<div id="ec6ba74d" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a aria-label="1"></a><span class="kw">def</span> score_knn(X_train, y_train, x, k):</span>
 <span id="cb8-2"><a aria-label="2"></a>    dist <span class="op">=</span> []</span>
 <span id="cb8-3"><a aria-label="3"></a>    <span class="cf">for</span> p <span class="kw">in</span> X_train:                                    <span class="co"># 訓練データの点を 1 点ずつ、全部の点について</span></span>
@@ -745,7 +745,7 @@ k = 71: train 0.830  test 0.790</code></pre>
 <pre><code>★ のスコア（k = 3）: 0.667</code></pre>
 </div>
 </div>
-<div id="066d328e" class="cell" data-execution_count="10">
+<div id="05cc28cb" class="cell" data-execution_count="10">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -764,7 +764,7 @@ k = 71: train 0.830  test 0.790</code></pre>
 <li>テストデータの 100 点のスコアから、k = 1、3、31 の ROC 曲線を描く</li>
 <li><code>roc_points</code> と <code>auc_of</code> は、<a href="./classification-2d-boundaries.html#peek-tree-roc" class="peek">決定木の ROC 曲線</a>と同じ関数</li>
 </ul>
-<div id="13059734" class="cell" data-execution_count="11">
+<div id="d6d9047d" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a aria-label="1"></a><span class="kw">def</span> roc_points(scores, y):</span>
 <span id="cb10-2"><a aria-label="2"></a>    <span class="co">"""スコアに閾値を当てて、閾値ごとの TP Rate と FP Rate を返す"""</span></span>
 <span id="cb10-3"><a aria-label="3"></a>    thresholds <span class="op">=</span> <span class="bu">list</span>(np.unique(scores)) <span class="op">+</span> [np.<span class="bu">max</span>(scores) <span class="op">+</span> <span class="dv">1</span>]   <span class="co"># スコアに現れる値と、全部を 0 と判定する値</span></span>
@@ -925,7 +925,7 @@ k = 31: AUC 0.844</code></pre>
 </div>
 <ul>
 <li>立方体を、各軸の中点（端と端のちょうど真ん中の位置）で切って、8 つの領域に分ける</li>
-<li>各軸を中点で切っているので、<strong>二分探索</strong>を 3 つの軸でやるだけで、★ の入っている領域にたどり着く</li>
+<li>各軸を中点で切っているので、<strong>二分探索</strong>（<span class="en">binary search</span>）を 3 つの軸でやるだけで、★ の入っている領域にたどり着く</li>
 <li>いちばん近い点は、その領域の中の点から探す
 <ul>
 <li>全部の点を測らずにすむ（全探索をしなくてよい）</li>
@@ -952,7 +952,7 @@ k = 31: AUC 0.844</code></pre>
 <li>点の少ない領域：近い点が領域の中になく、まわりの領域まで（1 つ上の領域に戻って）調べることになる</li>
 </ul></li>
 </ul>
-<div id="4c353d9e" class="cell" data-execution_count="14">
+<div id="6588755c" class="cell" data-execution_count="14">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1001,7 +1001,7 @@ k = 31: AUC 0.844</code></pre>
 <li><a href="./classification-2d-boundaries.html#peek-overfit-boundary" class="peek">決定木</a>と同じく、軸に沿った線で空間を分ける木</li>
 <li>図は 2 次元の訓練データ（100 点）で描く（作り方は何次元でも同じ）</li>
 </ul>
-<div id="bdbd561e" class="cell" data-execution_count="15">
+<div id="d786ba90" class="cell" data-execution_count="15">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1010,14 +1010,14 @@ k = 31: AUC 0.844</code></pre>
 </div>
 </div>
 </div>
-<div title="ただし">
+<div title="重要ポイント">
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>ただし</strong></p>
+<p><strong>重要ポイント</strong></p>
 </div>
 <div class="callout-content">
 <p>k-d の k は特徴量の数（次元）で、k-NN の k とは別</p>
@@ -1041,7 +1041,7 @@ k = 31: AUC 0.844</code></pre>
 <li>分けずに止めた領域（<strong>葉</strong>, <span class="en">leaf</span>）：中の点の番号 <code>points</code></li>
 </ul></li>
 </ul>
-<div id="b17930b3" class="cell" data-execution_count="16">
+<div id="75a69d6f" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a aria-label="1"></a><span class="kw">def</span> build_kdtree(X, idx, depth, leaf_size):</span>
 <span id="cb12-2"><a aria-label="2"></a>    <span class="cf">if</span> <span class="bu">len</span>(idx) <span class="op">&lt;=</span> leaf_size:                        <span class="co"># 点が leaf_size 個以下なら、分けずに止める（葉）</span></span>
 <span id="cb12-3"><a aria-label="3"></a>        <span class="cf">return</span> {<span class="st">"points"</span>: idx}</span>
@@ -1086,7 +1086,7 @@ k = 31: AUC 0.844</code></pre>
 <li>分け目までの距離が r 以上：反対側の点は全部 r より遠いので、反対側は調べずにスキップする</li>
 </ul></li>
 </ol>
-<div id="adbc6bca" class="cell" data-execution_count="18">
+<div id="4832739d" class="cell" data-execution_count="18">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1164,7 +1164,7 @@ k = 31: AUC 0.844</code></pre>
 <section id="いちばん近い点を-kd-tree-で探す" class="slide level2">
 <h2>いちばん近い点を KD-tree で探す</h2>
 <div class="slide-body">
-<div id="0568584b" class="cell" data-execution_count="19">
+<div id="f98532e3" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a aria-label="1"></a><span class="kw">def</span> search_kdtree(node, X, x, best):</span>
 <span id="cb13-2"><a aria-label="2"></a>    <span class="cf">if</span> <span class="st">"points"</span> <span class="kw">in</span> node:                             <span class="co"># 葉：領域の中の点だけ、1 点ずつ距離を測る</span></span>
 <span id="cb13-3"><a aria-label="3"></a>        <span class="cf">for</span> i <span class="kw">in</span> node[<span class="st">"points"</span>]:</span>
@@ -1235,7 +1235,7 @@ k = 31: AUC 0.844</code></pre>
 <li>r は、k 番目に近い距離（k 点そろうまでは、反対側を必ず調べる）</li>
 </ul></li>
 </ul>
-<div id="98a405ba" class="cell" data-execution_count="20">
+<div id="5fbaf7ac" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a aria-label="1"></a><span class="kw">def</span> search_kdtree_k(node, X, x, best, k):</span>
 <span id="cb15-2"><a aria-label="2"></a>    <span class="cf">if</span> <span class="st">"points"</span> <span class="kw">in</span> node:                             <span class="co"># 葉：領域の中の点だけ、1 点ずつ距離を測る</span></span>
 <span id="cb15-3"><a aria-label="3"></a>        dist <span class="op">=</span> []</span>
@@ -1303,7 +1303,7 @@ k = 31: AUC 0.844</code></pre>
 <li>近い k 点が見つかれば、あとは <a href="#/peek-knn-code" class="peek"><code>predict_knn</code></a> と同じ多数決</li>
 <li>テストデータの 100 点を k = 3 で予測し、当たった数と、距離を測った点の数（1 点あたりの平均）を出す</li>
 </ul>
-<div id="e9408624" class="cell" data-execution_count="21">
+<div id="3c6ecb43" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a aria-label="1"></a><span class="kw">def</span> predict_knn_kdtree(tree, X_train, y_train, x, k):</span>
 <span id="cb17-2"><a aria-label="2"></a>    best  <span class="op">=</span> nearest_k_kdtree(tree, X_train, x, k)    <span class="co"># 全探索の代わりに、KD-tree で近い k 点を探す</span></span>
 <span id="cb17-3"><a aria-label="3"></a>    votes <span class="op">=</span> y_train[best[<span class="st">"index"</span>]]                   <span class="co"># k 個のラベル（0 か 1）</span></span>
@@ -1349,7 +1349,7 @@ k = 31: AUC 0.844</code></pre>
 <li>2 次元の 0〜1 の範囲に点をばらまき、新しい点 100 個で、いちばん近い点を探す</li>
 <li>点の数を 1,000 → 1 万 → 10 万点に増やし、距離を測った点の数（平均）を比べる</li>
 </ul>
-<div id="e75448cd" class="cell" data-execution_count="23">
+<div id="ff8a7d9e" class="cell" data-execution_count="23">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a aria-label="1"></a>rng <span class="op">=</span> np.random.default_rng()                        <span class="co"># 乱数の生成器（実行するたびに違う点になる）</span></span>
 <span id="cb19-2"><a aria-label="2"></a></span>
 <span id="cb19-3"><a aria-label="3"></a><span class="bu">print</span>(<span class="st">"points       all  KD-tree"</span>)</span>
@@ -1361,7 +1361,7 @@ k = 31: AUC 0.844</code></pre>
 <span id="cb19-9"><a aria-label="9"></a>        count.append(nearest_kdtree(tree, X, q)[<span class="st">"count"</span>])</span>
 <span id="cb19-10"><a aria-label="10"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>n<span class="sc">:&lt;8d}</span><span class="ss">  </span><span class="sc">{</span>n<span class="sc">:6d}</span><span class="ss">  </span><span class="sc">{</span>np<span class="sc">.</span>mean(count)<span class="sc">:7.1f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="9ec412aa" class="cell" data-execution_count="24">
+<div id="28cda58f" class="cell" data-execution_count="24">
 <div class="cell-output cell-output-stdout">
 <pre><code>points       all  KD-tree
 1000        1000      9.7
@@ -1369,7 +1369,7 @@ k = 31: AUC 0.844</code></pre>
 100000    100000      7.6</code></pre>
 </div>
 </div>
-<div id="5ba9167e" class="cell" data-execution_count="25">
+<div id="43b12f52" class="cell" data-execution_count="25">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1408,7 +1408,7 @@ k = 31: AUC 0.844</code></pre>
 <li>既定の <code>"auto"</code> では、データに合わせて探し方を選ぶ</li>
 </ul></li>
 </ul>
-<div id="04616115" class="cell" data-execution_count="26">
+<div id="aa5e88cc" class="cell" data-execution_count="26">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a aria-label="1"></a><span class="im">from</span> sklearn.neighbors <span class="im">import</span> KNeighborsClassifier</span>
 <span id="cb21-2"><a aria-label="2"></a></span>
 <span id="cb21-3"><a aria-label="3"></a>knn <span class="op">=</span> KNeighborsClassifier(n_neighbors<span class="op">=</span><span class="dv">3</span>, algorithm<span class="op">=</span><span class="st">"kd_tree"</span>).fit(X_train, y_train)</span>
@@ -1424,7 +1424,7 @@ k = 31: AUC 0.844</code></pre>
 </colgroup>
 <thead>
 <tr class="header">
-<th>今日書いたもの</th>
+<th>自作のコード</th>
 <th>scikit-learn</th>
 </tr>
 </thead>
@@ -1487,7 +1487,7 @@ k = 31: AUC 0.844</code></pre>
 <li>訓練データは、どの次元でも 100 点</li>
 </ul></li>
 </ul>
-<div id="14bd1f11" class="cell" data-execution_count="27">
+<div id="df28b5f3" class="cell" data-execution_count="27">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a aria-label="1"></a><span class="kw">def</span> make_data(n, d):</span>
 <span id="cb23-2"><a aria-label="2"></a>    X <span class="op">=</span> rng.random((n, d))                           <span class="co"># n 点を、d 次元の 0〜1 の範囲にばらまく</span></span>
 <span id="cb23-3"><a aria-label="3"></a>    y <span class="op">=</span> (X.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>) <span class="op">&gt;</span> d <span class="op">/</span> <span class="dv">2</span>).astype(<span class="bu">int</span>)          <span class="co"># 座標の合計が d/2 より大きければ 1</span></span>
@@ -1501,7 +1501,7 @@ k = 31: AUC 0.844</code></pre>
 <span id="cb23-11"><a aria-label="11"></a>    acc <span class="op">=</span> accuracy_knn(Xd_train, yd_train, Xd_test, yd_test, <span class="dv">3</span>)</span>
 <span id="cb23-12"><a aria-label="12"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>d<span class="sc">:2d}</span><span class="ss">次元: Accuracy </span><span class="sc">{</span>acc<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="ab67e145" class="cell" data-execution_count="28">
+<div id="468238d2" class="cell" data-execution_count="28">
 <div class="cell-output cell-output-stdout">
 <pre><code> 2次元: Accuracy 0.838
  3次元: Accuracy 0.808
@@ -1510,7 +1510,7 @@ k = 31: AUC 0.844</code></pre>
 20次元: Accuracy 0.634</code></pre>
 </div>
 </div>
-<div id="497ac503" class="cell" data-execution_count="29">
+<div id="5561d36d" class="cell" data-execution_count="29">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1575,7 +1575,7 @@ k = 31: AUC 0.844</code></pre>
 <li>その中でいちばん小さいものが、<strong>いちばん近い点（最近傍, <span class="en">nearest neighbor</span>）までの距離</strong></li>
 <li>100 点それぞれで測り、その中央値を、点の混み具合として使う</li>
 </ul>
-<div id="cfa894ba" class="cell" data-execution_count="30">
+<div id="bd5f49ee" class="cell" data-execution_count="30">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a aria-label="1"></a><span class="kw">def</span> nearest_distance(P, i):</span>
 <span id="cb25-2"><a aria-label="2"></a>    dist <span class="op">=</span> []</span>
 <span id="cb25-3"><a aria-label="3"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(P)):                          <span class="co"># 点 i から、全部の点までの距離を 1 点ずつ測る</span></span>
@@ -1594,7 +1594,7 @@ k = 31: AUC 0.844</code></pre>
 100 点の中央値: 0.052</code></pre>
 </div>
 </div>
-<div id="c0748fd5" class="cell" data-execution_count="31">
+<div id="2b5a3c6c" class="cell" data-execution_count="31">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1631,7 +1631,7 @@ k = 31: AUC 0.844</code></pre>
 <ul>
 <li><code>make_data</code> で 100 点を作り、特徴量を 2, 3, 5, 10, 20 個に増やして、いちばん近い点までの距離（中央値）を測る</li>
 </ul>
-<div id="01079334" class="cell" data-execution_count="32">
+<div id="48ab97b9" class="cell" data-execution_count="32">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a aria-label="1"></a><span class="cf">for</span> d <span class="kw">in</span> [<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">20</span>]:</span>
 <span id="cb27-2"><a aria-label="2"></a>    P, label <span class="op">=</span> make_data(<span class="dv">100</span>, d)                     <span class="co"># 100 点を d 次元にばらまく（ラベルは使わない）</span></span>
 <span id="cb27-3"><a aria-label="3"></a>    nn <span class="op">=</span> []</span>
@@ -1639,7 +1639,7 @@ k = 31: AUC 0.844</code></pre>
 <span id="cb27-5"><a aria-label="5"></a>        nn.append(nearest_distance(P, i))</span>
 <span id="cb27-6"><a aria-label="6"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>d<span class="sc">:2d}</span><span class="ss">次元: いちばん近い点まで </span><span class="sc">{</span>np<span class="sc">.</span>median(nn)<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="ea825b96" class="cell" data-execution_count="33">
+<div id="deb221f2" class="cell" data-execution_count="33">
 <div class="cell-output cell-output-stdout">
 <pre><code> 2次元: いちばん近い点まで 0.049
  3次元: いちばん近い点まで 0.121
@@ -1648,7 +1648,7 @@ k = 31: AUC 0.844</code></pre>
 20次元: いちばん近い点まで 1.195</code></pre>
 </div>
 </div>
-<div id="55090083" class="cell" data-execution_count="34">
+<div id="06b08bc6" class="cell" data-execution_count="34">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1673,7 +1673,6 @@ k = 31: AUC 0.844</code></pre>
 <ul>
 <li>k-NN が投票させる「近い点」が、実際には遠い点になっている</li>
 </ul></li>
-<li>なぜこうなるのか、2 つの理由を見る</li>
 </ul>
 </div>
 </div>
@@ -1690,7 +1689,7 @@ k = 31: AUC 0.844</code></pre>
 </ul>
 <p><span class="math display">\[\left(\frac{1}{2}\right)^d \qquad
 \text{1 次元: } 50\% \quad \text{3 次元: } 12.5\% \quad \text{10 次元: } 0.1\% \quad \text{20 次元: } 100 万分の 1\]</span></p>
-<div id="da08f86e" class="cell" data-execution_count="35">
+<div id="a5e0d17f" class="cell" data-execution_count="35">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1732,7 +1731,7 @@ k = 31: AUC 0.844</code></pre>
 <li>1% を集めるのに必要な <span class="math inline">\(s\)</span> は：</li>
 </ul>
 <p><span class="math display">\[s = 0.01^{1/d}\]</span></p>
-<div id="d7b36f9f" class="cell" data-execution_count="36">
+<div id="113cd082" class="cell" data-execution_count="36">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1752,7 +1751,7 @@ k = 31: AUC 0.844</code></pre>
 </div>
 <div class="callout-content">
 <ul>
-<li>10 次元では、たった 1%の「ご近所」を集めるのに<strong>各軸の 63%</strong>を見渡す必要がある</li>
+<li>10 次元では、1%の「ご近所」を集めるのに<strong>各軸の 63%</strong>を見渡す必要がある</li>
 <li>それはもう「近所」ではない
 <ul>
 <li><strong>「近い点どうしは似ている」を前提にする手法（k-NN や k-means など）は、前提が成り立ちにくくなる</strong></li>
@@ -1772,7 +1771,7 @@ k = 31: AUC 0.844</code></pre>
 <li>点を一様にばらまき、ある 1 点からほかの 2000 点までの距離を測る</li>
 <li>距離のばらつきを、<strong>変動係数（<span class="en">coefficient of variation</span>）</strong>＝ 標準偏差 ÷ 平均 で比べる</li>
 </ul>
-<div id="6077144b" class="cell" data-execution_count="37">
+<div id="fb9fdcbd" class="cell" data-execution_count="37">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb29-2"><a aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb29-3"><a aria-label="3"></a><span class="im">import</span> japanize_matplotlib</span>
@@ -1799,7 +1798,7 @@ k = 31: AUC 0.844</code></pre>
 <span id="cb29-24"><a aria-label="24"></a>plt.tight_layout()</span>
 <span id="cb29-25"><a aria-label="25"></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="64c5bf5a" class="cell" data-execution_count="38">
+<div id="1653e616" class="cell" data-execution_count="38">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1837,7 +1836,7 @@ k = 31: AUC 0.844</code></pre>
 <ul>
 <li>同じサンプル数でも、次元が増えると空間が広くなりすぎる</li>
 </ul>
-<div id="502dacf6" class="cell" data-execution_count="39">
+<div id="d4905f48" class="cell" data-execution_count="39">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1875,7 +1874,7 @@ k = 31: AUC 0.844</code></pre>
 <li>当たらなくなったのは、訓練データが 100 点しかないからかもしれない</li>
 <li>訓練データを 1,000 → 1 万 → 10 万点に増やし、k = 3 の k-NN でテストデータ 1,000 点を予測する</li>
 </ul>
-<div id="9c2b6932" class="cell" data-execution_count="40">
+<div id="d01ec4ea" class="cell" data-execution_count="40">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a aria-label="1"></a><span class="bu">print</span>(<span class="st">"points      2D     5D    10D    20D"</span>)</span>
 <span id="cb30-2"><a aria-label="2"></a><span class="cf">for</span> n <span class="kw">in</span> [<span class="dv">1000</span>, <span class="dv">10000</span>, <span class="dv">100000</span>]:                      <span class="co"># 訓練データの点の数</span></span>
 <span id="cb30-3"><a aria-label="3"></a>    row <span class="op">=</span> []</span>
@@ -1885,7 +1884,7 @@ k = 31: AUC 0.844</code></pre>
 <span id="cb30-7"><a aria-label="7"></a>        row.append(accuracy_knn(Xd_train, yd_train, Xd_test, yd_test, <span class="dv">3</span>))</span>
 <span id="cb30-8"><a aria-label="8"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>n<span class="sc">:&lt;8d}</span><span class="ss">  </span><span class="sc">{</span>row[<span class="dv">0</span>]<span class="sc">:.3f}</span><span class="ss">  </span><span class="sc">{</span>row[<span class="dv">1</span>]<span class="sc">:.3f}</span><span class="ss">  </span><span class="sc">{</span>row[<span class="dv">2</span>]<span class="sc">:.3f}</span><span class="ss">  </span><span class="sc">{</span>row[<span class="dv">3</span>]<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="fce127a9" class="cell" data-execution_count="41">
+<div id="b09d9e6c" class="cell" data-execution_count="41">
 <div class="cell-output cell-output-stdout">
 <pre><code>points      2D     5D    10D    20D
 1000      0.868  0.786  0.762  0.682
@@ -1893,7 +1892,7 @@ k = 31: AUC 0.844</code></pre>
 100000    0.851  0.863  0.790  0.739</code></pre>
 </div>
 </div>
-<div id="867e7de1" class="cell" data-execution_count="42">
+<div id="97636258" class="cell" data-execution_count="42">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1933,7 +1932,7 @@ k = 31: AUC 0.844</code></pre>
 <ul>
 <li>1 万点で、特徴量を 2, 5, 10, 20 個に増やし、同じように探す</li>
 </ul>
-<div id="1be0d856" class="cell" data-execution_count="43">
+<div id="7853a52d" class="cell" data-execution_count="43">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a aria-label="1"></a>n <span class="op">=</span> <span class="dv">10000</span></span>
 <span id="cb32-2"><a aria-label="2"></a><span class="cf">for</span> d <span class="kw">in</span> [<span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">20</span>]:</span>
 <span id="cb32-3"><a aria-label="3"></a>    X    <span class="op">=</span> rng.random((n, d))                        <span class="co"># 1 万点を d 次元にばらまく</span></span>
@@ -1943,7 +1942,7 @@ k = 31: AUC 0.844</code></pre>
 <span id="cb32-7"><a aria-label="7"></a>        count.append(nearest_kdtree(tree, X, q)[<span class="st">"count"</span>])</span>
 <span id="cb32-8"><a aria-label="8"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>d<span class="sc">:2d}</span><span class="ss">次元: 距離を測った点 </span><span class="sc">{</span>np<span class="sc">.</span>mean(count)<span class="sc">:7.1f}</span><span class="ss"> / </span><span class="sc">{</span>n<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="1b114727" class="cell" data-execution_count="44">
+<div id="33d8828e" class="cell" data-execution_count="44">
 <div class="cell-output cell-output-stdout">
 <pre><code> 2次元: 距離を測った点    11.4 / 10000
  5次元: 距離を測った点    96.1 / 10000
@@ -1951,7 +1950,7 @@ k = 31: AUC 0.844</code></pre>
 20次元: 距離を測った点  9998.6 / 10000</code></pre>
 </div>
 </div>
-<div id="ebb1bdcb" class="cell" data-execution_count="45">
+<div id="aac8e9b2" class="cell" data-execution_count="45">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -2030,7 +2029,7 @@ k = 31: AUC 0.844</code></pre>
 <ol type="1">
 <li><strong>特徴量選択（<span class="en">feature selection</span>）</strong>：重要な特徴量だけを残す</li>
 <li><strong>次元削減（<span class="en">dimensionality reduction</span>）</strong>：情報を保ったまま次元を圧縮する</li>
-<li><strong>正則化（<span class="en">regularization</span>）</strong>：過学習を防ぐ（線形回帰の回で扱う）</li>
+<li><strong><a href="./linear-regression.html#peek-regularization-broad" class="peek">正則化</a>（<span class="en">regularization</span>）</strong>：過学習を防ぐ</li>
 </ol>
 </div>
 </div>
@@ -2047,7 +2046,7 @@ k = 31: AUC 0.844</code></pre>
 <li>例：魚の体長と重さは、ほぼ同じ情報</li>
 </ul></li>
 <li><strong>主成分分析（PCA, <span class="en"><strong>Principal Component Analysis</strong></span>）</strong>：データのばらつきが大きい方向を、新しい軸に取り直す方法</li>
-<li><a href="./dimensionality-pca.html">次元削減と PCA</a>で扱う</li>
+<li>詳しくは<a href="./dimensionality-pca.html">次元削減と PCA</a></li>
 </ul>
 </div>
 </section>
@@ -2070,29 +2069,13 @@ k = 31: AUC 0.844</code></pre>
 <li>KD-tree でも、スキップできる領域がなくなる</li>
 </ul></li>
 </ul>
-<div title="分類問題と特徴量のまとめ">
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>分類問題と特徴量のまとめ</strong></p>
-</div>
-<div class="callout-content">
-<p>1D → 2D の分類、評価と汎化、教師なし学習（k-means）、k-NN と次元の呪い。 <strong>機械学習の基本的な問いと道具が揃った。</strong></p>
-<p>ここまで、パラメータは手法ごとの探し方で見つけてきた。 次の「最適化」では、<strong>多くの手法で使える探し方</strong>を作る。</p>
-</div>
-</div>
-</div>
-</div>
 </div>
 </section>
 <section id="peek-knn-fish" class="slide level2 badge-practice scrollable">
 <h2><strong>到達チェック</strong> 魚を k-NN で分類する</h2>
 <div class="slide-body">
 <div class="prompt">
-<p>過学習と汎化の回の魚 120 匹（輝度・重さ）を k-NN で分類し、同じ分け方の決定木と、テストデータの Accuracy を比べよ。</p>
+<p>魚 120 匹（輝度・重さ）を k-NN で分類し、同じ分け方の決定木と、テストデータの Accuracy を比べよ。</p>
 </div>
 <ol start="0" type="1">
 <li>魚のデータ（下のコード）をコピー</li>
@@ -2102,7 +2085,7 @@ k = 31: AUC 0.844</code></pre>
 <li>輝度と重さを<a href="./clustering-kmeans.html#peek-scale" class="peek">標準化</a>してから 3 をもう一度（平均と標準偏差は訓練データから計算）</li>
 <li>標準化の前後で、距離の大きさを決めている特徴量がどう変わるかを、隣の人に説明</li>
 </ol>
-<div id="d053e787" class="cell" data-execution_count="46">
+<div id="fa1bb7f0" class="cell" data-execution_count="46">
 <details class="code-fold">
 <summary>魚のデータ（クリックして展開）</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -2142,7 +2125,7 @@ k = 31: AUC 0.844</code></pre>
 <section id="到達チェックの解答例" class="slide level2">
 <h2>到達チェックの解答例</h2>
 <div class="slide-body">
-<div id="b1c07b5f" class="cell" data-execution_count="47">
+<div id="2a09b2b8" class="cell" data-execution_count="47">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a aria-label="1"></a><span class="im">from</span> sklearn.tree <span class="im">import</span> DecisionTreeClassifier</span>
@@ -2197,7 +2180,7 @@ k = 31: AUC 0.844</code></pre>
 <h2>練習問題：領域に分けて、近い 3 点を探す</h2>
 <div class="slide-body">
 <p>0〜16 の範囲に、ラベルの分かっている点が 12 個ある。図をノートに 2 つ写し、新しい点 <span class="math inline">\(N(1, 9)\)</span> のラベルを、k = 3 の k-NN で予測せよ。</p>
-<div id="6292b650" class="cell" data-execution_count="48">
+<div id="1d0d438c" class="cell" data-execution_count="48">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>

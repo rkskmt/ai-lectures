@@ -104,7 +104,7 @@
     code span.vs { color: #032f62; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-e69bca93ec9d1486cefcf16a785f5ce6.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-f73900642b947ff7c946332e8eb6f3e3.css">
   <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -237,13 +237,13 @@
             config.math.config = config.math.config.replace("_HTML", "_CHTML");
             config.math.CommonHTML = { scale: 127, matchFontHeight: false };
           }
-          // A ruled lecture index (.lectures.ruled) lays itself out at
-          // the window's width (custom.css). reveal.js's slide view
+          // A ruled or network lecture index lays itself out at the
+          // window's width (custom.css). reveal.js's slide view
           // fixes every slide at 1280x720 and scales it, and reveal.js
           // switches to the scroll view only below 435px, so open such
           // a page in the scroll view at every width. Quarto calls
           // initialize at the end of <body>, so the page is parsed.
-          if (config && document.querySelector(".lectures.ruled")) {
+          if (config && document.querySelector(".lectures.ruled, .lectures.network")) {
             config.view = "scroll";
           }
           return initialize.call(this, config);
@@ -257,7 +257,8 @@
   <script src="peek-ui.js" defer=""></script>
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="d8db10d4b4158bbbcd7e33e6dccdb852a8b99e4c">
+  <script src="network-ui.js" defer=""></script>
+  <meta name="qmd-web-source" content="c5497dc895eb069b7189f7780c20efa57683ba4f">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -276,15 +277,20 @@ rkskmt
 </div>
 
 </section>
-<section id="この資料について" class="slide level2">
-<h2>この資料について</h2>
+<section id="newton法newtons-method" class="slide level2">
+<h2>Newton法（<span class="en">Newton’s Method</span>）</h2>
 <div class="slide-body">
 <ul>
-<li>本編「最適化と勾配降下法」の<strong>参考資料</strong></li>
-<li>勾配降下法の弱点（学習率の手動調整・収束の遅さ）を、<strong>2次微分</strong>で解決する手法</li>
-<li>ディープラーニングでは使われないが、<code>scikit-learn</code> のロジスティック回帰などの中で現役</li>
+<li><a href="./optimization-gradient-descent.html#peek-gd-code" class="peek">勾配降下法</a>（<span class="en">gradient descent</span>）の弱点を、<strong>2次微分（<span class="en">second derivative</span>）</strong>で解決する手法
+<ul>
+<li>弱点：学習率（<span class="en">learning rate</span>）の手動調整、収束の遅さ</li>
+</ul></li>
+<li>ディープラーニング（<span class="en">deep learning</span>）では使われない
+<ul>
+<li><code>scikit-learn</code> のロジスティック回帰（<span class="en">logistic regression</span>）などの中で使われている</li>
+</ul></li>
 </ul>
-<div id="2c92f21e" class="cell" data-execution_count="1">
+<div id="2a49538c" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-3"><a aria-label="3"></a><span class="im">import</span> japanize_matplotlib</span>
@@ -311,10 +317,9 @@ rkskmt
 <div class="slide-body">
 <p>勾配降下法の問題：</p>
 <ul>
-<li>学習率を手動で調整</li>
-<li>収束が遅い</li>
+<li>学習率を手動で調整する必要がある</li>
+<li>収束（<span class="en">convergence</span>）が遅い</li>
 </ul>
-<p><strong>解決策</strong>: もっと賢く進めないか？</p>
 <div title="Newton法のアイデア">
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
@@ -325,7 +330,7 @@ rkskmt
 <p><strong>Newton法のアイデア</strong></p>
 </div>
 <div class="callout-content">
-<p>「傾き」だけでなく「曲がり具合」も使えば、<strong>どこまで進めばいいか計算できる</strong>のでは？</p>
+<p>「傾き」だけでなく「曲がり具合」も使えば、<strong>どこまで進めばいいかを計算できる</strong>のでは？</p>
 </div>
 </div>
 </div>
@@ -338,8 +343,8 @@ rkskmt
 <div id="次微分とは" class="slide-body-heading">
 2次微分とは
 </div>
-<p><strong>1次微分</strong>: 傾き（どっちに進むか） <span class="math display">\[f'(x) = 2x - 4\]</span></p>
-<p><strong>2次微分</strong>: 曲率（どれくらい曲がっているか） <span class="math display">\[f''(x) = \frac{d}{dx}(2x - 4) = 2\]</span></p>
+<p><strong>1次微分（<span class="en">first derivative</span>）</strong>：傾き（どちらに進むか） <span class="math display">\[f'(x) = 2x - 4\]</span></p>
+<p><strong>2次微分</strong>：曲率（<span class="en">curvature</span>、どれくらい曲がっているか） <span class="math display">\[f''(x) = \frac{d}{dx}(2x - 4) = 2\]</span></p>
 <div title="2次微分の計算">
 <div class="callout callout-tip callout-titled callout-style-default">
 <div class="callout-body">
@@ -350,14 +355,13 @@ rkskmt
 <p><strong>2次微分の計算</strong></p>
 </div>
 <div class="callout-content">
-<p>1次微分をもう一度微分するだけ： <span class="math display">\[f'(x) = 2x - 4\]</span> <span class="math display">\[f''(x) = 2 \times 1 - 0 = 2\]</span></p>
+<p>1次微分をもう一度微分する： <span class="math display">\[f'(x) = 2x - 4\]</span> <span class="math display">\[f''(x) = 2 \times 1 - 0 = 2\]</span></p>
 </div>
 </div>
 </div>
 </div>
 <h3 id="ヘッセ行列hessian-matrixとは">ヘッセ行列（<span class="en">Hessian Matrix</span>）とは</h3>
-<p><strong>注意</strong>: 1変数の場合、2次微分は単なる数値なので「ヘッセ行列」とは呼ばない。</p>
-<p><strong>ヘッセ行列は2変数以上で使う用語</strong>：</p>
+<p><strong>ヘッセ行列</strong>：2変数以上の関数の2次微分を並べた行列</p>
 <p><span class="math display">\[H = \begin{bmatrix}
 \frac{\partial^2 f}{\partial x^2} &amp; \frac{\partial^2 f}{\partial x \partial y} \\
 \frac{\partial^2 f}{\partial y \partial x} &amp; \frac{\partial^2 f}{\partial y^2}
@@ -372,16 +376,16 @@ rkskmt
 </div>
 <div class="callout-content">
 <ul>
-<li>1変数: <span class="math inline">\(f''(x)\)</span> = 2次微分（スカラー）</li>
-<li>2変数以上: <span class="math inline">\(H\)</span> = ヘッセ行列（行列）</li>
+<li>1変数：<span class="math inline">\(f''(x)\)</span> = 2次微分（スカラー、<span class="en">scalar</span>）</li>
+<li>2変数以上：<span class="math inline">\(H\)</span> = ヘッセ行列（行列）</li>
+<li>この資料は1変数なので「2次微分」と呼ぶ</li>
 </ul>
-<p>この資料は1変数なので「2次微分」と呼ぶ。</p>
 </div>
 </div>
 </div>
 </div>
 </section>
-<section id="newton法のアルゴリズム" class="slide level2">
+<section id="peek-newton-update" class="slide level2">
 <h2>Newton法のアルゴリズム</h2>
 <div class="slide-body">
 <div id="更新式" class="slide-body-heading">
@@ -389,23 +393,30 @@ rkskmt
 </div>
 <p><span class="math display">\[x_{\text{new}} = x - \frac{f'(x)}{f''(x)}\]</span></p>
 <ul>
-<li><span class="math inline">\(f'(x)\)</span>: 1次微分（勾配）</li>
-<li><span class="math inline">\(f''(x)\)</span>: 2次微分（曲率）</li>
-<li><strong>学習率不要！</strong></li>
+<li><span class="math inline">\(f'(x)\)</span>：1次微分（勾配、<span class="en">gradient</span>）</li>
+<li><span class="math inline">\(f''(x)\)</span>：2次微分（曲率）</li>
+<li><strong>学習率は不要</strong></li>
 </ul>
-<h3 id="なぜこの式">なぜこの式？</h3>
-<p>現在地点で関数を2次関数で近似： <span class="math display">\[f(x) \approx f(x_0) + f'(x_0)(x-x_0) + \frac{1}{2}f''(x_0)(x-x_0)^2\]</span></p>
+<h3 id="更新式の導出">更新式の導出</h3>
+<p>現在地点 <span class="math inline">\(x_0\)</span> のまわりを2次関数で近似する： <span class="math display">\[f(x) \approx f(x_0) + f'(x_0)(x-x_0) + \frac{1}{2}f''(x_0)(x-x_0)^2\]</span></p>
 <p>この2次関数の最小値を求めると： <span class="math display">\[x_{\text{min}} = x_0 - \frac{f'(x_0)}{f''(x_0)}\]</span></p>
+<div title="要するに">
 <div class="callout callout-important callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>重要</strong></p>
+<p><strong>要するに</strong></p>
 </div>
 <div class="callout-content">
-<p><strong>2次関数の最小値は解析的に求められる</strong> → 一気にそこまでジャンプできる！</p>
+<ul>
+<li><strong>2次関数の最小値は解析的に求められる</strong>
+<ul>
+<li>一気にそこまでジャンプできる</li>
+</ul></li>
+</ul>
+</div>
 </div>
 </div>
 </div>
@@ -420,7 +431,7 @@ rkskmt
 <ul>
 <li>関数: <span class="math inline">\(f(x) = x^2 - 4x + 3\)</span></li>
 <li>1次微分: <span class="math inline">\(f'(x) = 2x - 4\)</span></li>
-<li><strong>2次微分: <span class="math inline">\(f''(x) = 2\)</span></strong>（重要！）</li>
+<li><strong>2次微分: <span class="math inline">\(f''(x) = 2\)</span></strong></li>
 <li>初期値: <span class="math inline">\(x_0 = 0\)</span></li>
 </ul>
 <div class="panel-tabset">
@@ -443,16 +454,18 @@ rkskmt
 &amp;= 0 + 2 \\
 &amp;= 2
 \end{align}\]</span></p>
+<div title="結果">
 <div class="callout callout-important callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>重要</strong></p>
+<p><strong>結果</strong></p>
 </div>
 <div class="callout-content">
-<p><strong>反復1の結果</strong>: <span class="math inline">\(x = 0 \rightarrow x = 2\)</span></p>
+<p>反復1で <span class="math inline">\(x = 0 \rightarrow x = 2\)</span></p>
+</div>
 </div>
 </div>
 </div>
@@ -464,17 +477,22 @@ rkskmt
 <p><span class="math display">\[f(2) = 2^2 - 4 \times 2 + 3 = 4 - 8 + 3 = -1\]</span></p>
 <h4 id="ステップ31次微分">ステップ3：1次微分</h4>
 <p><span class="math display">\[f'(2) = 2 \times 2 - 4 = 4 - 4 = 0\]</span></p>
-<div title="収束！">
+<div title="結果">
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>収束！</strong></p>
+<p><strong>結果</strong></p>
 </div>
 <div class="callout-content">
-<p><strong>勾配が0</strong> → 極値に到達 → これ以上更新不要</p>
+<ul>
+<li><strong>勾配が 0</strong> なので、極値（<span class="en">extremum</span>）に到達した
+<ul>
+<li>これ以上の更新は不要</li>
+</ul></li>
+</ul>
 </div>
 </div>
 </div>
@@ -484,13 +502,13 @@ rkskmt
 </div>
 <h3 id="答え">答え</h3>
 <p><span class="math display">\[x = 2, \quad f(2) = -1\]</span></p>
-<p><strong>たった1回の反復で最適解に到達！</strong></p>
+<p><strong>1回の反復で最適解に到達した</strong></p>
 </div>
 </section>
 <section id="newton法python実装" class="slide level2">
 <h2>Newton法：Python実装</h2>
 <div class="slide-body">
-<div id="c7ae8656" class="cell" data-execution_count="2">
+<div id="117feaef" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a><span class="co"># 初期値</span></span>
 <span id="cb2-2"><a aria-label="2"></a>x <span class="op">=</span> <span class="fl">0.0</span></span>
 <span id="cb2-3"><a aria-label="3"></a></span>
@@ -570,12 +588,12 @@ f''(x) = 2.0000
 <p><strong>手で微分して関数定義</strong></p>
 </div>
 <div class="callout-content">
+<p><strong>手で計算した結果を関数として定義</strong>している：</p>
 <ul>
 <li><span class="math inline">\(f(x) = x^2 - 4x + 3\)</span></li>
 <li><span class="math inline">\(f'(x) = 2x - 4\)</span></li>
 <li><span class="math inline">\(f''(x) = 2\)</span></li>
 </ul>
-<p><strong>手で計算した結果を関数として定義</strong>する。自動微分は使わない。</p>
 </div>
 </div>
 </div>
@@ -591,7 +609,7 @@ f''(x) = 2.0000
 <section id="可視化で比較" class="slide level2">
 <h2>可視化で比較</h2>
 <div class="slide-body">
-<div id="2d8dd70d" class="cell" data-execution_count="3">
+<div id="9a68a68a" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -656,10 +674,10 @@ f''(x) = 2.0000
 <section id="なぜnewton法は速いのか" class="slide level2">
 <h2>なぜNewton法は速いのか</h2>
 <div class="slide-body">
-<div id="視覚的説明" class="slide-body-heading">
-視覚的説明
+<div id="次近似quadratic-approximation" class="slide-body-heading">
+2次近似（<span class="en">Quadratic Approximation</span>）
 </div>
-<div id="478868fc" class="cell" data-execution_count="4">
+<div id="e1d1f6db" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -668,33 +686,48 @@ f''(x) = 2.0000
 </div>
 </div>
 </div>
-<div title="2次近似の威力">
+<div title="要するに">
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>2次近似の威力</strong></p>
+<p><strong>要するに</strong></p>
 </div>
 <div class="callout-content">
-<p><strong>勾配降下法</strong>: 1次近似（接線）だけ → 「どっちに進むか」はわかるが「どこまで進むか」は手探り</p>
-<p><strong>Newton法</strong>: 2次近似（放物線） → 放物線の最小値を計算 → 一気にジャンプ</p>
+<ul>
+<li><strong>勾配降下法</strong>：1次近似（<span class="en">linear approximation</span>、接線）だけを使う
+<ul>
+<li>どちらに進むかはわかるが、どこまで進むかは手探り</li>
+</ul></li>
+<li><strong>Newton法</strong>：2次近似（放物線）を使う
+<ul>
+<li>放物線の最小値を計算して、一気にジャンプする</li>
+</ul></li>
+</ul>
 </div>
 </div>
 </div>
 </div>
-<div title="ただし、放物線がウソをつくと…">
+<div title="放物線が上に凸だと失敗する">
 <div class="callout callout-warning callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>ただし、放物線がウソをつくと…</strong></p>
+<p><strong>放物線が上に凸だと失敗する</strong></p>
 </div>
 <div class="callout-content">
-<p>この「当てはめた放物線へ一気にジャンプ」は、<strong>当てはめた放物線が下に凸（お椀型）のときだけ</strong>うまくいく。 谷が複数ある関数では、上に凸の場所で放物線が逆さまになり、<strong>山に登ったり反対側へ吹っ飛んだり</strong>する。 → その失敗と直し方は <strong><a href="./optimization-local-minima-appendix.html">ローカルミニマムの罠</a></strong> で詳しく扱う。</p>
+<ul>
+<li>放物線の頂点へのジャンプがうまくいくのは、<strong>当てはめた放物線が下に凸（<span class="en">convex</span>、お椀型）のときだけ</strong></li>
+<li>谷が複数ある関数では、上に凸（<span class="en">concave</span>）の場所で放物線が逆さまになる
+<ul>
+<li><strong>山に登ったり、反対側へ大きく飛んだり</strong>する</li>
+</ul></li>
+<li><a href="./optimization-local-minima-appendix.html#peek-newton-fix" class="peek">この失敗の原因と直し方</a></li>
+</ul>
 </div>
 </div>
 </div>
@@ -714,8 +747,20 @@ f''(x) = 2.0000
 <p><strong>どちらを使うべきか</strong></p>
 </div>
 <div class="callout-content">
-<p><strong>勾配降下法を使う場合:</strong> - パラメータ数が多い（数万〜数百万） - メモリが限られている - オンライン学習（データが逐次的に来る） - 例：ディープラーニング</p>
-<p><strong>Newton法を使う場合:</strong> - パラメータ数が少ない（数個〜数千） - 高精度な解が必要 - バッチ学習 - 例：ロジスティック回帰、一般化線形モデル</p>
+<p><strong>勾配降下法を使う場合</strong></p>
+<ul>
+<li>パラメータ数が多い（数万〜数百万）</li>
+<li>メモリが限られている</li>
+<li>オンライン学習（<span class="en">online learning</span>、データが逐次的に来る）</li>
+<li>例：ディープラーニング</li>
+</ul>
+<p><strong>Newton法を使う場合</strong></p>
+<ul>
+<li>パラメータ数が少ない（数個〜数千）</li>
+<li>高精度な解が必要</li>
+<li>バッチ学習（<span class="en">batch learning</span>）</li>
+<li>例：ロジスティック回帰、一般化線形モデル（<span class="en">generalized linear model</span>）</li>
+</ul>
 </div>
 </div>
 </div>
@@ -725,12 +770,12 @@ f''(x) = 2.0000
 <section id="練習問題" class="slide level2 scrollable">
 <h2>練習問題</h2>
 <div class="slide-body">
-<p>本編の練習問題と同じ関数 <span class="math inline">\(f(x) = x^2 + 6x + 5\)</span> について：</p>
+<p><a href="./optimization-gradient-descent.html#練習問題" class="peek">勾配降下法の練習問題</a>と同じ関数 <span class="math inline">\(f(x) = x^2 + 6x + 5\)</span> について：</p>
 <ol type="1">
 <li>2次微分を求めよ</li>
 <li>初期値 <span class="math inline">\(x_0 = 0\)</span> でNewton法を実行せよ</li>
 <li>反復1、反復2を手計算で示せ</li>
-<li>本編の勾配降下法（<span class="math inline">\(\alpha = 0.2\)</span>）の結果と比較して、何回で収束したか、どちらが速かったかを述べよ</li>
+<li><a href="./optimization-gradient-descent.html#練習問題の解答例" class="peek">勾配降下法の解答例</a>（<span class="math inline">\(\alpha = 0.2\)</span>）の結果と比較して、何回で収束したか、どちらが速かったかを述べよ</li>
 </ol>
 </div>
 </section>
@@ -740,7 +785,27 @@ f''(x) = 2.0000
 <p><strong>2次微分:</strong> <span class="math display">\[f'(x) = 2x + 6, \qquad f''(x) = 2\]</span></p>
 <p><strong>反復1:</strong> <span class="math display">\[x_{\text{new}} = 0 - \frac{f'(0)}{f''(0)} = 0 - \frac{6}{2} = -3\]</span></p>
 <p><strong>反復2（収束確認）:</strong> <span class="math display">\[f'(-3) = 2 \times (-3) + 6 = 0\]</span></p>
-<p>勾配が 0 なので収束。理論値 <span class="math inline">\(x = -3\)</span> に<strong>1回</strong>で到達した。 勾配降下法は3回の反復後も <span class="math inline">\(x = -2.352\)</span> で、まだ収束していなかった。</p>
+<div title="結果">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>結果</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>勾配が 0 なので収束した
+<ul>
+<li>理論値 <span class="math inline">\(x = -3\)</span> に<strong>1回</strong>で到達</li>
+</ul></li>
+<li>勾配降下法は3回の反復後も <span class="math inline">\(x = -2.352\)</span> で、まだ収束していない</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
 
 
 <div id="3ade8a4a-fb1d-4a6c-8409-ac45482d5fc9" class="hidden">

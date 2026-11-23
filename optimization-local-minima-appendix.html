@@ -104,7 +104,7 @@
     code span.vs { color: #032f62; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-e69bca93ec9d1486cefcf16a785f5ce6.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-f73900642b947ff7c946332e8eb6f3e3.css">
   <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -237,13 +237,13 @@
             config.math.config = config.math.config.replace("_HTML", "_CHTML");
             config.math.CommonHTML = { scale: 127, matchFontHeight: false };
           }
-          // A ruled lecture index (.lectures.ruled) lays itself out at
-          // the window's width (custom.css). reveal.js's slide view
+          // A ruled or network lecture index lays itself out at the
+          // window's width (custom.css). reveal.js's slide view
           // fixes every slide at 1280x720 and scales it, and reveal.js
           // switches to the scroll view only below 435px, so open such
           // a page in the scroll view at every width. Quarto calls
           // initialize at the end of <body>, so the page is parsed.
-          if (config && document.querySelector(".lectures.ruled")) {
+          if (config && document.querySelector(".lectures.ruled, .lectures.network")) {
             config.view = "scroll";
           }
           return initialize.call(this, config);
@@ -257,7 +257,8 @@
   <script src="peek-ui.js" defer=""></script>
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="572b23f2895ea2740096c5fae7701a29006e31df">
+  <script src="network-ui.js" defer=""></script>
+  <meta name="qmd-web-source" content="dc7a6a2d44dfc9c9dfe66ffa7300ac8edd3b45c5">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -279,28 +280,33 @@ rkskmt
 <section id="section" class="slide level2 center break-slide" data-background-color="white">
 <h2></h2>
 <div class="break-title">
-<p>本編の振り返りと今回の問題</p>
+<p>谷の数と勾配降下法</p>
 </div>
 </section>
-<section id="本編でやったこと" class="slide level2">
-<h2>本編でやったこと</h2>
+<section id="谷が1つの関数" class="slide level2">
+<h2>谷が1つの関数</h2>
 <div class="slide-body">
-<p>本編では <span class="math inline">\(f(x) = x^2 - 4x + 3\)</span> という<strong>2次関数</strong>で勾配降下法を学びました。</p>
-<p>この関数は<strong>谷が1つだけ</strong>のシンプルな形でした。 どこから始めても、必ず同じ最小値 <span class="math inline">\(x = 2\)</span> にたどり着きました。</p>
-<div title="本編の結論">
+<ul>
+<li><a href="./optimization-gradient-descent.html#peek-gd-code" class="peek">勾配降下法</a>（<span class="en">gradient descent</span>）で最小化した <span class="math inline">\(f(x) = x^2 - 4x + 3\)</span> は<strong>2次関数</strong>（<span class="en">quadratic function</span>）
+<ul>
+<li><strong>谷が1つだけ</strong>のシンプルな形</li>
+<li>どこから始めても、同じ最小値 <span class="math inline">\(x = 2\)</span> にたどり着く</li>
+</ul></li>
+</ul>
+<div title="要するに">
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>本編の結論</strong></p>
+<p><strong>要するに</strong></p>
 </div>
 <div class="callout-content">
 <ul>
 <li>勾配降下法：傾きを測り、逆方向に少し進む、を繰り返す</li>
-<li>学習率が適切なら、谷の底にたどり着く</li>
-<li>スタート地点を変えても、<strong>たどり着く場所は同じ</strong>だった</li>
+<li>学習率（<span class="en">learning rate</span>）が適切なら、谷の底にたどり着く</li>
+<li>スタート地点を変えても、<strong>たどり着く場所は同じ</strong></li>
 </ul>
 </div>
 </div>
@@ -308,37 +314,51 @@ rkskmt
 </div>
 </div>
 </section>
-<section id="今回の疑問" class="slide level2">
-<h2>今回の疑問</h2>
+<section id="谷が2つ以上ある関数" class="slide level2">
+<h2>谷が2つ以上ある関数</h2>
 <div class="slide-body">
-<p>でも、こんな疑問が浮かびます：</p>
-<blockquote>
-<p><strong>「谷が2つ以上ある関数だったら、どうなるの？」</strong></p>
-</blockquote>
-<p>実際の機械学習の問題では、谷が1つだけということはほとんどありません。 パラメータが多くなると、<strong>たくさんの谷</strong>が存在します。</p>
-<p>今回は「谷が2つある関数」に勾配降下法を放り込んで、<strong>何が起こるか</strong>を体験しましょう。</p>
+<div title="今回の主題">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>今回の主題</strong></p>
+</div>
+<div class="callout-content">
+<p>谷が2つ以上ある関数では、勾配降下法はどうなるのか</p>
+</div>
+</div>
+</div>
+</div>
+<ul>
+<li>実際の機械学習（<span class="en">machine learning</span>）の問題では、谷が1つだけということはほとんどない</li>
+<li>パラメータが多くなると、<strong>たくさんの谷</strong>が存在する</li>
+<li>谷が2つある関数で、勾配降下法の動きを確かめる</li>
+</ul>
 </div>
 </section>
 <section id="section-1" class="slide level2 center break-slide" data-background-color="white">
 <h2></h2>
 <div class="break-title">
-<p>谷が2つある関数を見てみよう</p>
+<p>谷が2つある関数</p>
 </div>
 </section>
 <section id="関数の定義" class="slide level2">
 <h2>関数の定義</h2>
 <div class="slide-body">
-<p>今回使う関数はこれです：</p>
+<p>今回使う関数：</p>
 <p><span class="math display">\[f(x) = 0.1x^4 - x^3 + 2x^2 + 1\]</span></p>
-<p>本編と同じように、微分を手で計算しておきます。</p>
-<p><strong>1次微分</strong>（傾き）: <span class="math display">\[f'(x) = 0.4x^3 - 3x^2 + 4x\]</span></p>
-<p><strong>2次微分</strong>（曲がり具合）: <span class="math display">\[f''(x) = 1.2x^2 - 6x + 4\]</span></p>
+<p>微分を手で計算しておく。</p>
+<p><strong>1次微分</strong>（<span class="en">first derivative</span>、傾き）: <span class="math display">\[f'(x) = 0.4x^3 - 3x^2 + 4x\]</span></p>
+<p><strong>2次微分</strong>（<span class="en">second derivative</span>、曲がり具合）: <span class="math display">\[f''(x) = 1.2x^2 - 6x + 4\]</span></p>
 </div>
 </section>
 <section id="pythonでの定義" class="slide level2">
 <h2>Pythonでの定義</h2>
 <div class="slide-body">
-<div id="9c54335c" class="cell" data-execution_count="1">
+<div id="f864252e" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-3"><a aria-label="3"></a><span class="im">import</span> japanize_matplotlib</span>
@@ -355,11 +375,13 @@ rkskmt
 </div>
 </div>
 </section>
-<section id="まずグラフを描いてみよう" class="slide level2">
-<h2>まずグラフを描いてみよう</h2>
+<section id="まずグラフを描く" class="slide level2">
+<h2>まずグラフを描く</h2>
 <div class="slide-body">
-<p>どんな形の関数なのか、<strong>まず目で見る</strong>ことが大切です。</p>
-<div id="34a3f00c" class="cell" data-execution_count="2">
+<ul>
+<li>どんな形の関数なのかを、<strong>まず目で見る</strong></li>
+</ul>
+<div id="d77e9f3e" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -368,23 +390,36 @@ rkskmt
 </div>
 </div>
 </div>
-<div title="グラフを観察しよう">
+<div title="チェックポイント">
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>グラフを観察しよう</strong></p>
+<p><strong>チェックポイント</strong></p>
 </div>
 <div class="callout-content">
-<p>谷がいくつあるか、数えてみてください。</p>
+<p>谷がいくつあるか、数えてみてください</p>
 <ul>
 <li><strong>左の谷</strong>：浅い谷</li>
 <li><strong>右の谷</strong>：深い谷</li>
 </ul>
-<p>本編の2次関数は谷が1つだけでしたが、今回は<strong>2つ</strong>あります。</p>
-<p>さて、勾配降下法を走らせたら、どちらの谷に降りていくのでしょうか？</p>
+</div>
+</div>
+</div>
+</div>
+<div title="質問">
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>質問</strong></p>
+</div>
+<div class="callout-content">
+<p>勾配降下法を実行すると、どちらの谷に降りていくでしょうか？</p>
 </div>
 </div>
 </div>
@@ -394,16 +429,21 @@ rkskmt
 <section id="section-2" class="slide level2 center break-slide" data-background-color="white">
 <h2></h2>
 <div class="break-title">
-<p>実験：初期値を変えて勾配降下法を実行してみよう</p>
+<p>初期値を変えて実行する</p>
 </div>
 </section>
-<section id="作戦式は同じスタート地点だけ変える" class="slide level2">
-<h2>作戦：式は同じ、スタート地点だけ変える</h2>
+<section id="スタート地点だけを変える" class="slide level2">
+<h2>スタート地点だけを変える</h2>
 <div class="slide-body">
-<p>本編の勾配降下法の更新式を、<strong>そのまま</strong>使います：</p>
+<ul>
+<li><a href="./optimization-gradient-descent.html#peek-gd-code" class="peek">勾配降下法の更新式</a>をそのまま使う：</li>
+</ul>
 <p><span class="math display">\[x_{\text{new}} = x - \alpha \cdot f'(x)\]</span></p>
-<p>学習率は <span class="math inline">\(\alpha = 0.1\)</span> に固定。同じ式・同じ学習率で、<strong>スタート地点だけ変えて</strong>2回実験します。</p>
-<div id="749ac851" class="cell" data-execution_count="3">
+<ul>
+<li>学習率は <span class="math inline">\(\alpha = 0.1\)</span> に固定する</li>
+<li><strong>スタート地点（初期値、<span class="en">initial value</span>）だけを変えて</strong>2回実験する</li>
+</ul>
+<div id="64e4622c" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a><span class="kw">def</span> gradient_descent(f, fp, x0, lr<span class="op">=</span><span class="fl">0.1</span>, tol<span class="op">=</span><span class="fl">1e-6</span>, max_iter<span class="op">=</span><span class="dv">10000</span>):</span>
 <span id="cb2-2"><a aria-label="2"></a>    <span class="co">"""勾配降下法：収束した場所・そこでの f(x)・通り道を返す"""</span></span>
 <span id="cb2-3"><a aria-label="3"></a>    x <span class="op">=</span> x0</span>
@@ -421,8 +461,8 @@ rkskmt
 <section id="実験1x_0-0.5-からスタート左の谷の近く" class="slide level2">
 <h2>実験1：<span class="math inline">\(x_0 = 0.5\)</span> からスタート（左の谷の近く）</h2>
 <div class="slide-body">
-<div id="手計算で追いかけてみよう" class="slide-body-heading">
-手計算で追いかけてみよう
+<div id="手計算で追う" class="slide-body-heading">
+手計算で追う
 </div>
 <div class="panel-tabset">
 <ul id="tabset-1" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-1-1">反復1</a></li><li><a href="#tabset-1-2">反復2</a></li><li><a href="#tabset-1-3">反復3</a></li></ul>
@@ -439,7 +479,10 @@ rkskmt
 <div id="tabset-1-3">
 <p><strong>現在の位置</strong>: <span class="math inline">\(x = 0.261\)</span></p>
 <p><span class="math display">\[f'(0.261) \approx 0.847\]</span> <span class="math display">\[x_{\text{new}} = 0.261 - 0.085 = 0.176\]</span></p>
-<p>傾きの逆へ少しずつ、左の谷底 <span class="math inline">\(x = 0\)</span> に向かって降りています。続きはPythonに任せましょう。</p>
+<ul>
+<li>傾きの逆へ少しずつ、左の谷底 <span class="math inline">\(x = 0\)</span> に向かって降りている</li>
+<li>続きは Python で計算する</li>
+</ul>
 </div>
 </div>
 </div>
@@ -453,13 +496,13 @@ rkskmt
 <p><strong>実験1の結果</strong></p>
 </div>
 <div class="callout-content">
-<p><span class="math inline">\(x_0 = 0.5\)</span> からスタート → <span class="math inline">\(x = 0\)</span>（<strong>左の谷の底</strong>）に収束、<span class="math inline">\(f(0) = 1\)</span></p>
+<p><span class="math inline">\(x_0 = 0.5\)</span> からスタート → <span class="math inline">\(x = 0\)</span>（<strong>左の谷の底</strong>）に収束（<span class="en">convergence</span>）、<span class="math inline">\(f(0) = 1\)</span></p>
 </div>
 </div>
 </div>
 </div>
 <h3 id="pythonで確認">Pythonで確認</h3>
-<div id="c6e38bfa" class="cell" data-execution_count="4">
+<div id="419fb446" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a aria-label="1"></a><span class="co"># 実験1: x0 = 0.5 からスタート</span></span>
@@ -492,8 +535,8 @@ rkskmt
 <section id="実験2x_0-5.5-からスタート右の谷の近く" class="slide level2">
 <h2>実験2：<span class="math inline">\(x_0 = 5.5\)</span> からスタート（右の谷の近く）</h2>
 <div class="slide-body">
-<div id="手計算で追いかけてみよう-1" class="slide-body-heading">
-手計算で追いかけてみよう
+<div id="手計算で追う-1" class="slide-body-heading">
+手計算で追う
 </div>
 <div class="panel-tabset">
 <ul id="tabset-2" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-2-1">反復1</a></li><li><a href="#tabset-2-2">反復2</a></li><li><a href="#tabset-2-3">反復3</a></li></ul>
@@ -510,7 +553,7 @@ rkskmt
 <div id="tabset-2-3">
 <p><strong>現在の位置</strong>: <span class="math inline">\(x = 5.762\)</span></p>
 <p><span class="math display">\[f'(5.762) \approx -0.037\]</span></p>
-<p>傾きはもうほぼゼロ。<strong>谷底に到着です。</strong></p>
+<p>傾きはほぼゼロで、<strong>谷底に到着した</strong></p>
 </div>
 </div>
 </div>
@@ -524,14 +567,18 @@ rkskmt
 <p><strong>実験2の結果</strong></p>
 </div>
 <div class="callout-content">
-<p><span class="math inline">\(x_0 = 5.5\)</span> からスタート → <strong>右の谷の底</strong>に収束</p>
-<p>そこでの <span class="math inline">\(f(x)\)</span> は、実験1の <span class="math inline">\(f(0) = 1\)</span> より<strong>はるかに低い</strong></p>
+<ul>
+<li><span class="math inline">\(x_0 = 5.5\)</span> からスタート → <strong>右の谷の底</strong>に収束
+<ul>
+<li>そこでの <span class="math inline">\(f(x)\)</span> は、実験1の <span class="math inline">\(f(0) = 1\)</span> より<strong>はるかに低い</strong></li>
+</ul></li>
+</ul>
 </div>
 </div>
 </div>
 </div>
 <h3 id="pythonで確認-1">Pythonで確認</h3>
-<div id="7ee87b11" class="cell" data-execution_count="5">
+<div id="27d155e3" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a aria-label="1"></a><span class="co"># 実験2: x0 = 5.5 からスタート</span></span>
@@ -559,10 +606,10 @@ rkskmt
 </div>
 </div>
 </section>
-<section id="つの実験を並べてみよう" class="slide level2">
-<h2>2つの実験を並べてみよう</h2>
+<section id="つの実験を並べる" class="slide level2">
+<h2>2つの実験を並べる</h2>
 <div class="slide-body">
-<div id="7f32d2bf" class="cell" data-execution_count="6">
+<div id="14567427" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -581,7 +628,7 @@ rkskmt
 <p><strong>たどり着いた谷が違う</strong></p>
 </div>
 <div class="callout-content">
-<p><strong>まったく同じ勾配降下法を使ったのに：</strong></p>
+<p><strong>同じ勾配降下法でも、初期値が違うとたどり着く谷が変わる</strong></p>
 <table class="caption-top">
 <thead>
 <tr class="header">
@@ -604,10 +651,12 @@ rkskmt
 </tbody>
 </table>
 <ul>
-<li>どちらも正真正銘の谷（<span class="math inline">\(f''&gt;0\)</span>）。でも<strong>深さがまったく違う</strong></li>
-<li>実験1の答えは「その周辺では最適、全体では2番手」— そして使った本人は、<strong>もっと深い谷の存在に気づけない</strong></li>
+<li>どちらも谷（<span class="math inline">\(f''&gt;0\)</span>）だが、<strong>深さがまったく違う</strong></li>
+<li>実験1の答えは、その周辺では最適でも全体では最適ではない
+<ul>
+<li>実行した結果だけを見ても、<strong>もっと深い谷があることには気づけない</strong></li>
+</ul></li>
 </ul>
-<p><strong>スタート地点（初期値）が違うだけで、たどり着く谷が変わってしまう。</strong></p>
 </div>
 </div>
 </div>
@@ -617,16 +666,23 @@ rkskmt
 <section id="section-3" class="slide level2 center break-slide" data-background-color="white">
 <h2></h2>
 <div class="break-title">
-<p>この現象に名前をつけよう</p>
+<p>谷の種類</p>
 </div>
 </section>
 <section id="ローカルミニマムとグローバルミニマム" class="slide level2">
 <h2>ローカルミニマムとグローバルミニマム</h2>
 <div class="slide-body">
-<p>いま体験した現象には、ちゃんと名前がついています。</p>
-<p><strong>ローカルミニマム（局所的最小値, <span class="en">local minimum</span>）</strong>: 「その周辺では一番低い」けど、関数全体で見ると<strong>もっと低い場所がある</strong>点。 実験1で到達した<strong>左の谷（x = 0）</strong>がこれです。</p>
-<p><strong>グローバルミニマム（大域的最小値, <span class="en">global minimum</span>）</strong>: 関数全体で<strong>本当に一番低い</strong>点。 実験2で到達した<strong>右の谷</strong>がこれです。</p>
-<div id="b2440da4" class="cell" data-execution_count="7">
+<ul>
+<li><strong>ローカルミニマム（局所的最小値, <span class="en">local minimum</span>）</strong>：その周辺では一番低いが、関数全体で見ると<strong>もっと低い場所がある</strong>点
+<ul>
+<li>実験1で到達した<strong>左の谷（<span class="math inline">\(x = 0\)</span>）</strong></li>
+</ul></li>
+<li><strong>グローバルミニマム（大域的最小値, <span class="en">global minimum</span>）</strong>：関数全体で<strong>一番低い</strong>点
+<ul>
+<li>実験2で到達した<strong>右の谷</strong></li>
+</ul></li>
+</ul>
+<div id="7ecf5996" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -645,13 +701,13 @@ rkskmt
 <p><strong>たとえ話：山の中で一番低い場所を探す</strong></p>
 </div>
 <div class="callout-content">
-<p>あなたは目隠しをして山の中にいます。足元の傾きだけを頼りに、一番低い場所を探します。</p>
+<p>目隠しをして山の中に立ち、足元の傾きだけを頼りに一番低い場所を探す</p>
 <ul>
-<li>近くの谷に降りることはできる → <strong>ローカルミニマム</strong></li>
-<li>でも、山の向こうにもっと深い谷があるかもしれない → <strong>グローバルミニマム</strong></li>
-<li>目隠しをしているので、<strong>今いる谷が一番深いかどうかわからない！</strong></li>
+<li>近くの谷には降りられる → <strong>ローカルミニマム</strong></li>
+<li>山の向こうに、もっと深い谷があるかもしれない → <strong>グローバルミニマム</strong></li>
+<li>目隠しをしているので、<strong>今いる谷が一番深いかどうかはわからない</strong></li>
 </ul>
-<p>Newton法も勾配降下法も、この「目隠し」と同じ状況です。</p>
+<p>勾配降下法も Newton法（<span class="en">Newton’s method</span>）も、この「目隠し」と同じ状況にある</p>
 </div>
 </div>
 </div>
@@ -661,25 +717,44 @@ rkskmt
 <section id="section-4" class="slide level2 center break-slide" data-background-color="white">
 <h2></h2>
 <div class="break-title">
-<p>なぜこうなるのか：初期値と「引力圏」</p>
+<p>初期値と引力圏</p>
 </div>
 </section>
 <section id="勾配降下法は目の前の坂しか見ない" class="slide level2">
 <h2>勾配降下法は「目の前の坂」しか見ない</h2>
 <div class="slide-body">
-<p>勾配降下法は、いまいる場所の傾きだけを見て一歩を決めます。 遠くにもっと深い谷があっても、<strong>目の前の坂を下ることしかできません</strong>。</p>
-<p>だから、だいたいは：</p>
 <ul>
+<li>勾配降下法は、いまいる場所の傾きだけを見て一歩を決める
+<ul>
+<li>遠くにもっと深い谷があっても、<strong>目の前の坂を下ることしかできない</strong></li>
+</ul></li>
 <li><strong>左の谷の近くからスタート</strong> → 左の谷（ローカルミニマム）に落ちる（実験1）</li>
 <li><strong>右の谷の近くからスタート</strong> → 右の谷（グローバルミニマム）に落ちる（実験2）</li>
 </ul>
-<p>でも「近く」の境目はどこにあるのでしょうか。初期値を200個並べて、全部試してみましょう。</p>
+<div title="質問">
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>質問</strong></p>
+</div>
+<div class="callout-content">
+<p>「近く」の境目はどこにあるのか？</p>
+</div>
+</div>
+</div>
+</div>
+<ul>
+<li>初期値を200個並べて、全部試す</li>
+</ul>
 </div>
 </section>
-<section id="どの初期値がどの谷に落ちるのか" class="slide level2">
+<section id="peek-gd-basin" class="slide level2">
 <h2>どの初期値が、どの谷に落ちるのか</h2>
 <div class="slide-body">
-<div id="8d1214d1" class="cell" data-execution_count="8">
+<div id="7ca7d3fb" class="cell" data-execution_count="8">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a aria-label="1"></a><span class="co"># 初期値を -1.5 から 7.5 まで細かく変えて、全部試す</span></span>
@@ -688,7 +763,7 @@ rkskmt
 <span id="cb7-4"><a aria-label="4"></a>    [gradient_descent(f_poly, f_poly_prime, x0)[<span class="dv">0</span>] <span class="cf">for</span> x0 <span class="kw">in</span> x0_dense_gd])</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="40f9ca14" class="cell" data-execution_count="9">
+<div id="0e174068" class="cell" data-execution_count="9">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -697,28 +772,54 @@ rkskmt
 </div>
 </div>
 </div>
-<p><strong>図の見方（下のグラフ）：</strong></p>
+<div title="図の見方（下のグラフ）">
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>図の見方（下のグラフ）</strong></p>
+</div>
+<div class="callout-content">
 <ul>
-<li>横軸＝<strong>スタート地点</strong> x0、縦軸＝そこから勾配降下法が<strong>最終的にたどり着いた場所</strong></li>
+<li>横軸：<strong>スタート地点</strong> x0</li>
+<li>縦軸：そこから勾配降下法が<strong>最終的にたどり着いた場所</strong></li>
 <li>縦に1本選んで読む：「x0 = 1 から出発 → 点の高さは 0 → 左の谷に着いた」</li>
-<li>点は2つの高さのどちらかに張り付く — 行き先は<strong>左の谷（赤）か右の谷（緑）</strong>の2択</li>
-<li>背景の色の帯から出発すると、同じ色の谷に吸い込まれる。上下のグラフは横軸が揃えてある</li>
+<li>点は2つの高さのどちらかに集まる
+<ul>
+<li>行き先は<strong>左の谷（赤）か右の谷（緑）</strong>の2択</li>
+</ul></li>
+<li>背景の色の帯から出発すると、同じ色の谷に吸い込まれる
+<ul>
+<li>上下のグラフは横軸が揃えてある</li>
+</ul></li>
 </ul>
-<div title="引力圏（[Basin of Attraction]{.en}）とは">
+</div>
+</div>
+</div>
+</div>
+<div title="引力圏（[Basin of Attraction]{.en}）">
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>引力圏（<span class="en">Basin of Attraction</span>）とは</strong></p>
+<p><strong>引力圏（<span class="en">Basin of Attraction</span>）</strong></p>
 </div>
 <div class="callout-content">
-<p>各谷には<strong>引力圏</strong> — その範囲からスタートすると、その谷に吸い込まれる領域 — があります。</p>
 <ul>
-<li>勾配降下法の引力圏は、<strong>丘のてっぺんを境にしたきれいな2分割</strong>：てっぺんより左なら左の谷、右なら右の谷</li>
-<li>地図としては素直。でも裏を返せば、<strong>答えはスタート地点を選んだ瞬間に決まっている</strong></li>
-<li>どっちの谷が深いかは、降りてみるまでわからない — <strong>1回の実行を信用してはいけない</strong>理由がこれ</li>
+<li><strong>引力圏</strong>：その範囲からスタートすると、その谷に吸い込まれる領域</li>
+<li>勾配降下法の引力圏は、<strong>丘のてっぺんを境に2つに分かれる</strong>
+<ul>
+<li>てっぺんより左なら左の谷、右なら右の谷</li>
+</ul></li>
+<li><strong>答えはスタート地点を選んだ時点で決まる</strong></li>
+<li>どちらの谷が深いかは、降りてみるまでわからない
+<ul>
+<li>だから<strong>1回の実行の結果を信用してはいけない</strong></li>
+</ul></li>
 </ul>
 </div>
 </div>
@@ -729,62 +830,114 @@ rkskmt
 <section id="引力圏を立体で見る" class="slide level2">
 <h2>引力圏を立体で見る</h2>
 <div class="slide-body">
-<p>パラメータが2個になると、地形は<strong>面</strong>になります。谷が2つある地形 <span class="math inline">\(f(w_1, w_2) = (w_1^2 - 1)^2 + 0.5\, w_2^2\)</span>（谷底は <span class="math inline">\(w_1 = \pm 1\)</span>）を、 <strong>ほんの少しだけ違う2地点</strong>からスタートしてみます：</p>
+<ul>
+<li>パラメータが2個になると、地形は<strong>面</strong>になる</li>
+<li>谷が2つある地形 <span class="math inline">\(f(w_1, w_2) = (w_1^2 - 1)^2 + 0.5\, w_2^2\)</span>（谷底は <span class="math inline">\(w_1 = \pm 1\)</span>）で、<strong>少しだけ違う2地点</strong>からスタートする</li>
+</ul>
 <div style="display:flex; justify-content:center;">
 <iframe src="iframes/basin_3d.html" width="900" height="510" style="border:none;" onload="try{var d=this.contentDocument;if(d){d.documentElement.style.margin='0';d.documentElement.style.padding='0';d.body.style.margin='0';d.body.style.padding='0';}}catch(e){}"></iframe>
 </div>
+<div title="チェックポイント">
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>チェックポイント</strong></p>
+</div>
+<div class="callout-content">
 <ul>
-<li>スタートの差は <span class="math inline">\(w_1\)</span> が <span class="math inline">\(+0.1\)</span> か <span class="math inline">\(-0.1\)</span> か<strong>だけ</strong>。それでも赤は右の谷、橙は左の谷に吸い込まれます</li>
-<li><span class="hl">ドラッグで回して</span>、2つの谷の間の<strong>尾根</strong>を確認 — 尾根こそが引力圏の境界線です</li>
-<li>実際の機械学習の地形は、こうした谷が無数にある高次元版。初期値しだいで別の答えに落ち着く理由がこれです</li>
+<li>スタートの差は <span class="math inline">\(w_1\)</span> が <span class="math inline">\(+0.1\)</span> か <span class="math inline">\(-0.1\)</span> か<strong>だけ</strong>
+<ul>
+<li>それでも赤は右の谷、橙は左の谷に吸い込まれる</li>
+</ul></li>
+<li><span class="hl">ドラッグで回して</span>、2つの谷の間の<strong>尾根</strong>を確認
+<ul>
+<li>尾根が引力圏の境界線</li>
+</ul></li>
+<li>実際の機械学習の地形は、こうした谷が多数ある高次元版
+<ul>
+<li>だから初期値しだいで別の答えに落ち着く</li>
+</ul></li>
 </ul>
+</div>
+</div>
+</div>
+</div>
 </div>
 </section>
 <section id="section-5" class="slide level2 center break-slide" data-background-color="white">
 <h2></h2>
 <div class="break-title">
-<p>対策：どうすればグローバルミニマムを見つけられるか</p>
+<p>グローバルミニマムの探し方</p>
 </div>
 </section>
-<section id="打つ手はシンプル" class="slide level2">
-<h2>打つ手はシンプル</h2>
+<section id="対策初期値を変えて何回も試す" class="slide level2">
+<h2>対策：初期値を変えて何回も試す</h2>
 <div class="slide-body">
-<p>引力圏の地図が教えてくれたこと：</p>
 <ul>
-<li>勾配降下法は正しく動いている — ただ、<strong>スタート地点がすべてを決めている</strong></li>
-<li>どっちの谷が深いかは、降りてみるまでわからない（目隠しの限界）</li>
+<li>勾配降下法は正しく動いている
+<ul>
+<li>ただし、<strong>どの谷に着くかはスタート地点で決まる</strong></li>
+</ul></li>
+<li>どちらの谷が深いかは、降りてみるまでわからない（目隠しの限界）</li>
 </ul>
-<p><strong>解決策：スタート地点を変えて何回もやり、一番良い結果を選ぶ！</strong></p>
+<div title="重要ポイント">
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>重要ポイント</strong></p>
+</div>
+<div class="callout-content">
+<p>スタート地点を変えて何回も実行し、一番良い結果を選ぶ</p>
+</div>
+</div>
+</div>
+</div>
 </div>
 </section>
 <section id="方法1手で初期値を変えて比較する" class="slide level2">
 <h2>方法1：手で初期値を変えて比較する</h2>
 <div class="slide-body">
-<p>まず、3つの初期値から比較してみましょう。</p>
+<ul>
+<li>まず3つの初期値から実行して比較する</li>
+</ul>
 <div class="panel-tabset">
 <ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-3-1"><span class="math inline">\(x_0 = 0\)</span> からスタート</a></li><li><a href="#tabset-3-2"><span class="math inline">\(x_0 = 2\)</span> からスタート</a></li><li><a href="#tabset-3-3"><span class="math inline">\(x_0 = 6\)</span> からスタート</a></li></ul>
 <div class="tab-content">
 <div id="tabset-3-1">
 <p><span class="math display">\[f'(0) = 0.4 \times 0 - 3 \times 0 + 4 \times 0 = 0\]</span></p>
-<p>傾きがゼロなので、勾配降下法は<strong>一歩も動きません</strong>。<span class="math inline">\(x = 0\)</span>、<span class="math inline">\(f(0) = 1\)</span> で即「収束」。</p>
-<p><span class="math inline">\(f''(0) = 4 &gt; 0\)</span> なので、ここはちゃんと谷です。ただし<strong>谷底ど真ん中スタートだと、隣にもっと深い谷があっても永遠に気づけない</strong>。</p>
+<ul>
+<li>傾きがゼロなので、勾配降下法は<strong>一歩も動かない</strong>
+<ul>
+<li><span class="math inline">\(x = 0\)</span>、<span class="math inline">\(f(0) = 1\)</span> ですぐに「収束」する</li>
+</ul></li>
+<li><span class="math inline">\(f''(0) = 4 &gt; 0\)</span> なので、ここは谷
+<ul>
+<li>ただし<strong>谷底から始めると、隣にもっと深い谷があっても気づけない</strong></li>
+</ul></li>
+</ul>
 </div>
 <div id="tabset-3-2">
 <p><span class="math display">\[f'(2) = 0.4 \times 8 - 3 \times 4 + 4 \times 2 = 3.2 - 12 + 8 = -0.8\]</span></p>
 <p>傾きがマイナス（右下り坂）→ 一歩は<strong>右へ</strong>：</p>
 <p><span class="math display">\[x_{\text{new}} = 2 - 0.1 \times (-0.8) = 2.08\]</span></p>
-<p>→ そのまま坂を下り続けて、右の谷（グローバルミニマム）へ。</p>
+<p>そのまま坂を下り続けて、右の谷（グローバルミニマム）に着く</p>
 </div>
 <div id="tabset-3-3">
 <p><span class="math display">\[f'(6) = 0.4 \times 216 - 3 \times 36 + 4 \times 6 = 86.4 - 108 + 24 = 2.4\]</span></p>
 <p>傾きがプラス（右上り坂）→ 一歩は<strong>左へ</strong>：</p>
 <p><span class="math display">\[x_{\text{new}} = 6 - 0.1 \times 2.4 = 5.76\]</span></p>
-<p>→ こちらも右の谷へ。</p>
+<p>こちらも右の谷に着く</p>
 </div>
 </div>
 </div>
 <h3 id="つの結果を比較">3つの結果を比較</h3>
-<div id="0bcff3e3" class="cell" data-execution_count="11">
+<div id="0b6f2ff4" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a aria-label="1"></a><span class="co"># 3つの初期値から実行して比較</span></span>
 <span id="cb8-2"><a aria-label="2"></a>starting_points <span class="op">=</span> [<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">6</span>]</span>
 <span id="cb8-3"><a aria-label="3"></a></span>
@@ -813,18 +966,21 @@ rkskmt
  6.0  →    5.7656  →  -13.6726  →  右の谷 ← 最良！</code></pre>
 </div>
 </div>
-<div title="ポイント">
+<div title="結果">
 <div class="callout callout-important callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>ポイント</strong></p>
+<p><strong>結果</strong></p>
 </div>
 <div class="callout-content">
-<p>3つ試すと<strong>左右両方の谷</strong>が出てきました。 <strong><span class="math inline">\(f(x)\)</span> が最小のものを採用する</strong> — これで一番良い答えを選べます。</p>
-<p>手間は3倍になりますが、浅い谷の答えを信じてしまうよりずっと良いです。</p>
+<ul>
+<li>3つ試すと<strong>左右両方の谷</strong>が出た</li>
+<li><strong><span class="math inline">\(f(x)\)</span> が最小のものを採用する</strong>と、その中で一番良い答えを選べる</li>
+<li>手間は3倍になるが、浅い谷の答えを信じてしまうよりずっとよい</li>
+</ul>
 </div>
 </div>
 </div>
@@ -834,13 +990,18 @@ rkskmt
 <section id="方法2方法3たくさんの初期値を自動で試す" class="slide level2">
 <h2>方法2・方法3：たくさんの初期値を自動で試す</h2>
 <div class="slide-body">
-<p>手で3つ試すのも良いですが、コンピュータなら<strong>20個でも100個でも</strong>試せます。初期値の選び方は2通りあります。</p>
+<ul>
+<li>コンピュータなら、初期値を<strong>多数</strong>試せる</li>
+<li>初期値の選び方は2通りある</li>
+</ul>
 <div class="panel-tabset">
 <ul id="tabset-4" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-4-1">方法2：ランダムリスタート</a></li><li><a href="#tabset-4-2">方法3：グリッドサーチ</a></li></ul>
 <div class="tab-content">
 <div id="tabset-4-1">
-<p>初期値を<strong>ランダムに</strong>選ぶ方法です。</p>
-<div id="b3b5ed98" class="cell" data-execution_count="12">
+<ul>
+<li><strong>ランダムリスタート（<span class="en">random restart</span>）</strong>：初期値を<strong>ランダムに</strong>選ぶ方法</li>
+</ul>
+<div id="a0ecd64a" class="cell" data-execution_count="12">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a aria-label="1"></a><span class="co"># 20個のランダムな初期値から試す</span></span>
@@ -882,8 +1043,10 @@ rkskmt
 </div>
 </div>
 <div id="tabset-4-2">
-<p>ランダムではなく、<strong>等間隔に並べる</strong>方法もあります。</p>
-<div id="aef0f3e0" class="cell" data-execution_count="13">
+<ul>
+<li><strong>グリッドサーチ（<span class="en">grid search</span>）</strong>：初期値を<strong>等間隔に並べる</strong>方法</li>
+</ul>
+<div id="198aa04f" class="cell" data-execution_count="13">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a aria-label="1"></a><span class="co"># 等間隔に15個の初期値を用意</span></span>
@@ -927,7 +1090,7 @@ rkskmt
 ★ 最良: x0=3.57 → x=5.7656, f(x)=-13.6726</code></pre>
 </div>
 </div>
-<div id="26da1171" class="cell" data-execution_count="14">
+<div id="35fe2f5b" class="cell" data-execution_count="14">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -979,49 +1142,56 @@ rkskmt
 </tr>
 </tbody>
 </table>
-<p>どちらも<strong>「何回も試して一番良いのを選ぶ」</strong>という同じ考え方です。</p>
+<p>どちらも「<strong>何回も試して一番良いものを選ぶ</strong>」という考え方</p>
 </div>
 </div>
 </div>
 </div>
 </div>
 </section>
-<section id="この作戦実はもう使っている" class="slide level2">
-<h2>この作戦、実はもう使っている</h2>
+<section id="k-means-のランダムリスタート" class="slide level2">
+<h2>k-means のランダムリスタート</h2>
 <div class="slide-body">
-<div title="k-means の `kmeans_best(X, k, n_init=10)` の正体">
+<div title="`kmeans_best(xs, ys, k, n_init=10)` はランダムリスタート">
 <div class="callout callout-tip callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>k-means の <code>kmeans_best(X, k, n_init=10)</code> の正体</strong></p>
+<p><strong><code>kmeans_best(xs, ys, k, n_init=10)</code> はランダムリスタート</strong></p>
 </div>
 <div class="callout-content">
-<p>クラスタリングの回で、k-means が<strong>クラスタ中心の初期値</strong>しだいで変な分け方に落ち着くのを見ました。 あのとき書いた <code>kmeans_best(X, k, n_init=10)</code> は「初期値を変えて10回回し、SSE が最小の結果を採用」— つまり<strong>ランダムリスタート</strong>そのものです。</p>
-</div>
-</div>
-</div>
-</div>
-<p>「初期値を変えて何回も試し、一番良いのを選ぶ」。初期値の用意のしかた（手動・ランダム・グリッド）が違っても、考え方は同じです（最適化の分野ではまとめて <span class="en">multi-start</span> と呼ぶこともあります）。</p>
 <ul>
-<li>k-means の <code>kmeans_best</code> はランダムリスタート</li>
-<li>ニューラルネットワークで「乱数シードを変えて学習し直す」のもランダムリスタート</li>
-<li>名前は違っても、やっていることは今日の「方法1〜3」と同じ</li>
+<li>k-means も、<strong>クラスタ中心の初期値</strong>しだいで変な分け方に落ち着く</li>
+<li><a href="./clustering-kmeans.html#初期値を変えて何度も回しsse-最小の答えを採る" class="peek"><code>kmeans_best(xs, ys, k, n_init=10)</code></a> は、初期値を変えて10回実行し、<a href="./clustering-kmeans.html#peek-sse" class="peek">SSE</a> が最小の結果を採用する</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<ul>
+<li>「初期値を変えて何回も試し、一番良いものを選ぶ」という考え方は、初期値の用意のしかた（手動・ランダム・グリッド）によらず同じ
+<ul>
+<li>最適化（<span class="en">optimization</span>）の分野ではまとめて <span class="en">multi-start</span> と呼ぶこともある</li>
+</ul></li>
+<li>ニューラルネットワーク（<span class="en">neural network</span>）で「乱数シードを変えて学習し直す」のもランダムリスタート</li>
+<li>名前は違っても、やっていることは方法1〜3と同じ</li>
 </ul>
 </div>
 </section>
 <section id="section-6" class="slide level2 center break-slide" data-background-color="white">
 <h2></h2>
 <div class="break-title">
-<p>実践チェックリスト</p>
+<p>最適化の手順</p>
 </div>
 </section>
 <section id="最適化の4ステップ" class="slide level2">
 <h2>最適化の4ステップ</h2>
 <div class="slide-body">
-<p>最適化問題に取り組むときは、以下の手順を守りましょう。</p>
+<ul>
+<li>最適化問題は、次の手順で解く</li>
+</ul>
 <div title="ステップ1：関数を可視化する">
 <div class="callout callout-important callout-titled callout-style-default">
 <div class="callout-body">
@@ -1032,7 +1202,10 @@ rkskmt
 <p><strong>ステップ1：関数を可視化する</strong></p>
 </div>
 <div class="callout-content">
-<p>まずグラフを描いて、谷がいくつあるか確認する。 谷が複数ありそうなら、ローカルミニマムに注意！</p>
+<ul>
+<li>グラフを描いて、谷がいくつあるかを確認する</li>
+<li>谷が複数ありそうなら、ローカルミニマムに注意する</li>
+</ul>
 </div>
 </div>
 </div>
@@ -1047,7 +1220,10 @@ rkskmt
 <p><strong>ステップ2：複数の初期値を用意する</strong></p>
 </div>
 <div class="callout-content">
-<p>最低でも3〜5個。余裕があれば10個以上。 グリッドサーチかランダムリスタートで用意する。</p>
+<ul>
+<li>最低でも3〜5個、余裕があれば10個以上</li>
+<li>グリッドサーチかランダムリスタートで用意する</li>
+</ul>
 </div>
 </div>
 </div>
@@ -1062,7 +1238,10 @@ rkskmt
 <p><strong>ステップ3：全部実行して、結果を比較する</strong></p>
 </div>
 <div class="callout-content">
-<p>すべての初期値から最適化（勾配降下法など、手法は何でもよい）を実行し、 <span class="math inline">\(f(x)\)</span> が<strong>一番小さい</strong>結果を選ぶ。</p>
+<ul>
+<li>すべての初期値から最適化（勾配降下法など、手法は問わない）を実行する</li>
+<li><span class="math inline">\(f(x)\)</span> が<strong>一番小さい</strong>結果を選ぶ</li>
+</ul>
 </div>
 </div>
 </div>
@@ -1077,7 +1256,14 @@ rkskmt
 <p><strong>ステップ4：2次微分で確認する</strong></p>
 </div>
 <div class="callout-content">
-<p>収束した点で <span class="math inline">\(f''(x) &gt; 0\)</span> なら谷（最小値）、<span class="math inline">\(f''(x) &lt; 0\)</span> なら山なので捨てる。 坂を下ることしかしない勾配降下法ではまず山に止まらないが、確認は1行 — <strong>保険として常に入れておく</strong> （このあとの発展編で見るNewton法では必須）。</p>
+<ul>
+<li>収束した点で <span class="math inline">\(f''(x) &gt; 0\)</span> なら谷（最小値）</li>
+<li><span class="math inline">\(f''(x) &lt; 0\)</span> なら山なので捨てる</li>
+<li>勾配降下法が山で止まることはほとんどないが、確認は1行で済むので<strong>保険として常に入れておく</strong>
+<ul>
+<li><a href="#/peek-newton-hilltop" class="peek">Newton法</a>では必須</li>
+</ul></li>
+</ul>
 </div>
 </div>
 </div>
@@ -1087,8 +1273,10 @@ rkskmt
 <section id="実装テンプレート" class="slide level2">
 <h2>実装テンプレート</h2>
 <div class="slide-body">
-<p>上の4ステップをまとめたコードです。コピーして使えます。</p>
-<div id="c6371c7c" class="cell" data-execution_count="15">
+<ul>
+<li>4ステップをまとめたコード（コピーして使える）</li>
+</ul>
+<div id="baddd850" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a aria-label="1"></a><span class="kw">def</span> robust_optimization(f, fp, fpp, x0_list, lr<span class="op">=</span><span class="fl">0.1</span>, max_iter<span class="op">=</span><span class="dv">10000</span>):</span>
 <span id="cb14-2"><a aria-label="2"></a>    <span class="co">"""</span></span>
 <span id="cb14-3"><a aria-label="3"></a><span class="co">    複数の初期値を使ったロバストな最適化（勾配降下法版）</span></span>
@@ -1170,16 +1358,20 @@ rkskmt
 <section id="section-7" class="slide level2 center break-slide" data-background-color="white">
 <h2></h2>
 <div class="break-title">
-<p>発展：Newton法だと、もっと変なことが起こる</p>
+<p>Newton法の場合</p>
 </div>
 </section>
-<section id="newton法でやり直すと" class="slide level2">
-<h2>Newton法でやり直すと</h2>
+<section id="peek-newton-rerun" class="slide level2">
+<h2>Newton法でやり直す</h2>
 <div class="slide-body">
-<p><a href="./newton-method-appendix.html">Newton法（参考資料）</a>は、いまいる場所に放物線を当てはめて、<strong>その頂点へ一気にジャンプ</strong>する方法でした：</p>
+<ul>
+<li><a href="./newton-method-appendix.html#peek-newton-update" class="peek">Newton法</a>：いまいる場所に放物線を当てはめて、<strong>その頂点へ一気にジャンプ</strong>する方法</li>
+</ul>
 <p><span class="math display">\[x_{\text{new}} = x - \frac{f'(x)}{f''(x)}\]</span></p>
-<p>実験1・実験2と同じ初期値で、Newton法を走らせてみます。</p>
-<div id="036feaf9" class="cell" data-execution_count="16">
+<ul>
+<li>実験1・実験2と同じ初期値で実行する</li>
+</ul>
+<div id="2f9ee082" class="cell" data-execution_count="16">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a aria-label="1"></a><span class="kw">def</span> newton_naive(f, fp, fpp, x0, tol<span class="op">=</span><span class="fl">1e-6</span>, max_iter<span class="op">=</span><span class="dv">100</span>):</span>
@@ -1207,20 +1399,49 @@ x0 = 0.5: Newton法  5 回 / 勾配降下法 30 回  →  x = -0.0000
 x0 = 5.5: Newton法  4 回 / 勾配降下法  6 回  →  x = 5.7656</code></pre>
 </div>
 </div>
+<div title="結果">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>結果</strong></p>
+</div>
+<div class="callout-content">
 <ul>
-<li>行き先は勾配降下法と同じ2択（左の谷・右の谷）。しかも<strong>反復回数がずっと少ない</strong> — 圧倒的に速い</li>
-<li>「じゃあ全部Newton法でいいのでは？」— そうはいかないんです。スタート地点をもう少し意地悪にしてみます</li>
+<li>行き先は勾配降下法と同じ（左の谷か右の谷）</li>
+<li><strong>反復回数は勾配降下法より少ない</strong></li>
 </ul>
 </div>
+</div>
+</div>
+</div>
+<div title="質問">
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>質問</strong></p>
+</div>
+<div class="callout-content">
+<p>それなら、いつも Newton法を使えばよいのか？</p>
+</div>
+</div>
+</div>
+</div>
+</div>
 </section>
-<section id="実験3丘の中腹-x_0-1.5-から始めると" class="slide level2">
-<h2>実験3：丘の中腹 <span class="math inline">\(x_0 = 1.5\)</span> から始めると…</h2>
+<section id="peek-newton-hilltop" class="slide level2">
+<h2>実験3：丘の中腹 <span class="math inline">\(x_0 = 1.5\)</span> から始める</h2>
 <div class="slide-body">
 <ul>
-<li>同じ更新式を回すと：<span class="math inline">\(1.5 \rightarrow 1.761 \rightarrow 1.735 \rightarrow\)</span> 停止（<span class="math inline">\(f' \approx 0\)</span>）</li>
+<li>同じ更新式で計算すると：<span class="math inline">\(1.5 \rightarrow 1.761 \rightarrow 1.735 \rightarrow\)</span> 停止（<span class="math inline">\(f' \approx 0\)</span>）</li>
 <li>左に下り坂があるのに、<strong>坂を登って丘のてっぺんで止まった</strong></li>
 </ul>
-<div id="e20db862" class="cell" data-execution_count="17">
+<div id="ea220d05" class="cell" data-execution_count="17">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1229,13 +1450,38 @@ x0 = 5.5: Newton法  4 回 / 勾配降下法  6 回  →  x = 5.7656</code></pre
 </div>
 </div>
 </div>
-<p>なぜ<strong>登る</strong>のか：</p>
+<div title="坂を登る理由">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>坂を登る理由</strong></p>
+</div>
+<div class="callout-content">
 <ul>
-<li>一歩の向きは <span class="math inline">\(-f'/f''\)</span>。ここで <span class="math inline">\(f'(1.5) = +0.6\)</span>（右上り坂）、<span class="math inline">\(f''(1.5) = -2.3\)</span>（<strong>上に凸</strong>）</li>
-<li>符号が打ち消し合って、一歩は <span class="math inline">\(+0.26\)</span> — <strong>傾きと同じ向き、つまり登る向き</strong>になる</li>
-<li>Newton法が探しているのは「<span class="math inline">\(f' = 0\)</span> の点」だけ。そこが山か谷かは<strong>見ていない</strong></li>
-<li>停止条件（<span class="math inline">\(|f'|\)</span> がほぼゼロ）は山頂でも満たされる → <strong>山で本当に止まる</strong></li>
+<li>一歩の向きは <span class="math inline">\(-f'/f''\)</span>
+<ul>
+<li><span class="math inline">\(f'(1.5) = +0.6\)</span>（右上り坂）、<span class="math inline">\(f''(1.5) = -2.3\)</span>（<strong>上に凸</strong>、<span class="en">concave</span>）</li>
+</ul></li>
+<li>符号が打ち消し合って、一歩は <span class="math inline">\(+0.26\)</span>
+<ul>
+<li><strong>傾きと同じ向き、つまり登る向き</strong>になる</li>
+</ul></li>
+<li>Newton法が探しているのは「<span class="math inline">\(f' = 0\)</span> の点」だけ
+<ul>
+<li>そこが山か谷かは<strong>見ていない</strong></li>
+</ul></li>
+<li>停止条件（<span class="math inline">\(|f'|\)</span> がほぼゼロ）は山頂でも満たされる
+<ul>
+<li><strong>山で止まる</strong></li>
+</ul></li>
 </ul>
+</div>
+</div>
+</div>
+</div>
 <div title="$f''$ チェックは「止まった後の検品」">
 <div class="callout callout-tip callout-titled callout-style-default">
 <div class="callout-body">
@@ -1246,7 +1492,17 @@ x0 = 5.5: Newton法  4 回 / 勾配降下法  6 回  →  x = 5.7656</code></pre
 <p><strong><span class="math inline">\(f''\)</span> チェックは「止まった後の検品」</strong></p>
 </div>
 <div class="callout-content">
-<p>収束したら <span class="math inline">\(f''(x)\)</span> を確認：<strong>正なら谷、負なら山 — 山なら結果を捨てる</strong>。 山か谷かの区別は<strong>できる</strong>が、それは止まってからの話。 走っている最中のNewton法には、登りを避けるブレーキがついていない。 （実は後付けできる — 引力圏とカタパルトを見たあとで「修理」する）</p>
+<ul>
+<li>収束したら <span class="math inline">\(f''(x)\)</span> を確認する：<strong>正なら谷、負なら山</strong>
+<ul>
+<li>山なら結果を捨てる</li>
+</ul></li>
+<li>山か谷かを区別できるのは、止まった後
+<ul>
+<li>実行中の Newton法には、登りを避けるブレーキがない</li>
+</ul></li>
+<li>ブレーキは<a href="#/peek-newton-fix" class="peek">後から組み込める</a></li>
+</ul>
 </div>
 </div>
 </div>
@@ -1256,19 +1512,25 @@ x0 = 5.5: Newton法  4 回 / 勾配降下法  6 回  →  x = 5.7656</code></pre
 <section id="newton法は近くの傾きゼロに落ちる" class="slide level2">
 <h2>Newton法は「近くの傾きゼロ」に落ちる</h2>
 <div class="slide-body">
-<p>Newton法が探しているのは「傾きゼロの点」。そこが谷か山頂かは<strong>見ていません</strong>。</p>
 <ul>
-<li>谷の近くから → その谷に落ちる（さっきの再実験）</li>
+<li>Newton法が探しているのは「傾きゼロの点」
+<ul>
+<li>そこが谷か山頂かは<strong>見ていない</strong></li>
+</ul></li>
+<li>谷の近くから → その谷に落ちる（<a href="#/peek-newton-rerun" class="peek">実験1・2と同じ初期値での結果</a>）</li>
 <li>丘の上から → <strong>山頂に登って止まる</strong>（実験3）</li>
+<li><a href="#/peek-gd-basin" class="peek">勾配降下法のとき</a>と同じように、初期値200個で引力圏の地図を描く</li>
 </ul>
-<p>被害はこれだけなのでしょうか。勾配降下法のときと同じように、初期値200個で引力圏の地図を描いてみましょう。</p>
 </div>
 </section>
-<section id="newton法の引力圏を可視化しよう" class="slide level2">
-<h2>Newton法の引力圏を可視化しよう</h2>
+<section id="newton法の引力圏" class="slide level2">
+<h2>Newton法の引力圏</h2>
 <div class="slide-body">
-<p>勾配降下法では「丘のてっぺんを境にきれいな2分割」でした。Newton法ではどうなるでしょうか。</p>
-<div id="eeb9532a" class="cell" data-execution_count="18">
+<ul>
+<li><a href="#/peek-gd-basin" class="peek">勾配降下法の引力圏</a>は、丘のてっぺんを境に2つに分かれた</li>
+<li>Newton法ではどうなるか</li>
+</ul>
+<div id="fbdaf651" class="cell" data-execution_count="18">
 <details class="code-fold">
 <summary>コードを表示</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a aria-label="1"></a><span class="kw">def</span> newton_optimize(f, fp, fpp, x0, max_iter<span class="op">=</span><span class="dv">50</span>):</span>
@@ -1298,7 +1560,7 @@ x0 = 5.5: Newton法  4 回 / 勾配降下法  6 回  →  x = 5.7656</code></pre
 <span id="cb18-25"><a aria-label="25"></a>convergence_values <span class="op">=</span> np.array(convergence_values)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="e611fe58" class="cell" data-execution_count="19">
+<div id="26055a51" class="cell" data-execution_count="19">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1307,133 +1569,211 @@ x0 = 5.5: Newton法  4 回 / 勾配降下法  6 回  →  x = 5.7656</code></pre
 </div>
 </div>
 </div>
-<p><strong>図の見方（下のグラフ）：</strong></p>
-<ul>
-<li>横軸＝<strong>スタート地点</strong> x0、縦軸＝そこから Newton法が<strong>最終的にたどり着いた場所</strong></li>
-<li>縦に1本選んで読む：「x0 = −1 から出発 → 点の高さは 0 → 左の谷に着いた」</li>
-<li>点は3つの高さのどれかに張り付く — 行き先は <strong>左の谷（赤）・右の谷（緑）・山頂（橙）</strong> の3択</li>
-<li>背景の色の帯が<strong>引力圏</strong>：同じ色の帯から出発すると、同じ場所に吸い込まれる</li>
-<li>上下のグラフは横軸が揃えてある — 上の山谷と下の帯を見比べられる</li>
-</ul>
-<div title="Newton法の引力圏は、素直じゃない">
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>Newton法の引力圏は、素直じゃない</strong></p>
-</div>
-<div class="callout-content">
-<p>勾配降下法の「きれいな2分割」と見比べると、意地悪な結果になりました：</p>
-<ul>
-<li>赤い帯 → ローカルミニマム、緑の帯 → グローバルミニマム、ここまでは予想どおり</li>
-<li><strong>橙の帯 → 山のてっぺん（極大）に到着して止まる</strong>。Newton法が探しているのは「傾きゼロの場所」なので、谷と山頂を<strong>区別できない</strong></li>
-<li>帯はきれいな2分割ではない：<strong>グローバルミニマムのすぐ手前から出発しても、左の谷へ飛ばされる</strong></li>
-<li>初期値が少し変わるだけで行き先がガラッと変わる — 1回の実行を信用してはいけない理由がこれ</li>
-</ul>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="なぜすぐ手前の帯が左へ飛ぶのか" class="slide level2">
-<h2>なぜ「すぐ手前の帯」が左へ飛ぶのか</h2>
-<div class="slide-body">
-<p>x0 = 4.0 から始めたときの<strong>最初の1歩</strong>を解剖してみます。</p>
-<div id="a2ba3b08" class="cell" data-execution_count="20">
-<div class="cell-output cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><a href="optimization-local-minima-appendix_files/figure-revealjs/cell-21-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img data-src="optimization-local-minima-appendix_files/figure-revealjs/cell-21-output-1.png" class="quarto-figure quarto-figure-center" width="1041" height="488"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<ul>
-<li>Newton法の1歩は「いまの場所に<strong>放物線を当てはめて、その頂点へジャンプ</strong>」（<span class="math inline">\(x - f'/f''\)</span> の意味）</li>
-<li>ところが x0=4 は<strong>上に凸の区間</strong>（2つの変曲点 x≈0.79〜4.21 の間）の右端 — 当てはめた放物線が<strong>逆さま</strong>になり、頂点は左の遠く（x=−4）にある</li>
-<li>しかも変曲点の近くでは <span class="math inline">\(f'' \approx 0\)</span> なので、割り算 <span class="math inline">\(f'/f''\)</span> が<strong>爆発</strong>して飛距離が伸びる</li>
-<li>着地した x=−4 は左の谷の素直な（下に凸の）区間 → あとはおとなしく x=0 に収束</li>
-<li>細い緑の帯は同じ現象の<strong>逆向き</strong>：左の変曲点のすぐ内側から右へ大ジャンプして右の谷へ</li>
-</ul>
-<div class="callout callout-important callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>重要</strong></p>
-</div>
-<div class="callout-content">
-<p><strong>大ジャンプできるのがNewton法の強みで、放物線近似が嘘をつく場所では同じ大ジャンプが暴発する。</strong> 勾配降下法なら「傾きの逆に少しずつ」なので、x0=4 からは素直に右の谷へ降りる（前半の引力圏の地図のとおり）。</p>
-</div>
-</div>
-</div>
-<p>— では、この壊れ方は直せないのか？　<strong>直せます</strong>。次で修理しましょう。</p>
-</div>
-</section>
-<section id="section-8" class="slide level2 center break-slide" data-background-color="white">
-<h2></h2>
-<div class="break-title">
-<p>修理する：ワープの前に「検品」を入れる</p>
-</div>
-</section>
-<section id="故障の原因は無条件ワープ" class="slide level2">
-<h2>故障の原因は「無条件ワープ」</h2>
-<div class="slide-body">
-<p>ここまでに見た故障は2種類：</p>
-<ul>
-<li><strong>山頂で止まる</strong>（実験3）— 上に凸の場所では、一歩が<strong>登る向き</strong>になる</li>
-<li><strong>反対側へ吹っ飛ぶ</strong>（カタパルト）— 変曲点の近くでは、一歩が<strong>大きすぎる</strong></li>
-</ul>
-<p>原因はどちらも同じ。Newton法が、当てはめた放物線の頂点へ<strong>検査なしでワープ</strong>していることです。</p>
+<div title="図の見方（下のグラフ）">
 <div class="callout callout-tip callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>ヒント</strong></p>
+<p><strong>図の見方（下のグラフ）</strong></p>
 </div>
 <div class="callout-content">
-<p>修理方針：提案された一歩を、<strong>2つの検品</strong>に通してから踏む。</p>
+<ul>
+<li>横軸：<strong>スタート地点</strong> x0</li>
+<li>縦軸：そこから Newton法が<strong>最終的にたどり着いた場所</strong></li>
+<li>縦に1本選んで読む：「x0 = −1 から出発 → 点の高さは 0 → 左の谷に着いた」</li>
+<li>点は3つの高さのどれかに集まる
+<ul>
+<li>行き先は<strong>左の谷（赤）・右の谷（緑）・山頂（橙）</strong>の3択</li>
+</ul></li>
+<li>背景の色の帯が<strong>引力圏</strong>
+<ul>
+<li>同じ色の帯から出発すると、同じ場所に吸い込まれる</li>
+</ul></li>
+<li>上下のグラフは横軸が揃えてある
+<ul>
+<li>上の山谷と下の帯を見比べられる</li>
+</ul></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div title="結果">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>結果</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>赤い帯 → ローカルミニマム</li>
+<li>緑の帯 → グローバルミニマム</li>
+<li><strong>橙の帯 → 山のてっぺん（極大、<span class="en">local maximum</span>）に到着して止まる</strong>
+<ul>
+<li>Newton法が探しているのは「傾きゼロの場所」なので、谷と山頂を<strong>区別できない</strong></li>
+</ul></li>
+<li>帯の並びは、丘のてっぺんを境にした2分割にならない
+<ul>
+<li><strong>グローバルミニマムのすぐ手前から出発しても、左の谷へ飛ばされる</strong></li>
+</ul></li>
+<li>初期値が少し変わるだけで、行き先が大きく変わる
+<ul>
+<li><strong>1回の実行の結果を信用してはいけない</strong></li>
+</ul></li>
+</ul>
+</div>
 </div>
 </div>
 </div>
 </div>
 </section>
-<section id="検査1その方向本当に下り" class="slide level2">
-<h2>検査1：その方向、本当に「下り」？</h2>
+<section id="peek-newton-jump" class="slide level2">
+<h2>なぜ「すぐ手前の帯」が左へ飛ぶのか</h2>
+<div class="slide-body">
+<ul>
+<li>x0 = 4.0 から始めたときの<strong>最初の1歩</strong>を詳しく見る</li>
+</ul>
+<div id="1982ff63" class="cell" data-execution_count="20">
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="optimization-local-minima-appendix_files/figure-revealjs/cell-21-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img data-src="optimization-local-minima-appendix_files/figure-revealjs/cell-21-output-1.png" class="quarto-figure quarto-figure-center" width="1046" height="488"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<div title="結果">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>結果</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>Newton法の1歩は「いまの場所に<strong>放物線を当てはめて、その頂点へジャンプする</strong>」（<span class="math inline">\(x - f'/f''\)</span> の意味）</li>
+<li>x0=4 は、2つの変曲点（<span class="en">inflection point</span>）x≈0.79 と x≈4.21 の間にある<strong>上に凸の区間</strong>の右端
+<ul>
+<li>当てはめた放物線が<strong>逆さま</strong>になり、頂点は左の遠く（x=−4）にある</li>
+</ul></li>
+<li>変曲点の近くでは <span class="math inline">\(f'' \approx 0\)</span> なので、割り算 <span class="math inline">\(f'/f''\)</span> の値が<strong>非常に大きく</strong>なり、飛距離が伸びる</li>
+<li>着地した x=−4 は左の谷の下に凸（<span class="en">convex</span>）の区間
+<ul>
+<li>あとは x=0 に収束する</li>
+</ul></li>
+<li>細い緑の帯は同じ現象の<strong>逆向き</strong>
+<ul>
+<li>左の変曲点のすぐ内側から右へ大きくジャンプして、右の谷に着く</li>
+</ul></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div title="要するに">
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>要するに</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li><strong>大きくジャンプできるのが Newton法の強み</strong>
+<ul>
+<li>放物線の近似が外れる場所では、同じジャンプが失敗の原因になる</li>
+</ul></li>
+<li>勾配降下法は「傾きの逆に少しずつ」進むので、x0=4 からは<a href="#/peek-gd-basin" class="peek">右の谷へ降りる</a></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-8" class="slide level2 center break-slide" data-background-color="white">
+<h2></h2>
+<div class="break-title">
+<p>Newton法の修理</p>
+</div>
+</section>
+<section id="peek-newton-fix" class="slide level2">
+<h2>2種類の失敗の原因</h2>
+<div class="slide-body">
+<ul>
+<li><strong>山頂で止まる</strong>（<a href="#/peek-newton-hilltop" class="peek">実験3</a>）
+<ul>
+<li>上に凸の場所では、一歩が<strong>登る向き</strong>になる</li>
+</ul></li>
+<li><strong>反対側へ大きく飛ぶ</strong>（<a href="#/peek-newton-jump" class="peek">x0=4 の例</a>）
+<ul>
+<li>変曲点の近くでは、一歩が<strong>大きすぎる</strong></li>
+</ul></li>
+<li>原因はどちらも、当てはめた放物線の頂点へ<strong>検査なしでジャンプ</strong>すること</li>
+</ul>
+<div title="修理方針">
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>修理方針</strong></p>
+</div>
+<div class="callout-content">
+<p>提案された一歩を、<strong>2つの検査</strong>に通してから踏む</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="検査1その方向は下りか" class="slide level2">
+<h2>検査1：その方向は「下り」か</h2>
 <div class="slide-body">
 <ul>
 <li>Newton法の一歩 <span class="math inline">\(d = -f'/f''\)</span> は<strong>提案</strong>として扱う</li>
-<li>踏む前にチェック：<span class="math inline">\(f' \cdot d \geq 0\)</span> なら、提案は<strong>傾きと同じ向き＝登り</strong>なので<strong>却下</strong></li>
-<li>却下したら、確実に下る<strong>最急降下方向</strong> <span class="math inline">\(d = -f'\)</span> に差し替える</li>
-<li>登り提案が出るのは、ちょうど <span class="math inline">\(f'' &lt; 0\)</span>（上に凸）の場所 — 実験3とカタパルトの現場そのもの</li>
+<li>踏む前に確認する：<span class="math inline">\(f' \cdot d \geq 0\)</span> なら、提案は<strong>傾きと同じ向き＝登り</strong>なので<strong>却下</strong></li>
+<li>却下したら、確実に下る<strong>最急降下方向（<span class="en">steepest descent direction</span>）</strong> <span class="math inline">\(d = -f'\)</span> に差し替える</li>
+<li>登りの提案が出るのは、<span class="math inline">\(f'' &lt; 0\)</span>（上に凸）の場所
+<ul>
+<li><a href="#/peek-newton-hilltop" class="peek">実験3</a>と<a href="#/peek-newton-jump" class="peek">x0=4 の例</a>は、どちらもこの場所</li>
+</ul></li>
 </ul>
-<p>実験3の現場検証：<span class="math inline">\(x = 1.5\)</span> では提案 <span class="math inline">\(d = +0.26\)</span>。 <span class="math inline">\(f' \cdot d = 0.6 \times 0.26 &gt; 0\)</span> → 登りなので却下 → <span class="math inline">\(d = -f' = -0.6\)</span>（左の下りへ）</p>
+<p>実験3の <span class="math inline">\(x = 1.5\)</span> で確かめる：</p>
+<ul>
+<li>提案は <span class="math inline">\(d = +0.26\)</span></li>
+<li><span class="math inline">\(f' \cdot d = 0.6 \times 0.26 &gt; 0\)</span> → 登りなので却下 → <span class="math inline">\(d = -f' = -0.6\)</span>（左の下りへ）</li>
+</ul>
 </div>
 </section>
-<section id="検査2その一歩実測で下がってる" class="slide level2">
-<h2>検査2：その一歩、実測で下がってる？</h2>
+<section id="検査2実際に-f-が下がるか" class="slide level2">
+<h2>検査2：実際に <span class="math inline">\(f\)</span> が下がるか</h2>
 <div class="slide-body">
 <ul>
 <li>向きが正しくても、<strong>歩幅が大きすぎる</strong>と谷を飛び越えて高い場所に着くことがある</li>
-<li>そこで、踏む前に着地点の<strong>本物の <span class="math inline">\(f\)</span> を実測</strong>する：
+<li>踏む前に、着地点の <strong><span class="math inline">\(f\)</span> の値を実際に計算</strong>する：
 <ul>
 <li>十分下がっていれば採用</li>
-<li>下がっていなければ<strong>歩幅を半分</strong>にしてやり直し（バックトラッキング）</li>
+<li>下がっていなければ<strong>歩幅を半分</strong>にしてやり直す（バックトラッキング、<span class="en">backtracking</span>）</li>
 </ul></li>
-<li>放物線の「予言」ではなく、<strong>実測</strong>で確認してからしか進まない</li>
+<li>放物線の予測ではなく、<strong>実際の <span class="math inline">\(f\)</span> の値</strong>を確かめてから進む</li>
 </ul>
 </div>
 </section>
 <section id="修理版newton法検査12入り" class="slide level2">
 <h2>修理版Newton法（検査1・2入り）</h2>
 <div class="slide-body">
-<div id="1d705ff5" class="cell" data-execution_count="21">
+<div id="a14c5893" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a aria-label="1"></a><span class="kw">def</span> newton_safe(f, fp, fpp, x0, max_iter<span class="op">=</span><span class="dv">100</span>):</span>
 <span id="cb19-2"><a aria-label="2"></a>    <span class="co">"""Newton法＋検査1（降下方向）＋検査2（実測バックトラッキング）"""</span></span>
 <span id="cb19-3"><a aria-label="3"></a>    x <span class="op">=</span> x0</span>
@@ -1451,7 +1791,7 @@ x0 = 5.5: Newton法  4 回 / 勾配降下法  6 回  →  x = 5.7656</code></pre
 <span id="cb19-15"><a aria-label="15"></a>        x <span class="op">=</span> x <span class="op">+</span> step_size <span class="op">*</span> d</span>
 <span id="cb19-16"><a aria-label="16"></a>    <span class="cf">return</span> x, f(x)</span>
 <span id="cb19-17"><a aria-label="17"></a></span>
-<span id="cb19-18"><a aria-label="18"></a><span class="co"># 故障していた2つの初期値で試運転</span></span>
+<span id="cb19-18"><a aria-label="18"></a><span class="co"># 失敗していた2つの初期値で確認</span></span>
 <span id="cb19-19"><a aria-label="19"></a><span class="cf">for</span> x0 <span class="kw">in</span> [<span class="fl">1.5</span>, <span class="fl">4.0</span>]:</span>
 <span id="cb19-20"><a aria-label="20"></a>    x_fin, f_fin <span class="op">=</span> newton_safe(f_poly, f_poly_prime, f_poly_double_prime, x0)</span>
 <span id="cb19-21"><a aria-label="21"></a>    <span class="bu">print</span>(<span class="ss">f"x0 = </span><span class="sc">{</span>x0<span class="sc">}</span><span class="ss"> → x = </span><span class="sc">{</span>x_fin<span class="sc">:.4f}</span><span class="ss">, f(x) = </span><span class="sc">{</span>f_fin<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
@@ -1460,16 +1800,30 @@ x0 = 5.5: Newton法  4 回 / 勾配降下法  6 回  →  x = 5.7656</code></pre
 x0 = 4.0 → x = 5.7656, f(x) = -13.6726</code></pre>
 </div>
 </div>
+<div title="結果">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>結果</strong></p>
+</div>
+<div class="callout-content">
 <ul>
 <li>山頂に登っていた <span class="math inline">\(x_0 = 1.5\)</span> は<strong>左の谷</strong>へ降りた</li>
-<li>カタパルトだった <span class="math inline">\(x_0 = 4\)</span> は、なんと<strong>右の谷（グローバルミニマム）</strong>へ — 暴発も消えた</li>
+<li>反対側へ飛んでいた <span class="math inline">\(x_0 = 4\)</span> は<strong>右の谷（グローバルミニマム）</strong>へ降りた</li>
 </ul>
+</div>
+</div>
+</div>
+</div>
 </div>
 </section>
 <section id="修理後の引力圏" class="slide level2">
 <h2>修理後の引力圏</h2>
 <div class="slide-body">
-<div id="31b0cd51" class="cell" data-execution_count="22">
+<div id="bf64317f" class="cell" data-execution_count="22">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1478,48 +1832,79 @@ x0 = 4.0 → x = 5.7656, f(x) = -13.6726</code></pre>
 </div>
 </div>
 </div>
-<ul>
-<li><strong>山頂の帯（橙）も、飛ばされる帯も消えた</strong> — てっぺんより左なら左の谷、右なら右の谷</li>
-<li>検査1・2で直るのは、ここまで</li>
-</ul>
-</div>
-</section>
-<section id="ライブラリは最初から修理済み" class="slide level2">
-<h2>ライブラリは最初から修理済み</h2>
-<div class="slide-body">
-<ul>
-<li>scipy などの実用ソルバーは、この種の検品を<strong>毎歩</strong>組み込み済み：
-<ul>
-<li><strong>BFGS</strong>：常に「下り向きの提案」しか出ないよう作った近似 <span class="math inline">\(f''\)</span> を使う</li>
-<li><strong>Newton-CG</strong>：負の曲率（上に凸）を検出した瞬間に計算を打ち切り、勾配方向へ切り替え</li>
-<li><strong>信頼領域法</strong>：放物線を「信じる半径」の中でだけ使う</li>
-</ul></li>
-<li>実測：<span class="math inline">\(x_0 = 1.5\)</span> から <code>scipy.optimize.minimize</code> を呼ぶと、BFGS / Newton-CG / trust-exact のすべてが山頂に登らず <span class="math inline">\(x=0\)</span> の谷に降りる</li>
-<li>流儀は違っても思想は同じ：<strong>「<span class="math inline">\(f\)</span> が下がらない一歩は踏まない」</strong></li>
-</ul>
+<div title="結果">
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>ノート</strong></p>
+<p><strong>結果</strong></p>
 </div>
 <div class="callout-content">
-<p>授業で書いた素のNewton法が「欠陥品」なわけではない。教科書のNewton法はもともと「<span class="math inline">\(f'=0\)</span> を解く」方法で、 <strong>最小化に使うための安全装置</strong>は別売り — ライブラリにはそれが標準装備されている、ということ。</p>
+<ul>
+<li><strong>山頂の帯（橙）も、飛ばされる帯も消えた</strong>
+<ul>
+<li>てっぺんより左なら左の谷、右なら右の谷</li>
+</ul></li>
+<li>検査1・2で直せるのは、この2種類の失敗まで</li>
+</ul>
+</div>
 </div>
 </div>
 </div>
 </div>
 </section>
-<section id="発展編のまとめ修理して直るのは事故だけ" class="slide level2">
-<h2>発展編のまとめ：修理して直るのは「事故」だけ</h2>
+<section id="ライブラリには検査が組み込まれている" class="slide level2">
+<h2>ライブラリには検査が組み込まれている</h2>
 <div class="slide-body">
 <ul>
-<li><strong>山頂で止まる・反対側へ吹っ飛ぶ</strong>は、検査1・2で直せる — ライブラリは標準装備済み</li>
-<li>でも修理後も、行き先は相変わらず<strong>2つ</strong>ある — どの谷に落ちるかは初期値しだいのまま</li>
-<li>これはNewton法の故障ではなく、<strong>目隠しで坂を下ること自体の限界</strong>（目の前の谷しか見えない）</li>
-<li>だから、複数の初期値から試す作戦（方法1〜3）は<strong>どんな手法を使っても必須</strong></li>
+<li>scipy などの実用ソルバーは、この種の検査を<strong>毎回の更新</strong>に組み込んでいる：
+<ul>
+<li><strong>BFGS</strong>：常に下り向きの提案が出るように作った近似 <span class="math inline">\(f''\)</span> を使う</li>
+<li><strong>Newton-CG</strong>：負の曲率（<span class="en">negative curvature</span>、上に凸）を検出すると計算を打ち切り、勾配方向へ切り替える</li>
+<li><strong>信頼領域法（<span class="en">trust region method</span>）</strong>：放物線を「信じる半径」の中でだけ使う</li>
+</ul></li>
+<li>実測：<span class="math inline">\(x_0 = 1.5\)</span> から <code>scipy.optimize.minimize</code> を呼ぶと、BFGS / Newton-CG / trust-exact のすべてが山頂に登らず <span class="math inline">\(x=0\)</span> の谷に降りる</li>
+<li>方法は違っても、考え方は同じ：<strong><span class="math inline">\(f\)</span> が下がらない一歩は踏まない</strong></li>
+</ul>
+<div title="要するに">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>要するに</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>教科書の Newton法は、もともと「<span class="math inline">\(f'=0\)</span> を解く」方法
+<ul>
+<li><strong>最小化に使うための検査</strong>は含まれていない</li>
+</ul></li>
+<li>ライブラリには、その検査が組み込まれている</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="newton法のまとめ検査で直るのは2種類の失敗だけ" class="slide level2">
+<h2>Newton法のまとめ：検査で直るのは2種類の失敗だけ</h2>
+<div class="slide-body">
+<ul>
+<li><strong>山頂で止まる・反対側へ飛ぶ</strong>失敗は、検査1・2で直せる
+<ul>
+<li>ライブラリにはこの検査が組み込まれている</li>
+</ul></li>
+<li>修理後も、行き先は<strong>2つ</strong>ある
+<ul>
+<li>どの谷に落ちるかは初期値しだいのまま</li>
+</ul></li>
+<li>これは Newton法の欠陥ではなく、<strong>目隠しで坂を下ること自体の限界</strong>（目の前の谷しか見えない）</li>
+<li>だから、複数の初期値から試す方法（方法1〜3）は<strong>どの手法でも必須</strong></li>
 </ul>
 </div>
 </section>
@@ -1529,8 +1914,8 @@ x0 = 4.0 → x = 5.7656, f(x) = -13.6726</code></pre>
 <p>まとめ</p>
 </div>
 </section>
-<section id="今回学んだこと" class="slide level2 scrollable">
-<h2>今回学んだこと</h2>
+<section id="まとめ" class="slide level2 scrollable">
+<h2>まとめ</h2>
 <div class="slide-body">
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
@@ -1544,40 +1929,47 @@ x0 = 4.0 → x = 5.7656, f(x) = -13.6726</code></pre>
 <ol type="1">
 <li><strong>谷が複数ある関数では、答えが初期値に依存する</strong>
 <ul>
-<li>勾配降下法は目の前の坂を下ることしかできない — 近くの谷に落ちる</li>
+<li>勾配降下法は目の前の坂を下ることしかできず、近くの谷に落ちる</li>
 <li>どの初期値がどの谷に行くかの地図が<strong>引力圏</strong>（境界は丘のてっぺん）</li>
 </ul></li>
 <li><strong>ローカルミニマムとグローバルミニマム</strong>
 <ul>
-<li>ローカルミニマム = 周辺では一番低いが、全体では最低ではない</li>
-<li>グローバルミニマム = 全体で本当に一番低い点</li>
+<li>ローカルミニマム：周辺では一番低いが、全体では最低ではない</li>
+<li>グローバルミニマム：全体で一番低い点</li>
 </ul></li>
 <li><strong>対策は「複数の初期値から試して、一番良い結果を選ぶ」</strong>
 <ul>
 <li>ランダムリスタートやグリッドサーチで初期値を用意する</li>
-<li>k-means の <code>kmeans_best(X, k, n_init=10)</code> はこの作戦そのもの</li>
+<li>k-means の <code>kmeans_best(xs, ys, k, n_init=10)</code> も同じ方法</li>
 <li>2次微分の確認（<span class="math inline">\(f'' &gt; 0\)</span> なら谷）は保険として常に入れる</li>
 </ul></li>
-<li><strong>発展：Newton法は速いが、「山頂停止」「カタパルト」という事故も起こす</strong>
+<li><strong>Newton法は速いが、山頂で止まる・反対側へ飛ぶという失敗も起こす</strong>
 <ul>
-<li>検査1（下り向きか）・検査2（実測で下がったか）で事故は直せる — ライブラリは修理済み</li>
-<li>それでも「どの谷か」の2択は残る：初期値を変えて試す以外に手はない</li>
+<li>検査1（下り向きか）・検査2（実際に下がったか）で直せる
+<ul>
+<li>ライブラリにはこの検査が組み込まれている</li>
+</ul></li>
+<li>それでも「どの谷か」は初期値で決まるので、初期値を変えて試すしかない</li>
 </ul></li>
 </ol>
 </div>
 </div>
 </div>
-<div title="この話、ニューラルネットワークの本番でまた会う">
+<div title="ニューラルネットワークの場合">
 <div class="callout callout-tip callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>この話、ニューラルネットワークの本番でまた会う</strong></p>
+<p><strong>ニューラルネットワークの場合</strong></p>
 </div>
 <div class="callout-content">
-<p>ニューラルネットワークの損失関数は、パラメータが何万個もある<strong>谷だらけの地形</strong>です。 同じデータで学習し直すたびに結果が微妙に違うのは、初期値（乱数）しだいで<strong>別の谷に落ちている</strong>から。 「何回か学習して一番良いのを選ぶ」は、深層学習でも現役の作戦です。</p>
+<ul>
+<li>ニューラルネットワークの損失関数は、パラメータが何万個もある<strong>谷だらけの地形</strong></li>
+<li>同じデータで学習し直すたびに結果が少し違うのは、初期値（乱数）しだいで<strong>別の谷に落ちる</strong>から</li>
+<li>「何回か学習して一番良いものを選ぶ」方法は、深層学習でも使われている</li>
+</ul>
 </div>
 </div>
 </div>
@@ -1596,14 +1988,14 @@ x0 = 4.0 → x = 5.7656, f(x) = -13.6726</code></pre>
 <li>初期値 <span class="math inline">\(x_0 = -3, 0, 3\)</span> の3つから勾配降下法を実行せよ（学習率 <span class="math inline">\(\alpha = 0.01\)</span>、到着地点と <span class="math inline">\(g(x)\)</span> を表示）</li>
 <li>グローバルミニマムはどちらの谷か、<span class="math inline">\(g(x)\)</span> の値で判定せよ</li>
 </ol>
-<p>ヒント：今回の資料の関数とは、<strong>深い谷の位置が違う</strong>かもしれない。</p>
+<p>ヒント：この資料の関数とは、<strong>深い谷の位置が違う</strong>かもしれない。</p>
 </div>
 </section>
 <section id="問題1の解答例" class="slide level2">
 <h2>問題1の解答例</h2>
 <div class="slide-body">
 <p><strong>導関数（手計算）:</strong> <span class="math display">\[g'(x) = 4x^3 - 16x + 3\]</span></p>
-<div id="e7289c5c" class="cell" data-execution_count="23">
+<div id="d23e5efe" class="cell" data-execution_count="23">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -1661,12 +2053,33 @@ x0 = 4.0 → x = 5.7656, f(x) = -13.6726</code></pre>
 ★ グローバルミニマム: x = -2.0879, g(x) = -22.1346</code></pre>
 </div>
 </div>
+<div title="結果">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>結果</strong></p>
+</div>
+<div class="callout-content">
 <ul>
-<li><span class="math inline">\(x_0 = -3, 0\)</span> → <strong>左の谷</strong>、<span class="math inline">\(x_0 = 3\)</span> → 右の谷</li>
-<li><span class="math inline">\(x_0 = 0\)</span> は傾き <span class="math inline">\(g'(0) = 3\)</span>（右上り坂）なので<strong>左へ</strong>転がり落ちる</li>
-<li>左の谷の方が <span class="math inline">\(g(x)\)</span> が小さく<strong>グローバルミニマム</strong> — 今回の資料の関数とは逆に、<strong>今度は左が正解</strong></li>
-<li>どっちの谷が深いかは関数ごとに違う。だから毎回、複数の初期値で確かめる</li>
+<li><span class="math inline">\(x_0 = -3, 0\)</span> → <strong>左の谷</strong></li>
+<li><span class="math inline">\(x_0 = 3\)</span> → 右の谷</li>
+<li><span class="math inline">\(x_0 = 0\)</span> は傾き <span class="math inline">\(g'(0) = 3\)</span>（右上り坂）なので<strong>左へ</strong>下る</li>
+<li>左の谷のほうが <span class="math inline">\(g(x)\)</span> が小さいので、<strong>左の谷がグローバルミニマム</strong>
+<ul>
+<li>この資料の <span class="math inline">\(f(x)\)</span> では、右の谷がグローバルミニマムだった</li>
+</ul></li>
+<li>どちらの谷が深いかは関数ごとに違う
+<ul>
+<li>だから毎回、複数の初期値で確かめる</li>
+</ul></li>
 </ul>
+</div>
+</div>
+</div>
+</div>
 
 
 <div id="3ade8a4a-fb1d-4a6c-8409-ac45482d5fc9" class="hidden">
