@@ -10,7 +10,7 @@
   <meta name="generator" content="quarto-1.10.19">
 
   <meta name="author" content="rkskmt">
-  <title>AI Lectures – レポート：自分のデータを分類する</title>
+  <title>AI Lectures – レポート</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -168,6 +168,15 @@
             config.math.config = config.math.config.replace("_HTML", "_CHTML");
             config.math.CommonHTML = { scale: 127, matchFontHeight: false };
           }
+          // A ruled or network lecture index lays itself out at the
+          // window's width (custom.css). reveal.js's slide view
+          // fixes every slide at 1280x720 and scales it, and reveal.js
+          // switches to the scroll view only below 435px, so open such
+          // a page in the scroll view at every width. Quarto calls
+          // initialize at the end of <body>, so the page is parsed.
+          if (config && document.querySelector(".lectures.ruled, .lectures.network")) {
+            config.view = "scroll";
+          }
           return initialize.call(this, config);
         };
       }
@@ -179,15 +188,16 @@
   <script src="peek-ui.js" defer=""></script>
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="357514a3e86b97ce43f9c94b1c9f1a5dad3eb439">
+  <script src="network-ui.js" defer=""></script>
+  <meta name="qmd-web-source" content="0dd29f18bf3ad444bc1e7b2045b296507b2478ef">
 </head>
 <body class="quarto-light">
   <div class="reveal">
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">レポート：自分のデータを分類する</h1>
-  <p class="subtitle">決定木と k-NN を、自分で見つけたデータで比べる</p>
+  <h1 class="title">レポート</h1>
+  <p class="subtitle">分類問題で解けうるオリジナルのデータを探す</p>
 
 <div class="quarto-title-authors">
 <div class="quarto-title-author">

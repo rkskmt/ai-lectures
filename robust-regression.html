@@ -237,6 +237,15 @@
             config.math.config = config.math.config.replace("_HTML", "_CHTML");
             config.math.CommonHTML = { scale: 127, matchFontHeight: false };
           }
+          // A ruled or network lecture index lays itself out at the
+          // window's width (custom.css). reveal.js's slide view
+          // fixes every slide at 1280x720 and scales it, and reveal.js
+          // switches to the scroll view only below 435px, so open such
+          // a page in the scroll view at every width. Quarto calls
+          // initialize at the end of <body>, so the page is parsed.
+          if (config && document.querySelector(".lectures.ruled, .lectures.network")) {
+            config.view = "scroll";
+          }
           return initialize.call(this, config);
         };
       }
@@ -248,7 +257,8 @@
   <script src="peek-ui.js" defer=""></script>
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="6cb45f755c468840d92aa4c29815589a05689328">
+  <script src="network-ui.js" defer=""></script>
+  <meta name="qmd-web-source" content="56f72e2fbe8fcd5dbeda3d6e41f3c42eeb749172">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -300,7 +310,7 @@ rkskmt
 <ul>
 <li>線形回帰で使った 80 匹の体長と重さを使う</li>
 </ul>
-<div id="187f1d4a" class="cell" data-execution_count="1">
+<div id="7159dc40" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>魚データの定義（クリックして展開）</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -335,7 +345,7 @@ rkskmt
 <li>間違っていたのは、いちばん大きい 2 匹（2,457 g → 24,570 g、2,474 g → 24,740 g）</li>
 <li>この 80 枚で直線を fit し直す</li>
 </ul>
-<div id="4c5c4276" class="cell" data-execution_count="2">
+<div id="dd437bd6" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
 <span id="cb2-2"><a aria-label="2"></a></span>
 <span id="cb2-3"><a aria-label="3"></a>bad <span class="op">=</span> [<span class="dv">3</span>, <span class="dv">6</span>]                                       <span class="co"># 打ち間違えた2枚（いちばん大きい2匹）</span></span>
@@ -351,7 +361,7 @@ rkskmt
 2枚が間違った80枚 : 体長 1cm あたり 451.2 g</code></pre>
 </div>
 </div>
-<div id="f88b9291" class="cell" data-execution_count="3">
+<div id="1223e7cd" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -392,7 +402,7 @@ rkskmt
 <li>MSE は「ズレの二乗」の平均なので、ズレが 100 倍なら損失への寄与は 10,000 倍</li>
 <li>正しい 80 枚の直線からの、各伝票のズレを比べる</li>
 </ul>
-<div id="dca62178" class="cell" data-execution_count="4">
+<div id="8a01b22d" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a aria-label="1"></a>pred_ok <span class="op">=</span> reg_ok.predict(lengths.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>))        <span class="co"># 正しい80枚の直線による予測</span></span>
 <span id="cb4-2"><a aria-label="2"></a>error   <span class="op">=</span> weights_typo <span class="op">-</span> pred_ok                        <span class="co"># 各伝票のズレ（g）</span></span>
 <span id="cb4-3"><a aria-label="3"></a>ok      <span class="op">=</span> np.ones(<span class="dv">80</span>, dtype<span class="op">=</span><span class="bu">bool</span>)</span>
@@ -453,15 +463,14 @@ rkskmt
 <div class="slide-body">
 <ul>
 <li>外れ値に引っ張られる原因は二乗なので、二乗をやめる</li>
-<li>ズレの<strong>絶対値</strong>を平均する</li>
+<li><strong>MAE（<span class="en"><strong>Mean Absolute Error</strong></span> / 平均絶対誤差）</strong>：ズレの<strong>絶対値</strong>の平均</li>
 </ul>
 <p><span class="math display">\[L(a, b) = \frac{1}{N} \sum_{i} \left| \underbrace{a x_i + b}_{\text{予測}} - \underbrace{t_i}_{\text{実際}} \right|\]</span></p>
 <ul>
-<li><strong>MAE（<span class="en"><strong>Mean Absolute Error</strong></span> / 平均絶対誤差）</strong>と呼ぶ</li>
 <li><a href="./linear-regression.html#peek-mse" class="peek">MSE</a> との違いは、二乗が絶対値に変わったことだけ</li>
 <li>正しい 80 枚の直線からのズレを、絶対値で比べる</li>
 </ul>
-<div id="c5c31204" class="cell" data-execution_count="5">
+<div id="5ea69c31" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a aria-label="1"></a><span class="bu">print</span>(<span class="ss">f"正しい78枚のズレ: 絶対値の合計 </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">sum</span>(np.<span class="bu">abs</span>(error[ok]))<span class="sc">:,.0f}</span><span class="ss"> g"</span>)</span>
 <span id="cb6-2"><a aria-label="2"></a><span class="bu">print</span>(<span class="ss">f"打ち間違い2枚のズレ: 絶対値の合計 </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">sum</span>(np.<span class="bu">abs</span>(error[bad]))<span class="sc">:,.0f}</span><span class="ss"> g"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -496,7 +505,7 @@ rkskmt
 <li>勾配降下法には、損失の微分が要る</li>
 <li><span class="math inline">\(u^2\)</span> の微分は <span class="math inline">\(2u\)</span>、<span class="math inline">\(|u|\)</span> の微分は <span class="math inline">\(u\)</span> の符号</li>
 </ul>
-<div id="528ccfa2" class="cell" data-execution_count="6">
+<div id="1e38777c" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -576,7 +585,7 @@ rkskmt
 <li><a href="./linear-regression.html#peek-gdfit-code" class="peek">線形回帰の勾配降下法</a>の、勾配の 2 行を書き換える</li>
 <li>学習率 0.1 と更新 100 回は変えない</li>
 </ul>
-<div id="b13d705e" class="cell" data-execution_count="7">
+<div id="77cc9111" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a aria-label="1"></a>x <span class="op">=</span> (lengths <span class="op">-</span> lengths.mean()) <span class="op">/</span> lengths.std()                   <span class="co"># 標準化した体長</span></span>
 <span id="cb8-2"><a aria-label="2"></a>t <span class="op">=</span> (weights_typo <span class="op">-</span> weights_typo.mean()) <span class="op">/</span> weights_typo.std()    <span class="co"># 標準化した重さ（打ち間違い入り）</span></span>
 <span id="cb8-3"><a aria-label="3"></a></span>
@@ -633,7 +642,7 @@ rkskmt
 <li>更新を 300 回に増やす</li>
 <li>更新のたびに、45 cm の魚の予測を記録する</li>
 </ul>
-<div id="aba64bb3" class="cell" data-execution_count="8">
+<div id="5b1ef2ff" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a aria-label="1"></a><span class="kw">def</span> fit_mae(lr, n_updates):</span>
 <span id="cb10-2"><a aria-label="2"></a>    <span class="co">"""MAE の勾配降下法で fit し、更新ごとの「45 cm の魚の予測（g）」も返す"""</span></span>
 <span id="cb10-3"><a aria-label="3"></a>    a, b <span class="op">=</span> <span class="fl">0.0</span>, <span class="fl">0.0</span></span>
@@ -721,7 +730,7 @@ rkskmt
 <li>標準化した重さの 1 は、標準偏差 1 つ分の重さ</li>
 </ul></li>
 </ul>
-<div id="8e80b4be" class="cell" data-execution_count="9">
+<div id="6be824bf" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a aria-label="1"></a><span class="bu">print</span>(<span class="ss">f"重さの標準偏差: </span><span class="sc">{</span>weights_typo<span class="sc">.</span>std()<span class="sc">:,.0f}</span><span class="ss"> g"</span>)</span>
 <span id="cb12-2"><a aria-label="2"></a><span class="bu">print</span>(<span class="ss">f"学習率 0.1 の 1 歩: 最大 </span><span class="sc">{</span><span class="fl">0.1</span> <span class="op">*</span> weights_typo<span class="sc">.</span>std()<span class="sc">:,.0f}</span><span class="ss"> g"</span>)</span>
 <span id="cb12-3"><a aria-label="3"></a><span class="bu">print</span>(<span class="ss">f"正しい伝票のズレ: 最大 </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">abs</span>(error[ok])<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss"> g"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
@@ -816,7 +825,7 @@ rkskmt
 <section id="mae-の直線をmse-の直線と比べる" class="slide level2">
 <h2>MAE の直線を、MSE の直線と比べる</h2>
 <div class="slide-body">
-<div id="08198912" class="cell" data-execution_count="10">
+<div id="79a4702f" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a aria-label="1"></a>a, b, history <span class="op">=</span> fit_mae(lr<span class="op">=</span><span class="fl">0.01</span>, n_updates<span class="op">=</span><span class="dv">1000</span>)</span>
 <span id="cb14-2"><a aria-label="2"></a>a_mae <span class="op">=</span> (to_gram(a, b, <span class="dv">62</span>) <span class="op">-</span> to_gram(a, b, <span class="dv">45</span>)) <span class="op">/</span> (<span class="dv">62</span> <span class="op">-</span> <span class="dv">45</span>)     <span class="co"># 傾き（g/cm）</span></span>
 <span id="cb14-3"><a aria-label="3"></a><span class="bu">print</span>(<span class="ss">f"MAE の直線: 体長 1cm あたり </span><span class="sc">{</span>a_mae<span class="sc">:.1f}</span><span class="ss"> g"</span>)</span>
@@ -828,7 +837,7 @@ rkskmt
 62 cm の予測: 2,508 g</code></pre>
 </div>
 </div>
-<div id="075cf646" class="cell" data-execution_count="11">
+<div id="75490aff" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>描画コード</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a aria-label="1"></a>grid_cm <span class="op">=</span> np.linspace(<span class="dv">44</span>, <span class="dv">63</span>, <span class="dv">50</span>)</span>
@@ -894,7 +903,7 @@ rkskmt
 <li>1〜3 を 200 回繰り返し、賛同者が最多だった直線を残す</li>
 <li>その賛同者だけで最小二乗法をやり直す</li>
 </ol></li>
-<li>この手法を <strong>RANSAC（<span class="en"><strong>Random Sample Consensus</strong></span> / ランダムに選んだ標本の合意）</strong> と呼ぶ</li>
+<li><strong>RANSAC（<span class="en"><strong>Random Sample Consensus</strong></span> / ランダムに選んだ標本の合意）</strong>：ランダムに選んだ 2 点で直線を引くことを繰り返し、賛同者が最多の直線を残す手法</li>
 </ul>
 <div class="caption-note">
 <p>300 g の根拠：<a href="#/peek-outlier-squares" class="peek">正しい伝票のズレの最大</a>より少し広くとる</p>
@@ -904,7 +913,7 @@ rkskmt
 <section id="回の試行を図で見る" class="slide level2">
 <h2>1回の試行を図で見る</h2>
 <div class="slide-body">
-<div id="987c8442" class="cell" data-execution_count="12">
+<div id="8daed450" class="cell" data-execution_count="12">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -921,7 +930,7 @@ rkskmt
 <section id="peek-ransac-code" class="slide level2">
 <h2>RANSAC を実装する</h2>
 <div class="slide-body">
-<div id="b9afe031" class="cell" data-execution_count="13">
+<div id="f77ae2c7" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a aria-label="1"></a><span class="kw">def</span> ransac_line(x, t, threshold, n_trials<span class="op">=</span><span class="dv">200</span>):</span>
 <span id="cb17-2"><a aria-label="2"></a>    best_count <span class="op">=</span> <span class="dv">0</span></span>
 <span id="cb17-3"><a aria-label="3"></a>    <span class="cf">for</span> trial <span class="kw">in</span> <span class="bu">range</span>(n_trials):</span>
@@ -940,13 +949,13 @@ rkskmt
 <span id="cb17-16"><a aria-label="16"></a><span class="bu">print</span>(<span class="ss">f"賛同者 </span><span class="sc">{</span>inliers<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss"> 枚、除外 </span><span class="sc">{</span>(<span class="op">~</span>inliers)<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss"> 枚"</span>)</span>
 <span id="cb17-17"><a aria-label="17"></a><span class="bu">print</span>(<span class="ss">f"RANSAC の直線: 体長 1cm あたり </span><span class="sc">{</span>a_r<span class="sc">:.1f}</span><span class="ss"> g"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="12f15d5f" class="cell" data-execution_count="14">
+<div id="fa637577" class="cell" data-execution_count="14">
 <div class="cell-output cell-output-stdout">
 <pre><code>賛同者 78 枚、除外 2 枚
 RANSAC の直線: 体長 1cm あたり 90.0 g</code></pre>
 </div>
 </div>
-<div id="36eac9b9" class="cell" data-execution_count="15">
+<div id="98357184" class="cell" data-execution_count="15">
 <details class="code-fold">
 <summary>描画コード</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a aria-label="1"></a>grid_cm <span class="op">=</span> np.linspace(<span class="dv">44</span>, <span class="dv">63</span>, <span class="dv">50</span>)</span>
@@ -1092,7 +1101,7 @@ RANSAC の直線: 体長 1cm あたり 90.0 g</code></pre>
 <ul>
 <li>今日書いた <code>ransac_line</code> は、ライブラリでは <code>RANSACRegressor</code> に入っている</li>
 </ul>
-<div id="f81f909b" class="cell" data-execution_count="16">
+<div id="cb8b913e" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a aria-label="1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> RANSACRegressor</span>
 <span id="cb20-2"><a aria-label="2"></a></span>
 <span id="cb20-3"><a aria-label="3"></a>ransac <span class="op">=</span> RANSACRegressor(LinearRegression(), residual_threshold<span class="op">=</span><span class="dv">300</span>, random_state<span class="op">=</span><span class="dv">0</span>)</span>
@@ -1254,7 +1263,7 @@ RANSAC の直線: 体長 1cm あたり 90.0 g</code></pre>
 <li><span class="math inline">\(E\)</span> を除外していないのに、RANSAC と同じ直線になった</li>
 </ul></li>
 </ul>
-<div id="c74c452e" class="cell" data-execution_count="17">
+<div id="133d2e33" class="cell" data-execution_count="17">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -1283,7 +1292,7 @@ RANSAC の直線: 体長 1cm あたり 90.0 g</code></pre>
 <span id="cb22-24"><a aria-label="24"></a><span class="bu">print</span>(<span class="ss">f"MAE の勾配降下法（5点すべて）: a=</span><span class="sc">{</span>a<span class="sc">:.2f}</span><span class="ss">, b=</span><span class="sc">{</span>b<span class="sc">:.2f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="f819630b" class="cell" data-execution_count="18">
+<div id="e3ad6c54" class="cell" data-execution_count="18">
 <div class="cell-output cell-output-stdout">
 <pre><code>勾配降下法（5点すべて）: a=1.46, b=0.46
 RANSAC: a=1.00, b=0.00, 賛同者=[1 1 1 1 0]

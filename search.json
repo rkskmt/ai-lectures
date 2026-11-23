@@ -207,7 +207,7 @@
     "href": "optimization-gradient-descent.html#今回のテーマ",
     "title": "最適化と勾配降下法",
     "section": "今回のテーマ",
-    "text": "今回のテーマ\n\n\n\n\n\n\n\n\n前回まで\n今回から\n\n\n\n\n境界・重心を、手法ごとの探し方で見つけた\n多くの手法で使える探し方を作る\n\n\n学習後のモデルを観察した\n数字が学習される途中を追う\n\n\n\n\n\n\n\n\n\n\n前半のテーマ\n\n\n損失が小さくなる数字を、機械はどうやって見つけているのか？"
+    "text": "今回のテーマ\n\n\n\n\n\n\n\n\n前回まで\n今回から\n\n\n\n\n境界・重心を、手法ごとの探し方で見つけた\n多くの手法で使える探し方を作る\n\n\n学習後のモデルを観察した\n数字が学習される途中を追う\n\n\n\n\n\n\n\n\n\n\n今回の主題\n\n\n候補を全部試さずに、小さくしたい値が最小になる数字を見つける"
   },
   {
     "objectID": "optimization-gradient-descent.html#fit-がやっていたこと",
@@ -228,14 +228,14 @@
     "href": "optimization-gradient-descent.html#損失関数を図で見る",
     "title": "最適化と勾配降下法",
     "section": "損失関数を図で見る",
-    "text": "損失関数を図で見る\n\n\n以下は、サケとスズキの分類のパラメータを変えた場合の損失関数の推移\n\n横軸：パラメータ（しきい値）\n縦軸：損失（誤分類の数）\n\nしきい値を1つ決めると、損失が1つ決まる\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n要するに\n\n\n\n最小化する最適化問題は、グラフの谷底探しとして考えられる"
+    "text": "損失関数を図で見る\n\n\n損失関数（loss function）：パラメータを入力したらlossを返す関数\n以下は、サケとスズキの分類のパラメータを変えた場合の損失関数の推移\n\n横軸：パラメータ（しきい値）\n縦軸：損失（誤分類の数）\n\nしきい値を1つ決めると、損失が1つ決まる\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n要するに\n\n\n\n最小化する最適化問題は、グラフの谷底探しとして考えられる"
   },
   {
     "objectID": "optimization-gradient-descent.html#パラメータ",
     "href": "optimization-gradient-descent.html#パラメータ",
     "title": "最適化と勾配降下法",
     "section": "パラメータ",
-    "text": "パラメータ\n\n\nモデルが学習中に変更する変数のこと\n\n\n\n\n回\nモデル\nパラメータ\n\n\n\n\n1次元分類\nしきい値で判定\n重さのしきい値（変数1つ）\n\n\n2次元の決定境界\n直線で判定\n傾きと切片（変数2つ）\n\n\nクラスタリング\nk-means\n重心の座標リスト（N次元の変数k個）\n\n\n\n\n\n\n\n\n\n\nkはハイパパラメータ\n\n\n\nk-meansのkは、ユーザが関数に与える変数、つまりプログラミングの意味では「パラメータ」だが、決定木の深さと同じくハイパパラメータ\n\n学習中に更新されないからパラメータではない\n\n逆に、表題のパラメータ、最適化の過程で更新される側（k-meansなら重心の座標）は、学習可能パラメータ（trainable parameter / learnable parameter）と呼ばれる。\n\nモデルパラメータ（model parameter）という呼び方もある\nとはいえ普通はこれをパラメータと呼ぶ"
+    "text": "パラメータ\n\n\nパラメータ：学習がデータから決める値\n\n学習が終われば固定\n\n学習：データからパラメータを決めること\n\n多くのモデルでは最適化によって実現される\n\n\n\n\n\n\n\n\n\n「パラメータ」の呼び分け\n\n\n\nプログラミングでは、関数に渡す値もパラメータと呼ぶ\n\nk-means の k はこの意味ではパラメータだが、機械学習ではハイパーパラメータ\n\n学習で決まる側は、学習可能パラメータ（trainable parameter / learnable parameter）やモデルパラメータ（model parameter）とも呼ばれる\n\n普通は単にパラメータと呼ぶ"
   },
   {
     "objectID": "optimization-gradient-descent.html#パラメータの可視化例",
@@ -277,7 +277,7 @@
     "href": "optimization-gradient-descent.html#勾配降下法には滑らかな損失関数が必要",
     "title": "最適化と勾配降下法",
     "section": "勾配降下法には滑らかな損失関数が必要",
-    "text": "勾配降下法には滑らかな損失関数が必要\n\n\n今回は、目的関数 \\(f(x)\\) ＝ 損失関数\n\n\\(x\\)：パラメータ\n\\(f(x)\\)：損失関数\n\n勾配降下法では、傾きを計算できる滑らかな損失関数を使う\n\n滑らか = 微分ができるという意味\n\n\n\n\n\n\n\n\n\n参考：分類で使う代理損失\n\n\n\n分類の学習では、予測の外れ方を連続的に測る滑らかな関数を使う\n誤分類数などの評価基準の代わりに最小化するため、代理損失（surrogate loss）と呼ぶ\n学習では代理損失を最小化し、評価には誤分類数や正答率を使える"
+    "text": "勾配降下法には滑らかな損失関数が必要\n\n\n今回は、目的関数 \\(f(x)\\) ＝ 損失関数\n\n\\(x\\)：パラメータ\n\\(f(x)\\)：損失関数\n\n勾配降下法では、傾きを計算できる滑らかな損失関数を使う\n\n滑らか = 微分ができるという意味\n\n\n\n\n\n\n\n\n\n参考：分類で使う代理損失\n\n\n\n分類の学習では、予測の外れ方を連続的に測る滑らかな関数を使う\n代理損失（surrogate loss）：誤分類数などの評価基準の代わりに最小化する損失\n学習では代理損失を最小化し、評価には誤分類数や正答率を使える"
   },
   {
     "objectID": "optimization-gradient-descent.html#基本方針今いる位置から徐々に谷底を目指す",
@@ -368,14 +368,14 @@
     "href": "optimization-gradient-descent.html#まとめ",
     "title": "最適化と勾配降下法",
     "section": "まとめ",
-    "text": "まとめ\n\n\n最適化：評価基準が最も良くなるパラメータを探すこと。多くの fit() の中心にある\n勾配降下法：傾きを測り、逆方向に少し進む、を繰り返す\n\n\\[x_{\\text{new}} = x - \\alpha \\cdot f'(x)\\]\n\n学習率 \\(\\alpha\\) は主な調整値：小さいと遅く、大きすぎると発散する\n初期値・最大反復回数・停止条件も決める必要がある\nシンプルで軽く、大規模問題（ディープラーニング）の標準エンジンとなっている"
+    "text": "まとめ\n\n\n最適化：損失が最小になるパラメータを探すこと\n\n候補を全部試す探し方は、パラメータが増えると使えない\n\n勾配降下法：傾きを測り、逆方向に少し進む、を繰り返す\n\n\\[x_{\\text{new}} = x - \\alpha \\cdot f'(x)\\]\n\n学習率 \\(\\alpha\\) は主な調整値：小さいと遅く、大きすぎると発散する\n初期値・最大反復回数・停止条件も決める必要がある\nシンプルで軽く、大規模問題（ディープラーニング）の標準エンジンとなっている"
   },
   {
     "objectID": "optimization-gradient-descent.html#次回予告",
     "href": "optimization-gradient-descent.html#次回予告",
     "title": "最適化と勾配降下法",
     "section": "次回予告",
-    "text": "次回予告\n\n\n今日手に入れた勾配降下法が、fit() の中身を開ける鍵になる\n次回、本物のモデル（線形回帰）を、この道具で自分の手で fit する\nその先に分類モデル、そしてニューラルネットワークが続く。勾配降下法はディープラーニングを動かしている本物のエンジン"
+    "text": "次回予告\n\n\n次回は勾配降下法で直線のパラメータ（傾きと切片）を求める（線形回帰）\nその先に分類モデル、そしてニューラルネットワークが続く。勾配降下法はディープラーニングを動かしている本物のエンジン"
   },
   {
     "objectID": "optimization-gradient-descent.html#練習問題",
@@ -620,7 +620,7 @@
     "href": "nn-logistic.html#peek-nn-learning-cycle",
     "title": "ロジスティック回帰をNNとして実装する",
     "section": "これでNNの学習が1ステップ進んだ",
-    "text": "これでNNの学習が1ステップ進んだ\n\n\n\nForward → Loss → Backward → Update の一周を、学習の1ステップと呼ぶ\n次のステップでは、更新後の \\(w,b\\) から再びForwardを始める"
+    "text": "これでNNの学習が1ステップ進んだ\n\n\n\n学習の1ステップ：Forward → Loss → Backward → Update の一周\n次のステップでは、更新後の \\(w,b\\) から再びForwardを始める"
   },
   {
     "objectID": "nn-logistic.html#ステップは4つの関数呼び出し",
@@ -753,7 +753,7 @@
     "href": "logistic-regression.html#ここまでの道具",
     "title": "ロジスティック回帰",
     "section": "ここまでの道具",
-    "text": "ここまでの道具\n\n\n勾配降下法：傾きの逆方向に少しずつ進んで最小値を探す（最適化の回）\n回帰：体長→重さの直線を勾配降下で当て、sklearn と一致した（前回）\n分類 — 決定境界の回では、直線を目で見て引いた\n\n\n\n\n\n\n\n\n今回のテーマ\n\n\n\n「斜めの直線で分けられそう」と言いながら、引けたのは縦線だけだった。\n決定境界の斜めの最適な直線を、機械に fit させられるか？"
+    "text": "ここまでの道具\n\n\n勾配降下法：傾きの逆方向に少しずつ進んで最小値を探す（最適化の回）\n回帰：体長→重さの直線を勾配降下で当て、sklearn と一致した（前回）\n分類 — 決定境界の回では、直線を目で見て引いた\n\n\n\n\n\n\n\n\n今回のテーマ\n\n\n\n「斜めの直線で分けられそう」と言いながら、引けたのは縦線だけだった。\n斜めの決定境界の最適な直線を、データから求められるか？"
   },
   {
     "objectID": "logistic-regression.html#分類問題で出てきた閾値の縦線",
@@ -858,7 +858,7 @@
     "href": "logistic-regression.html#peek-cross-entropy",
     "title": "ロジスティック回帰",
     "section": "予測を採点する損失関数 — 交差エントロピー",
-    "text": "予測を採点する損失関数 — 交差エントロピー\n\n\nクラス \\(c\\) ごとに、正解ラベル \\(y_c\\) と予測確率 \\(p_c\\) を用意する\n\n正解クラスだけ \\(y_c=1\\)、それ以外は \\(y_c=0\\)\n\n\n\\[\n\\ell(\\mathbf{y},\\mathbf{p})\n=-\\sum_c y_c\\log p_c\n\\]\n\n\\(y_c=0\\) の項は消えるので、正解クラスの項だけが残る\n正解クラスに出した確率を \\(q\\) と置けば：\n\n\\[\\ell=-\\log q\\]\n\nこの損失関数を 交差エントロピー（cross entropy）と呼ぶ"
+    "text": "予測を採点する損失関数 — 交差エントロピー\n\n\nクラス \\(c\\) ごとに、正解ラベル \\(y_c\\) と予測確率 \\(p_c\\) を用意する\n\n正解クラスだけ \\(y_c=1\\)、それ以外は \\(y_c=0\\)\n\n\n\\[\n\\ell(\\mathbf{y},\\mathbf{p})\n=-\\sum_c y_c\\log p_c\n\\]\n\n\\(y_c=0\\) の項は消えるので、正解クラスの項だけが残る\n正解クラスに出した確率を \\(q\\) と置けば：\n\n\\[\\ell=-\\log q\\]\n\n交差エントロピー（cross entropy）：正解クラスに出した確率 \\(q\\) を \\(-\\log q\\) で採点する損失関数"
   },
   {
     "objectID": "logistic-regression.html#peek-binary-cross-entropy",
@@ -878,8 +878,8 @@
     "objectID": "logistic-regression.html#peek-neglog",
     "href": "logistic-regression.html#peek-neglog",
     "title": "ロジスティック回帰",
-    "section": "−log の形：外すほど急に効く",
-    "text": "−log の形：外すほど急に効く\n\n\n\n\n\n\n\n\n\n\n\n正解クラスの確率が高い（\\(q \\to 1\\)）ほど損失はほぼ 0\n外れるほど急カーブで跳ね上がる\n\\(q \\to 0\\)（自信満々の間違い）では青天井\n\n急激に大きなlossになり都合がよい"
+    "section": "−log の形",
+    "text": "−log の形\n\n\n\n\n\n\n\n\n\n\n\n正解クラスの確率が高い（\\(q \\to 1\\)）ほど損失はほぼ 0\n外れるほど急カーブで跳ね上がる\n\\(q \\to 0\\)（自信満々の間違い）では青天井\n\n急激に大きなlossになり都合がよい"
   },
   {
     "objectID": "logistic-regression.html#peek-bce-derivative",
@@ -907,28 +907,28 @@
     "href": "logistic-regression.html#peek-gradient-code",
     "title": "ロジスティック回帰",
     "section": "1匹分の勾配をコードに置き換える",
-    "text": "1匹分の勾配をコードに置き換える\n\n数式の各部分へ、そのまま変数名を付ける：\ndelta = p - y\nd_w = delta * x\nd_b = delta\n\n\n\n\n\n\n\n\nコード\n数式\n意味\n\n\n\n\ndelta\n\\(p-y=\\dfrac{\\partial \\ell}{\\partial z}\\)\n予測のずれが \\(z\\) に与える勾配\n\n\nd_w[j]\n\\((p-y)x_j=\\dfrac{\\partial \\ell}{\\partial w_j}\\)\n重み \\(w_j\\) の勾配\n\n\nd_b\n\\(p-y=\\dfrac{\\partial \\ell}{\\partial b}\\)\nバイアス \\(b\\) の勾配\n\n\n\n\n\n\n\n\n\nノート\n\n\n次回、NNとして実装するときは、この出力側から各パラメータの勾配を求める処理を backward と呼ぶ。"
+    "text": "1匹分の勾配をコードに置き換える\n\n数式の各部分へ、そのまま変数名を付ける：\ndelta = p - y\nd_w = delta * x\nd_b = delta\n\n\n\n\n\n\n\n\nコード\n数式\n意味\n\n\n\n\ndelta\n\\(p-y=\\dfrac{\\partial \\ell}{\\partial z}\\)\n予測のずれが \\(z\\) に与える勾配\n\n\nd_w[j]\n\\((p-y)x_j=\\dfrac{\\partial \\ell}{\\partial w_j}\\)\n重み \\(w_j\\) の勾配\n\n\nd_b\n\\(p-y=\\dfrac{\\partial \\ell}{\\partial b}\\)\nバイアス \\(b\\) の勾配\n\n\n\n\n\n\n\n\n\nノート\n\n\nbackward：次回の NN 実装でこの出力側から各パラメータの勾配を求める処理を担う関数"
   },
   {
     "objectID": "logistic-regression.html#peek-forward",
     "href": "logistic-regression.html#peek-forward",
     "title": "ロジスティック回帰",
-    "section": "実装：必要な関数は4つだけ",
-    "text": "実装：必要な関数は4つだけ\n\n\n\n魚データの定義（クリックして展開）\nimport numpy as np\n\nsalmon_weights     = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,\n                               1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,\n                               2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,\n                               1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652])\nsalmon_brightness  = np.array([3.5, 5.8, 4.9, 4.4, 2.6, 2.6, 2.2, 5.5, 4.4, 4.8, 2.1,\n                               5.9, 5.3, 2.8, 2.7, 2.7, 3.2, 4.1, 3.7, 3.2, 4.4, 2.6,\n                               3.2, 3.5, 3.8, 5.1, 2.8, 4.1, 4.4, 2.2, 4.4, 2.7, 2.3,\n                               5.8, 5.9, 5.2, 3.2, 2.4, 4.7, 3.8])\nseabass_weights    = np.array([1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,\n                               1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,\n                               1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,\n                               1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531])\nseabass_brightness = np.array([5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8,\n                               8.9, 9.7, 9.5, 8.0, 9.6, 5.4, 6.0, 5.2, 6.6, 6.9, 6.4,\n                               9.1, 6.8, 6.4, 7.7, 5.7, 9.0, 5.4, 9.9, 8.9, 6.0, 5.0,\n                               9.1, 8.5, 8.6, 8.9, 5.4, 6.8, 5.6])\n\nX = np.column_stack([\n    np.concatenate([salmon_brightness, seabass_brightness]),\n    np.concatenate([salmon_weights,    seabass_weights])\n])\ny = np.array([1]*40 + [0]*40)   # 1=Salmon, 0=Sea bass\n\n# スケールを揃える（クラスタリング回の教訓）\nX_norm = (X - X.mean(axis=0)) / X.std(axis=0)\n\n# Salmon, Sea bass, Salmon, ... と交互に並べ替えておく\norder = np.empty(80, dtype=int)\norder[0::2] = np.arange(0, 40)\norder[1::2] = np.arange(40, 80)\nX_norm = X_norm[order]\ny      = y[order]\n\n\n\ndef sigmoid(z):\n    return 1 / (1 + np.exp(-z))\n\ndef forward(X, w, b):\n    \"\"\"線形結合＋バイアス → シグモイド\"\"\"\n    return sigmoid(X @ w + b)\n\ndef loss_fn(y_true, p):\n    \"\"\"全魚の二値交差エントロピーを平均する\"\"\"\n    eps = 1e-10\n    # log(0) は計算できないため、確率が厳密な 0 / 1 にならないようにする\n    p = np.clip(p, eps, 1 - eps)\n    return -np.mean(y_true * np.log(p) + (1 - y_true) * np.log(1 - p))\n\ndef accuracy(y_true, p):\n    return np.mean((p &gt;= 0.5) == y_true)"
+    "section": "実装",
+    "text": "実装\n\n\n\n魚データの定義（クリックして展開）\nimport numpy as np\n\nsalmon_weights     = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,\n                               1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,\n                               2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,\n                               1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652])\nsalmon_brightness  = np.array([3.5, 5.8, 4.9, 4.4, 2.6, 2.6, 2.2, 5.5, 4.4, 4.8, 2.1,\n                               5.9, 5.3, 2.8, 2.7, 2.7, 3.2, 4.1, 3.7, 3.2, 4.4, 2.6,\n                               3.2, 3.5, 3.8, 5.1, 2.8, 4.1, 4.4, 2.2, 4.4, 2.7, 2.3,\n                               5.8, 5.9, 5.2, 3.2, 2.4, 4.7, 3.8])\nseabass_weights    = np.array([1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,\n                               1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,\n                               1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,\n                               1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531])\nseabass_brightness = np.array([5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8,\n                               8.9, 9.7, 9.5, 8.0, 9.6, 5.4, 6.0, 5.2, 6.6, 6.9, 6.4,\n                               9.1, 6.8, 6.4, 7.7, 5.7, 9.0, 5.4, 9.9, 8.9, 6.0, 5.0,\n                               9.1, 8.5, 8.6, 8.9, 5.4, 6.8, 5.6])\n\nX = np.column_stack([\n    np.concatenate([salmon_brightness, seabass_brightness]),\n    np.concatenate([salmon_weights,    seabass_weights])\n])\ny = np.array([1]*40 + [0]*40)   # 1=Salmon, 0=Sea bass\n\n# スケールを揃える（クラスタリング回の教訓）\nX_norm = (X - X.mean(axis=0)) / X.std(axis=0)\n\n# Salmon, Sea bass, Salmon, ... と交互に並べ替えておく\norder = np.empty(80, dtype=int)\norder[0::2] = np.arange(0, 40)\norder[1::2] = np.arange(40, 80)\nX_norm = X_norm[order]\ny      = y[order]\n\n\n\ndef sigmoid(z):\n    return 1 / (1 + np.exp(-z))\n\ndef forward(X, w, b):\n    \"\"\"線形結合＋バイアス → シグモイド\"\"\"\n    return sigmoid(X @ w + b)\n\ndef loss_fn(y_true, p):\n    \"\"\"全魚の二値交差エントロピーを平均する\"\"\"\n    eps = 1e-10\n    # log(0) は計算できないため、確率が厳密な 0 / 1 にならないようにする\n    p = np.clip(p, eps, 1 - eps)\n    return -np.mean(y_true * np.log(p) + (1 - y_true) * np.log(1 - p))\n\ndef accuracy(y_true, p):\n    return np.mean((p &gt;= 0.5) == y_true)"
   },
   {
     "objectID": "logistic-regression.html#peek-logistic-functions",
     "href": "logistic-regression.html#peek-logistic-functions",
     "title": "ロジスティック回帰",
-    "section": "4つの関数の役割",
-    "text": "4つの関数の役割\n\n\n\n\n関数\n役割\n\n\n\n\nsigmoid\n\\(z\\) を確率 \\(p\\) に変換する\n\n\nforward\n全魚の入力 \\(X\\) から確率を予測する\n\n\nloss_fn\n全魚の二値交差エントロピー \\(L\\) を計算する\n\n\naccuracy\n\\(p\\geq0.5\\) を Salmon として正答率を計算する\n\n\n\n\n1匹分の勾配は、直前の delta、d_w、d_b の3行で計算する"
+    "section": "各関数の役割",
+    "text": "各関数の役割\n\n\n\n\n関数\n役割\n\n\n\n\nsigmoid\n\\(z\\) を確率 \\(p\\) に変換する\n\n\nforward\n全魚の入力 \\(X\\) から確率を予測する\n\n\nloss_fn\n全魚の二値交差エントロピー \\(L\\) を計算する\n\n\naccuracy\n\\(p\\geq0.5\\) を Salmon として正答率を計算する\n\n\n\n\n1匹分の勾配は、直前の delta、d_w、d_b の3行で計算する"
   },
   {
     "objectID": "logistic-regression.html#peek-one-at-a-time",
     "href": "logistic-regression.html#peek-one-at-a-time",
     "title": "ロジスティック回帰",
-    "section": "魚を1匹ずつ見せて学習する",
-    "text": "魚を1匹ずつ見せて学習する\n\n\nここでは1匹分の損失 \\(\\ell\\) の勾配で更新する\n\n全魚の平均損失 \\(L\\) を一度に使わず１匹分だけ\n\n1匹見るたびにパラメータが少し動く\n\n\nw = np.array([0.0, 0.0])   # Weights start at zero\nb  = 0.0\nlr = 0.5                       # 学習率\n\nfor i in range(10):\n    xi, yi = X_norm[i], y[i]\n    # この1匹の損失 ℓ の勾配で、パラメータを更新する\n    p_i   = sigmoid(xi @ w + b)   # Forward：1匹だけ予測\n    delta = p_i - yi\n    d_w = delta * xi\n    d_b = delta\n    w = w - lr * d_w\n    b     = b  - lr * d_b\n\n    # 全魚の Loss と正答率は、学習の様子を表示するためだけに計算する\n    p_all = forward(X_norm, w, b)\n    print(f\"{i+1}匹目 | Loss: {loss_fn(y, p_all):.4f} | 正答率: {accuracy(y, p_all):.1%} \"\n          f\"| w=[{w[0]:6.3f}, {w[1]:6.3f}] | b={b:6.3f}\")\n\n1匹目 | Loss: 0.5326 | 正答率: 85.0% | w=[-0.233,  0.335] | b= 0.250\n2匹目 | Loss: 0.5179 | 正答率: 90.0% | w=[-0.233,  0.371] | b=-0.026\n3匹目 | Loss: 0.4974 | 正答率: 85.0% | w=[-0.213,  0.537] | b= 0.196\n4匹目 | Loss: 0.4269 | 正答率: 88.8% | w=[-0.359,  0.748] | b= 0.023\n5匹目 | Loss: 0.4044 | 正答率: 85.0% | w=[-0.394,  0.914] | b= 0.135\n6匹目 | Loss: 0.3994 | 正答率: 87.5% | w=[-0.360,  1.054] | b=-0.059\n7匹目 | Loss: 0.3901 | 正答率: 87.5% | w=[-0.379,  1.137] | b=-0.023\n8匹目 | Loss: 0.3617 | 正答率: 87.5% | w=[-0.516,  1.206] | b=-0.102\n9匹目 | Loss: 0.3364 | 正答率: 88.8% | w=[-0.650,  1.272] | b=-0.002\n10匹目 | Loss: 0.3330 | 正答率: 90.0% | w=[-0.741,  1.146] | b=-0.294\n\n\n\nたった10匹見せただけで、Loss は1匹ごとに下がっていく\n\n\n\n\n\n\n\n\n更新に使う値と、表示する値は別\n\n\n\n更新：いま見ている1匹の勾配 delta、d_w、d_b を使う\n表示：更新後に全魚の平均損失 \\(L\\) と正答率を計算する。表示したLossの数値を更新式へ代入するわけではない"
+    "section": "1データずつ学習してみる",
+    "text": "1データずつ学習してみる\n\n\nここでは1データ分 \\(\\ell\\) の勾配で更新\n\n全データの平均損失 \\(L\\) を一度に使わない\n\n\n\nw = np.array([0.0, 0.0])   # Weights start at zero\nb  = 0.0\nlr = 0.5                       # 学習率\n\nfor i in range(10):\n    xi, yi = X_norm[i], y[i]\n    # この1匹の損失 ℓ の勾配で、パラメータを更新する\n    p_i   = sigmoid(xi @ w + b)   # Forward：1匹だけ予測\n    delta = p_i - yi\n    d_w = delta * xi\n    d_b = delta\n    w = w - lr * d_w\n    b     = b  - lr * d_b\n\n    # 全魚の Loss と正答率は、学習の様子を表示するためだけに計算する\n    p_all = forward(X_norm, w, b)\n    print(f\"{i+1}匹目 | Loss: {loss_fn(y, p_all):.4f} | 正答率: {accuracy(y, p_all):.1%} \"\n          f\"| w=[{w[0]:6.3f}, {w[1]:6.3f}] | b={b:6.3f}\")\n\n1匹目 | Loss: 0.5326 | 正答率: 85.0% | w=[-0.233,  0.335] | b= 0.250\n2匹目 | Loss: 0.5179 | 正答率: 90.0% | w=[-0.233,  0.371] | b=-0.026\n3匹目 | Loss: 0.4974 | 正答率: 85.0% | w=[-0.213,  0.537] | b= 0.196\n4匹目 | Loss: 0.4269 | 正答率: 88.8% | w=[-0.359,  0.748] | b= 0.023\n5匹目 | Loss: 0.4044 | 正答率: 85.0% | w=[-0.394,  0.914] | b= 0.135\n6匹目 | Loss: 0.3994 | 正答率: 87.5% | w=[-0.360,  1.054] | b=-0.059\n7匹目 | Loss: 0.3901 | 正答率: 87.5% | w=[-0.379,  1.137] | b=-0.023\n8匹目 | Loss: 0.3617 | 正答率: 87.5% | w=[-0.516,  1.206] | b=-0.102\n9匹目 | Loss: 0.3364 | 正答率: 88.8% | w=[-0.650,  1.272] | b=-0.002\n10匹目 | Loss: 0.3330 | 正答率: 90.0% | w=[-0.741,  1.146] | b=-0.294\n\n\n\nたった10匹見せただけで、Loss は1匹ごとに下がっていく\n\n\n\n\n\n\n\n\n更新に使う値と、表示する値は別\n\n\n\n更新：いま見ている1匹の勾配 delta、d_w、d_b を使う\n表示：更新後に全魚の平均損失 \\(L\\) と正答率を計算する。表示したLossの数値を更新式へ代入するわけではない"
   },
   {
     "objectID": "logistic-regression.html#境界が動く様子を見る",
@@ -942,7 +942,7 @@
     "href": "logistic-regression.html#匹を見た後のパラメータを読む",
     "title": "ロジスティック回帰",
     "section": "10匹を見た後のパラメータを読む",
-    "text": "10匹を見た後のパラメータを読む\n\n\n10匹を見た後の \\(w\\)、\\(b\\) は、学習ループの出力の最終行\n\n\n\n\nパラメータ\n値\n意味\n\n\n\n\n\\(w_1\\)（輝度）\n負\n暗いほど Salmon 寄り\n\n\n\\(w_2\\)（重さ）\n正\n重いほど Salmon 寄り\n\n\n\\(b\\)（バイアス）\n負\n決定境界の位置を調整\n\n\n\n\n1次元分類・2次元分類の回に目で見て発見したことを、機械が数値として再発見した\n\n\n\n\n\n\n\nノート\n\n\nsklearn の fit() も「予測 → 損失 → パラメータを更新」という考え方は同じ。ただし、この1匹ずつのループをそのまま実行するわけではなく、最適化方法や正則化などが加わる。 ブラックボックスが1つ開いた。"
+    "text": "10匹を見た後のパラメータを読む\n\n\n10匹を見た後の \\(w\\)、\\(b\\) は、学習ループの出力の最終行\n\n\n\n\nパラメータ\n値\n意味\n\n\n\n\n\\(w_1\\)（輝度）\n負\n暗いほど Salmon 寄り\n\n\n\\(w_2\\)（重さ）\n正\n重いほど Salmon 寄り\n\n\n\\(b\\)（バイアス）\n負\n決定境界の位置を調整\n\n\n\n\n1次元分類・2次元分類の回に目で見て発見したことを、機械が数値として再発見した\n\n\n\n\n\n\n\nノート\n\n\nsklearn の fit() も「予測 → 損失 → パラメータを更新」という考え方は同じ。ただし、この1匹ずつのループをそのまま実行するわけではなく、最適化方法や正則化などが加わる。"
   },
   {
     "objectID": "logistic-regression.html#tweak-学習の様子をいじって観察する",
@@ -963,7 +963,7 @@
     "href": "logistic-regression.html#section-2",
     "title": "ロジスティック回帰",
     "section": "",
-    "text": "「線形」の正体"
+    "text": "ところで「線形」とは何？"
   },
   {
     "objectID": "logistic-regression.html#この式なんと呼ばれているか",
@@ -1012,7 +1012,7 @@
     "href": "logistic-regression.html#まとめ",
     "title": "ロジスティック回帰",
     "section": "まとめ",
-    "text": "まとめ\n\n\nロジスティック回帰 ＝ 線形結合（＋バイアス）→ ロジスティック関数。決定境界は \\(z = 0\\) の直線\n「線形」は直線の見た目ではなく「定数倍と足し算だけ」という性質 — \\(f(0) \\neq 0\\) なら線形失格\n\\(+b\\) は厳密には線形破り — 「常に 1 の入力 \\(x_0\\)」と読み替えれば線形結合に収まる（文献の呼び名：アフィン）\n学習 ＝ 交差エントロピーを勾配降下法で最小化\n\n勾配は \\((p - y) x\\) — ロジスティック関数＋交差エントロピーの組み合わせの妙\n\nfit() の中身は「予測 → 差を測る → 境界を少し動かす」の繰り返しだった\n\n\n\n\n\n\n\n\n次回予告\n\n\n\n今回の「線形結合 → ロジスティック関数」は、すでに最小構成のニューラルネットワーク\n次は同じ計算をNNの形と名前で書き直し、NumPyで学習まで実装する"
+    "text": "まとめ\n\n\nロジスティック回帰 ＝ 線形結合（＋バイアス）→ ロジスティック関数。決定境界は \\(z = 0\\) の直線\n「線形」は直線の見た目ではなく「定数倍と足し算だけ」という性質 — \\(f(0) \\neq 0\\) なら線形失格\n\\(+b\\) は厳密には線形破り — 「常に 1 の入力 \\(x_0\\)」と読み替えれば線形結合に収まる（文献の呼び名：アフィン）\n学習 ＝ 交差エントロピーを勾配降下法で最小化\n\n勾配は \\((p - y) x\\) — ロジスティック関数＋交差エントロピーの組み合わせの妙\n\n学習の中身は「予測 → 差を測る → 境界を少し動かす」の繰り返し\n\n\n\n\n\n\n\n\n次回予告\n\n\n\n今回の「線形結合 → ロジスティック関数」は、すでに最小構成のニューラルネットワーク\n次は同じ計算をNNの形と名前で書き直し、NumPyで学習まで実装する"
   },
   {
     "objectID": "logistic-regression.html#練習問題",
@@ -1047,7 +1047,7 @@
     "href": "index.html#人工知能",
     "title": "AI Lectures",
     "section": "人工知能",
-    "text": "人工知能\n\nPDF\n\n\n\n\n\n\n\n\n\n\n導入\n\n\n\n人工知能概論\nNumPy 逆引き\n\n\n\n\n\n分類問題と特徴量\n\n\n\n２クラス分類\n2次元の決定境界\n過学習と汎化\n教師なし学習・クラスタリング\nk-NN と次元の呪い\n自分のデータを分類する\n\n\n\n\n\nfit() の中身を開ける\n\n\n\n最適化と勾配降下法\n線形回帰と正則化\nロジスティック回帰\n\n\n\n\n\nニューラルネットワーク\n\n\n\nロジスティック回帰をNNとして実装する\n隠れ層とReLUで曲がる境界をつくる\nバックプロパゲーション\nPyTorch入門\n\n\n\n\n\nプロジェクト\n\n\n\n手書き数字分類プロジェクト\n\n\n\n\n\n参考資料 回数外\n\n\n\n次元削減と PCA\n外れ値に強い回帰\nNewton法\nローカルミニマムの罠"
+    "text": "人工知能\n\nPDF\n\n\n\n\n\n\n\n\n\n\n導入\n\n\n\n人工知能概論\nNumPy 逆引き\n\n\n\n\n\n分類問題と特徴量\n\n\n\n２クラス分類\n2次元の決定境界\n過学習と汎化\n教師なし学習・クラスタリング\nk-NN と次元の呪い\n分類用データを探せ\n\n\n\n\n\n最適化と回帰\n\n\n\n最適化と勾配降下法\n線形回帰と正則化\nロジスティック回帰\n\n\n\n\n\nニューラルネットワーク\n\n\n\nロジスティック回帰をNNとして実装\n隠れ層とReLUで折る境界\nバックプロパゲーション\nPyTorch入門\n\n\n\n\n\nプロジェクト\n\n\n\n手書き文字分類\n\n\n\n\n\n参考資料 回数外\n\n\n\n次元削減と PCA\n外れ値に強い回帰\nNewton法\nローカルミニマムの罠"
   },
   {
     "objectID": "dimensionality-pca.html#特徴量の数を増やすのが最強か",
@@ -1201,7 +1201,7 @@
     "href": "dimensionality-pca.html#答えが固有ベクトルになる理由",
     "title": "次元削減と PCA",
     "section": "答えが「固有ベクトル」になる理由",
-    "text": "答えが「固有ベクトル」になる理由\n\n\n\\(\\|\\mathbf{v}\\| = 1\\) は「\\(\\mathbf{v}\\) の先端は半径1の球面の上」という意味\n\\(\\mathbf{v}\\) を少しだけ \\(\\boldsymbol{\\varepsilon}\\) 動かすと、分散 \\(\\mathbf{v}^{\\mathsf T} C \\mathbf{v}\\) はこう変わる：\n\n\\[(\\mathbf{v} + \\boldsymbol{\\varepsilon})^{\\mathsf T} C\\, (\\mathbf{v} + \\boldsymbol{\\varepsilon})\n= \\mathbf{v}^{\\mathsf T} C \\mathbf{v} + 2\\, \\boldsymbol{\\varepsilon}^{\\mathsf T} (C \\mathbf{v}) + \\boldsymbol{\\varepsilon}^{\\mathsf T} C \\boldsymbol{\\varepsilon}\\]\n\n\\(C\\) は対称なので \\(\\mathbf{v}^{\\mathsf T} C \\boldsymbol{\\varepsilon}\\) と \\(\\boldsymbol{\\varepsilon}^{\\mathsf T} C \\mathbf{v}\\) は同じ値。\\(\\boldsymbol{\\varepsilon}\\) が小さければ最後の項は無視できる\n\n\n増える量は \\(2\\, \\boldsymbol{\\varepsilon}^{\\mathsf T} (C \\mathbf{v})\\)、つまり \\(\\boldsymbol{\\varepsilon}\\) と \\(C\\mathbf{v}\\) の内積の2倍\n\n内積は向きがそろうほど大きいので、分散がいちばん増える向きは \\(C\\mathbf{v}\\)\n\n球面に沿って動くとき、\\(\\boldsymbol{\\varepsilon}\\) は \\(\\mathbf{v}\\) と直交する\n球面上のてっぺんでは、球面に沿ってどちらへ動いても分散は増えない\n\n\\(\\mathbf{v}\\) と直交するどの \\(\\boldsymbol{\\varepsilon}\\) とも \\(C\\mathbf{v}\\) の内積が 0 になるので、\\(C\\mathbf{v}\\) は \\(\\mathbf{v}\\) と平行になるしかない：\n\n\n\\[C \\mathbf{v} = \\lambda \\mathbf{v} \\quad \\text{（固有ベクトルの定義式そのもの！）}\\]\n\nしかもそのときの分散は \\(\\mathbf{v}^{\\mathsf T} C \\mathbf{v} = \\lambda \\mathbf{v}^{\\mathsf T} \\mathbf{v} = \\lambda\\)。固有値＝その方向の分散\n\n\n\n\n\n\n\nヒント\n\n\n\n固有ベクトル＝「球面上でこれ以上増やせない方向」の候補リスト\n固有値＝その候補での分散の値\n\\(\\lambda_1 \\geq \\lambda_2 \\geq \\cdots\\) と並べて、一番大きい候補から PC1, PC2, … と呼ぶ\n\n対称行列の固有ベクトルは互いに直交するので、PC2 は「PC1 と直交する方向の中で分散が最大」の軸"
+    "text": "答えが「固有ベクトル」になる理由\n\n\n\\(\\|\\mathbf{v}\\| = 1\\) は「\\(\\mathbf{v}\\) の先端は半径1の球面の上」という意味\n\\(\\mathbf{v}\\) を少しだけ \\(\\boldsymbol{\\varepsilon}\\) 動かすと、分散 \\(\\mathbf{v}^{\\mathsf T} C \\mathbf{v}\\) はこう変わる：\n\n\\[(\\mathbf{v} + \\boldsymbol{\\varepsilon})^{\\mathsf T} C\\, (\\mathbf{v} + \\boldsymbol{\\varepsilon})\n= \\mathbf{v}^{\\mathsf T} C \\mathbf{v} + 2\\, \\boldsymbol{\\varepsilon}^{\\mathsf T} (C \\mathbf{v}) + \\boldsymbol{\\varepsilon}^{\\mathsf T} C \\boldsymbol{\\varepsilon}\\]\n\n\\(C\\) は対称なので \\(\\mathbf{v}^{\\mathsf T} C \\boldsymbol{\\varepsilon}\\) と \\(\\boldsymbol{\\varepsilon}^{\\mathsf T} C \\mathbf{v}\\) は同じ値。\\(\\boldsymbol{\\varepsilon}\\) が小さければ最後の項は無視できる\n\n\n増える量は \\(2\\, \\boldsymbol{\\varepsilon}^{\\mathsf T} (C \\mathbf{v})\\)、つまり \\(\\boldsymbol{\\varepsilon}\\) と \\(C\\mathbf{v}\\) の内積の2倍\n\n内積は向きがそろうほど大きいので、分散がいちばん増える向きは \\(C\\mathbf{v}\\)\n\n球面に沿って動くとき、\\(\\boldsymbol{\\varepsilon}\\) は \\(\\mathbf{v}\\) と直交する\n球面上のてっぺんでは、球面に沿ってどちらへ動いても分散は増えない\n\n\\(\\mathbf{v}\\) と直交するどの \\(\\boldsymbol{\\varepsilon}\\) とも \\(C\\mathbf{v}\\) の内積が 0 になるので、\\(C\\mathbf{v}\\) は \\(\\mathbf{v}\\) と平行になるしかない：\n\n\n\\[C \\mathbf{v} = \\lambda \\mathbf{v} \\quad \\text{（固有ベクトルの定義式そのもの！）}\\]\n\nしかもそのときの分散は \\(\\mathbf{v}^{\\mathsf T} C \\mathbf{v} = \\lambda \\mathbf{v}^{\\mathsf T} \\mathbf{v} = \\lambda\\)。固有値＝その方向の分散\n\n\n\n\n\n\n\nヒント\n\n\n\n固有ベクトル＝「球面上でこれ以上増やせない方向」の候補リスト\n固有値＝その候補での分散の値\n\\(\\lambda_1 \\geq \\lambda_2 \\geq \\cdots\\) と並べて、一番大きい候補から順に PC1, PC2, …\n\n対称行列の固有ベクトルは互いに直交するので、PC2 は「PC1 と直交する方向の中で分散が最大」の軸"
   },
   {
     "objectID": "dimensionality-pca.html#総当たりで確かめる全方向の分散を測る",
@@ -1333,8 +1333,8 @@
     "objectID": "classification-evaluation.html#peek-hyperparameter",
     "href": "classification-evaluation.html#peek-hyperparameter",
     "title": "過学習と汎化",
-    "section": "深さ＝ハイパパラメータ",
-    "text": "深さ＝ハイパパラメータ\n\n\n\n\n\n\n\n\n\n\n決め方\n決定木の例\n\n\n\n\nハイパパラメータ（hyperparameter）\n学習の前に人が決める\n何段まで分けるか（深さ max_depth）\n\n\nパラメータ（parameter）\n学習（fit）がデータから決める\nどこで分けるか（特徴量と閾値）\n\n\n\n\n決定木における深さ\n\nある階層での分割する閾値は fit が決定\n\nパラメータ\n\n何段まで分けるかは人が決めた\n\nハイパパラメータ\n\nhyper：上の（パラメータより上位のパラメータ）"
+    "section": "深さ＝ハイパーパラメータ",
+    "text": "深さ＝ハイパーパラメータ\n\n\n\n\n\n\n\n\n\n\n決め方\n決定木の例\n\n\n\n\nハイパーパラメータ（hyperparameter）\n学習の前に人が決める\n何段まで分けるか（深さ max_depth）\n\n\nパラメータ（parameter）\n学習（fit）がデータから決める\nどこで分けるか（特徴量と閾値）\n\n\n\n\n決定木における深さ\n\nある階層での分割する閾値は fit が決定\n\nパラメータ\n\n何段まで分けるかは人が決めた\n\nハイパーパラメータ\n\nhyper：上の（パラメータより上位のパラメータ）"
   },
   {
     "objectID": "classification-evaluation.html#ハイパパラメータはどう決めるべきなのか",
@@ -1369,7 +1369,7 @@
     "href": "classification-evaluation.html#peek-test-data-rule",
     "title": "過学習と汎化",
     "section": "テストデータの鉄則",
-    "text": "テストデータの鉄則\n\n\nテストデータを確認してからモデルを調整しない\n\n\n調整：ハイパパラメータ（木の深さなど）を変えること\nテストデータは、学習と調整がすべて終わってから一度だけ採点に使う\n試験でいえば、今年の問題を先に見てから対策するのと同じ\n\n点は上がるが、実力は分からない"
+    "text": "テストデータの鉄則\n\n\nテストデータを確認してからモデルを調整しない\n\n\n調整：ハイパーパラメータ（木の深さなど）を変えること\nテストデータは、学習と調整がすべて終わってから一度だけ採点に使う\n試験でいえば、今年の問題を先に見てから対策するのと同じ\n\n点は上がるが、実力は分からない"
   },
   {
     "objectID": "classification-evaluation.html#ダメ先頭のものだけを訓練データにしてみる",
@@ -1418,7 +1418,7 @@
     "href": "classification-evaluation.html#検証データvalidation-data",
     "title": "過学習と汎化",
     "section": "検証データ（Validation Data）",
-    "text": "検証データ（Validation Data）\n\n\n訓練データをさらに分け、一部を検証データにする\n\nハイパパラメータの比較に使う\nテストデータは最後の採点まで使わない\n\nvalidation：検証、正しいと確かめること"
+    "text": "検証データ（Validation Data）\n\n\n訓練データをさらに分け、一部を検証データにする\n\nハイパーパラメータの比較に使う\nテストデータは最後の採点まで使わない\n\nvalidation：検証、正しいと確かめること"
   },
   {
     "objectID": "classification-evaluation.html#回分けるだけでは揺れる",
@@ -1474,7 +1474,7 @@
     "href": "classification-evaluation.html#まとめ",
     "title": "過学習と汎化",
     "section": "まとめ",
-    "text": "まとめ\n\n\n訓練データで評価した成績は楽観的\n汎化：学習に使っていないデータにも通用すること\n過学習：訓練データを暗記して、新しいデータで性能が落ちること\n\n証拠は汎化ギャップ（訓練とテストの成績の差）\n\nパラメータ：学習（fit）がデータから決める\nハイパパラメータ：学習の前に人が決める（決定木の深さなど）\nホールドアウト法：手軽だが分割次第で成績が揺れる\nk-fold 交差検証：k 回の平均で揺れを抑える\nハイパパラメータの選択：訓練データの中の交差検証（検証データ）で選び、テストデータは最後に一度だけ使う\n\n\n\n\n\n\n\n\n次回\n\n\n「分類にはラベルが必要だった。ラベルがない場合はどうすれば？」"
+    "text": "まとめ\n\n\n訓練データで評価した成績は楽観的\n汎化：学習に使っていないデータにも通用すること\n過学習：訓練データを暗記して、新しいデータで性能が落ちること\n\n証拠は汎化ギャップ（訓練とテストの成績の差）\n\nパラメータ：学習（fit）がデータから決める\nハイパーパラメータ：学習の前に人が決める（決定木の深さなど）\nホールドアウト法：手軽だが分割次第で成績が揺れる\nk-fold 交差検証：k 回の平均で揺れを抑える\nハイパーパラメータの選択：訓練データの中の交差検証（検証データ）で選び、テストデータは最後に一度だけ使う\n\n\n\n\n\n\n\n\n次回\n\n\n「分類にはラベルが必要だった。ラベルがない場合はどうすれば？」"
   },
   {
     "objectID": "classification-evaluation.html#練習問題1どちらのモデルを仕入れる",
@@ -2468,7 +2468,7 @@
     "href": "clustering-kmeans.html#peek-sse",
     "title": "教師なし学習とクラスタリング",
     "section": "結果の良さを数で測る：SSE（誤差の二乗和）",
-    "text": "結果の良さを数で測る：SSE（誤差の二乗和）\n\n\n各点の誤差を 1 つの数にまとめる\n誤差を 2 乗して全部足す\n\n2 乗するのは、大きな誤差を重く数えるため（誤差 10 の点 1 個は、誤差 1 の点 100 個ぶん）\n小さいほど塊がきつい\n\nこの合計を SSE（Sum of Squared Errors / 誤差の二乗和） と呼ぶ（クラスタリングでは「クラスタ内二乗和」とも）\n\n\\[\\text{SSE} = \\sum_{\\text{全点}} (\\text{誤差})^2 = \\sum_{\\text{全点}} (\\text{自分の重心までの距離})^2\\]\n\ndef sse(xs, ys, labels, cx, cy):\n    total = 0.0\n    for j in range(len(cx)):\n        mask = labels == j                                               # クラスタ j の点だけ True\n        total += np.sum((xs[mask] - cx[j])**2 + (ys[mask] - cy[j])**2)  # 重心までの距離の2乗を合計\n    return total\n\nprint(f\"A の SSE: {sse(bx, by, labels_A, cx_A, cy_A):.1f}\")\nprint(f\"B の SSE: {sse(bx, by, labels_B, cx_B, cy_B):.1f}\")\n\nA の SSE: 868.8\nB の SSE: 275.8\n\n\n\n\n\n\n\n\n\n結果\n\n\n\nB の SSE は A よりずっと小さい\n\n目で見たとおり B のほうがまとまっている"
+    "text": "結果の良さを数で測る：SSE（誤差の二乗和）\n\n\n各点の誤差を 1 つの数にまとめる\nSSE（Sum of Squared Errors / 誤差の二乗和）：誤差を 2 乗して全部足した合計\n\n2 乗するのは、大きな誤差を重く数えるため（誤差 10 の点 1 個は、誤差 1 の点 100 個ぶん）\n小さいほど塊がきつい\nクラスタリングでは「クラスタ内二乗和」とも呼ばれる\n\n\n\\[\\text{SSE} = \\sum_{\\text{全点}} (\\text{誤差})^2 = \\sum_{\\text{全点}} (\\text{自分の重心までの距離})^2\\]\n\ndef sse(xs, ys, labels, cx, cy):\n    total = 0.0\n    for j in range(len(cx)):\n        mask = labels == j                                               # クラスタ j の点だけ True\n        total += np.sum((xs[mask] - cx[j])**2 + (ys[mask] - cy[j])**2)  # 重心までの距離の2乗を合計\n    return total\n\nprint(f\"A の SSE: {sse(bx, by, labels_A, cx_A, cy_A):.1f}\")\nprint(f\"B の SSE: {sse(bx, by, labels_B, cx_B, cy_B):.1f}\")\n\nA の SSE: 868.8\nB の SSE: 275.8\n\n\n\n\n\n\n\n\n\n結果\n\n\n\nB の SSE は A よりずっと小さい\n\n目で見たとおり B のほうがまとまっている"
   },
   {
     "objectID": "clustering-kmeans.html#k-means-は-sse-を下げていき下がらなくなった所で止まる",
@@ -2482,14 +2482,14 @@
     "href": "clustering-kmeans.html#止まった所が全体で最小とは限らないローカルミニマム",
     "title": "教師なし学習とクラスタリング",
     "section": "止まった所が全体で最小とは限らない：ローカルミニマム",
-    "text": "止まった所が全体で最小とは限らない：ローカルミニマム\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nローカルミニマム\n\n\n\n手順2と手順3ではもう SSE が下がらないのに、別の所にもっと SSE の小さい答えがある点をローカルミニマム（local minimum / 局所的最小値）と呼ぶ\n\nまわりでは一番小さいが、全体で一番小さいとは限らない\n\n全体で一番小さい所はグローバルミニマム（global minimum / 大域的最小値）\n\n\n\n\n\n\nk-means が止まった所はローカルミニマムかもしれず、どこで止まるかは手順1の出発点しだい\n\n\n\n\n\n\n\n\n（参考）k-means 以外でも起こる\n\n\n後の回で学ぶ勾配降下法でも、初期値しだいでローカルミニマムに止まることがある"
+    "text": "止まった所が全体で最小とは限らない：ローカルミニマム\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nローカルミニマム\n\n\n\nローカルミニマム（local minimum / 局所的最小値）：手順2と手順3ではもう SSE が下がらないのに、別の所にもっと SSE の小さい答えがある点\n\nまわりでは一番小さいが、全体で一番小さいとは限らない\n\n全体で一番小さい所はグローバルミニマム（global minimum / 大域的最小値）\n\n\n\n\n\n\nk-means が止まった所はローカルミニマムかもしれず、どこで止まるかは手順1の出発点しだい\n\n\n\n\n\n\n\n\n（参考）k-means 以外でも起こる\n\n\n後の回で学ぶ勾配降下法でも、初期値しだいでローカルミニマムに止まることがある"
   },
   {
     "objectID": "clustering-kmeans.html#初期値を変えて何度も回しsse-最小の答えを採る",
     "href": "clustering-kmeans.html#初期値を変えて何度も回しsse-最小の答えを採る",
     "title": "教師なし学習とクラスタリング",
     "section": "初期値を変えて何度も回し、SSE 最小の答えを採る",
-    "text": "初期値を変えて何度も回し、SSE 最小の答えを採る\n\n\n1回の k-means は初期値しだい。そこで初期値を変えて決めた回数だけ回し、SSE が最小の結果だけを残す\nこの作戦をランダムリスタート（random restart）と呼ぶ\n\n\ndef kmeans_best(xs, ys, k, n_init=10):\n    best_score = None\n    for trial in range(n_init):\n        cx, cy = init_centroids(xs, ys, k)               # 毎回ちがうランダムな初期値\n        labels, cx, cy = kmeans(xs, ys, cx, cy)\n        score = sse(xs, ys, labels, cx, cy)\n        if best_score is None or score &lt; best_score:    # これまでの最小より小さければ入れ替え\n            best_score, best_labels, best_cx, best_cy = score, labels, cx, cy\n    return best_labels, best_cx, best_cy\n\nlabels_best, cx_best, cy_best = kmeans_best(bx, by, 5)\nprint(f\"10回の最良の SSE: {sse(bx, by, labels_best, cx_best, cy_best):.2f}\")\n\n\n\n10回の最良の SSE: 275.79\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n（参考）ランダムリスタート\n\n\n初期値しだいで結果が変わる最適化の、一般的な対策。参考資料 ローカルミニマムの罠 で詳しく扱っている"
+    "text": "初期値を変えて何度も回し、SSE 最小の答えを採る\n\n\n1回の k-means は初期値しだい\nランダムリスタート（random restart）：初期値を変えて決めた回数だけ回し、SSE が最小の結果だけを残す作戦\n\n\ndef kmeans_best(xs, ys, k, n_init=10):\n    best_score = None\n    for trial in range(n_init):\n        cx, cy = init_centroids(xs, ys, k)               # 毎回ちがうランダムな初期値\n        labels, cx, cy = kmeans(xs, ys, cx, cy)\n        score = sse(xs, ys, labels, cx, cy)\n        if best_score is None or score &lt; best_score:    # これまでの最小より小さければ入れ替え\n            best_score, best_labels, best_cx, best_cy = score, labels, cx, cy\n    return best_labels, best_cx, best_cy\n\nlabels_best, cx_best, cy_best = kmeans_best(bx, by, 5)\nprint(f\"10回の最良の SSE: {sse(bx, by, labels_best, cx_best, cy_best):.2f}\")\n\n\n\n10回の最良の SSE: 275.79\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n（参考）ランダムリスタート\n\n\n初期値しだいで結果が変わる最適化の、一般的な対策。参考資料 ローカルミニマムの罠 で詳しく扱っている"
   },
   {
     "objectID": "clustering-kmeans.html#tweak-やり直しの回数を変更",
@@ -2573,21 +2573,21 @@
     "href": "handouts.html#handouts",
     "title": "AI Lectures",
     "section": "Handouts",
-    "text": "Handouts\n\n← Lectures\n\n各回スライドの配布用 PDF。クリックで開く。番号は講義一覧と対応。\n\n\n\n\n\n導入\n\n\n\n人工知能概論\nNumPy 逆引き\n\n\n\n\n\n分類問題と特徴量\n\n\n\n２クラス分類\n2次元の決定境界\n過学習と汎化\n教師なし学習・クラスタリング\nk-NN と次元の呪い\n自分のデータを分類する\n\n\n\n\n\nfit() の中身を開ける\n\n\n\n最適化と勾配降下法\n線形回帰と正則化\nロジスティック回帰\n\n\n\n\n\nニューラルネットワーク\n\n\n\nロジスティック回帰をNNとして実装する\n隠れ層とReLUで曲がる境界をつくる\nバックプロパゲーション\nPyTorch入門\n\n\n\n\n\nプロジェクト\n\n\n\n手書き数字分類プロジェクト\n\n\n\n\n\n参考資料 回数外\n\n\n\n次元削減と PCA\n外れ値に強い回帰\nNewton法\nローカルミニマムの罠"
+    "text": "Handouts\n\n← Lectures\n\n各回スライドの配布用 PDF。クリックで開く。番号は講義一覧と対応。\n\n\n\n\n\n導入\n\n\n\n人工知能概論\nNumPy 逆引き\n\n\n\n\n\n分類問題と特徴量\n\n\n\n２クラス分類\n2次元の決定境界\n過学習と汎化\n教師なし学習・クラスタリング\nk-NN と次元の呪い\n自分のデータを分類する\n\n\n\n\n\n最適化と回帰\n\n\n\n最適化と勾配降下法\n線形回帰と正則化\nロジスティック回帰\n\n\n\n\n\nニューラルネットワーク\n\n\n\nロジスティック回帰をNNとして実装する\n隠れ層とReLUで曲がる境界をつくる\nバックプロパゲーション\nPyTorch入門\n\n\n\n\n\nプロジェクト\n\n\n\n手書き数字分類プロジェクト\n\n\n\n\n\n参考資料 回数外\n\n\n\n次元削減と PCA\n外れ値に強い回帰\nNewton法\nローカルミニマムの罠"
   },
   {
     "objectID": "linear-regression.html#ここまでの道具",
     "href": "linear-regression.html#ここまでの道具",
     "title": "線形回帰と正則化",
     "section": "ここまでの道具",
-    "text": "ここまでの道具\n\n\n勾配降下法：傾きの逆方向に少しずつ進んで、損失が最小の場所を探す\nただし前回最小化したのは、簡単な関数 \\(f(x) = x^2 - 4x + 3\\) だった\n\n\n\n\n\n\n\n\n今回の目的\n\n\n勾配降下法で回帰モデルをfit する"
+    "text": "ここまでの道具\n\n\n勾配降下法：傾きの逆方向に少しずつ進んで、損失が最小の場所を探す\nただし前回最小化したのは、簡単な関数 \\(f(x) = x^2 - 4x + 3\\) だった\n\n\n\n\n\n\n\n\n今回の目的\n\n\n勾配降下法でデータに合う直線を求める"
   },
   {
     "objectID": "linear-regression.html#モデルとは",
     "href": "linear-regression.html#モデルとは",
     "title": "線形回帰と正則化",
     "section": "モデルとは",
-    "text": "モデルとは\n\n\nこれまでの「モデル」を、2つの部分に分けてみる：\n\n\n\n\n回\n計算の形（人間が決めた）\n空欄の数字（データが決めた）\n\n\n\n\n1次元分類\n重さをしきい値と比べて判定\nしきい値（1個）\n\n\n2次元の決定境界\n直線の上下で判定\n傾きと切片（2個）\n\n\nクラスタリング\n一番近い重心に割り当て\n重心の座標（k個）\n\n\n\n\n\n\n\n\n\n\nモデル（model）\n\n\n\n入力から出力を計算するやり方。ただし、形だけが決まっていて、中の数字は空欄\n空欄の名前がパラメータ\n空欄をデータで埋めるのが学習（fit() がやっていたこと）\n\n\n\n\n\n\n今回もまず、人間が形を決める。何を選ぶかは、データを見てから"
+    "text": "モデルとは\n\n\nこれまでの「モデル」を、2つの部分に分けてみる：\n\n\n\n\n\n\n\n\n\n回\n計算の形（人間が決めた）\n空欄の数字（データが決めた）\n\n\n\n\n1次元分類\n重さをしきい値と比べて判定\nしきい値（1個）\n\n\n2次元の決定境界\nしきい値との比較を繰り返して判定（決定木）\n分岐ごとのしきい値\n\n\nクラスタリング\n一番近い重心に割り当て\n重心の座標（k個）\n\n\n\n\n\n\n\n\n\n\nモデル（model）\n\n\n\n入力から出力を計算するやり方。ただし、形だけが決まっていて、中の数字は空欄\n空欄の名前がパラメータ\n空欄をデータで埋めるのが学習\n\n\n\n\n\n\n今回もまず、人間が形を決める。何を選ぶかは、データを見てから"
   },
   {
     "objectID": "linear-regression.html#回帰問題とは",
@@ -2621,15 +2621,15 @@
     "objectID": "linear-regression.html#peek-gdfit-code",
     "href": "linear-regression.html#peek-gdfit-code",
     "title": "線形回帰と正則化",
-    "section": "勾配降下法で fit する",
-    "text": "勾配降下法で fit する\n\n\nスケールを揃えてから（クラスタリングの回の教訓。学習率を1つで済ませるため）\n\n\nx = (lengths - lengths.mean()) / lengths.std()   # 標準化した体長\nt = (weights - weights.mean()) / weights.std()   # 標準化した重さ\n\na, b = 0.0, 0.0   # 直線はゼロからスタート\nlr = 0.1          # Learning rate alpha in the equation\n\nfor i in range(1, 101):\n    pred   = a * x + b\n    grad_a = 2 * np.mean((pred - t) * x)\n    grad_b = 2 * np.mean(pred - t)\n    a -= lr * grad_a\n    b -= lr * grad_b\n    if i in (1, 3, 10, 50, 100):\n        print(f\"更新 {i:3d}回 | a={a:.4f} b={b:.4f} | MSE={np.mean((a*x+b - t)**2):.4f}\")\n\n更新   1回 | a=0.1946 b=0.0000 | MSE=0.6593\n更新   3回 | a=0.4747 b=0.0000 | MSE=0.3017\n更新  10回 | a=0.8684 b=0.0000 | MSE=0.0645\n更新  50回 | a=0.9728 b=0.0000 | MSE=0.0536\n更新 100回 | a=0.9728 b=0.0000 | MSE=0.0536\n\n\n\n50回あたりで動かなくなった ＝ 収束"
+    "section": "勾配降下法で傾きと切片を求める",
+    "text": "勾配降下法で傾きと切片を求める\n\n\nスケールを揃えてから（クラスタリングの回の教訓。学習率を1つで済ませるため）\n\n\nx = (lengths - lengths.mean()) / lengths.std()   # 標準化した体長\nt = (weights - weights.mean()) / weights.std()   # 標準化した重さ\n\na, b = 0.0, 0.0   # 直線はゼロからスタート\nlr = 0.1          # Learning rate alpha in the equation\n\nfor i in range(1, 101):\n    pred   = a * x + b\n    grad_a = 2 * np.mean((pred - t) * x)\n    grad_b = 2 * np.mean(pred - t)\n    a -= lr * grad_a\n    b -= lr * grad_b\n    if i in (1, 3, 10, 50, 100):\n        print(f\"更新 {i:3d}回 | a={a:.4f} b={b:.4f} | MSE={np.mean((a*x+b - t)**2):.4f}\")\n\n更新   1回 | a=0.1946 b=0.0000 | MSE=0.6593\n更新   3回 | a=0.4747 b=0.0000 | MSE=0.3017\n更新  10回 | a=0.8684 b=0.0000 | MSE=0.0645\n更新  50回 | a=0.9728 b=0.0000 | MSE=0.0536\n更新 100回 | a=0.9728 b=0.0000 | MSE=0.0536\n\n\n\n50回あたりで動かなくなった ＝ 収束"
   },
   {
     "objectID": "linear-regression.html#tweak-学習率をいじって収束を壊す",
     "href": "linear-regression.html#tweak-学習率をいじって収束を壊す",
     "title": "線形回帰と正則化",
     "section": "Tweak 学習率をいじって収束を壊す",
-    "text": "Tweak 学習率をいじって収束を壊す\n\n\nさっきのコード の lr = 0.1 を書き換えて実行\n\n\n\n\n\nやりたいこと\nコード\n\n\n\n\n目で見て分かるほど遅くする\nlr = 0.01\n\n\nギリギリを攻める\nlr = 0.9\n\n\n壊す\nlr = 1.1\n\n\n\n\n\n\n\n\n\n\n\nここで観察\n\n\n\n0.9 は行きすぎて戻ってを繰り返しながら、それでも収束する\n1.1 は MSE がどうなっていく？ — 前回の「学習率が大きすぎると発散」を、本物の fit() で再現できた"
+    "text": "Tweak 学習率をいじって収束を壊す\n\n\nさっきのコード の lr = 0.1 を書き換えて実行\n\n\n\n\n\nやりたいこと\nコード\n\n\n\n\n目で見て分かるほど遅くする\nlr = 0.01\n\n\nギリギリを攻める\nlr = 0.9\n\n\n壊す\nlr = 1.1\n\n\n\n\n\n\n\n\n\n\n\nここで観察\n\n\n\n0.9 は行きすぎて戻ってを繰り返しながら、それでも収束する\n1.1 は MSE がどうなっていく？\n\n学習率が大きすぎると発散するのは、直線を求めるときも同じ"
   },
   {
     "objectID": "linear-regression.html#直線が合っていく様子",
@@ -2643,14 +2643,14 @@
     "href": "linear-regression.html#回帰直線でできること",
     "title": "線形回帰と正則化",
     "section": "回帰直線でできること",
-    "text": "回帰直線でできること\n\n\n新しい魚は、体長を測って式に入れるだけで重さを予測できる。秤に乗せなくてよい\n「数値から数値を予測する」問題は、身の回りにいくらでもある：\n\n\n\n\n入力\n予測したい数値\n\n\n\n\n気温\nアイスクリームの売り上げ\n\n\n部屋の広さ・駅からの距離\n家賃\n\n\n広告費\n商品の売り上げ\n\n\n\n\nどれも今回と同じ手順で解ける：モデルの形を決め、損失を決め、勾配降下法で fit する"
+    "text": "回帰直線でできること\n\n\n新しい魚は、体長を測って式に入れるだけで重さを予測できる。秤に乗せなくてよい\n「数値から数値を予測する」問題は、身の回りにいくらでもある：\n\n\n\n\n入力\n予測したい数値\n\n\n\n\n気温\nアイスクリームの売り上げ\n\n\n部屋の広さ・駅からの距離\n家賃\n\n\n広告費\n商品の売り上げ\n\n\n\n\nどれも今回と同じ手順で解ける：モデルの形を決め、損失を決め、勾配降下法でパラメータを求める"
   },
   {
     "objectID": "linear-regression.html#答え合わせsklearn-と比べる",
     "href": "linear-regression.html#答え合わせsklearn-と比べる",
     "title": "線形回帰と正則化",
     "section": "答え合わせ：sklearn と比べる",
-    "text": "答え合わせ：sklearn と比べる\n\n\nfrom sklearn.linear_model import LinearRegression\n\nreg = LinearRegression().fit(x.reshape(-1, 1), t)\nprint(f\"自作の勾配降下: a={a:.4f}, b={b:.4f}\")\nprint(f\"sklearn の fit: a={reg.coef_[0]:.4f}, b={reg.intercept_:.4f}\")\n\n自作の勾配降下: a=0.9728, b=0.0000\nsklearn の fit: a=0.9728, b=0.0000\n\n\n\n完全に一致。fit() の中身を、初めて自分の手で再現できた\n元の単位に戻すと「体長 1cm あたり約 91g」という意味のある数字になる\n\n\n\n\n\n\n\nノート\n\n\nブラックボックスがまた1つ開いた。分類モデルの fit() も同じ要領で開けられる（次回）。"
+    "text": "答え合わせ：sklearn と比べる\n\n\nfrom sklearn.linear_model import LinearRegression\n\nreg = LinearRegression().fit(x.reshape(-1, 1), t)\nprint(f\"自作の勾配降下: a={a:.4f}, b={b:.4f}\")\nprint(f\"sklearn の fit: a={reg.coef_[0]:.4f}, b={reg.intercept_:.4f}\")\n\n自作の勾配降下: a=0.9728, b=0.0000\nsklearn の fit: a=0.9728, b=0.0000\n\n\n\n自作の勾配降下法と sklearn の結果が一致\n元の単位に戻すと「体長 1cm あたり約 91g」という意味のある数字になる"
   },
   {
     "objectID": "linear-regression.html#section",
@@ -2776,7 +2776,7 @@
     "href": "linear-regression.html#まとめ",
     "title": "線形回帰と正則化",
     "section": "まとめ",
-    "text": "まとめ\n\n\n回帰：数値を予測する。損失は二乗誤差（MSE）— 微分しやすさで選ぶ\n勾配降下法で fit を自作 → sklearn と完全一致\n多項式回帰：特徴量に \\(x^2, x^3, \\ldots\\) を足せば道具は線形回帰のまま\n過学習は回帰でも起きる：次数を上げると訓練誤差↓・テスト誤差爆発\n正則化（regularization）：大きい係数に罰金 → 暴れる曲線を手なずける\n\n\n\n\n\n\n\n\n次回予告\n\n\n回帰の fit() は開けた。次は分類の fit() — 次の相手は分類の定番、ロジスティック回帰。同じ道具（損失＋勾配降下法）で fit() を開けにいく。"
+    "text": "まとめ\n\n\n回帰：数値を予測する。損失は二乗誤差（MSE）— 微分しやすさで選ぶ\n勾配降下法で求めた傾きと切片は、sklearn の結果と一致\n多項式回帰：特徴量に \\(x^2, x^3, \\ldots\\) を足せば道具は線形回帰のまま\n過学習は回帰でも起きる：次数を上げると訓練誤差↓・テスト誤差爆発\n正則化（regularization）：大きい係数に罰金 → 暴れる曲線を手なずける\n\n\n\n\n\n\n\n\n次回予告\n\n\n次回は分類のロジスティック回帰。損失と勾配降下法で斜めの決定境界を求める。"
   },
   {
     "objectID": "linear-regression.html#問題1魚2匹だけの世界で-fit-する",
@@ -2888,7 +2888,7 @@
     "href": "mnist-project.html#ミニバッチ6万枚は一口ずつ",
     "title": "手書き数字分類プロジェクト",
     "section": "ミニバッチ：6万枚は一口ずつ",
-    "text": "ミニバッチ：6万枚は一口ずつ\n\n\n6万枚まとめて勾配を計算すると重い → 128枚ずつ取り出して1歩ずつ進む — この一口がミニバッチ（mini-batch）\nデータを一巡することを 1エポック（epoch）と呼ぶ\n\n\ntrain_loader = torch.utils.data.DataLoader(train_ds, batch_size=128, shuffle=True)\ntest_loader  = torch.utils.data.DataLoader(test_ds,  batch_size=1000)\n\nloss_fn   = nn.CrossEntropyLoss()\noptimizer = torch.optim.Adam(model.parameters(), lr=1e-3)\n\npreview_generator = torch.Generator().manual_seed(123)\npreview_loader = torch.utils.data.DataLoader(\n    train_ds, batch_size=128, shuffle=False, generator=preview_generator\n)\nx_batch, y_batch = next(iter(preview_loader))\nprint(\"画像バッチ:\", tuple(x_batch.shape))\nprint(\"ラベルバッチ:\", tuple(y_batch.shape))\n\n\n\n画像バッチ: (128, 1, 28, 28)\nラベルバッチ: (128,)\n\n\n\nNumPyで2層NNを学習した回では、全200件を1つのバッチにして1回更新した\n今回は6万枚を128枚ずつのミニバッチへ分け、1ミニバッチごとに1回更新する"
+    "text": "ミニバッチ：6万枚は一口ずつ\n\n\n6万枚まとめて勾配を計算すると重い → 128枚ずつ取り出して1歩ずつ進む — この一口がミニバッチ（mini-batch）\n1エポック（epoch）：データを一巡すること\n\n\ntrain_loader = torch.utils.data.DataLoader(train_ds, batch_size=128, shuffle=True)\ntest_loader  = torch.utils.data.DataLoader(test_ds,  batch_size=1000)\n\nloss_fn   = nn.CrossEntropyLoss()\noptimizer = torch.optim.Adam(model.parameters(), lr=1e-3)\n\npreview_generator = torch.Generator().manual_seed(123)\npreview_loader = torch.utils.data.DataLoader(\n    train_ds, batch_size=128, shuffle=False, generator=preview_generator\n)\nx_batch, y_batch = next(iter(preview_loader))\nprint(\"画像バッチ:\", tuple(x_batch.shape))\nprint(\"ラベルバッチ:\", tuple(y_batch.shape))\n\n\n\n画像バッチ: (128, 1, 28, 28)\nラベルバッチ: (128,)\n\n\n\nNumPyで2層NNを学習した回では、全200件を1つのバッチにして1回更新した\n今回は6万枚を128枚ずつのミニバッチへ分け、1ミニバッチごとに1回更新する"
   },
   {
     "objectID": "mnist-project.html#エポックで約469回更新する",
@@ -3007,7 +3007,7 @@
     "href": "mnist-project.html#講義全体のまとめ",
     "title": "手書き数字分類プロジェクト",
     "section": "講義全体のまとめ",
-    "text": "講義全体のまとめ\n\n\n魚の選別から始まり、fit() という1行の中身を開け続けた\n\nしきい値 → 直線 → 木 → ロジスティック回帰 → 多層NN\n損失（交差エントロピー・MSE）と勾配降下法が全編を貫く背骨\n\n満点を疑うこと（過学習）、スケールを揃えること、テストで採点すること\n最後に、手書き数字を読む機械を自分の部品で組み上げた\n\n\n\n\n\n\n\n\n持ち帰り\n\n\n「自分の字は読めるのか」のデモを家でも試せる。読めなかった場合も、訓練データとの違いから理由を考えられる。"
+    "text": "講義全体のまとめ\n\n\n魚の選別から始まり、学習の手順を自分のコードで書いてきた\n\nしきい値 → 直線 → 木 → ロジスティック回帰 → 多層NN\n損失（交差エントロピー・MSE）と勾配降下法が全編を貫く背骨\n\n満点を疑うこと（過学習）、スケールを揃えること、テストで採点すること\n最後に、手書き数字を読む機械を自分の部品で組み上げた\n\n\n\n\n\n\n\n\n持ち帰り\n\n\n「自分の字は読めるのか」のデモを家でも試せる。読めなかった場合も、訓練データとの違いから理由を考えられる。"
   },
   {
     "objectID": "nn-backprop.html#前回の振り返り",
@@ -3188,15 +3188,15 @@
     "objectID": "nn-backprop.html#peek-full-batch",
     "href": "nn-backprop.html#peek-full-batch",
     "title": "バックプロパゲーション",
-    "section": "1回の更新に使うデータのまとまりをバッチと呼ぶ",
-    "text": "1回の更新に使うデータのまとまりをバッチと呼ぶ\n\n\n\nバッチ（batch）：1回の勾配計算とパラメータ更新に使うデータのまとまり\n次の学習で使う X には学習データ200件をすべて入れるため、バッチサイズは200\n全学習データを1つのバッチにする方法を、フルバッチ（full batch）と呼ぶ\ndZ2 = (P - y) / len(X) で200件の影響を平均し、その勾配で1回更新する"
+    "section": "バッチ（Batch）",
+    "text": "バッチ（Batch）\n\n\n\n1回の勾配計算とパラメータ更新に使うデータのまとまり\n次の学習で使う X には学習データ200件をすべて入れるため、バッチサイズは200\nフルバッチ（full batch）：全学習データを1つのバッチにする方法\ndZ2 = (P - y) / len(X) で200件の影響を平均し、その勾配で1回更新する"
   },
   {
     "objectID": "nn-backprop.html#peek-epoch",
     "href": "nn-backprop.html#peek-epoch",
     "title": "バックプロパゲーション",
-    "section": "全学習データを一巡する単位をepochと呼ぶ",
-    "text": "全学習データを一巡する単位をepochと呼ぶ\n\n\nエポック（epoch）：学習データを一通り使う1周\n今回は全200件を1つのバッチにするため、1 epochで1回更新する\nfor epoch in range(4000) は、全200件を4000周し、4000回更新するという意味\n\n\n\n\n学習方法\n1回の更新に使うデータ\n1 epochの更新回数\n\n\n\n\n今回のフルバッチ\n200件\n1回\n\n\n後で使うミニバッチ\n全データの一部\n複数回\n\n\n\n\n\n\n\n\n\nノート\n\n\nepochは更新回数そのものではない。1 epochに何回更新するかは、バッチの分け方で変わる"
+    "section": "エポック（Epoch）",
+    "text": "エポック（Epoch）\n\n\n学習データを一通り使う1周\n今回は全200件を1つのバッチにするため、1 epochで1回更新する\nfor epoch in range(4000) は、全200件を4000周し、4000回更新するという意味\n\n\n\n\n学習方法\n1回の更新に使うデータ\n1 epochの更新回数\n\n\n\n\n今回のフルバッチ\n200件\n1回\n\n\n後で使うミニバッチ\n全データの一部\n複数回\n\n\n\n\n\n\n\n\n\nノート\n\n\nepochは更新回数そのものではない。1 epochに何回更新するかは、バッチの分け方で変わる"
   },
   {
     "objectID": "nn-backprop.html#peek-numpy-nn-train",
@@ -4132,35 +4132,35 @@
   {
     "objectID": "report-classification.html#レポート-分類器を作成するに相応しいデータを自分で探せ",
     "href": "report-classification.html#レポート-分類器を作成するに相応しいデータを自分で探せ",
-    "title": "レポート：自分のデータを分類する",
+    "title": "レポート",
     "section": "レポート 分類器を作成するに相応しいデータを自分で探せ",
     "text": "レポート 分類器を作成するに相応しいデータを自分で探せ\n\n\n2 種類のデータを自分で探して集めて分類せよ\n\n\nデータのルールに合うデータと特徴量を決め、各 30 個以上のデータを収集（選んだ理由と、出どころまたは測り方を記述）\n散布図と、特徴量ごとに閾値で分類した場合の ROC 曲線と AUC を表示\n\n散布図はクラスで色分けすること\n\n決定木で分類し、ROC 曲線と AUC を表示\nk-NN で分類し、ROC 曲線と AUC を表示（特徴量は標準化し、近い k 点は KD-tree で探索）\n決定木と k-NN を 5-fold 交差検証し、学習に使っていない点のスコアで ROC 曲線と AUC を表示（3・4 の ROC 曲線と同じグラフに重ねる）\n決定木と k-NN のどちらが自分のデータに合うかを、5 の結果から説明"
   },
   {
     "objectID": "report-classification.html#peek-report-rules",
     "href": "report-classification.html#peek-report-rules",
-    "title": "レポート：自分のデータを分類する",
+    "title": "レポート",
     "section": "ルール",
     "text": "ルール\n\n\n社会通念上、意味的に 2 種類のものを表すデータであること\nコードはscikit-learnなどのライブラリを使わずnumpyとpltで実装すること\n特徴量は3種類以上とする\n各特徴量単体では、完全に分類できないこと\n\n少なくとも 10% 程度以上には重なっていること\n\n公序良俗に反しないこと\nデータは、自分で計測してもよいし、Web を参照してもよい\n抜き出しうるデータのうち恣意的なピックアップ（チェリーピック, cherry picking）をして、ルールにちょうど合うようにしないこと\n\n例えば、パリーグの選手とセリーグの選手のうち、ちょうど重ならない選手だけ抜き出すなどはNG。ただし、WBCに出場した選手のような客観的な指標であるならばよい"
   },
   {
     "objectID": "report-classification.html#データの例",
     "href": "report-classification.html#データの例",
-    "title": "レポート：自分のデータを分類する",
+    "title": "レポート",
     "section": "データの例",
     "text": "データの例\n\n\n\n\n\n\n\n\n\n\n2 種類\n特徴量の例\n集め方\n気をつけること\n\n\n\n\nプロ野球選手と J リーグの選手\n身長、体重、年齢\n球団やクラブの公式サイトの選手名鑑\n選手の選び方を先に決める\n\n\n軽自動車と普通車\n車両重量、燃費、価格\nメーカーの諸元表\n規格で決まる値（全長、排気量）は使わない\n\n\n2 つの都市の 1 日\n最高気温、平均湿度\n気象庁の過去の気象データ\n気候の近い都市の、同じ月を選ぶ\n\n\n2 種類の木の葉\n長さ、幅\n定規で測る\n形の似た種類を選ぶ\n\n\n\n\n例から選んでもよいし、自分で決めてもよい"
   },
   {
     "objectID": "report-classification.html#使うツール",
     "href": "report-classification.html#使うツール",
-    "title": "レポート：自分のデータを分類する",
+    "title": "レポート",
     "section": "使うツール",
     "text": "使うツール\n\n\n\n\n\nやること\n使うもの\n\n\n\n\nデータを配列にする\n魚のデータと同じ形の X（1 行が 1 個の [特徴量 1, 特徴量 2, …]）と y（ラベル）\n\n\n特徴量ごとの ROC 曲線と AUC\nROC 曲線のコードと AUC（閾値を当てる値は特徴量の値）\n\n\n分類器の ROC 曲線と AUC\nroc_points と auc_of（閾値を当てる値はスコア）\n\n\n決定木\nfind_best_split_for_feature で分け方を探し、build_kdtree と同じ再帰で木を作る\n\n\n決定木のスコア\n葉に入った訓練データのうち、ラベル 1 の割合\n\n\n標準化\n平均を引いて、標準偏差で割る\n\n\nKD-tree を使った k-NN\nbuild_kdtree と predict_knn_kdtree\n\n\nk-NN のスコア\nscore_knn：近い k 点のうち、ラベル 1 の割合（KD-tree で探した k 点に使う）\n\n\n交差検証のスコア\n5-fold 交差検証と同じ番号でデータを 5 つのグループに分け、グループ i の点には、グループ i を除いた点だけで学習した決定木（k-NN）のスコアを付ける（5 回分のスコアを集めて ROC 曲線を 1 本描く）"
   },
   {
     "objectID": "report-classification.html#提出物",
     "href": "report-classification.html#提出物",
-    "title": "レポート：自分のデータを分類する",
+    "title": "レポート",
     "section": "提出物",
     "text": "提出物\n\n\n以下を１つのPDFにして提出（スライド形式でもよい）\n\nそのデータの説明と選定理由\nデータ（X と y の配列）と、出どころの URL、または測っている様子の写真\nコード\n出力\n考察\n\n提出ファイル名\n\n学生番号-名前-人工知能課題（分類問題）.pdf"
   },
@@ -4204,7 +4204,7 @@
     "href": "robust-regression.html#peek-mae",
     "title": "外れ値に強い回帰",
     "section": "対策：ズレを二乗せずに測る（MAE）",
-    "text": "対策：ズレを二乗せずに測る（MAE）\n\n\n外れ値に引っ張られる原因は二乗なので、二乗をやめる\nズレの絶対値を平均する\n\n\\[L(a, b) = \\frac{1}{N} \\sum_{i} \\left| \\underbrace{a x_i + b}_{\\text{予測}} - \\underbrace{t_i}_{\\text{実際}} \\right|\\]\n\nMAE（Mean Absolute Error / 平均絶対誤差）と呼ぶ\nMSE との違いは、二乗が絶対値に変わったことだけ\n正しい 80 枚の直線からのズレを、絶対値で比べる\n\n\nprint(f\"正しい78枚のズレ: 絶対値の合計 {np.sum(np.abs(error[ok])):,.0f} g\")\nprint(f\"打ち間違い2枚のズレ: 絶対値の合計 {np.sum(np.abs(error[bad])):,.0f} g\")\n\n正しい78枚のズレ: 絶対値の合計 4,734 g\n打ち間違い2枚のズレ: 絶対値の合計 44,484 g\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n2 枚の絶対値の和も 78 枚より大きいが、二乗の和ほどの差はない\nズレが 100 倍でも、損失への寄与は 100 倍で済む"
+    "text": "対策：ズレを二乗せずに測る（MAE）\n\n\n外れ値に引っ張られる原因は二乗なので、二乗をやめる\nMAE（Mean Absolute Error / 平均絶対誤差）：ズレの絶対値の平均\n\n\\[L(a, b) = \\frac{1}{N} \\sum_{i} \\left| \\underbrace{a x_i + b}_{\\text{予測}} - \\underbrace{t_i}_{\\text{実際}} \\right|\\]\n\nMSE との違いは、二乗が絶対値に変わったことだけ\n正しい 80 枚の直線からのズレを、絶対値で比べる\n\n\nprint(f\"正しい78枚のズレ: 絶対値の合計 {np.sum(np.abs(error[ok])):,.0f} g\")\nprint(f\"打ち間違い2枚のズレ: 絶対値の合計 {np.sum(np.abs(error[bad])):,.0f} g\")\n\n正しい78枚のズレ: 絶対値の合計 4,734 g\n打ち間違い2枚のズレ: 絶対値の合計 44,484 g\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n2 枚の絶対値の和も 78 枚より大きいが、二乗の和ほどの差はない\nズレが 100 倍でも、損失への寄与は 100 倍で済む"
   },
   {
     "objectID": "robust-regression.html#絶対値の微分は符号だけになる",
@@ -4267,7 +4267,7 @@
     "href": "robust-regression.html#もう1つの対策賛同者が最多の直線を探すransac",
     "title": "外れ値に強い回帰",
     "section": "もう1つの対策：賛同者が最多の直線を探す（RANSAC）",
-    "text": "もう1つの対策：賛同者が最多の直線を探す（RANSAC）\n\n\n全部の伝票に合わせるのをやめ、多くの伝票が賛同する直線を探す\n直線は 2 点で決まるので、2 枚の伝票から直線を引き、その直線の近くにある伝票を数える\n手順：\n\n伝票から 2 枚をランダムに選ぶ\nその 2 点を通る直線を引く\n直線から 300 g 以内にある伝票（賛同者、インライア、inlier）を数える\n1〜3 を 200 回繰り返し、賛同者が最多だった直線を残す\nその賛同者だけで最小二乗法をやり直す\n\nこの手法を RANSAC（Random Sample Consensus / ランダムに選んだ標本の合意） と呼ぶ\n\n\n300 g の根拠：正しい伝票のズレの最大より少し広くとる"
+    "text": "もう1つの対策：賛同者が最多の直線を探す（RANSAC）\n\n\n全部の伝票に合わせるのをやめ、多くの伝票が賛同する直線を探す\n直線は 2 点で決まるので、2 枚の伝票から直線を引き、その直線の近くにある伝票を数える\n手順：\n\n伝票から 2 枚をランダムに選ぶ\nその 2 点を通る直線を引く\n直線から 300 g 以内にある伝票（賛同者、インライア、inlier）を数える\n1〜3 を 200 回繰り返し、賛同者が最多だった直線を残す\nその賛同者だけで最小二乗法をやり直す\n\nRANSAC（Random Sample Consensus / ランダムに選んだ標本の合意）：ランダムに選んだ 2 点で直線を引くことを繰り返し、賛同者が最多の直線を残す手法\n\n\n300 g の根拠：正しい伝票のズレの最大より少し広くとる"
   },
   {
     "objectID": "robust-regression.html#回の試行を図で見る",
@@ -4392,8 +4392,8 @@
     "objectID": "knn-curse.html#peek-knn-k",
     "href": "knn-curse.html#peek-knn-k",
     "title": "k-NN と次元の呪い",
-    "section": "k はハイパパラメータ",
-    "text": "k はハイパパラメータ\n\n\nk を変えながら、訓練データとテストデータの両方で Accuracy（正解率）を出す\n\n\ndef accuracy_knn(X_train, y_train, X, y, k):\n    \"\"\"X の点を 1 点ずつ k-NN で予測し、当たった割合を返す\"\"\"\n    pred = []\n    for x in X:\n        pred.append(predict_knn(X_train, y_train, x, k))\n    return np.mean(np.array(pred) == y)\n\nks = [1, 3, 5, 9, 15, 21, 31, 51, 71]\ntrain_acc, test_acc = [], []\nfor k in ks:\n    train_acc.append(accuracy_knn(X_train, y_train, X_train, y_train, k))\n    test_acc.append(accuracy_knn(X_train, y_train, X_test, y_test, k))\n    print(f\"k = {k:2d}: train {train_acc[-1]:.3f}  test {test_acc[-1]:.3f}\")\n\nplt.figure(figsize=(6.5, 3.4))\nplt.plot(ks, train_acc, \"o-\", color=\"#2980b9\", label=\"訓練データ\")\nplt.plot(ks, test_acc, \"s-\", color=\"#e74c3c\", label=\"テストデータ\")\nplt.xlabel(\"k\")\nplt.ylabel(\"Accuracy\")\nplt.legend()\nplt.grid(True, alpha=0.4)\nplt.tight_layout()\nplt.show()\n\nk =  1: train 1.000  test 0.810\nk =  3: train 0.890  test 0.850\nk =  5: train 0.890  test 0.810\nk =  9: train 0.890  test 0.830\nk = 15: train 0.860  test 0.820\nk = 21: train 0.880  test 0.830\nk = 31: train 0.860  test 0.840\nk = 51: train 0.840  test 0.820\nk = 71: train 0.830  test 0.790\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\nk = 1：訓練データでは満点\n\n訓練データの点にいちばん近いのは、その点自身なので、必ず当たる\n訓練とテストの差が大きいので、過学習している\n\nk = 3〜31 では、テストデータの成績はほぼ横ばい\nk を大きくしすぎると、遠くの点まで多数決に入り、テストデータでも下がる\n\n\n\n\n\n\n\n\n\n\n\n\n重要ポイント\n\n\n\nk はハイパパラメータ\nテストデータの成績を見て k を選ばない\n訓練データの中の交差検証で選ぶ"
+    "section": "k はハイパーパラメータ",
+    "text": "k はハイパーパラメータ\n\n\nk を変えながら、訓練データとテストデータの両方で Accuracy（正解率）を出す\n\n\ndef accuracy_knn(X_train, y_train, X, y, k):\n    \"\"\"X の点を 1 点ずつ k-NN で予測し、当たった割合を返す\"\"\"\n    pred = []\n    for x in X:\n        pred.append(predict_knn(X_train, y_train, x, k))\n    return np.mean(np.array(pred) == y)\n\nks = [1, 3, 5, 9, 15, 21, 31, 51, 71]\ntrain_acc, test_acc = [], []\nfor k in ks:\n    train_acc.append(accuracy_knn(X_train, y_train, X_train, y_train, k))\n    test_acc.append(accuracy_knn(X_train, y_train, X_test, y_test, k))\n    print(f\"k = {k:2d}: train {train_acc[-1]:.3f}  test {test_acc[-1]:.3f}\")\n\nplt.figure(figsize=(6.5, 3.4))\nplt.plot(ks, train_acc, \"o-\", color=\"#2980b9\", label=\"訓練データ\")\nplt.plot(ks, test_acc, \"s-\", color=\"#e74c3c\", label=\"テストデータ\")\nplt.xlabel(\"k\")\nplt.ylabel(\"Accuracy\")\nplt.legend()\nplt.grid(True, alpha=0.4)\nplt.tight_layout()\nplt.show()\n\nk =  1: train 1.000  test 0.810\nk =  3: train 0.890  test 0.850\nk =  5: train 0.890  test 0.810\nk =  9: train 0.890  test 0.830\nk = 15: train 0.860  test 0.820\nk = 21: train 0.880  test 0.830\nk = 31: train 0.860  test 0.840\nk = 51: train 0.840  test 0.820\nk = 71: train 0.830  test 0.790\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\nk = 1：訓練データでは満点\n\n訓練データの点にいちばん近いのは、その点自身なので、必ず当たる\n訓練とテストの差が大きいので、過学習している\n\nk = 3〜31 では、テストデータの成績はほぼ横ばい\nk を大きくしすぎると、遠くの点まで多数決に入り、テストデータでも下がる\n\n\n\n\n\n\n\n\n\n\n\n\n重要ポイント\n\n\n\nk はハイパーパラメータ\nテストデータの成績を見て k を選ばない\n訓練データの中の交差検証で選ぶ"
   },
   {
     "objectID": "knn-curse.html#tweak-k-を変える",
@@ -4610,7 +4610,7 @@
     "href": "knn-curse.html#まとめ",
     "title": "k-NN と次元の呪い",
     "section": "まとめ",
-    "text": "まとめ\n\n\nk-NN：新しい点のラベルを、近い k 点のラベルの多数決で決める\n\n学習では境界を作らず、訓練データをそのまま取っておく\n\nk はハイパパラメータ：k = 1 は訓練データで必ず当たるが、テストデータでは下がる（過学習）\nKD-tree：点の数が均等になるように空間を領域に分け、遠い領域をスキップして、いちばん近い点を探す\n\n全部の点までの距離を測らずにすむ（全探索をしなくてよい）\n\n次元の呪い：特徴量を増やすと空間が広くなり、いちばん近い点も遠くなる\n\nk-NN は当たらなくなり、点を増やしても追いつかない\nKD-tree でも、スキップできる領域がなくなる\n\n\n\n\n\n\n\n\n\n分類問題と特徴量のまとめ\n\n\n1D → 2D の分類、評価と汎化、教師なし学習（k-means）、k-NN と次元の呪い。 機械学習の基本的な問いと道具が揃った。\nここまで fit() の1行を何度も呼び、その中身（最良のパラメータの探し方）も手法ごとに見てきた。 次の「最適化」では、多くの手法で使える探し方を作る。"
+    "text": "まとめ\n\n\nk-NN：新しい点のラベルを、近い k 点のラベルの多数決で決める\n\n学習では境界を作らず、訓練データをそのまま取っておく\n\nk はハイパーパラメータ：k = 1 は訓練データで必ず当たるが、テストデータでは下がる（過学習）\nKD-tree：点の数が均等になるように空間を領域に分け、遠い領域をスキップして、いちばん近い点を探す\n\n全部の点までの距離を測らずにすむ（全探索をしなくてよい）\n\n次元の呪い：特徴量を増やすと空間が広くなり、いちばん近い点も遠くなる\n\nk-NN は当たらなくなり、点を増やしても追いつかない\nKD-tree でも、スキップできる領域がなくなる\n\n\n\n\n\n\n\n\n\n分類問題と特徴量のまとめ\n\n\n1D → 2D の分類、評価と汎化、教師なし学習（k-means）、k-NN と次元の呪い。 機械学習の基本的な問いと道具が揃った。\nここまで、パラメータは手法ごとの探し方で見つけてきた。 次の「最適化」では、多くの手法で使える探し方を作る。"
   },
   {
     "objectID": "knn-curse.html#peek-knn-fish",
@@ -4729,7 +4729,7 @@
     "href": "classification-evaluation.html#peek-refit-all",
     "title": "過学習と汎化",
     "section": "最後にテストのあとは全データで学習し直す",
-    "text": "最後にテストのあとは全データで学習し直す\n\n\nテストデータの採点で、成績の見積もりは終わった\n本番で使うモデルは、選んだ深さのまま、全120匹で学習し直す\n\n\n# 選んだ深さのまま、全データ（訓練データ＋テストデータ）で学習し直す\nfinal_tree = DecisionTreeClassifier(max_depth=best_depth).fit(X, y)\nprint(f\"深さ {best_depth}、{len(y)} 匹で学習\")\n\n\n\n深さ 2、120 匹で学習\n\n\n\n\n\n\n\n\n\n全データ（テストデータ含む）でもOK\n\n\n\nハイパパラメータ（深さ）：交差検証で選んだまま変えない\nパラメータ：全データで決め直してよい\n\n学習に使えるデータは多いほうがよい\n\nこのモデルの成績は、もう測れない（採点に使えるデータが残っていない）\n\nテストデータでの成績を、その見積もりとして使う"
+    "text": "最後にテストのあとは全データで学習し直す\n\n\nテストデータの採点で、成績の見積もりは終わった\n本番で使うモデルは、選んだ深さのまま、全120匹で学習し直す\n\n\n# 選んだ深さのまま、全データ（訓練データ＋テストデータ）で学習し直す\nfinal_tree = DecisionTreeClassifier(max_depth=best_depth).fit(X, y)\nprint(f\"深さ {best_depth}、{len(y)} 匹で学習\")\n\n\n\n深さ 2、120 匹で学習\n\n\n\n\n\n\n\n\n\n全データ（テストデータ含む）でもOK\n\n\n\nハイパーパラメータ（深さ）：交差検証で選んだまま変えない\nパラメータ：全データで決め直してよい\n\n学習に使えるデータは多いほうがよい\n\nこのモデルの成績は、もう測れない（採点に使えるデータが残っていない）\n\nテストデータでの成績を、その見積もりとして使う"
   },
   {
     "objectID": "dimensionality-pca.html#ここまでの道具",
@@ -4743,7 +4743,7 @@
     "href": "linear-regression.html#peek-mse",
     "title": "線形回帰と正則化",
     "section": "損失関数：二乗誤差（MSE）",
-    "text": "損失関数：二乗誤差（MSE）\n\n\n各魚について「予測と実際のズレ」を測り、二乗して平均する\n\n\\[L(a, b) = \\frac{1}{N} \\sum_{i} \\left( \\underbrace{a x_i + b}_{\\text{予測}} - \\underbrace{t_i}_{\\text{実際}} \\right)^2\\]\n\nMSE（Mean Squared Error / 平均二乗誤差）と呼ぶ\nクラスタリングの回の SSE と同じ発想で、誤差を 2 乗して集めたものを点の数で割った平均\n全魚のズレを1本のベクトルと見ると、MSE はそのノルム（norm・ベクトルの長さ）の2乗を \\(N\\) で割ったもの\n\n\n\n\n\n\n\n\n損失関数は MSE だけではない\n\n\n\nズレの絶対値の平均でも「小さいほど良い直線」は測れる — MAE（Mean Absolute Error / 平均絶対誤差）\nズレの4乗の平均でもよい。「ズレが減るほど小さくなる」関数なら損失関数の候補になれる\n今回 MSE を選ぶ理由は微分のしやすさ：絶対値は 0 のところで折れていて微分できない。二乗なら微分がきれい\nMAE での fit は外れ値に強い回帰で扱う"
+    "text": "損失関数：二乗誤差（MSE）\n\n\nMSE（Mean Squared Error / 平均二乗誤差）：各魚の「予測と実際のズレ」を二乗して平均した値\n\n\\[L(a, b) = \\frac{1}{N} \\sum_{i} \\left( \\underbrace{a x_i + b}_{\\text{予測}} - \\underbrace{t_i}_{\\text{実際}} \\right)^2\\]\n\nクラスタリングの回の SSE と同じ発想で、誤差を 2 乗して集めたものを点の数で割った平均\n全魚のズレを1本のベクトルと見ると、MSE はそのノルム（norm・ベクトルの長さ）の2乗を \\(N\\) で割ったもの\n\n\n\n\n\n\n\n\n損失関数は MSE だけではない\n\n\n\nズレの絶対値の平均でも「小さいほど良い直線」は測れる — MAE（Mean Absolute Error / 平均絶対誤差）\nズレの4乗の平均でもよい。「ズレが減るほど小さくなる」関数なら損失関数の候補になれる\n今回 MSE を選ぶ理由は微分のしやすさ：絶対値は 0 のところで折れていて微分できない。二乗なら微分がきれい\nMAE を損失にした回帰は外れ値に強い回帰で扱う"
   },
   {
     "objectID": "linear-regression.html#peek-mse-grad",
@@ -4757,7 +4757,7 @@
     "href": "linear-regression.html#peek-l2-ridge",
     "title": "線形回帰と正則化",
     "section": "この罰金の名前：L2正則化とリッジ回帰",
-    "text": "この罰金の名前：L2正則化とリッジ回帰\n\n\n\\(\\lambda \\sum_j w_j^2\\) の形の罰金：L2正則化（L2 regularization）\nL2正則化つきの線形回帰：リッジ回帰（Ridge regression）\n\nsklearn には Ridge として入っている\n\nNN でも同じ道具がそのまま使われる（weight decay と呼ぶ）"
+    "text": "この罰金の名前：L2正則化とリッジ回帰\n\n\n\\(\\lambda \\sum_j w_j^2\\) の形の罰金：L2正則化（L2 regularization）\nL2正則化つきの線形回帰：リッジ回帰（Ridge regression）\n\nsklearn には Ridge として入っている\n\nNN でも同じ道具がそのまま使われる（NN での名前は weight decay）"
   },
   {
     "objectID": "linear-regression.html#peek-regularization-broad",
@@ -4786,5 +4786,257 @@
     "title": "手書き数字分類プロジェクト",
     "section": "到達チェック 正答率の中身を読む",
     "text": "到達チェック 正答率の中身を読む\n\n\nテスト正答率の数字だけでは分からないこのモデルの性質を、前の観察から3つ挙げよ。\n\n\n混ざりやすい数字の組\n自信満々で間違う例\n自分の手書き画像で成績が変わる理由"
+  },
+  {
+    "objectID": "optimization-gradient-descent.html#ある値が最小になる数字を手法ごとに探してきた",
+    "href": "optimization-gradient-descent.html#ある値が最小になる数字を手法ごとに探してきた",
+    "title": "最適化と勾配降下法",
+    "section": "ある値が最小になる数字を手法ごとに探してきた",
+    "text": "ある値が最小になる数字を手法ごとに探してきた\n\n\n\n\n手法\n動かした数字\n小さくしたい値\n探し方\n\n\n\n\nしきい値で分類\n重さのしきい値\n総コスト\n候補を全部試す（総当たり）\n\n\n決定木\n分岐のしきい値\n加重平均ジニ不純度\n候補を全部試す\n\n\nk-means\n重心の位置\nSSE\nassign と update の繰り返し"
+  },
+  {
+    "objectID": "optimization-gradient-descent.html#共通の形に名前を付ける",
+    "href": "optimization-gradient-descent.html#共通の形に名前を付ける",
+    "title": "最適化と勾配降下法",
+    "section": "共通の形に名前を付ける",
+    "text": "共通の形に名前を付ける\n\n\n\n\n動かす数字\n小さくしたい値\n最小になる所を探すこと\n\n\n\n\nパラメータ\n損失\n最適化\n\n\n\n\n\n\n\n\n\n\n学習とはパラメータという数字を決めること\n\n\n\n損失（loss）：ダメさを測る物差し。低いほど良い。\nパラメータ：モデル（深さ2の決定木とか3-meansとか）の学習中に更新されていく値。学習が終われば固定\n損失関数（loss function）：パラメータを入力したらlossを返す関数\n最適化(optimization)：lossを最小化する良い感じのパラメータを決める行為。最適や最小化とはいっているが、本当に最も適した最もよい値ではなく、それっぽい値でも最適化と呼ぶ\n学習：データからパラメータを決めること。多くのモデルでは最適化によって実現される"
+  },
+  {
+    "objectID": "optimization-gradient-descent.html#パラメータは学習中に更新される数字",
+    "href": "optimization-gradient-descent.html#パラメータは学習中に更新される数字",
+    "title": "最適化と勾配降下法",
+    "section": "パラメータは、学習中に更新される数字",
+    "text": "パラメータは、学習中に更新される数字\n\n\n\n\n\n\n\n\nkはハイパパラメータ\n\n\n\nk-meansのkは、ユーザが関数に与える変数、つまりプログラミングの意味では「パラメータ」だが、決定木の深さと同じくハイパパラメータ\n\n学習中に更新されないからパラメータではない\n\n逆に、表題のパラメータ、最適化の過程で更新される側（k-meansなら重心の座標）は、学習可能パラメータ（trainable parameter / learnable parameter）と呼ばれる。\n\nモデルパラメータ（model parameter）という呼び方もある\nとはいえ普通はこれをパラメータと呼ぶ"
+  },
+  {
+    "objectID": "optimization-gradient-descent.html#斜めの直線のパラメータは傾きと切片の2個",
+    "href": "optimization-gradient-descent.html#斜めの直線のパラメータは傾きと切片の2個",
+    "title": "最適化と勾配降下法",
+    "section": "斜めの直線のパラメータは、傾きと切片の2個",
+    "text": "斜めの直線のパラメータは、傾きと切片の2個\n\n\n斜めの直線で分けられそうに見えた境界は、傾きと切片で決まる\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n要するに\n\n\n\nパラメータを変える ＝ 図の境界線が変わる\n値によって正答率が大きく変わる"
+  },
+  {
+    "objectID": "optimization-gradient-descent.html#総当たりはパラメータが増えると試しきれない",
+    "href": "optimization-gradient-descent.html#総当たりはパラメータが増えると試しきれない",
+    "title": "最適化と勾配降下法",
+    "section": "総当たりは、パラメータが増えると試しきれない",
+    "text": "総当たりは、パラメータが増えると試しきれない\n\n\nパラメータ1個につき、候補を100個試すとする\n\n\n\n\n\n\n\n\n\n\n\n\n\nパラメータの数\n試す組み合わせ\n\n\n\n\n1個（しきい値）\n\\(100\\) 通り\n\n\n2個（傾きと切片）\n\\(100 \\times 100 = 10^4\\) 通り\n\n\n10個\n\\(100^{10} = 10^{20}\\) 通り"
+  },
+  {
+    "objectID": "optimization-gradient-descent.html#損失loss",
+    "href": "optimization-gradient-descent.html#損失loss",
+    "title": "最適化と勾配降下法",
+    "section": "損失（Loss）",
+    "text": "損失（Loss）\n\n\nダメさを測る物差し\n\n低いほど良い\n\n使い方\n\n2つの結果を比べる（損失が低いほうが良い）\n損失が最小になるパラメータを探す（最適化, optimization）\n\n最適や最小化とはいっているが、本当に最も適した最もよい値ではなく、それっぽい値でも最適化と呼ぶ\n\n\n\n\n\n\n手法\n損失\n測っているダメさ\n\n\n\n\nしきい値で分類\n総コスト\n誤分類にかかる費用の合計\n\n\n決定木\n加重平均ジニ不純度\n分けた左右にクラスが混ざっている度合い\n\n\nk-means\nSSE\n各点から自分の重心までの距離の2乗の合計"
+  },
+  {
+    "objectID": "nn-logistic.html#nnの丸はすべてノード",
+    "href": "nn-logistic.html#nnの丸はすべてノード",
+    "title": "ロジスティック回帰をNNとして実装する",
+    "section": "NNの丸はすべてノード",
+    "text": "NNの丸はすべてノード\n\n\nノード（node）：NNの図に出てくる丸の総称\n入力ノード：入力値を置くノード\nニューロン：届いた値から新しい値を計算するノード\n\n\n\n\n\n\n\n\n\n\n図の部分\n呼び方\n役割\n\n\n\n\n\\(x_1,x_2\\) の丸\n入力ノード\n入力値を受け取り、次へ渡す\n\n\n\\(h\\) の丸\nニューロン\n届いた値から、新しい値を1個計算する\n\n\n丸を結ぶ矢印\n接続\n前のノードの値を次へ渡す\n\n\n矢印上の \\(w_1,w_2\\)\n重み\n前のノードの値が次のニューロンへ与える影響の強さを調整する"
+  },
+  {
+    "objectID": "nn-logistic.html#予測入力から出力までの計算がforward",
+    "href": "nn-logistic.html#予測入力から出力までの計算がforward",
+    "title": "ロジスティック回帰をNNとして実装する",
+    "section": "予測：入力から出力までの計算がForward",
+    "text": "予測：入力から出力までの計算がForward\n\n\n\nForward（forward pass、順伝播）：入力から出力へ向かって、ネットワークの計算を順番に実行すること\n今回のForwardは、重み付き和 → 活性化関数の2段階\nForwardは学習方法ではない。現在の \\(w,b\\) で予測を計算する処理"
+  },
+  {
+    "objectID": "nn-logistic.html#勾配この逆向きの計算がbackward",
+    "href": "nn-logistic.html#勾配この逆向きの計算がbackward",
+    "title": "ロジスティック回帰をNNとして実装する",
+    "section": "勾配：この逆向きの計算がBackward",
+    "text": "勾配：この逆向きの計算がBackward\n\n\nBackward（backward pass、逆向きの計算）：出力側から連鎖律をたどり、各パラメータの勾配を求める工程\n誤差逆伝播法（backpropagation、BP）：ネットワークの接続を出力側から逆向きにたどることで、Backwardを行う方法\n\nForward  : x ──→ z ──→ p ──→ ℓ\nBackward :       d_w, d_b ←── d_z ←── ℓ\n\n今回のロジスティック回帰も、ニューロン1個のNNにおけるbackpropagationの最小例\n隠れ層が増えても、出力側で求めた微分値から順につないでいく"
+  },
+  {
+    "objectID": "nn-multilayer.html#横に並べる変換の数が幅",
+    "href": "nn-multilayer.html#横に並べる変換の数が幅",
+    "title": "隠れ層とReLUで曲がる境界をつくる",
+    "section": "横に並べる変換の数が「幅」",
+    "text": "横に並べる変換の数が「幅」\n\n\n中間の変換が2個なら幅2、16個なら幅16\n2次元入力・中間幅 \\(m\\)・2クラス出力なら、パラメータ数は：\n\n\\[\n\\underbrace{2m}_{\\text{中間の重み}}\n+\\underbrace{m}_{\\text{中間のバイアス}}\n+\\underbrace{m}_{\\text{出力の重み}}\n+\\underbrace{1}_{\\text{出力のバイアス}}\n=4m+1\n\\]\n\n\n\n幅 \\(m\\)\n折り目の候補\nパラメータ数\n\n\n\n\n2\n2本\n9\n\n\n4\n4本\n17\n\n\n16\n16本\n65\n\n\n\n\n幅を増やすほど、境界を細かく折る余地が増える"
+  },
+  {
+    "objectID": "nn-logistic.html#ノードnode",
+    "href": "nn-logistic.html#ノードnode",
+    "title": "ロジスティック回帰をNNとして実装する",
+    "section": "ノード（Node）",
+    "text": "ノード（Node）\n\n\nNNの図に出てくる丸の総称\n入力ノード：入力値を置くノード\nニューロン：届いた値から新しい値を計算するノード\n\n\n\n\n\n\n\n\n\n\n図の部分\n呼び方\n役割\n\n\n\n\n\\(x_1,x_2\\) の丸\n入力ノード\n入力値を受け取り、次へ渡す\n\n\n\\(h\\) の丸\nニューロン\n届いた値から、新しい値を1個計算する\n\n\n丸を結ぶ矢印\n接続\n前のノードの値を次へ渡す\n\n\n矢印上の \\(w_1,w_2\\)\n重み\n前のノードの値が次のニューロンへ与える影響の強さを調整する"
+  },
+  {
+    "objectID": "nn-logistic.html#予測forward",
+    "href": "nn-logistic.html#予測forward",
+    "title": "ロジスティック回帰をNNとして実装する",
+    "section": "予測：Forward",
+    "text": "予測：Forward\n\n\n\nForward（forward pass、順伝播）：入力から出力へ向かって、ネットワークの計算を順番に実行すること\n今回のForwardは、重み付き和 → 活性化関数の2段階\nForwardは学習方法ではない。現在の \\(w,b\\) で予測を計算する処理"
+  },
+  {
+    "objectID": "nn-logistic.html#勾配backward",
+    "href": "nn-logistic.html#勾配backward",
+    "title": "ロジスティック回帰をNNとして実装する",
+    "section": "勾配：Backward",
+    "text": "勾配：Backward\n\n\nBackward（backward pass、逆向きの計算）：出力側から連鎖律をたどり、各パラメータの勾配を求める工程\n誤差逆伝播法（backpropagation、BP）：ネットワークの接続を出力側から逆向きにたどることで、Backwardを行う方法\n\nForward  : x ──→ z ──→ p ──→ ℓ\nBackward :       d_w, d_b ←── d_z ←── ℓ\n\n今回のロジスティック回帰も、ニューロン1個のNNにおけるbackpropagationの最小例\n隠れ層が増えても、出力側で求めた微分値から順につないでいく"
+  },
+  {
+    "objectID": "nn-multilayer.html#幅横に並べる変換の数",
+    "href": "nn-multilayer.html#幅横に並べる変換の数",
+    "title": "隠れ層とReLUで曲がる境界をつくる",
+    "section": "幅：横に並べる変換の数",
+    "text": "幅：横に並べる変換の数\n\n\n中間の変換が2個なら幅2、16個なら幅16\n2次元入力・中間幅 \\(m\\)・2クラス出力なら、パラメータ数は：\n\n\\[\n\\underbrace{2m}_{\\text{中間の重み}}\n+\\underbrace{m}_{\\text{中間のバイアス}}\n+\\underbrace{m}_{\\text{出力の重み}}\n+\\underbrace{1}_{\\text{出力のバイアス}}\n=4m+1\n\\]\n\n\n\n幅 \\(m\\)\n折り目の候補\nパラメータ数\n\n\n\n\n2\n2本\n9\n\n\n4\n4本\n17\n\n\n16\n16本\n65\n\n\n\n\n幅を増やすほど、境界を細かく折る余地が増える"
+  },
+  {
+    "objectID": "optimization-gradient-descent.html#今回の対象",
+    "href": "optimization-gradient-descent.html#今回の対象",
+    "title": "最適化と勾配降下法",
+    "section": "今回の対象",
+    "text": "今回の対象\n\nこの関数の最小値を求めよう\n\\[f(x) = x^2 - 4x + 3\\]\n数学的には簡単だが、今回は数値的に（コンピュータのアプローチ）解く\n\nこのような最小化または最大化の対象となる関数が目的関数（objective function)"
+  },
+  {
+    "objectID": "optimization-gradient-descent.html#今回はこれを最小化しよう",
+    "href": "optimization-gradient-descent.html#今回はこれを最小化しよう",
+    "title": "最適化と勾配降下法",
+    "section": "今回はこれを最小化しよう",
+    "text": "今回はこれを最小化しよう\n\nこの関数の最小値を求めよう\n\\[f(x) = x^2 - 4x + 3\\]\n数学的には簡単だが、今回は数値的に（コンピュータのアプローチ）解く\n\nこのような最小化または最大化の対象となる関数が目的関数（objective function)"
+  },
+  {
+    "objectID": "optimization-gradient-descent.html#今回はこの関数を最小化しよう",
+    "href": "optimization-gradient-descent.html#今回はこの関数を最小化しよう",
+    "title": "最適化と勾配降下法",
+    "section": "今回はこの関数を最小化しよう",
+    "text": "今回はこの関数を最小化しよう\n\n\\[f(x) = x^2 - 4x + 3\\]\n数学的には簡単だが、今回は数値的に（コンピュータのアプローチ）解く（数値的解法）\n\n\n\n\n\n\nノート\n\n\n数値的解法の逆は、解析的解法（numerical analysis）\n\n\n\n\nこのような最小化または最大化の対象となる関数が目的関数（objective function)"
+  },
+  {
+    "objectID": "optimization-gradient-descent.html#今回はこの関数を最小化しよう目的関数objective-function",
+    "href": "optimization-gradient-descent.html#今回はこの関数を最小化しよう目的関数objective-function",
+    "title": "最適化と勾配降下法",
+    "section": "今回はこの関数を最小化しよう：目的関数（objective function)",
+    "text": "今回はこの関数を最小化しよう：目的関数（objective function)\n\n\\[f(x) = x^2 - 4x + 3\\]\n数学的には簡単だが、今回は数値的に（コンピュータのアプローチ）解く（数値的解法）\n\n\n\n\n\n\nノート\n\n\n数値的解法の逆は、解析的解法（numerical analysis）\n\n\n\n\n目的関数は最小化する場合と最大化する場合がある"
+  },
+  {
+    "objectID": "optimization-gradient-descent.html#peek-lr",
+    "href": "optimization-gradient-descent.html#peek-lr",
+    "title": "最適化と勾配降下法",
+    "section": "学習率で挙動が変わる",
+    "text": "学習率で挙動が変わる\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n振動と発散は別\n\n\n\n\\(\\alpha=0.75\\)：谷をまたいで振動するが、振幅は小さくなり収束する\n\\(\\alpha=1.1\\)：谷をまたぐたびに振幅が大きくなり発散する"
+  },
+  {
+    "objectID": "linear-regression.html#問題12点のデータから直線を求める",
+    "href": "linear-regression.html#問題12点のデータから直線を求める",
+    "title": "線形回帰と正則化",
+    "section": "問題1：2点のデータから直線を求める",
+    "text": "問題1：2点のデータから直線を求める\n\nデータは2点だけ：\\((x_1, t_1) = (-1, 0)\\)、\\((x_2, t_2) = (1, 2)\\)。 直線 \\(ax + b\\) を勾配降下法で求める。初期値 \\(a = 0, b = 0\\)、学習率 \\(\\alpha = 0.1\\)。手計算とPythonコードの両方で解け。\n\n勾配の式に代入して、\\(\\dfrac{\\partial L}{\\partial a}\\) と \\(\\dfrac{\\partial L}{\\partial b}\\) を求めよ\n更新を3回、手計算で示せ\n同じ更新をコードで100回繰り返し、sklearn の答えと比較せよ\n\nヒント：2点を通る直線は \\(y = x + 1\\)。つまり答えは \\(a = 1, b = 1\\) になるはず。"
+  },
+  {
+    "objectID": "logistic-regression.html#ロジスティック回帰も勾配降下法で学習する",
+    "href": "logistic-regression.html#ロジスティック回帰も勾配降下法で学習する",
+    "title": "ロジスティック回帰",
+    "section": "ロジスティック回帰も勾配降下法で学習する",
+    "text": "ロジスティック回帰も勾配降下法で学習する\n\n\n\n1匹分の損失を \\(\\ell\\)、全魚の平均損失を \\(L\\) と書き分ける\n前の回と同じ更新式。\\(\\alpha\\)（アルファ）は学習率：\n\nコードではlearning rateを略して lr と書く\n\n\n\\[w_j \\leftarrow w_j-\\alpha\\frac{\\partial L}{\\partial w_j},\n\\qquad b \\leftarrow b-\\alpha\\frac{\\partial L}{\\partial b}\\]\n\nここで\\(j\\) は「どの特徴量の重みか」を表す添字\n\nここでは \\(j=1\\)（輝度）、\\(j=2\\)（重さ）\n\nロジスティック回帰で必要なのは：\n\n予測をどう採点するか：損失 \\(L\\)\n採点結果をどう微分するか：勾配"
+  },
+  {
+    "objectID": "optimization-gradient-descent.html#これまである値が最小になる数字を手法ごとに探してきた",
+    "href": "optimization-gradient-descent.html#これまである値が最小になる数字を手法ごとに探してきた",
+    "title": "最適化と勾配降下法",
+    "section": "これまで、ある値が最小になる数字を手法ごとに探してきた",
+    "text": "これまで、ある値が最小になる数字を手法ごとに探してきた\n\n\n\n\n手法\nパラメータ\n小さくしたい値\n方法\n\n\n\n\nしきい値で分類\n重さのしきい値\n総コスト\n候補を全部試す（総当たり）\n\n\n決定木\n分岐のしきい値\n加重平均ジニ不純度\n候補を全部試す\n\n\nk-means\n重心の位置\nSSE\nassign と update の繰り返し"
+  },
+  {
+    "objectID": "optimization-gradient-descent.html#これまである値が最小になるパラメータを探してきた",
+    "href": "optimization-gradient-descent.html#これまである値が最小になるパラメータを探してきた",
+    "title": "最適化と勾配降下法",
+    "section": "これまで、ある値が最小になるパラメータを探してきた",
+    "text": "これまで、ある値が最小になるパラメータを探してきた\n\n\n\n\n手法\nパラメータ\n小さくしたい値\n方法\n\n\n\n\nしきい値で分類\n重さの閾値\n総コスト\n候補を全部試す（総当たり）\n\n\n決定木\n分岐の閾値\n加重平均ジニ不純度\n候補を全部試す\n\n\nk-means\n重心の位置\nSSE\nassign と update の繰り返し"
+  },
+  {
+    "objectID": "clustering-kmeans.html#peek-parameter",
+    "href": "clustering-kmeans.html#peek-parameter",
+    "title": "教師なし学習とクラスタリング",
+    "section": "パラメータとハイパーパラメータ",
+    "text": "パラメータとハイパーパラメータ\n\n\n手順を動かす前に人が決める値と、手順がデータから決める値を区別する\n\n\n\n\n\n手順を動かす前に人が決める\n手順がデータから決める\n\n\n\n\n呼び方\nハイパーパラメータ（hyperparameter）\nパラメータ（parameter）\n\n\nk-means\nクラスタ数 \\(k\\)\n重心 \\(k\\) 個の位置\n\n\n決定木（前回まで）\n木の深さ\n分岐の閾値\n\n\n\n\nハイパーパラメータの決め方は、手順の外で別に考える\n\n決定木の深さは訓練データの中で交差検証して選んだ\n\\(k\\) の決め方は後半のエルボー法で扱う"
+  },
+  {
+    "objectID": "clustering-kmeans.html#ハイパーパラメータ-k-の決め方エルボー法elbow-method",
+    "href": "clustering-kmeans.html#ハイパーパラメータ-k-の決め方エルボー法elbow-method",
+    "title": "教師なし学習とクラスタリング",
+    "section": "ハイパーパラメータ k の決め方：エルボー法（Elbow Method）",
+    "text": "ハイパーパラメータ k の決め方：エルボー法（Elbow Method）\n\n\n標準化した80個の点（z_brightness, z_weights）では、\\(k = 2\\) と決めて進めた\n\\(k\\) もデータから決めたい\nエルボー法：k を 1 から順に増やしながら SSE を測り、折れ曲がる所を探す\n\n各 k では、ランダムリスタートで SSE 最小の答えを採る\n\n\n\nks = range(1, 9)\nsse_list = []\nfor k in ks:\n    labels_k, cx_k, cy_k = kmeans_best(z_brightness, z_weights, k)\n    sse_list.append(sse(z_brightness, z_weights, labels_k, cx_k, cy_k))\nprint(np.array(sse_list).round(1))\n\n\n\n[160.   67.8  49.2  37.2  25.9  22.2  18.8  16.9]\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nエルボー（肘）の見方\n\n\nグラフが急激に折れ曲がる点（肘のような形）が最適な k の目安。 それ以上増やしても改善幅が小さい。このデータでは k=2 で折れている。"
+  },
+  {
+    "objectID": "classification-evaluation.html#ハイパーパラメータはどう決めるべきなのか",
+    "href": "classification-evaluation.html#ハイパーパラメータはどう決めるべきなのか",
+    "title": "過学習と汎化",
+    "section": "ハイパーパラメータはどう決めるべきなのか",
+    "text": "ハイパーパラメータはどう決めるべきなのか\n\n\n経験的に決めてしまう\n一つ一つ深さの異なる決定木をつくっていき、それぞれ評価して一番良いものとする\n\nただし、決定木の場合、深さをMAXにすれば最強の評価を得られる"
+  },
+  {
+    "objectID": "classification-evaluation.html#結局どのハイパーパラメータにすればいいのか",
+    "href": "classification-evaluation.html#結局どのハイパーパラメータにすればいいのか",
+    "title": "過学習と汎化",
+    "section": "結局どのハイパーパラメータにすればいいのか",
+    "text": "結局どのハイパーパラメータにすればいいのか\n\n\nテストの成績が一番いい深さを選ぶだけで十分だろうか？\n\n\n曲線を見ると、テストの成績が一番いい深さを選びたくなる\nしかし、それではテストデータを使って深さを決めたことになる\n\n24匹でたまたま良かった深さを選ぶので、その成績は高めに出る\n学習に使ったデータで採点すると高めに出るのと同じ理屈\n\nテストデータは、もう本番のデータの代わりにならない\n\n\n\n\n\n\n\n\nポイント\n\n\n\nハイパーパラメータは、テストデータを使わずに選ぶ"
+  },
+  {
+    "objectID": "logistic-regression.html#z-を高さとして見る",
+    "href": "logistic-regression.html#z-を高さとして見る",
+    "title": "ロジスティック回帰",
+    "section": "\\(z\\) を高さとして見る",
+    "text": "\\(z\\) を高さとして見る\n\n\n\n\n\n\n\n\n\n\n\n各点 \\((x_1, x_2)\\) に高さ \\(z = w_1x_1 + w_2x_2 + b\\) がある → 平面の上の傾いた板\n決定境界 ＝ 高さ 0 の線（水際）。水面より上（\\(z&gt;0\\)）は Salmon、下（\\(z&lt;0\\)）は Sea bass"
+  },
+  {
+    "objectID": "logistic-regression.html#係数は板の傾きと高さを決める",
+    "href": "logistic-regression.html#係数は板の傾きと高さを決める",
+    "title": "ロジスティック回帰",
+    "section": "係数は板の「傾き」と「高さ」を決める",
+    "text": "係数は板の「傾き」と「高さ」を決める\n\n\n\n\n係数\n板にとっては\n境界にとっては\n\n\n\n\n\\(w_1, w_2\\)\n傾き（どちら向きに上り坂か）\n境界の向き\n\n\n\\(b\\)\n全体の上げ下げ\n境界の平行移動\n\n\n\n\n\\(w_1&lt;0\\) は「暗い方へ上り坂」→ 前のスライドの「暗いほど Salmon 寄り」\n\\(b\\) で板を上下させると水際が平行に動く → 「\\(b\\) は決定境界の位置を調整」\n「見慣れた式」で \\(z = 0\\) と置いた直線の式は、この水際を式で書いたもの\n学習で境界が動く ＝ 係数が変わって板が傾き直し、水際が動く"
+  },
+  {
+    "objectID": "logistic-regression.html#例線形結合の式",
+    "href": "logistic-regression.html#例線形結合の式",
+    "title": "ロジスティック回帰",
+    "section": "例：「線形」結合の式",
+    "text": "例：「線形」結合の式\n\n\\[z = w_1 x_1 + w_2 x_2 + b\\]\n\n線形結合（linear combination） の式\nロジスティック回帰は線形分類器\n前回は線形回帰\n\n\nこの線形って何？直線のこと？"
+  },
+  {
+    "objectID": "logistic-regression.html#線形性linearityとは斉次性と加法性を満たすもの",
+    "href": "logistic-regression.html#線形性linearityとは斉次性と加法性を満たすもの",
+    "title": "ロジスティック回帰",
+    "section": "線形（性）（linearity）とは斉次性と加法性を満たすもの",
+    "text": "線形（性）（linearity）とは斉次性と加法性を満たすもの\n\n\n斉次性（homogeneity）：先に定数倍しても後で定数倍しても同じ\n加法性（additivity）：先に足しても後で足しても同じ\n\n\\[\\;\\;\\text{斉次性：} f(c\\,u) = c\\,f(u) \\qquad \\qquad \\] \\[\\;\\text{加法性：}f(u + v) = f(u) + f(v) \\]\n\n\n\n\n\n\n\n例\n\n\n\n\\(f(x) = 3x\\) は線形\n\\(f(x) = x^2\\) は \\(f(1{+}1) = 4 \\neq f(1) + f(1) = 2\\) で非線形"
+  },
+  {
+    "objectID": "logistic-regression.html#よって線形結合バイアスは厳密には線形ではない",
+    "href": "logistic-regression.html#よって線形結合バイアスは厳密には線形ではない",
+    "title": "ロジスティック回帰",
+    "section": "よって「線形結合＋バイアス」は厳密には線形ではない",
+    "text": "よって「線形結合＋バイアス」は厳密には線形ではない\n\n\n\\(f(x) = ax + b\\) は、\\(b\\neq0\\) なら非線形\n\n足してから入れる：\\(f(u+v) = a(u+v) + b\\)\n入れてから足す：\\(f(u)+f(v) = (au+b) + (av+b) = a(u+v) + 2b\\) → \\(+b\\)\n\n例：\\(f(x)=3x+1\\) なら\n\n\\(f(1{+}2) = 10\\)\n\\(f(1)+f(2) = 4+7 = 11\\)\n\n\n\n\n\n\n\n\n\nつまり\n\n\n\\(b\\) の分だけズレるので加法性を満たさない"
+  },
+  {
+    "objectID": "logistic-regression.html#線形の簡単チェック法f0-0",
+    "href": "logistic-regression.html#線形の簡単チェック法f0-0",
+    "title": "ロジスティック回帰",
+    "section": "線形の簡単チェック法：\\(f(0) = 0\\)",
+    "text": "線形の簡単チェック法：\\(f(0) = 0\\)\n\n\n線形なら \\(f(0) = f(0 \\cdot x) = 0 \\cdot f(x) = 0\\)\n\n0 の戻り値は必ず 0 \n\nよって、\\(f(0) \\neq 0\\) の関数は非線形\n\n\n\n\n\n\n\n重要\n\n\n\n「グラフが直線」（見た目）と「線形性」（性質）は別物\n一次関数を「線形」と呼ぶのは、高校までの見た目基準。\n\n\n\n\n\n\n\n\n\n\nノート\n\n\n\n\\(f(0) = 0\\) は失格者を見つける検査\n\n\\(f(0) = 0\\) でも \\(x^2\\) のように非線形なものはある（合格の証明にはならない）。"
+  },
+  {
+    "objectID": "logistic-regression.html#b-の式を線形にするトリック",
+    "href": "logistic-regression.html#b-の式を線形にするトリック",
+    "title": "ロジスティック回帰",
+    "section": "\\(+b\\) の式を線形にするトリック",
+    "text": "\\(+b\\) の式を線形にするトリック\n\n\n\\(b\\) を「常に 1 が入っている入力 \\(x_0\\) への重み \\(w_0\\)」と読み替える：\n\n\\[z = w_0 \\underbrace{x_0}_{=\\,1} + w_1 x_1 + w_2 x_2\\]\n\n入力を \\((1, x_1, x_2)\\) の3次元と見れば、\\(f(0,0,0) = 0\\)\n\nこれは線形結合\n\n統計学ではデータ表に「全部 1 の列」を足す定番の手（切片項）\n実装でも広く使われるトリック\nなお、\\(+b\\) の形（線形＋平行移動）はアフィン変換（affine transformation）と呼ばれる\n\n\n\n\n\n\n\n\nしかし\n\n\n\n世の中の説明の多くは \\(+b\\) 込みでも「線形」と書く — 頭の中で \\(x_0 = 1\\) を補えば、その呼び方でも辻褄が合う。"
+  },
+  {
+    "objectID": "logistic-regression.html#線形だと何かと都合がよい",
+    "href": "logistic-regression.html#線形だと何かと都合がよい",
+    "title": "ロジスティック回帰",
+    "section": "線形だと何かと都合がよい",
+    "text": "線形だと何かと都合がよい\n\n\n行列のかけ算 として計算可能\n\nさらに何回掛け算しても線形のまま\n\n微分した結果wが残らない：\\(\\dfrac{\\partial z}{\\partial w_1} = x_1\\)、\\(\\dfrac{\\partial z}{\\partial b} = 1\\)\n\n（非線形の例）重みの2乗：\\(z = w_1^2 x_1\\) なら \\(\\dfrac{\\partial z}{\\partial w_1} = 2w_1x_1\\) で、\\(w_1\\) 自身が残ります。\n\n線形代数の道具が使える：最小二乗なら正規方程式で勾配降下法なしに解ける\n凸な損失と組めばローカルミニマムがない（ロジスティック回帰の交差エントロピーもこれ）"
+  },
+  {
+    "objectID": "logistic-regression.html#どの変数に対する線形か",
+    "href": "logistic-regression.html#どの変数に対する線形か",
+    "title": "ロジスティック回帰",
+    "section": "どの変数に対する「線形」か",
+    "text": "どの変数に対する「線形」か\n\n\nここでの変数はデータ \\(x\\) とパラメータ \\(w\\) の2種類\n\n\n\n\n\n\n\n\n\n\n見方\n固定\n動かす\n1次だと嬉しいこと\n\n\n\n\n学習するとき\n\\(x\\)（データ）\n\\(w\\)\n微分で \\(w\\) が残らない・正規方程式・ローカルミニマムなし\n\n\n予測するとき\n\\(w\\)\n\\(x\\)\n決定境界が直線・行列のかけ算・重ねても線形\n\n\n\n\n\\(z = w_1 x + w_2 x^2\\)：曲がった境界が引けて、学習は今までどおり楽\n\n\n\\(x\\) について曲線なので、境界が直線以外も可能\n\n例： \\(b\\) も入れて \\(z = w_1x + w_2x^2 + b\\) とし、\\(w_2 &lt; 0\\) にすると、\\(z &gt; 0\\) になるのは \\(x\\) が中くらいの範囲だけ\n「小さすぎず大きすぎないものだけ A」という、直線1本では分けられない分類が可能\n\n\\(w\\) について1次なので、学習の仕方に変化なし\n\n\\(x^2\\) を新しい入力のベクトルとしてデータ表に足す\n\n\\(x_0 = 1\\) の列を足したのと同じ\n\n損失はお椀型のままで、ローカルミニマムがない\n\nロジスティック回帰が可能\n\n\n\n\n\\(z = w^2 x\\)：表現力は増えないのに、学習だけ難しくなる\n\n\n\\(x\\) について直線なので、表現力は \\(z = wx\\) と変わりません。むしろ \\(w^2 \\geq 0\\) なので、傾きを負にできない分、狭くなっています。\n\\(w\\) について1次でないので、学習が厄介になります。\n\n勾配が \\(2wx\\) なので、\\(w = 0\\) から始めると勾配が0で、まったく動けません。\n\\(w = 1\\) と \\(w = -1\\) が同じモデルになるので、谷が2つできます。\n\n\n\n\n\n\n\n\nノート\n\n\n統計の「線形モデル」は \\(w\\) について線形（多項式回帰も含む）。「線形分類器」は \\(x\\) について線形。"
   }
 ]

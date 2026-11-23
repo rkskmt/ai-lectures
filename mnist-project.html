@@ -237,13 +237,13 @@
             config.math.config = config.math.config.replace("_HTML", "_CHTML");
             config.math.CommonHTML = { scale: 127, matchFontHeight: false };
           }
-          // A ruled lecture index (.lectures.ruled) lays itself out at
-          // the window's width (custom.css). reveal.js's slide view
+          // A ruled or network lecture index lays itself out at the
+          // window's width (custom.css). reveal.js's slide view
           // fixes every slide at 1280x720 and scales it, and reveal.js
           // switches to the scroll view only below 435px, so open such
           // a page in the scroll view at every width. Quarto calls
           // initialize at the end of <body>, so the page is parsed.
-          if (config && document.querySelector(".lectures.ruled")) {
+          if (config && document.querySelector(".lectures.ruled, .lectures.network")) {
             config.view = "scroll";
           }
           return initialize.call(this, config);
@@ -257,7 +257,8 @@
   <script src="peek-ui.js" defer=""></script>
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="8a0a938b146053a5efaa90e3292a1ff5ec836147">
+  <script src="network-ui.js" defer=""></script>
+  <meta name="qmd-web-source" content="e5b2cd113b320f84399dc84e75bd1d127dbd8469">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -279,7 +280,7 @@ rkskmt
 <section id="手書き数字を読み取る機械を作る" class="slide level2">
 <h2>手書き数字を読み取る機械を作る</h2>
 <div class="slide-body">
-<div id="925d5b73" class="cell" data-execution_count="1">
+<div id="3a2450da" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -299,7 +300,7 @@ rkskmt
 <ul>
 <li>手書き数字の定番データセット。<strong>訓練6万枚・テスト1万枚</strong>、各28×28ピクセル</li>
 </ul>
-<div id="31132ac7" class="cell" data-execution_count="2">
+<div id="22f18a85" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
 <span id="cb1-2"><a aria-label="2"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
 <span id="cb1-3"><a aria-label="3"></a><span class="im">from</span> torchvision <span class="im">import</span> datasets, transforms</span>
@@ -312,13 +313,13 @@ rkskmt
 <span id="cb1-10"><a aria-label="10"></a>img, label <span class="op">=</span> train_ds[<span class="dv">0</span>]</span>
 <span id="cb1-11"><a aria-label="11"></a><span class="bu">print</span>(<span class="st">"1枚の形:"</span>, <span class="bu">tuple</span>(img.shape), <span class="st">" 正解ラベル:"</span>, label)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="2e4451eb" class="cell" data-execution_count="3">
+<div id="5bcbe339" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-stdout">
 <pre><code>訓練: 60000 枚 / テスト: 10000 枚
 1枚の形: (1, 28, 28)  正解ラベル: 5</code></pre>
 </div>
 </div>
-<div id="2f151e00" class="cell" data-execution_count="4">
+<div id="747e24ce" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -376,7 +377,7 @@ rkskmt
 <li>高次元（<a href="./knn-curse.html#peek-curse" class="peek">次元の呪い</a>）が、<strong>本物の入力</strong>として現れる</li>
 <li><code>nn.Flatten()</code> が「画像 → ベクトル」の変換をやる</li>
 </ul>
-<div id="4cb43970" class="cell" data-execution_count="5">
+<div id="f50aeef5" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
 <span id="cb3-2"><a aria-label="2"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
 <span id="cb3-3"><a aria-label="3"></a></span>
@@ -514,7 +515,7 @@ rkskmt
 <section id="ソフトマックスの仕事ぶり" class="slide level2">
 <h2>ソフトマックスの仕事ぶり</h2>
 <div class="slide-body">
-<div id="25de0ba1" class="cell" data-execution_count="6">
+<div id="86a6c6c2" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -532,7 +533,7 @@ rkskmt
 <section id="crossentropyloss-はsoftmax込み" class="slide level2">
 <h2><code>CrossEntropyLoss</code> はsoftmax込み</h2>
 <div class="slide-body">
-<div id="4efe7dba" class="cell" data-execution_count="7">
+<div id="e18042ea" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a aria-label="1"></a><span class="im">import</span> torch</span>
 <span id="cb5-2"><a aria-label="2"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
 <span id="cb5-3"><a aria-label="3"></a></span>
@@ -557,7 +558,7 @@ rkskmt
 <section id="モデル784-128-10" class="slide level2">
 <h2>モデル：784 → 128 → 10</h2>
 <div class="slide-body">
-<div id="162cb601" class="cell" data-execution_count="8">
+<div id="8b79d1a5" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a aria-label="1"></a>torch.manual_seed(<span class="dv">0</span>)</span>
 <span id="cb7-2"><a aria-label="2"></a></span>
 <span id="cb7-3"><a aria-label="3"></a>model <span class="op">=</span> nn.Sequential(</span>
@@ -625,9 +626,9 @@ rkskmt
 <div class="slide-body">
 <ul>
 <li>6万枚まとめて勾配を計算すると重い → <strong>128枚ずつ</strong>取り出して1歩ずつ進む — この一口が<strong>ミニバッチ</strong>（<span class="en">mini-batch</span>）</li>
-<li>データを一巡することを <strong>1エポック</strong>（<span class="en">epoch</span>）と呼ぶ</li>
+<li><strong>1エポック</strong>（<span class="en">epoch</span>）：データを一巡すること</li>
 </ul>
-<div id="33150f97" class="cell" data-execution_count="9">
+<div id="e4f7c603" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a aria-label="1"></a>train_loader <span class="op">=</span> torch.utils.data.DataLoader(train_ds, batch_size<span class="op">=</span><span class="dv">128</span>, shuffle<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb10-2"><a aria-label="2"></a>test_loader  <span class="op">=</span> torch.utils.data.DataLoader(test_ds,  batch_size<span class="op">=</span><span class="dv">1000</span>)</span>
 <span id="cb10-3"><a aria-label="3"></a></span>
@@ -642,7 +643,7 @@ rkskmt
 <span id="cb10-12"><a aria-label="12"></a><span class="bu">print</span>(<span class="st">"画像バッチ:"</span>, <span class="bu">tuple</span>(x_batch.shape))</span>
 <span id="cb10-13"><a aria-label="13"></a><span class="bu">print</span>(<span class="st">"ラベルバッチ:"</span>, <span class="bu">tuple</span>(y_batch.shape))</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="1a2fd304" class="cell" data-execution_count="10">
+<div id="e3a4a51d" class="cell" data-execution_count="10">
 <div class="cell-output cell-output-stdout">
 <pre><code>画像バッチ: (128, 1, 28, 28)
 ラベルバッチ: (128,)</code></pre>
@@ -683,7 +684,7 @@ rkskmt
 <section id="peek-mnist-train" class="slide level2">
 <h2>学習する</h2>
 <div class="slide-body">
-<div id="9afed132" class="cell" data-execution_count="11">
+<div id="3455cec8" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a aria-label="1"></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">4</span>):</span>
 <span id="cb12-2"><a aria-label="2"></a>    loss_sum <span class="op">=</span> <span class="fl">0.0</span></span>
 <span id="cb12-3"><a aria-label="3"></a>    <span class="cf">for</span> x_batch, y_batch <span class="kw">in</span> train_loader:</span>
@@ -702,7 +703,7 @@ rkskmt
 <span id="cb12-16"><a aria-label="16"></a>    <span class="bu">print</span>(<span class="ss">f"エポック </span><span class="sc">{</span>epoch<span class="sc">}</span><span class="ss"> | 訓練Loss: </span><span class="sc">{</span>train_loss<span class="sc">:.4f}</span><span class="ss"> "</span></span>
 <span id="cb12-17"><a aria-label="17"></a>          <span class="ss">f"| テスト正答率: </span><span class="sc">{</span>correct <span class="op">/</span> <span class="bu">len</span>(test_ds)<span class="sc">:.2%}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="1a008b10" class="cell" data-execution_count="12">
+<div id="bcf7ad18" class="cell" data-execution_count="12">
 <div class="cell-output cell-output-stdout">
 <pre><code>エポック 1 | 訓練Loss: 0.4125 | テスト正答率: 93.49%
 エポック 2 | 訓練Loss: 0.1968 | テスト正答率: 95.15%
@@ -774,7 +775,7 @@ rkskmt
 <section id="読めている様子" class="slide level2">
 <h2>読めている様子</h2>
 <div class="slide-body">
-<div id="b06def61" class="cell" data-execution_count="13">
+<div id="57cac991" class="cell" data-execution_count="13">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -791,7 +792,7 @@ rkskmt
 <section id="間違いを眺める" class="slide level2">
 <h2>間違いを眺める</h2>
 <div class="slide-body">
-<div id="84289237" class="cell" data-execution_count="14">
+<div id="ca61ac6b" class="cell" data-execution_count="14">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -824,7 +825,7 @@ rkskmt
 </div>
 </div>
 </div>
-<div id="b9d64ce5" class="cell" data-execution_count="15">
+<div id="270bb761" class="cell" data-execution_count="15">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -843,7 +844,7 @@ rkskmt
 <section id="自信満々の間違い" class="slide level2">
 <h2>自信満々の間違い</h2>
 <div class="slide-body">
-<div id="fc7445ca" class="cell" data-execution_count="16">
+<div id="acc2afdc" class="cell" data-execution_count="16">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -865,7 +866,7 @@ rkskmt
 <ul>
 <li>第1層 <code>nn.Linear(784, 128)</code> の各ユニットは、784本の重みを持つ ＝ <strong>28×28の「模様」</strong>として絵にできる</li>
 </ul>
-<div id="cfe003fa" class="cell" data-execution_count="17">
+<div id="465f9266" class="cell" data-execution_count="17">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -911,7 +912,7 @@ rkskmt
 <h2>自分の字は読めるのか（持ち帰りデモ）</h2>
 <div class="slide-body">
 <p>紙に数字を書いて撮影し、この機械に読ませてみよう。 ただし<strong>写真をそのまま28×28に縮めても、まず読めない</strong> — MNISTの画像は「数字を20ピクセル角に収め、重心をど真ん中に置く」ように揃えてあり、撮った写真はそうなっていないから。同じ揃え方を自分でやってから見せる：</p>
-<div id="0e357360" class="cell" data-execution_count="18">
+<div id="a25230a3" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a aria-label="1"></a><span class="im">from</span> PIL <span class="im">import</span> Image</span>
 <span id="cb14-2"><a aria-label="2"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb14-3"><a aria-label="3"></a><span class="im">import</span> torch</span>
@@ -1068,7 +1069,7 @@ rkskmt
 <h2>講義全体のまとめ</h2>
 <div class="slide-body">
 <ul>
-<li>魚の選別から始まり、<code>fit()</code> という1行の中身を開け続けた
+<li>魚の選別から始まり、学習の手順を自分のコードで書いてきた
 <ul>
 <li>しきい値 → 直線 → 木 → ロジスティック回帰 → 多層NN</li>
 <li>損失（交差エントロピー・MSE）と勾配降下法が全編を貫く背骨</li>

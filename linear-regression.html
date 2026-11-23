@@ -237,13 +237,13 @@
             config.math.config = config.math.config.replace("_HTML", "_CHTML");
             config.math.CommonHTML = { scale: 127, matchFontHeight: false };
           }
-          // A ruled lecture index (.lectures.ruled) lays itself out at
-          // the window's width (custom.css). reveal.js's slide view
+          // A ruled or network lecture index lays itself out at the
+          // window's width (custom.css). reveal.js's slide view
           // fixes every slide at 1280x720 and scales it, and reveal.js
           // switches to the scroll view only below 435px, so open such
           // a page in the scroll view at every width. Quarto calls
           // initialize at the end of <body>, so the page is parsed.
-          if (config && document.querySelector(".lectures.ruled")) {
+          if (config && document.querySelector(".lectures.ruled, .lectures.network")) {
             config.view = "scroll";
           }
           return initialize.call(this, config);
@@ -257,7 +257,8 @@
   <script src="peek-ui.js" defer=""></script>
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="2b4713d1485e612b4b319e4accc3d969daf9de09">
+  <script src="network-ui.js" defer=""></script>
+  <meta name="qmd-web-source" content="49f015285b0c5584045411243cf68f0c8544c37f">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -265,7 +266,7 @@
 
 <section id="title-slide" class="quarto-title-block center">
   <h1 class="title">線形回帰と正則化</h1>
-  <p class="subtitle">fit() を自分の手で作る</p>
+  <p class="subtitle">勾配降下法で直線を求める</p>
 
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
@@ -293,7 +294,7 @@ rkskmt
 <p><strong>今回の目的</strong></p>
 </div>
 <div class="callout-content">
-<p>勾配降下法で回帰モデルを<code>fit</code> する</p>
+<p>勾配降下法でデータに合う直線を求める</p>
 </div>
 </div>
 </div>
@@ -307,6 +308,11 @@ rkskmt
 <li>これまでの「モデル」を、2つの部分に分けてみる：</li>
 </ul>
 <table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
 <thead>
 <tr class="header">
 <th>回</th>
@@ -322,8 +328,8 @@ rkskmt
 </tr>
 <tr class="even">
 <td>2次元の決定境界</td>
-<td>直線の上下で判定</td>
-<td>傾きと切片（2個）</td>
+<td>しきい値との比較を繰り返して判定（決定木）</td>
+<td>分岐ごとのしきい値</td>
 </tr>
 <tr class="odd">
 <td>クラスタリング</td>
@@ -345,7 +351,7 @@ rkskmt
 <ul>
 <li>入力から出力を計算するやり方。ただし、<strong>形</strong>だけが決まっていて、中の数字は<strong>空欄</strong></li>
 <li>空欄の名前が<strong>パラメータ</strong></li>
-<li>空欄をデータで埋めるのが<strong>学習</strong>（<code>fit()</code> がやっていたこと）</li>
+<li>空欄をデータで埋めるのが<strong>学習</strong></li>
 </ul>
 </div>
 </div>
@@ -393,7 +399,7 @@ rkskmt
 <li>魚の<strong>体長</strong>（cm）を、新しい特徴量として使う</li>
 <li>体長を測るだけで重さが分かれば、<strong>秤に乗せる手間が省ける</strong></li>
 </ul>
-<div id="924cc5c5" class="cell" data-execution_count="1">
+<div id="989ea2cc" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>魚データの定義（クリックして展開）</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -418,7 +424,7 @@ rkskmt
 <span id="cb1-20"><a aria-label="20"></a>lengths <span class="op">=</span> np.<span class="bu">round</span>(np.cbrt(weights) <span class="op">*</span> <span class="fl">4.5</span> <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="fl">1.0</span>, <span class="bu">len</span>(weights)), <span class="dv">1</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="8e9760e9" class="cell" data-execution_count="2">
+<div id="de729d1b" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -437,11 +443,10 @@ rkskmt
 <h2>損失関数：二乗誤差（MSE）</h2>
 <div class="slide-body">
 <ul>
-<li>各魚について「予測と実際のズレ」を測り、二乗して平均する</li>
+<li><strong>MSE（<span class="en"><strong>Mean Squared Error</strong></span> / 平均二乗誤差）</strong>：各魚の「予測と実際のズレ」を二乗して平均した値</li>
 </ul>
 <p><span class="math display">\[L(a, b) = \frac{1}{N} \sum_{i} \left( \underbrace{a x_i + b}_{\text{予測}} - \underbrace{t_i}_{\text{実際}} \right)^2\]</span></p>
 <ul>
-<li><strong>MSE（<span class="en"><strong>Mean Squared Error</strong></span> / 平均二乗誤差）</strong>と呼ぶ</li>
 <li><a href="./clustering-kmeans.html#peek-sse" class="peek">クラスタリングの回の SSE</a> と同じ発想で、誤差を 2 乗して集めたものを点の数で割った平均</li>
 <li>全魚のズレを1本のベクトルと見ると、MSE はその<strong>ノルム（<span class="en">norm</span>・ベクトルの長さ）</strong>の2乗を <span class="math inline">\(N\)</span> で割ったもの</li>
 </ul>
@@ -459,7 +464,7 @@ rkskmt
 <li>ズレの<strong>絶対値</strong>の平均でも「小さいほど良い直線」は測れる — <strong>MAE（<span class="en">Mean Absolute Error</span> / 平均絶対誤差）</strong></li>
 <li>ズレの4乗の平均でもよい。「ズレが減るほど小さくなる」関数なら損失関数の候補になれる</li>
 <li>今回 MSE を選ぶ理由は<strong>微分のしやすさ</strong>：絶対値は 0 のところで折れていて微分できない。二乗なら微分がきれい</li>
-<li>MAE での fit は<a href="./robust-regression.html#peek-mae" class="peek">外れ値に強い回帰</a>で扱う</li>
+<li>MAE を損失にした回帰は<a href="./robust-regression.html#peek-mae" class="peek">外れ値に強い回帰</a>で扱う</li>
 </ul>
 </div>
 </div>
@@ -500,12 +505,12 @@ rkskmt
 </div>
 </section>
 <section id="peek-gdfit-code" class="slide level2">
-<h2>勾配降下法で fit する</h2>
+<h2>勾配降下法で傾きと切片を求める</h2>
 <div class="slide-body">
 <ul>
 <li>スケールを揃えてから（<a href="./clustering-kmeans.html#peek-scale" class="peek">クラスタリングの回の教訓</a>。学習率を1つで済ませるため）</li>
 </ul>
-<div id="f1408918" class="cell" data-execution_count="3">
+<div id="908ebd0d" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a>x <span class="op">=</span> (lengths <span class="op">-</span> lengths.mean()) <span class="op">/</span> lengths.std()   <span class="co"># 標準化した体長</span></span>
 <span id="cb2-2"><a aria-label="2"></a>t <span class="op">=</span> (weights <span class="op">-</span> weights.mean()) <span class="op">/</span> weights.std()   <span class="co"># 標準化した重さ</span></span>
 <span id="cb2-3"><a aria-label="3"></a></span>
@@ -575,7 +580,10 @@ rkskmt
 <div class="callout-content">
 <ul>
 <li><code>0.9</code> は行きすぎて戻ってを繰り返しながら、それでも収束する</li>
-<li><code>1.1</code> は MSE がどうなっていく？ — 前回の「学習率が大きすぎると発散」を、本物の <code>fit()</code> で再現できた</li>
+<li><code>1.1</code> は MSE がどうなっていく？
+<ul>
+<li><a href="./optimization-gradient-descent.html#peek-lr" class="peek">学習率が大きすぎると発散する</a>のは、直線を求めるときも同じ</li>
+</ul></li>
 </ul>
 </div>
 </div>
@@ -586,7 +594,7 @@ rkskmt
 <section id="直線が合っていく様子" class="slide level2">
 <h2>直線が合っていく様子</h2>
 <div class="slide-body">
-<div id="c370685a" class="cell" data-execution_count="4">
+<div id="2f0860df" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -631,14 +639,14 @@ rkskmt
 </tbody>
 </table>
 <ul>
-<li>どれも今回と同じ手順で解ける：モデルの形を決め、損失を決め、勾配降下法で <code>fit</code> する</li>
+<li>どれも今回と同じ手順で解ける：モデルの形を決め、損失を決め、勾配降下法でパラメータを求める</li>
 </ul>
 </div>
 </section>
 <section id="答え合わせsklearn-と比べる" class="slide level2">
 <h2>答え合わせ：sklearn と比べる</h2>
 <div class="slide-body">
-<div id="12909586" class="cell" data-execution_count="5">
+<div id="ac8e0abc" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a aria-label="1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
 <span id="cb4-2"><a aria-label="2"></a></span>
 <span id="cb4-3"><a aria-label="3"></a>reg <span class="op">=</span> LinearRegression().fit(x.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), t)</span>
@@ -650,22 +658,9 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 </div>
 </div>
 <ul>
-<li><strong>完全に一致</strong>。<code>fit()</code> の中身を、初めて自分の手で再現できた</li>
+<li>自作の勾配降下法と sklearn の結果が<strong>一致</strong></li>
 <li>元の単位に戻すと「体長 1cm あたり約 91g」という意味のある数字になる</li>
 </ul>
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>ノート</strong></p>
-</div>
-<div class="callout-content">
-<p>ブラックボックスがまた1つ開いた。分類モデルの <code>fit()</code> も同じ要領で開けられる（次回）。</p>
-</div>
-</div>
-</div>
 </div>
 </section>
 <section id="section" class="slide level2 center break-slide" data-background-color="white">
@@ -705,7 +700,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <section id="次数を上げてみる" class="slide level2">
 <h2>次数を上げてみる</h2>
 <div class="slide-body">
-<div id="453b2f4c" class="cell" data-execution_count="6">
+<div id="b2a74d7e" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a aria-label="1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
@@ -750,7 +745,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <section id="数字で見るまた会ったな過学習" class="slide level2">
 <h2>数字で見る：また会ったな、過学習</h2>
 <div class="slide-body">
-<div id="87e9d414" class="cell" data-execution_count="7">
+<div id="620003ca" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a aria-label="1"></a>degrees <span class="op">=</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">10</span>)</span>
 <span id="cb7-2"><a aria-label="2"></a>train_mse, test_mse <span class="op">=</span> [], []</span>
 <span id="cb7-3"><a aria-label="3"></a><span class="cf">for</span> deg <span class="kw">in</span> degrees:</span>
@@ -787,7 +782,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <ul>
 <li>暴れている曲線の正体は、<strong>巨大な係数</strong></li>
 </ul>
-<div id="ceb84b0d" class="cell" data-execution_count="8">
+<div id="f6ff0b8f" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a aria-label="1"></a>plain <span class="op">=</span> make_pipeline(PolynomialFeatures(<span class="dv">9</span>), StandardScaler(), LinearRegression())</span>
 <span id="cb8-2"><a aria-label="2"></a>plain.fit(X_train, y_train)</span>
 <span id="cb8-3"><a aria-label="3"></a><span class="bu">print</span>(<span class="st">"次数9の係数の最大絶対値:"</span>, <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">abs</span>(plain[<span class="op">-</span><span class="dv">1</span>].coef_)<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
@@ -813,7 +808,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <li>sklearn には任せない。冒頭で自作した勾配降下法に、<strong>罰金の項を足すだけ</strong></li>
 <li>罰金 <span class="math inline">\(\lambda \sum w^2\)</span> の微分は <span class="math inline">\(2\lambda w\)</span>。各係数の勾配に足せばよい</li>
 </ul>
-<div id="b841786c" class="cell" data-execution_count="9">
+<div id="55d34051" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a aria-label="1"></a><span class="co"># 特徴量 x, x², …, x⁹ も自分で作る（列が x^1 〜 x^9 の配列）</span></span>
 <span id="cb10-2"><a aria-label="2"></a>P_train <span class="op">=</span> X_train <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)          <span class="co"># 形 (10, 9)</span></span>
 <span id="cb10-3"><a aria-label="3"></a>P_test  <span class="op">=</span> X_test  <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)</span>
@@ -851,7 +846,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <section id="罰金ありなしを見比べる" class="slide level2">
 <h2>罰金あり・なしを見比べる</h2>
 <div class="slide-body">
-<div id="19974ba1" class="cell" data-execution_count="10">
+<div id="65dc1c4d" class="cell" data-execution_count="10">
 <details class="code-fold">
 <summary>描画コード</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a aria-label="1"></a>P_grid    <span class="op">=</span> ((grid <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)) <span class="op">-</span> mu) <span class="op">/</span> sd</span>
@@ -911,7 +906,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <ul>
 <li><code>sklearn</code> には <code>Ridge</code> として入っている</li>
 </ul></li>
-<li>NN でも同じ道具がそのまま使われる（<span class="en">weight decay</span> と呼ぶ）</li>
+<li>NN でも同じ道具がそのまま使われる（NN での名前は <span class="en">weight decay</span>）</li>
 </ul>
 </div>
 </section>
@@ -1022,7 +1017,7 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <div class="slide-body">
 <ul>
 <li><strong>回帰</strong>：数値を予測する。損失は<strong>二乗誤差（MSE）</strong>— 微分しやすさで選ぶ</li>
-<li>勾配降下法で fit を自作 → <code>sklearn</code> と<strong>完全一致</strong></li>
+<li>勾配降下法で求めた傾きと切片は、<code>sklearn</code> の結果と<strong>一致</strong></li>
 <li><strong>多項式回帰</strong>：特徴量に <span class="math inline">\(x^2, x^3, \ldots\)</span> を足せば道具は線形回帰のまま</li>
 <li><strong>過学習は回帰でも起きる</strong>：次数を上げると訓練誤差↓・テスト誤差爆発</li>
 <li><strong>正則化（<span class="en">regularization</span>）</strong>：大きい係数に罰金 → 暴れる曲線を手なずける</li>
@@ -1037,17 +1032,17 @@ sklearn の fit: a=0.9728, b=0.0000</code></pre>
 <p><strong>次回予告</strong></p>
 </div>
 <div class="callout-content">
-<p>回帰の <code>fit()</code> は開けた。次は<strong>分類</strong>の <code>fit()</code> — 次の相手は分類の定番、<strong>ロジスティック回帰</strong>。同じ道具（損失＋勾配降下法）で fit() を開けにいく。</p>
+<p>次回は分類の<strong>ロジスティック回帰</strong>。損失と勾配降下法で斜めの決定境界を求める。</p>
 </div>
 </div>
 </div>
 </div>
 </div>
 </section>
-<section id="問題1魚2匹だけの世界で-fit-する" class="slide level2 scrollable">
-<h2>問題1：魚2匹だけの世界で fit する</h2>
+<section id="問題12点のデータから直線を求める" class="slide level2 scrollable">
+<h2>問題1：2点のデータから直線を求める</h2>
 <div class="slide-body">
-<p>データは2点だけ：<span class="math inline">\((x_1, t_1) = (-1, 0)\)</span>、<span class="math inline">\((x_2, t_2) = (1, 2)\)</span>。 直線 <span class="math inline">\(ax + b\)</span> を勾配降下法で fit する。初期値 <span class="math inline">\(a = 0, b = 0\)</span>、学習率 <span class="math inline">\(\alpha = 0.1\)</span>。<strong>手計算</strong>と<strong>Pythonコード</strong>の両方で解け。</p>
+<p>データは2点だけ：<span class="math inline">\((x_1, t_1) = (-1, 0)\)</span>、<span class="math inline">\((x_2, t_2) = (1, 2)\)</span>。 直線 <span class="math inline">\(ax + b\)</span> を勾配降下法で求める。初期値 <span class="math inline">\(a = 0, b = 0\)</span>、学習率 <span class="math inline">\(\alpha = 0.1\)</span>。<strong>手計算</strong>と<strong>Pythonコード</strong>の両方で解け。</p>
 <ol type="1">
 <li>勾配の式に代入して、<span class="math inline">\(\dfrac{\partial L}{\partial a}\)</span> と <span class="math inline">\(\dfrac{\partial L}{\partial b}\)</span> を求めよ</li>
 <li>更新を3回、手計算で示せ</li>
@@ -1084,7 +1079,7 @@ a = 0.2 + 0.16 = 0.36\]</span></p>
 </div>
 </div>
 <h3 id="コードで確認">コードで確認</h3>
-<div id="d187f2f3" class="cell" data-execution_count="11">
+<div id="77e0f861" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
