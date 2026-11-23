@@ -66,20 +66,12 @@ import japanize_matplotlib
 plt.rcParams["font.size"] = 11
 plt.rcParams["figure.dpi"] = 100
 
-salmon_weights     = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,
-                               1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,
-                               2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,
-                               1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652])
-seabass_weights    = np.array([1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,
-                               1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,
-                               1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,
-                               1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531])
-
-weights = np.concatenate([salmon_weights, seabass_weights]).astype(float)
-
-# 体長の測定値（cm）
-rng     = np.random.default_rng(42)
-lengths = np.round(np.cbrt(weights) * 4.5 + rng.normal(0, 1.0, len(weights)), 1)
+# 説明変数：体長（cm）
+lengths = np.array([55.2, 56.0, 51.8, 58.1, 56.8, 51.5, 56.6, 51.6, 61.0, 52.0,
+                    58.5, 50.5, 55.5, 48.7, 46.6])
+# 目的変数：重さ（g）
+weights = np.array([1884, 1978, 1483, 2181, 2028, 1476, 2094, 1563, 2474, 1414,
+                    2230, 1445, 1838, 1370, 1096], dtype=float)
 ```
 
 ```{python}
@@ -229,7 +221,7 @@ print(f"sklearn の fit: a={reg.coef_[0]:.4f}, b={reg.intercept_:.4f}")
 
 ::: {.callout-note title="結果"}
 - 自作の勾配降下法と sklearn の結果が**一致**
-- 元の単位に戻すと「体長 1cm あたり約 91g」という意味のある数字になる
+- 元の単位に戻すと「体長 1cm あたり約 97g」という意味のある数字になる
 :::
 
 
@@ -260,19 +252,16 @@ $$\text{予測} = w_1 x + w_2 x^2 + \cdots + w_d x^d + b$$
 #| echo: true
 #| code-fold: true
 #| code-summary: "code"
-# 新しい仕入れ先の15匹（訓練10匹、テスト5匹）
-train_idx = [24, 32, 14, 56, 20, 45, 17, 55, 6, 57]
-test_idx = [7, 61, 28, 70, 77]
-x_train, t_train = lengths[train_idx], weights[train_idx]
-x_test, t_test = lengths[test_idx], weights[test_idx]
+# 先頭の10匹を訓練データ、残りの5匹をテストデータにする
+x_train, t_train = lengths[:10], weights[:10]
+x_test, t_test = lengths[10:], weights[10:]
 
 # 体長を標準化してから多項式を当てはめる（そのまま9乗すると計算が不安定になる）
 x_mean, x_std = x_train.mean(), x_train.std()
 z_train = (x_train - x_mean) / x_std
 z_test = (x_test - x_mean) / x_std
 
-all_x = np.concatenate([x_train, x_test])
-grid = np.linspace(all_x.min() - 0.5, all_x.max() + 0.5, 300)
+grid = np.linspace(lengths.min() - 0.5, lengths.max() + 0.5, 300)
 z_grid = (grid - x_mean) / x_std
 
 fig, axes = plt.subplots(1, 3, figsize=(12, 3.6))
