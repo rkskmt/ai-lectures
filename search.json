@@ -5128,6 +5128,6 @@
     "href": "linear-regression.html#peek-exact-line",
     "title": "線形回帰と正則化",
     "section": "答え合わせ：厳密解と比べる",
-    "text": "答え合わせ：厳密解と比べる\n\n\nnp.polyfit(x, t, d)：二乗誤差が最小になる \\(d\\) 次式の係数を求める関数\n\n更新を繰り返さず、最小二乗法（least squares）で直接求める\n係数は次数の高い順に返る（d = 1 なら \\(a, b\\) の順）\n\n\n\na_exact, b_exact = np.polyfit(x, t, 1)\nprint(f\"gradient descent: a={a:.4f}, b={b:.4f}\")\nprint(f\"np.polyfit      : a={a_exact:.4f}, b={b_exact:.4f}\")\n\ngradient descent: a=0.9854, b=0.0000\nnp.polyfit      : a=0.9854, b=0.0000\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n自作の勾配降下法と厳密解が一致\n元の単位に戻すと「体長 1cm あたり約 97g」という意味のある数字になる"
+    "text": "答え合わせ：厳密解と比べる\n\n\nnp.polyfit(x, t, d)：二乗誤差が最小になる \\(d\\) 次式の係数を求める関数\n\n更新を繰り返さず、最小二乗法（least squares）で直接求める\n\n（参考）SVD（特異値分解, Singular Value Decomposition）だけで求まる\n\n係数は次数の高い順に返る（d = 1 なら \\(a, b\\) の順）\n\n\n\na_exact, b_exact = np.polyfit(x, t, 1)\nprint(f\"gradient descent: a={a:.4f}, b={b:.4f}\")\nprint(f\"np.polyfit      : a={a_exact:.4f}, b={b_exact:.4f}\")\n\ngradient descent: a=0.9854, b=0.0000\nnp.polyfit      : a=0.9854, b=0.0000\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n自作の勾配降下法と厳密解が一致\n元の単位に戻すと「体長 1cm あたり約 97g」という意味のある数字になる"
   }
 ]

@@ -258,7 +258,7 @@
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
   <script src="network-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="c4a0cf5558b0be710b31ae87df94b49af6f84623">
+  <meta name="qmd-web-source" content="5f43385d8b7bd6868b75cfec32a8fa0e3b64eb2b">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -421,7 +421,7 @@ rkskmt
 <li>魚の<strong>体長</strong>（cm）を、新しい特徴量として使う</li>
 <li>体長を測るだけで重さが分かれば、<strong>秤に乗せる手間が省ける</strong></li>
 </ul>
-<div id="27a0c0f2" class="cell" data-execution_count="1">
+<div id="6794585a" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>魚データの定義（クリックして展開）</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -438,7 +438,7 @@ rkskmt
 <span id="cb1-12"><a aria-label="12"></a>                    <span class="dv">2230</span>, <span class="dv">1445</span>, <span class="dv">1838</span>, <span class="dv">1370</span>, <span class="dv">1096</span>], dtype<span class="op">=</span><span class="bu">float</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="f94b0f92" class="cell" data-execution_count="2">
+<div id="57b24e3f" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -554,7 +554,7 @@ rkskmt
 <li>学習率を1つで済ませるため</li>
 </ul></li>
 </ul>
-<div id="0557f012" class="cell" data-execution_count="3">
+<div id="fe53e782" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a>x <span class="op">=</span> (lengths <span class="op">-</span> lengths.mean()) <span class="op">/</span> lengths.std()   <span class="co"># 標準化した体長</span></span>
 <span id="cb2-2"><a aria-label="2"></a>t <span class="op">=</span> (weights <span class="op">-</span> weights.mean()) <span class="op">/</span> weights.std()   <span class="co"># 標準化した重さ</span></span>
 <span id="cb2-3"><a aria-label="3"></a></span>
@@ -597,7 +597,7 @@ rkskmt
 <section id="直線が合っていく様子" class="slide level2">
 <h2>直線が合っていく様子</h2>
 <div class="slide-body">
-<div id="e07fb9aa" class="cell" data-execution_count="4">
+<div id="5e20da3a" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -678,11 +678,14 @@ rkskmt
 <ul>
 <li><code>np.polyfit(x, t, d)</code>：二乗誤差が最小になる <span class="math inline">\(d\)</span> 次式の係数を求める関数
 <ul>
-<li>更新を繰り返さず、<strong>最小二乗法（<span class="en">least squares</span>）</strong>で直接求める</li>
+<li>更新を繰り返さず、<strong>最小二乗法（<span class="en">least squares</span>）</strong>で直接求める
+<ul>
+<li>（参考）<strong>SVD（特異値分解, <span class="en">Singular Value Decomposition</span>）</strong>だけで求まる</li>
+</ul></li>
 <li>係数は次数の高い順に返る（<code>d = 1</code> なら <span class="math inline">\(a, b\)</span> の順）</li>
 </ul></li>
 </ul>
-<div id="833cfa61" class="cell" data-execution_count="5">
+<div id="6ebac033" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a aria-label="1"></a>a_exact, b_exact <span class="op">=</span> np.polyfit(x, t, <span class="dv">1</span>)</span>
 <span id="cb4-2"><a aria-label="2"></a><span class="bu">print</span>(<span class="ss">f"gradient descent: a=</span><span class="sc">{</span>a<span class="sc">:.4f}</span><span class="ss">, b=</span><span class="sc">{</span>b<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
 <span id="cb4-3"><a aria-label="3"></a><span class="bu">print</span>(<span class="ss">f"np.polyfit      : a=</span><span class="sc">{</span>a_exact<span class="sc">:.4f}</span><span class="ss">, b=</span><span class="sc">{</span>b_exact<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
@@ -748,7 +751,7 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <section id="次数を上げてみる" class="slide level2">
 <h2>次数を上げてみる</h2>
 <div class="slide-body">
-<div id="164d8934" class="cell" data-execution_count="6">
+<div id="6a722c8d" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a aria-label="1"></a><span class="co"># 先頭の10匹を訓練データ、残りの5匹をテストデータにする</span></span>
@@ -807,7 +810,7 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <section id="数字で見る回帰でも過学習が起きる" class="slide level2">
 <h2>数字で見る：回帰でも過学習が起きる</h2>
 <div class="slide-body">
-<div id="d10e017d" class="cell" data-execution_count="7">
+<div id="83a01312" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a aria-label="1"></a>degrees <span class="op">=</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">9</span>)</span>
 <span id="cb7-2"><a aria-label="2"></a>train_mse, test_mse <span class="op">=</span> [], []</span>
 <span id="cb7-3"><a aria-label="3"></a><span class="cf">for</span> deg <span class="kw">in</span> degrees:</span>
@@ -863,7 +866,7 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <ul>
 <li>曲線が大きく振れる原因は、<strong>巨大な係数</strong></li>
 </ul>
-<div id="fcb18701" class="cell" data-execution_count="8">
+<div id="d4519a40" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a aria-label="1"></a>coef1 <span class="op">=</span> np.polyfit(z_train, t_train, <span class="dv">1</span>)</span>
 <span id="cb8-2"><a aria-label="2"></a>coef9 <span class="op">=</span> np.polyfit(z_train, t_train, <span class="dv">9</span>)</span>
 <span id="cb8-3"><a aria-label="3"></a><span class="bu">print</span>(<span class="st">"次数1の係数の最大絶対値:"</span>, <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">abs</span>(coef1[:<span class="op">-</span><span class="dv">1</span>])<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss">"</span>)   <span class="co"># [:-1] は切片を除く</span></span>
@@ -897,7 +900,7 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <li>各係数の勾配に足せばよい</li>
 </ul></li>
 </ul>
-<div id="5f789578" class="cell" data-execution_count="9">
+<div id="5e22fc8f" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a aria-label="1"></a><span class="co"># 特徴量 x, x², …, x⁹ も自分で作る（列が x^1 〜 x^9 の配列）</span></span>
 <span id="cb10-2"><a aria-label="2"></a>P_train <span class="op">=</span> x_train.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>) <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)   <span class="co"># 形 (10, 9)</span></span>
 <span id="cb10-3"><a aria-label="3"></a>P_test  <span class="op">=</span> x_test.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)  <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)</span>
@@ -957,7 +960,7 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <section id="罰金ありなしを見比べる" class="slide level2">
 <h2>罰金あり・なしを見比べる</h2>
 <div class="slide-body">
-<div id="c2748df8" class="cell" data-execution_count="10">
+<div id="1a2ef783" class="cell" data-execution_count="10">
 <details class="code-fold">
 <summary>描画コード</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a aria-label="1"></a>P_grid    <span class="op">=</span> ((grid.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>) <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)) <span class="op">-</span> mu) <span class="op">/</span> sd</span>
@@ -1184,7 +1187,7 @@ a = 0.2 + 0.16 = 0.36\]</span></p>
 </div>
 </div>
 <h3 id="コードで確認">コードで確認</h3>
-<div id="46c3c634" class="cell" data-execution_count="11">
+<div id="61d7b47a" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
