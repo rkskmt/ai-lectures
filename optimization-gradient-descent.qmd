@@ -563,7 +563,7 @@ plt.show()
 :::
 
 
-## 勾配降下法の実装例
+## 勾配降下法の実装例 {#peek-gd-code}
 
 - 手計算で使った更新式を、そのまま `for` 文で繰り返す
 
@@ -592,6 +592,25 @@ for iteration in range(1, max_iter + 1):
 print(f"最終 x = {x:.4f}")
 print(f"最終 f(x) = {f(x):.4f}")
 ```
+
+
+## **Tweak** 学習率を変更 {.badge-practice}
+
+- [実装例のコード](#peek-gd-code){.peek} の `lr` を**書き換えて実行**
+
+::: {.tweak}
+| やりたいこと | コード |
+|--|--|
+| 歩幅を小さくする | `lr = 0.01` |
+| 歩幅を大きくする | `lr = 0.75` |
+| さらに大きくする | `lr = 1.0` |
+| もう少しだけ大きくする | `lr = 1.1` |
+:::
+
+::: {.callout-tip title="チェックポイント"}
+- `lr = 0.01`：10回の更新では谷底 $x=2$ に届かない
+- `lr = 1.0`：谷底をはさんだ同じ2点を往復し続ける
+:::
 
 
 ## 学習率で挙動が変わる {#peek-lr}
@@ -672,6 +691,70 @@ $$
 
 ::: {.callout-note title="1変数との共通点"}
 パラメータが増えても、各パラメータを個別に計算するだけ。１次元と変わらない。
+:::
+
+
+## 2変数の勾配降下法：手計算で実行
+
+- 関数：$f(w_1,w_2)=w_1^2+3w_2^2$
+- 初期値：$(w_1,w_2)=(-4,2)$
+- 学習率：$\alpha=0.25$
+
+**勾配:**
+
+$$
+\underbrace{\frac{\partial f}{\partial w_1}=2w_1}_{w_2\text{ を定数と見て微分}}
+\qquad
+\underbrace{\frac{\partial f}{\partial w_2}=6w_2}_{w_1\text{ を定数と見て微分}}
+$$
+
+$$
+\nabla f(-4,2)=
+\begin{pmatrix}2\times(-4)\\6\times2\end{pmatrix}
+=
+\begin{pmatrix}-8\\12\end{pmatrix}
+$$
+
+**更新:**
+
+$$
+\begin{pmatrix}w_1\\w_2\end{pmatrix}_{\mathrm{new}}
+=
+\begin{pmatrix}-4\\2\end{pmatrix}
+-0.25\begin{pmatrix}-8\\12\end{pmatrix}
+=
+\begin{pmatrix}-2\\-1\end{pmatrix}
+$$
+
+::: {.callout-note title="結果"}
+$f$ の値は $f(-4,2)=28$ から $f(-2,-1)=7$ に下がる
+:::
+
+
+## 2変数の勾配降下法の実装例
+
+- [1変数の実装](#peek-gd-code){.peek}と同様に、$w_1$ と $w_2$ をそれぞれ更新する
+
+```{python}
+#| echo: true
+def f2(w1, w2):
+    return w1**2 + 3 * w2**2
+
+w1 = -4.0
+w2 = 2.0
+lr = 0.25
+max_iter = 6
+
+for iteration in range(1, max_iter + 1):
+    grad_w1 = 2 * w1   # df/dw1
+    grad_w2 = 6 * w2   # df/dw2
+    w1 = w1 - lr * grad_w1
+    w2 = w2 - lr * grad_w2
+    print(f"iter {iteration}: w1={w1:7.4f} w2={w2:7.4f} f={f2(w1, w2):.4f}")
+```
+
+::: {.caption-note .center}
+`iter 1` の行が手計算の結果
 :::
 
 
