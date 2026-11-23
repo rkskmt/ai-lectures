@@ -14,12 +14,12 @@ subtitle: "最適化問題と損失"
 候補を全部試さずに、小さくしたい値が最小になる数字を見つける
 :::
 
-## ある値が最小になる数字を手法ごとに探してきた
+## これまで、ある値が最小になるパラメータを探してきた
 
-| 手法 | 動かした数字 | 小さくしたい値 | 探し方 |
+| 手法 | パラメータ | 小さくしたい値 | 方法 |
 |---|---|---|---|
-| しきい値で分類 | 重さのしきい値 | [総コスト](classification-basics-1d.qmd#peek-cost){.peek} | 候補を全部試す（総当たり） |
-| 決定木 | 分岐のしきい値 | [加重平均ジニ不純度](classification-2d-boundaries.qmd#最適化ジニ不純度が最小になる閾値を探索){.peek} | 候補を全部試す |
+| しきい値で分類 | 重さの閾値 | [総コスト](classification-basics-1d.qmd#peek-cost){.peek} | 候補を全部試す（総当たり） |
+| 決定木 | 分岐の閾値 | [加重平均ジニ不純度](classification-2d-boundaries.qmd#最適化ジニ不純度が最小になる閾値を探索){.peek} | 候補を全部試す |
 | k-means | 重心の位置 | [SSE](clustering-kmeans.qmd#peek-sse){.peek} | assign と update の繰り返し |
 
 
@@ -41,15 +41,16 @@ subtitle: "最適化問題と損失"
 
 ## パラメータ
 
-- モデル（深さ2の決定木とか3-meansとか）の学習中に更新されていく値。学習が終われば固定
-- **学習**：データからパラメータを決めること。多くのモデルでは最適化によって実現される
+- [パラメータ](clustering-kmeans.qmd#peek-parameter){.peek}：学習がデータから決める値
+   - 学習が終われば固定
+- **学習**：データからパラメータを決めること
+   - 多くのモデルでは最適化によって実現される
 
-::: {.callout-caution title="kはハイパパラメータ"}
-- k-meansのkは、ユーザが関数に与える変数、つまりプログラミングの意味では「パラメータ」だが、[決定木の深さ](classification-evaluation.qmd#peek-hyperparameter){.peek}と同じく**ハイパパラメータ**
-   - 学習中に更新されないからパラメータではない
-- 逆に、表題のパラメータ、最適化の過程で更新される側（k-meansなら重心の座標）は、学習可能パラメータ（[trainable parameter]{.en} / [learnable parameter]{.en}）と呼ばれる。
-   - モデルパラメータ（[model parameter]{.en}）という呼び方もある
-   - とはいえ**普通はこれをパラメータと呼ぶ**
+::: {.callout-note title="「パラメータ」の呼び分け"}
+- プログラミングでは、関数に渡す値もパラメータと呼ぶ
+   - k-means の k はこの意味ではパラメータだが、機械学習ではハイパーパラメータ
+- 学習で決まる側は、学習可能パラメータ（[trainable parameter]{.en} / [learnable parameter]{.en}）やモデルパラメータ（[model parameter]{.en}）とも呼ばれる
+   - 普通は単にパラメータと呼ぶ
 :::
 
 
