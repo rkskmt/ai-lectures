@@ -195,7 +195,7 @@ if overlap_max >= overlap_min:
 
 ## 境界線（閾値）を考える {#peek-decision-boundary}
 
-大体でいいので **しきい値（[threshold]{.en}）** を設定する。
+大体でいいので **閾値（[threshold]{.en}）** を設定する。
 
 
 ### 方針
@@ -391,7 +391,7 @@ print(f"Precision = {TP} / ({TP} + {FP}) = {precision:.3f}")
 print(f"Recall    = {TP} / ({TP} + {FN}) = {recall:.3f}")
 ```
 
-## しきい値を変えると？
+## 閾値を変えると？
 
 ```python
 thresholds = [1600, 1800, 2000]
@@ -444,7 +444,7 @@ print(df.to_string(index=False))
 :::
 
 
-## しきい値の比較（1600g vs 2000g）
+## 閾値の比較（1600g vs 2000g）
 
 :::: {.columns}
 
@@ -579,10 +579,10 @@ print(f"min cost: {best_threshold}g")
 ```
 
 ::: {.callout-note title="結果"}
-Sea bass 混入（FP）のコストが高いので、高めのしきい値で総コストが最小になる
+Sea bass 混入（FP）のコストが高いので、高めの閾値で総コストが最小になる
 :::
 
-## **Tweak** しきい値を変更 {.badge-practice}
+## **Tweak** 閾値を変更 {.badge-practice}
 
 - [4つのパターンを数えるコード](#peek-cm-1800){.peek}の `threshold` と、[コスト最適化のコード](#peek-cost){.peek}を**書き換えて実行**（指標のセルまで続けて実行）
 
@@ -599,7 +599,7 @@ Sea bass 混入（FP）のコストが高いので、高めのしきい値で総
    - 全部 Salmon と判定するだけで得られる値
    - そのとき Precision は 50%、Accuracy も 50%
       - ==単独の指標は当てにならない==
-- コストを入れ替えると、最適しきい値が **高い側から低い側に反転**する
+- コストを入れ替えると、最適閾値が **高い側から低い側に反転**する
 :::
 
 
@@ -764,7 +764,7 @@ seabass_weights = [1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,
 
 3. 1700gの場合の **Accuracy, Precision, Recall** を求めよ
 
-4. $C_{FP}=5000$円、$C_{FN}=1000$円としたとき、総コストを最小にするしきい値を求めよ
+4. $C_{FP}=5000$円、$C_{FN}=1000$円としたとき、総コストを最小にする閾値を求めよ
 
 ## 問0の答え（可視化）
 

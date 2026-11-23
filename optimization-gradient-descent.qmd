@@ -76,8 +76,8 @@ sse_xs = np.linspace(centers[0, 0] - 2, centers[0, 0] + 2, 300)
 sse_vals = np.array([sse_at(v) for v in sse_xs])
 
 panels = [
-    ("しきい値で分類", "重さのしきい値 (g)", "総コスト（万円）", cost_ts, cost_vals, "steps-post"),
-    ("決定木", "輝度のしきい値", "加重平均ジニ不純度", gini_ts, gini_vals, "steps-post"),
+    ("閾値で分類", "重さの閾値 (g)", "総コスト（万円）", cost_ts, cost_vals, "steps-post"),
+    ("決定木", "輝度の閾値", "加重平均ジニ不純度", gini_ts, gini_vals, "steps-post"),
     ("k-means", "片方の重心の横座標（他は固定）", "SSE", sse_xs, sse_vals, "default"),
 ]
 fig, axes = plt.subplots(1, 3, figsize=(12, 3.5))
@@ -108,7 +108,7 @@ plt.show()
 
 | 手法 | 損失 | 測っているダメさ |
 |---|---|---|
-| しきい値で分類 | [総コスト](classification-basics-1d.qmd#peek-cost){.peek} | 誤分類にかかる費用の合計 |
+| 閾値で分類 | [総コスト](classification-basics-1d.qmd#peek-cost){.peek} | 誤分類にかかる費用の合計 |
 | 決定木 | [加重平均ジニ不純度](classification-2d-boundaries.qmd#最適化ジニ不純度が最小になる閾値を探索){.peek} | 分けた左右にクラスが混ざっている度合い |
 | k-means | [SSE](clustering-kmeans.qmd#peek-sse){.peek} | 各点から自分の重心までの距離の2乗の合計 |
 
@@ -116,7 +116,7 @@ plt.show()
 ## 損失関数（[Loss Function]{.en}） {#peek-loss-function}
 
 - **損失関数**：パラメータを入力すると損失を返す関数
-   - 例：Salmon と Sea bass の分類では、しきい値を決めると誤分類の数が決まる
+   - 例：Salmon と Sea bass の分類では、閾値を決めると誤分類の数が決まる
 
 ```{python}
 #| echo: false
@@ -142,7 +142,7 @@ for t, col, ls in [(1600, "black", "--"), (2000, "gray", ":")]:
             fontsize=9, fontweight="bold", bbox=dict(fc="white", ec="none", alpha=0.8))
 ax.set_xlim(1000, 2600)
 ax.set_xlabel("重さ (g)"); ax.set_ylabel("匹数")
-ax.set_title("パラメータ＝しきい値の位置", fontsize=11)
+ax.set_title("パラメータ＝閾値の位置", fontsize=11)
 ax.legend(fontsize=9)
 ax.grid(True, alpha=0.3)
 
@@ -159,7 +159,7 @@ ax.annotate(f"谷底：{best_t}g（誤分類{losses.min()}匹）", (best_t, loss
             textcoords="offset points", xytext=(10, -16), fontsize=9, color="green")
 ax.set_xlim(1000, 2600)
 ax.set_ylim(0, losses.max() + 6)
-ax.set_xlabel("しきい値 (g) ＝ パラメータ"); ax.set_ylabel("誤分類の数 ＝ 損失")
+ax.set_xlabel("閾値 (g) ＝ パラメータ"); ax.set_ylabel("誤分類の数 ＝ 損失")
 ax.set_title("損失関数", fontsize=11)
 ax.grid(True, alpha=0.3)
 
@@ -192,7 +192,7 @@ for thr, col, ls, acc in [(1600, "black", "--", "80%"), (2000, "gray", ":", "65%
             ha="center", va="top", fontsize=9, fontweight="bold",
             bbox=dict(fc="white", ec="none", alpha=0.8))
 ax.set_xlabel("重さ (g)"); ax.set_ylabel("匹数")
-ax.set_title("しきい値：数字1個 ＝ 縦線の位置", fontsize=11)
+ax.set_title("閾値：数字1個 ＝ 縦線の位置", fontsize=11)
 ax.legend(fontsize=9)
 ax.grid(True, alpha=0.3)
 
@@ -240,7 +240,7 @@ ax = axes[0]
 ax.scatter(cand, np.zeros(len(cand)), s=6, color="#34495e")
 ax.set_ylim(-1, 1)
 ax.set_yticks([])
-ax.set_xlabel("しきい値の候補")
+ax.set_xlabel("閾値の候補")
 ax.set_title("パラメータ1個", fontsize=11)
 
 ax = axes[1]
@@ -259,7 +259,7 @@ plt.show()
 
 | パラメータの数 | 試す組み合わせ |
 |---|---|
-| 1個（しきい値） | $100$ 通り |
+| 1個（閾値） | $100$ 通り |
 | 2個（傾きと切片） | $100 \times 100 = 10^4$ 通り |
 | 10個 | $100^{10} = 10^{20}$ 通り |
 
