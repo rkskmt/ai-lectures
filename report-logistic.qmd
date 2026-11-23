@@ -1,0 +1,164 @@
+---
+title: "レポート"
+subtitle: "勾配降下法を手で解く"
+---
+
+## **レポート** 勾配降下法を手で解け {.badge-practice}
+
+::: {.prompt}
+次の 5 問を、電卓を使わず手で解け
+:::
+
+- **課題2-1**　[3 変数の関数を最小化する](#peek-report2-function){.peek}
+- **課題2-2**　[直線を当てはめる](#peek-report2-line){.peek}
+- **課題2-3**　[重みから判定と決定境界を出す](#peek-report2-boundary){.peek}
+- **課題2-4**　[1 回の学習で全点を分類する](#peek-report2-one){.peek}
+- **課題2-5**　[2 回の学習で全点を分類する](#peek-report2-two){.peek}
+
+解答には課題番号を付け、途中の式も書くこと
+
+
+## **課題2-1** 3 変数の関数を最小化する {#peek-report2-function .badge-practice}
+
+::: {.prompt}
+次の関数を、$(w_1, w_2, b) = (0, 0, 0)$ から勾配降下法で最小化せよ
+:::
+
+$$f(w_1, w_2, b) = (w_1 - 2)^2 + 4(w_2 - 1)^2 + 2(b + 1)^2$$
+
+1. 勾配 $\nabla f$ を計算
+2. $\alpha = 0.1$ で 2 回更新（各回の $f$ も記述）
+3. $b$ が 1 回の更新で最小値に着く $\alpha$ を計算
+4. 3 の $\alpha$ で 3 回更新し、$w_1$、$w_2$、$b$ の動きの違いを説明
+
+
+## **課題2-2** 直線を当てはめる {#peek-report2-line .badge-practice}
+
+::: {.prompt}
+2 点 $(x, t) = (-2, 5),\ (2, -3)$ に、直線 $ax + b$ を勾配降下法で当てはめよ
+:::
+
+$$L(a, b) = \frac{1}{N}\sum_{i=1}^{N} (ax_i + b - t_i)^2$$
+
+- 初期値 $a = 0$、$b = 0$、学習率 $\alpha = 0.1$
+
+1. 初期値での $\dfrac{\partial L}{\partial a}$ と $\dfrac{\partial L}{\partial b}$ を計算
+2. 2 回更新
+3. 正解の直線 $t = -2x + 1$ に $a$ と $b$ のどちらが近いかを、理由とともに勾配の式から説明
+
+
+## **課題2-3** 重みから判定と決定境界を出す {#peek-report2-boundary .badge-practice}
+
+::: {.prompt}
+$w_1 = 2$、$w_2 = -1$、$b = -1$ のロジスティック回帰について答えよ
+:::
+
+- $z = w_1 x_1 + w_2 x_2 + b$、$p = \sigma(z)$。$p \geq 0.5$ ならクラス 1、$p < 0.5$ ならクラス 0
+
+| $z$ | $-2$ | $0$ | $2$ |
+|---|---|---|---|
+| $\sigma(z)$ | 0.12 | 0.5 | 0.88 |
+
+1. 点 $(1, 1)$、$(2, 1)$、$(0, 1)$ の $z$、$p$、判定を計算
+2. 決定境界の式を $x_2 = \cdots$ の形で記述
+3. 境界の上側と下側のどちらがクラス 1 かを、理由とともに説明
+
+
+## **課題2-4** 1 回の学習で全点を分類する {#peek-report2-one .badge-practice}
+
+::: {.prompt}
+今の境界線上の格子点を 1 つ選び、ラベル（0 か 1）を付けて 1 回学習させ、6 点すべてを正しく分類せよ
+:::
+
+:::: {.columns}
+::: {.column width="48%"}
+
+```{python}
+#| echo: false
+#| fig-align: center
+import numpy as np
+import matplotlib.pyplot as plt
+import japanize_matplotlib
+
+
+def draw_board(class1, class0, w, b):
+    """Draw the 7x7 lattice, the two classes in monochrome markers and the boundary z = 0."""
+    fig, ax = plt.subplots(figsize=(4.4, 4.4))
+    ticks = np.arange(-3, 4)
+    ax.set_xticks(ticks)
+    ax.set_yticks(ticks)
+    ax.grid(True, color="0.8", lw=0.8)
+    ax.axhline(0, color="0.45", lw=1)
+    ax.axvline(0, color="0.45", lw=1)
+    c1, c0 = np.array(class1), np.array(class0)
+    ax.scatter(c1[:, 0], c1[:, 1], s=120, facecolors="white", edgecolors="black",
+               linewidths=1.8, marker="o", zorder=3)
+    ax.scatter(c0[:, 0], c0[:, 1], s=110, c="black", linewidths=2.2,
+               marker="x", zorder=3)
+    xs = np.array([-3.4, 3.4])
+    ax.plot(xs, -(w[0] * xs + b) / w[1], "k--", lw=1.8)
+    ax.set_xlim(-3.4, 3.4)
+    ax.set_ylim(-3.4, 3.4)
+    ax.set_aspect("equal")
+    ax.set_xlabel("$x_1$")
+    ax.set_ylabel("$x_2$")
+    fig.tight_layout()
+    plt.show()
+
+
+draw_board([(2, 0), (1, -3), (3, 2)], [(-1, 3), (0, 3), (0, -3)], (1, -1), 0)
+```
+
+:::
+::: {.column width="52%"}
+
+- ○ はクラス 1、× はクラス 0、破線は今の境界
+- 今の $w = (1, -1)$、$b = 0$、$\alpha = 1$
+- 格子点は $-3 \leq x_1, x_2 \leq 3$ の整数の点
+- $\delta = p - y$
+- $w \leftarrow w - \alpha\,\delta\,x$、$b \leftarrow b - \alpha\,\delta$
+
+1. 各点の $z$ を計算し、誤分類の点を指摘
+2. 選んだ格子点とラベルを記述
+3. 更新後の $w$、$b$ と境界の式を計算
+4. 6 点の $z$ を計算し、すべて正しいことを確認
+
+:::
+::::
+
+
+## **課題2-5** 2 回の学習で全点を分類する {#peek-report2-two .badge-practice}
+
+::: {.prompt}
+今の境界線上の点のない格子点を選んで 1 回学習させ、更新後の境界線上の点のない格子点を選んでもう 1 回学習させて、8 点すべてを正しく分類せよ
+:::
+
+:::: {.columns}
+::: {.column width="48%"}
+
+```{python}
+#| echo: false
+#| fig-align: center
+draw_board([(1, 2), (3, -1), (1, 3), (0, 3)], [(0, -2), (-1, 0), (3, -2), (2, -1)], (1, 1), 0)
+```
+
+:::
+::: {.column width="52%"}
+
+- ○ はクラス 1、× はクラス 0、破線は今の境界
+- 今の $w = (1, 1)$、$b = 0$、$\alpha = 1$
+- 格子点は $-3 \leq x_1, x_2 \leq 3$ の整数の点
+
+1. 1 回目の格子点とラベル、更新後の $w$、$b$、境界の式を記述
+2. 2 回目の格子点とラベル、更新後の $w$、$b$、境界の式を記述
+3. 8 点の $z$ を計算し、すべて正しいことを確認
+
+:::
+::::
+
+
+## 提出物
+
+- 手書きの解答を撮影し、1 つの PDF にして提出
+- 提出ファイル名
+   - 学生番号-名前-人工知能課題（勾配降下法）.pdf
