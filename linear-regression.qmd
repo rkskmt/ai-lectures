@@ -3,10 +3,11 @@ title: "線形回帰と正則化"
 subtitle: "勾配降下法で直線を求める"
 ---
 
-## ここまでの道具
+##  勾配降下法を知った
 
 - **勾配降下法**：傾きの逆方向に少しずつ進んで、損失が最小の場所を探す
-- ただし[ここまで最小化した](optimization-gradient-descent.qmd#peek-gd-code){.peek}のは、$f(x) = x^2 - 4x + 3$ のような簡単な関数だった
+- ただし[ここまで最小化した](optimization-gradient-descent.qmd#peek-gd-code){.peek}のは簡単な関数
+  - 例：$f(x) = x^2 - 4x + 3$ のような
 
 ::: {.callout-note title="今回の目的"}
 勾配降下法でデータに合う直線を求める
@@ -205,6 +206,13 @@ print(f"np.polyfit      : a={a_exact:.4f}, b={b_exact:.4f}")
 :::
 
 
+
+
+## {background-color="white" .center .break-slide}
+
+::: {.break-title}
+モデルを複雑にしてみる
+:::
 ## モデル（[Model]{.en}）
 
 | 手法 | モデル |
@@ -217,13 +225,6 @@ print(f"np.polyfit      : a={a_exact:.4f}, b={b_exact:.4f}")
 
 ::: {.takeaway}
 どのモデルを使うかは人間が選ぶ
-:::
-
-
-## {background-color="white" .center .break-slide}
-
-::: {.break-title}
-モデルを複雑にしてみる
 :::
 
 
@@ -279,7 +280,7 @@ plt.show()
 :::
 
 
-## 回帰でも過学習が起きる
+## テストデータで過学習を確認
 
 ```{python}
 #| echo: true
@@ -471,7 +472,7 @@ plt.show()
 ## 練習問題：2点のデータから直線を求める
 
 データは2点だけ：$(x_1, t_1) = (-1, 0)$、$(x_2, t_2) = (1, 2)$。
-直線 $ax + b$ を勾配降下法で求める。初期値 $a = 0, b = 0$、学習率 $\alpha = 0.1$。**手計算**と**Pythonコード**の両方で解け。
+直線 $ax + b$ を勾配降下法で求める。初期値 $a = 0, b = 0$、学習率 $\alpha = 0.1$
 
 1. 勾配の式に代入して、$\dfrac{\partial L}{\partial a}$ と $\dfrac{\partial L}{\partial b}$ を求めよ
 2. 更新を3回、手計算で示せ
