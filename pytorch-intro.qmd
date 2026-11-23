@@ -63,7 +63,7 @@ print(t * 2)          # 演算は NumPy とほぼ同じ感覚
 print(t.numpy())      # NumPy 配列との相互変換も簡単
 ```
 
-::: {.callout-note title="要するに"}
+::: {.callout-note}
 - NumPy 配列との違いは2つ
    - **GPU に載せられる**
    - **勾配を覚えられる**
@@ -109,7 +109,7 @@ y.backward()                                # ← この行で微分する
 print(x.grad)
 ```
 
-::: {.callout-note title="要するに"}
+::: {.callout-note}
 - `requires_grad=True` を付けた tensor は、**自分が関わった計算をすべて記録**する
 - `backward()` を呼ぶと、記録を逆にたどって微分が計算され、`x.grad` に入る
 - $x^2$ では簡単すぎるので、後で[1往復ぶん手計算したネットワーク](nn-backprop.qmd#peek-handcalc){.peek}でも照合する
@@ -128,7 +128,7 @@ Y: "y" { style.fill: "#d5f5e3" }
 X -> M -> A -> S -> Y
 ```
 
-::: {.callout-note title="要するに"}
+::: {.callout-note}
 - `y = ((x * 3) + 1) ** 2` を実行すると、演算のつながりも記録される
 - `y.backward()` は「掛け算 → 足し算 → 2乗」の逆順に局所微分を適用する
 - Pythonで書いた実際のforwardに応じて、その場でグラフが作られる
@@ -221,7 +221,7 @@ print("確率:", torch.sigmoid(logits))
 print("損失:", loss_each(logits, targets))
 ```
 
-::: {.callout-note title="要するに"}
+::: {.callout-note}
 - モデルの出力 $u$ をそのまま損失関数へ渡す
 - 確率を表示・判定するときだけ `torch.sigmoid(u)` を使う
 :::
@@ -278,7 +278,7 @@ X -> L1 -> R -> L2 -> O
 | `torch.optim.SGD` | 勾配降下法（[gradient descent]{.en}、`θ -= lr * grad`） |
 | `loss.backward()` | バックプロパゲーション（[backpropagation]{.en}） |
 
-::: {.callout-note title="要するに"}
+::: {.takeaway}
 どの部品も、ここまでに自作・手計算したものと対応する
 :::
 
@@ -358,7 +358,7 @@ Pythonでも確認できる：
 sum(p.numel() for p in model.parameters())  # 65
 ```
 
-::: {.callout-note title="要するに"}
+::: {.callout-note}
 - `model.parameters()` で、この65個をまとめてoptimizerへ渡せる
 - ネットワークを組み替えると、登録される数も自動で変わる
 :::
@@ -384,7 +384,7 @@ print("更新後:", theta)          # 2 − 0.1 × 4 = 1.6
 $$\theta \leftarrow \theta-0.1\frac{dL}{d\theta}
 =2-0.1\times4=1.6$$
 
-::: {.callout-note title="要するに"}
+::: {.callout-note}
 - `loss.backward()`：勾配を計算して `.grad` に入れる
 - `optimizer.step()`：その勾配を使ってパラメータを更新する
 :::
@@ -541,7 +541,7 @@ plt.show()
 
 ![](frozen/pytorch-intro-frz-boundary-1.png){fig-align="center"}
 
-::: {.callout-note title="要するに"}
+::: {.callout-note}
 - NumPy 版で自分で書いた微分処理を、PyTorchでは `loss.backward()` に任せられる
 - 浮いた労力は、**モデルとデータを考えること**に使う
 :::

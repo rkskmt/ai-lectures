@@ -27,7 +27,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-::: {.callout-note title="要するに"}
+::: {.takeaway}
 必要な部品は、ここまでに自作するか手計算で中身を確認してきた
 :::
 
@@ -197,7 +197,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-::: {.callout-note title="要するに"}
+::: {.callout-note title="結果"}
 - スコアが大きいほど確率も大きい
    - $e^u$ を通すので**差が強調される**（スコア差 1.0 が、確率では 0.66 対 0.24）
 - 合計 1 の「自信の配分」になる
@@ -220,7 +220,7 @@ print("確率:", torch.softmax(logits, dim=1))
 print("損失:", loss_fn_demo(logits, target))
 ```
 
-::: {.callout-note title="要するに"}
+::: {.callout-note}
 - モデルの出力 `logits`（softmax 前のスコア）をそのまま損失関数へ渡す
 - `CrossEntropyLoss` の中でsoftmaxと $-\log p_{\text{正解}}$ が計算される
 - 予測ラベルは、最大スコアの位置 `logits.argmax(dim=1)` で求められる
@@ -255,7 +255,7 @@ O: "10個のスコア\n→ softmax で確率" { style.fill: "#d5f5e3" }
 I -> F -> L1 -> R -> L2 -> O
 ```
 
-::: {.callout-note title="要するに"}
+::: {.callout-note}
 - パラメータは[ロジスティック回帰](logistic-regression.qmd)の**3個**から**10万個**に増えた
    - 学習ループは同じ[3拍子](pytorch-intro.qmd#peek-train-loop){.peek}
 
@@ -322,7 +322,7 @@ print("画像バッチ:", tuple(int(n) for n in frozen["batch_x_shape"]))
 print("ラベルバッチ:", tuple(int(n) for n in frozen["batch_y_shape"]))
 ```
 
-::: {.callout-note title="要するに"}
+::: {.callout-note}
 - [NumPyの2層NN](nn-backprop.qmd#peek-full-batch){.peek}では、全200件を1つのバッチにして1回更新した
 - ここでは6万枚を128枚ずつのミニバッチへ分け、1ミニバッチごとに1回更新する
 :::
@@ -435,7 +435,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-::: {.callout-note title="要するに"}
+::: {.callout-note title="結果"}
 - 間違えた字をよく見ると、**人間でも迷うものが多い**
 - 正答率の数字だけでなく**間違いの中身**も確認する
    - 混同行列（[confusion matrix]{.en}）の発想
@@ -491,7 +491,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-::: {.callout-note title="要するに"}
+::: {.callout-note title="結果"}
 - どれも間違った数字にほぼ 1 の確率を出している
    - 正答率の高い機械も、間違えるときは自信満々のことがある
 - 正解クラスの確率は [−log のカーブ](logistic-regression.qmd#peek-neglog){.peek}の左端にあたる

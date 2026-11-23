@@ -223,7 +223,7 @@ X -> A1 -> R -> A2 -> S -> L
 | 出力スコア $u$ | $0.05$ | シグモイドを通った位置 |
 | 確率 $p$ | $0.5125$ | $\delta_{\rm out}=p-y$ |
 
-::: {.callout-note title="要するに"}
+::: {.callout-note}
 - パラメータだけ保存しても復路は計算できない
 - 入力ごとの途中結果も必要なので、深いネットワークほど学習時のメモリを使う
 :::
@@ -331,7 +331,7 @@ L -> A2: "δ_out = −0.4875" { style.stroke: "#c0392b"; style.font-color: "#c03
 A2 -> A1: "δ_mid = −0.2438" { style.stroke: "#c0392b"; style.font-color: "#c0392b"; style.font-size: 24; style.stroke-width: 3 }
 ```
 
-::: {.callout-note title="要するに"}
+::: {.callout-note}
 - 黒い矢印：**往路**
 - 赤い矢印：**復路**
 - $\delta$：その場所の値を少し変えたとき、$\ell$ がどれだけ変わるか
@@ -448,7 +448,7 @@ print(f"grad_v: {grad_v:.4f}")
 print(f"grad_c: {grad_c:.4f}")
 ```
 
-::: {.callout-note title="要するに"}
+::: {.callout-note}
 - 手計算の5個の勾配が、`backward` の各行に対応する
 - `(z > 0)` が $\mathrm{ReLU}'(z)$
 - 往路で保存した `z, h, p` を復路で再利用する
@@ -501,7 +501,7 @@ for name in params:
 | 数値微分 | パラメータごとに往路を再計算 | 少数の勾配の検算 |
 | backprop | 往路1回＋復路1回 | 実際の学習 |
 
-::: {.callout-note title="要するに"}
+::: {.callout-note}
 - パラメータが5個なら数値微分でも困らない
 - 100万個なら、1ステップごとに約100万回の往路が必要になり現実的でない
 - backprop は途中の計算を使い回すので、全パラメータを一度の復路で扱える
@@ -546,7 +546,7 @@ $$\delta^{(k)} = \delta^{(k+1)} \cdot w^{(k+1)} \cdot f'(z^{(k)})$$
 | $dW_1=X^{\mathsf T}dZ_1$ | $(2,m)$ |
 | $db_1=\sum_i dZ_{1i}$ | $(m,)$ |
 
-::: {.callout-note title="要するに"}
+::: {.callout-note}
 - 行列積で、すべてのデータとニューロンの勾配を一度に計算する
 - $\odot$：同じ位置どうしの掛け算
 - 各勾配の形は、対応するパラメータの形と一致する
@@ -586,7 +586,7 @@ print("dW1:", dW1.shape, " db1:", db1.shape)
 print("dW2:", dW2.shape, " db2:", db2.shape)
 ```
 
-::: {.callout-note title="要するに"}
+::: {.callout-note}
 - 出力側の `dZ2` から始め、上から下へ入力側の勾配まで計算する
 - `Z1, H, Z2, P` は[2層NNのForward](nn-multilayer.qmd#peek-multilayer-forward){.peek}で出した値と同じ
 - `P` は、保存した `Z2` へシグモイドを適用して再現している
@@ -605,7 +605,7 @@ U: "Update\n1回" { style.fill: "#d5f5e3" }
 X -> F -> L -> B -> U
 ```
 
-::: {.callout-note title="要するに"}
+::: {.callout-note}
 - **バッチ**：1回の勾配計算とパラメータ更新に使うデータのまとまり
 - このあとの学習で使う `X` には学習データ200件をすべて入れるため、バッチサイズ（[batch size]{.en}）は200
 - フルバッチ（[full batch]{.en}）：全学習データを1つのバッチにする方法
@@ -712,7 +712,7 @@ import json
 print(json.load(open("frozen/nn-backprop.json", encoding="utf-8"))["frz-train"], end="")
 ```
 
-::: {.callout-note title="要するに"}
+::: {.callout-note}
 - [2層NNの `forward`](nn-multilayer.qmd#peek-multilayer-forward){.peek}と[行列版の `backward`](#peek-matrix-backward){.peek}を同じループへ接続した
 - `loss` の値は学習前後の確認用
    - 更新式へ入るのは `dW1, db1, dW2, db2`
