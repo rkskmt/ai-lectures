@@ -16,8 +16,6 @@ subtitle: "損失を変える・データを選ぶ"
 
 ## 準備：魚の体長と重さ
 
-- 線形回帰で使った 80 匹の体長と重さを使う
-
 ```{python}
 #| echo: true
 #| code-fold: true
@@ -39,7 +37,7 @@ seabass_weights    = np.array([1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1
 
 weights = np.concatenate([salmon_weights, seabass_weights]).astype(float)
 
-# 体長の測定値（cm）— 次元削減の回と同じ
+# 体長の測定値（cm）
 rng     = np.random.default_rng(42)
 lengths = np.round(np.cbrt(weights) * 4.5 + rng.normal(0, 1.0, len(weights)), 1)
 ```
