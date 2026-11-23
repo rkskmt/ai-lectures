@@ -15,7 +15,7 @@ subtitle: "勾配降下法で直線を求める"
 
 ## 回帰（[Regression]{.en}）
 
-- 目的変数（[target variable]{.en}）$t$ と説明変数（[explanatory variable]{.en}）$x$ の関係を関数（モデル）で表し、その関数をデータから推定する手法
+- 目的変数（[target variable]{.en}）$t$ と説明変数（[explanatory variable]{.en}）$x$ の関係を関数で表し、その関数をデータから推定する手法
 
 $$t = f(x) + \varepsilon \qquad (\varepsilon \text{：誤差})$$
 
@@ -181,7 +181,7 @@ plt.show()
 | 広告費 | 商品の売り上げ |
 
 ::: {.takeaway}
-どれも今回と同じ手順で解ける：モデルの形を決め、損失を決め、勾配降下法でパラメータを求める
+どれも、予測の式と損失を決めれば、勾配降下法でパラメータを求められる
 :::
 
 
@@ -202,6 +202,21 @@ print(f"np.polyfit      : a={a_exact:.4f}, b={b_exact:.4f}")
 ::: {.callout-note title="結果"}
 - 自作の勾配降下法と厳密解が**一致**
 - 元の単位に戻すと「体長 1cm あたり約 97g」という意味のある数字になる
+:::
+
+
+## モデル（[Model]{.en}）
+
+| 手法 | モデル |
+|---|---|
+| 閾値で分類 | 重さが閾値以上なら Salmon |
+| 決定木 | 閾値との比較を重ねた分岐 |
+| k-means | 一番近い重心に割り当てる |
+| 回帰（直線） | $\text{重さ} = a \times \text{体長} + b$ |
+| 回帰（2次式） | $\text{重さ} = a \times \text{体長}^2 + b \times \text{体長} + c$ |
+
+::: {.takeaway}
+どのモデルを使うかは人間が選ぶ
 :::
 
 
