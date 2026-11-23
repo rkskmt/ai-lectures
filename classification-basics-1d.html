@@ -258,7 +258,7 @@
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
   <script src="network-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="08e3a912562c928b73ba749c2ddc44163c599223">
+  <meta name="qmd-web-source" content="6ad5902bbd7f2891b984df1ef95f3cacd83104bf">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -368,7 +368,7 @@ rkskmt
 <li>重量計をつけられそうなので、まず重さで識別できないかを考えた</li>
 <li>サンプルとして20匹ずつの重さを測定した</li>
 </ul>
-<div id="ff014b14" class="cell" data-execution_count="1">
+<div id="7e58892c" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="co"># Salmon（20匹）の重さ (g)</span></span>
 <span id="cb1-2"><a aria-label="2"></a>salmon_weights <span class="op">=</span> [<span class="dv">2149</span>, <span class="dv">1959</span>, <span class="dv">2194</span>, <span class="dv">2457</span>, <span class="dv">1930</span>, <span class="dv">1930</span>, <span class="dv">2474</span>, <span class="dv">2230</span>, <span class="dv">1859</span>, <span class="dv">2163</span>,</span>
 <span id="cb1-3"><a aria-label="3"></a>                  <span class="dv">1861</span>, <span class="dv">1860</span>, <span class="dv">2073</span>, <span class="dv">1426</span>, <span class="dv">1483</span>, <span class="dv">1831</span>, <span class="dv">1696</span>, <span class="dv">2094</span>, <span class="dv">1728</span>, <span class="dv">1576</span>]</span>
@@ -378,7 +378,7 @@ rkskmt
 <span id="cb1-7"><a aria-label="7"></a>seabass_weights <span class="op">=</span> [<span class="dv">1677</span>, <span class="dv">1327</span>, <span class="dv">1486</span>, <span class="dv">1440</span>, <span class="dv">1857</span>, <span class="dv">1476</span>, <span class="dv">1749</span>, <span class="dv">2203</span>, <span class="dv">1979</span>, <span class="dv">1468</span>,</span>
 <span id="cb1-8"><a aria-label="8"></a>                   <span class="dv">1496</span>, <span class="dv">1737</span>, <span class="dv">1099</span>, <span class="dv">1341</span>, <span class="dv">1748</span>, <span class="dv">1563</span>, <span class="dv">2181</span>, <span class="dv">1414</span>, <span class="dv">1286</span>, <span class="dv">1333</span>]</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="e323ee78" class="cell" data-execution_count="2">
+<div id="b3a04694" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div>
 <figure>
@@ -395,7 +395,7 @@ rkskmt
 <p>pandas, numpy, matplotlib, scikit-learn をインストールする。</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a aria-label="1"></a><span class="ex">pip</span> install pandas numpy matplotlib scikit-learn</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <p>続けて、以下を実行</p>
-<div id="9d11d7f4" class="cell" data-execution_count="3">
+<div id="1f7bc2be" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb3-2"><a aria-label="2"></a></span>
 <span id="cb3-3"><a aria-label="3"></a><span class="co"># numpy配列にキャスト</span></span>
@@ -407,7 +407,7 @@ rkskmt
 <section id="まずはヒストグラム" class="slide level2">
 <h2>まずはヒストグラム</h2>
 <div class="slide-body">
-<div id="3051b0a0" class="cell" data-execution_count="5">
+<div id="6559fdcc" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>（参考）描画コード</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a aria-label="1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -442,7 +442,7 @@ rkskmt
 <section id="統計値を見る" class="slide level2">
 <h2>統計値を見る</h2>
 <div class="slide-body">
-<div id="f1bd695c" class="cell" data-execution_count="6">
+<div id="a3357e6b" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a aria-label="1"></a><span class="bu">print</span>(<span class="ss">f"Salmon   - 最小: </span><span class="sc">{</span><span class="bu">min</span>(salmon_weights)<span class="sc">}</span><span class="ss">g, 最大: </span><span class="sc">{</span><span class="bu">max</span>(salmon_weights)<span class="sc">}</span><span class="ss">g, 平均: </span><span class="sc">{</span>np<span class="sc">.</span>mean(salmon_weights)<span class="sc">:.0f}</span><span class="ss">g"</span>)</span>
 <span id="cb5-2"><a aria-label="2"></a><span class="bu">print</span>(<span class="ss">f"Sea bass - 最小: </span><span class="sc">{</span><span class="bu">min</span>(seabass_weights)<span class="sc">}</span><span class="ss">g, 最大: </span><span class="sc">{</span><span class="bu">max</span>(seabass_weights)<span class="sc">}</span><span class="ss">g, 平均: </span><span class="sc">{</span>np<span class="sc">.</span>mean(seabass_weights)<span class="sc">:.0f}</span><span class="ss">g"</span>)</span>
 <span id="cb5-3"><a aria-label="3"></a>overlap_min <span class="op">=</span> <span class="bu">max</span>(<span class="bu">min</span>(salmon_weights), <span class="bu">min</span>(seabass_weights))</span>
@@ -481,7 +481,7 @@ Sea bass - 最小: 1099g, 最大: 2203g, 平均: 1593g
 <section id="peek-decision-boundary" class="slide level2">
 <h2>境界線（閾値）を考える</h2>
 <div class="slide-body">
-<p>大体でいいので <strong>しきい値（<span class="en">threshold</span>）</strong> を設定する。</p>
+<p>大体でいいので <strong>閾値（<span class="en">threshold</span>）</strong> を設定する。</p>
 <h3 id="方針">方針</h3>
 <p><strong>1800g以上</strong> → Salmon</p>
 <p><strong>1800g未満</strong> → Sea bass</p>
@@ -494,7 +494,7 @@ Sea bass - 最小: 1099g, 最大: 2203g, 平均: 1593g
 <section id="青の破線で切ったとしたら" class="slide level2">
 <h2>青の破線で切ったとしたら</h2>
 <div class="slide-body">
-<div id="053ccac2" class="cell" data-execution_count="7">
+<div id="faef148f" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -575,7 +575,7 @@ Sea bass - 最小: 1099g, 最大: 2203g, 平均: 1593g
 <li><code>seabass_weights &gt;= threshold</code> は、40匹それぞれの判定を True / False で並べた配列</li>
 <li><a href="./numpy-recipes.html#peek-np-count" class="peek"><code>np.sum</code></a> は True を 1、False を 0 として足すので、条件を満たした<strong>匹数</strong>になる</li>
 </ul>
-<div id="b4dfca62" class="cell" data-execution_count="8">
+<div id="2070d9ec" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a aria-label="1"></a>threshold <span class="op">=</span> <span class="dv">1800</span></span>
 <span id="cb7-2"><a aria-label="2"></a></span>
 <span id="cb7-3"><a aria-label="3"></a><span class="bu">print</span>(seabass_weights[:<span class="dv">5</span>] <span class="op">&gt;=</span> threshold)   <span class="co"># 先頭5匹の判定</span></span>
@@ -595,7 +595,7 @@ TP=15, FN=5, FP=4, TN=16</code></pre>
 <section id="peek-confusion-matrix" class="slide level2">
 <h2>混同行列（<span class="en">Confusion Matrix</span>）</h2>
 <div class="slide-body">
-<div id="5b2759eb" class="cell" data-execution_count="9">
+<div id="933b7b40" class="cell" data-execution_count="9">
 <details class="code-fold">
 <summary>（参考）描画コード</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a aria-label="1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -734,7 +734,7 @@ TP=15, FN=5, FP=4, TN=16</code></pre>
 <ul>
 <li><a href="#/peek-cm-1800" class="peek">境界線1800gの混同行列</a>の値を計算式に代入する</li>
 </ul>
-<div id="9d8a8408" class="cell" data-execution_count="10">
+<div id="6278d08d" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a aria-label="1"></a><span class="co"># Calculate metrics</span></span>
 <span id="cb10-2"><a aria-label="2"></a>accuracy <span class="op">=</span> (TP <span class="op">+</span> TN) <span class="op">/</span> (TP <span class="op">+</span> TN <span class="op">+</span> FP <span class="op">+</span> FN)</span>
 <span id="cb10-3"><a aria-label="3"></a>precision <span class="op">=</span> TP <span class="op">/</span> (TP <span class="op">+</span> FP) <span class="cf">if</span> (TP <span class="op">+</span> FP) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> <span class="dv">0</span></span>
@@ -751,11 +751,11 @@ Recall    = 15 / (15 + 5) = 0.750</code></pre>
 </div>
 </div>
 </section>
-<section id="しきい値を変えると" class="slide level2">
-<h2>しきい値を変えると？</h2>
+<section id="閾値を変えると" class="slide level2">
+<h2>閾値を変えると？</h2>
 <div class="slide-body">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a aria-label="1"></a>thresholds <span class="op">=</span> [<span class="dv">1600</span>, <span class="dv">1800</span>, <span class="dv">2000</span>]</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
-<div id="1bcb5988" class="cell" data-execution_count="11">
+<div id="364d6083" class="cell" data-execution_count="11">
 <div class="cell-output cell-output-stdout">
 <pre><code>threshold  TP  FP  FN  TN Precision Recall Accuracy
     1600g  17   8   3  12     68.0%  85.0%    72.5%
@@ -790,12 +790,12 @@ Recall    = 15 / (15 + 5) = 0.750</code></pre>
 </div>
 </div>
 </section>
-<section id="しきい値の比較1600g-vs-2000g" class="slide level2">
-<h2>しきい値の比較（1600g vs 2000g）</h2>
+<section id="閾値の比較1600g-vs-2000g" class="slide level2">
+<h2>閾値の比較（1600g vs 2000g）</h2>
 <div class="slide-body">
 <div class="columns">
 <div class="column" style="width:50%;">
-<div id="775f84d2" class="cell" data-execution_count="12">
+<div id="26467dde" class="cell" data-execution_count="12">
 <div class="cell-output cell-output-display">
 <div>
 <figure>
@@ -823,7 +823,7 @@ Recall    = 15 / (15 + 5) = 0.750</code></pre>
 </div>
 </div>
 </div><div class="column" style="width:50%;">
-<div id="00c8ff06" class="cell" data-execution_count="13">
+<div id="84efd3be" class="cell" data-execution_count="13">
 <div class="cell-output cell-output-display">
 <div>
 <figure>
@@ -890,7 +890,7 @@ Recall    = 15 / (15 + 5) = 0.750</code></pre>
 &amp;\quad \small{N(x): x\text{の個数},\; \text{Cost}(x): x\text{ 1個あたりのコスト}}
 \end{aligned}
 \]</span></p>
-<div id="a69c3e2b" class="cell" data-execution_count="14">
+<div id="22844920" class="cell" data-execution_count="14">
 <details class="code-fold">
 <summary>code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a aria-label="1"></a><span class="co"># 例：Sea bass混入のクレーム対応コストが高い場合</span></span>
@@ -926,15 +926,15 @@ min cost: 2000g</code></pre>
 <p><strong>結果</strong></p>
 </div>
 <div class="callout-content">
-<p>Sea bass 混入（FP）のコストが高いので、高めのしきい値で総コストが最小になる</p>
+<p>Sea bass 混入（FP）のコストが高いので、高めの閾値で総コストが最小になる</p>
 </div>
 </div>
 </div>
 </div>
 </div>
 </section>
-<section id="tweak-しきい値を変更" class="slide level2 badge-practice">
-<h2><strong>Tweak</strong> しきい値を変更</h2>
+<section id="tweak-閾値を変更" class="slide level2 badge-practice">
+<h2><strong>Tweak</strong> 閾値を変更</h2>
 <div class="slide-body">
 <ul>
 <li><a href="#/peek-cm-1800" class="peek">4つのパターンを数えるコード</a>の <code>threshold</code> と、<a href="#/peek-cost" class="peek">コスト最適化のコード</a>を<strong>書き換えて実行</strong>（指標のセルまで続けて実行）</li>
@@ -982,7 +982,7 @@ min cost: 2000g</code></pre>
 <li><span class="hl">単独の指標は当てにならない</span></li>
 </ul></li>
 </ul></li>
-<li>コストを入れ替えると、最適しきい値が <strong>高い側から低い側に反転</strong>する</li>
+<li>コストを入れ替えると、最適閾値が <strong>高い側から低い側に反転</strong>する</li>
 </ul>
 </div>
 </div>
@@ -1034,7 +1034,7 @@ min cost: 2000g</code></pre>
 </div>
 </div>
 </div>
-<div id="cf4efb10" class="cell" data-execution_count="15">
+<div id="a0a10d8d" class="cell" data-execution_count="15">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1057,7 +1057,7 @@ min cost: 2000g</code></pre>
 </ul></li>
 </ul></li>
 </ul>
-<div id="45aff133" class="cell" data-execution_count="16">
+<div id="308c4f97" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a aria-label="1"></a>weights <span class="op">=</span> np.concatenate([salmon_weights, seabass_weights])     <span class="co"># 40 匹の重さ</span></span>
 <span id="cb16-2"><a aria-label="2"></a>tpr <span class="op">=</span> []   <span class="co"># TP Rate（Recall）</span></span>
 <span id="cb16-3"><a aria-label="3"></a>fpr <span class="op">=</span> []   <span class="co"># FP Rate</span></span>
@@ -1101,7 +1101,7 @@ min cost: 2000g</code></pre>
 <li><a href="#/peek-roc-code" class="peek">ROC曲線のコード</a>で作った <code>tpr</code> と <code>fpr</code> をそのまま使う</li>
 </ul></li>
 </ul>
-<div id="857f9c04" class="cell" data-execution_count="17">
+<div id="f742d843" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a aria-label="1"></a>auc <span class="op">=</span> <span class="dv">0</span></span>
 <span id="cb17-2"><a aria-label="2"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(fpr) <span class="op">-</span> <span class="dv">1</span>):</span>
 <span id="cb17-3"><a aria-label="3"></a>    width  <span class="op">=</span> fpr[i] <span class="op">-</span> fpr[i <span class="op">+</span> <span class="dv">1</span>]          <span class="co"># 台形の幅（閾値を上げると FP Rate は下がる）</span></span>
@@ -1169,7 +1169,7 @@ min cost: 2000g</code></pre>
 <h2>練習問題</h2>
 <div class="slide-body">
 <p>下記の新データ（それぞれ20匹ずつ追加した）について、以下の1〜4を実行して分類器をつくれ</p>
-<div id="fb89bd64" class="cell" data-execution_count="19">
+<div id="c3587806" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a aria-label="1"></a>salmon_weights <span class="op">=</span> [<span class="dv">2149</span>, <span class="dv">1959</span>, <span class="dv">2194</span>, <span class="dv">2457</span>, <span class="dv">1930</span>, <span class="dv">1930</span>, <span class="dv">2474</span>, <span class="dv">2230</span>, <span class="dv">1859</span>, <span class="dv">2163</span>,</span>
 <span id="cb19-2"><a aria-label="2"></a>                  <span class="dv">1861</span>, <span class="dv">1860</span>, <span class="dv">2073</span>, <span class="dv">1426</span>, <span class="dv">1483</span>, <span class="dv">1831</span>, <span class="dv">1696</span>, <span class="dv">2094</span>, <span class="dv">1728</span>, <span class="dv">1576</span>,</span>
 <span id="cb19-3"><a aria-label="3"></a>                  <span class="dv">2028</span>, <span class="dv">1903</span>, <span class="dv">2057</span>, <span class="dv">2229</span>, <span class="dv">1884</span>, <span class="dv">1884</span>, <span class="dv">2240</span>, <span class="dv">2081</span>, <span class="dv">1838</span>, <span class="dv">2037</span>,</span>
@@ -1184,14 +1184,14 @@ min cost: 2000g</code></pre>
 <li><p>閾値を1800gにした場合の TP, FP, FN, TN を計算せよ</p></li>
 <li><p>1800gの場合の <strong>Accuracy, Precision, Recall</strong> を求めよ</p></li>
 <li><p>1700gの場合の <strong>Accuracy, Precision, Recall</strong> を求めよ</p></li>
-<li><p><span class="math inline">\(C_{FP}=5000\)</span>円、<span class="math inline">\(C_{FN}=1000\)</span>円としたとき、総コストを最小にするしきい値を求めよ</p></li>
+<li><p><span class="math inline">\(C_{FP}=5000\)</span>円、<span class="math inline">\(C_{FN}=1000\)</span>円としたとき、総コストを最小にする閾値を求めよ</p></li>
 </ol>
 </div>
 </section>
 <section id="問0の答え可視化" class="slide level2">
 <h2>問0の答え（可視化）</h2>
 <div class="slide-body">
-<div id="cc376d95" class="cell" data-execution_count="20">
+<div id="8b79107e" class="cell" data-execution_count="20">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>

@@ -104,7 +104,7 @@
     code span.vs { color: #032f62; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-e69bca93ec9d1486cefcf16a785f5ce6.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-f73900642b947ff7c946332e8eb6f3e3.css">
   <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -258,7 +258,7 @@
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
   <script src="network-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="5f43385d8b7bd6868b75cfec32a8fa0e3b64eb2b">
+  <meta name="qmd-web-source" content="b7578a78988d50d25ada3c04759e4901e19b9867">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -277,12 +277,15 @@ rkskmt
 </div>
 
 </section>
-<section id="ここまでの道具" class="slide level2">
-<h2>ここまでの道具</h2>
+<section id="勾配降下法を知った" class="slide level2">
+<h2>勾配降下法を知った</h2>
 <div class="slide-body">
 <ul>
 <li><strong>勾配降下法</strong>：傾きの逆方向に少しずつ進んで、損失が最小の場所を探す</li>
-<li>ただし<a href="./optimization-gradient-descent.html#peek-gd-code" class="peek">ここまで最小化した</a>のは、<span class="math inline">\(f(x) = x^2 - 4x + 3\)</span> のような簡単な関数だった</li>
+<li>ただし<a href="./optimization-gradient-descent.html#peek-gd-code" class="peek">ここまで最小化した</a>のは簡単な関数
+<ul>
+<li>例：<span class="math inline">\(f(x) = x^2 - 4x + 3\)</span> のような</li>
+</ul></li>
 </ul>
 <div title="今回の目的">
 <div class="callout callout-note callout-titled callout-style-default">
@@ -301,96 +304,17 @@ rkskmt
 </div>
 </div>
 </section>
-<section id="モデルとは" class="slide level2">
-<h2>モデルとは</h2>
+<section id="回帰regression" class="slide level2">
+<h2>回帰（<span class="en">Regression</span>）</h2>
 <div class="slide-body">
 <ul>
-<li>これまでの「モデル」を、2つの部分に分けてみる：</li>
+<li>目的変数（<span class="en">target variable</span>）<span class="math inline">\(t\)</span> と説明変数（<span class="en">explanatory variable</span>）<span class="math inline">\(x\)</span> の関係を関数で表し、その関数をデータから推定する手法</li>
 </ul>
-<table class="caption-top">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>回</th>
-<th>計算の形（人間が決めた）</th>
-<th>空欄の数字（データが決めた）</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>1次元分類</td>
-<td>重さをしきい値と比べて判定</td>
-<td>しきい値（1個）</td>
-</tr>
-<tr class="even">
-<td>2次元の決定境界</td>
-<td>しきい値との比較を繰り返して判定（決定木）</td>
-<td>分岐ごとのしきい値</td>
-</tr>
-<tr class="odd">
-<td>クラスタリング</td>
-<td>一番近い重心に割り当て</td>
-<td>重心の座標（k個）</td>
-</tr>
-</tbody>
-</table>
-<div title="モデル（model）">
-<div class="callout callout-important callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>モデル（model）</strong></p>
-</div>
-<div class="callout-content">
-<ul>
-<li>入力から出力を計算するやり方
-<ul>
-<li>ただし、<strong>形</strong>だけが決まっていて、中の数字は<strong>空欄</strong></li>
-</ul></li>
-<li>空欄の名前が<strong>パラメータ</strong></li>
-<li>空欄をデータで埋めるのが<strong>学習</strong></li>
-</ul>
-</div>
-</div>
-</div>
-</div>
-<ul>
-<li>今回もまず、人間が<strong>形</strong>を決める
-<ul>
-<li>何を選ぶかは、データを見てから</li>
-</ul></li>
-</ul>
-</div>
-</section>
-<section id="回帰問題とは" class="slide level2">
-<h2>回帰問題とは</h2>
-<div class="slide-body">
-<div title="回帰（Regression）">
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>回帰（Regression）</strong></p>
-</div>
-<div class="callout-content">
-<p>目的変数（<span class="en">target variable</span>）<span class="math inline">\(t\)</span> と説明変数（<span class="en">explanatory variable</span>）<span class="math inline">\(x\)</span> の関係を関数（モデル）で表し、その関数をデータから推定する手法</p>
 <p><span class="math display">\[t = f(x) + \varepsilon \qquad (\varepsilon \text{：誤差})\]</span></p>
 <ul>
 <li>目的変数は通常、<strong>連続値（<span class="en">continuous value</span>）</strong></li>
 <li>統計的には、<span class="math inline">\(x\)</span> が与えられたときの <span class="math inline">\(t\)</span> の<strong>条件付き期待値（<span class="en">conditional expectation</span>）</strong> <span class="math inline">\(E[t \mid x]\)</span> を推定することにあたる（二乗誤差の場合）</li>
 </ul>
-</div>
-</div>
-</div>
-</div>
 <table class="caption-top">
 <thead>
 <tr class="header">
@@ -421,7 +345,7 @@ rkskmt
 <li>魚の<strong>体長</strong>（cm）を、新しい特徴量として使う</li>
 <li>体長を測るだけで重さが分かれば、<strong>秤に乗せる手間が省ける</strong></li>
 </ul>
-<div id="6794585a" class="cell" data-execution_count="1">
+<div id="8578e8e5" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>魚データの定義（クリックして展開）</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -438,7 +362,7 @@ rkskmt
 <span id="cb1-12"><a aria-label="12"></a>                    <span class="dv">2230</span>, <span class="dv">1445</span>, <span class="dv">1838</span>, <span class="dv">1370</span>, <span class="dv">1096</span>], dtype<span class="op">=</span><span class="bu">float</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="57b24e3f" class="cell" data-execution_count="2">
+<div id="0fbb1162" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -447,14 +371,14 @@ rkskmt
 </div>
 </div>
 </div>
-<div title="要するに">
+<div title="結果">
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>要するに</strong></p>
+<p><strong>結果</strong></p>
 </div>
 <div class="callout-content">
 <ul>
@@ -554,7 +478,7 @@ rkskmt
 <li>学習率を1つで済ませるため</li>
 </ul></li>
 </ul>
-<div id="fe53e782" class="cell" data-execution_count="3">
+<div id="f5ba4bd2" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a>x <span class="op">=</span> (lengths <span class="op">-</span> lengths.mean()) <span class="op">/</span> lengths.std()   <span class="co"># 標準化した体長</span></span>
 <span id="cb2-2"><a aria-label="2"></a>t <span class="op">=</span> (weights <span class="op">-</span> weights.mean()) <span class="op">/</span> weights.std()   <span class="co"># 標準化した重さ</span></span>
 <span id="cb2-3"><a aria-label="3"></a></span>
@@ -597,7 +521,7 @@ rkskmt
 <section id="直線が合っていく様子" class="slide level2">
 <h2>直線が合っていく様子</h2>
 <div class="slide-body">
-<div id="5e20da3a" class="cell" data-execution_count="4">
+<div id="714a6119" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -655,20 +579,8 @@ rkskmt
 </tr>
 </tbody>
 </table>
-<div title="要するに">
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>要するに</strong></p>
-</div>
-<div class="callout-content">
-<p>どれも今回と同じ手順で解ける：モデルの形を決め、損失を決め、勾配降下法でパラメータを求める</p>
-</div>
-</div>
-</div>
+<div class="takeaway">
+<p>どれも、予測の式と損失を決めれば、勾配降下法でパラメータを求められる</p>
 </div>
 </div>
 </section>
@@ -685,7 +597,7 @@ rkskmt
 <li>係数は次数の高い順に返る（<code>d = 1</code> なら <span class="math inline">\(a, b\)</span> の順）</li>
 </ul></li>
 </ul>
-<div id="6ebac033" class="cell" data-execution_count="5">
+<div id="cb4632b9" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a aria-label="1"></a>a_exact, b_exact <span class="op">=</span> np.polyfit(x, t, <span class="dv">1</span>)</span>
 <span id="cb4-2"><a aria-label="2"></a><span class="bu">print</span>(<span class="ss">f"gradient descent: a=</span><span class="sc">{</span>a<span class="sc">:.4f}</span><span class="ss">, b=</span><span class="sc">{</span>b<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
 <span id="cb4-3"><a aria-label="3"></a><span class="bu">print</span>(<span class="ss">f"np.polyfit      : a=</span><span class="sc">{</span>a_exact<span class="sc">:.4f}</span><span class="ss">, b=</span><span class="sc">{</span>b_exact<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
@@ -705,7 +617,7 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 </div>
 <div class="callout-content">
 <ul>
-<li>自作の勾配降下法と厳密解が<strong>一致</strong></li>
+<li>勾配降下法と厳密解が<strong>一致</strong></li>
 <li>元の単位に戻すと「体長 1cm あたり約 97g」という意味のある数字になる</li>
 </ul>
 </div>
@@ -718,6 +630,48 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <h2></h2>
 <div class="break-title">
 <p>モデルを複雑にしてみる</p>
+</div>
+</section>
+<section id="モデルmodel" class="slide level2">
+<h2>モデル（<span class="en">Model</span>）</h2>
+<div class="slide-body">
+<table class="caption-top">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>手法</th>
+<th>モデル</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>閾値で分類</td>
+<td>重さが閾値以上なら Salmon</td>
+</tr>
+<tr class="even">
+<td>決定木</td>
+<td>閾値との比較を重ねた分岐</td>
+</tr>
+<tr class="odd">
+<td>k-means</td>
+<td>一番近い重心に割り当てる</td>
+</tr>
+<tr class="even">
+<td>回帰（直線）</td>
+<td><span class="math inline">\(\text{重さ} = a \times \text{体長} + b\)</span></td>
+</tr>
+<tr class="odd">
+<td>回帰（2次式）</td>
+<td><span class="math inline">\(\text{重さ} = a \times \text{体長}^2 + b \times \text{体長} + c\)</span></td>
+</tr>
+</tbody>
+</table>
+<div class="takeaway">
+<p>どのモデルを使うかは人間が選ぶ</p>
+</div>
 </div>
 </section>
 <section id="モデルを曲線にする" class="slide level2">
@@ -751,7 +705,7 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <section id="次数を上げてみる" class="slide level2">
 <h2>次数を上げてみる</h2>
 <div class="slide-body">
-<div id="6a722c8d" class="cell" data-execution_count="6">
+<div id="eb302c93" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a aria-label="1"></a><span class="co"># 先頭の10匹を訓練データ、残りの5匹をテストデータにする</span></span>
@@ -807,10 +761,10 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 </div>
 </div>
 </section>
-<section id="数字で見る回帰でも過学習が起きる" class="slide level2">
-<h2>数字で見る：回帰でも過学習が起きる</h2>
+<section id="テストデータで過学習を確認" class="slide level2">
+<h2>テストデータで過学習を確認</h2>
 <div class="slide-body">
-<div id="83a01312" class="cell" data-execution_count="7">
+<div id="dab07e6b" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a aria-label="1"></a>degrees <span class="op">=</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">9</span>)</span>
 <span id="cb7-2"><a aria-label="2"></a>train_mse, test_mse <span class="op">=</span> [], []</span>
 <span id="cb7-3"><a aria-label="3"></a><span class="cf">for</span> deg <span class="kw">in</span> degrees:</span>
@@ -836,14 +790,14 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <div class="caption-note center">
 <p>次数9は訓練の10点をすべて通り、訓練MSEが0になるので対数目盛には描けない</p>
 </div>
-<div title="要するに">
+<div title="結果">
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>要するに</strong></p>
+<p><strong>結果</strong></p>
 </div>
 <div class="callout-content">
 <ul>
@@ -860,13 +814,13 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 </div>
 </div>
 </section>
-<section id="正則化大きい係数に罰金を払わせる" class="slide level2">
-<h2>正則化：大きい係数に罰金を払わせる</h2>
+<section id="正則化大きい係数にペナルティを与える" class="slide level2">
+<h2>正則化：大きい係数にペナルティを与える</h2>
 <div class="slide-body">
 <ul>
 <li>曲線が大きく振れる原因は、<strong>巨大な係数</strong></li>
 </ul>
-<div id="d4519a40" class="cell" data-execution_count="8">
+<div id="90b8b8a9" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a aria-label="1"></a>coef1 <span class="op">=</span> np.polyfit(z_train, t_train, <span class="dv">1</span>)</span>
 <span id="cb8-2"><a aria-label="2"></a>coef9 <span class="op">=</span> np.polyfit(z_train, t_train, <span class="dv">9</span>)</span>
 <span id="cb8-3"><a aria-label="3"></a><span class="bu">print</span>(<span class="st">"次数1の係数の最大絶対値:"</span>, <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">abs</span>(coef1[:<span class="op">-</span><span class="dv">1</span>])<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss">"</span>)   <span class="co"># [:-1] は切片を除く</span></span>
@@ -881,27 +835,28 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 </ul>
 <p><span class="math display">\[L = \mathrm{MSE} + \lambda \sum_j w_j^2\]</span></p>
 <ul>
-<li><strong>正則化（<span class="en">regularization</span>）</strong>：モデルの複雑さを抑える罰則を損失に足す手法</li>
+<li><strong>正則化（<span class="en">regularization</span>）</strong>：モデルの複雑さを抑えるペナルティを損失に足す手法</li>
 <li>MSE だけではなく、係数の大きさも loss に入れ込む</li>
-<li><span class="math inline">\(\lambda\)</span>（ラムダ）：罰金の強さ
+<li><span class="math inline">\(\lambda\)</span>（ラムダ）：ペナルティの強さ
 <ul>
 <li><span class="math inline">\(\lambda = 0\)</span> なら今までどおりの MSE</li>
+<li>学習のしかたを決める<a href="./clustering-kmeans.html#peek-parameter" class="peek">ハイパーパラメータ</a></li>
 </ul></li>
 </ul>
 </div>
 </section>
 <section id="peek-ridge-code" class="slide level2">
-<h2>正則化の実装：自作の勾配降下法に罰金を足す</h2>
+<h2>正則化の実装：勾配降下法にペナルティを足す</h2>
 <div class="slide-body">
 <ul>
-<li><a href="#/peek-gdfit-code" class="peek">自作した勾配降下法</a>に、<strong>罰金の項を足す</strong></li>
-<li>罰金 <span class="math inline">\(\lambda \sum w^2\)</span> の微分は <span class="math inline">\(2\lambda w\)</span>
+<li><a href="#/peek-gdfit-code" class="peek">勾配降下法</a>に、<strong>ペナルティの項を足す</strong></li>
+<li>ペナルティ <span class="math inline">\(\lambda \sum w^2\)</span> の微分は <span class="math inline">\(2\lambda w\)</span>
 <ul>
 <li>各係数の勾配に足せばよい</li>
 </ul></li>
 </ul>
-<div id="5e22fc8f" class="cell" data-execution_count="9">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a aria-label="1"></a><span class="co"># 特徴量 x, x², …, x⁹ も自分で作る（列が x^1 〜 x^9 の配列）</span></span>
+<div id="f133ee25" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a aria-label="1"></a><span class="co"># 特徴量 x, x², …, x⁹ を作る（列が x^1 〜 x^9 の配列）</span></span>
 <span id="cb10-2"><a aria-label="2"></a>P_train <span class="op">=</span> x_train.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>) <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)   <span class="co"># 形 (10, 9)</span></span>
 <span id="cb10-3"><a aria-label="3"></a>P_test  <span class="op">=</span> x_test.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)  <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)</span>
 <span id="cb10-4"><a aria-label="4"></a>mu, sd  <span class="op">=</span> P_train.mean(axis<span class="op">=</span><span class="dv">0</span>), P_train.std(axis<span class="op">=</span><span class="dv">0</span>)</span>
@@ -910,13 +865,13 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <span id="cb10-7"><a aria-label="7"></a>t_mean, t_std <span class="op">=</span> t_train.mean(), t_train.std()</span>
 <span id="cb10-8"><a aria-label="8"></a>tt <span class="op">=</span> (t_train <span class="op">-</span> t_mean) <span class="op">/</span> t_std                <span class="co"># 重さも標準化</span></span>
 <span id="cb10-9"><a aria-label="9"></a></span>
-<span id="cb10-10"><a aria-label="10"></a>lam  <span class="op">=</span> <span class="fl">0.1</span>        <span class="co"># 罰金の強さ λ</span></span>
+<span id="cb10-10"><a aria-label="10"></a>lam  <span class="op">=</span> <span class="fl">0.1</span>        <span class="co"># ペナルティの強さ λ</span></span>
 <span id="cb10-11"><a aria-label="11"></a>w, b <span class="op">=</span> np.zeros(<span class="dv">9</span>), <span class="fl">0.0</span></span>
 <span id="cb10-12"><a aria-label="12"></a>lr   <span class="op">=</span> <span class="fl">0.01</span></span>
 <span id="cb10-13"><a aria-label="13"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10_000</span>):</span>
 <span id="cb10-14"><a aria-label="14"></a>    pred   <span class="op">=</span> P_train <span class="op">@</span> w <span class="op">+</span> b</span>
 <span id="cb10-15"><a aria-label="15"></a>    grad_w <span class="op">=</span> np.array([<span class="dv">2</span> <span class="op">*</span> np.mean((pred <span class="op">-</span> tt) <span class="op">*</span> P_train[:, d]) <span class="cf">for</span> d <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">9</span>)]) <span class="op">\</span></span>
-<span id="cb10-16"><a aria-label="16"></a>             <span class="op">+</span> <span class="dv">2</span> <span class="op">*</span> lam <span class="op">*</span> w                     <span class="co"># ← MSEの勾配 ＋ 罰金の勾配</span></span>
+<span id="cb10-16"><a aria-label="16"></a>             <span class="op">+</span> <span class="dv">2</span> <span class="op">*</span> lam <span class="op">*</span> w                     <span class="co"># ← MSEの勾配 ＋ ペナルティの勾配</span></span>
 <span id="cb10-17"><a aria-label="17"></a>    grad_b <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> np.mean(pred <span class="op">-</span> tt)</span>
 <span id="cb10-18"><a aria-label="18"></a>    w <span class="op">-=</span> lr <span class="op">*</span> grad_w</span>
 <span id="cb10-19"><a aria-label="19"></a>    b <span class="op">-=</span> lr <span class="op">*</span> grad_b</span>
@@ -944,9 +899,9 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <ul>
 <li>係数の最大絶対値が<strong>桁違いに小さく</strong>なった
 <ul>
-<li>罰金が係数の増大を抑えた</li>
+<li>ペナルティが係数の増大を抑えた</li>
 </ul></li>
-<li>勾配降下法のループは<a href="#/peek-gdfit-code" class="peek">自作のコード</a>と同じ形
+<li>勾配降下法のループは<a href="#/peek-gdfit-code" class="peek">正則化なしのコード</a>と同じ形
 <ul>
 <li>増えたのは <code>+ 2 * lam * w</code> の項だけ</li>
 </ul></li>
@@ -957,10 +912,10 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 </div>
 </div>
 </section>
-<section id="罰金ありなしを見比べる" class="slide level2">
-<h2>罰金あり・なしを見比べる</h2>
+<section id="ペナルティありなしを見比べる" class="slide level2">
+<h2>ペナルティあり・なしを見比べる</h2>
 <div class="slide-body">
-<div id="1a2ef783" class="cell" data-execution_count="10">
+<div id="ebd245b6" class="cell" data-execution_count="10">
 <details class="code-fold">
 <summary>描画コード</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a aria-label="1"></a>P_grid    <span class="op">=</span> ((grid.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>) <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)) <span class="op">-</span> mu) <span class="op">/</span> sd</span>
@@ -970,7 +925,7 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <span id="cb12-5"><a aria-label="5"></a><span class="cf">for</span> ax, curve, name, mse <span class="kw">in</span> [</span>
 <span id="cb12-6"><a aria-label="6"></a>        (axes[<span class="dv">0</span>], np.polyval(coef9, z_grid), <span class="st">"次数9（正則化なし）"</span>,</span>
 <span id="cb12-7"><a aria-label="7"></a>         np.mean((np.polyval(coef9, z_test) <span class="op">-</span> t_test) <span class="op">**</span> <span class="dv">2</span>)),</span>
-<span id="cb12-8"><a aria-label="8"></a>        (axes[<span class="dv">1</span>], own_curve, <span class="st">"次数9 + 正則化（自作の勾配降下法）"</span>,</span>
+<span id="cb12-8"><a aria-label="8"></a>        (axes[<span class="dv">1</span>], own_curve, <span class="st">"次数9 + 正則化（勾配降下法）"</span>,</span>
 <span id="cb12-9"><a aria-label="9"></a>         np.mean((test_pred <span class="op">-</span> t_test) <span class="op">**</span> <span class="dv">2</span>))]:</span>
 <span id="cb12-10"><a aria-label="10"></a>    ax.scatter(x_train, t_train, c<span class="op">=</span><span class="st">"#2980b9"</span>, s<span class="op">=</span><span class="dv">45</span>)</span>
 <span id="cb12-11"><a aria-label="11"></a>    ax.scatter(x_test, t_test, c<span class="op">=</span><span class="st">"#e74c3c"</span>, marker<span class="op">=</span><span class="st">"s"</span>, s<span class="op">=</span><span class="dv">45</span>)</span>
@@ -1001,7 +956,7 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 </div>
 <div class="callout-content">
 <ul>
-<li>同じ次数9なのに、罰金の項を足しただけで素直な曲線に戻った</li>
+<li>同じ次数9なのに、ペナルティの項を足しただけで素直な曲線に戻った</li>
 <li>テストMSEは<strong>桁違いに</strong>改善（図のタイトル）</li>
 </ul>
 </div>
@@ -1014,7 +969,7 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <h2>L2正則化とリッジ回帰</h2>
 <div class="slide-body">
 <ul>
-<li><span class="math inline">\(\lambda \sum_j w_j^2\)</span> の形の罰金：<strong>L2正則化</strong>（<span class="en">L2 regularization</span>）</li>
+<li><span class="math inline">\(\lambda \sum_j w_j^2\)</span> の形のペナルティ：<strong>L2正則化</strong>（<span class="en">L2 regularization</span>）</li>
 <li>L2正則化を加えた線形回帰は、歴史的な経緯で<strong>リッジ回帰</strong>（<span class="en">Ridge regression</span>）と呼ばれる
 <ul>
 <li>モデルは線形回帰のままで、変わるのは損失だけ</li>
@@ -1027,7 +982,7 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <h2>深さの制限も、広い意味での正則化</h2>
 <div class="slide-body">
 <ul>
-<li>次数9の曲線の MSE を、罰金のあり・なしで比べる</li>
+<li>次数9の曲線の MSE を、ペナルティのあり・なしで比べる</li>
 </ul>
 <table class="caption-top">
 <thead>
@@ -1039,12 +994,12 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td>罰金なし</td>
+<td>ペナルティなし</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;"><span class="math inline">\(4.4 \times 10^{14}\)</span></td>
 </tr>
 <tr class="even">
-<td>罰金あり（<span class="math inline">\(\lambda = 0.1\)</span>）</td>
+<td>ペナルティあり（<span class="math inline">\(\lambda = 0.1\)</span>）</td>
 <td style="text-align: right;">3,585</td>
 <td style="text-align: right;">3,427</td>
 </tr>
@@ -1063,7 +1018,7 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <ul>
 <li>訓練誤差を犠牲にして、<a href="./classification-evaluation.html#peek-generalization-gap" class="peek">汎化誤差</a>を下げる工夫
 <ul>
-<li>罰金：訓練MSEは上がり、テストMSEは下がった</li>
+<li>ペナルティ：訓練MSEは上がり、テストMSEは下がった</li>
 <li><a href="./classification-evaluation.html#peek-depth-curve" class="peek">決定木の深さの制限</a>：訓練データでの成績は満点でなくなる</li>
 </ul></li>
 </ul>
@@ -1073,8 +1028,8 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 </div>
 </div>
 </section>
-<section id="tweak-罰金の強さで曲線が変わる" class="slide level2 badge-practice">
-<h2><strong>Tweak</strong> 罰金の強さで曲線が変わる</h2>
+<section id="tweak-ペナルティの強さで曲線が変わる" class="slide level2 badge-practice">
+<h2><strong>Tweak</strong> ペナルティの強さで曲線が変わる</h2>
 <div class="slide-body">
 <ul>
 <li><a href="#/peek-ridge-code" class="peek">さっきのコード</a> の <code>lam = 0.1</code> を<strong>書き換えて実行</strong>（比較の図まで続けて実行すると形の変化が見える）</li>
@@ -1089,11 +1044,11 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td>罰金をゼロにする</td>
+<td>ペナルティをゼロにする</td>
 <td><code>lam = 0.0</code></td>
 </tr>
 <tr class="even">
-<td>罰金を強烈にする</td>
+<td>ペナルティを強烈にする</td>
 <td><code>lam = 10</code></td>
 </tr>
 </tbody>
@@ -1117,7 +1072,7 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 </ul></li>
 <li><code>10</code>：曲線はほぼ<strong>まっすぐ寝て</strong>、訓練MSEまで悪化する
 <ul>
-<li>罰金が強すぎて、訓練データに合わなくなる</li>
+<li>ペナルティが強すぎて、訓練データに合わなくなる</li>
 </ul></li>
 <li>ちょうど良い <span class="math inline">\(\lambda\)</span> は問題ごとに違う
 <ul>
@@ -1143,14 +1098,14 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <li>勾配降下法で求めた傾きと切片は、最小二乗法の厳密解と<strong>一致</strong></li>
 <li><strong>多項式回帰</strong>：特徴量に <span class="math inline">\(x^2, x^3, \ldots\)</span> を足せば道具は線形回帰のまま</li>
 <li><strong>過学習は回帰でも起きる</strong>：次数を上げると訓練誤差は下がり、テスト誤差は桁違いに増える</li>
-<li><strong>正則化（<span class="en">regularization</span>）</strong>：大きい係数に罰金を課し、曲線の振れを抑える</li>
+<li><strong>正則化（<span class="en">regularization</span>）</strong>：大きい係数にペナルティを与え、曲線の振れを抑える</li>
 </ul>
 </div>
 </section>
 <section id="練習問題2点のデータから直線を求める" class="slide level2 scrollable">
 <h2>練習問題：2点のデータから直線を求める</h2>
 <div class="slide-body">
-<p>データは2点だけ：<span class="math inline">\((x_1, t_1) = (-1, 0)\)</span>、<span class="math inline">\((x_2, t_2) = (1, 2)\)</span>。 直線 <span class="math inline">\(ax + b\)</span> を勾配降下法で求める。初期値 <span class="math inline">\(a = 0, b = 0\)</span>、学習率 <span class="math inline">\(\alpha = 0.1\)</span>。<strong>手計算</strong>と<strong>Pythonコード</strong>の両方で解け。</p>
+<p>データは2点だけ：<span class="math inline">\((x_1, t_1) = (-1, 0)\)</span>、<span class="math inline">\((x_2, t_2) = (1, 2)\)</span>。 直線 <span class="math inline">\(ax + b\)</span> を勾配降下法で求める。初期値 <span class="math inline">\(a = 0, b = 0\)</span>、学習率 <span class="math inline">\(\alpha = 0.1\)</span></p>
 <ol type="1">
 <li>勾配の式に代入して、<span class="math inline">\(\dfrac{\partial L}{\partial a}\)</span> と <span class="math inline">\(\dfrac{\partial L}{\partial b}\)</span> を求めよ</li>
 <li>更新を3回、手計算で示せ</li>
@@ -1187,7 +1142,7 @@ a = 0.2 + 0.16 = 0.36\]</span></p>
 </div>
 </div>
 <h3 id="コードで確認">コードで確認</h3>
-<div id="61d7b47a" class="cell" data-execution_count="11">
+<div id="63328c2b" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -1229,8 +1184,8 @@ np.polyfit: a=1.0000, b=1.0000</code></pre>
 <li>このデータの値を代入して整理した <span class="math inline">\(\dfrac{\partial L}{\partial a}\)</span> と <span class="math inline">\(\dfrac{\partial L}{\partial b}\)</span> の式</li>
 <li>3回の更新（各回の勾配と <span class="math inline">\(a,\ b\)</span> を記載）</li>
 <li>勾配が <span class="math inline">\(0\)</span> になる <span class="math inline">\(a,\ b\)</span> の値</li>
-<li>損失に罰金 <span class="math inline">\(\lambda a^2\)</span>（<span class="math inline">\(\lambda = 1.25\)</span>）を足したときの、2 と 3 の再計算</li>
-<li>罰金の有無による傾き <span class="math inline">\(a\)</span> の比較</li>
+<li>損失にペナルティ <span class="math inline">\(\lambda a^2\)</span>（<span class="math inline">\(\lambda = 1.25\)</span>）を足したときの、2 と 3 の再計算</li>
+<li>ペナルティの有無による傾き <span class="math inline">\(a\)</span> の比較</li>
 </ol>
 
 

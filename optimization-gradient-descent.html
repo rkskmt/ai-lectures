@@ -258,7 +258,7 @@
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
   <script src="network-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="3d60eece6b9da6493f22b0fbd52d4cef7ca74379">
+  <meta name="qmd-web-source" content="b7fedb113abd5441ba93ab006972e62ad17ee748">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -277,50 +277,29 @@ rkskmt
 </div>
 
 </section>
-<section id="どの手法もある値が最小になるパラメータを探していた" class="slide level2">
-<h2>どの手法も、ある値が最小になるパラメータを探していた</h2>
+<section id="小さくなるようにパラメータを探索" class="slide level2">
+<h2>小さくなるようにパラメータを探索</h2>
 <div class="slide-body">
-<table class="caption-top">
-<thead>
-<tr class="header">
-<th>手法</th>
-<th>パラメータ</th>
-<th>小さくしたい値</th>
-<th>探し方</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>しきい値で分類</td>
-<td>重さのしきい値</td>
-<td><a href="./classification-basics-1d.html#peek-cost" class="peek">総コスト</a></td>
-<td>候補を全部試す（総当たり）</td>
-</tr>
-<tr class="even">
-<td>決定木</td>
-<td>分岐のしきい値</td>
-<td><a href="./classification-2d-boundaries.html#最適化ジニ不純度が最小になる閾値を探索" class="peek">加重平均ジニ不純度</a></td>
-<td>候補を全部試す</td>
-</tr>
-<tr class="odd">
-<td>k-means</td>
-<td>重心の位置</td>
-<td><a href="./clustering-kmeans.html#peek-sse" class="peek">SSE</a></td>
-<td>assign と update の繰り返し</td>
-</tr>
-</tbody>
-</table>
-<div title="今回の主題">
+<div id="be5602a4" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-2-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-2-output-1.png" class="quarto-figure quarto-figure-center" width="1187" height="337"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<div title="今回のトピック">
 <div class="callout callout-important callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>今回の主題</strong></p>
+<p><strong>今回のトピック</strong></p>
 </div>
 <div class="callout-content">
-<p>候補を全部試さずに、多くの手法に共通して使える探し方はあるか</p>
+<p>総当たりではない探し方を考えよう</p>
 </div>
 </div>
 </div>
@@ -335,8 +314,9 @@ rkskmt
 <ul>
 <li>小さいほど良い</li>
 </ul></li>
-<li><strong>最適化（<span class="en">optimization</span>）</strong>：損失が最小になるパラメータを探すこと
+<li><strong>最適化（<span class="en">optimization</span>）</strong>：損失が最小になる<a href="./clustering-kmeans.html#peek-parameter" class="peek">パラメータ</a>を探すこと
 <ul>
+<li><a href="./clustering-kmeans.html#peek-parameter" class="peek">ハイパーパラメータ</a>は固定したまま</li>
 <li>本当の最小値に届かなくても、十分に小さい値が見つかれば最適化と呼ぶことが多い</li>
 </ul></li>
 </ul>
@@ -350,7 +330,7 @@ rkskmt
 </thead>
 <tbody>
 <tr class="odd">
-<td>しきい値で分類</td>
+<td>閾値で分類</td>
 <td><a href="./classification-basics-1d.html#peek-cost" class="peek">総コスト</a></td>
 <td>誤分類にかかる費用の合計</td>
 </tr>
@@ -368,87 +348,16 @@ rkskmt
 </table>
 </div>
 </section>
-<section id="パラメータ" class="slide level2">
-<h2>パラメータ</h2>
-<div class="slide-body">
-<ul>
-<li><a href="./clustering-kmeans.html#peek-parameter" class="peek">パラメータ</a>：学習がデータから決める値
-<ul>
-<li>学習が終われば固定</li>
-</ul></li>
-<li><strong>学習</strong>：データからパラメータを決めること
-<ul>
-<li>多くのモデルでは、最適化でパラメータを決める</li>
-</ul></li>
-</ul>
-<div title="「パラメータ」の呼び分け">
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>「パラメータ」の呼び分け</strong></p>
-</div>
-<div class="callout-content">
-<ul>
-<li>プログラミングでは、関数に渡す値もパラメータと呼ぶ
-<ul>
-<li>k-means の k はこの意味ではパラメータだが、機械学習ではハイパーパラメータ</li>
-</ul></li>
-<li>学習で決まる側は、学習可能パラメータ（<span class="en">trainable parameter</span> / <span class="en">learnable parameter</span>）やモデルパラメータ（<span class="en">model parameter</span>）とも呼ばれる
-<ul>
-<li>普通は単にパラメータと呼ぶ</li>
-</ul></li>
-</ul>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
 <section id="peek-loss-function" class="slide level2">
 <h2>損失関数（<span class="en">Loss Function</span>）</h2>
 <div class="slide-body">
 <ul>
 <li><strong>損失関数</strong>：パラメータを入力すると損失を返す関数
 <ul>
-<li>例：Salmon と Sea bass の分類では、しきい値を決めると誤分類の数が決まる</li>
+<li>例：Salmon と Sea bass の分類では、閾値を決めると誤分類の数が決まる</li>
 </ul></li>
 </ul>
-<div id="6b8d1bff" class="cell" data-execution_count="1">
-<div class="cell-output cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-2-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-2-output-1.png" class="quarto-figure quarto-figure-center" width="1087" height="367"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div title="要するに">
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>要するに</strong></p>
-</div>
-<div class="callout-content">
-<p>損失の最小化は、損失関数のグラフの<strong>谷底探し</strong></p>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="斜めの直線のパラメータは傾きと切片の2個" class="slide level2">
-<h2>斜めの直線のパラメータは、傾きと切片の2個</h2>
-<div class="slide-body">
-<ul>
-<li><a href="./classification-2d-boundaries.html#peek-diagonal" class="peek">斜めの直線で分けられそう</a>に見えた境界は、傾きと切片で決まる</li>
-</ul>
-<div id="6b2c5332" class="cell" data-execution_count="2">
+<div id="99d830b6" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -457,34 +366,42 @@ rkskmt
 </div>
 </div>
 </div>
-<div title="要するに">
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
+<div class="takeaway">
+<p>損失の最小化は、損失関数のグラフの<strong>谷底探し</strong></p>
 </div>
-<p><strong>要するに</strong></p>
 </div>
-<div class="callout-content">
-<p>パラメータを変えると<strong>境界線が動き</strong>、正答率が変わる</p>
-</div>
+</section>
+<section id="斜めの直線を決定境界とするとしたら" class="slide level2">
+<h2>斜めの直線を決定境界とするとしたら</h2>
+<div class="slide-body">
+<ul>
+<li>傾きと切片の2個のパラメータをきめるだけでいい
+<ul>
+<li><a href="./classification-2d-boundaries.html#peek-diagonal" class="peek">斜めの直線で分けられそう</a></li>
+</ul></li>
+</ul>
+<div id="2857cc7f" class="cell" data-execution_count="3">
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-4-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-4-output-1.png" class="quarto-figure quarto-figure-center" width="1087" height="367"></a></p>
+</figure>
 </div>
 </div>
 </div>
 </div>
 </section>
-<section id="総当たりはパラメータが増えると試しきれない" class="slide level2">
-<h2>総当たりは、パラメータが増えると試しきれない</h2>
+<section id="パラメータ数が増える総当たりは厳しい" class="slide level2">
+<h2>パラメータ数が増える総当たりは厳しい</h2>
 <div class="slide-body">
 <ul>
 <li>パラメータ1個につき、候補を100個試すとする</li>
 </ul>
-<div id="2b0120c5" class="cell fig-small" data-execution_count="3">
+<div id="8620b8e4" class="cell fig-small" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-4-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-4-output-1.png" class="quarto-figure quarto-figure-center" width="887" height="327"></a></p>
+<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-5-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-5-output-1.png" class="quarto-figure quarto-figure-center" width="887" height="327"></a></p>
 </figure>
 </div>
 </div>
@@ -498,7 +415,7 @@ rkskmt
 </thead>
 <tbody>
 <tr class="odd">
-<td>1個（しきい値）</td>
+<td>1個（閾値）</td>
 <td><span class="math inline">\(100\)</span> 通り</td>
 </tr>
 <tr class="even">
@@ -589,32 +506,17 @@ rkskmt
 <li>傾きが<strong>負</strong>なので、右へ少し動くと <span class="math inline">\(f(x)\)</span> が下がる</li>
 <li>谷底に近づくには、傾きの<strong>逆方向</strong>へ少し進めばよい</li>
 </ul>
-<div id="47351d22" class="cell fig-small" data-execution_count="4">
+<div id="a34e688d" class="cell fig-small" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-5-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-5-output-1.png" class="quarto-figure quarto-figure-center" width="637" height="307"></a></p>
+<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-6-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-6-output-1.png" class="quarto-figure quarto-figure-center" width="637" height="307"></a></p>
 </figure>
 </div>
 </div>
 </div>
-<div title="要するに">
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>要するに</strong></p>
-</div>
-<div class="callout-content">
-<ul>
-<li>進んだ先でまた傾きを測れば、次の一歩も決まる</li>
-<li><strong>繰り返せば谷底に近づく</strong></li>
-</ul>
-</div>
-</div>
-</div>
+<div class="takeaway">
+<p>傾きを測って進むことを繰り返せば、<strong>谷底に近づく</strong></p>
 </div>
 </div>
 </section>
@@ -738,11 +640,11 @@ rkskmt
 </div>
 </div>
 </div>
-<div id="e1a9c06d" class="cell" data-execution_count="6">
+<div id="8c3c2004" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-7-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-7-output-1.png" class="quarto-figure quarto-figure-center" width="606" height="287"></a></p>
+<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-8-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-8-output-1.png" class="quarto-figure quarto-figure-center" width="606" height="287"></a></p>
 </figure>
 </div>
 </div>
@@ -770,11 +672,11 @@ rkskmt
 </div>
 </div>
 </div>
-<div id="0fb9c5fa" class="cell" data-execution_count="7">
+<div id="ba18017d" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-8-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-8-output-1.png" class="quarto-figure quarto-figure-center" width="606" height="287"></a></p>
+<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-9-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-9-output-1.png" class="quarto-figure quarto-figure-center" width="606" height="287"></a></p>
 </figure>
 </div>
 </div>
@@ -797,11 +699,11 @@ rkskmt
 <p><span class="math display">\[f'(1.68) = 2 \times 1.68 - 4 = 3.36 - 4 = -0.64\]</span></p>
 <h4 id="更新">更新</h4>
 <p><span class="math display">\[x_{\text{new}} = 1.68 - 0.3 \times (-0.64) = 1.68 + 0.192 = 1.872\]</span></p>
-<div id="425232a7" class="cell" data-execution_count="8">
+<div id="2a1b2aaf" class="cell" data-execution_count="9">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-9-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-9-output-1.png" class="quarto-figure quarto-figure-center" width="606" height="287"></a></p>
+<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-10-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-10-output-1.png" class="quarto-figure quarto-figure-center" width="606" height="287"></a></p>
 </figure>
 </div>
 </div>
@@ -814,11 +716,11 @@ rkskmt
 <p><span class="math display">\[f'(1.872) = 2 \times 1.872 - 4 = 3.744 - 4 = -0.256\]</span></p>
 <h4 id="更新-1">更新</h4>
 <p><span class="math display">\[x_{\text{new}} = 1.872 - 0.3 \times (-0.256) = 1.872 + 0.0768 = 1.9488\]</span></p>
-<div id="a7349f1a" class="cell" data-execution_count="9">
+<div id="5d9151e4" class="cell" data-execution_count="10">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-10-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-10-output-1.png" class="quarto-figure quarto-figure-center" width="606" height="287"></a></p>
+<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-11-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-11-output-1.png" class="quarto-figure quarto-figure-center" width="606" height="287"></a></p>
 </figure>
 </div>
 </div>
@@ -873,11 +775,11 @@ rkskmt
 </tr>
 </tbody>
 </table>
-<div id="c2466ca6" class="cell" data-execution_count="10">
+<div id="f1197e04" class="cell" data-execution_count="11">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-11-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-11-output-1.png" class="quarto-figure quarto-figure-center" width="637" height="307"></a></p>
+<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-12-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-12-output-1.png" class="quarto-figure quarto-figure-center" width="637" height="307"></a></p>
 </figure>
 </div>
 </div>
@@ -906,7 +808,7 @@ rkskmt
 <ul>
 <li>手計算で使った更新式を、そのまま <code>for</code> 文で繰り返す</li>
 </ul>
-<div id="7e01780b" class="cell" data-execution_count="11">
+<div id="259e9da2" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="kw">def</span> f(x):</span>
 <span id="cb1-2"><a aria-label="2"></a>    <span class="cf">return</span> x<span class="op">**</span><span class="dv">2</span> <span class="op">-</span> <span class="dv">4</span><span class="op">*</span>x <span class="op">+</span> <span class="dv">3</span></span>
 <span id="cb1-3"><a aria-label="3"></a></span>
@@ -1016,11 +918,11 @@ iter  7: x = 1.9967
 <section id="peek-lr" class="slide level2">
 <h2>学習率で挙動が変わる</h2>
 <div class="slide-body">
-<div id="022d84f9" class="cell fig-medium" data-execution_count="12">
+<div id="c80b441a" class="cell fig-medium" data-execution_count="13">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-13-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-13-output-1.png" class="quarto-figure quarto-figure-center" width="986" height="588"></a></p>
+<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-14-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-14-output-1.png" class="quarto-figure quarto-figure-center" width="986" height="588"></a></p>
 </figure>
 </div>
 </div>
@@ -1177,7 +1079,7 @@ f(w_1,w_2)=w_1^2+3w_2^2,
 <ul>
 <li><a href="#/peek-gd-code" class="peek">1変数の実装</a>と同様に、<span class="math inline">\(w_1\)</span> と <span class="math inline">\(w_2\)</span> をそれぞれ更新する</li>
 </ul>
-<div id="61f741f0" class="cell" data-execution_count="13">
+<div id="4977619b" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a aria-label="1"></a><span class="kw">def</span> f2(w1, w2):</span>
 <span id="cb3-2"><a aria-label="2"></a>    <span class="cf">return</span> w1<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> <span class="dv">3</span> <span class="op">*</span> w2<span class="op">**</span><span class="dv">2</span></span>
 <span id="cb3-3"><a aria-label="3"></a></span>
@@ -1213,20 +1115,19 @@ iter 6: w1=-0.0625 w2= 0.0312 f=0.0068</code></pre>
 <div style="display:flex; justify-content:center;">
 <iframe src="iframes/gd_bowl_3d.html" width="900" height="520" style="border:none;" onload="try{var d=this.contentDocument;if(d){d.documentElement.style.margin='0';d.documentElement.style.padding='0';d.body.style.margin='0';d.body.style.padding='0';}}catch(e){}"></iframe>
 </div>
-<div title="要するに">
+<div title="結果">
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>要するに</strong></p>
+<p><strong>結果</strong></p>
 </div>
 <div class="callout-content">
 <ul>
 <li><span class="math inline">\(w_1\)</span> は谷の同じ側から近づく</li>
 <li><span class="math inline">\(w_2\)</span> は谷をまたぎ、<strong>振動しながら収束</strong>する</li>
-<li>実際の機械学習はパラメータがさらに多いが、更新のしかたは同じ</li>
 </ul>
 </div>
 </div>
@@ -1320,11 +1221,11 @@ iter 6: w1=-0.0625 w2= 0.0312 f=0.0068</code></pre>
 </div>
 </div>
 </div>
-<div id="7dc05b18" class="cell" data-execution_count="15">
+<div id="957b22fc" class="cell" data-execution_count="16">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-16-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-16-output-1.png" class="quarto-figure quarto-figure-center" width="606" height="287"></a></p>
+<p><a href="optimization-gradient-descent_files/figure-revealjs/cell-17-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-12"><img data-src="optimization-gradient-descent_files/figure-revealjs/cell-17-output-1.png" class="quarto-figure quarto-figure-center" width="606" height="287"></a></p>
 </figure>
 </div>
 </div>
@@ -1346,8 +1247,8 @@ iter 6: w1=-0.0625 w2= 0.0312 f=0.0068</code></pre>
 </div>
 </div>
 </section>
-<section id="演習4次関数で初期値を変える" class="slide level2 badge-practice scrollable">
-<h2>演習：4次関数で初期値を変える</h2>
+<section id="演習１4次関数で初期値を変える" class="slide level2 badge-practice scrollable">
+<h2>演習１：4次関数で初期値を変える</h2>
 <div class="slide-body">
 <p><span class="math inline">\(f(x) = x^4 - 2x^2\)</span> を学習率 <span class="math inline">\(\alpha = 0.05\)</span> の勾配降下法で最小化する過程を、紙に書いて求めよ。</p>
 <ol type="1">
@@ -1359,8 +1260,8 @@ iter 6: w1=-0.0625 w2= 0.0312 f=0.0068</code></pre>
 </ol>
 </div>
 </section>
-<section id="演習2変数関数を更新する" class="slide level2 badge-practice scrollable">
-<h2>演習：2変数関数を更新する</h2>
+<section id="演習２2変数関数を更新する" class="slide level2 badge-practice scrollable">
+<h2>演習２：2変数関数を更新する</h2>
 <div class="slide-body">
 <p><span class="math inline">\(f(w_1, w_2) = w_1^2 + 2w_2^2 - 2w_1 + 4w_2\)</span> を、初期値 <span class="math inline">\((w_1, w_2) = (0, 0)\)</span>、学習率 <span class="math inline">\(\alpha = 0.2\)</span> の勾配降下法で最小化する過程を、紙に書いて求めよ。</p>
 <ol type="1">
