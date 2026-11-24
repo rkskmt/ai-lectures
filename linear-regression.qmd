@@ -458,17 +458,67 @@ plt.show()
 
 ## 深さの制限も、広い意味での正則化 {#peek-regularization-broad}
 
-- 次数9の曲線の MSE を、ペナルティのあり・なしで比べる
+- **広い意味での正則化**：訓練誤差を犠牲にして、[汎化誤差](classification-evaluation.qmd#peek-generalization-gap){.peek}を下げる工夫
 
-| | 訓練MSE | テストMSE |
-|---|---:|---:|
-| ペナルティなし | 0 | $4.4 \times 10^{14}$ |
-| ペナルティあり（$\lambda = 0.1$） | 3,585 | 3,427 |
+```{python}
+#| echo: false
+#| fig-align: center
+from sklearn.tree import DecisionTreeClassifier
 
-::: {.callout-note title="広い意味での正則化"}
-- 訓練誤差を犠牲にして、[汎化誤差](classification-evaluation.qmd#peek-generalization-gap){.peek}を下げる工夫
-   - ペナルティ：訓練MSEは上がり、テストMSEは下がった
-   - [決定木の深さの制限](classification-evaluation.qmd#peek-depth-curve){.peek}：訓練データでの成績は満点でなくなる
+salmon_w = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,
+                     1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,
+                     2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,
+                     1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652])
+salmon_l = np.array([3.5, 5.8, 4.9, 4.4, 2.6, 2.6, 2.2, 5.5, 4.4, 4.8, 2.1,
+                     5.9, 5.3, 2.8, 2.7, 2.7, 3.2, 4.1, 3.7, 3.2, 4.4, 2.6,
+                     3.2, 3.5, 3.8, 5.1, 2.8, 4.1, 4.4, 2.2, 4.4, 2.7, 2.3,
+                     5.8, 5.9, 5.2, 3.2, 2.4, 4.7, 3.8])
+seabass_w = np.array([1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,
+                      1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,
+                      1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,
+                      1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531])
+seabass_l = np.array([5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8,
+                      8.9, 9.7, 9.5, 8.0, 9.6, 5.4, 6.0, 5.2, 6.6, 6.9, 6.4,
+                      9.1, 6.8, 6.4, 7.7, 5.7, 9.0, 5.4, 9.9, 8.9, 6.0, 5.0,
+                      9.1, 8.5, 8.6, 8.9, 5.4, 6.8, 5.6])
+fish_X = np.column_stack([np.r_[salmon_l, seabass_l], np.r_[salmon_w, seabass_w]])
+fish_y = np.array([1] * 40 + [0] * 40)
+mesh_l, mesh_w = np.meshgrid(np.arange(fish_X[:, 0].min() - 1, fish_X[:, 0].max() + 1, 0.05),
+                             np.arange(fish_X[:, 1].min() - 100, fish_X[:, 1].max() + 100, 10))
+
+fig, axes = plt.subplots(2, 2, figsize=(10, 5.2))
+for ax, depth, name in [(axes[0, 0], None, "決定木：深さ無制限"),
+                        (axes[0, 1], 3, "決定木：深さ3")]:
+    tree = DecisionTreeClassifier(max_depth=depth, random_state=0).fit(fish_X, fish_y)
+    Z = tree.predict(np.c_[mesh_l.ravel(), mesh_w.ravel()]).reshape(mesh_l.shape)
+    ax.contourf(mesh_l, mesh_w, Z, alpha=0.3, levels=1, colors=["lightcoral", "lightblue"])
+    ax.contour(mesh_l, mesh_w, Z, levels=[0.5], colors="blue", linewidths=1.5)
+    ax.scatter(salmon_l, salmon_w, c="black", marker="o", s=14, alpha=0.7, label="Salmon")
+    ax.scatter(seabass_l, seabass_w, c="red", marker="s", s=14, alpha=0.7, label="Sea bass")
+    ax.set_title(name, fontsize=11)
+
+for ax, curve, name in [(axes[1, 0], np.polyval(coef9, z_grid), "多項式回帰：ペナルティなし"),
+                        (axes[1, 1], own_curve, "多項式回帰：ペナルティあり")]:
+    ax.scatter(x_train, t_train, c="#2980b9", s=30, label="訓練")
+    ax.scatter(x_test, t_test, c="#e74c3c", marker="s", s=30, label="テスト")
+    ax.plot(grid, curve, "k-", lw=2)
+    ax.set_ylim(800, 2900)
+    ax.set_title(name, fontsize=11)
+
+axes[0, 0].legend(fontsize=8, loc="upper right")
+axes[1, 0].legend(fontsize=8, loc="upper left")
+for ax in axes.ravel():
+    ax.set_xticks([]); ax.set_yticks([])
+plt.tight_layout(w_pad=5)
+for row in range(2):
+    left, right = axes[row, 0].get_position(), axes[row, 1].get_position()
+    fig.text((left.x1 + right.x0) / 2, (left.y0 + left.y1) / 2, "→",
+             ha="center", va="center", fontsize=24)
+plt.show()
+```
+
+::: {.takeaway}
+[決定木の深さの制限](classification-evaluation.qmd#peek-depth-curve){.peek}は、すでに使っていた正則化
 :::
 
 
