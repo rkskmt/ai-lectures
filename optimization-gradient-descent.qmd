@@ -3,7 +3,7 @@ title: "最適化と勾配降下法"
 subtitle: "最適化問題と損失"
 ---
 
-## 小さくなるようにパラメータを探索
+## 今までのパラメータ探索
 
 ```{python}
 #| echo: false
@@ -76,9 +76,9 @@ sse_xs = np.linspace(centers[0, 0] - 2, centers[0, 0] + 2, 300)
 sse_vals = np.array([sse_at(v) for v in sse_xs])
 
 panels = [
-    ("閾値で分類", "重さの閾値 (g)", "総コスト（万円）", cost_ts, cost_vals, "steps-post"),
-    ("決定木", "輝度の閾値", "加重平均ジニ不純度", gini_ts, gini_vals, "steps-post"),
-    ("k-means", "片方の重心の横座標（他は固定）", "SSE", sse_xs, sse_vals, "default"),
+    ("閾値で分類（コストが最低）", "重さの閾値 (g)", "総コスト（万円）", cost_ts, cost_vals, "steps-post"),
+    ("決定木（ジニ不純度が最低）", "輝度の閾値", "加重平均ジニ不純度", gini_ts, gini_vals, "steps-post"),
+    ("k-means（SSEが最低）", "片方の重心の横座標（他は固定）", "SSE", sse_xs, sse_vals, "default"),
 ]
 fig, axes = plt.subplots(1, 3, figsize=(12, 3.5))
 for ax, (title, xlabel, ylabel, xs, ys, style) in zip(axes, panels):
@@ -101,12 +101,12 @@ plt.show()
 ## 損失（[Loss]{.en}）
 
 - **損失**：結果の**ダメさ**を測る物差し
-   - 小さいほど良い
+   - 高いほど悪い / 低いほど良い
 - **最適化（[optimization]{.en}）**：損失が最小になる[パラメータ](clustering-kmeans.qmd#peek-parameter){.peek}を探すこと
    - [ハイパーパラメータ](clustering-kmeans.qmd#peek-parameter){.peek}は固定したまま
-   - 本当の最小値に届かなくても、十分に小さい値が見つかれば最適化と呼ぶことが多い
+   - 実務上、最小値ではなくとも十分に小さい値で最適化と呼ぶことが多い
 
-| 手法 | 損失 | 測っているダメさ |
+| 手法 | 損失 | ダメさ |
 |---|---|---|
 | 閾値で分類 | [総コスト](classification-basics-1d.qmd#peek-cost){.peek} | 誤分類にかかる費用の合計 |
 | 決定木 | [加重平均ジニ不純度](classification-2d-boundaries.qmd#最適化ジニ不純度が最小になる閾値を探索){.peek} | 分けた左右にクラスが混ざっている度合い |
@@ -172,11 +172,10 @@ plt.show()
 :::
 
 
-## 斜めの直線を決定境界とするとしたら
+## 仮に斜めの直線を決定境界とするとパラメータ数は２つ
 
-
-- 傾きと切片の2個のパラメータをきめるだけでいい
-  - [斜めの直線で分けられそう](classification-2d-boundaries.qmd#peek-diagonal){.peek}
+- [斜めの直線で分けられそう](classification-2d-boundaries.qmd#peek-diagonal){.peek}
+  - 傾きと切片の2個のパラメータをきめるだけでいい
 
 ```{python}
 #| echo: false
@@ -188,10 +187,11 @@ ax = axes[0]
 bins = np.arange(1000, 2600, 100)
 ax.hist(salmon_weights, bins=bins, histtype="step", lw=2, color="#e74c3c", label="Salmon")
 ax.hist(seabass_weights, bins=bins, histtype="step", lw=2, color="#2980b9", label="Sea bass")
-for thr, col, ls, acc in [(1600, "black", "--", "80%"), (2000, "gray", ":", "65%")]:
+for thr, col, ls, acc, label_x, label_ha in [(1600, "black", "--", "80%", 1600, "center"),
+                                             (2000, "gray", ":", "65%", 2015, "left")]:
     ax.axvline(thr, color=col, ls=ls, lw=2)
-    ax.text(thr, ax.get_ylim()[1] * 0.97, f"{thr}g（正答率{acc}）",
-            ha="center", va="top", fontsize=9, fontweight="bold",
+    ax.text(label_x, ax.get_ylim()[1] * 0.97, f"{thr}g（正答率{acc}）",
+            ha=label_ha, va="top", fontsize=9, fontweight="bold",
             bbox=dict(fc="white", ec="none", alpha=0.8))
 ax.set_xlabel("重さ (g)"); ax.set_ylabel("匹数")
 ax.set_title("閾値：数字1個 ＝ 縦線の位置", fontsize=11)
@@ -221,9 +221,9 @@ plt.show()
 
 
 
-## パラメータ数が増える総当たりは厳しい
+## しかし、パラメータ数が増えると総当たりは厳しい
 
-- パラメータ1個につき、候補を100個試すとする
+- パラメータ1個につき、候補を100個試すとすると……
 
 ```{python}
 #| echo: false
@@ -656,7 +656,7 @@ plt.show()
 :::
 
 
-## 学習率以外にも決める値がある
+## 学習率以外の決めなければならない値
 
 - **初期値**：どこから探索を始めるか
 - **学習率**：1回の更新でどれだけ進むか
@@ -664,7 +664,7 @@ plt.show()
 - **停止条件**：$|f'(x)| < 0.01$ など、いつ収束したと判断するか
 
 
-## 勾配降下法には滑らかな損失関数が必要
+## 【制約】勾配降下法には滑らかな損失関数が必要
 
 - 勾配降下法は傾きを手がかりにするので、**滑らかな**損失関数を使う
    - 滑らか：微分できること
@@ -844,7 +844,9 @@ $f(x) = x^2 + 6x + 5$ を、初期値 $x_0 = 0$、学習率 $\alpha = 0.2$ の�
 1. $f'(x)$ の導出
 2. 3回の更新（各回の $f'(x)$ と $x$ を記載）
 
-（参考）[Newton法](newton-method-appendix.qmd)の練習問題では、同じ関数を別の手法で解いて速さを比べる
+::: {.callout-note title="（参考）"}
+[Newton法](newton-method-appendix.qmd)の練習問題では、同じ関数を別の手法で解いて速さを比べる
+:::
 
 
 ## 練習問題の解答例
