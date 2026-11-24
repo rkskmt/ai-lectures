@@ -5927,5 +5927,26 @@
     "title": "線形回帰と正則化",
     "section": "範囲の中で MSE が最小の点が解",
     "text": "範囲の中で MSE が最小の点が解\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n答え\n\n\n\n楕円が範囲に最初に触れた点（○）が解\n\n\\(\\mathrm{MSE} + \\lambda \\times\\) ペナルティの解は、ある \\(c\\) の範囲の中で MSE が最小の点と同じ\n\\(\\lambda\\) を大きくするほど、\\(c\\) は小さくなる\n\n円（リッジ回帰）：角がないので、接点はふつう軸から外れ、両方の係数が残る\nひし形（ラッソ回帰）：角が軸の上にあるので角で触れやすく、そのとき片方の係数がちょうど 0\n\n係数が 0 の特徴量は、予測に使われない：特徴量選択（feature selection）\n相関の強い特徴量からは、1つだけが残りやすい（ここでは花弁の幅だけ）"
+  },
+  {
+    "objectID": "ai-introduction.html#練習問題elizaを机上で作る",
+    "href": "ai-introduction.html#練習問題elizaを机上で作る",
+    "title": "人工知能概論",
+    "section": "練習問題：ELIZAを机上で作る",
+    "text": "練習問題：ELIZAを机上で作る\n\n会話ごとにルールを増やすチャットボットを机上で演じよ。\n\n初期応答ルールの用意\n\n相手の文に「〜がつらい」があれば「なぜ◯◯がつらいと思うのですか？」、それ以外は「もう少し詳しく」と応答\n\n現在のルールで対応できない文が出たら、if文で書ける程度のルールを考えて追加\n大抵の患者に対して N ターンまで会話が続くルールの集合を作成\n\n\n量も内容も、このルール作りの負担が古典的AI最大の課題"
+  },
+  {
+    "objectID": "nn-logistic.html#練習問題1匹の魚でforwardとbackwardを実行する",
+    "href": "nn-logistic.html#練習問題1匹の魚でforwardとbackwardを実行する",
+    "title": "ロジスティック回帰をNNとして実装する",
+    "section": "練習問題：1匹の魚でForwardとBackwardを実行する",
+    "text": "練習問題：1匹の魚でForwardとBackwardを実行する\n\n\n問題：スライドの数値を自分のコードで再現する\n\nここまでに作った関数を1つのPythonファイルにまとめ、魚 \\(x=(2,\\,0.5)\\)、\\(y=1\\) でForwardとBackwardを実行せよ。\n\nimport numpy as np、x = np.array([2.0, 0.5])、y = 1.0、w = np.array([-0.2, 0.0])、b = 0.0 を用意\nlinear・sigmoid・forward・binary_cross_entropy・backward の5つを実装\nforward で z と p を計算（両方表示）\nbinary_cross_entropy で loss を計算（表示）\nbackward で d_w と d_b を計算（両方表示）\n表示した値を、スライドの \\(p\\approx0.4013\\)、\\(\\ell\\approx0.913\\)、\\(d_w\\approx(-1.1974,\\,-0.2993)\\)、\\(d_b\\approx-0.5987\\) と照合"
+  },
+  {
+    "objectID": "nn-logistic.html#練習問題の解答例",
+    "href": "nn-logistic.html#練習問題の解答例",
+    "title": "ロジスティック回帰をNNとして実装する",
+    "section": "練習問題の解答例",
+    "text": "練習問題の解答例\n\n\n\n解答例を見る\nimport numpy as np\n\ndef linear(x, w, b):\n    return x @ w + b\n\ndef sigmoid(z):\n    return 1 / (1 + np.exp(-z))\n\ndef forward(x, w, b):\n    z = linear(x, w, b)\n    p = sigmoid(z)\n    return z, p\n\ndef binary_cross_entropy(y, p):\n    eps = 1e-10\n    p = np.clip(p, eps, 1 - eps)\n    return -(y * np.log(p) + (1 - y) * np.log(1 - p))\n\ndef backward(x, y, p):\n    d_z = p - y\n    d_w = d_z * x\n    d_b = d_z\n    return d_w, d_b\n\nx = np.array([2.0, 0.5])\ny = 1.0\nw = np.array([-0.2, 0.0])\nb = 0.0\n\nz, p = forward(x, w, b)\nloss = binary_cross_entropy(y, p)\nd_w, d_b = backward(x, y, p)\n\nprint(f\"z: {z}\")\nprint(f\"p: {p}\")\nprint(f\"loss: {loss}\")\nprint(\"d_w:\", d_w)\nprint(\"d_b:\", d_b)"
   }
 ]
