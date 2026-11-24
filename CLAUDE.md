@@ -41,6 +41,7 @@ Use Python as the vehicle, but frame concepts as broadly as possible. Where a co
 
 - **Whenever using matplotlib, `import japanize_matplotlib`** — even if the current plot has no Japanese text, for consistency.
 - **Do not use `rcParams['font.family']`** for Japanese — it never works reliably. `japanize_matplotlib` is the only reliable approach.
+- **Displayed figures are limited to 1920x1080 and 256 colors by `tools/fig_cap.py`.** Pixels beyond Full HD only add weight. matplotlib sets a size only through `figsize` x dpi, so the module replaces its PNG output and redraws a figure that is over the limit at a lower dpi (shrinking a finished PNG blurs it and makes the file larger). It loads at kernel start through `_environment` (`IPYTHONDIR=.ipython`) and `.ipython/profile_default/startup/`; decks need no code for it. Saved images in `frozen/` do not pass through it.
 
 ## Conventions
 
