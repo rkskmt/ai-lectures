@@ -105,14 +105,18 @@ print(f"相関係数: {np.corrcoef(lengths, weights)[0, 1]:.3f}")
 
 ```{python}
 #| echo: false
-#| fig-align: center
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
 X_lw    = np.column_stack([lengths, weights])
 X_lw_sc = StandardScaler().fit_transform(X_lw)
 pca_d   = PCA(n_components=2).fit(X_lw_sc)
+```
 
+```{python}
+#| echo: false
+#| eval: false
+#| label: frz-pca-axes
 fig, ax = plt.subplots(figsize=(5.6, 4.2))
 ax.scatter(X_lw_sc[:, 0], X_lw_sc[:, 1],
            alpha=0.6, s=40, c="#5dade2", edgecolors="gray")
@@ -133,6 +137,8 @@ ax.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.show()
 ```
+
+![](frozen/dimensionality-pca-frz-pca-axes-1.png){fig-align="center"}
 
 ::: {.callout-note title="結果"}
 - PC1 は体長と重さを合わせた「**大きさ**」の軸

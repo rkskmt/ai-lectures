@@ -99,7 +99,8 @@ plt.show()
 
 ```{python}
 #| echo: false
-#| fig-align: center
+#| eval: false
+#| label: frz-depth-boundaries
 from sklearn.tree import DecisionTreeClassifier
 
 xx_g, yy_g = np.meshgrid(np.arange(X[:, 0].min() - 1, X[:, 0].max() + 1, 0.05),
@@ -120,6 +121,8 @@ axes[0].legend(fontsize=8, loc="upper right")
 plt.tight_layout()
 plt.show()
 ```
+
+![](frozen/classification-evaluation-frz-depth-boundaries-1.png){fig-align="center"}
 
 
 ## 深さ＝ハイパーパラメータ {#peek-hyperparameter}
@@ -144,7 +147,8 @@ plt.show()
 
 ```{python}
 #| echo: false
-#| fig-align: center
+#| eval: false
+#| label: frz-full-depth
 from sklearn.metrics import precision_score, recall_score
 
 m = DecisionTreeClassifier(max_depth=None).fit(X, y)
@@ -162,6 +166,8 @@ plt.title(f"max_depth=None　Precision {precision_score(y, pred):.3f}　Recall {
 plt.tight_layout()
 plt.show()
 ```
+
+![](frozen/classification-evaluation-frz-full-depth-1.png){fig-align="center"}
 
 
 ## 過学習（[Overfitting]{.en}）

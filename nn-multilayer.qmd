@@ -76,7 +76,8 @@ plt.show()
 
 ```{python}
 #| echo: false
-#| fig-align: center
+#| eval: false
+#| label: frz-logreg-boundary
 from sklearn.linear_model import LogisticRegression
 from sklearn.neural_network import MLPClassifier
 
@@ -100,6 +101,8 @@ plot_boundary(ax, logreg, X_moon, y_moon,
 plt.tight_layout()
 plt.show()
 ```
+
+![](frozen/nn-multilayer-frz-logreg-boundary-1.png){fig-align="center"}
 
 ::: {.takeaway}
 決定境界が直線のままでは、パラメータをどう選んでも分けきれない
@@ -140,7 +143,8 @@ $$z^{(2)} = \underbrace{(w^{(2)} w^{(1)})}_{\text{新しい傾き}} x + \underbr
 
 ```{python}
 #| echo: false
-#| fig-align: center
+#| eval: false
+#| label: frz-stacked-linear
 # 16 parallel hidden units with identity activation still form one affine map
 stacked_affine = MLPClassifier(hidden_layer_sizes=(16,), activation="identity",
                                solver="lbfgs", max_iter=5000,
@@ -152,6 +156,8 @@ plot_boundary(ax, stacked_affine, X_moon, y_moon,
 plt.tight_layout()
 plt.show()
 ```
+
+![](frozen/nn-multilayer-frz-stacked-linear-1.png){fig-align="center"}
 
 ::: {.callout-note title="結果"}
 - 中間に16個並べても、出力層で線形結合すれば全体は1つの線形変換にまとまる
@@ -611,7 +617,8 @@ $$
 
 ```{python}
 #| echo: false
-#| fig-align: center
+#| eval: false
+#| label: frz-width-boundaries
 models = [
     (logreg, "直線だけ（最小単位）"),
     (MLPClassifier(hidden_layer_sizes=(2,), activation="relu", solver="lbfgs",
@@ -629,6 +636,8 @@ for ax, (model, name) in zip(axes, models):
 plt.tight_layout()
 plt.show()
 ```
+
+![](frozen/nn-multilayer-frz-width-boundaries-1.png){fig-align="center"}
 
 ::: {.callout-note title="結果"}
 - ReLU 1個につき**折り目が1つ**増える
