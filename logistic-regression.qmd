@@ -1034,7 +1034,8 @@ $$\text{(a)}\; f(x) = 5x \qquad \text{(b)}\; f(x) = 3x + 2 \qquad \text{(c)}\; f
    - 斉次性も $f(cx) = 5cx = c f(x)$ で成立するので**線形**
 - (c) $f(1+2) = 9 \neq f(1) + f(2) = 1 + 4 = 5$：**非線形**
    - $f(0)=0$ を満たしても線形とは限らない
-- (d) $f(u+v)=2(u_1+v_1)-(u_2+v_2)=f(u)+f(v)$：成立するので**線形**
+- (d) $f(u+v)=2(u_1+v_1)-(u_2+v_2)=f(u)+f(v)$：成立
+   - 斉次性も $f(cu) = 2cu_1 - cu_2 = c f(u)$ で成立するので**線形**
 
 :::
 
@@ -1044,16 +1045,25 @@ $$\text{(a)}\; f(x) = 5x \qquad \text{(b)}\; f(x) = 3x + 2 \qquad \text{(c)}\; f
 #| echo: true
 #| code-fold: true
 #| code-summary: "解答例を見る"
-funcs = {
-    "(a) 5x":     lambda x: 5 * x,
-    "(b) 3x + 2": lambda x: 3 * x + 2,
-    "(c) x^2":    lambda x: x ** 2,
-}
-for name, f in funcs.items():
-    print(f"{name:12s} f(0)={f(0):3d} | f(1+2)={f(3):3d} vs f(1)+f(2)={f(1) + f(2):3d}")
+def f_a(x):
+    return 5 * x
 
-g = lambda x1, x2: 2 * x1 - x2
-print(f"(d) 2x1-x2   f(0,0)={g(0, 0)} | f(1+3, 2+1)={g(4, 3)} vs f(1,2)+f(3,1)={g(1, 2) + g(3, 1)}")
+def f_b(x):
+    return 3 * x + 2
+
+def f_c(x):
+    return x ** 2
+
+def f_d(x1, x2):
+    return 2 * x1 - x2
+
+# u = 1, v = 2
+print("(a) f(0) =", f_a(0), "| f(1+2) =", f_a(1 + 2), "| f(1)+f(2) =", f_a(1) + f_a(2))
+print("(b) f(0) =", f_b(0), "| f(1+2) =", f_b(1 + 2), "| f(1)+f(2) =", f_b(1) + f_b(2))
+print("(c) f(0) =", f_c(0), "| f(1+2) =", f_c(1 + 2), "| f(1)+f(2) =", f_c(1) + f_c(2))
+# u = (1, 2), v = (3, 1)
+print("(d) f(0,0) =", f_d(0, 0), "| f(1+3, 2+1) =", f_d(1 + 3, 2 + 1),
+      "| f(1,2)+f(3,1) =", f_d(1, 2) + f_d(3, 1))
 ```
 
 ::: {.callout-note title="結果"}
