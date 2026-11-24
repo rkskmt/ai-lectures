@@ -593,41 +593,35 @@ def mse2(w1, w2):
             - 2 * (g2[0] * w1 + g2[1] * w2) + 1)
 
 
-def draw_coef_plane(reveal):
-    """Draw error contours over the L2 and L1 regions; mark the contact if reveal."""
-    W1, W2 = np.meshgrid(np.linspace(-0.75, 1.05, 400), np.linspace(-0.75, 1.15, 400))
-    fig, axes = plt.subplots(1, 2, figsize=(10, 4.8))
-    panels = [(axes[0], w_ridge2, np.linalg.norm(w_ridge2), "リッジ回帰：L2ノルム $\\leq c$（円）", "#2980b9"),
-              (axes[1], w_lasso2, np.abs(w_lasso2).sum(), "ラッソ回帰：L1ノルム $\\leq c$（ひし形）", "#d35400")]
-    for ax, w_sol, c, name, color in panels:
-        if color == "#2980b9":
-            region = Circle((0, 0), c, facecolor=color, alpha=0.25, edgecolor=color, lw=2)
-        else:
-            region = Polygon([(c, 0), (0, c), (-c, 0), (0, -c)], closed=True,
-                             facecolor=color, alpha=0.25, edgecolor=color, lw=2)
-        ax.add_patch(region)
-        base, contact = mse2(*w_ols2), mse2(*w_sol)
-        levels = base + (contact - base) * (np.arange(1, 9) / 4) ** 2   # 4th ring passes the solution
-        ax.contour(W1, W2, mse2(W1, W2), levels=levels, colors="#1e8449", linewidths=1)
-        ax.scatter(*w_ols2, marker="x", s=70, c="black", zorder=4)
-        ax.annotate("正則化なしの解", w_ols2, xytext=(8, 6), textcoords="offset points", fontsize=9)
-        if reveal:
-            ax.contour(W1, W2, mse2(W1, W2), levels=[contact], colors="#1e8449", linewidths=3)
-            ax.scatter(*w_sol, s=90, facecolors="white", edgecolors="black", lw=2, zorder=5)
-            ax.annotate(f"解 ({w_sol[0]:.2f}, {w_sol[1]:.2f})", w_sol, xytext=(10, -16),
-                        textcoords="offset points", fontsize=10, fontweight="bold")
-        ax.axhline(0, color="gray", lw=0.8)
-        ax.axvline(0, color="gray", lw=0.8)
-        ax.set_aspect("equal")
-        ax.set_xlim(-0.75, 1.05); ax.set_ylim(-0.75, 1.15)
-        ax.set_xlabel("$w_1$（萼片の長さ）")
-        ax.set_title(name, fontsize=11)
-    axes[0].set_ylabel("$w_2$（花弁の幅）")
-    plt.tight_layout()
-    plt.show()
-
-
-draw_coef_plane(reveal=False)
+W1, W2 = np.meshgrid(np.linspace(-0.75, 1.05, 400), np.linspace(-0.75, 1.15, 400))
+fig, axes = plt.subplots(1, 2, figsize=(10, 4.8))
+panels = [(axes[0], w_ridge2, np.linalg.norm(w_ridge2), "リッジ回帰：L2ノルム $\\leq c$（円）", "#2980b9"),
+          (axes[1], w_lasso2, np.abs(w_lasso2).sum(), "ラッソ回帰：L1ノルム $\\leq c$（ひし形）", "#d35400")]
+for ax, w_sol, c, name, color in panels:
+    if color == "#2980b9":
+        region = Circle((0, 0), c, facecolor=color, alpha=0.25, edgecolor=color, lw=2)
+    else:
+        region = Polygon([(c, 0), (0, c), (-c, 0), (0, -c)], closed=True,
+                         facecolor=color, alpha=0.25, edgecolor=color, lw=2)
+    ax.add_patch(region)
+    base, contact = mse2(*w_ols2), mse2(*w_sol)
+    levels = base + (contact - base) * (np.arange(1, 9) / 4) ** 2   # 4th ring passes the solution
+    ax.contour(W1, W2, mse2(W1, W2), levels=levels, colors="#1e8449", linewidths=1)
+    ax.contour(W1, W2, mse2(W1, W2), levels=[contact], colors="#1e8449", linewidths=3)
+    ax.scatter(*w_ols2, marker="x", s=70, c="black", zorder=4)
+    ax.annotate("正則化なしの解", w_ols2, xytext=(8, 6), textcoords="offset points", fontsize=9)
+    ax.scatter(*w_sol, s=90, facecolors="white", edgecolors="black", lw=2, zorder=5)
+    ax.annotate(f"解 ({w_sol[0]:.2f}, {w_sol[1]:.2f})", w_sol, xytext=(10, -16),
+                textcoords="offset points", fontsize=10, fontweight="bold")
+    ax.axhline(0, color="gray", lw=0.8)
+    ax.axvline(0, color="gray", lw=0.8)
+    ax.set_aspect("equal")
+    ax.set_xlim(-0.75, 1.05); ax.set_ylim(-0.75, 1.15)
+    ax.set_xlabel("$w_1$（萼片の長さ）")
+    ax.set_title(name, fontsize=11)
+axes[0].set_ylabel("$w_2$（花弁の幅）")
+plt.tight_layout()
+plt.show()
 ```
 
 ::: {.callout-note}
@@ -639,21 +633,8 @@ draw_coef_plane(reveal=False)
    - **L1ノルム**（[L1 norm]{.en}）$\|w\|_1 = |w_1| + |w_2|$ が $c$ 以下：ひし形
 :::
 
-::: {.callout-important title="質問"}
-中心から楕円を広げていくと、塗った範囲に最初に触れるのはどこ？
-:::
-
-
-## 範囲の中で MSE が最小の点が解 {#peek-coef-plane-answer}
-
-```{python}
-#| echo: false
-#| fig-align: center
-draw_coef_plane(reveal=True)
-```
-
-::: {.callout-note title="答え"}
-- 楕円が範囲に最初に触れた点（○）が解
+::: {.callout-note title="結果"}
+- 中心から楕円を広げ、範囲に最初に触れた点（○）が解（太線がその等高線）
    - $\mathrm{MSE} + \lambda \times$ ペナルティの解は、ある $c$ の範囲の中で MSE が最小の点と同じ
    - $\lambda$ を大きくするほど、$c$ は小さくなる
 - 円（リッジ回帰）：角がないので、接点はふつう軸から外れ、両方の係数が残る
