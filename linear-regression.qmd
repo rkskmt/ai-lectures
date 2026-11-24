@@ -206,7 +206,7 @@ plt.show()
 :::
 
 
-## 答え合わせ：厳密解と比べる {#peek-exact-line}
+## 検算：厳密解と比較 {#peek-exact-line}
 
 - `np.polyfit(x, t, d)`：二乗誤差が最小になる $d$ 次式の係数を求める関数
    - 更新を繰り返さず、**最小二乗法（[least squares]{.en}）**で直接求める
@@ -382,7 +382,7 @@ $$L = \mathrm{MSE} + \lambda \sum_j w_j^2$$
 ```{python}
 #| echo: true
 # 特徴量 x, x², …, x⁹ を作る（列が x^1 〜 x^9 の配列）
-P_train = x_train.reshape(-1, 1) ** np.arange(1, 10)   # 形 (10, 9)
+P_train = x_train.reshape(-1, 1) ** np.arange(1, 10)   # (10, 9)
 P_test  = x_test.reshape(-1, 1)  ** np.arange(1, 10)
 mu, sd  = P_train.mean(axis=0), P_train.std(axis=0)
 P_train = (P_train - mu) / sd                  # スケールを揃える（いつもの）
@@ -450,15 +450,19 @@ plt.show()
 
 ## L2正則化とリッジ回帰 {#peek-l2-ridge}
 
-- $\lambda \sum_j w_j^2$ の形のペナルティ：**L2正則化**（[L2 regularization]{.en}）
-- L2正則化を加えた線形回帰は、歴史的な経緯で**リッジ回帰**（[Ridge regression]{.en}）と呼ばれる
+- **L2正則化**（[L2 regularization]{.en}）: $\lambda \sum_j w_j^2$ の形のペナルティの線形回帰
+- これは歴史的経緯で**リッジ回帰**（[Ridge regression]{.en}）という特別な名前がついている
    - モデルは線形回帰のままで、変わるのは損失だけ
-- NN でも同じ道具がそのまま使われる（NN での名前は [weight decay]{.en}）
+- NN でも使われる（NN での名前は [weight decay]{.en}）
 
 
 ## 深さの制限も、広い意味での正則化 {#peek-regularization-broad}
 
-- **広い意味での正則化**：訓練誤差を犠牲にして、[汎化誤差](classification-evaluation.qmd#peek-generalization-gap){.peek}を下げる工夫
+**広い意味での正則化**：訓練誤差を犠牲にして、[汎化誤差](classification-evaluation.qmd#peek-generalization-gap){.peek}を下げる工夫
+
+::: {.takeaway}
+つまり、[決定木の深さの制限](classification-evaluation.qmd#peek-depth-curve){.peek}も正則化
+:::
 
 ```{python}
 #| echo: false
@@ -517,9 +521,6 @@ for row in range(2):
 plt.show()
 ```
 
-::: {.takeaway}
-[決定木の深さの制限](classification-evaluation.qmd#peek-depth-curve){.peek}は、すでに使っていた正則化
-:::
 
 
 ## **Tweak** ペナルティの強さで曲線が変わる {.badge-practice}
@@ -546,84 +547,16 @@ plt.show()
 :::
 
 
-## L1正則化とラッソ回帰 {#peek-l1-lasso}
+## L1正則化（ラッソ回帰） {#peek-l1-lasso}
 
 $$L = \mathrm{MSE} + \lambda \sum_j |w_j|$$
 
 - $\lambda \sum_j |w_j|$ の形のペナルティ：**L1正則化**（[L1 regularization]{.en}）
 - L1正則化を加えた線形回帰：**ラッソ回帰**（[Lasso regression]{.en}）
    - モデルは線形回帰のままで、変わるのは損失だけ
-- $|w_j|$ は 0 で折れていて微分できない
+- $|w_j|$ は ひし形＝微分できない
    - [滑らかな損失](optimization-gradient-descent.qmd#peek-smooth-loss){.peek}を前提にした勾配降下法は、そのままでは使えない
-   - scikit-learn は**座標降下法（[coordinate descent]{.en}）**で解く
-
-::: {.callout-important title="質問"}
-同じ $\lambda$ で、[リッジ回帰](#peek-l2-ridge){.peek}とラッソ回帰の係数はどう違う？
-:::
-
-
-## リッジ回帰とラッソ回帰の係数を比べる {#peek-ridge-lasso-coef}
-
-- [次数9の特徴量](#peek-ridge-code){.peek}を、どちらも $\lambda = 0.1$ で学習する
-
-```{python}
-#| echo: true
-from sklearn.linear_model import Ridge, Lasso
-
-lam = 0.1
-# scikit-learn の alpha は、式の λ と倍率が違う
-ridge = Ridge(alpha=len(tt) * lam).fit(P_train, tt)   # alpha = Nλ
-lasso = Lasso(alpha=lam / 2).fit(P_train, tt)         # alpha = λ/2
-
-print("ridge:", np.round(ridge.coef_, 3))
-print("lasso:", np.round(lasso.coef_, 3))
-```
-
-```{python}
-#| echo: true
-#| code-fold: true
-#| code-summary: "（参考）座標降下法で自作する場合"
-def coordinate_descent(penalty, lam):
-    coef = np.zeros(9)
-    for sweep in range(1000):
-        for j in range(9):            # 他の係数を固定して、w_j を最適な値にする
-            coef[j] = 0.0
-            rho = np.mean((tt - P_train @ coef) * P_train[:, j])
-            if penalty == "ridge":
-                coef[j] = rho / (1 + lam)
-            else:                     # |rho| が λ/2 以下なら、ちょうど 0
-                coef[j] = np.sign(rho) * max(abs(rho) - lam / 2, 0)
-    return coef
-
-print("ridge:", np.round(coordinate_descent("ridge", lam), 3))
-print("lasso:", np.round(coordinate_descent("lasso", lam), 3))
-```
-
-```{python}
-#| echo: true
-#| code-fold: true
-#| code-summary: "描画コード"
-#| fig-align: center
-fig, axes = plt.subplots(1, 2, figsize=(9.5, 3.4), sharey=True)
-for ax, model, name in [(axes[0], ridge, "リッジ回帰（L2）"),
-                        (axes[1], lasso, "ラッソ回帰（L1）")]:
-    pred_g = model.predict(P_test) * t_std + t_mean   # 元の単位（g）に戻す
-    ax.bar(range(1, 10), model.coef_, color="#2980b9", width=0.7)
-    ax.axhline(0, color="gray", lw=0.8)
-    ax.set_xticks(range(1, 10))
-    ax.set_xlabel("$x$ の次数")
-    ax.set_title(f"{name}\nテストMSE {np.mean((pred_g - t_test) ** 2):,.0f}", fontsize=10)
-axes[0].set_ylabel("係数")
-plt.tight_layout()
-plt.show()
-```
-
-::: {.callout-note title="結果"}
-- ラッソ回帰は $x$ の項だけを残し、ほかの係数が**ちょうど 0**
-   - 係数が 0 の特徴量は、予測に使われない：**特徴量選択**（[feature selection]{.en}）
-   - よく似た特徴量（$x, x^2, \ldots$）からは、1つだけが残る
-- リッジ回帰の係数は小さくなるが、0 にはならない
-:::
+     - （参考）scikit-learn では**座標降下法（[coordinate descent]{.en}）** を使用
 
 
 ## 係数の平面に誤差とペナルティを描く {#peek-coef-plane}
@@ -725,6 +658,8 @@ draw_coef_plane(reveal=True)
    - $\lambda$ を大きくするほど、$c$ は小さくなる
 - 円（リッジ回帰）：角がないので、接点はふつう軸から外れ、両方の係数が残る
 - ひし形（ラッソ回帰）：角が軸の上にあるので角で触れやすく、そのとき片方の係数が**ちょうど 0**
+   - 係数が 0 の特徴量は、予測に使われない：**特徴量選択**（[feature selection]{.en}）
+   - 相関の強い特徴量からは、1つだけが残りやすい（ここでは花弁の幅だけ）
 :::
 
 
@@ -734,7 +669,7 @@ draw_coef_plane(reveal=True)
 |---|---|---|
 | ペナルティ | L2：$\lambda \sum_j w_j^2$ | L1：$\lambda \sum_j \lvert w_j \rvert$ |
 | 係数 | 全体を小さくする | 一部をちょうど 0 にする |
-| 使いどころ | 予測を安定させたい | 使う特徴量を絞りたい（測る項目を減らす、効く特徴量を読む） |
+| 使いどころ | 予測を安定させたい | 使う特徴量を絞りたい（測る項目を減らす） |
 
 ::: {.takeaway}
 どちらが良いかはデータごとに違うので、[交差検証](classification-evaluation.qmd#peek-cv){.peek}で選ぶ
