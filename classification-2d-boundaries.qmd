@@ -21,7 +21,7 @@ subtitle: "決定境界と決定木"
 ### 1次元での分類
 
 - **重さ**だけで Salmon vs Sea bass を分類
-- **閾値（[threshold]{.en}）**を手動で設定
+- **閾値（[threshold]{.en}）**を人が設定
 - [**TP / FP / TN / FN**](classification-basics-1d.qmd#peek-cm-1800){.peek}
 - **Precision** / **Recall**
 - [最適な閾値はケースによって異なる](classification-basics-1d.qmd#peek-which-metric){.peek}
@@ -1154,9 +1154,9 @@ plot_decision_boundary(tree_model, X, y,
 :::
 
 
-## 手動の直線 vs 決定木
+## 人が引いた直線 vs 決定木
 
-|  | 手動の直線 | 決定木 |
+|  | 人が引いた直線 | 決定木 |
 |---|-------|-------|
 | 境界の決め方 | 目で見て引く（データを眺める過程が入る） | ジニ不純度で自動最適化 |
 | 説明のしやすさ | 単純で、理由を説明しやすい | if-then ルールとして読める |
@@ -1177,7 +1177,7 @@ recall_hand    = recall_score(y, y_pred_hand)
 
 print("| モデル | Accuracy | Precision | Recall |")
 print("|---|---|---|---|")
-print(f"| 手動の縦線（輝度 5.5） | {accuracy_hand:.3f} | {precision_hand:.3f} | {recall_hand:.3f} |")
+print(f"| 人が引いた縦線（輝度 5.5） | {accuracy_hand:.3f} | {precision_hand:.3f} | {recall_hand:.3f} |")
 print(f"| 決定木（深さ3） | {accuracy_tree:.3f} | {precision_tree:.3f} | {recall_tree:.3f} |")
 ```
 
@@ -1271,12 +1271,12 @@ plt.show()
 1. **2次元にすることで分類精度が向上**
    - 重さ + 輝度の組み合わせで、より正確に分類
 
-2. **決定境界は手でも、アルゴリズムでも決められる**
-   - 手動の直線：目で見て引く
+2. **決定境界は人が決めても、アルゴリズムで決めてもよい**
+   - 人：目で見て直線を引く
    - 決定木：ジニ不純度で自動最適化
 
 3. **手法によって決定境界が異なる**
-   - 手動: 縦線（閾値の2次元版）
+   - 人が引いた直線: 縦線（閾値の2次元版）
    - 決定木: 階段状（軸に平行）
 
 4. **トレードオフを理解する**

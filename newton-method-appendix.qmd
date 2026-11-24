@@ -6,7 +6,7 @@ subtitle: "2次微分で一気にジャンプ"
 ## Newton法（[Newton's Method]{.en}）
 
 - [勾配降下法](optimization-gradient-descent.qmd#peek-gd-code){.peek}（[gradient descent]{.en}）の弱点を、**2次微分（[second derivative]{.en}）**で解決する手法
-   - 弱点：学習率（[learning rate]{.en}）の手動調整、収束の遅さ
+   - 弱点：学習率（[learning rate]{.en}）の調整、収束の遅さ
 - ディープラーニング（[deep learning]{.en}）では使われない
    - `scikit-learn` のロジスティック回帰（[logistic regression]{.en}）などの中で使われている
 
@@ -37,7 +37,7 @@ def f_double_prime(x):
 
 勾配降下法の問題：
 
- - 学習率を手動で調整する必要がある
+ - 学習率を調整する必要がある
  - 収束（[convergence]{.en}）が遅い
 
 ::: {.callout-note title="Newton法のアイデア"}
@@ -216,8 +216,8 @@ print("\n" + "=" * 60)
 print(f"最終結果: x = {x:.4f}, f(x) = {f(x):.4f}")
 ```
 
-::: {.callout-tip title="手で微分して関数定義"}
-**手で計算した結果を関数として定義**している：
+::: {.callout-tip title="微分を計算して関数定義"}
+**計算の結果を関数として定義**している：
 
 - $f(x) = x^2 - 4x + 3$
 - $f'(x) = 2x - 4$
