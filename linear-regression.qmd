@@ -454,6 +454,9 @@ plt.show()
 - これは歴史的経緯で**リッジ回帰**（[Ridge regression]{.en}）という特別な名前がついている
    - モデルは線形回帰のままで、変わるのは損失だけ
 - NN でも使われる（NN での名前は [weight decay]{.en}）
+   - [正則化の実装](#peek-ridge-code){.peek}の更新式を整理すると、毎回 $w$ を一定の割合で縮めている（decay）
+
+$$w \leftarrow w - \alpha \left( \text{MSEの勾配} + 2\lambda w \right) = (1 - 2\alpha\lambda)\, w - \alpha \times \text{MSEの勾配}$$
 
 
 ## 深さの制限も、広い意味での正則化 {#peek-regularization-broad}
