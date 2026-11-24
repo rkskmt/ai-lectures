@@ -7,7 +7,7 @@
 関連ドキュメント：
 
 - [slide-tone-rules.md](slide-tone-rules.md)：語り口、タイトル、言葉の選び方
-- [engaging-lecture-design.md](engaging-lecture-design.md)：講義全体の構成、問いかけ、演習設計
+- [engaging-lecture-design.md](engaging-lecture-design.md)：講義全体の構成、問いかけ、練習問題と演習の設計
 - この文書：記号、値、数式、コード、スライド間の接続
 
 ## 基本原則
