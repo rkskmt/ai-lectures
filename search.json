@@ -67,7 +67,7 @@
     "href": "pytorch-intro.html#なぜ自動でできるのか",
     "title": "PyTorch入門",
     "section": "なぜ自動でできるのか",
-    "text": "なぜ自動でできるのか\n\n\nforward の間、PyTorch は計算の履歴（計算グラフ）を記録している\nbackward() は、その履歴を逆順にたどって連鎖律を適用するだけ\nやっていることは手計算の1往復と同じ\n\n往路の途中の値を保存（そのぶんメモリを使う）\n\\(\\delta\\) を出力側から掛けて貯める\n\n\n\n\n\n\n\n\nヒント\n\n\nブラックボックスとして使うのと、中身を知って使うのは別物。 われわれは中身を手で再現済みなので、堂々と楽をしてよい。"
+    "text": "なぜ自動でできるのか\n\n\nforward の間、PyTorch は計算の履歴（計算グラフ）を記録している\nbackward() は、その履歴を逆順にたどって連鎖律を適用するだけ\nやっていることは手計算の1往復と同じ\n\n往路の途中の値を保存（そのぶんメモリを使う）\n\\(\\delta\\) を出力側から掛けて貯める\n\n\n\n\n\n\n\n\nヒント\n\n\nブラックボックスとして使うのと、中身を知って使うのは別物。 われわれは中身を自分で再現済みなので、堂々と楽をしてよい。"
   },
   {
     "objectID": "pytorch-intro.html#bcewithlogitsloss-は2部品をまとめる",
@@ -669,7 +669,7 @@
     "href": "newton-method-appendix.html#なぜnewton法が必要か",
     "title": "Newton法",
     "section": "なぜNewton法が必要か",
-    "text": "なぜNewton法が必要か\n\n勾配降下法の問題：\n\n学習率を手動で調整する必要がある\n収束（convergence）が遅い\n\n\n\n\n\n\n\n\nNewton法のアイデア\n\n\n「傾き」だけでなく「曲がり具合」も使えば、どこまで進めばいいかを計算できるのでは？"
+    "text": "なぜNewton法が必要か\n\n勾配降下法の問題：\n\n学習率を調整する必要がある\n収束（convergence）が遅い\n\n\n\n\n\n\n\n\nNewton法のアイデア\n\n\n「傾き」だけでなく「曲がり具合」も使えば、どこまで進めばいいかを計算できるのでは？"
   },
   {
     "objectID": "newton-method-appendix.html#次微分の役割",
@@ -697,7 +697,7 @@
     "href": "newton-method-appendix.html#newton法python実装",
     "title": "Newton法",
     "section": "Newton法：Python実装",
-    "text": "Newton法：Python実装\n\n\n# 初期値\nx = 0.0\n\nprint(\"Newton法で最小値を求める\")\nprint(\"=\" * 60)\n\nfor iteration in range(1, 6):\n    print(f\"\\n--- 反復 {iteration} ---\")\n    print(f\"現在の x = {x:.4f}\")\n\n    # 関数値\n    fx = f(x)\n    print(f\"f(x) = {fx:.4f}\")\n\n    # 1次微分（勾配）\n    fp = f_prime(x)\n    print(f\"f'(x) = {fp:.4f}\")\n\n    # 2次微分（曲率）\n    fpp = f_double_prime(x)\n    print(f\"f''(x) = {fpp:.4f}\")\n\n    # Newton法の更新\n    step = fp / fpp\n    x_new = x - step\n\n    print(f\"\\n更新:\")\n    print(f\"  ステップ幅 = f'(x)/f''(x) = {fp:.4f}/{fpp:.4f} = {step:.4f}\")\n    print(f\"  x_new = {x:.4f} - {step:.4f} = {x_new:.4f}\")\n\n    x = x_new\n\n    # 収束チェック\n    if abs(fp) &lt; 0.0001:\n        print(f\"\\n★ 収束！ f'(x) ≈ 0\")\n        break\n\nprint(\"\\n\" + \"=\" * 60)\nprint(f\"最終結果: x = {x:.4f}, f(x) = {f(x):.4f}\")\n\nNewton法で最小値を求める\n============================================================\n\n--- 反復 1 ---\n現在の x = 0.0000\nf(x) = 3.0000\nf'(x) = -4.0000\nf''(x) = 2.0000\n\n更新:\n  ステップ幅 = f'(x)/f''(x) = -4.0000/2.0000 = -2.0000\n  x_new = 0.0000 - -2.0000 = 2.0000\n\n--- 反復 2 ---\n現在の x = 2.0000\nf(x) = -1.0000\nf'(x) = 0.0000\nf''(x) = 2.0000\n\n更新:\n  ステップ幅 = f'(x)/f''(x) = 0.0000/2.0000 = 0.0000\n  x_new = 2.0000 - 0.0000 = 2.0000\n\n★ 収束！ f'(x) ≈ 0\n\n============================================================\n最終結果: x = 2.0000, f(x) = -1.0000\n\n\n\n\n\n\n\n\n\n手で微分して関数定義\n\n\n手で計算した結果を関数として定義している：\n\n\\(f(x) = x^2 - 4x + 3\\)\n\\(f'(x) = 2x - 4\\)\n\\(f''(x) = 2\\)"
+    "text": "Newton法：Python実装\n\n\n# 初期値\nx = 0.0\n\nprint(\"Newton法で最小値を求める\")\nprint(\"=\" * 60)\n\nfor iteration in range(1, 6):\n    print(f\"\\n--- 反復 {iteration} ---\")\n    print(f\"現在の x = {x:.4f}\")\n\n    # 関数値\n    fx = f(x)\n    print(f\"f(x) = {fx:.4f}\")\n\n    # 1次微分（勾配）\n    fp = f_prime(x)\n    print(f\"f'(x) = {fp:.4f}\")\n\n    # 2次微分（曲率）\n    fpp = f_double_prime(x)\n    print(f\"f''(x) = {fpp:.4f}\")\n\n    # Newton法の更新\n    step = fp / fpp\n    x_new = x - step\n\n    print(f\"\\n更新:\")\n    print(f\"  ステップ幅 = f'(x)/f''(x) = {fp:.4f}/{fpp:.4f} = {step:.4f}\")\n    print(f\"  x_new = {x:.4f} - {step:.4f} = {x_new:.4f}\")\n\n    x = x_new\n\n    # 収束チェック\n    if abs(fp) &lt; 0.0001:\n        print(f\"\\n★ 収束！ f'(x) ≈ 0\")\n        break\n\nprint(\"\\n\" + \"=\" * 60)\nprint(f\"最終結果: x = {x:.4f}, f(x) = {f(x):.4f}\")\n\nNewton法で最小値を求める\n============================================================\n\n--- 反復 1 ---\n現在の x = 0.0000\nf(x) = 3.0000\nf'(x) = -4.0000\nf''(x) = 2.0000\n\n更新:\n  ステップ幅 = f'(x)/f''(x) = -4.0000/2.0000 = -2.0000\n  x_new = 0.0000 - -2.0000 = 2.0000\n\n--- 反復 2 ---\n現在の x = 2.0000\nf(x) = -1.0000\nf'(x) = 0.0000\nf''(x) = 2.0000\n\n更新:\n  ステップ幅 = f'(x)/f''(x) = 0.0000/2.0000 = 0.0000\n  x_new = 2.0000 - 0.0000 = 2.0000\n\n★ 収束！ f'(x) ≈ 0\n\n============================================================\n最終結果: x = 2.0000, f(x) = -1.0000\n\n\n\n\n\n\n\n\n\n微分を計算して関数定義\n\n\n計算の結果を関数として定義している：\n\n\\(f(x) = x^2 - 4x + 3\\)\n\\(f'(x) = 2x - 4\\)\n\\(f''(x) = 2\\)"
   },
   {
     "objectID": "newton-method-appendix.html#section",
@@ -788,7 +788,7 @@
     "href": "logistic-regression.html#peek-logistic-structure",
     "title": "ロジスティック回帰",
     "section": "ロジスティック回帰（Logistic Regression）",
-    "text": "ロジスティック回帰（Logistic Regression）\n\n\n\nロジスティック回帰：直線のパラメータを最適化して分類\n中身は2ステップ\n\nStep 1：直線を仮定\nStep 2：クラスに属する確率を計算\n\n\n\n\n\n\n\n\n\n「回帰」なのに分類？\n\n\n\n予測する値が 0/1 のラベルではなく、「Salmon である確率」という連続値だから\n確率を数値として回帰し、最後に閾値 0.5 で分類する\n\nただし、この説明は苦しく、歴史的経緯で回帰と呼ばれているとしか言いようがない"
+    "text": "ロジスティック回帰（Logistic Regression）\n\n\n\nロジスティック回帰：直線のパラメータを最適化して分類\n中身は2ステップ\n\nStep 1：直線を仮定\nStep 2：クラスに属する確率を計算\n\n\n\n\n\n\n\n\n\n「回帰」なのに分類？\n\n\n\n予測する値が 0/1 のラベルではなく、「Salmon である確率」という連続値だから\n確率を数値として回帰し、最後に閾値 0.5 で分類する"
   },
   {
     "objectID": "logistic-regression.html#peek-logistic-linear",
@@ -1026,7 +1026,7 @@
     "href": "logistic-regression.html#問題1の解答例",
     "title": "ロジスティック回帰",
     "section": "問題1の解答例",
-    "text": "問題1の解答例\n\n\nf(0) チェック加法性チェック\n\n\n\n\n\\(f(0) = 0\\)：通過\n\n\n\\(f(0) = 2 \\neq 0\\)：線形ではない\n\n\n\\(f(0) = 0\\)：通過（線形とはまだ言えない）\n\n\n\\(f(0, 0) = 0\\)：通過\n\n\n\n\n\n\n\\(f(1+2) = 15 = f(1) + f(2) = 5 + 10\\)：成立\n\n\n斉次性も \\(f(cx) = 5cx = c f(x)\\) で成立するので線形\n\n\n\\(f(1+2) = 9 \\neq f(1) + f(2) = 1 + 4 = 5\\)：非線形\n\n\n\\(f(0)=0\\) を満たしても線形とは限らない\n\n\n\\(f(u+v)=2(u_1+v_1)-(u_2+v_2)=f(u)+f(v)\\)：成立するので線形\n\n\n\n\n\nコードで確認\n\n\n解答例を見る\nfuncs = {\n    \"(a) 5x\":     lambda x: 5 * x,\n    \"(b) 3x + 2\": lambda x: 3 * x + 2,\n    \"(c) x^2\":    lambda x: x ** 2,\n}\nfor name, f in funcs.items():\n    print(f\"{name:12s} f(0)={f(0):3d} | f(1+2)={f(3):3d} vs f(1)+f(2)={f(1) + f(2):3d}\")\n\ng = lambda x1, x2: 2 * x1 - x2\nprint(f\"(d) 2x1-x2   f(0,0)={g(0, 0)} | f(1+3, 2+1)={g(4, 3)} vs f(1,2)+f(3,1)={g(1, 2) + g(3, 1)}\")\n\n\n(a) 5x       f(0)=  0 | f(1+2)= 15 vs f(1)+f(2)= 15\n(b) 3x + 2   f(0)=  2 | f(1+2)= 11 vs f(1)+f(2)= 13\n(c) x^2      f(0)=  0 | f(1+2)=  9 vs f(1)+f(2)=  5\n(d) 2x1-x2   f(0,0)=0 | f(1+3, 2+1)=5 vs f(1,2)+f(3,1)=5\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n(b)：\\(f(0) \\neq 0\\) なので線形ではない\n(c)：加法性が成り立たないので線形ではない\n(a)(d)：両辺が一致し、手計算と同じ結果"
+    "text": "問題1の解答例\n\n\nf(0) チェック加法性チェック\n\n\n\n\n\\(f(0) = 0\\)：通過\n\n\n\\(f(0) = 2 \\neq 0\\)：線形ではない\n\n\n\\(f(0) = 0\\)：通過（線形とはまだ言えない）\n\n\n\\(f(0, 0) = 0\\)：通過\n\n\n\n\n\n\n\\(f(1+2) = 15 = f(1) + f(2) = 5 + 10\\)：成立\n\n\n斉次性も \\(f(cx) = 5cx = c f(x)\\) で成立するので線形\n\n\n\\(f(1+2) = 9 \\neq f(1) + f(2) = 1 + 4 = 5\\)：非線形\n\n\n\\(f(0)=0\\) を満たしても線形とは限らない\n\n\n\\(f(u+v)=2(u_1+v_1)-(u_2+v_2)=f(u)+f(v)\\)：成立\n\n\n斉次性も \\(f(cu) = 2cu_1 - cu_2 = c f(u)\\) で成立するので線形\n\n\n\n\n\nコードで確認\n\n\n解答例を見る\ndef f_a(x):\n    return 5 * x\n\ndef f_b(x):\n    return 3 * x + 2\n\ndef f_c(x):\n    return x ** 2\n\ndef f_d(x1, x2):\n    return 2 * x1 - x2\n\n# u = 1, v = 2\nprint(\"(a) f(0) =\", f_a(0), \"| f(1+2) =\", f_a(1 + 2), \"| f(1)+f(2) =\", f_a(1) + f_a(2))\nprint(\"(b) f(0) =\", f_b(0), \"| f(1+2) =\", f_b(1 + 2), \"| f(1)+f(2) =\", f_b(1) + f_b(2))\nprint(\"(c) f(0) =\", f_c(0), \"| f(1+2) =\", f_c(1 + 2), \"| f(1)+f(2) =\", f_c(1) + f_c(2))\n# u = (1, 2), v = (3, 1)\nprint(\"(d) f(0,0) =\", f_d(0, 0), \"| f(1+3, 2+1) =\", f_d(1 + 3, 2 + 1),\n      \"| f(1,2)+f(3,1) =\", f_d(1, 2) + f_d(3, 1))\n\n\n(a) f(0) = 0 | f(1+2) = 15 | f(1)+f(2) = 15\n(b) f(0) = 2 | f(1+2) = 11 | f(1)+f(2) = 13\n(c) f(0) = 0 | f(1+2) = 9 | f(1)+f(2) = 5\n(d) f(0,0) = 0 | f(1+3, 2+1) = 5 | f(1,2)+f(3,1) = 5\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n(b)：\\(f(0) \\neq 0\\) なので線形ではない\n(c)：加法性が成り立たないので線形ではない\n(a)(d)：両辺が一致し、手計算と同じ結果"
   },
   {
     "objectID": "logistic-regression.html#問題2の解答例",
@@ -1782,7 +1782,7 @@
     "href": "classification-2d-boundaries.html#性能比較表",
     "title": "2次元の特徴量で分類",
     "section": "性能比較表",
-    "text": "性能比較表\n\n\n\n\nモデル\nAccuracy\nPrecision\nRecall\n\n\n\n\n手動の縦線（輝度 5.5）\n0.863\n0.854\n0.875\n\n\n決定木（深さ3）\n0.975\n0.952\n1.000\n\n\n\n\n普段は scikit-learn の決定木を使えばよい（自動で最適化でき、特徴量が3つ以上でもそのまま扱える）"
+    "text": "性能比較表\n\n\n\n\nモデル\nAccuracy\nPrecision\nRecall\n\n\n\n\n人が引いた縦線（輝度 5.5）\n0.863\n0.854\n0.875\n\n\n決定木（深さ3）\n0.975\n0.952\n1.000\n\n\n\n\n普段は scikit-learn の決定木を使えばよい（自動で最適化でき、特徴量が3つ以上でもそのまま扱える）"
   },
   {
     "objectID": "classification-2d-boundaries.html#peek-depth",
@@ -1810,7 +1810,7 @@
     "href": "classification-2d-boundaries.html#まとめ",
     "title": "2次元の特徴量で分類",
     "section": "まとめ",
-    "text": "まとめ\n\n\n\n\n\n\n\n\n重要ポイント\n\n\n\n2次元にすることで分類精度が向上\n\n重さ + 輝度の組み合わせで、より正確に分類\n\n決定境界は手でも、アルゴリズムでも決められる\n\n手動の直線：目で見て引く\n決定木：ジニ不純度で自動最適化\n\n手法によって決定境界が異なる\n\n手動: 縦線（閾値の2次元版）\n決定木: 階段状（軸に平行）\n\nトレードオフを理解する\n\nシンプル vs 複雑\n解釈しやすさ vs 性能\n深さ無制限で満点が出たが、採点に使ったのは学習と同じ80匹"
+    "text": "まとめ\n\n\n\n\n\n\n\n\n重要ポイント\n\n\n\n2次元にすることで分類精度が向上\n\n重さ + 輝度の組み合わせで、より正確に分類\n\n決定境界は人が決めても、アルゴリズムで決めてもよい\n\n人：目で見て直線を引く\n決定木：ジニ不純度で自動最適化\n\n手法によって決定境界が異なる\n\n人が引いた直線: 縦線（閾値の2次元版）\n決定木: 階段状（軸に平行）\n\nトレードオフを理解する\n\nシンプル vs 複雑\n解釈しやすさ vs 性能\n深さ無制限で満点が出たが、採点に使ったのは学習と同じ80匹"
   },
   {
     "objectID": "classification-2d-boundaries.html#次回",
@@ -2643,7 +2643,7 @@
     "href": "linear-regression.html#回帰直線でできること",
     "title": "線形回帰と正則化",
     "section": "回帰直線でできること",
-    "text": "回帰直線でできること\n\n\n新しい魚は、体長を測って式に入れるだけで重さを予測できる\n\n秤に乗せなくてよい\n\n「数値から数値を予測する」問題は、身の回りにいくらでもある\n\n\n\n\n入力\n予測したい数値\n\n\n\n\n気温\nアイスクリームの売り上げ\n\n\n部屋の広さ・駅からの距離\n家賃\n\n\n広告費\n商品の売り上げ\n\n\n\n\nどれも、予測の式と損失を決めれば、勾配降下法でパラメータを求められる"
+    "text": "回帰直線でできること\n\n\n回帰直線（regression line）：損失が最小になるように求めた直線\n新しい魚は、体長を測って式に入れるだけで重さを予測できる\n\n秤に乗せなくてよい\n\n「数値から数値を予測する」問題は、身の回りにいくらでもある\n\n\n\n\n入力\n予測したい数値\n\n\n\n\n気温\nアイスクリームの売り上げ\n\n\n部屋の広さ・駅からの距離\n家賃\n\n\n広告費\n商品の売り上げ\n\n\n\n\nどれも、予測の式と損失を決めれば、勾配降下法でパラメータを求められる"
   },
   {
     "objectID": "linear-regression.html#答え合わせsklearn-と比べる",
@@ -2664,7 +2664,7 @@
     "href": "linear-regression.html#モデルを曲線にする",
     "title": "線形回帰と正則化",
     "section": "モデルを曲線にする",
-    "text": "モデルを曲線にする\n\n\n回帰式は直線だけでなく、曲線でもよい：多項式回帰（polynomial regression）\n\n\\[\\text{予測} = w_1 x + w_2 x^2 + \\cdots + w_d x^d + b\\]\n\n\\(x^2, x^3, \\ldots\\) を新しい特徴量として作れば、道具は線形回帰のまま\nモデルの複雑さを決める次数 \\(d\\)\n\nハイパーパラメータ\n\n\n\n\n\n\n\n\n\n質問\n\n\n次数を 1 → 3 → 9 と上げていくと、訓練誤差とテスト誤差はそれぞれどうなる？"
+    "text": "モデルを曲線にする\n\n\n線形回帰は曲線も表せる：多項式回帰（polynomial regression）\n\n\\[\\text{予測} = w_1 x + w_2 x^2 + \\cdots + w_d x^d + b\\]\n\n\\(x^2, x^3, \\ldots\\) を新しい特徴量として作れば、道具は線形回帰のまま\nモデルの複雑さを決める次数 \\(d\\)\n\nハイパーパラメータ\n\n\n\n\n\n\n\n\n\n質問\n\n\n次数を 1 → 3 → 9 と上げていくと、訓練誤差とテスト誤差はそれぞれどうなる？"
   },
   {
     "objectID": "linear-regression.html#次数を上げてみる",
@@ -2692,7 +2692,7 @@
     "href": "linear-regression.html#peek-ridge-code",
     "title": "線形回帰と正則化",
     "section": "正則化の実装：勾配降下法にペナルティを足す",
-    "text": "正則化の実装：勾配降下法にペナルティを足す\n\n\n勾配降下法に、ペナルティの項を足す\nペナルティ \\(\\lambda \\sum w^2\\) の微分は \\(2\\lambda w\\)\n\n各係数の勾配に足せばよい\n\n\n\n# 特徴量 x, x², …, x⁹ を作る（列が x^1 〜 x^9 の配列）\nP_train = x_train.reshape(-1, 1) ** np.arange(1, 10)   # 形 (10, 9)\nP_test  = x_test.reshape(-1, 1)  ** np.arange(1, 10)\nmu, sd  = P_train.mean(axis=0), P_train.std(axis=0)\nP_train = (P_train - mu) / sd                  # スケールを揃える（いつもの）\nP_test  = (P_test  - mu) / sd\nt_mean, t_std = t_train.mean(), t_train.std()\ntt = (t_train - t_mean) / t_std                # 重さも標準化\n\nlam  = 0.1        # ペナルティの強さ λ\nw, b = np.zeros(9), 0.0\nlr   = 0.01\nfor i in range(10_000):\n    pred   = P_train @ w + b\n    grad_w = np.array([2 * np.mean((pred - tt) * P_train[:, d]) for d in range(9)]) \\\n             + 2 * lam * w                     # ← MSEの勾配 ＋ ペナルティの勾配\n    grad_b = 2 * np.mean(pred - tt)\n    w -= lr * grad_w\n    b -= lr * grad_b\n\ntest_pred = (P_test @ w + b) * t_std + t_mean  # 元の単位（g）に戻す\ntrain_pred = (P_train @ w + b) * t_std + t_mean\ncoef_own = np.polyfit(z_train, train_pred, 9)  # 前のスライドと同じ多項式の係数に直す\nprint(\"係数の最大絶対値:\", f\"{np.abs(coef_own[:-1]).max():,.0f}\")\nprint(\"テストMSE:\", f\"{np.mean((test_pred - t_test) ** 2):,.0f}\")\n\n係数の最大絶対値: 320\nテストMSE: 3,427\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n係数の最大絶対値が桁違いに小さくなった\n\nペナルティが係数の増大を抑えた\n\n勾配降下法のループは正則化なしのコードと同じ形\n\n増えたのは + 2 * lam * w の項だけ"
+    "text": "正則化の実装：勾配降下法にペナルティを足す\n\n\n勾配降下法に、ペナルティの項を足す\nペナルティ \\(\\lambda \\sum w^2\\) の微分は \\(2\\lambda w\\)\n\n各係数の勾配に足せばよい\n\n\n\n# 特徴量 x, x², …, x⁹ を作る（列が x^1 〜 x^9 の配列）\nP_train = x_train.reshape(-1, 1) ** np.arange(1, 10)   # (10, 9)\nP_test  = x_test.reshape(-1, 1)  ** np.arange(1, 10)\nmu, sd  = P_train.mean(axis=0), P_train.std(axis=0)\nP_train = (P_train - mu) / sd                  # スケールを揃える（いつもの）\nP_test  = (P_test  - mu) / sd\nt_mean, t_std = t_train.mean(), t_train.std()\ntt = (t_train - t_mean) / t_std                # 重さも標準化\n\nlam  = 0.1        # ペナルティの強さ λ\nw, b = np.zeros(9), 0.0\nlr   = 0.01\nfor i in range(10_000):\n    pred   = P_train @ w + b\n    grad_w = np.array([2 * np.mean((pred - tt) * P_train[:, d]) for d in range(9)]) \\\n             + 2 * lam * w                     # ← MSEの勾配 ＋ ペナルティの勾配\n    grad_b = 2 * np.mean(pred - tt)\n    w -= lr * grad_w\n    b -= lr * grad_b\n\ntest_pred = (P_test @ w + b) * t_std + t_mean  # 元の単位（g）に戻す\ntrain_pred = (P_train @ w + b) * t_std + t_mean\ncoef_own = np.polyfit(z_train, train_pred, 9)  # 前のスライドと同じ多項式の係数に直す\nprint(\"係数の最大絶対値:\", f\"{np.abs(coef_own[:-1]).max():,.0f}\")\nprint(\"テストMSE:\", f\"{np.mean((test_pred - t_test) ** 2):,.0f}\")\n\n係数の最大絶対値: 320\nテストMSE: 3,427\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n係数の最大絶対値が桁違いに小さくなった\n\nペナルティが係数の増大を抑えた\n\n勾配降下法のループは正則化なしのコードと同じ形\n\n増えたのは + 2 * lam * w の項だけ"
   },
   {
     "objectID": "linear-regression.html#罰金ありなしを見比べる",
@@ -2776,7 +2776,7 @@
     "href": "linear-regression.html#まとめ",
     "title": "線形回帰と正則化",
     "section": "まとめ",
-    "text": "まとめ\n\n\n回帰：\\(t = f(x) + \\varepsilon\\) の \\(f\\) をデータから推定する手法\n\n損失は二乗誤差（MSE）（微分しやすさで選ぶ）\n\n勾配降下法で求めた傾きと切片は、最小二乗法の厳密解と一致\n多項式回帰：特徴量に \\(x^2, x^3, \\ldots\\) を足せば道具は線形回帰のまま\n過学習は回帰でも起きる：次数を上げると訓練誤差は下がり、テスト誤差は桁違いに増える\n正則化（regularization）：大きい係数にペナルティを与え、曲線の振れを抑える"
+    "text": "まとめ\n\n\n回帰：\\(t = f(x) + \\varepsilon\\) の \\(f\\) をデータから推定する手法\n\n損失は二乗誤差（MSE）（微分しやすさで選ぶ）\n\n勾配降下法で求めた傾きと切片は、最小二乗法の厳密解と一致\n多項式回帰：特徴量に \\(x^2, x^3, \\ldots\\) を足せば道具は線形回帰のまま\n過学習は回帰でも起きる：次数を上げると訓練誤差は下がり、テスト誤差は桁違いに増える\n正則化（regularization）：大きい係数にペナルティを与え、曲線の振れを抑える\n\nリッジ回帰（L2）：係数全体を小さくする\nラッソ回帰（L1）：一部の係数をちょうど 0 にする"
   },
   {
     "objectID": "linear-regression.html#問題1魚2匹だけの世界で-fit-する",
@@ -3546,7 +3546,7 @@
     "href": "optimization-local-minima-appendix.html#関数の定義",
     "title": "ローカルミニマムの罠",
     "section": "関数の定義",
-    "text": "関数の定義\n\n今回使う関数：\n\\[f(x) = 0.1x^4 - x^3 + 2x^2 + 1\\]\n微分を手で計算しておく。\n1次微分（first derivative、傾き）： \\[f'(x) = 0.4x^3 - 3x^2 + 4x\\]\n2次微分（second derivative、曲がり具合）： \\[f''(x) = 1.2x^2 - 6x + 4\\]"
+    "text": "関数の定義\n\n今回使う関数：\n\\[f(x) = 0.1x^4 - x^3 + 2x^2 + 1\\]\n微分を計算しておく。\n1次微分（first derivative、傾き）： \\[f'(x) = 0.4x^3 - 3x^2 + 4x\\]\n2次微分（second derivative、曲がり具合）： \\[f''(x) = 1.2x^2 - 6x + 4\\]"
   },
   {
     "objectID": "optimization-local-minima-appendix.html#pythonでの定義",
@@ -4749,22 +4749,22 @@
     "objectID": "linear-regression.html#peek-mse-grad",
     "href": "linear-regression.html#peek-mse-grad",
     "title": "線形回帰と正則化",
-    "section": "勾配を手で出す",
-    "text": "勾配を手で出す\n\n\\(L\\) を \\(a\\) と \\(b\\) でそれぞれ微分する（合成関数の微分）：\n\\[\\frac{\\partial L}{\\partial a} = \\frac{2}{N} \\sum_i (a x_i + b - t_i) \\, x_i\n\\qquad\n\\frac{\\partial L}{\\partial b} = \\frac{2}{N} \\sum_i (a x_i + b - t_i)\\]\n\n構造は単純：「予測と正解の差」を入力の大きさに応じて配る\nあとは勾配降下法に渡すだけ\n\n\\[a \\leftarrow a - \\alpha \\frac{\\partial L}{\\partial a}, \\qquad b \\leftarrow b - \\alpha \\frac{\\partial L}{\\partial b}\\]\n\n\n\n\n\n\n\n数式とコードの名前\n\n\n\n数式では学習率を \\(\\alpha\\) と書く\nコードでは、learning rateを略して lr と書く"
+    "section": "勾配を計算する",
+    "text": "勾配を計算する\n\n\\(L\\) を \\(a\\) と \\(b\\) でそれぞれ微分する（合成関数の微分）：\n\\[\\frac{\\partial L}{\\partial a} = \\frac{2}{N} \\sum_i (a x_i + b - t_i) \\, x_i\n\\qquad\n\\frac{\\partial L}{\\partial b} = \\frac{2}{N} \\sum_i (a x_i + b - t_i)\\]\n\n構造は単純：「予測と正解の差」を入力の大きさに応じて配る\nあとは勾配降下法に渡すだけ\n\n\\[a \\leftarrow a - \\alpha \\frac{\\partial L}{\\partial a}, \\qquad b \\leftarrow b - \\alpha \\frac{\\partial L}{\\partial b}\\]\n\n\n\n\n\n\n\n数式とコードの名前\n\n\n\n数式では学習率を \\(\\alpha\\) と書く\nコードでは、learning rateを略して lr と書く"
   },
   {
     "objectID": "linear-regression.html#peek-l2-ridge",
     "href": "linear-regression.html#peek-l2-ridge",
     "title": "線形回帰と正則化",
     "section": "L2正則化とリッジ回帰",
-    "text": "L2正則化とリッジ回帰\n\n\n\\(\\lambda \\sum_j w_j^2\\) の形のペナルティ：L2正則化（L2 regularization）\nL2正則化を加えた線形回帰は、歴史的な経緯でリッジ回帰（Ridge regression）と呼ばれる\n\nモデルは線形回帰のままで、変わるのは損失だけ\n\nNN でも同じ道具がそのまま使われる（NN での名前は weight decay）"
+    "text": "L2正則化とリッジ回帰\n\n\nL2正則化（L2 regularization）: \\(\\lambda \\sum_j w_j^2\\) の形のペナルティの線形回帰\nこれは歴史的経緯でリッジ回帰（Ridge regression）という特別な名前がついている\n\nモデルは線形回帰のままで、変わるのは損失だけ\n\nNN でも使われる（NN での名前は weight decay）\n\n正則化の実装の更新式を整理すると、毎回 \\(w\\) を一定の割合で縮めている（decay）\n\n\n\\[w \\leftarrow w - \\alpha \\left( \\text{MSEの勾配} + 2\\lambda w \\right) = (1 - 2\\alpha\\lambda)\\, w - \\alpha \\times \\text{MSEの勾配}\\]"
   },
   {
     "objectID": "linear-regression.html#peek-regularization-broad",
     "href": "linear-regression.html#peek-regularization-broad",
     "title": "線形回帰と正則化",
     "section": "深さの制限も、広い意味での正則化",
-    "text": "深さの制限も、広い意味での正則化\n\n\n次数9の曲線の MSE を、ペナルティのあり・なしで比べる\n\n\n\n\n\n訓練MSE\nテストMSE\n\n\n\n\nペナルティなし\n0\n\\(4.4 \\times 10^{14}\\)\n\n\nペナルティあり（\\(\\lambda = 0.1\\)）\n3,585\n3,427\n\n\n\n\n\n\n\n\n\n\n広い意味での正則化\n\n\n\n訓練誤差を犠牲にして、汎化誤差を下げる工夫\n\nペナルティ：訓練MSEは上がり、テストMSEは下がった\n決定木の深さの制限：訓練データでの成績は満点でなくなる"
+    "text": "深さの制限も、広い意味での正則化\n\n広い意味での正則化：訓練誤差を犠牲にして、汎化誤差を下げる工夫\n\nつまり、決定木の深さの制限も正則化"
   },
   {
     "objectID": "mnist-project.html#手書き数字を読み取る機械を作る",
@@ -5072,7 +5072,7 @@
     "href": "optimization-gradient-descent.html#変数の勾配降下法の実装例",
     "title": "最適化と勾配降下法",
     "section": "2変数の勾配降下法の実装例",
-    "text": "2変数の勾配降下法の実装例\n\n\n1変数の実装と同様に、\\(w_1\\) と \\(w_2\\) をそれぞれ更新する\n\n\ndef f2(w1, w2):\n    return w1**2 + 3 * w2**2\n\nw1 = -4.0\nw2 = 2.0\nlr = 0.25\nmax_iter = 6\n\nfor iteration in range(1, max_iter + 1):\n    grad_w1 = 2 * w1   # df/dw1\n    grad_w2 = 6 * w2   # df/dw2\n    w1 = w1 - lr * grad_w1\n    w2 = w2 - lr * grad_w2\n    print(f\"iter {iteration}: w1={w1:7.4f} w2={w2:7.4f} f={f2(w1, w2):.4f}\")\n\niter 1: w1=-2.0000 w2=-1.0000 f=7.0000\niter 2: w1=-1.0000 w2= 0.5000 f=1.7500\niter 3: w1=-0.5000 w2=-0.2500 f=0.4375\niter 4: w1=-0.2500 w2= 0.1250 f=0.1094\niter 5: w1=-0.1250 w2=-0.0625 f=0.0273\niter 6: w1=-0.0625 w2= 0.0312 f=0.0068\n\n\n\niter 1 の行が手計算の結果"
+    "text": "2変数の勾配降下法の実装例\n\n\n1変数の実装と同様に、\\(w_1\\) と \\(w_2\\) をそれぞれ更新する\n\n\ndef f2(w1, w2):\n    return w1**2 + 3 * w2**2\n\nw1 = -4.0\nw2 = 2.0\nlr = 0.25\nmax_iter = 6\n\nfor iteration in range(1, max_iter + 1):\n    grad_w1 = 2 * w1   # df/dw1\n    grad_w2 = 6 * w2   # df/dw2\n    w1 = w1 - lr * grad_w1\n    w2 = w2 - lr * grad_w2\n    print(f\"iter {iteration}: w1={w1:7.4f} w2={w2:7.4f} f={f2(w1, w2):.4f}\")\n\niter 1: w1=-2.0000 w2=-1.0000 f=7.0000\niter 2: w1=-1.0000 w2= 0.5000 f=1.7500\niter 3: w1=-0.5000 w2=-0.2500 f=0.4375\niter 4: w1=-0.2500 w2= 0.1250 f=0.1094\niter 5: w1=-0.1250 w2=-0.0625 f=0.0273\niter 6: w1=-0.0625 w2= 0.0312 f=0.0068\n\n\n\niter 1 の行が先ほどの計算の結果"
   },
   {
     "objectID": "linear-regression.html#数字で見る回帰でも過学習が起きる",
@@ -5127,8 +5127,8 @@
     "objectID": "linear-regression.html#peek-exact-line",
     "href": "linear-regression.html#peek-exact-line",
     "title": "線形回帰と正則化",
-    "section": "答え合わせ：厳密解と比べる",
-    "text": "答え合わせ：厳密解と比べる\n\n\nnp.polyfit(x, t, d)：二乗誤差が最小になる \\(d\\) 次式の係数を求める関数\n\n更新を繰り返さず、最小二乗法（least squares）で直接求める\n\n（参考）SVD（特異値分解, Singular Value Decomposition）だけで求まる\n\n係数は次数の高い順に返る（d = 1 なら \\(a, b\\) の順）\n\n\n\na_exact, b_exact = np.polyfit(x, t, 1)\nprint(f\"gradient descent: a={a:.4f}, b={b:.4f}\")\nprint(f\"np.polyfit      : a={a_exact:.4f}, b={b_exact:.4f}\")\n\ngradient descent: a=0.9854, b=0.0000\nnp.polyfit      : a=0.9854, b=0.0000\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n勾配降下法と厳密解が一致\n元の単位に戻すと「体長 1cm あたり約 97g」という意味のある数字になる"
+    "section": "検算：厳密解と比較",
+    "text": "検算：厳密解と比較\n\n\nnp.polyfit(x, t, d)：二乗誤差が最小になる \\(d\\) 次式の係数を求める関数\n\n更新を繰り返さず、最小二乗法（least squares）で直接求める\n\n（参考）SVD（特異値分解, Singular Value Decomposition）だけで求まる\n\n係数は次数の高い順に返る（d = 1 なら \\(a, b\\) の順）\n\n\n\na_exact, b_exact = np.polyfit(x, t, 1)\nprint(f\"gradient descent: a={a:.4f}, b={b:.4f}\")\nprint(f\"np.polyfit      : a={a_exact:.4f}, b={b_exact:.4f}\")\n\ngradient descent: a=0.9854, b=0.0000\nnp.polyfit      : a=0.9854, b=0.0000\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n勾配降下法と厳密解が一致\n元の単位に戻すと「体長 1cm あたり約 97g」という意味のある数字になる"
   },
   {
     "objectID": "optimization-gradient-descent.html#どの手法もある値が最小になるパラメータを探していた",
@@ -5184,7 +5184,7 @@
     "href": "classification-2d-boundaries.html#ここまでの道具",
     "title": "2次元の特徴量で分類",
     "section": "ここまでの道具",
-    "text": "ここまでの道具\n\n\n1次元での分類\n\n\n重さだけで Salmon vs Sea bass を分類\n閾値（threshold）を手動で設定\nTP / FP / TN / FN\nPrecision / Recall\n最適な閾値はケースによって異なる\n\nコスト計算などで決定"
+    "text": "ここまでの道具\n\n\n1次元での分類\n\n\n重さだけで Salmon vs Sea bass を分類\n閾値（threshold）を人が設定\nTP / FP / TN / FN\nPrecision / Recall\n最適な閾値はケースによって異なる\n\nコスト計算などで決定"
   },
   {
     "objectID": "classification-2d-boundaries.html#データの値だけを探索するコード",
@@ -5233,7 +5233,7 @@
     "href": "classification-evaluation.html#ここまでの道具",
     "title": "過学習と汎化",
     "section": "ここまでの道具",
-    "text": "ここまでの道具\n\n\n学習データでの満点は意味がない\n\n\n重さ + 輝度の 2特徴量 で Salmon / Sea bass を分類\n手動の直線と決定木で決定境界を定めた\n決定木は深くするほど、成績が上がった\n\n深さ無制限では80匹全部を正しく分類（Precision も Recall も 100%）\nただし採点は学習に使った同じデータ\n\n\n\n\n\n\n\n\n\n今回の主題\n\n\n決定木の深さはいくつにすればいいか"
+    "text": "ここまでの道具\n\n\n学習データでの満点は意味がない\n\n\n重さ + 輝度の 2特徴量 で Salmon / Sea bass を分類\n人が引いた直線と決定木で決定境界を定めた\n決定木は深くするほど、成績が上がった\n\n深さ無制限では80匹全部を正しく分類（Precision も Recall も 100%）\nただし採点は学習に使った同じデータ\n\n\n\n\n\n\n\n\n\n今回の主題\n\n\n決定木の深さはいくつにすればいいか"
   },
   {
     "objectID": "clustering-kmeans.html#教師なし学習unsupervised-learning",
@@ -5338,7 +5338,7 @@
     "href": "newton-method-appendix.html#newton法newtons-method",
     "title": "Newton法",
     "section": "Newton法（Newton’s Method）",
-    "text": "Newton法（Newton’s Method）\n\n\n勾配降下法（gradient descent）の弱点を、2次微分（second derivative）で解決する手法\n\n弱点：学習率（learning rate）の手動調整、収束の遅さ\n\nディープラーニング（deep learning）では使われない\n\nscikit-learn のロジスティック回帰（logistic regression）などの中で使われている\n\n\n\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\n\nplt.rcParams[\"font.size\"] = 11\nplt.rcParams[\"figure.dpi\"] = 100\n\ndef f(x):\n    \"\"\"目的関数 f(x) = x^2 - 4x + 3\"\"\"\n    return x**2 - 4*x + 3\n\ndef f_prime(x):\n    \"\"\"1次微分 f'(x) = 2x - 4\"\"\"\n    return 2*x - 4\n\ndef f_double_prime(x):\n    \"\"\"2次微分 f''(x) = 2\"\"\"\n    return 2"
+    "text": "Newton法（Newton’s Method）\n\n\n勾配降下法（gradient descent）の弱点を、2次微分（second derivative）で解決する手法\n\n弱点：学習率（learning rate）の調整、収束の遅さ\n\nディープラーニング（deep learning）では使われない\n\nscikit-learn のロジスティック回帰（logistic regression）などの中で使われている\n\n\n\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\n\nplt.rcParams[\"font.size\"] = 11\nplt.rcParams[\"figure.dpi\"] = 100\n\ndef f(x):\n    \"\"\"目的関数 f(x) = x^2 - 4x + 3\"\"\"\n    return x**2 - 4*x + 3\n\ndef f_prime(x):\n    \"\"\"1次微分 f'(x) = 2x - 4\"\"\"\n    return 2*x - 4\n\ndef f_double_prime(x):\n    \"\"\"2次微分 f''(x) = 2\"\"\"\n    return 2"
   },
   {
     "objectID": "newton-method-appendix.html#peek-newton-update",
@@ -5520,7 +5520,7 @@
     "href": "optimization-local-minima-appendix.html#k-means-のランダムリスタート",
     "title": "ローカルミニマムの罠",
     "section": "k-means のランダムリスタート",
-    "text": "k-means のランダムリスタート\n\n\n\n\n\n\n\n\nkmeans_best(xs, ys, k, n_init=10) はランダムリスタート\n\n\n\nk-means も、クラスタ中心の初期値しだいで変な分け方に落ち着く\nkmeans_best(xs, ys, k, n_init=10) は、初期値を変えて10回実行し、SSE が最小の結果を採用する\n\n\n\n\n\n\n「初期値を変えて何回も試し、一番良いものを選ぶ」という考え方は、初期値の用意のしかた（手動・ランダム・グリッド）によらず同じ\n\n最適化（optimization）の分野ではまとめて multi-start と呼ぶこともある\n\nニューラルネットワーク（neural network）で「乱数シードを変えて学習し直す」のもランダムリスタート\n名前は違っても、やっていることは方法1〜3と同じ"
+    "text": "k-means のランダムリスタート\n\n\n\n\n\n\n\n\nkmeans_best(xs, ys, k, n_init=10) はランダムリスタート\n\n\n\nk-means も、クラスタ中心の初期値しだいで変な分け方に落ち着く\nkmeans_best(xs, ys, k, n_init=10) は、初期値を変えて10回実行し、SSE が最小の結果を採用する\n\n\n\n\n\n\n「初期値を変えて何回も試し、一番良いものを選ぶ」という考え方は、初期値の用意のしかた（人が選ぶ・ランダム・グリッド）によらず同じ\n\n最適化（optimization）の分野ではまとめて multi-start と呼ぶこともある\n\nニューラルネットワーク（neural network）で「乱数シードを変えて学習し直す」のもランダムリスタート\n名前は違っても、やっていることは方法1〜3と同じ"
   },
   {
     "objectID": "optimization-local-minima-appendix.html#peek-newton-rerun",
@@ -5737,7 +5737,7 @@
     "href": "linear-regression.html#回帰regression",
     "title": "線形回帰と正則化",
     "section": "回帰（Regression）",
-    "text": "回帰（Regression）\n\n\n目的変数（target variable）\\(t\\) と説明変数（explanatory variable）\\(x\\) の関係を関数で表し、その関数をデータから推定する手法\n\n\\[t = f(x) + \\varepsilon \\qquad (\\varepsilon \\text{：誤差})\\]\n\n目的変数は通常、連続値（continuous value）\n統計的には、\\(x\\) が与えられたときの \\(t\\) の条件付き期待値（conditional expectation） \\(E[t \\mid x]\\) を推定することにあたる（二乗誤差の場合）\n\n\n\n\n\n分類\n回帰\n\n\n\n\n出力\nグループ名\n連続値\n\n\n例\nこの魚は Salmon\nこの魚は約 1900g"
+    "text": "回帰（Regression）\n\n\n目的変数（target variable）\\(t\\) と説明変数（explanatory variable）\\(x\\) の関係を関数で表し、その関数をデータから推定する手法\n\n\\[t = f(x) + \\varepsilon \\qquad (\\varepsilon \\text{：誤差})\\]\n\n目的変数は通常、連続値（continuous value）\n統計的には、\\(x\\) が与えられたときの \\(t\\) の条件付き期待値（conditional expectation） \\(E[t \\mid x]\\) を推定することにあたる（二乗誤差の場合）\n\n\n\n\n\n分類\n回帰\n\n\n\n\n出力\nグループ名\n連続値\n\n\n例\nこの魚は Salmon\nこの魚は約 1900g\n\n\n\n\n\n\n\n\n\n\n（参考）分類も回帰で解ける\n\n\n\nラベルを 0 と 1 にして回帰する\n\n\\(E[t \\mid x]\\) が「\\(t=1\\) である確率」になる\n\n直線の予測は 0〜1 をはみ出すため、確率の予測にはロジスティック回帰を使う"
   },
   {
     "objectID": "linear-regression.html#モデルmodel",
@@ -5822,5 +5822,110 @@
     "title": "最適化と勾配降下法",
     "section": "しかし、パラメータ数が増えると総当たりは厳しい",
     "text": "しかし、パラメータ数が増えると総当たりは厳しい\n\n\nパラメータ1個につき、候補を100個試すとすると……\n\n\n\n\n\n\n\n\n\n\n\n\n\nパラメータの数\n試す組み合わせ\n\n\n\n\n1個（閾値）\n\\(100\\) 通り\n\n\n2個（傾きと切片）\n\\(100 \\times 100 = 10^4\\) 通り\n\n\n10個\n\\(100^{10} = 10^{20}\\) 通り"
+  },
+  {
+    "objectID": "classification-2d-boundaries.html#人が引いた直線-vs-決定木",
+    "href": "classification-2d-boundaries.html#人が引いた直線-vs-決定木",
+    "title": "2次元の特徴量で分類",
+    "section": "人が引いた直線 vs 決定木",
+    "text": "人が引いた直線 vs 決定木\n\n\n\n\n\n\n\n\n\n\n人が引いた直線\n決定木\n\n\n\n\n境界の決め方\n目で見て引く（データを眺める過程が入る）\nジニ不純度で自動最適化\n\n\n説明のしやすさ\n単純で、理由を説明しやすい\nif-then ルールとして読める\n\n\n特徴量が3つ以上\n目で見えなくなる\nそのまま扱える\n\n\n弱点\n最適の保証がない自動化できない\n過学習（overfitting）しやすい境界は階段状のみ"
+  },
+  {
+    "objectID": "clustering-kmeans.html#問題1k-means-の1周を計算する",
+    "href": "clustering-kmeans.html#問題1k-means-の1周を計算する",
+    "title": "教師なし学習とクラスタリング",
+    "section": "問題1：k-means の1周を計算する",
+    "text": "問題1：k-means の1周を計算する\n\n4点 \\(A(0, 0)\\)、\\(B(0, 2)\\)、\\(C(4, 0)\\)、\\(D(4, 2)\\) がある。\\(k = 2\\)、最初の重心を \\(M_1 = (0, 0)\\)、\\(M_2 = (0, 2)\\) に置く。手計算で解け。\n\nassign：各点を近い方の重心に割り当てよ（距離はユークリッド距離）\nupdate：割り当てから新しい重心を計算せよ\nassign が変わらなくなるまで繰り返し、最終的なクラスタ分けと SSE（各点から自分の重心までの二乗距離の合計）を求めよ\nこのデータの「自然な」分け方 \\(\\{A, B\\}\\) と \\(\\{C, D\\}\\) の SSE も計算し、3.の結果と比較せよ"
+  },
+  {
+    "objectID": "knn-curse.html#練習問題計算の結果をコードで確かめる",
+    "href": "knn-curse.html#練習問題計算の結果をコードで確かめる",
+    "title": "k-NN と次元の呪い",
+    "section": "練習問題：計算の結果をコードで確かめる",
+    "text": "練習問題：計算の結果をコードで確かめる\n\n前の練習問題の 12 点と \\(N(1, 9)\\) について、計算の結果を、本編の関数で確かめよ。\n\n12 点の座標、ラベル、\\(N\\) を、NumPy の配列にせよ\npredict_knn で、k = 3 の予測を表示せよ\nbuild_kdtree（領域の点が 3 個以下になるまで分ける）で木を作り、nearest_k_kdtree で、\\(N\\) に近い 3 点の番号と、距離を測った点の数を表示せよ\npredict_knn_kdtree で、k = 3 の予測を表示し、2 と比べよ\n木の分ける値 value を表示し、手で引いた KD-tree の線の位置と比べよ"
+  },
+  {
+    "objectID": "optimization-local-minima-appendix.html#方法1初期値を変えて比較する",
+    "href": "optimization-local-minima-appendix.html#方法1初期値を変えて比較する",
+    "title": "ローカルミニマムの罠",
+    "section": "方法1：初期値を変えて比較する",
+    "text": "方法1：初期値を変えて比較する\n\n\nまず3つの初期値から実行して比較する\n\n\n\\(x_0 = 0\\) からスタート\\(x_0 = 2\\) からスタート\\(x_0 = 6\\) からスタート\n\n\n\\[f'(0) = 0.4 \\times 0 - 3 \\times 0 + 4 \\times 0 = 0\\]\n\n傾きがゼロなので、勾配降下法は一歩も動かない\n\n\\(x = 0\\)、\\(f(0) = 1\\) ですぐに「収束」する\n\n\\(f''(0) = 4 &gt; 0\\) なので、ここは谷\n\nただし谷底から始めると、隣にもっと深い谷があっても気づけない\n\n\n\n\n\\[f'(2) = 0.4 \\times 8 - 3 \\times 4 + 4 \\times 2 = 3.2 - 12 + 8 = -0.8\\]\n傾きがマイナス（右下り坂）→ 一歩は右へ：\n\\[x_{\\text{new}} = 2 - 0.1 \\times (-0.8) = 2.08\\]\nそのまま坂を下り続けて、右の谷（グローバルミニマム）に着く\n\n\n\\[f'(6) = 0.4 \\times 216 - 3 \\times 36 + 4 \\times 6 = 86.4 - 108 + 24 = 2.4\\]\n傾きがプラス（右上り坂）→ 一歩は左へ：\n\\[x_{\\text{new}} = 6 - 0.1 \\times 2.4 = 5.76\\]\nこちらも右の谷に着く\n\n\n\n3つの結果を比較\n\n# 3つの初期値から実行して比較\nstarting_points = [0, 2, 6]\n\nprint(\"初期値を変えて比較（勾配降下法）\")\nprint(\"=\" * 60)\nprint(f\"{'x0':&gt;4}  →  {'到着地点':&gt;8}  →  {'f(x)':&gt;8}  →  どこの谷？\")\nprint(\"-\" * 60)\n\nresults_comparison = []\nfor x0 in starting_points:\n    x_final, f_final, _ = gradient_descent(f_poly, f_poly_prime, x0)\n    results_comparison.append((x0, x_final, f_final))\n\nbest_f = min(r[2] for r in results_comparison)\nfor x0, xf, fx in results_comparison:\n    where = \"左の谷\" if xf &lt; 3 else \"右の谷\"\n    marker = \" ← 最良！\" if fx == best_f else \"\"\n    print(f\"{x0:4.1f}  →  {xf:8.4f}  →  {fx:8.4f}  →  {where}{marker}\")\n\n初期値を変えて比較（勾配降下法）\n============================================================\n  x0  →      到着地点  →      f(x)  →  どこの谷？\n------------------------------------------------------------\n 0.0  →    0.0000  →    1.0000  →  左の谷\n 2.0  →    5.7656  →  -13.6726  →  右の谷 ← 最良！\n 6.0  →    5.7656  →  -13.6726  →  右の谷 ← 最良！\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n3つ試すと左右両方の谷が出た\n\\(f(x)\\) が最小のものを採用すると、その中で一番良い答えを選べる\n手間は3倍になるが、浅い谷の答えを信じてしまうよりずっとよい"
+  },
+  {
+    "objectID": "robust-regression.html#練習問題ransac-の1周を計算する",
+    "href": "robust-regression.html#練習問題ransac-の1周を計算する",
+    "title": "外れ値に強い回帰",
+    "section": "練習問題：RANSAC の1周を計算する",
+    "text": "練習問題：RANSAC の1周を計算する\n\n5 点：\\(A(0, 0)\\)、\\(B(1, 1)\\)、\\(C(2, 2)\\)、\\(D(3, 3)\\)、\\(E(2, 8)\\)。閾値は 0.5。1〜3 は手計算、4 と 5 はPythonコードで解け。\n\n\\(A\\) と \\(B\\) を通る直線を求め、直線からのズレが 0.5 未満の点（賛同者）を数えよ\n\\(A\\) と \\(E\\) を通る直線で同じことをせよ\nRANSAC が最終的に選ぶ直線と、その賛同者を答えよ\nPython：5 点に MSE の勾配降下法で直線を fit し（標準化なし、学習率 0.1、100 回）、ransac_line の直線と比較せよ（傾きと切片を表示）\nPython：4 の勾配を MAE の勾配に書き換えて fit せよ（学習率 0.001、10000 回、傾きと切片を表示）"
+  },
+  {
+    "objectID": "linear-regression.html#peek-linear-regression",
+    "href": "linear-regression.html#peek-linear-regression",
+    "title": "線形回帰と正則化",
+    "section": "線形回帰（Linear Regression）",
+    "text": "線形回帰（Linear Regression）\n\n\n予測がパラメータについて線形な回帰\n\n\\(ax + b\\) は \\(a, b\\) について線形\n\n線形なので、予測は \\(a, b\\) で微分できる\n\n\\[\\frac{\\partial}{\\partial a}(ax + b) = x \\qquad \\frac{\\partial}{\\partial b}(ax + b) = 1\\]\n\n予測も MSE も微分できるので、損失が滑らかになり、勾配降下法が使える"
+  },
+  {
+    "objectID": "linear-regression.html#peek-quadratic-linear",
+    "href": "linear-regression.html#peek-quadratic-linear",
+    "title": "線形回帰と正則化",
+    "section": "2次式も線形回帰",
+    "text": "2次式も線形回帰\n\n\\[\\text{予測} = a x^2 + b x + c\\]\n\n\\(x\\) について線形ではない（グラフは曲線）\n学習で動かす \\(a, b, c\\) について線形\n\n\\(x\\) はデータなので、学習中は定数\n例：\\(x = 2\\) なら、予測は \\(4a + 2b + c\\)\n\n\n\\[\\frac{\\partial\\, \\text{予測}}{\\partial a} = x^2 \\qquad \\frac{\\partial\\, \\text{予測}}{\\partial b} = x \\qquad \\frac{\\partial\\, \\text{予測}}{\\partial c} = 1\\]\n\n線形回帰の「線形」は、\\(x\\) ではなくパラメータについての線形性"
+  },
+  {
+    "objectID": "optimization-gradient-descent.html#peek-smooth-loss",
+    "href": "optimization-gradient-descent.html#peek-smooth-loss",
+    "title": "最適化と勾配降下法",
+    "section": "【制約】勾配降下法には滑らかな損失関数が必要",
+    "text": "【制約】勾配降下法には滑らかな損失関数が必要\n\n\n勾配降下法は傾きを手がかりにするので、滑らかな損失関数を使う\n\n滑らか：微分できること\n\n誤分類の数は階段状で、傾きが手がかりにならない\n\n\n\n\n\n\n\n\n（参考）分類で使う代理損失\n\n\n\n代理損失（surrogate loss）：誤分類数などの評価基準の代わりに最小化する、滑らかな損失\n学習では代理損失を最小化し、評価には誤分類数や正答率を使う"
+  },
+  {
+    "objectID": "logistic-regression.html#peek-linearity",
+    "href": "logistic-regression.html#peek-linearity",
+    "title": "ロジスティック回帰",
+    "section": "線形性（Linearity）：斉次性と加法性を満たすこと",
+    "text": "線形性（Linearity）：斉次性と加法性を満たすこと\n\n\n斉次性（homogeneity）：先に定数倍しても後で定数倍しても同じ\n加法性（additivity）：先に足しても後で足しても同じ\n\n\\[\\;\\;\\text{斉次性：} f(c\\,u) = c\\,f(u) \\qquad \\qquad \\] \\[\\;\\text{加法性：}f(u + v) = f(u) + f(v) \\]\n\n\n\n\n\n\n\n例\n\n\n\n\\(f(x) = 3x\\) は線形\n\\(f(x) = x^2\\) は \\(f(1{+}1) = 4 \\neq f(1) + f(1) = 2\\) で非線形"
+  },
+  {
+    "objectID": "linear-regression.html#peek-l1-lasso",
+    "href": "linear-regression.html#peek-l1-lasso",
+    "title": "線形回帰と正則化",
+    "section": "L1正則化（ラッソ回帰）",
+    "text": "L1正則化（ラッソ回帰）\n\n\\[L = \\mathrm{MSE} + \\lambda \\sum_j |w_j|\\]\n\n\\(\\lambda \\sum_j |w_j|\\) の形のペナルティ：L1正則化（L1 regularization）\nL1正則化を加えた線形回帰：ラッソ回帰（Lasso regression）\n\nモデルは線形回帰のままで、変わるのは損失だけ\n\n\\(|w_j|\\) は ひし形＝微分できない\n\n滑らかな損失を前提にした勾配降下法は、そのままでは使えない\n\n（参考）scikit-learn では座標降下法（coordinate descent） を使用"
+  },
+  {
+    "objectID": "linear-regression.html#peek-ridge-lasso-coef",
+    "href": "linear-regression.html#peek-ridge-lasso-coef",
+    "title": "線形回帰と正則化",
+    "section": "リッジ回帰とラッソ回帰の係数を比べる",
+    "text": "リッジ回帰とラッソ回帰の係数を比べる\n\n\n次数9の特徴量を、どちらも \\(\\lambda = 0.1\\) で学習する\n\n\nfrom sklearn.linear_model import Ridge, Lasso\n\nlam = 0.1\n# scikit-learn の alpha は、式の λ と倍率が違う\nridge = Ridge(alpha=len(tt) * lam).fit(P_train, tt)   # alpha = Nλ\nlasso = Lasso(alpha=lam / 2).fit(P_train, tt)         # alpha = λ/2\n\nprint(\"ridge:\", np.round(ridge.coef_, 3))\nprint(\"lasso:\", np.round(lasso.coef_, 3))\n\nridge: [ 0.218  0.192  0.165  0.138  0.109  0.081  0.052  0.022 -0.007]\nlasso: [0.939 0.    0.    0.    0.    0.    0.    0.    0.   ]\n\n\n\n\n（参考）座標降下法で自作する場合\ndef coordinate_descent(penalty, lam):\n    coef = np.zeros(9)\n    for sweep in range(1000):\n        for j in range(9):            # 他の係数を固定して、w_j を最適な値にする\n            coef[j] = 0.0\n            rho = np.mean((tt - P_train @ coef) * P_train[:, j])\n            if penalty == \"ridge\":\n                coef[j] = rho / (1 + lam)\n            else:                     # |rho| が λ/2 以下なら、ちょうど 0\n                coef[j] = np.sign(rho) * max(abs(rho) - lam / 2, 0)\n    return coef\n\nprint(\"ridge:\", np.round(coordinate_descent(\"ridge\", lam), 3))\nprint(\"lasso:\", np.round(coordinate_descent(\"lasso\", lam), 3))\n\n\nridge: [ 0.218  0.192  0.165  0.138  0.109  0.081  0.052  0.022 -0.007]\nlasso: [0.939 0.    0.    0.    0.    0.    0.    0.    0.   ]\n\n\n\n\n描画コード\nfig, axes = plt.subplots(1, 2, figsize=(9.5, 3.4), sharey=True)\nfor ax, model, name in [(axes[0], ridge, \"リッジ回帰（L2）\"),\n                        (axes[1], lasso, \"ラッソ回帰（L1）\")]:\n    pred_g = model.predict(P_test) * t_std + t_mean   # 元の単位（g）に戻す\n    ax.bar(range(1, 10), model.coef_, color=\"#2980b9\", width=0.7)\n    ax.axhline(0, color=\"gray\", lw=0.8)\n    ax.set_xticks(range(1, 10))\n    ax.set_xlabel(\"$x$ の次数\")\n    ax.set_title(f\"{name}\\nテストMSE {np.mean((pred_g - t_test) ** 2):,.0f}\", fontsize=10)\naxes[0].set_ylabel(\"係数\")\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\nラッソ回帰は \\(x\\) の項だけを残し、ほかの係数がちょうど 0\n\n係数が 0 の特徴量は、予測に使われない：特徴量選択（feature selection）\nよく似た特徴量（\\(x, x^2, \\ldots\\)）からは、1つだけが残る\n\nリッジ回帰の係数は小さくなるが、0 にはならない"
+  },
+  {
+    "objectID": "linear-regression.html#peek-lasso-zero",
+    "href": "linear-regression.html#peek-lasso-zero",
+    "title": "線形回帰と正則化",
+    "section": "ラッソ回帰で係数がちょうど 0 になる理由",
+    "text": "ラッソ回帰で係数がちょうど 0 になる理由\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nノート\n\n\n\nリッジ回帰：\\(w\\) が 0 に近づくと、ペナルティの傾きも 0 に近づく\n\n0 へ引く力が弱まり、0 の手前で MSE の傾きとつり合う\n\nラッソ回帰：ペナルティの傾きの大きさは、0 の直前まで \\(\\lambda\\) のまま\n\n\\(w = 0\\) での MSE の傾きの大きさが \\(\\lambda\\) 以下の係数は、0 で止まる"
+  },
+  {
+    "objectID": "linear-regression.html#リッジ回帰とラッソ回帰の違い",
+    "href": "linear-regression.html#リッジ回帰とラッソ回帰の違い",
+    "title": "線形回帰と正則化",
+    "section": "リッジ回帰とラッソ回帰の違い",
+    "text": "リッジ回帰とラッソ回帰の違い\n\n\n\n\n\n\n\n\n\n\nリッジ回帰\nラッソ回帰\n\n\n\n\nペナルティ\nL2：\\(\\lambda \\sum_j w_j^2\\)\nL1：\\(\\lambda \\sum_j \\lvert w_j \\rvert\\)\n\n\n係数\n全体を小さくする\n一部をちょうど 0 にする\n\n\n使いどころ\n予測を安定させたい\n使う特徴量を絞りたい（測る項目を減らす）\n\n\n\n\nどちらが良いかはデータごとに違うので、交差検証で選ぶ"
+  },
+  {
+    "objectID": "linear-regression.html#peek-coef-plane",
+    "href": "linear-regression.html#peek-coef-plane",
+    "title": "線形回帰と正則化",
+    "section": "係数の平面に誤差とペナルティを描く",
+    "text": "係数の平面に誤差とペナルティを描く\n\n\nアヤメ150本：萼片の長さと花弁の幅から、花弁の長さを予測（すべて標準化）\n横軸・縦軸は係数 \\(w_1\\)（萼片の長さ）・\\(w_2\\)（花弁の幅）\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nノート\n\n\n\n緑の楕円：MSE が同じ値になる \\((w_1, w_2)\\) を結んだ等高線\n\n中心（×）が正則化なしの解で、外側ほど MSE が大きい\n予測が \\(w\\) について線形なので MSE は \\(w\\) の2次式になり、等高線は楕円\n\n塗った範囲：ペナルティが一定値 \\(c\\) 以下になる \\((w_1, w_2)\\)\n\nL2ノルム（L2 norm）\\(\\|w\\|_2 = \\sqrt{w_1^2 + w_2^2}\\) が \\(c\\) 以下：円\nL1ノルム（L1 norm）\\(\\|w\\|_1 = |w_1| + |w_2|\\) が \\(c\\) 以下：ひし形\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n中心から楕円を広げ、範囲に最初に触れた点（○）が解\n\n\\(\\mathrm{MSE} + \\lambda \\times\\) ペナルティの解は、ある \\(c\\) の範囲の中で MSE が最小の点と同じ\n\\(\\lambda\\) を大きくするほど、\\(c\\) は小さくなる\n\n円（リッジ回帰）：角がないので、接点はふつう両方の係数が 0 でない点\nひし形（ラッソ回帰）：楕円は角で触れやすく、角では片方の係数がちょうど 0\n\n角はどれも、灰色の線（\\(w_1 = 0\\) か \\(w_2 = 0\\)）の上\n係数が 0 の特徴量は、予測に使われない：特徴量選択（feature selection）"
+  },
+  {
+    "objectID": "linear-regression.html#peek-coef-plane-answer",
+    "href": "linear-regression.html#peek-coef-plane-answer",
+    "title": "線形回帰と正則化",
+    "section": "範囲の中で MSE が最小の点が解",
+    "text": "範囲の中で MSE が最小の点が解\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n答え\n\n\n\n楕円が範囲に最初に触れた点（○）が解\n\n\\(\\mathrm{MSE} + \\lambda \\times\\) ペナルティの解は、ある \\(c\\) の範囲の中で MSE が最小の点と同じ\n\\(\\lambda\\) を大きくするほど、\\(c\\) は小さくなる\n\n円（リッジ回帰）：角がないので、接点はふつう軸から外れ、両方の係数が残る\nひし形（ラッソ回帰）：角が軸の上にあるので角で触れやすく、そのとき片方の係数がちょうど 0\n\n係数が 0 の特徴量は、予測に使われない：特徴量選択（feature selection）\n相関の強い特徴量からは、1つだけが残りやすい（ここでは花弁の幅だけ）"
   }
 ]

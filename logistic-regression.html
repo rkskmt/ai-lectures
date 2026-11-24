@@ -258,7 +258,7 @@
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
   <script src="network-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="099db4b2698240252a6be12fc0b4746c47061f3b">
+  <meta name="qmd-web-source" content="453b61df0ee873ff273202ae8b0f4aba95ed0226">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -308,7 +308,7 @@ rkskmt
 <section id="分類問題で出てきた閾値の縦線" class="slide level2">
 <h2>分類問題で出てきた閾値の縦線</h2>
 <div class="slide-body">
-<div id="82469019" class="cell fig-medium" data-execution_count="1">
+<div id="385c205e" class="cell fig-medium" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -340,7 +340,7 @@ rkskmt
 <section id="このような直線を求めたい" class="slide level2">
 <h2>このような直線を求めたい</h2>
 <div class="slide-body">
-<div id="4a37a97e" class="cell fig-medium" data-execution_count="2">
+<div id="fe83356a" class="cell fig-medium" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -379,7 +379,7 @@ rkskmt
 <section id="注意決定境界は回帰直線ではない" class="slide level2">
 <h2>【注意】決定境界は回帰直線ではない</h2>
 <div class="slide-body">
-<div id="af90530a" class="cell" data-execution_count="3">
+<div id="e5412815" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -444,10 +444,7 @@ rkskmt
 <div class="callout-content">
 <ul>
 <li>予測する値が 0/1 のラベルではなく、「Salmon である<strong>確率</strong>」という連続値だから</li>
-<li>確率を数値として回帰し、最後に閾値 0.5 で分類する
-<ul>
-<li>ただし、この説明は苦しく、歴史的経緯で回帰と呼ばれているとしか言いようがない</li>
-</ul></li>
+<li>確率を数値として回帰し、最後に閾値 0.5 で分類する</li>
 </ul>
 </div>
 </div>
@@ -484,7 +481,7 @@ rkskmt
 <li><span class="math inline">\(z\)</span> の<strong>符号</strong>：線の上か下か</li>
 <li><span class="math inline">\(z\)</span> の<strong>大きさ</strong>：線からの遠さ</li>
 </ul>
-<div id="bf74bea0" class="cell fig-small" data-execution_count="4">
+<div id="fbb5cf25" class="cell fig-small" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -523,7 +520,7 @@ rkskmt
 </ul>
 <p><span class="math display">\[p = \sigma(w_1 x_1 + w_2 x_2 + b)
 = \frac{1}{1 + e^{-(w_1 x_1 + w_2 x_2 + b)}}\]</span></p>
-<div id="2d9f4662" class="cell" data-execution_count="5">
+<div id="f103d3ef" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -780,7 +777,7 @@ rkskmt
 <section id="peek-neglog" class="slide level2">
 <h2>−log の形</h2>
 <div class="slide-body">
-<div id="4e71ef67" class="cell" data-execution_count="6">
+<div id="bd500f48" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -970,7 +967,7 @@ b \leftarrow b-\alpha(p-y)\]</span></p>
 <section id="peek-forward" class="slide level2">
 <h2>実装</h2>
 <div class="slide-body">
-<div id="fdd354cb" class="cell" data-execution_count="7">
+<div id="d58b4d0d" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>魚データの定義（クリックして展開）</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -1009,7 +1006,7 @@ b \leftarrow b-\alpha(p-y)\]</span></p>
 <span id="cb2-34"><a aria-label="34"></a>y      <span class="op">=</span> y[order]</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="121673fd" class="cell" data-execution_count="8">
+<div id="93ba851c" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a aria-label="1"></a><span class="kw">def</span> sigmoid(z):</span>
 <span id="cb3-2"><a aria-label="2"></a>    <span class="cf">return</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>z))</span>
 <span id="cb3-3"><a aria-label="3"></a></span>
@@ -1072,7 +1069,7 @@ b \leftarrow b-\alpha(p-y)\]</span></p>
 <li>全魚の平均損失 <span class="math inline">\(L\)</span> は更新に使わない</li>
 </ul></li>
 </ul>
-<div id="cf7bfa34" class="cell" data-execution_count="9">
+<div id="6b073c4f" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a aria-label="1"></a>w <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">0.0</span>])   <span class="co"># Weights start at zero</span></span>
 <span id="cb4-2"><a aria-label="2"></a>b  <span class="op">=</span> <span class="fl">0.0</span></span>
 <span id="cb4-3"><a aria-label="3"></a>lr <span class="op">=</span> <span class="fl">0.5</span>                       <span class="co"># 学習率</span></span>
@@ -1145,7 +1142,7 @@ b \leftarrow b-\alpha(p-y)\]</span></p>
 <section id="境界が動く様子を見る" class="slide level2">
 <h2>境界が動く様子を見る</h2>
 <div class="slide-body">
-<div id="712033d7" class="cell" data-execution_count="10">
+<div id="ec4bf54f" class="cell" data-execution_count="10">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1235,7 +1232,7 @@ b \leftarrow b-\alpha(p-y)\]</span></p>
 <section id="z-を高さとして見る" class="slide level2">
 <h2><span class="math inline">\(z\)</span> を高さとして見る</h2>
 <div class="slide-body">
-<div id="7426441b" class="cell" data-execution_count="11">
+<div id="2e1ca113" class="cell" data-execution_count="11">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1399,7 +1396,7 @@ b \leftarrow b-\alpha(p-y)\]</span></p>
 </div>
 </div>
 </section>
-<section id="線形性linearity斉次性と加法性を満たすこと" class="slide level2">
+<section id="peek-linearity" class="slide level2">
 <h2>線形性（<span class="en">Linearity</span>）：斉次性と加法性を満たすこと</h2>
 <div class="slide-body">
 <ul>
@@ -1729,32 +1726,44 @@ b \leftarrow b-\alpha(p-y)\]</span></p>
 <li><span class="math inline">\(f(0)=0\)</span> を満たしても線形とは限らない</li>
 </ul></li>
 <li><ol start="4" type="a">
-<li><span class="math inline">\(f(u+v)=2(u_1+v_1)-(u_2+v_2)=f(u)+f(v)\)</span>：成立するので<strong>線形</strong></li>
-</ol></li>
+<li><span class="math inline">\(f(u+v)=2(u_1+v_1)-(u_2+v_2)=f(u)+f(v)\)</span>：成立</li>
+</ol>
+<ul>
+<li>斉次性も <span class="math inline">\(f(cu) = 2cu_1 - cu_2 = c f(u)\)</span> で成立するので<strong>線形</strong></li>
+</ul></li>
 </ul>
 </div>
 </div>
 </div>
 <h3 id="コードで確認">コードで確認</h3>
-<div id="08a3804b" class="cell" data-execution_count="12">
+<div id="b653cbf3" class="cell" data-execution_count="12">
 <details class="code-fold">
 <summary>解答例を見る</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a aria-label="1"></a>funcs <span class="op">=</span> {</span>
-<span id="cb6-2"><a aria-label="2"></a>    <span class="st">"(a) 5x"</span>:     <span class="kw">lambda</span> x: <span class="dv">5</span> <span class="op">*</span> x,</span>
-<span id="cb6-3"><a aria-label="3"></a>    <span class="st">"(b) 3x + 2"</span>: <span class="kw">lambda</span> x: <span class="dv">3</span> <span class="op">*</span> x <span class="op">+</span> <span class="dv">2</span>,</span>
-<span id="cb6-4"><a aria-label="4"></a>    <span class="st">"(c) x^2"</span>:    <span class="kw">lambda</span> x: x <span class="op">**</span> <span class="dv">2</span>,</span>
-<span id="cb6-5"><a aria-label="5"></a>}</span>
-<span id="cb6-6"><a aria-label="6"></a><span class="cf">for</span> name, f <span class="kw">in</span> funcs.items():</span>
-<span id="cb6-7"><a aria-label="7"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">:12s}</span><span class="ss"> f(0)=</span><span class="sc">{</span>f(<span class="dv">0</span>)<span class="sc">:3d}</span><span class="ss"> | f(1+2)=</span><span class="sc">{</span>f(<span class="dv">3</span>)<span class="sc">:3d}</span><span class="ss"> vs f(1)+f(2)=</span><span class="sc">{</span>f(<span class="dv">1</span>) <span class="op">+</span> f(<span class="dv">2</span>)<span class="sc">:3d}</span><span class="ss">"</span>)</span>
-<span id="cb6-8"><a aria-label="8"></a></span>
-<span id="cb6-9"><a aria-label="9"></a>g <span class="op">=</span> <span class="kw">lambda</span> x1, x2: <span class="dv">2</span> <span class="op">*</span> x1 <span class="op">-</span> x2</span>
-<span id="cb6-10"><a aria-label="10"></a><span class="bu">print</span>(<span class="ss">f"(d) 2x1-x2   f(0,0)=</span><span class="sc">{</span>g(<span class="dv">0</span>, <span class="dv">0</span>)<span class="sc">}</span><span class="ss"> | f(1+3, 2+1)=</span><span class="sc">{</span>g(<span class="dv">4</span>, <span class="dv">3</span>)<span class="sc">}</span><span class="ss"> vs f(1,2)+f(3,1)=</span><span class="sc">{</span>g(<span class="dv">1</span>, <span class="dv">2</span>) <span class="op">+</span> g(<span class="dv">3</span>, <span class="dv">1</span>)<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a aria-label="1"></a><span class="kw">def</span> f_a(x):</span>
+<span id="cb6-2"><a aria-label="2"></a>    <span class="cf">return</span> <span class="dv">5</span> <span class="op">*</span> x</span>
+<span id="cb6-3"><a aria-label="3"></a></span>
+<span id="cb6-4"><a aria-label="4"></a><span class="kw">def</span> f_b(x):</span>
+<span id="cb6-5"><a aria-label="5"></a>    <span class="cf">return</span> <span class="dv">3</span> <span class="op">*</span> x <span class="op">+</span> <span class="dv">2</span></span>
+<span id="cb6-6"><a aria-label="6"></a></span>
+<span id="cb6-7"><a aria-label="7"></a><span class="kw">def</span> f_c(x):</span>
+<span id="cb6-8"><a aria-label="8"></a>    <span class="cf">return</span> x <span class="op">**</span> <span class="dv">2</span></span>
+<span id="cb6-9"><a aria-label="9"></a></span>
+<span id="cb6-10"><a aria-label="10"></a><span class="kw">def</span> f_d(x1, x2):</span>
+<span id="cb6-11"><a aria-label="11"></a>    <span class="cf">return</span> <span class="dv">2</span> <span class="op">*</span> x1 <span class="op">-</span> x2</span>
+<span id="cb6-12"><a aria-label="12"></a></span>
+<span id="cb6-13"><a aria-label="13"></a><span class="co"># u = 1, v = 2</span></span>
+<span id="cb6-14"><a aria-label="14"></a><span class="bu">print</span>(<span class="st">"(a) f(0) ="</span>, f_a(<span class="dv">0</span>), <span class="st">"| f(1+2) ="</span>, f_a(<span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span>), <span class="st">"| f(1)+f(2) ="</span>, f_a(<span class="dv">1</span>) <span class="op">+</span> f_a(<span class="dv">2</span>))</span>
+<span id="cb6-15"><a aria-label="15"></a><span class="bu">print</span>(<span class="st">"(b) f(0) ="</span>, f_b(<span class="dv">0</span>), <span class="st">"| f(1+2) ="</span>, f_b(<span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span>), <span class="st">"| f(1)+f(2) ="</span>, f_b(<span class="dv">1</span>) <span class="op">+</span> f_b(<span class="dv">2</span>))</span>
+<span id="cb6-16"><a aria-label="16"></a><span class="bu">print</span>(<span class="st">"(c) f(0) ="</span>, f_c(<span class="dv">0</span>), <span class="st">"| f(1+2) ="</span>, f_c(<span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span>), <span class="st">"| f(1)+f(2) ="</span>, f_c(<span class="dv">1</span>) <span class="op">+</span> f_c(<span class="dv">2</span>))</span>
+<span id="cb6-17"><a aria-label="17"></a><span class="co"># u = (1, 2), v = (3, 1)</span></span>
+<span id="cb6-18"><a aria-label="18"></a><span class="bu">print</span>(<span class="st">"(d) f(0,0) ="</span>, f_d(<span class="dv">0</span>, <span class="dv">0</span>), <span class="st">"| f(1+3, 2+1) ="</span>, f_d(<span class="dv">1</span> <span class="op">+</span> <span class="dv">3</span>, <span class="dv">2</span> <span class="op">+</span> <span class="dv">1</span>),</span>
+<span id="cb6-19"><a aria-label="19"></a>      <span class="st">"| f(1,2)+f(3,1) ="</span>, f_d(<span class="dv">1</span>, <span class="dv">2</span>) <span class="op">+</span> f_d(<span class="dv">3</span>, <span class="dv">1</span>))</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>(a) 5x       f(0)=  0 | f(1+2)= 15 vs f(1)+f(2)= 15
-(b) 3x + 2   f(0)=  2 | f(1+2)= 11 vs f(1)+f(2)= 13
-(c) x^2      f(0)=  0 | f(1+2)=  9 vs f(1)+f(2)=  5
-(d) 2x1-x2   f(0,0)=0 | f(1+3, 2+1)=5 vs f(1,2)+f(3,1)=5</code></pre>
+<pre><code>(a) f(0) = 0 | f(1+2) = 15 | f(1)+f(2) = 15
+(b) f(0) = 2 | f(1+2) = 11 | f(1)+f(2) = 13
+(c) f(0) = 0 | f(1+2) = 9 | f(1)+f(2) = 5
+(d) f(0,0) = 0 | f(1+3, 2+1) = 5 | f(1,2)+f(3,1) = 5</code></pre>
 </div>
 </div>
 <div title="結果">
@@ -1802,7 +1811,7 @@ b \leftarrow b-\alpha(p-y)\]</span></p>
 </div>
 </div>
 <h3 id="コードで確認-1">コードで確認</h3>
-<div id="96a40057" class="cell" data-execution_count="13">
+<div id="db828a36" class="cell" data-execution_count="13">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -1858,7 +1867,7 @@ b \leftarrow b-\alpha(p-y)\]</span></p>
 <li><span class="math inline">\(\log a=1\)</span> になる特別な底が <span class="math inline">\(e\approx2.718\)</span></li>
 </ul>
 <p><span class="math display">\[\frac{d}{dx}e^x=e^x\]</span></p>
-<div id="d44e1b79" class="cell fig-small" data-execution_count="14">
+<div id="e12399b0" class="cell fig-small" data-execution_count="14">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
