@@ -97,6 +97,19 @@ $$L(a, b) = \frac{1}{N} \sum_{i} \left( \underbrace{a x_i + b}_{\text{予測}} -
 :::
 
 
+## 線形回帰（[Linear Regression]{.en}） {#peek-linear-regression}
+
+- 予測が[**パラメータについて線形**](logistic-regression.qmd#peek-linearity){.peek}な回帰
+   - $ax + b$ は $a, b$ について線形
+- 線形なので、予測は $a, b$ で微分できる
+
+$$\frac{\partial}{\partial a}(ax + b) = x \qquad \frac{\partial}{\partial b}(ax + b) = 1$$
+
+::: {.takeaway}
+予測も MSE も微分できるので、損失が[滑らか](optimization-gradient-descent.qmd#peek-smooth-loss){.peek}になり、勾配降下法が使える
+:::
+
+
 ## 勾配を計算する {#peek-mse-grad}
 
 $L$ を $a$ と $b$ でそれぞれ微分する（合成関数の微分）：
@@ -231,6 +244,22 @@ print(f"np.polyfit      : a={a_exact:.4f}, b={b_exact:.4f}")
 
 ::: {.takeaway}
 どのモデルを使うかは人間が選ぶ
+:::
+
+
+## 2次式も線形回帰 {#peek-quadratic-linear}
+
+$$\text{予測} = a x^2 + b x + c$$
+
+- $x$ について線形ではない（グラフは**曲線**）
+- 学習で動かす $a, b, c$ について[**線形**](logistic-regression.qmd#peek-linearity){.peek}
+   - $x$ はデータなので、学習中は定数
+   - 例：$x = 2$ なら、予測は $4a + 2b + c$
+
+$$\frac{\partial\, \text{予測}}{\partial a} = x^2 \qquad \frac{\partial\, \text{予測}}{\partial b} = x \qquad \frac{\partial\, \text{予測}}{\partial c} = 1$$
+
+::: {.takeaway}
+線形回帰の「線形」は、$x$ ではなくパラメータについての線形性
 :::
 
 
