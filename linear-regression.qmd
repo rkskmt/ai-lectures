@@ -496,6 +496,116 @@ plt.show()
 :::
 
 
+## L1正則化とラッソ回帰 {#peek-l1-lasso}
+
+$$L = \mathrm{MSE} + \lambda \sum_j |w_j|$$
+
+- $\lambda \sum_j |w_j|$ の形のペナルティ：**L1正則化**（[L1 regularization]{.en}）
+- L1正則化を加えた線形回帰：**ラッソ回帰**（[Lasso regression]{.en}）
+   - モデルは線形回帰のままで、変わるのは損失だけ
+- $|w_j|$ は 0 で折れていて微分できない
+   - [滑らかな損失](optimization-gradient-descent.qmd#peek-smooth-loss){.peek}を前提にした勾配降下法は、そのままでは使えない
+   - scikit-learn は**座標降下法（[coordinate descent]{.en}）**で解く
+
+::: {.callout-important title="質問"}
+同じ $\lambda$ で、[リッジ回帰](#peek-l2-ridge){.peek}とラッソ回帰の係数はどう違う？
+:::
+
+
+## リッジ回帰とラッソ回帰の係数を比べる {#peek-ridge-lasso-coef}
+
+- [次数9の特徴量](#peek-ridge-code){.peek}を、どちらも $\lambda = 0.1$ で学習する
+
+```{python}
+#| echo: true
+from sklearn.linear_model import Ridge, Lasso
+
+lam = 0.1
+# scikit-learn の alpha は、式の λ と倍率が違う
+ridge = Ridge(alpha=len(tt) * lam).fit(P_train, tt)   # alpha = Nλ
+lasso = Lasso(alpha=lam / 2).fit(P_train, tt)         # alpha = λ/2
+
+print("ridge:", np.round(ridge.coef_, 3))
+print("lasso:", np.round(lasso.coef_, 3))
+```
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "描画コード"
+#| fig-align: center
+fig, axes = plt.subplots(1, 2, figsize=(9.5, 3.4), sharey=True)
+for ax, model, name in [(axes[0], ridge, "リッジ回帰（L2）"),
+                        (axes[1], lasso, "ラッソ回帰（L1）")]:
+    pred_g = model.predict(P_test) * t_std + t_mean   # 元の単位（g）に戻す
+    ax.bar(range(1, 10), model.coef_, color="#2980b9", width=0.7)
+    ax.axhline(0, color="gray", lw=0.8)
+    ax.set_xticks(range(1, 10))
+    ax.set_xlabel("$x$ の次数")
+    ax.set_title(f"{name}\nテストMSE {np.mean((pred_g - t_test) ** 2):,.0f}", fontsize=10)
+axes[0].set_ylabel("係数")
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-note title="結果"}
+- ラッソ回帰は $x$ の項だけを残し、ほかの係数が**ちょうど 0**
+- リッジ回帰の係数は小さくなるが、0 にはならない
+:::
+
+
+## ラッソ回帰で係数がちょうど 0 になる理由 {#peek-lasso-zero}
+
+```{python}
+#| echo: false
+#| fig-align: center
+w_axis = np.linspace(-1.5, 1.5, 301)
+w_neg, w_pos = w_axis[w_axis < 0], w_axis[w_axis > 0]
+
+fig, axes = plt.subplots(1, 2, figsize=(9.5, 3.4))
+axes[0].plot(w_axis, w_axis ** 2, color="#2980b9", lw=2, label="リッジ回帰：$w^2$")
+axes[0].plot(w_axis, np.abs(w_axis), color="#d35400", lw=2, ls="--", label="ラッソ回帰：$|w|$")
+axes[0].set_title("ペナルティ（$\\lambda = 1$）", fontsize=11)
+axes[0].set_ylabel("ペナルティ")
+axes[0].legend(fontsize=9, loc="upper center")
+
+axes[1].plot(w_axis, 2 * w_axis, color="#2980b9", lw=2, label="リッジ回帰：$2w$")
+axes[1].plot(w_neg, -np.ones_like(w_neg), color="#d35400", lw=2, ls="--", label="ラッソ回帰：$\\pm 1$")
+axes[1].plot(w_pos, np.ones_like(w_pos), color="#d35400", lw=2, ls="--")
+axes[1].scatter([0, 0], [-1, 1], s=45, facecolors="white", edgecolors="#d35400", zorder=3)
+axes[1].axhline(0, color="gray", lw=0.8)
+axes[1].set_title("ペナルティの傾き（$\\lambda = 1$）", fontsize=11)
+axes[1].set_ylabel("傾き")
+axes[1].legend(fontsize=9, loc="upper left")
+
+for ax in axes:
+    ax.set_xlabel("係数 $w$")
+    ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-note}
+- リッジ回帰：$w$ が 0 に近づくと、ペナルティの傾きも 0 に近づく
+   - 0 へ引く力が弱まり、0 の手前で MSE の傾きとつり合う
+- ラッソ回帰：ペナルティの傾きの大きさは、0 の直前まで $\lambda$ のまま
+   - $w = 0$ での MSE の傾きの大きさが $\lambda$ 以下の係数は、0 で止まる
+:::
+
+
+## リッジ回帰とラッソ回帰の違い
+
+| | リッジ回帰 | ラッソ回帰 |
+|---|---|---|
+| ペナルティ | L2：$\lambda \sum_j w_j^2$ | L1：$\lambda \sum_j \lvert w_j \rvert$ |
+| 係数 | 全体を小さくする | 一部をちょうど 0 にする（**特徴量選択**、[feature selection]{.en}） |
+| 向くデータ | 多くの特徴量が少しずつ効く | 効く特徴量が少ない |
+
+::: {.takeaway}
+どちらが良いかはデータごとに違うので、[交差検証](classification-evaluation.qmd#peek-cv){.peek}で選ぶ
+:::
+
+
 ## まとめ
 
 - **回帰**：$t = f(x) + \varepsilon$ の $f$ をデータから推定する手法
@@ -504,6 +614,8 @@ plt.show()
 - **多項式回帰**：特徴量に $x^2, x^3, \ldots$ を足せば道具は線形回帰のまま
 - **過学習は回帰でも起きる**：次数を上げると訓練誤差は下がり、テスト誤差は桁違いに増える
 - **正則化（[regularization]{.en}）**：大きい係数にペナルティを与え、曲線の振れを抑える
+   - **リッジ回帰**（L2）：係数全体を小さくする
+   - **ラッソ回帰**（L1）：一部の係数をちょうど 0 にする
 
 
 ## 練習問題：2点のデータから直線を求める
