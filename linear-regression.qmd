@@ -582,6 +582,26 @@ print("lasso:", np.round(lasso.coef_, 3))
 ```{python}
 #| echo: true
 #| code-fold: true
+#| code-summary: "（参考）座標降下法で自作する場合"
+def coordinate_descent(penalty, lam):
+    coef = np.zeros(9)
+    for sweep in range(1000):
+        for j in range(9):            # 他の係数を固定して、w_j を最適な値にする
+            coef[j] = 0.0
+            rho = np.mean((tt - P_train @ coef) * P_train[:, j])
+            if penalty == "ridge":
+                coef[j] = rho / (1 + lam)
+            else:                     # |rho| が λ/2 以下なら、ちょうど 0
+                coef[j] = np.sign(rho) * max(abs(rho) - lam / 2, 0)
+    return coef
+
+print("ridge:", np.round(coordinate_descent("ridge", lam), 3))
+print("lasso:", np.round(coordinate_descent("lasso", lam), 3))
+```
+
+```{python}
+#| echo: true
+#| code-fold: true
 #| code-summary: "描画コード"
 #| fig-align: center
 fig, axes = plt.subplots(1, 2, figsize=(9.5, 3.4), sharey=True)
@@ -600,46 +620,111 @@ plt.show()
 
 ::: {.callout-note title="結果"}
 - ラッソ回帰は $x$ の項だけを残し、ほかの係数が**ちょうど 0**
+   - 係数が 0 の特徴量は、予測に使われない：**特徴量選択**（[feature selection]{.en}）
+   - よく似た特徴量（$x, x^2, \ldots$）からは、1つだけが残る
 - リッジ回帰の係数は小さくなるが、0 にはならない
 :::
 
 
-## ラッソ回帰で係数がちょうど 0 になる理由 {#peek-lasso-zero}
+## 係数の平面に誤差とペナルティを描く {#peek-coef-plane}
+
+- アヤメ150本：萼片の長さと花弁の幅から、花弁の長さを予測（すべて標準化）
+- 横軸・縦軸は係数 $w_1$（萼片の長さ）・$w_2$（花弁の幅）
 
 ```{python}
 #| echo: false
 #| fig-align: center
-w_axis = np.linspace(-1.5, 1.5, 301)
-w_neg, w_pos = w_axis[w_axis < 0], w_axis[w_axis > 0]
+from matplotlib.patches import Circle, Polygon
+from sklearn.datasets import load_iris
 
-fig, axes = plt.subplots(1, 2, figsize=(9.5, 3.4))
-axes[0].plot(w_axis, w_axis ** 2, color="#2980b9", lw=2, label="リッジ回帰：$w^2$")
-axes[0].plot(w_axis, np.abs(w_axis), color="#d35400", lw=2, ls="--", label="ラッソ回帰：$|w|$")
-axes[0].set_title("ペナルティ（$\\lambda = 1$）", fontsize=11)
-axes[0].set_ylabel("ペナルティ")
-axes[0].legend(fontsize=9, loc="upper center")
+iris_data = load_iris().data
+X2 = iris_data[:, [0, 3]]                      # sepal length, petal width
+y2 = iris_data[:, 2]                           # petal length
+X2 = (X2 - X2.mean(axis=0)) / X2.std(axis=0)
+y2 = (y2 - y2.mean()) / y2.std()
+H2, g2 = X2.T @ X2 / len(y2), X2.T @ y2 / len(y2)
+w_ols2 = np.linalg.solve(H2, g2)
 
-axes[1].plot(w_axis, 2 * w_axis, color="#2980b9", lw=2, label="リッジ回帰：$2w$")
-axes[1].plot(w_neg, -np.ones_like(w_neg), color="#d35400", lw=2, ls="--", label="ラッソ回帰：$\\pm 1$")
-axes[1].plot(w_pos, np.ones_like(w_pos), color="#d35400", lw=2, ls="--")
-axes[1].scatter([0, 0], [-1, 1], s=45, facecolors="white", edgecolors="#d35400", zorder=3)
-axes[1].axhline(0, color="gray", lw=0.8)
-axes[1].set_title("ペナルティの傾き（$\\lambda = 1$）", fontsize=11)
-axes[1].set_ylabel("傾き")
-axes[1].legend(fontsize=9, loc="upper left")
+# Both lambdas give regions of the same size (doc/measured-log.md).
+w_ridge2 = np.linalg.solve(H2 + 0.91716633715197 * np.eye(2), g2)
+w_lasso2 = np.zeros(2)
+for sweep in range(1000):
+    for j, k in ((0, 1), (1, 0)):
+        rho2 = g2[j] - H2[j, k] * w_lasso2[k]
+        w_lasso2[j] = np.sign(rho2) * max(abs(rho2) - 0.9699083425548454 / 2, 0)
 
-for ax in axes:
-    ax.set_xlabel("係数 $w$")
-    ax.grid(True, alpha=0.3)
-plt.tight_layout()
-plt.show()
+
+def mse2(w1, w2):
+    """MSE of the standardized fit; mean(y2**2) is 1."""
+    return (H2[0, 0] * w1 ** 2 + 2 * H2[0, 1] * w1 * w2 + H2[1, 1] * w2 ** 2
+            - 2 * (g2[0] * w1 + g2[1] * w2) + 1)
+
+
+def draw_coef_plane(reveal):
+    """Draw error contours over the L2 and L1 regions; mark the contact if reveal."""
+    W1, W2 = np.meshgrid(np.linspace(-0.75, 1.05, 400), np.linspace(-0.75, 1.15, 400))
+    fig, axes = plt.subplots(1, 2, figsize=(10, 4.8))
+    panels = [(axes[0], w_ridge2, np.linalg.norm(w_ridge2), "リッジ回帰：L2ノルム $\\leq c$（円）", "#2980b9"),
+              (axes[1], w_lasso2, np.abs(w_lasso2).sum(), "ラッソ回帰：L1ノルム $\\leq c$（ひし形）", "#d35400")]
+    for ax, w_sol, c, name, color in panels:
+        if color == "#2980b9":
+            region = Circle((0, 0), c, facecolor=color, alpha=0.25, edgecolor=color, lw=2)
+        else:
+            region = Polygon([(c, 0), (0, c), (-c, 0), (0, -c)], closed=True,
+                             facecolor=color, alpha=0.25, edgecolor=color, lw=2)
+        ax.add_patch(region)
+        base, contact = mse2(*w_ols2), mse2(*w_sol)
+        levels = base + (contact - base) * (np.arange(1, 9) / 4) ** 2   # 4th ring passes the solution
+        ax.contour(W1, W2, mse2(W1, W2), levels=levels, colors="#1e8449", linewidths=1)
+        ax.scatter(*w_ols2, marker="x", s=70, c="black", zorder=4)
+        ax.annotate("正則化なしの解", w_ols2, xytext=(8, 6), textcoords="offset points", fontsize=9)
+        if reveal:
+            ax.contour(W1, W2, mse2(W1, W2), levels=[contact], colors="#1e8449", linewidths=3)
+            ax.scatter(*w_sol, s=90, facecolors="white", edgecolors="black", lw=2, zorder=5)
+            ax.annotate(f"解 ({w_sol[0]:.2f}, {w_sol[1]:.2f})", w_sol, xytext=(10, -16),
+                        textcoords="offset points", fontsize=10, fontweight="bold")
+        ax.axhline(0, color="gray", lw=0.8)
+        ax.axvline(0, color="gray", lw=0.8)
+        ax.set_aspect("equal")
+        ax.set_xlim(-0.75, 1.05); ax.set_ylim(-0.75, 1.15)
+        ax.set_xlabel("$w_1$（萼片の長さ）")
+        ax.set_title(name, fontsize=11)
+    axes[0].set_ylabel("$w_2$（花弁の幅）")
+    plt.tight_layout()
+    plt.show()
+
+
+draw_coef_plane(reveal=False)
 ```
 
 ::: {.callout-note}
-- リッジ回帰：$w$ が 0 に近づくと、ペナルティの傾きも 0 に近づく
-   - 0 へ引く力が弱まり、0 の手前で MSE の傾きとつり合う
-- ラッソ回帰：ペナルティの傾きの大きさは、0 の直前まで $\lambda$ のまま
-   - $w = 0$ での MSE の傾きの大きさが $\lambda$ 以下の係数は、0 で止まる
+- 緑の楕円：MSE が同じ値になる $(w_1, w_2)$ を結んだ**等高線**
+   - 中心（×）が正則化なしの解で、外側ほど MSE が大きい
+   - 予測が $w$ について[線形](#peek-quadratic-linear){.peek}なので MSE は $w$ の2次式になり、等高線は楕円
+- 塗った範囲：ペナルティが一定値 $c$ 以下になる $(w_1, w_2)$
+   - **L2ノルム**（[L2 norm]{.en}）$\|w\|_2 = \sqrt{w_1^2 + w_2^2}$ が $c$ 以下：円
+   - **L1ノルム**（[L1 norm]{.en}）$\|w\|_1 = |w_1| + |w_2|$ が $c$ 以下：ひし形
+:::
+
+::: {.callout-important title="質問"}
+中心から楕円を広げていくと、塗った範囲に最初に触れるのはどこ？
+:::
+
+
+## 範囲の中で MSE が最小の点が解 {#peek-coef-plane-answer}
+
+```{python}
+#| echo: false
+#| fig-align: center
+draw_coef_plane(reveal=True)
+```
+
+::: {.callout-note title="答え"}
+- 楕円が範囲に最初に触れた点（○）が解
+   - $\mathrm{MSE} + \lambda \times$ ペナルティの解は、ある $c$ の範囲の中で MSE が最小の点と同じ
+   - $\lambda$ を大きくするほど、$c$ は小さくなる
+- 円（リッジ回帰）：角がないので、接点はふつう軸から外れ、両方の係数が残る
+- ひし形（ラッソ回帰）：角が軸の上にあるので角で触れやすく、そのとき片方の係数が**ちょうど 0**
 :::
 
 
@@ -648,8 +733,8 @@ plt.show()
 | | リッジ回帰 | ラッソ回帰 |
 |---|---|---|
 | ペナルティ | L2：$\lambda \sum_j w_j^2$ | L1：$\lambda \sum_j \lvert w_j \rvert$ |
-| 係数 | 全体を小さくする | 一部をちょうど 0 にする（**特徴量選択**、[feature selection]{.en}） |
-| 向くデータ | 多くの特徴量が少しずつ効く | 効く特徴量が少ない |
+| 係数 | 全体を小さくする | 一部をちょうど 0 にする |
+| 使いどころ | 予測を安定させたい | 使う特徴量を絞りたい（測る項目を減らす、効く特徴量を読む） |
 
 ::: {.takeaway}
 どちらが良いかはデータごとに違うので、[交差検証](classification-evaluation.qmd#peek-cv){.peek}で選ぶ
