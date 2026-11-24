@@ -258,7 +258,7 @@
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
   <script src="network-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="40ab32e3d34758c63024326e8636e329fd24bc3e">
+  <meta name="qmd-web-source" content="3e1e21b4e1a89f71825c6322688546f5f25760e0">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -316,7 +316,7 @@ rkskmt
 <li><a href="./classification-2d-boundaries.html#peek-diagonal" class="peek">ここまでの80匹</a>に、新しく測った<strong>40匹</strong>を加えた<strong>120匹</strong>で考える</li>
 <li>数が増えると、<strong>どちらとも言いにくい個体</strong>も混じってくる</li>
 </ul>
-<div id="65e12f44" class="cell" data-execution_count="1">
+<div id="70c182ae" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>新データ（ここをクリック）</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -363,7 +363,7 @@ rkskmt
 <section id="まずは可視化" class="slide level2">
 <h2>まずは可視化</h2>
 <div class="slide-body">
-<div id="6fdc9677" class="cell" data-execution_count="2">
+<div id="a6e0e5fe" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>（参考）描画コード</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -411,14 +411,10 @@ rkskmt
 <section id="適当に深さを決めて決定木で決定境界を作成" class="slide level2">
 <h2>適当に深さを決めて決定木で決定境界を作成</h2>
 <div class="slide-body">
-<div id="26e43f94" class="cell" data-execution_count="3">
-<div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="classification-evaluation_files/figure-revealjs/cell-4-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img data-src="classification-evaluation_files/figure-revealjs/cell-4-output-1.png" class="quarto-figure quarto-figure-center" width="1286" height="387"></a></p>
+<p><a href="frozen/classification-evaluation-frz-depth-boundaries-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img data-src="frozen/classification-evaluation-frz-depth-boundaries-1.png" class="quarto-figure quarto-figure-center"></a></p>
 </figure>
-</div>
-</div>
 </div>
 </div>
 </section>
@@ -479,14 +475,10 @@ rkskmt
 <li>ただし、決定木は深さを最大にすれば、学習データでの評価は最も高くなる</li>
 </ul></li>
 </ul>
-<div id="bcc90571" class="cell" data-execution_count="4">
-<div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="classification-evaluation_files/figure-revealjs/cell-5-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img data-src="classification-evaluation_files/figure-revealjs/cell-5-output-1.png" class="quarto-figure quarto-figure-center" width="686" height="408"></a></p>
+<p><a href="frozen/classification-evaluation-frz-full-depth-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img data-src="frozen/classification-evaluation-frz-full-depth-1.png" class="quarto-figure quarto-figure-center"></a></p>
 </figure>
-</div>
-</div>
 </div>
 </div>
 </section>
@@ -568,7 +560,7 @@ rkskmt
 </ul></li>
 <li><span class="en">hold out</span>：取っておく</li>
 </ul>
-<div id="dc4c359e" class="cell" data-execution_count="5">
+<div id="5a3ec670" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -602,7 +594,7 @@ rkskmt
 <li><code>X</code> と <code>y</code> は、Salmon 60匹のあとに Sea bass 60匹の順に並んでいる</li>
 <li>先頭の8割（96匹）を訓練データ、残りの2割（24匹）をテストデータにすると</li>
 </ul>
-<div id="d660b3c6" class="cell" data-execution_count="6">
+<div id="c7d44a23" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a aria-label="1"></a>y_train_head <span class="op">=</span> y[:<span class="dv">96</span>]   <span class="co"># 先頭96匹を訓練データに</span></span>
 <span id="cb3-2"><a aria-label="2"></a>y_test_tail <span class="op">=</span> y[<span class="dv">96</span>:]    <span class="co"># 残り24匹をテストデータに</span></span>
 <span id="cb3-3"><a aria-label="3"></a></span>
@@ -655,7 +647,7 @@ rkskmt
 <span id="cb5-14"><a aria-label="14"></a><span class="bu">print</span>(<span class="ss">f"テストデータ </span><span class="sc">{</span><span class="bu">len</span>(X_test)<span class="sc">}</span><span class="ss"> 匹"</span>)</span>
 <span id="cb5-15"><a aria-label="15"></a><span class="bu">print</span>(<span class="ss">f"テストデータの内訳: Salmon </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">sum</span>(y_test <span class="op">==</span> <span class="dv">1</span>)<span class="sc">}</span><span class="ss"> 匹, Sea bass </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">sum</span>(y_test <span class="op">==</span> <span class="dv">0</span>)<span class="sc">}</span><span class="ss"> 匹"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="33da7576" class="cell" data-execution_count="8">
+<div id="4b0f4f59" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-stdout">
 <pre><code>[0 1 2 3 4 5 6 7 8 9]
 [ 85  41  62  40 108 103  50   9  35  15]
@@ -867,7 +859,7 @@ rkskmt
 </ul></li>
 <li><span class="en">validation</span>：検証、正しいと確かめること</li>
 </ul>
-<div id="371845ab" class="cell" data-execution_count="10">
+<div id="90de154b" class="cell" data-execution_count="10">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -895,7 +887,7 @@ rkskmt
 <span id="cb8-7"><a aria-label="7"></a>    pred <span class="op">=</span> tree.fit(X_fit, y_fit).predict(X_val)   <span class="co"># fit の戻り値は学習済みモデルなので、続けて predict できる</span></span>
 <span id="cb8-8"><a aria-label="8"></a>    <span class="bu">print</span>(<span class="ss">f"split </span><span class="sc">{</span>i <span class="op">+</span> <span class="dv">1</span><span class="sc">}</span><span class="ss">  Precision: </span><span class="sc">{</span>precision_score(y_val, pred)<span class="sc">:.3f}</span><span class="ss">  Recall: </span><span class="sc">{</span>recall_score(y_val, pred)<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="f9bcb54f" class="cell" data-execution_count="12">
+<div id="a0fc4e51" class="cell" data-execution_count="12">
 <div class="cell-output cell-output-stdout">
 <pre><code>split 1  Precision: 0.778  Recall: 0.875
 split 2  Precision: 0.818  Recall: 0.818
@@ -939,7 +931,7 @@ split 5  Precision: 0.917  Recall: 1.000</code></pre>
 <li>k 個の成績の<strong>平均</strong>を最終スコアとする</li>
 <li><span class="en">cross-validation</span>：<span class="en">cross</span>＝交差、<span class="en">validation</span>＝検証</li>
 </ul>
-<div id="41f99a10" class="cell" data-execution_count="13">
+<div id="f6b44032" class="cell" data-execution_count="13">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -978,7 +970,7 @@ split 5  Precision: 0.917  Recall: 1.000</code></pre>
 <span id="cb10-17"><a aria-label="17"></a><span class="bu">print</span>(<span class="ss">f"平均 Precision: </span><span class="sc">{</span>np<span class="sc">.</span>mean(precisions)<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
 <span id="cb10-18"><a aria-label="18"></a><span class="bu">print</span>(<span class="ss">f"平均 Recall:    </span><span class="sc">{</span>np<span class="sc">.</span>mean(recalls)<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="1cb50291" class="cell" data-execution_count="15">
+<div id="0c67e60a" class="cell" data-execution_count="15">
 <div class="cell-output cell-output-stdout">
 <pre><code>group 0  Precision: 0.900  Recall: 0.818
 group 1  Precision: 0.833  Recall: 0.833
@@ -1036,7 +1028,7 @@ group 4  Precision: 0.778  Recall: 1.000
 <span id="cb12-17"><a aria-label="17"></a>best_depth <span class="op">=</span> sel_depths[<span class="bu">int</span>(np.argmax(cv_precisions))]   <span class="co"># 最大値の位置（0始まり）を深さ（1始まり）に直す</span></span>
 <span id="cb12-18"><a aria-label="18"></a><span class="bu">print</span>(<span class="ss">f"平均 Precision が最大の深さ: </span><span class="sc">{</span>best_depth<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="ecab9d79" class="cell" data-execution_count="17">
+<div id="e62f7d67" class="cell" data-execution_count="17">
 <div class="cell-output cell-output-stdout">
 <pre><code>平均 Precision が最大の深さ: 2</code></pre>
 </div>
@@ -1057,7 +1049,7 @@ group 4  Precision: 0.778  Recall: 1.000
 <span id="cb14-3"><a aria-label="3"></a>pred_test <span class="op">=</span> best_tree.predict(X_test)</span>
 <span id="cb14-4"><a aria-label="4"></a><span class="bu">print</span>(<span class="ss">f"Precision </span><span class="sc">{</span>precision_score(y_test, pred_test)<span class="sc">:.3f}</span><span class="ss">  Recall </span><span class="sc">{</span>recall_score(y_test, pred_test)<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="f8bcb55e" class="cell" data-execution_count="20">
+<div id="52c04762" class="cell" data-execution_count="20">
 <div class="cell-output cell-output-stdout">
 <pre><code>Precision 0.667  Recall 0.769</code></pre>
 </div>
@@ -1076,7 +1068,7 @@ group 4  Precision: 0.778  Recall: 1.000
 <span id="cb16-2"><a aria-label="2"></a>final_tree <span class="op">=</span> DecisionTreeClassifier(max_depth<span class="op">=</span>best_depth).fit(X, y)</span>
 <span id="cb16-3"><a aria-label="3"></a><span class="bu">print</span>(<span class="ss">f"深さ </span><span class="sc">{</span>best_depth<span class="sc">}</span><span class="ss">、</span><span class="sc">{</span><span class="bu">len</span>(y)<span class="sc">}</span><span class="ss"> 匹で学習"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="43c86c9a" class="cell" data-execution_count="22">
+<div id="c3b8ff69" class="cell" data-execution_count="22">
 <div class="cell-output cell-output-stdout">
 <pre><code>深さ 2、120 匹で学習</code></pre>
 </div>
@@ -1311,7 +1303,7 @@ group 4  Precision: 0.778  Recall: 1.000
 <span id="cb19-27"><a aria-label="27"></a><span class="bu">print</span>(<span class="ss">f"Precision で選んだ深さ（本編）: </span><span class="sc">{</span>best_depth<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="cd7a1f03" class="cell" data-execution_count="25">
+<div id="3c548a7d" class="cell" data-execution_count="25">
 <div class="cell-output cell-output-stdout">
 <pre><code>depth  1: mean Recall 0.768
 depth  2: mean Recall 0.752
@@ -1371,7 +1363,7 @@ Precision で選んだ深さ（本編）: 2</code></pre>
 <span id="cb21-5"><a aria-label="5"></a><span class="bu">print</span>(<span class="ss">f"訓練データ </span><span class="sc">{</span><span class="bu">len</span>(X_train)<span class="sc">}</span><span class="ss"> 匹"</span>)</span>
 <span id="cb21-6"><a aria-label="6"></a><span class="bu">print</span>(<span class="ss">f"テストデータ </span><span class="sc">{</span><span class="bu">len</span>(X_test)<span class="sc">}</span><span class="ss"> 匹: Salmon </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">sum</span>(y_test <span class="op">==</span> <span class="dv">1</span>)<span class="sc">}</span><span class="ss"> 匹, Sea bass </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">sum</span>(y_test <span class="op">==</span> <span class="dv">0</span>)<span class="sc">}</span><span class="ss"> 匹"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="b0e0d0b6" class="cell" data-execution_count="27">
+<div id="62b132f8" class="cell" data-execution_count="27">
 <div class="cell-output cell-output-stdout">
 <pre><code>訓練データ 96 匹
 テストデータ 24 匹: Salmon 15 匹, Sea bass 9 匹</code></pre>
@@ -1401,7 +1393,7 @@ Precision で選んだ深さ（本編）: 2</code></pre>
 <span id="cb23-5"><a aria-label="5"></a><span class="bu">print</span>(scores)</span>
 <span id="cb23-6"><a aria-label="6"></a><span class="bu">print</span>(<span class="ss">f"平均 Precision: </span><span class="sc">{</span>scores<span class="sc">.</span>mean()<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="469f4316" class="cell" data-execution_count="29">
+<div id="ac49f428" class="cell" data-execution_count="29">
 <div class="cell-output cell-output-stdout">
 <pre><code>[0.58333333 0.66666667 0.85714286 0.64285714 0.875     ]
 平均 Precision: 0.725</code></pre>
