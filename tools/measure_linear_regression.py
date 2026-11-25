@@ -1,17 +1,20 @@
-"""Measure ridge and lasso for linear-regression.qmd.
+"""Measure the polynomial and regularization part of linear-regression.qmd.
 
-Part 1 uses the deck's degree-9 features. It solves both penalties to
-convergence with scikit-learn and checks two things the deck shows students:
-the hand-written coordinate descent, and the scikit-learn settings.
+From the slide "次数を上げてみる" on, the deck uses one data set of body
+length (cm) and weight (g), separate from the fish of the first half.
 
-Part 2 screens two-feature datasets for the contour figure, which needs a
-tilted error ellipse, a lasso solution on a corner of the L1 region, and a
-ridge solution that keeps both coefficients at the same norm.
+Part 1 picks that data set. Points are drawn around the line t = x and
+shown as length = 20 x cm and weight = 1000 t g; scaling leaves every
+standardized feature and target unchanged. The set must serve two figures:
+the degree-9 fit that passes every training point and swings between them,
+tamed by the L2 penalty, and the x, x^2 fit on the coefficient plane, whose
+unpenalized parabola bends visibly and whose coefficients run far out.
 
-Part 3 picks a small synthetic data set for the ridge figure on the
-coefficient plane: with only x and x^2 as features, the unpenalized fit must
-bend visibly and its coefficients must run far from the origin, while the
-error ellipse stays wide enough to read.
+Part 2 measures every number and claim the slides show on that data, with
+the same code as the deck: exact fits by np.polyfit on standardized length,
+and the hand-written gradient descent with the penalty.
+
+Part 3 screens two-feature data sets for the circle and diamond figure.
 
 Usage:
     python tools/measure_linear_regression.py --out results.json
@@ -23,23 +26,30 @@ import warnings
 
 import numpy as np
 from sklearn.datasets import load_iris
-from sklearn.exceptions import ConvergenceWarning
-from sklearn.linear_model import Lasso, Ridge
 
-LENGTHS = np.array([55.2, 56.0, 51.8, 58.1, 56.8, 51.5, 56.6, 51.6, 61.0, 52.0,
-                    58.5, 50.5, 55.5, 48.7, 46.6])
-WEIGHTS = np.array([1884, 1978, 1483, 2181, 2028, 1476, 2094, 1563, 2474, 1414,
-                    2230, 1445, 1838, 1370, 1096], dtype=float)
-N_TRAIN = 10
+# Part 1: data for the polynomial part.
+POLY_NOISE = 0.35
+POLY_N_TRAIN = 10
+POLY_TEST_X = np.round(np.linspace(0.9, 3.1, 6), 1)
+POLY_SEEDS = 20_000
+POLY_CHOSEN_SEED = 16310    # picked by eye among the candidates, see doc/measured-log.md
+CM_PER_X, G_PER_X = 20, 1000
+# Screening conditions; bends are in units of x (1 = 20 cm, 1000 g).
+MIN_BEND_X2 = 0.5           # x, x^2 fit without penalty: largest gap from a line
+MIN_RUNAWAY = 3.0           # |w(lambda=0)| / |w(lambda=0.1)| for x, x^2
+MAX_AXIS_RATIO = 30.0       # long / short axis of the x, x^2 error ellipse
+MAX_TEST_RATIO_X2 = 0.5     # x, x^2 test MSE with the penalty / without
+MIN_BLOWUP_DEG9 = 100.0     # degree-9 exact test MSE / degree-1 test MSE
+MAX_RIDGE9_VS_DEG1 = 2.0    # degree-9 ridge test MSE / degree-1 test MSE
+MAX_WIGGLE_RIDGE9 = 0.5     # degree-9 ridge curve: largest gap from a line
+
+# Part 2: the deck's settings.
 DEGREE = 9
 LR = 0.01
 N_UPDATES = 10_000
-LAMBDAS = [0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3]
-STUDENT_MAX_ITER = 100_000
-CD_SWEEPS = 1000
-# Values already logged in doc/measured-log.md for the deck's ridge run.
-LOGGED_RIDGE_TRAIN_MSE = 3585
-LOGGED_RIDGE_TEST_MSE = 3427
+GD_LAMBDAS = [0.0, 0.1, 10.0]
+PLANE_LAMBDAS = [0.0, 0.01, 0.1, 1.0]
+GRID = np.linspace(15, 65, 300)   # the deck's drawing grid in cm
 
 # The 80 fish of dimensionality-pca.qmd: 40 salmon, then 40 sea bass.
 FISH_WEIGHTS = np.array([
@@ -70,140 +80,178 @@ FISH_LENGTHS = np.array([
     52.9, 50.5, 51.7, 48.5, 50.8, 52.5, 48.2, 51.8, 50.8, 50.5,
     48.7, 54.2, 50.5, 49.3, 53.4, 49.1, 51.5, 46.6, 48.7, 51.6])
 
-# Screening for the contour figure.
+# Part 3: screening for the circle and diamond figure.
 NORM_FRACTIONS = [0.5, 0.6, 0.7, 0.8, 0.9]
 MIN_ABS_CORR, MAX_ABS_CORR = 0.2, 0.85
 MIN_COEF_RATIO = 0.25
 BISECTION_STEPS = 60
 
-# Synthetic data for the ridge figure: noisy points around t = x.
-SYN_NOISE = 0.25
-SYN_N_TEST = 8
-SYN_N_TRAIN = [5, 6]
-SYN_SEEDS = 4000
-SYN_LAMBDA = 0.1
-SYN_MIN_RUNAWAY = 3.0       # |w_ols| / |w_ridge|
-SYN_MAX_AXIS_RATIO = 15.0   # long / short axis of the error ellipse
-SYN_MIN_BEND = 0.5          # largest gap between the fitted parabola and a line
-SYN_MAX_TEST_RATIO = 0.4    # test MSE with the penalty / without
-SYN_CHOSEN = (6, 429)
-SYN_CM_PER_X = 20           # the slide shows x as body length in cm
-SYN_G_PER_T = 1000          # and t as weight in g
-SYN_REPORT_LAMBDAS = [0.0, 0.01, 0.1, 1.0]
+
+def draw_points(seed):
+    """Training x uniform on 1 to 3, test x on a fixed grid, t = x plus noise."""
+    rng = np.random.default_rng(seed)
+    x_train = np.sort(np.round(rng.uniform(1, 3, POLY_N_TRAIN), 1))
+    t_train = np.round(x_train + rng.normal(0, POLY_NOISE, POLY_N_TRAIN), 2)
+    t_test = np.round(POLY_TEST_X + rng.normal(0, POLY_NOISE, len(POLY_TEST_X)), 2)
+    return x_train, t_train, POLY_TEST_X.copy(), t_test
 
 
-def prepare():
-    """Build the standardized features and target exactly as the deck does."""
+def ridge_fit(x_train, t_train, degree, lam):
+    """Closed-form ridge on the standardized powers x^1..x^degree, as in the ridge code."""
+    powers = np.arange(1, degree + 1)
+    raw = x_train.reshape(-1, 1) ** powers
+    mu, sd = raw.mean(axis=0), raw.std(axis=0)
+    features = lambda x: (x.reshape(-1, 1) ** powers - mu) / sd
+    t_mean, t_std = t_train.mean(), t_train.std()
+    P, y = features(x_train), (t_train - t_mean) / t_std
+    H, g = P.T @ P / len(y), P.T @ y / len(y)
+    if lam > 0:
+        w = np.linalg.solve(H + lam * np.eye(degree), g)
+    else:
+        w = np.linalg.lstsq(P, y, rcond=None)[0]
+    return w, (lambda x: features(x) @ w * t_std + t_mean), H
+
+
+def exact_fit(x_train, t_train, degree):
+    """np.polyfit on standardized length, as on the slide "次数を上げてみる"."""
+    mean, std = x_train.mean(), x_train.std()
+    coef = np.polyfit((x_train - mean) / std, t_train, degree)
+    return coef, (lambda x: np.polyval(coef, (x - mean) / std))
+
+
+def gap_from_line(grid, curve):
+    """Largest distance between a curve and its least-squares line."""
+    return float(np.abs(curve - np.polyval(np.polyfit(grid, curve, 1), grid)).max())
+
+
+def screen_poly_data():
+    """Part 1: list the seeds whose points meet every condition."""
+    grid = np.linspace(POLY_TEST_X.min() - 0.2, POLY_TEST_X.max() + 0.2, 200)
+    candidates = []
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", np.exceptions.RankWarning)
+        for seed in range(POLY_SEEDS):
+            x_train, t_train, x_test, t_test = draw_points(seed)
+            if len(set(x_train)) < POLY_N_TRAIN:
+                continue
+            mse = lambda f: float(np.mean((f(x_test) - t_test) ** 2))
+            w0, f0, H = ridge_fit(x_train, t_train, 2, 0.0)
+            w1, f1, _ = ridge_fit(x_train, t_train, 2, 0.1)
+            axis_ratio = float(np.sqrt((1 + abs(H[0, 1])) / (1 - abs(H[0, 1]))))
+            row = {"seed": seed, "bend_x2": gap_from_line(grid, f0(grid)),
+                   "runaway": float(np.linalg.norm(w0) / np.linalg.norm(w1)),
+                   "axis_ratio": axis_ratio, "test_x2": mse(f0), "test_x2_ridge": mse(f1)}
+            if not (w0[0] * w0[1] < 0 and row["bend_x2"] >= MIN_BEND_X2
+                    and row["runaway"] >= MIN_RUNAWAY and axis_ratio <= MAX_AXIS_RATIO
+                    and row["test_x2_ridge"] <= MAX_TEST_RATIO_X2 * row["test_x2"]):
+                continue
+            row["test_deg1"] = mse(exact_fit(x_train, t_train, 1)[1])
+            row["test_deg9"] = mse(exact_fit(x_train, t_train, 9)[1])
+            _, f9, _ = ridge_fit(x_train, t_train, 9, 0.1)
+            row["test_deg9_ridge"] = mse(f9)
+            row["wiggle_deg9_ridge"] = gap_from_line(grid, f9(grid))
+            if (row["test_deg9"] >= MIN_BLOWUP_DEG9 * row["test_deg1"]
+                    and row["test_deg9_ridge"] <= MAX_RIDGE9_VS_DEG1 * row["test_deg1"]
+                    and row["wiggle_deg9_ridge"] <= MAX_WIGGLE_RIDGE9):
+                candidates.append(row)
+    print(f"{len(candidates)} seeds pass; by the bend of the x, x^2 fit:")
+    for row in sorted(candidates, key=lambda r: -r["bend_x2"])[:8]:
+        print(f"  seed {row['seed']:5d} bend {row['bend_x2']:.2f} runaway {row['runaway']:.1f} "
+              f"axis {row['axis_ratio']:4.1f} x2 test {row['test_x2']:.3f} -> "
+              f"{row['test_x2_ridge']:.3f} | deg1 {row['test_deg1']:.3f} "
+              f"deg9 {row['test_deg9']:.2g} deg9 ridge {row['test_deg9_ridge']:.3f}")
+    assert any(row["seed"] == POLY_CHOSEN_SEED for row in candidates)
+    return candidates
+
+
+def poly_data():
+    """The chosen points in the deck's units."""
+    x_train, t_train, x_test, t_test = draw_points(POLY_CHOSEN_SEED)
+    return (np.round(x_train * CM_PER_X), np.round(t_train * G_PER_X),
+            np.round(x_test * CM_PER_X), np.round(t_test * G_PER_X))
+
+
+def fit_gd(x_train, t_train, lam):
+    """The deck's ridge code: standardized x^1..x^9, gradient descent with the penalty."""
     powers = np.arange(1, DEGREE + 1)
-    x_train, x_test = LENGTHS[:N_TRAIN], LENGTHS[N_TRAIN:]
-    t_train, t_test = WEIGHTS[:N_TRAIN], WEIGHTS[N_TRAIN:]
-    P_train = x_train.reshape(-1, 1) ** powers
-    P_test = x_test.reshape(-1, 1) ** powers
-    mu, sd = P_train.mean(axis=0), P_train.std(axis=0)
-    grid = np.linspace(LENGTHS.min() - 0.5, LENGTHS.max() + 0.5, 300)
-    return {
-        "P_train": (P_train - mu) / sd,
-        "P_test": (P_test - mu) / sd,
-        "P_grid": (grid.reshape(-1, 1) ** powers - mu) / sd,
-        "t_train": t_train,
-        "t_test": t_test,
-        "t_mean": t_train.mean(),
-        "t_std": t_train.std(),
-    }
-
-
-def fit_ridge_gd(P, y, lam):
-    """Run the deck's gradient descent for the L2 penalty."""
-    w, b = np.zeros(P.shape[1]), 0.0
+    raw = x_train.reshape(-1, 1) ** powers
+    mu, sd = raw.mean(axis=0), raw.std(axis=0)
+    features = lambda x: (x.reshape(-1, 1) ** powers - mu) / sd
+    t_mean, t_std = t_train.mean(), t_train.std()
+    P, tt = features(x_train), (t_train - t_mean) / t_std
+    w, b = np.zeros(DEGREE), 0.0
     for _ in range(N_UPDATES):
-        residual = P @ w + b - y
-        w = w - LR * (2 * P.T @ residual / len(y) + 2 * lam * w)
-        b = b - LR * 2 * residual.mean()
-    return w, b
+        pred = P @ w + b
+        grad_w = 2 * P.T @ (pred - tt) / len(tt) + 2 * lam * w
+        grad_b = 2 * np.mean(pred - tt)
+        w -= LR * grad_w
+        b -= LR * grad_b
+    return lambda x: (features(x) @ w + b) * t_std + t_mean
 
 
-def coordinate_descent(P, y, penalty, lam):
-    """Run the coordinate descent shown in the deck on standardized data."""
-    coef = np.zeros(P.shape[1])
-    for _ in range(CD_SWEEPS):
-        for j in range(P.shape[1]):
-            coef[j] = 0.0
-            rho = np.mean((y - P @ coef) * P[:, j])
-            if penalty == "ridge":
-                coef[j] = rho / (1 + lam)
-            else:
-                coef[j] = np.sign(rho) * max(abs(rho) - lam / 2, 0)
-    return coef
+def measure_poly():
+    """Part 2: the numbers behind the slides from "次数を上げてみる" on."""
+    x_train, t_train, x_test, t_test = poly_data()
+    print(f"\nchosen seed {POLY_CHOSEN_SEED}")
+    print("x_train", x_train.astype(int).tolist(), "\nt_train", t_train.astype(int).tolist())
+    print("x_test ", x_test.astype(int).tolist(), "\nt_test ", t_test.astype(int).tolist())
+    mse = lambda f, x, t: float(np.mean((f(x) - t) ** 2))
+    z_train = (x_train - x_train.mean()) / x_train.std()
+    results = {"x_train": x_train.tolist(), "t_train": t_train.tolist(),
+               "x_test": x_test.tolist(), "t_test": t_test.tolist(), "exact": {}, "gd": {},
+               "plane": {}}
 
+    print("\nexact fits (np.polyfit on standardized length)")
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", np.exceptions.RankWarning)
+        for degree in range(1, DEGREE + 1):
+            coef, f = exact_fit(x_train, t_train, degree)
+            curve = f(GRID)
+            row = {"train_mse": mse(f, x_train, t_train), "test_mse": mse(f, x_test, t_test),
+                   "max_abs_coef": float(np.abs(coef[:-1]).max()),
+                   "curve_min": float(curve.min()), "curve_max": float(curve.max()),
+                   "test_pred": f(x_test).tolist()}
+            results["exact"][degree] = row
+            print(f"  degree {degree}: train {row['train_mse']:.4g} test {row['test_mse']:.4g} "
+                  f"max|coef| {row['max_abs_coef']:,.0f} curve [{row['curve_min']:,.0f}, "
+                  f"{row['curve_max']:,.0f}]")
+        f9 = exact_fit(x_train, t_train, DEGREE)[1]
+        negative = GRID[f9(GRID) < 0]
+        print(f"  degree 9 is negative on {negative.min():.1f}..{negative.max():.1f} cm "
+              f"({len(negative)} of {len(GRID)} grid points); test predictions "
+              f"{np.round(f9(x_test)).astype(int).tolist()}")
 
-def support(w):
-    """Return the degrees whose coefficient is exactly nonzero."""
-    return [int(d) + 1 for d in np.flatnonzero(w)]
+    print("\ngradient descent (lr 0.01, 10,000 updates)")
+    for lam in GD_LAMBDAS:
+        f = fit_gd(x_train, t_train, lam)
+        coef_own = np.polyfit(z_train, f(x_train), DEGREE)
+        curve = f(GRID)
+        inside = curve[(GRID >= x_train.min()) & (GRID <= x_train.max())]
+        row = {"train_mse": mse(f, x_train, t_train), "test_mse": mse(f, x_test, t_test),
+               "max_abs_coef": float(np.abs(coef_own[:-1]).max()),
+               "curve_min": float(curve.min()), "curve_max": float(curve.max()),
+               "inside_min": float(inside.min()), "inside_max": float(inside.max()),
+               "wiggle": gap_from_line(GRID, curve)}
+        results["gd"][lam] = row
+        print(f"  lam {lam:<4}: train {row['train_mse']:,.0f} test {row['test_mse']:,.0f} "
+              f"max|coef| {row['max_abs_coef']:,.0f} curve [{row['curve_min']:,.0f}, "
+              f"{row['curve_max']:,.0f}], within the training lengths "
+              f"[{row['inside_min']:,.0f}, {row['inside_max']:,.0f}]")
 
-
-def summarize(data, w, b):
-    """Report errors in grams and the shape of the fitted curve."""
-    to_grams = lambda P: (P @ w + b) * data["t_std"] + data["t_mean"]
-    curve = to_grams(data["P_grid"])
-    return {
-        "w": np.asarray(w).tolist(),
-        "b": float(b),
-        "n_nonzero": int(np.count_nonzero(w)),
-        "support": support(w),
-        "min_abs_w": float(np.abs(w).min()),
-        "max_abs_w": float(np.abs(w).max()),
-        "train_mse": float(np.mean((to_grams(data["P_train"]) - data["t_train"]) ** 2)),
-        "test_mse": float(np.mean((to_grams(data["P_test"]) - data["t_test"]) ** 2)),
-        "curve_min": float(curve.min()),
-        "curve_max": float(curve.max()),
-    }
-
-
-def student_lasso(P, y, lam):
-    """Fit with the scikit-learn settings shown on the slide, recording warnings."""
-    model = Lasso(alpha=lam / 2, max_iter=STUDENT_MAX_ITER)
-    with warnings.catch_warnings(record=True) as caught:
-        warnings.simplefilter("always")
-        model.fit(P, y)
-    n_warned = sum(issubclass(c.category, ConvergenceWarning) for c in caught)
-    return model, n_warned
-
-
-def measure_degree9():
-    """Part 1: compare the penalties on the deck's degree-9 features."""
-    data = prepare()
-    P, y = data["P_train"], (data["t_train"] - data["t_mean"]) / data["t_std"]
-
-    baseline = summarize(data, *fit_ridge_gd(P, y, 0.1))
-    assert round(baseline["train_mse"]) == LOGGED_RIDGE_TRAIN_MSE, baseline["train_mse"]
-    assert round(baseline["test_mse"]) == LOGGED_RIDGE_TEST_MSE, baseline["test_mse"]
-
-    results = {"ridge_gd_lam_0.1": baseline, "ridge": {}, "lasso": {}}
-    print(f"{'penalty':7} {'lam':>7} {'nonzero':>7} {'train':>9} {'test':>11} "
-          f"{'cd_gap':>9}  support")
-    for lam in LAMBDAS:
-        model = Ridge(alpha=len(y) * lam).fit(P, y)
-        ridge = summarize(data, model.coef_, model.intercept_)
-        ridge["cd_max_coef_gap"] = float(
-            np.abs(coordinate_descent(P, y, "ridge", lam) - model.coef_).max())
-        results["ridge"][str(lam)] = ridge
-        print(f"{'ridge':7} {lam:7} {ridge['n_nonzero']:7d} {ridge['train_mse']:9.0f} "
-              f"{ridge['test_mse']:11.0f} {ridge['cd_max_coef_gap']:9.1e}  {ridge['support']}")
-
-        exact = Lasso(alpha=lam / 2, max_iter=10_000_000, tol=1e-12).fit(P, y)
-        lasso = summarize(data, exact.coef_, exact.intercept_)
-        cd_coef = coordinate_descent(P, y, "lasso", lam)
-        lasso["cd_max_coef_gap"] = float(np.abs(cd_coef - exact.coef_).max())
-        lasso["cd_support"] = support(cd_coef)
-        shown, n_warned = student_lasso(P, y, lam)
-        lasso["student_n_iter"] = int(shown.n_iter_)
-        lasso["student_n_warnings"] = n_warned
-        lasso["student_support"] = support(shown.coef_)
-        lasso["student_max_coef_gap"] = float(np.abs(shown.coef_ - exact.coef_).max())
-        results["lasso"][str(lam)] = lasso
-        print(f"{'lasso':7} {lam:7} {lasso['n_nonzero']:7d} {lasso['train_mse']:9.0f} "
-              f"{lasso['test_mse']:11.0f} {lasso['cd_max_coef_gap']:9.1e}  {lasso['support']} "
-              f"cd={lasso['cd_support']} student={lasso['student_support']}")
+    print("\nx and x^2 only (the coefficient plane)")
+    _, _, H = ridge_fit(x_train, t_train, 2, 0.0)
+    results["plane"]["corr"] = float(H[0, 1])
+    results["plane"]["axis_ratio"] = float(np.sqrt((1 + H[0, 1]) / (1 - H[0, 1])))
+    print(f"  corr {H[0, 1]:.4f}, ellipse axis ratio {results['plane']['axis_ratio']:.1f}")
+    for lam in PLANE_LAMBDAS:
+        w, f, _ = ridge_fit(x_train, t_train, 2, lam)
+        row = {"w": w.tolist(), "l2_norm": float(np.linalg.norm(w)),
+               "train_mse": mse(f, x_train, t_train), "test_mse": mse(f, x_test, t_test),
+               "gap_from_line": gap_from_line(GRID, f(GRID))}
+        results["plane"][lam] = row
+        print(f"  lam {lam:<4}: w ({w[0]:+.4f}, {w[1]:+.4f}) |w| {row['l2_norm']:.4f} "
+              f"train {row['train_mse']:,.0f} test {row['test_mse']:,.0f} "
+              f"gap from a line {row['gap_from_line']:,.0f}")
     return results
 
 
@@ -264,7 +312,7 @@ def lasso_at_norm(H, g, r):
 
 
 def measure_contour_cases():
-    """Part 2: find datasets that show the circle and diamond contact clearly."""
+    """Part 3: find datasets that show the circle and diamond contact clearly."""
     results = []
     print("\ncontour candidates (rows meet every screening condition)")
     print(f"{'case':52} {'corr':>6} {'w_ols':>16} {'frac':>4} {'w_ridge':>16} "
@@ -299,99 +347,13 @@ def measure_contour_cases():
     return results
 
 
-def synthetic_data(n_train, seed):
-    """Draw points around the line t = x: random training x, a fixed grid of test x."""
-    rng = np.random.default_rng(seed)
-    x_train = np.sort(np.round(rng.uniform(1, 3, n_train), 1))
-    t_train = np.round(x_train + rng.normal(0, SYN_NOISE, n_train), 2)
-    x_test = np.round(np.linspace(0.6, 3.4, SYN_N_TEST), 1)
-    t_test = np.round(x_test + rng.normal(0, SYN_NOISE, SYN_N_TEST), 2)
-    return x_train, t_train, x_test, t_test
-
-
-def fit_x_x2(x_train, t_train, lam):
-    """Ridge on the standardized x and x^2 columns, as in the deck's ridge code."""
-    powers = x_train.reshape(-1, 1) ** np.arange(1, 3)
-    mu, sd = powers.mean(axis=0), powers.std(axis=0)
-    features = lambda x: (x.reshape(-1, 1) ** np.arange(1, 3) - mu) / sd
-    t_mean, t_std = t_train.mean(), t_train.std()
-    P, y = features(x_train), (t_train - t_mean) / t_std
-    H, g = P.T @ P / len(y), P.T @ y / len(y)
-    w = np.linalg.solve(H + lam * np.eye(2), g)
-    return w, (lambda x: (features(x) @ w) * t_std + t_mean), H
-
-
-def screen_synthetic():
-    """Part 3: find a small data set whose x, x^2 fit bends visibly and runs away."""
-    print("\nsynthetic candidates (n, seed, corr, axis ratio, |w_ols|/|w_ridge|, bend, test MSE)")
-    grid = np.linspace(0.5, 3.5, 200)
-    candidates = []
-    for n_train in SYN_N_TRAIN:
-        for seed in range(SYN_SEEDS):
-            x_train, t_train, x_test, t_test = synthetic_data(n_train, seed)
-            if len(set(x_train)) < n_train:
-                continue
-            w_ols, f_ols, H = fit_x_x2(x_train, t_train, 0.0)
-            w_ridge, f_ridge, _ = fit_x_x2(x_train, t_train, SYN_LAMBDA)
-            axis_ratio = float(np.sqrt((1 + abs(H[0, 1])) / (1 - abs(H[0, 1]))))
-            runaway = float(np.linalg.norm(w_ols) / np.linalg.norm(w_ridge))
-            curve = f_ols(grid)
-            bend = float(np.abs(curve - np.polyval(np.polyfit(grid, curve, 1), grid)).max())
-            test_ols = float(np.mean((f_ols(x_test) - t_test) ** 2))
-            test_ridge = float(np.mean((f_ridge(x_test) - t_test) ** 2))
-            if (w_ols[0] * w_ols[1] < 0 and runaway >= SYN_MIN_RUNAWAY
-                    and axis_ratio <= SYN_MAX_AXIS_RATIO and bend >= SYN_MIN_BEND
-                    and test_ridge <= SYN_MAX_TEST_RATIO * test_ols):
-                candidates.append({"n_train": n_train, "seed": seed, "corr": float(H[0, 1]),
-                                   "axis_ratio": axis_ratio, "runaway": runaway, "bend": bend,
-                                   "test_ols": test_ols, "test_ridge": test_ridge})
-    for c in sorted(candidates, key=lambda c: -c["bend"])[:8]:
-        print(f"n={c['n_train']} seed={c['seed']:4d} corr={c['corr']:.3f} axis={c['axis_ratio']:4.1f} "
-              f"runaway={c['runaway']:.1f} bend={c['bend']:.2f} "
-              f"test {c['test_ols']:.3f} -> {c['test_ridge']:.3f}")
-    print(f"{len(candidates)} candidates pass")
-    return candidates
-
-
-def measure_synthetic():
-    """Part 3: report the chosen data set in the deck's units and its fits.
-
-    The slide labels x as body length in cm and t as weight in g. Scaling x
-    leaves the standardized x and x^2 columns unchanged, and scaling t leaves
-    the standardized target unchanged, so the screened properties carry over.
-    """
-    x_train, t_train, x_test, t_test = synthetic_data(*SYN_CHOSEN)
-    x_train, x_test = x_train * SYN_CM_PER_X, x_test * SYN_CM_PER_X
-    t_train, t_test = t_train * SYN_G_PER_T, t_test * SYN_G_PER_T
-    _, _, H = fit_x_x2(x_train, t_train, 0.0)
-    results = {"n_train_seed": list(SYN_CHOSEN), "x_train": x_train.tolist(),
-               "t_train": t_train.tolist(), "x_test": x_test.tolist(), "t_test": t_test.tolist(),
-               "corr": float(H[0, 1]),
-               "axis_ratio": float(np.sqrt((1 + H[0, 1]) / (1 - H[0, 1]))), "fits": {}}
-    print(f"\nchosen n={SYN_CHOSEN[0]} seed={SYN_CHOSEN[1]}")
-    print("x_train", x_train.tolist(), "\nt_train", t_train.tolist())
-    print("x_test ", x_test.tolist(), "\nt_test ", t_test.tolist())
-    print(f"corr {results['corr']:.4f}, ellipse axis ratio {results['axis_ratio']:.1f}")
-    for lam in SYN_REPORT_LAMBDAS:
-        w, f, _ = fit_x_x2(x_train, t_train, lam)
-        fit = {"w": w.tolist(), "l2_norm": float(np.linalg.norm(w)),
-               "train_mse": float(np.mean((f(x_train) - t_train) ** 2)),
-               "test_mse": float(np.mean((f(x_test) - t_test) ** 2))}
-        results["fits"][str(lam)] = fit
-        print(f"lam={lam:<5} w=({w[0]:+.4f}, {w[1]:+.4f}) |w|={fit['l2_norm']:.4f} "
-              f"train {fit['train_mse']:,.0f} test {fit['test_mse']:,.0f}")
-    return results
-
-
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", required=True, help="path of the JSON result file")
     args = parser.parse_args()
 
-    results = measure_degree9()
-    results["contour_cases"] = measure_contour_cases()
-    results["synthetic_candidates"] = screen_synthetic()
-    results["synthetic"] = measure_synthetic()
+    results = {"poly_candidates": screen_poly_data(), "poly": measure_poly(),
+               "contour_cases": measure_contour_cases()}
     with open(args.out, "w", encoding="utf-8") as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
 
