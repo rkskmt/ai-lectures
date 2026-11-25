@@ -8,8 +8,10 @@ Part 2 screens two-feature datasets for the contour figure, which needs a
 tilted error ellipse, a lasso solution on a corner of the L1 region, and a
 ridge solution that keeps both coefficients at the same norm.
 
-Part 3 keeps only the x and x^2 columns of the deck's features, so that the
-coefficients that run away without a penalty can be drawn on a plane.
+Part 3 picks a small synthetic data set for the ridge figure on the
+coefficient plane: with only x and x^2 as features, the unpenalized fit must
+bend visibly and its coefficients must run far from the origin, while the
+error ellipse stays wide enough to read.
 
 Usage:
     python tools/measure_linear_regression.py --out results.json
@@ -73,6 +75,19 @@ NORM_FRACTIONS = [0.5, 0.6, 0.7, 0.8, 0.9]
 MIN_ABS_CORR, MAX_ABS_CORR = 0.2, 0.85
 MIN_COEF_RATIO = 0.25
 BISECTION_STEPS = 60
+
+# Synthetic data for the ridge figure: noisy points around t = x.
+SYN_NOISE = 0.25
+SYN_N_TEST = 8
+SYN_N_TRAIN = [5, 6]
+SYN_SEEDS = 4000
+SYN_LAMBDA = 0.1
+SYN_MIN_RUNAWAY = 3.0       # |w_ols| / |w_ridge|
+SYN_MAX_AXIS_RATIO = 15.0   # long / short axis of the error ellipse
+SYN_MIN_BEND = 0.5          # largest gap between the fitted parabola and a line
+SYN_MAX_TEST_RATIO = 0.4    # test MSE with the penalty / without
+SYN_CHOSEN = (6, 429)
+SYN_REPORT_LAMBDAS = [0.0, 0.01, 0.1, 1.0]
 
 
 def prepare():
@@ -282,48 +297,80 @@ def measure_contour_cases():
     return results
 
 
-def measure_x_x2():
-    """Part 3: fit the x and x^2 columns alone, with and without the L2 penalty."""
-    data = prepare()
-    P_train, P_test = data["P_train"][:, :2], data["P_test"][:, :2]
-    P_grid = data["P_grid"][:, :2]
-    y = (data["t_train"] - data["t_mean"]) / data["t_std"]
-    H, g = P_train.T @ P_train / len(y), P_train.T @ y / len(y)
-    to_grams = lambda P, w: (P @ w) * data["t_std"] + data["t_mean"]
-    grid = np.linspace(LENGTHS.min() - 0.5, LENGTHS.max() + 0.5, 300)
-    inside = (grid >= LENGTHS[:N_TRAIN].min()) & (grid <= LENGTHS[:N_TRAIN].max())
+def synthetic_data(n_train, seed):
+    """Draw points around the line t = x: random training x, a fixed grid of test x."""
+    rng = np.random.default_rng(seed)
+    x_train = np.sort(np.round(rng.uniform(1, 3, n_train), 1))
+    t_train = np.round(x_train + rng.normal(0, SYN_NOISE, n_train), 2)
+    x_test = np.round(np.linspace(0.6, 3.4, SYN_N_TEST), 1)
+    t_test = np.round(x_test + rng.normal(0, SYN_NOISE, SYN_N_TEST), 2)
+    return x_train, t_train, x_test, t_test
 
-    eigvals = np.linalg.eigvalsh(H)
-    results = {
-        "corr": float(H[0, 1]),
-        "max_abs_column_gap": float(np.abs(P_train[:, 0] - P_train[:, 1]).max()),
-        "ellipse_axis_ratio": float(np.sqrt(eigvals.max() / eigvals.min())),
-        "fits": {},
-    }
-    fits = {"ols": np.linalg.solve(H, g),
-            "ridge_0.1": np.linalg.solve(H + 0.1 * np.eye(2), g),
-            "lasso_0.1": lasso_2d(H, g, 0.1)}
-    for name, w in fits.items():
-        results["fits"][name] = {
-            "w": w.tolist(),
-            "l2_norm": float(np.linalg.norm(w)),
-            "train_mse": float(np.mean((to_grams(P_train, w) - data["t_train"]) ** 2)),
-            "test_mse": float(np.mean((to_grams(P_test, w) - data["t_test"]) ** 2)),
-            "curve": to_grams(P_grid, w),
-        }
-    gap = np.abs(results["fits"]["ols"].pop("curve") - results["fits"]["ridge_0.1"].pop("curve"))
-    results["fits"]["lasso_0.1"].pop("curve")
-    results["curve_gap_inside_train_range"] = float(gap[inside].max())
-    results["curve_gap_outside_train_range"] = float(gap[~inside].max())
 
-    print(f"\nx and x^2 only: corr {results['corr']:.5f}, "
-          f"max |x - x^2| (standardized) {results['max_abs_column_gap']:.4f}, "
-          f"ellipse axis ratio {results['ellipse_axis_ratio']:.1f}")
-    for name, fit in results["fits"].items():
-        print(f"{name:9} w=({fit['w'][0]:+.4f}, {fit['w'][1]:+.4f}) |w|={fit['l2_norm']:.4f} "
-              f"train {fit['train_mse']:7.0f} test {fit['test_mse']:7.0f}")
-    print(f"curve gap ols vs ridge: inside train range {results['curve_gap_inside_train_range']:.0f} g, "
-          f"outside {results['curve_gap_outside_train_range']:.0f} g")
+def fit_x_x2(x_train, t_train, lam):
+    """Ridge on the standardized x and x^2 columns, as in the deck's ridge code."""
+    powers = x_train.reshape(-1, 1) ** np.arange(1, 3)
+    mu, sd = powers.mean(axis=0), powers.std(axis=0)
+    features = lambda x: (x.reshape(-1, 1) ** np.arange(1, 3) - mu) / sd
+    t_mean, t_std = t_train.mean(), t_train.std()
+    P, y = features(x_train), (t_train - t_mean) / t_std
+    H, g = P.T @ P / len(y), P.T @ y / len(y)
+    w = np.linalg.solve(H + lam * np.eye(2), g)
+    return w, (lambda x: (features(x) @ w) * t_std + t_mean), H
+
+
+def screen_synthetic():
+    """Part 3: find a small data set whose x, x^2 fit bends visibly and runs away."""
+    print("\nsynthetic candidates (n, seed, corr, axis ratio, |w_ols|/|w_ridge|, bend, test MSE)")
+    grid = np.linspace(0.5, 3.5, 200)
+    candidates = []
+    for n_train in SYN_N_TRAIN:
+        for seed in range(SYN_SEEDS):
+            x_train, t_train, x_test, t_test = synthetic_data(n_train, seed)
+            if len(set(x_train)) < n_train:
+                continue
+            w_ols, f_ols, H = fit_x_x2(x_train, t_train, 0.0)
+            w_ridge, f_ridge, _ = fit_x_x2(x_train, t_train, SYN_LAMBDA)
+            axis_ratio = float(np.sqrt((1 + abs(H[0, 1])) / (1 - abs(H[0, 1]))))
+            runaway = float(np.linalg.norm(w_ols) / np.linalg.norm(w_ridge))
+            curve = f_ols(grid)
+            bend = float(np.abs(curve - np.polyval(np.polyfit(grid, curve, 1), grid)).max())
+            test_ols = float(np.mean((f_ols(x_test) - t_test) ** 2))
+            test_ridge = float(np.mean((f_ridge(x_test) - t_test) ** 2))
+            if (w_ols[0] * w_ols[1] < 0 and runaway >= SYN_MIN_RUNAWAY
+                    and axis_ratio <= SYN_MAX_AXIS_RATIO and bend >= SYN_MIN_BEND
+                    and test_ridge <= SYN_MAX_TEST_RATIO * test_ols):
+                candidates.append({"n_train": n_train, "seed": seed, "corr": float(H[0, 1]),
+                                   "axis_ratio": axis_ratio, "runaway": runaway, "bend": bend,
+                                   "test_ols": test_ols, "test_ridge": test_ridge})
+    for c in sorted(candidates, key=lambda c: -c["bend"])[:8]:
+        print(f"n={c['n_train']} seed={c['seed']:4d} corr={c['corr']:.3f} axis={c['axis_ratio']:4.1f} "
+              f"runaway={c['runaway']:.1f} bend={c['bend']:.2f} "
+              f"test {c['test_ols']:.3f} -> {c['test_ridge']:.3f}")
+    print(f"{len(candidates)} candidates pass")
+    return candidates
+
+
+def measure_synthetic():
+    """Part 3: report the chosen data set and its fits for the deck."""
+    x_train, t_train, x_test, t_test = synthetic_data(*SYN_CHOSEN)
+    _, _, H = fit_x_x2(x_train, t_train, 0.0)
+    results = {"n_train_seed": list(SYN_CHOSEN), "x_train": x_train.tolist(),
+               "t_train": t_train.tolist(), "x_test": x_test.tolist(), "t_test": t_test.tolist(),
+               "corr": float(H[0, 1]),
+               "axis_ratio": float(np.sqrt((1 + H[0, 1]) / (1 - H[0, 1]))), "fits": {}}
+    print(f"\nchosen n={SYN_CHOSEN[0]} seed={SYN_CHOSEN[1]}")
+    print("x_train", x_train.tolist(), "\nt_train", t_train.tolist())
+    print("x_test ", x_test.tolist(), "\nt_test ", t_test.tolist())
+    print(f"corr {results['corr']:.4f}, ellipse axis ratio {results['axis_ratio']:.1f}")
+    for lam in SYN_REPORT_LAMBDAS:
+        w, f, _ = fit_x_x2(x_train, t_train, lam)
+        fit = {"w": w.tolist(), "l2_norm": float(np.linalg.norm(w)),
+               "train_mse": float(np.mean((f(x_train) - t_train) ** 2)),
+               "test_mse": float(np.mean((f(x_test) - t_test) ** 2))}
+        results["fits"][str(lam)] = fit
+        print(f"lam={lam:<5} w=({w[0]:+.4f}, {w[1]:+.4f}) |w|={fit['l2_norm']:.4f} "
+              f"train {fit['train_mse']:.4f} test {fit['test_mse']:.4f}")
     return results
 
 
@@ -334,7 +381,8 @@ def main():
 
     results = measure_degree9()
     results["contour_cases"] = measure_contour_cases()
-    results["x_x2"] = measure_x_x2()
+    results["synthetic_candidates"] = screen_synthetic()
+    results["synthetic"] = measure_synthetic()
     with open(args.out, "w", encoding="utf-8") as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
 
