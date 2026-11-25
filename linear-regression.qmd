@@ -463,16 +463,19 @@ $$w \leftarrow w - \alpha \left( \text{MSEの勾配} + 2\lambda w \right) = (1 -
 
 ## 係数の空間と正則化の関係 {#peek-coef-plane}
 
-$w_1, w_2$（標準化ずみ） をモデルとした場合、係数の組 $(w_1, w_2)$は、平面上に表せる。
-
-
 $$\text{予測} = w_1 x + w_2 x^2 + b$$
 
-正則化がない場合が一番MSEが低いが、点線のような形で汎化性能が低い。この状態でラムダを大きくしていくと、同じMSEとなるW２,W2が等高線のように表現できる。L2はW1W2の水色の円であり、W1,W2をその範囲内に収めたいのがL2正則化。
+- このモデルの係数の組 $(w_1, w_2)$ は、平面上の点として表せる（$x$ と $x^2$ の列は標準化ずみ）
+- 正則化なし（×）は訓練データの MSE が一番低いが、左の図の破線のように曲がり、汎化性能が低い
+- MSE が同じになる $(w_1, w_2)$ を結ぶと、等高線（緑の楕円）になる
+- L2正則化：$(w_1, w_2)$ を水色の円の範囲内に収める
+   - 円：**L2ノルム**（[L2 norm]{.en}）$\|w\|_2 = \sqrt{w_1^2 + w_2^2}$ が一定値以下の範囲
+   - $\lambda$ を大きくするほど円は小さくなり、解（円が等高線に接する点）は原点へ寄る（赤の点線）
 
 ```{python}
 #| echo: false
 #| fig-align: center
+import matplotlib
 from matplotlib.patches import Circle
 
 # Only the x and x^2 columns of the ridge code's features (doc/measured-log.md).
@@ -511,26 +514,32 @@ q_path = np.array([q_ridge(lam_q) for lam_q in np.r_[0.0, np.logspace(-4, 3, 300
 
 fig, axes = plt.subplots(1, 2, figsize=(11, 4.8))
 ax = axes[1]                                   # right: the coefficient plane
-ax.add_patch(Circle((0, 0), np.linalg.norm(w_pen), facecolor="#2980b9", alpha=0.25,
-                    edgecolor="#2980b9", lw=2))
 Ws1, Ws2 = np.meshgrid(np.linspace(-3.2, 4.2, 600), np.linspace(-3.2, 4.2, 600))
-base, contact = q_mse(*w_free), q_mse(*w_pen)
-levels = base + (contact - base) * (np.arange(1, 9) / 4) ** 2   # 4th ring passes the solution
-ax.contour(Ws1, Ws2, q_mse(Ws1, Ws2), levels=levels, colors="#1e8449", linewidths=1)
-ax.contour(Ws1, Ws2, q_mse(Ws1, Ws2), levels=[contact], colors="#1e8449", linewidths=2.5)
+circle_lams = [0.01, 0.1, 1]
+base = q_mse(*w_free)
+contacts = [q_mse(*q_ridge(lam_q)) for lam_q in circle_lams]   # rings through each solution
+ax.contour(Ws1, Ws2, q_mse(Ws1, Ws2), levels=[base + (contacts[0] - base) * f for f in (0.2, 0.55)],
+           colors="#1e8449", linewidths=1)
+ax.contour(Ws1, Ws2, q_mse(Ws1, Ws2), levels=contacts, colors="#1e8449", linewidths=1.5)
+ax.plot([], [], color="#1e8449", lw=1.5, label="MSE の等高線")
 ax.plot(q_path[:, 0], q_path[:, 1], color="#c0392b", lw=2, ls=":",
         label="$\\lambda$ を 0 から大きくしたときの解")
 label_box = dict(boxstyle="round,pad=0.15", fc="white", ec="none", alpha=0.85)
-for lam_q, offset, align in [(0.01, (10, -2), "left"), (1, (-8, 8), "right")]:
-    ax.scatter(*q_ridge(lam_q), s=20, c="#c0392b", zorder=5)
-    ax.annotate(f"$\\lambda = {lam_q}$", q_ridge(lam_q), xytext=offset, ha=align,
-                textcoords="offset points", fontsize=9, color="#c0392b", bbox=label_box)
+for lam_q, angle in zip(circle_lams, [125, 150, 215]):
+    w_q = q_ridge(lam_q)
+    r = np.linalg.norm(w_q)
+    ax.add_patch(Circle((0, 0), r, facecolor=matplotlib.colors.to_rgba("#2980b9", 0.12),
+                        edgecolor="#2980b9", lw=1.5))
+    ax.annotate(f"$\\lambda = {lam_q}$", (r * np.cos(np.radians(angle)), r * np.sin(np.radians(angle))),
+                xytext=(-4, 0), textcoords="offset points", ha="right", va="center",
+                fontsize=9, color="#2980b9", bbox=label_box)
+    if lam_q == 0.1:
+        ax.scatter(*w_q, s=90, facecolors="white", edgecolors="black", lw=2, zorder=5)
+    else:
+        ax.scatter(*w_q, s=30, c="#c0392b", zorder=5)
 ax.scatter(*w_free, marker="x", s=70, c="black", zorder=4)
-ax.annotate("$\\lambda = 0$（正則化なし）", w_free, xytext=(-12, 0), ha="right", va="center",
+ax.annotate("正則化なし（$\\lambda = 0$）", w_free, xytext=(-12, 0), ha="right", va="center",
             textcoords="offset points", fontsize=9, bbox=label_box)
-ax.scatter(*w_pen, s=90, facecolors="white", edgecolors="black", lw=2, zorder=5)
-ax.annotate("$\\lambda = 0.1$", w_pen, xytext=(10, 6), textcoords="offset points",
-            fontsize=10, fontweight="bold", bbox=label_box)
 ax.axhline(0, color="gray", lw=0.8)
 ax.axvline(0, color="gray", lw=0.8)
 ax.set_aspect("equal")
@@ -555,26 +564,6 @@ ax.set_title("当てはめた曲線", fontsize=11)
 plt.tight_layout()
 plt.show()
 ```
-
-::: {.callout-note}
-- 緑の楕円：MSE が同じ値になる $(w_1, w_2)$ を結んだ**等高線**
-   - 中心（×）が正則化なしの解で、外側ほど MSE が大きい
-   - 予測が $w$ について[線形](#peek-quadratic-linear){.peek}なので MSE は $w$ の2次式になり、等高線は楕円
-- 塗った円：**L2ノルム**（[L2 norm]{.en}）$\|w\|_2 = \sqrt{w_1^2 + w_2^2}$ が一定値 $c$ 以下になる範囲
-   - $\mathrm{MSE} + \lambda \sum_j w_j^2$ の解は、ある $c$ の円の中で MSE が最小の点と同じ
-   - $\lambda$ を大きくするほど、$c$ は小さくなる
-- 赤の点線：$\lambda$ を 0 から大きくしていったときの解の動き
-:::
-
-::: {.callout-note title="結果"}
-- 正則化なしの解（×）は原点から遠く、曲線は訓練データに合わせて大きく曲がる（左の破線）
-   - $x$ と $x^2$ が似た動きをするので楕円は細長く、$w_1$ を増やして $w_2$ を減らしても MSE はあまり増えない
-- $\lambda$ を大きくするほど、解は原点へ引き寄せられる（赤の点線）
-   - ペナルティ $\lambda \sum_j w_j^2$ は、原点から離れるほど大きい
-- $\lambda = 0.1$ の解（○）は、楕円を中心から広げて円に最初に触れた点
-   - 曲線はほぼ直線になる
-:::
-
 
 ## 深さの制限も、広い意味での正則化 {#peek-regularization-broad}
 
