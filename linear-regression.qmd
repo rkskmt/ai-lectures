@@ -463,8 +463,10 @@ $$w \leftarrow w - \alpha \left( \text{MSEの勾配} + 2\lambda w \right) = (1 -
 
 ## 係数の空間と正則化の関係 {#peek-coef-plane}
 
-- 特徴量を体長 $x$ と $x^2$ の2つにする（[正則化の実装](#peek-ridge-code){.peek}と同じく、各列を標準化）
-   - 係数が2つなので、係数の組 $(w_1, w_2)$ を平面上の点として描ける
+$$\text{予測} = w_1 x + w_2 x^2 + b$$
+
+- 係数は $w_1, w_2$ の2つ（体長 $x$ と $x^2$ の列は、[正則化の実装](#peek-ridge-code){.peek}と同じく標準化）
+   - 係数の組 $(w_1, w_2)$ を、平面上の点として描ける
 
 ```{python}
 #| echo: false
@@ -675,7 +677,7 @@ $$L = \mathrm{MSE} + \lambda \sum_j |w_j|$$
      - （参考）scikit-learn では**座標降下法（[coordinate descent]{.en}）** を使用
 
 
-## ラッソ回帰を係数の空間に描く {#peek-l1-plane}
+## ラッソ回帰とリッジ回帰 {#peek-l1-plane}
 
 - アヤメ150本：萼片の長さと花弁の幅から、花弁の長さを予測（すべて標準化）
 - 横軸・縦軸は係数 $w_1$（萼片の長さ）・$w_2$（花弁の幅）
