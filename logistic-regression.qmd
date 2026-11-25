@@ -97,6 +97,59 @@ plt.show()
 :::
 
 
+## 点が線より上か下かを式で判定する {#peek-line-substitute}
+
+- 直線の式を、右辺が 0 になるように移項する
+
+$$\text{重さ} - 120 \times \text{輝度} - 1050 = 0$$
+
+- 左辺に魚の輝度と重さを代入する
+
+```{python}
+#| echo: false
+#| fig-align: center
+#| classes: fig-medium
+# Three fish: far above the line, just above it, far below it
+picked = [(salmon_brightness[3], salmon_weights[3], "black", "o"),
+          (salmon_brightness[13], salmon_weights[13], "black", "o"),
+          (seabass_brightness[13], seabass_weights[13], "red", "s")]
+bb = np.linspace(1.6, 10.4, 50)
+plt.figure(figsize=(6.5, 4.0))
+plt.scatter(salmon_brightness, salmon_weights, c="black", marker="o", s=35, alpha=0.15)
+plt.scatter(seabass_brightness, seabass_weights, c="red", marker="s", s=35, alpha=0.15)
+plt.plot(bb, 120 * bb + 1050, color="blue", linestyle="--", linewidth=2.5)
+for bx, wy, col, mk in picked:
+    on_line = 120 * bx + 1050
+    value = wy - 120 * bx - 1050
+    label = f"{value:+.0f}".replace("-", "−")
+    plt.plot([bx, bx], [on_line, wy], color="#8e44ad", lw=2)
+    plt.scatter([bx], [wy], c=col, marker=mk, s=70, zorder=5)
+    if abs(value) > 200:  # long segment: label beside its middle
+        plt.text(bx + 0.15, (on_line + wy) / 2, label, fontsize=13, color="#8e44ad",
+                 ha="left", va="center")
+    else:                 # short segment: label left of the fish, clear of the line
+        plt.text(bx - 0.15, wy, label, fontsize=13, color="#8e44ad",
+                 ha="right", va="center")
+plt.annotate("線上は 0", (8.0, 120 * 8.0 + 1050), xytext=(6.9, 2450), fontsize=12,
+             color="blue", arrowprops={"arrowstyle": "->", "color": "blue"})
+plt.xlabel("輝度"); plt.ylabel("重さ (g)")
+plt.ylim(950, 2700)
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.caption-note .center}
+紫の数値：代入した値（線から縦に何 g 離れているか）
+:::
+
+::: {.callout-note title="結果"}
+- 線より上は**正**、線より下は**負**
+- 線から遠いほど、値の絶対値が大きい
+- 直線は、値が **0** になる点の集まり
+:::
+
+
 ## 【注意】決定境界は回帰直線ではない
 
 ```{python}
@@ -189,8 +242,9 @@ $$\underbrace{w_1}_{A}\, x_1 + \underbrace{w_2}_{B}\, x_2 + \underbrace{\;b\;}_{
 
 - **直線の式 $Ax_1 + Bx_2 + C = 0$** そのもの
    - この直線を決定境界とする
-- $z$ の**符号**：線の上か下か
-- $z$ の**大きさ**：線からの遠さ
+- $z$ は、[直線の式の左辺に点を代入した値](#peek-line-substitute){.peek}
+   - **符号**：線の上か下か
+   - **大きさ**：線からの遠さ
 
 ```{python}
 #| echo: false
