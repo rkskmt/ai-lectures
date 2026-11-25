@@ -87,6 +87,8 @@ SYN_MAX_AXIS_RATIO = 15.0   # long / short axis of the error ellipse
 SYN_MIN_BEND = 0.5          # largest gap between the fitted parabola and a line
 SYN_MAX_TEST_RATIO = 0.4    # test MSE with the penalty / without
 SYN_CHOSEN = (6, 429)
+SYN_CM_PER_X = 20           # the slide shows x as body length in cm
+SYN_G_PER_T = 1000          # and t as weight in g
 SYN_REPORT_LAMBDAS = [0.0, 0.01, 0.1, 1.0]
 
 
@@ -352,8 +354,15 @@ def screen_synthetic():
 
 
 def measure_synthetic():
-    """Part 3: report the chosen data set and its fits for the deck."""
+    """Part 3: report the chosen data set in the deck's units and its fits.
+
+    The slide labels x as body length in cm and t as weight in g. Scaling x
+    leaves the standardized x and x^2 columns unchanged, and scaling t leaves
+    the standardized target unchanged, so the screened properties carry over.
+    """
     x_train, t_train, x_test, t_test = synthetic_data(*SYN_CHOSEN)
+    x_train, x_test = x_train * SYN_CM_PER_X, x_test * SYN_CM_PER_X
+    t_train, t_test = t_train * SYN_G_PER_T, t_test * SYN_G_PER_T
     _, _, H = fit_x_x2(x_train, t_train, 0.0)
     results = {"n_train_seed": list(SYN_CHOSEN), "x_train": x_train.tolist(),
                "t_train": t_train.tolist(), "x_test": x_test.tolist(), "t_test": t_test.tolist(),
@@ -370,7 +379,7 @@ def measure_synthetic():
                "test_mse": float(np.mean((f(x_test) - t_test) ** 2))}
         results["fits"][str(lam)] = fit
         print(f"lam={lam:<5} w=({w[0]:+.4f}, {w[1]:+.4f}) |w|={fit['l2_norm']:.4f} "
-              f"train {fit['train_mse']:.4f} test {fit['test_mse']:.4f}")
+              f"train {fit['train_mse']:,.0f} test {fit['test_mse']:,.0f}")
     return results
 
 
