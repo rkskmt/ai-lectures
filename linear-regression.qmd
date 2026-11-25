@@ -463,10 +463,12 @@ $$w \leftarrow w - \alpha \left( \text{MSEの勾配} + 2\lambda w \right) = (1 -
 
 ## 係数の空間と正則化の関係 {#peek-coef-plane}
 
+$w_1, w_2$（標準化ずみ） をモデルとした場合、係数の組 $(w_1, w_2)$は、平面上に表せる。
+
+
 $$\text{予測} = w_1 x + w_2 x^2 + b$$
 
-- 係数は $w_1, w_2$ の2つ（体長 $x$ と $x^2$ の列は、[正則化の実装](#peek-ridge-code){.peek}と同じく標準化）
-   - 係数の組 $(w_1, w_2)$ を、平面上の点として描ける
+正則化がない場合が一番MSEが低いが、点線のような形で汎化性能が低い。この状態でラムダを大きくしていくと、同じMSEとなるW２,W2が等高線のように表現できる。L2はW1W2の水色の円であり、W1,W2をその範囲内に収めたいのがL2正則化。
 
 ```{python}
 #| echo: false
@@ -508,7 +510,7 @@ w_free, w_pen = q_ridge(0.0), q_ridge(0.1)
 q_path = np.array([q_ridge(lam_q) for lam_q in np.r_[0.0, np.logspace(-4, 3, 300)]])
 
 fig, axes = plt.subplots(1, 2, figsize=(11, 4.8))
-ax = axes[0]
+ax = axes[1]                                   # right: the coefficient plane
 ax.add_patch(Circle((0, 0), np.linalg.norm(w_pen), facecolor="#2980b9", alpha=0.25,
                     edgecolor="#2980b9", lw=2))
 Ws1, Ws2 = np.meshgrid(np.linspace(-3.2, 4.2, 600), np.linspace(-3.2, 4.2, 600))
@@ -538,7 +540,7 @@ ax.set_ylabel("$w_2$（$x^2$ の係数）")
 ax.legend(fontsize=8, loc="upper right")
 ax.set_title("係数の空間", fontsize=11)
 
-ax = axes[1]
+ax = axes[0]                                   # left: the fitted curves
 ax.scatter(x_train, t_train, c="#2980b9", s=40, label="訓練", zorder=3)
 ax.scatter(x_test, t_test, c="#e74c3c", marker="s", s=30, label="テスト", zorder=3)
 for w_s, style, name in [(w_free, "k--", "$\\lambda = 0$"), (w_pen, "k-", "$\\lambda = 0.1$")]:
@@ -565,7 +567,7 @@ plt.show()
 :::
 
 ::: {.callout-note title="結果"}
-- 正則化なしの解（×）は原点から遠く、曲線は訓練データに合わせて大きく曲がる（右の破線）
+- 正則化なしの解（×）は原点から遠く、曲線は訓練データに合わせて大きく曲がる（左の破線）
    - $x$ と $x^2$ が似た動きをするので楕円は細長く、$w_1$ を増やして $w_2$ を減らしても MSE はあまり増えない
 - $\lambda$ を大きくするほど、解は原点へ引き寄せられる（赤の点線）
    - ペナルティ $\lambda \sum_j w_j^2$ は、原点から離れるほど大きい
