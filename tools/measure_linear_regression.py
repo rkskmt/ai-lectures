@@ -8,6 +8,9 @@ Part 2 screens two-feature datasets for the contour figure, which needs a
 tilted error ellipse, a lasso solution on a corner of the L1 region, and a
 ridge solution that keeps both coefficients at the same norm.
 
+Part 3 keeps only the x and x^2 columns of the deck's features, so that the
+coefficients that run away without a penalty can be drawn on a plane.
+
 Usage:
     python tools/measure_linear_regression.py --out results.json
 """
@@ -279,6 +282,51 @@ def measure_contour_cases():
     return results
 
 
+def measure_x_x2():
+    """Part 3: fit the x and x^2 columns alone, with and without the L2 penalty."""
+    data = prepare()
+    P_train, P_test = data["P_train"][:, :2], data["P_test"][:, :2]
+    P_grid = data["P_grid"][:, :2]
+    y = (data["t_train"] - data["t_mean"]) / data["t_std"]
+    H, g = P_train.T @ P_train / len(y), P_train.T @ y / len(y)
+    to_grams = lambda P, w: (P @ w) * data["t_std"] + data["t_mean"]
+    grid = np.linspace(LENGTHS.min() - 0.5, LENGTHS.max() + 0.5, 300)
+    inside = (grid >= LENGTHS[:N_TRAIN].min()) & (grid <= LENGTHS[:N_TRAIN].max())
+
+    eigvals = np.linalg.eigvalsh(H)
+    results = {
+        "corr": float(H[0, 1]),
+        "max_abs_column_gap": float(np.abs(P_train[:, 0] - P_train[:, 1]).max()),
+        "ellipse_axis_ratio": float(np.sqrt(eigvals.max() / eigvals.min())),
+        "fits": {},
+    }
+    fits = {"ols": np.linalg.solve(H, g),
+            "ridge_0.1": np.linalg.solve(H + 0.1 * np.eye(2), g),
+            "lasso_0.1": lasso_2d(H, g, 0.1)}
+    for name, w in fits.items():
+        results["fits"][name] = {
+            "w": w.tolist(),
+            "l2_norm": float(np.linalg.norm(w)),
+            "train_mse": float(np.mean((to_grams(P_train, w) - data["t_train"]) ** 2)),
+            "test_mse": float(np.mean((to_grams(P_test, w) - data["t_test"]) ** 2)),
+            "curve": to_grams(P_grid, w),
+        }
+    gap = np.abs(results["fits"]["ols"].pop("curve") - results["fits"]["ridge_0.1"].pop("curve"))
+    results["fits"]["lasso_0.1"].pop("curve")
+    results["curve_gap_inside_train_range"] = float(gap[inside].max())
+    results["curve_gap_outside_train_range"] = float(gap[~inside].max())
+
+    print(f"\nx and x^2 only: corr {results['corr']:.5f}, "
+          f"max |x - x^2| (standardized) {results['max_abs_column_gap']:.4f}, "
+          f"ellipse axis ratio {results['ellipse_axis_ratio']:.1f}")
+    for name, fit in results["fits"].items():
+        print(f"{name:9} w=({fit['w'][0]:+.4f}, {fit['w'][1]:+.4f}) |w|={fit['l2_norm']:.4f} "
+              f"train {fit['train_mse']:7.0f} test {fit['test_mse']:7.0f}")
+    print(f"curve gap ols vs ridge: inside train range {results['curve_gap_inside_train_range']:.0f} g, "
+          f"outside {results['curve_gap_outside_train_range']:.0f} g")
+    return results
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", required=True, help="path of the JSON result file")
@@ -286,6 +334,7 @@ def main():
 
     results = measure_degree9()
     results["contour_cases"] = measure_contour_cases()
+    results["x_x2"] = measure_x_x2()
     with open(args.out, "w", encoding="utf-8") as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
 

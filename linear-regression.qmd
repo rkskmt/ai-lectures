@@ -550,6 +550,100 @@ plt.show()
 :::
 
 
+## 係数の空間と正則化の関係 {#peek-coef-plane}
+
+- [正則化の実装](#peek-ridge-code){.peek}の特徴量のうち、$x$ と $x^2$ の2つだけで重さを予測
+   - 係数が2つなので、係数の組 $(w_1, w_2)$ を平面上の点として描ける
+- 左の図の横軸・縦軸は係数 $w_1$（$x$）・$w_2$（$x^2$）
+
+```{python}
+#| echo: false
+#| fig-align: center
+from matplotlib.patches import Circle
+
+# Only the x and x^2 columns of the ridge code's features (doc/measured-log.md).
+q_powers = x_train.reshape(-1, 1) ** np.arange(1, 3)
+q_mu, q_sd = q_powers.mean(axis=0), q_powers.std(axis=0)
+
+
+def features_q(x):
+    """Standardized x and x^2 columns, scaled with the training data."""
+    return (x.reshape(-1, 1) ** np.arange(1, 3) - q_mu) / q_sd
+
+
+q_tm, q_ts = t_train.mean(), t_train.std()
+Pq = features_q(x_train)
+yq = (t_train - q_tm) / q_ts
+Hq, gq = Pq.T @ Pq / len(yq), Pq.T @ yq / len(yq)
+w_olsq = np.linalg.solve(Hq, gq)
+w_ridgeq = np.linalg.solve(Hq + 0.1 * np.eye(2), gq)    # same lam as the ridge code
+
+
+def mseq(w1, w2):
+    """MSE of the standardized fit; mean(yq**2) is 1."""
+    return (Hq[0, 0] * w1 ** 2 + 2 * Hq[0, 1] * w1 * w2 + Hq[1, 1] * w2 ** 2
+            - 2 * (gq[0] * w1 + gq[1] * w2) + 1)
+
+
+fig, axes = plt.subplots(1, 2, figsize=(11, 4.8), gridspec_kw={"width_ratios": [1.1, 1]})
+ax = axes[0]
+ax.add_patch(Circle((0, 0), np.linalg.norm(w_ridgeq), facecolor="#2980b9", alpha=0.25,
+                    edgecolor="#2980b9", lw=2))
+Wq1, Wq2 = np.meshgrid(np.linspace(-1.0, 5.4, 1200), np.linspace(-4.3, 1.6, 1200))
+base, contact = mseq(*w_olsq), mseq(*w_ridgeq)
+ax.contour(Wq1, Wq2, mseq(Wq1, Wq2), levels=[base + (contact - base) / 4],
+           colors="#1e8449", linewidths=1)
+ax.contour(Wq1, Wq2, mseq(Wq1, Wq2), levels=[contact], colors="#1e8449", linewidths=2.5)
+ax.scatter(*w_olsq, marker="x", s=70, c="black", zorder=4)
+ax.annotate(f"正則化なしの解 ({w_olsq[0]:.2f}, {w_olsq[1]:.2f})", w_olsq, xytext=(12, 4),
+            textcoords="offset points", fontsize=9)
+ax.scatter(*w_ridgeq, s=90, facecolors="white", edgecolors="black", lw=2, zorder=5)
+ax.annotate(f"解 ({w_ridgeq[0]:.2f}, {w_ridgeq[1]:.2f})", w_ridgeq, xytext=(12, 6),
+            textcoords="offset points", fontsize=10, fontweight="bold")
+ax.axhline(0, color="gray", lw=0.8)
+ax.axvline(0, color="gray", lw=0.8)
+ax.set_aspect("equal")
+ax.set_xlim(-1.0, 5.4); ax.set_ylim(-4.3, 1.6)
+ax.set_xlabel("$w_1$（$x$ の係数）")
+ax.set_ylabel("$w_2$（$x^2$ の係数）")
+ax.set_title("リッジ回帰（$\\lambda = 0.1$）：L2ノルム $\\leq c$（円）", fontsize=11)
+
+ax = axes[1]
+ax.scatter(x_train, t_train, c="#2980b9", s=30, label="訓練", zorder=3)
+ax.scatter(x_test, t_test, c="#e74c3c", marker="s", s=30, label="テスト", zorder=3)
+for w_q, style, name in [(w_olsq, "k--", "正則化なし"), (w_ridgeq, "k-", "リッジ回帰")]:
+    test_mse = np.mean(((features_q(x_test) @ w_q) * q_ts + q_tm - t_test) ** 2)
+    ax.plot(grid, (features_q(grid) @ w_q) * q_ts + q_tm, style, lw=2,
+            label=f"{name}（テストMSE {test_mse:,.0f}）")
+ax.set_ylim(800, 2900)
+ax.set_xlabel("体長 (cm)")
+ax.set_ylabel("重さ (g)")
+ax.legend(fontsize=8, loc="upper left")
+ax.set_title("当てはめた曲線", fontsize=11)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-note}
+- 緑の楕円：MSE が同じ値になる $(w_1, w_2)$ を結んだ**等高線**
+   - 中心（×）が正則化なしの解で、外側ほど MSE が大きい
+   - 予測が $w$ について[線形](#peek-quadratic-linear){.peek}なので MSE は $w$ の2次式になり、等高線は楕円
+- 塗った円：**L2ノルム**（[L2 norm]{.en}）$\|w\|_2 = \sqrt{w_1^2 + w_2^2}$ が一定値 $c$ 以下になる範囲
+   - $\mathrm{MSE} + \lambda \sum_j w_j^2$ の解は、ある $c$ の円の中で MSE が最小の点と同じ
+   - $\lambda$ を大きくするほど、$c$ は小さくなる
+:::
+
+::: {.callout-note title="結果"}
+- 楕円は極端に細長い
+   - 標準化した $x$ と $x^2$ は、訓練データではほとんど同じ値
+   - 予測はほぼ $w_1 + w_2$ だけで決まり、和が同じなら MSE もほぼ同じ
+- 正則化なしの解（×）は、原点から遠い
+   - 符号が逆の大きな係数になり、訓練データより短い魚で予測が大きく外れる（右の図の破線）
+- 中心から楕円を広げ、円に最初に触れた点（○）がリッジ回帰の解
+   - 係数は円の中に収まり、テストMSEは下がる
+:::
+
+
 ## L1正則化（ラッソ回帰） {#peek-l1-lasso}
 
 $$L = \mathrm{MSE} + \lambda \sum_j |w_j|$$
@@ -562,7 +656,7 @@ $$L = \mathrm{MSE} + \lambda \sum_j |w_j|$$
      - （参考）scikit-learn では**座標降下法（[coordinate descent]{.en}）** を使用
 
 
-## 係数の平面に誤差とペナルティを描く {#peek-coef-plane}
+## ラッソ回帰で係数がちょうど 0 になる理由 {#peek-l1-corner}
 
 - アヤメ150本：萼片の長さと花弁の幅から、花弁の長さを予測（すべて標準化）
 - 横軸・縦軸は係数 $w_1$（萼片の長さ）・$w_2$（花弁の幅）
@@ -628,18 +722,14 @@ plt.show()
 ```
 
 ::: {.callout-note}
-- 緑の楕円：MSE が同じ値になる $(w_1, w_2)$ を結んだ**等高線**
-   - 中心（×）が正則化なしの解で、外側ほど MSE が大きい
-   - 予測が $w$ について[線形](#peek-quadratic-linear){.peek}なので MSE は $w$ の2次式になり、等高線は楕円
+- 緑の楕円：[MSE の等高線](#peek-coef-plane){.peek}（中心の × が正則化なしの解）
 - 塗った範囲：ペナルティが一定値 $c$ 以下になる $(w_1, w_2)$
-   - **L2ノルム**（[L2 norm]{.en}）$\|w\|_2 = \sqrt{w_1^2 + w_2^2}$ が $c$ 以下：円
+   - L2ノルム $\|w\|_2 = \sqrt{w_1^2 + w_2^2}$ が $c$ 以下：円
    - **L1ノルム**（[L1 norm]{.en}）$\|w\|_1 = |w_1| + |w_2|$ が $c$ 以下：ひし形
 :::
 
 ::: {.callout-note title="結果"}
-- 中心から楕円を広げ、範囲に最初に触れた点（○）が解
-   - $\mathrm{MSE} + \lambda \times$ ペナルティの解は、ある $c$ の範囲の中で MSE が最小の点と同じ
-   - $\lambda$ を大きくするほど、$c$ は小さくなる
+- 範囲に最初に触れた点（○）が解
 - 円（リッジ回帰）：角がないので、接点はふつう両方の係数が 0 でない点
 - ひし形（ラッソ回帰）：楕円は角で触れやすく、角では片方の係数が**ちょうど 0**
    - 角はどれも、灰色の線（$w_1 = 0$ か $w_2 = 0$）の上
