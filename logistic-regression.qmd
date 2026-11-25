@@ -97,59 +97,6 @@ plt.show()
 :::
 
 
-## 点が線より上か下かを式で判定する {#peek-line-substitute}
-
-- 直線の式を、右辺が 0 になるように移項する
-
-$$\text{重さ} - 120 \times \text{輝度} - 1050 = 0$$
-
-- 左辺に魚の輝度と重さを代入する
-
-```{python}
-#| echo: false
-#| fig-align: center
-#| classes: fig-medium
-# Three fish: far above the line, just above it, far below it
-picked = [(salmon_brightness[3], salmon_weights[3], "black", "o"),
-          (salmon_brightness[13], salmon_weights[13], "black", "o"),
-          (seabass_brightness[13], seabass_weights[13], "red", "s")]
-bb = np.linspace(1.6, 10.4, 50)
-plt.figure(figsize=(6.5, 4.0))
-plt.scatter(salmon_brightness, salmon_weights, c="black", marker="o", s=35, alpha=0.15)
-plt.scatter(seabass_brightness, seabass_weights, c="red", marker="s", s=35, alpha=0.15)
-plt.plot(bb, 120 * bb + 1050, color="blue", linestyle="--", linewidth=2.5)
-for bx, wy, col, mk in picked:
-    on_line = 120 * bx + 1050
-    value = wy - 120 * bx - 1050
-    label = f"{value:+.0f}".replace("-", "−")
-    plt.plot([bx, bx], [on_line, wy], color="#8e44ad", lw=2)
-    plt.scatter([bx], [wy], c=col, marker=mk, s=70, zorder=5)
-    if abs(value) > 200:  # long segment: label beside its middle
-        plt.text(bx + 0.15, (on_line + wy) / 2, label, fontsize=13, color="#8e44ad",
-                 ha="left", va="center")
-    else:                 # short segment: label left of the fish, clear of the line
-        plt.text(bx - 0.15, wy, label, fontsize=13, color="#8e44ad",
-                 ha="right", va="center")
-plt.annotate("線上は 0", (8.0, 120 * 8.0 + 1050), xytext=(6.9, 2450), fontsize=12,
-             color="blue", arrowprops={"arrowstyle": "->", "color": "blue"})
-plt.xlabel("輝度"); plt.ylabel("重さ (g)")
-plt.ylim(950, 2700)
-plt.grid(True, alpha=0.3)
-plt.tight_layout()
-plt.show()
-```
-
-::: {.caption-note .center}
-紫の数値：代入した値（線から縦に何 g 離れているか）
-:::
-
-::: {.callout-note title="結果"}
-- 線より上は**正**、線より下は**負**
-- 線から遠いほど、値の絶対値が大きい
-- 直線は、値が **0** になる点の集まり
-:::
-
-
 ## 【注意】決定境界は回帰直線ではない
 
 ```{python}
@@ -186,6 +133,57 @@ plt.show()
    - **点の間**を通る
 :::
 
+
+## そもそも直線とは {#peek-line-distance}
+
+- 直線の式
+
+$$Ax_1 + Bx_2 + C = 0$$
+
+- 左辺に点 $(x_1, x_2)$ を代入すると、値が1つ決まる
+- その絶対値を $\sqrt{A^2 + B^2}$ で割ると、**点と直線の距離**になる
+
+$$\text{距離} = \frac{|Ax_1 + Bx_2 + C|}{\sqrt{A^2 + B^2}}$$
+
+```{python}
+#| echo: false
+#| fig-align: center
+#| classes: fig-medium
+# Example line 3*x1 + 4*x2 - 12 = 0, where sqrt(3^2 + 4^2) = 5
+A, B, C = 3, 4, -12
+ab_norm = np.hypot(A, B)
+xs = np.linspace(-0.5, 5.5, 50)
+line_x2 = -(A * xs + C) / B
+plt.figure(figsize=(6.0, 5.0))
+plt.fill_between(xs, line_x2, 4.5, color="#f5b7b1", alpha=0.4)
+plt.fill_between(xs, -0.5, line_x2, color="#aed6f1", alpha=0.4)
+plt.plot(xs, line_x2, "b--", lw=2.5)
+# Each point, its value, and the perpendicular to the line (its distance)
+for u1, u2, dy in [(4, 3, 0.35), (1, 1, -0.4)]:
+    value = A * u1 + B * u2 + C
+    foot = np.array([u1, u2]) - value / ab_norm**2 * np.array([A, B])
+    plt.plot([u1, foot[0]], [u2, foot[1]], color="#8e44ad", lw=2.5)
+    plt.scatter([u1], [u2], c="#2c3e50", s=55, zorder=5)
+    plt.text(u1, u2 + dy, f"値 {value:+d}　距離 {abs(value) / ab_norm:g}".replace("-", "−"),
+             fontsize=12, color="#8e44ad", ha="center", va="center")
+plt.annotate("値 = 0", (3.6, 0.3), xytext=(4.1, 1.1), fontsize=12, color="blue",
+             arrowprops={"arrowstyle": "->", "color": "blue"})
+plt.text(3.2, 4.0, "値 > 0 の側", fontsize=11, color="#c0392b", fontweight="bold")
+plt.text(-0.3, -0.2, "値 < 0 の側", fontsize=11, color="#2471a3", fontweight="bold")
+plt.xlim(-0.5, 5.5); plt.ylim(-0.5, 4.5)
+plt.gca().set_aspect("equal")
+plt.xlabel("$x_1$"); plt.ylabel("$x_2$")
+plt.title("例：$3x_1 + 4x_2 - 12 = 0$（$\\sqrt{3^2 + 4^2} = 5$）", fontsize=11)
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-note title="結果"}
+- 直線は、代入した値が **0** になる点の集まり
+- 値の**符号**：直線のどちら側か
+- 値の**大きさ**：直線からの遠さ（距離に比例）
+:::
 
 
 ## {background-color="white" .center .break-slide}
@@ -242,7 +240,7 @@ $$\underbrace{w_1}_{A}\, x_1 + \underbrace{w_2}_{B}\, x_2 + \underbrace{\;b\;}_{
 
 - **直線の式 $Ax_1 + Bx_2 + C = 0$** そのもの
    - この直線を決定境界とする
-- $z$ は、[直線の式の左辺に点を代入した値](#peek-line-substitute){.peek}
+- $z$ は、[直線の式の左辺に点を代入した値](#peek-line-distance){.peek}
    - **符号**：線の上か下か
    - **大きさ**：線からの遠さ
 
