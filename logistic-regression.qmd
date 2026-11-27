@@ -204,13 +204,25 @@ plt.show()
 :::
 
 
-## $f(x)$ を確率に変える：シグモイド関数（[Sigmoid Function]{.en}） {#peek-logistic-function}
+## $f(x)$ を確率に変える {#peek-to-probability}
 
 - $f(x)$ は $-\infty$ から $+\infty$ まで取る
 - 確率にすると、正解クラスにどれだけの確率を出したかで採点できる
-- **シグモイド関数**：S字形の関数の総称
-   - 確率に変えるには、値が 0〜1 に収まるシグモイド関数を使う
-   - 今回使うのは、代表的な[**ロジスティック関数**](#peek-logistic-name){.peek}（[logistic function]{.en}）
+- 変換に求めること（$p$：Salmon である確率）
+
+| データ点の位置 | $f(x)$ | $p$ |
+|---|---|---|
+| Salmon の側で直線から遠い | 大きい正の値 | 1 に近い |
+| 直線の上 | 0 | 0.5 |
+| Sea bass の側で直線から遠い | 大きい負の値 | 0 に近い |
+
+- **シグモイド関数（[sigmoid function]{.en}）**：S字形の関数の総称
+   - 表の変換は、値が 0〜1 に収まるシグモイド関数で作れる
+
+
+## ロジスティック関数（[Logistic Function]{.en}） {#peek-logistic-function}
+
+- 値が 0〜1 に収まるシグモイド関数のうち、代表的な[ロジスティック関数](#peek-logistic-name){.peek}を使う
 
 $$p=\sigma(f(x))=\frac{1}{1+e^{-f(x)}}$$
 
@@ -234,6 +246,7 @@ plt.show()
 ```
 
 ::: {.callout-note}
+- [$f(x)$ と $p$ の対応表](#peek-to-probability){.peek}どおりの形
 - $f(x) = 0$（直線の上）でちょうど $p = 0.5$
    - $p \geq 0.5$（$f(x) \geq 0$）なら Salmon と判定
    - $p < 0.5$ なら Sea bass と判定
