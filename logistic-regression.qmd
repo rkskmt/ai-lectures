@@ -7,11 +7,11 @@ subtitle: "斜めの決定境界をデータから求める"
 
 - [**勾配降下法**](optimization-gradient-descent.qmd#peek-gd-code){.peek}（[gradient descent]{.en}）：傾きの逆方向に少しずつ進んで最小値を探す
 - **回帰**：体長→重さの直線を勾配降下で当て、[厳密解と一致した](linear-regression.qmd#peek-exact-line){.peek}
-- **分類（[classification]{.en}）**：輝度・重さ→魚の種類を[閾値](classification-2d-boundaries.qmd#peek-handline){.peek}（[threshold]{.en}）で判定
+- **分類（[classification]{.en}）**：輝度・重さ→ Salmon か Sea bass かを[閾値](classification-2d-boundaries.qmd#peek-handline){.peek}（[threshold]{.en}）で判定
 
 
 ::: {.callout-note title="今回の主題"}
-- [「斜めの直線で分けられそう」と言いながら、引けたのは縦線だけだった](classification-2d-boundaries.qmd#peek-diagonal){.peek}
+- [「斜めの直線で分けられそう」と言いながら、求めた境界は軸に平行な線だけだった](classification-2d-boundaries.qmd#peek-diagonal){.peek}
 - データから最適な**斜めの決定境界（[decision boundary]{.en}）**を求められるか？
 :::
 
@@ -101,7 +101,7 @@ plt.show()
 
 $$f(x) = ax_1 + bx_2 + c$$
 
-という関数に対してf(x)=0となる点の集合が直線である。
+という関数に対して$f(x)=0$となる点の集合が直線である。
 
 
 ```{python}
@@ -141,12 +141,12 @@ plt.show()
 - 値の**大きさ**：直線からの遠さ
 
 
-## 回帰は $f$ を 0 に近づけ、分類は 0 から遠ざける {#peek-far-loss}
+## 回帰は $f(x)$ を 0 に近づけ、分類は 0 から遠ざける {#peek-far-loss}
 
 ```{python}
 #| echo: false
 #| fig-align: center
-# Left: the 15 fish of the regression deck and their least-squares line
+# Left: the 15 data points of the regression deck and their least-squares line
 reg_lengths = np.array([55.2, 56.0, 51.8, 58.1, 56.8, 51.5, 56.6, 51.6, 61.0, 52.0,
                         58.5, 50.5, 55.5, 48.7, 46.6])
 reg_weights = np.array([1884, 1978, 1483, 2181, 2028, 1476, 2094, 1563, 2474, 1414,
@@ -159,8 +159,8 @@ gx = np.linspace(46, 62, 50)
 ax.plot(gx, a_ls * gx + b_ls, color="blue", lw=2)
 ax.vlines(reg_lengths, reg_weights, a_ls * reg_lengths + b_ls, color="#8e44ad", lw=2)
 ax.scatter(reg_lengths, reg_weights, c="#5dade2", edgecolors="gray", s=40, zorder=3)
-ax.set_title("回帰直線　$f$ の値＝予測と実際のズレ", fontsize=11)
-ax.set_xlabel("体長 $x$ (cm)"); ax.set_ylabel("重さ $t$ (g)")
+ax.set_title("回帰直線　$f(x)$＝予測と実際のズレ", fontsize=11)
+ax.set_xlabel("体長 (cm)"); ax.set_ylabel("重さ (g)")
 
 # Right: the slanted boundary from "このような直線を求めたい", x2 = 120 x1 + 1050
 ax = axes[1]
@@ -181,17 +181,17 @@ plt.show()
 ```
 
 ::: {.caption-note .center}
-縦の線分：データ点を代入した $f$ の値
+縦の線分：データ点 $x$ での $f(x)$
 :::
 
 |  | **回帰直線（[regression line]{.en}）** | **決定境界** |
 |---|---|---|
 | 役割 | 縦軸の値を予測する（点の真ん中を通る） | 2クラスを分ける（点の間を通る） |
-| データ点での $f$ の値 | 0 に**近づける** | 0 から**遠ざける**（符号はクラスで逆） |
-| 損失 | [MSE（平均二乗誤差）](linear-regression.qmd#peek-mse){.peek}：$f$ の値の2乗の平均 | **？** |
+| データ点での $f(x)$ | 0 に**近づける** | 0 から**遠ざける**（符号はクラスで逆） |
+| 損失 | [MSE（平均二乗誤差）](linear-regression.qmd#peek-mse){.peek}：$f(x)$ の2乗の平均 | **？** |
 
 ::: {.takeaway}
-分類の損失：$f$ の値が正しい側で 0 から離れるほど小さくなる関数
+分類の損失：$f(x)$ が正しい側で 0 から離れるほど小さくなる関数
 :::
 
 
@@ -202,15 +202,15 @@ plt.show()
 :::
 
 
-## $f$ の値を確率に変える：ロジスティック関数（[Logistic Function]{.en}） {#peek-logistic-function}
+## $f(x)$ を確率に変える：ロジスティック関数（[Logistic Function]{.en}） {#peek-logistic-function}
 
-- $f$ の値は $-\infty$ から $+\infty$ まで取る
+- $f(x)$ は $-\infty$ から $+\infty$ まで取る
 - 確率にすると、正解クラスにどれだけの確率を出したかで採点できる
 
-$$p=\sigma(f)=\frac{1}{1+e^{-f}}$$
+$$p=\sigma(f(x))=\frac{1}{1+e^{-f(x)}}$$
 
 - $\sigma$：ロジスティック関数
-- $f$：ロジスティック関数への入力（データ点を代入した $f$ の値）
+- $f(x)$：ロジスティック関数への入力（データ点 $x$ での値）
 - $p$：ロジスティック関数から得られる出力（Salmon である確率）
 
 ```{python}
@@ -221,7 +221,7 @@ plt.figure(figsize=(5.5, 2.8))
 plt.plot(ff, 1 / (1 + np.exp(-ff)), color="#e74c3c", lw=2.5)
 plt.axhline(0.5, color="gray", ls=":", lw=1)
 plt.axvline(0, color="gray", ls=":", lw=1)
-plt.xlabel("$f$"); plt.ylabel("$p = \\sigma(f)$")
+plt.xlabel("$f(x)$"); plt.ylabel("$p = \\sigma(f(x))$")
 plt.title("ロジスティック関数")
 plt.grid(True, alpha=0.3)
 plt.tight_layout()
@@ -229,29 +229,31 @@ plt.show()
 ```
 
 ::: {.callout-note}
-- $f = 0$（直線の上）でちょうど $p = 0.5$
-   - 判定：$p \geq 0.5$（$f \geq 0$）なら Salmon、$p < 0.5$ なら Sea bass
+- $f(x) = 0$（直線の上）でちょうど $p = 0.5$
+   - $p \geq 0.5$（$f(x) \geq 0$）なら Salmon と判定
+   - $p < 0.5$ なら Sea bass と判定
 - 直線から遠いほど、$p$ は 1 か 0 に近づく
    - $p$ は「**どれくらい自信があるか**」まで表す
 - [S字形の関数なので、機械学習では単に `sigmoid` と呼ぶことも多い](#peek-logistic-name){.peek}
 :::
 
 
-## $f = 1$ を実際に確率へ変換する
+## $f(x) = 1$ を実際に確率へ変換する
 
-- $f = 1$ をロジスティック関数に代入する
+- $f(x) = 1$ をロジスティック関数に代入する
 
 $$p = \sigma(1) = \frac{1}{1 + e^{-1}} \approx 0.731$$
 
-- $f=1$ のデータ点は、Salmon である確率が $73.1\%$ と解釈できる
+- $f(x)=1$ のデータ点は、Salmon である確率が $73.1\%$ と解釈できる
 
 
 ## 正解クラスの確率 $q$ で、損失の条件を言い直す {#peek-q-condition}
 
-- 正解ラベル $y$：Salmon なら $y=1$、Sea bass なら $y=0$
+- $y$：正解ラベル（Salmon は 1、Sea bass は 0）
 - 2クラスしかないので、Salmon である確率が $p$ なら、Sea bass である確率は $1-p$
 - $q$：正解クラスに出した確率
-   - 正解が Salmon なら $q = p$、Sea bass なら $q = 1-p$
+   - 正解が Salmon なら $q = p$
+   - 正解が Sea bass なら $q = 1-p$
 
 | データ点の位置 | $q$ | 損失 |
 |---|---|---|
@@ -267,8 +269,9 @@ $q$ が 1 に近いほど小さく、0 に近いほど大きい損失を作る
 ## 全データの $q$ の積を大きくする {#peek-q-product}
 
 - 全データで、正解クラスの確率を同時に高めたい
-   - 各データの $q$ を掛けた積 $q_1 q_2 \cdots q_N$ を大きくする（全データの正解ラベルを、まとめて出す確率）
-- log は増加関数なので、積の log を大きくしても同じ
+   - 各データの $q$ を掛けた積 $q_1 q_2 \cdots q_N$ を大きくする
+   - この積：全データの正解ラベルを、まとめて出す確率
+- log は増加関数なので、積を大きくすることと、積の log を大きくすることは同じ
    - log をとると積が和になり、1データずつの損失に分けられる
 
 $$\log(q_1 q_2 \cdots q_N) = \log q_1 + \log q_2 + \cdots + \log q_N$$
@@ -353,7 +356,7 @@ $$\ell(y,p)=-\left[y\log p+(1-y)\log(1-p)\right]$$
 :::
 
 
-## $p=0.4$ の魚を採点する {#peek-loss-value}
+## $p=0.4$ のデータ点を採点する {#peek-loss-value}
 
 | 正解 | 採点する確率 $q$ | $p=0.4$ のときの損失 $-\log q$ |
 |---|---:|---:|
@@ -363,11 +366,11 @@ $$\ell(y,p)=-\left[y\log p+(1-y)\log(1-p)\right]$$
 - 全データの平均損失：$L=\dfrac{1}{N}\sum_i\ell(y_i,p_i)$
 
 
-## 損失を $f$ で見ると、0 から遠ざける形になっている {#peek-loss-in-f}
+## 損失を $f(x)$ で見ると、0 から遠ざける形になっている {#peek-loss-in-f}
 
-- $p = \sigma(f)$ を二値交差エントロピーに代入する
-   - $y=1$（Salmon）：$\ell = -\log \sigma(f)$
-   - $y=0$（Sea bass）：$\ell = -\log\bigl(1-\sigma(f)\bigr)$
+- $p = \sigma(f(x))$ を二値交差エントロピーに代入する
+   - $y=1$（Salmon）：$\ell = -\log \sigma(f(x))$
+   - $y=0$（Sea bass）：$\ell = -\log\bigl(1-\sigma(f(x))\bigr)$
 
 ```{python}
 #| echo: false
@@ -381,7 +384,7 @@ plt.plot(ff, np.logaddexp(0, ff), color="red", lw=2.5, ls="--", label="正解が
 plt.axvline(0, color="gray", ls=":", lw=1)
 plt.text(4.5, 1.0, "Salmon の側", ha="center", fontsize=11)
 plt.text(-4.5, 1.0, "Sea bass の側", ha="center", fontsize=11)
-plt.xlabel("データ点での $f$ の値"); plt.ylabel("損失 $\\ell$")
+plt.xlabel("データ点での $f(x)$"); plt.ylabel("損失 $\\ell$")
 plt.ylim(-0.2, 6.4)
 plt.legend(fontsize=9, loc="upper center")
 plt.grid(True, alpha=0.3)
@@ -410,10 +413,10 @@ plt.show()
 
 $$z = w_1 x_1 + w_2 x_2 + b$$
 
-- [直線の $f$](#peek-line-distance){.peek} と同じ形で、係数を学習で求める
+- [直線の $f(x) = ax_1 + bx_2 + c$](#peek-line-distance){.peek} と同じ形で、係数を学習で求める
    - 係数の名前を、機械学習の書き方に変える
 
-| 直線の $f$ | $a$ | $b$ | $c$ |
+| 直線の $f(x)$ | $a$ | $b$ | $c$ |
 |---|---|---|---|
 | $z$ | $w_1$ | $w_2$ | $b$ |
 
@@ -422,7 +425,7 @@ $$z = w_1 x_1 + w_2 x_2 + b$$
 - 確率は $p = \sigma(z)$
 
 ::: {.takeaway}
-$z$：データ点を代入した $f$ の値（$z = 0$ の点の集合が決定境界）
+$z$：データ点 $x$ での $f(x)$（$z = 0$ の点の集合が決定境界）
 :::
 
 
@@ -531,7 +534,7 @@ $$
 
 - ロジスティック関数の微分は、どちらの正解でも同じ
 
-$$\frac{\partial p}{\partial z}=p(1-p)$$
+$$\frac{dp}{dz}=p(1-p)$$
 
 - **正解が $y=1$ のとき**：
 
@@ -611,7 +614,7 @@ d_b = delta
 ```{python}
 #| echo: true
 #| code-fold: true
-#| code-summary: "魚データの定義（クリックして展開）"
+#| code-summary: "データの定義（クリックして展開）"
 import numpy as np
 
 salmon_weights     = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,
@@ -706,7 +709,7 @@ for i in range(10):
 
     # 全データの Loss と正答率は、学習の様子を表示するためだけに計算する
     p_all = forward(X_norm, w, b)
-    print(f"{i+1}匹目 | Loss: {loss_fn(y, p_all):.4f} | 正答率: {accuracy(y, p_all):.1%} "
+    print(f"{i+1}件目 | Loss: {loss_fn(y, p_all):.4f} | 正答率: {accuracy(y, p_all):.1%} "
           f"| w=[{w[0]:6.3f}, {w[1]:6.3f}] | b={b:6.3f}")
 ```
 
@@ -750,7 +753,7 @@ for ax, step in zip(axes.flat, [0, 1, 2, 3, 4, 10]):
         xr = np.linspace(-2.5, 2.5, 50)
         ax.plot(xr, -(a[0] * xr + bb) / a[1], "r--", lw=2)
     ax.set_xlim(-2.5, 2.5); ax.set_ylim(-2.5, 2.8)
-    ax.set_title("学習前（境界なし）" if step == 0 else f"魚を{step}匹見た後", fontsize=10)
+    ax.set_title("学習前（境界なし）" if step == 0 else f"{step}件を見た後", fontsize=10)
     ax.grid(True, alpha=0.3)
 fig.supxlabel("輝度（標準化）", fontsize=10)
 fig.supylabel("重さ（標準化）", fontsize=10)
@@ -759,18 +762,18 @@ plt.show()
 ```
 
 ::: {.caption-note .center}
-◯印：直前に見せた魚
+◯印：直前に見せたデータ点
 :::
 
 ::: {.callout-note title="結果"}
-- **予測が正解からずれている分だけ、境界がその魚を正しく分類する向きへ動く**
+- **予測が正解からずれている分だけ、境界がその点を正しく分類する向きへ動く**
 - 人が決めた閾値（縦線）と違い、機械は**斜めの直線**を自由に調整していく
 :::
 
 
-## 10匹を見た後のパラメータを読む {#peek-logistic-params}
+## 10件を見た後のパラメータを読む {#peek-logistic-params}
 
-- 10匹を見た後の $w$、$b$ は、[学習ループ](#peek-one-at-a-time){.peek}の出力の最終行
+- 10件を見た後の $w$、$b$ は、[学習ループ](#peek-one-at-a-time){.peek}の出力の最終行
 
 | パラメータ | 値 | 意味 |
 |---|---|---|
@@ -782,7 +785,7 @@ plt.show()
 
 ::: {.callout-note}
 - `sklearn` の `fit()` も「予測 → 損失 → パラメータを更新」という考え方は同じ
-   - ただし、この1匹ずつのループをそのまま実行するわけではなく、最適化方法や正則化などが加わる
+   - ただし、この1データずつのループをそのまま実行するわけではなく、最適化方法や正則化などが加わる
 :::
 
 
@@ -793,7 +796,7 @@ plt.show()
 #| fig-align: center
 from matplotlib.colors import TwoSlopeNorm
 
-# Height z over the (brightness, weight) plane, using w and b after 10 fish
+# Height z over the (brightness, weight) plane, using w and b after 10 data points
 g1, g2 = np.meshgrid(np.linspace(-2.5, 2.5, 60), np.linspace(-2.5, 2.8, 60))
 zg = w[0] * g1 + w[1] * g2 + b
 zmax = np.abs(zg).max()
@@ -840,27 +843,27 @@ plt.show()
 
 - $w_1<0$：暗い方へ上り坂になる（[暗いほど Salmon 寄り](#peek-logistic-params){.peek}）
 - $b$ で板を上下させると、水際が平行に動く（[決定境界の位置の調整](#peek-logistic-params){.peek}）
-- [直線（$f = 0$ の点の集合）](#peek-line-distance){.peek}は、この水際を表す
+- [直線（$f(x) = 0$ の点の集合）](#peek-line-distance){.peek}は、この水際を表す
 - 学習で係数が変わると、板が傾き直して水際（決定境界）が動く
 
 
-## **Tweak** 学習率と魚の数を変える {.badge-practice}
+## **Tweak** 学習率とデータの数を変える {.badge-practice}
 
-- [1匹ずつ学習するコード](#peek-one-at-a-time){.peek} を**書き換えて実行**
+- [1データずつ学習するコード](#peek-one-at-a-time){.peek} を**書き換えて実行**
 
 ::: {.tweak}
 | やりたいこと | コード |
 |--|--|
 | ゆっくり学ばせる | `lr = 0.05` |
-| 80匹全部見せる | `for i in range(80):` |
+| 80件全部見せる | `for i in range(80):` |
 :::
 
 ::: {.callout-tip title="チェックポイント"}
 - `lr = 0.05`：正答率は元の `lr = 0.5` と並ぶのに、**Loss は大きく異なる**
-   - パラメータが少ししか動かず、当たってはいるが**自信がない**（$p$ が 0.5 の近くにある）
+   - パラメータが少ししか動かず、正しく分類できてはいるが**自信がない**（$p$ が 0.5 の近くにある）
    - 正答率に出ない差が Loss に出る
-- 80匹全部見せると、正答率はどこまで上がる？
-   - 途中で**下がる瞬間**が何度もある（間違えた魚に境界が引っ張られるため）
+- 80件全部見せると、正答率はどこまで上がる？
+   - 途中で**下がる瞬間**が何度もある（間違えたデータ点に境界が引っ張られるため）
 :::
 
 
@@ -1022,7 +1025,7 @@ $$z = w_0 \underbrace{x_0}_{=\,1} + w_1 x_1 + w_2 x_2$$
 
 
 ::: {.takeaway}
-**$z = w_1 x + w_2 x^2$：曲がった境界が引けて、学習は今までどおり楽**
+**$z = w_1 x + w_2 x^2$：曲がった境界を作れて、学習は今までどおり楽**
 :::
 
 - **$x$ について曲線なので、境界を直線以外にできる**
@@ -1055,11 +1058,11 @@ $$z = w_0 \underbrace{x_0}_{=\,1} + w_1 x_1 + w_2 x_2$$
 - 直線は、$f(x) = ax_1 + bx_2 + c$ が 0 になる点の集合
    - 値の符号：直線のどちら側か
    - 値の大きさ：直線からの遠さ
-- 回帰と分類で、データ点での $f$ の値に求めることが逆
+- 回帰と分類で、データ点での $f(x)$ に求めることが逆
    - 回帰：0 に近づける（MSE）
    - 分類：正しい側で 0 から遠ざける
 - 分類の損失：二値交差エントロピー
-   - 確率に変換：$p = \sigma(f)$
+   - 確率に変換：$p = \sigma(f(x))$
    - 採点：正解クラスの確率 $q$ に $-\log q$
 - 学習：交差エントロピーを**勾配降下法**で最小化
    - 勾配は $(p - y) x$（ロジスティック関数と交差エントロピーを組み合わせた結果）
@@ -1088,17 +1091,17 @@ $$\text{(a)}\; f(x) = 5x \qquad \text{(b)}\; f(x) = 3x + 2 \qquad \text{(c)}\; f
 
 ### 問題2：ロジスティック回帰を2ステップ学習する
 
-次の2匹のデータで、ロジスティック回帰のパラメータを2回更新せよ。
+次の2件のデータで、ロジスティック回帰のパラメータを2回更新せよ。
 
 - 特徴量（標準化済み）：（輝度, 重さ）
-- 1匹目：$x^{(1)} = (2, 1)$、Salmon（$y=1$）
-- 2匹目：$x^{(2)} = (-1, 1)$、Sea bass（$y=0$）
+- 1件目：$x^{(1)} = (2, 1)$、Salmon（$y=1$）
+- 2件目：$x^{(2)} = (-1, 1)$、Sea bass（$y=0$）
 - 初期値：$w = (0, 0)$、$b = 0$
 - 学習率：$\alpha = 0.5$
 
-1. 1匹目の $z$、$p = \sigma(z)$、差 $\delta = p - y$ を計算
+1. 1件目の $z$、$p = \sigma(z)$、差 $\delta = p - y$ を計算
 2. 更新式 $w \leftarrow w - \alpha\,\delta\,x$、$b \leftarrow b - \alpha\,\delta$ で更新
-3. 続けて2匹目でも更新
+3. 続けて2件目でも更新
 4. 同じ計算をコードで実行し、手計算との一致を確認
 
 ヒント：$\sigma(0) = 0.5$（この問題で使う $\sigma$ の値はこれだけ）
@@ -1164,7 +1167,7 @@ print("(d) f(0,0) =", f_d(0, 0), "| f(1+3, 2+1) =", f_d(1 + 3, 2 + 1),
 
 ::: {.panel-tabset}
 
-### 1匹目（$x = (2, 1)$、$y = 1$）
+### 1件目（$x = (2, 1)$、$y = 1$）
 
 $$z = 0 \times 2 + 0 \times 1 + 0 = 0, \qquad p = \sigma(0) = 0.5, \qquad \delta = 0.5 - 1 = -0.5$$
 
@@ -1175,11 +1178,11 @@ $$b \leftarrow 0 + 0.25 = 0.25$$
 - パラメータがすべて 0 なので $p = 0.5$（五分五分）
 - 正解 $y=1$ との差 $\delta=-0.5$ の分だけ、パラメータが動く
 
-### 2匹目（$x = (-1, 1)$、$y = 0$）
+### 2件目（$x = (-1, 1)$、$y = 0$）
 
 $$z = 0.5 \times (-1) + 0.25 \times 1 + 0.25 = 0, \qquad p = 0.5, \qquad \delta = 0.5$$
 
-- 2匹目は**ちょうど境界の上**（$z = 0$）にある
+- 2件目は**ちょうど境界の上**（$z = 0$）にある
 
 **更新:**
 $$w \leftarrow (0.5, 0.25) - 0.5 \times 0.5 \times (-1, 1) = (0.75,\; 0)$$
@@ -1202,16 +1205,16 @@ w = np.array([0.0, 0.0])
 b  = 0.0
 lr = 0.5
 
-fishes = [(np.array([2.0, 1.0]), 1),    # Salmon
-          (np.array([-1.0, 1.0]), 0)]   # Sea bass
+samples = [(np.array([2.0, 1.0]), 1),    # Salmon
+           (np.array([-1.0, 1.0]), 0)]   # Sea bass
 
-for i, (xi, yi) in enumerate(fishes, 1):
+for i, (xi, yi) in enumerate(samples, 1):
     z     = xi @ w + b
     p     = sigmoid(z)
     delta = p - yi
     w = w - lr * delta * xi
     b     = b - lr * delta
-    print(f"{i}匹目: z={z:.2f}, p={p:.2f}, δ={delta:+.2f} → w={w}, b={b:.2f}")
+    print(f"{i}件目: z={z:.2f}, p={p:.2f}, δ={delta:+.2f} → w={w}, b={b:.2f}")
 ```
 
 ::: {.callout-note title="結果"}
