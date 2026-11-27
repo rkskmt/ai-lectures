@@ -159,7 +159,7 @@ plt.show()
 ```{python}
 #| echo: true
 
-# 目で見て決めた閾値。輝度がこれより小さければ Salmon
+# 散布図から決めた閾値。輝度がこれより小さければ Salmon
 lightness_threshold = 5.5
 ```
 
@@ -365,7 +365,7 @@ salmon_brightness = np.array(salmon_brightness)
 seabass_weights = np.array(seabass_weights)
 seabass_brightness = np.array(seabass_brightness)
 
-# 目で見て決めた閾値。輝度がこれより小さければ Salmon
+# 散布図から決めた閾値。輝度がこれより小さければ Salmon
 lightness_threshold = 5.5
 
 def gini(n_salmon, n_seabass):
@@ -1158,7 +1158,7 @@ plot_decision_boundary(tree_model, X, y,
 
 |  | 人が引いた直線 | 決定木 |
 |---|-------|-------|
-| 境界の決め方 | 目で見て引く（データを眺める過程が入る） | ジニ不純度で自動最適化 |
+| 境界の決め方 | 散布図を見て人が判断 | ジニ不純度で自動最適化 |
 | 説明のしやすさ | 単純で、理由を説明しやすい | if-then ルールとして読める |
 | 特徴量が3つ以上 | 目で見えなくなる | そのまま扱える |
 | 弱点 | 最適の保証がない<br>自動化できない | 過学習（[overfitting]{.en}）しやすい<br>境界は階段状のみ |
@@ -1272,7 +1272,7 @@ plt.show()
    - 重さ + 輝度の組み合わせで、より正確に分類
 
 2. **決定境界は人が決めても、アルゴリズムで決めてもよい**
-   - 人：目で見て直線を引く
+   - 人：散布図を見て直線を引く
    - 決定木：ジニ不純度で自動最適化
 
 3. **手法によって決定境界が異なる**

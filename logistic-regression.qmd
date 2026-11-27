@@ -7,7 +7,7 @@ subtitle: "斜めの決定境界をデータから求める"
 
 - [**勾配降下法**](optimization-gradient-descent.qmd#peek-gd-code){.peek}（[gradient descent]{.en}）：傾きの逆方向に少しずつ進んで最小値を探す
 - **回帰**：体長→重さの直線を勾配降下で当て、[厳密解と一致した](linear-regression.qmd#peek-exact-line){.peek}
-- **分類（[classification]{.en}）**：[直線を**目で見て**引いた](classification-2d-boundaries.qmd#peek-handline){.peek}
+- **分類（[classification]{.en}）**：輝度・重さ→魚の種類を[閾値](classification-2d-boundaries.qmd#peek-handline){.peek}（[threshold]{.en}）で判定
 
 
 ::: {.callout-note title="今回の主題"}
@@ -50,9 +50,9 @@ plt.scatter(salmon_brightness, salmon_weights, c="black", marker="o", s=35,
             alpha=0.7, label="Salmon")
 plt.scatter(seabass_brightness, seabass_weights, c="red", marker="s", s=35,
             alpha=0.7, label="Sea bass")
-plt.axvline(x=5.5, color="blue", linestyle="--", linewidth=2.5, label="手で引いた縦線（輝度 5.5）")
+plt.axvline(x=5.5, color="blue", linestyle="--", linewidth=2.5, label="人が引いた縦線（輝度 5.5）")
 plt.xlabel("輝度"); plt.ylabel("重さ (g)")
-plt.title("目で見て引いた決定境界　正答率 86%")
+plt.title("人が引いた決定境界　正答率 86%")
 plt.legend(fontsize=9, loc="upper left")
 plt.grid(True, alpha=0.3)
 plt.tight_layout()
@@ -60,7 +60,7 @@ plt.show()
 ```
 
 ::: {.callout-note title="結果"}
-- [目で見て決めた閾値](classification-2d-boundaries.qmd#peek-handline){.peek}（[threshold]{.en}、輝度 5.5）で引いた縦線
+- [人が決めた閾値](classification-2d-boundaries.qmd#peek-handline){.peek}（輝度 5.5）で引いた縦線
 - **斜めの線**ならもっと上手く分離できそう
 :::
 
@@ -785,7 +785,7 @@ plt.show()
 | $w_2$（重さ） | 正 | **重い**ほど Salmon 寄り |
 | $b$（バイアス） | 負 | 決定境界の位置を調整 |
 
-- [散布図を**目で見て**分かった傾向](classification-2d-boundaries.qmd#peek-diagonal){.peek}を、学習したパラメータが数値で示している
+- [散布図から分かった傾向](classification-2d-boundaries.qmd#peek-diagonal){.peek}を、学習したパラメータが数値で示している
 
 ::: {.callout-note}
 - `sklearn` の `fit()` も「予測 → 損失 → パラメータを更新」という考え方は同じ
