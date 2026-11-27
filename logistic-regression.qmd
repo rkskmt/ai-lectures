@@ -216,6 +216,35 @@ plt.show()
 | 直線の上 | 0 | 0.5 |
 | Sea bass の側で直線から遠い | 大きい負の値 | 0 に近い |
 
+```{python}
+#| echo: false
+#| fig-align: center
+#| classes: fig-medium
+# The S-shaped curve squeezes the whole real line of f(x) into 0..1
+ff = np.linspace(-8, 8, 400)
+plt.figure(figsize=(7.0, 3.8))
+plt.axhline(1, color="gray", ls="--", lw=1)
+plt.axhline(0, color="gray", ls="--", lw=1)
+plt.plot(ff, 1 / (1 + np.exp(-ff)), color="#e74c3c", lw=2.5)
+for fx, note, tx, ty in [(-5, "Sea bass の側で遠い", -7.6, 0.35),
+                         (0, "直線の上（p = 0.5）", 0.8, 0.22),
+                         (5, "Salmon の側で遠い", 2.6, 0.6)]:
+    px = 1 / (1 + np.exp(-fx))
+    plt.scatter([fx], [px], s=50, color="#2c3e50", zorder=5)
+    plt.annotate(note, (fx, px), xytext=(tx, ty), fontsize=10,
+                 arrowprops={"arrowstyle": "->", "color": "gray"})
+plt.text(-7.9, 1.04, "1 を超えない", ha="left", va="bottom", fontsize=10, color="gray")
+plt.text(7.9, -0.04, "0 を下回らない", ha="right", va="top", fontsize=10, color="gray")
+plt.text(-7.9, -0.17, "← −∞ まで続く", ha="left", va="top", fontsize=10)
+plt.text(7.9, -0.17, "+∞ まで続く →", ha="right", va="top", fontsize=10)
+plt.xlim(-8, 8); plt.ylim(-0.27, 1.15); plt.yticks([0, 0.25, 0.5, 0.75, 1])
+plt.xlabel("$f(x)$"); plt.ylabel("$p$")
+plt.title("S字形の関数：どんな $f(x)$ も 0〜1 に収める", fontsize=11)
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
 - **シグモイド関数（[sigmoid function]{.en}）**：S字形の関数の総称
    - 表の変換は、値が 0〜1 に収まるシグモイド関数で作れる
 
@@ -227,32 +256,21 @@ plt.show()
 $$p=\sigma(f(x))=\frac{1}{1+e^{-f(x)}}$$
 
 - $\sigma$：ロジスティック関数（sigmoid の s に当たるギリシャ文字）
+   - コードでは `sigmoid` という関数名で書くことが多い
 - $f(x)$：ロジスティック関数への入力（データ点 $x$ での値）
 - $p$：ロジスティック関数から得られる出力（Salmon である確率）
 
-```{python}
-#| echo: false
-#| fig-align: center
-ff = np.linspace(-6, 6, 200)
-plt.figure(figsize=(5.5, 2.8))
-plt.plot(ff, 1 / (1 + np.exp(-ff)), color="#e74c3c", lw=2.5)
-plt.axhline(0.5, color="gray", ls=":", lw=1)
-plt.axvline(0, color="gray", ls=":", lw=1)
-plt.xlabel("$f(x)$"); plt.ylabel("$p = \\sigma(f(x))$")
-plt.title("ロジスティック関数")
-plt.grid(True, alpha=0.3)
-plt.tight_layout()
-plt.show()
-```
-
 ::: {.callout-note}
-- [$f(x)$ と $p$ の対応表](#peek-to-probability){.peek}どおりの形
-- $f(x) = 0$（直線の上）でちょうど $p = 0.5$
-   - $p \geq 0.5$（$f(x) \geq 0$）なら Salmon と判定
-   - $p < 0.5$ なら Sea bass と判定
-- 直線から遠いほど、$p$ は 1 か 0 に近づく
-   - $p$ は「**どれくらい自信があるか**」まで表す
-- コードでは、ロジスティック関数を `sigmoid` という名前で書くことが多い
+- $f(x) = 0$：$e^{0} = 1$ なので $p = \dfrac{1}{2}$
+- $f(x) \to +\infty$：$e^{-f(x)} \to 0$ なので $p \to 1$
+- $f(x) \to -\infty$：$e^{-f(x)} \to +\infty$ なので $p \to 0$
+- どれも[$f(x)$ と $p$ の対応表](#peek-to-probability){.peek}どおり
+:::
+
+::: {.callout-important title="重要ポイント"}
+- $p \geq 0.5$（$f(x) \geq 0$）なら Salmon と判定
+- $p < 0.5$ なら Sea bass と判定
+- $p$ は「**どれくらい自信があるか**」まで表す
 :::
 
 
