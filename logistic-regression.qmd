@@ -7,11 +7,13 @@ subtitle: "斜めの決定境界をデータから求める"
 
 - [**勾配降下法**](optimization-gradient-descent.qmd#peek-gd-code){.peek}（[gradient descent]{.en}）：傾きの逆方向に少しずつ進んで最小値を探す
 - **回帰**：体長→重さの直線を勾配降下で当て、[厳密解と一致した](linear-regression.qmd#peek-exact-line){.peek}
-- **分類（[classification]{.en}）**：輝度・重さ→ Salmon か Sea bass かを[閾値](classification-2d-boundaries.qmd#peek-handline){.peek}（[threshold]{.en}）で判定
+- **分類（[classification]{.en}）**：特徴量からクラスを予測
+   - [決定木](classification-2d-boundaries.qmd#peek-tree-boundary){.peek}：軸に平行な閾値を組み合わせて分ける
+   - [k-NN](knn-curse.qmd#peek-knn-code){.peek}：近い $k$ 個のデータの投票で決める
 
 
 ::: {.callout-note title="今回の主題"}
-- [「斜めの直線で分けられそう」と言いながら、求めた境界は軸に平行な線だけだった](classification-2d-boundaries.qmd#peek-diagonal){.peek}
+- [「斜めの直線で分けられそう」と言いながら、斜めの直線は求めていなかった](classification-2d-boundaries.qmd#peek-diagonal){.peek}
 - データから最適な**斜めの決定境界（[decision boundary]{.en}）**を求められるか？
 :::
 
@@ -60,7 +62,7 @@ plt.show()
 ```
 
 ::: {.callout-note title="結果"}
-- [人が決めた閾値](classification-2d-boundaries.qmd#peek-handline){.peek}（輝度 5.5）の縦線
+- [人が決めた閾値](classification-2d-boundaries.qmd#peek-handline){.peek}（[threshold]{.en}、輝度 5.5）の縦線
 - **斜めの線**ならもっと上手く分離できそう
 :::
 
