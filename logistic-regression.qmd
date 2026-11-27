@@ -3,10 +3,11 @@ title: "ロジスティック回帰"
 subtitle: "斜めの決定境界をデータから求める"
 ---
 
-## ここまでの道具
+## ここまで
 
-- [**勾配降下法**](optimization-gradient-descent.qmd#peek-gd-code){.peek}（[gradient descent]{.en}）：傾きの逆方向に少しずつ進んで最小値を探す
-- **回帰**：体長→重さの直線を勾配降下で当て、[厳密解と一致した](linear-regression.qmd#peek-exact-line){.peek}
+- [**勾配降下法**](optimization-gradient-descent.qmd#peek-gd-code){.peek}（[gradient descent]{.en}）：少しずつ進んで最小値を探す
+- **回帰**：体長→重さの直線を勾配降下法でフィッティング
+   - [このケースでは解と一致](linear-regression.qmd#peek-exact-line){.peek}
 - **分類（[classification]{.en}）**：特徴量からクラスを予測
    - [決定木](classification-2d-boundaries.qmd#peek-tree-boundary){.peek}：軸に平行な閾値を組み合わせて分ける
    - [k-NN](knn-curse.qmd#peek-knn-code){.peek}：近い $k$ 個のデータの投票で決める
@@ -207,8 +208,9 @@ plt.show()
 ## $f(x)$ を確率に変える {#peek-to-probability}
 
 - $f(x)$ は $-\infty$ から $+\infty$ まで取る
-- 確率にすると、正解クラスにどれだけの確率を出したかで採点できる
-- 変換に求めること（$p$：Salmon である確率）
+- そこで、この値域を 0〜1 に変換する関数を考える
+   - この 0〜1 の値を確率 $p$ として扱う
+      - $p$：Salmon である確率
 
 | データ点の位置 | $f(x)$ | $p$ |
 |---|---|---|
@@ -249,33 +251,29 @@ plt.show()
 - 0〜1 に押し込める仕組み：$f(x)$ が 0 から離れるほど、$p$ の変化を小さくする
    - $f(x)$ が 0 の近くでは、$p$ は大きく変わる
    - 0 から遠くでは $p$ はほとんど変わらず、1 や 0 に近づくだけで届かない
-- **シグモイド関数（[sigmoid function]{.en}）**：この仕組みを持つS字形の関数の総称
 :::
 
 
 ## ロジスティック関数（[Logistic Function]{.en}） {#peek-logistic-function}
 
-- 値が 0〜1 に収まるシグモイド関数のうち、代表的な[ロジスティック関数](#peek-logistic-name){.peek}を使う
+- ロジスティック回帰はシグモイド関数として[ロジスティック関数](#peek-logistic-name){.peek}を使う
 
 $$p=\sigma(f(x))=\frac{1}{1+e^{-f(x)}}$$
 
 - $\sigma$：ロジスティック関数（sigmoid の s に当たるギリシャ文字）
-   - コードでは `sigmoid` という関数名で書くことが多い
 - $f(x)$：ロジスティック関数への入力（データ点 $x$ での値）
-- $p$：ロジスティック関数から得られる出力（Salmon である確率）
+- $p$：各クラスである確率（Salmon である確率）
 
-::: {.callout-note}
+::: {.callout-note title="[$f(x)$ と $p$ の対応表](#peek-to-probability){.peek}どおり"}
 - どんな $f(x)$ でも $e^{-f(x)} > 0$ なので、分母は 1 より大きく $0 < p < 1$
 - $f(x) = 0$：$e^{0} = 1$ なので $p = \dfrac{1}{2}$
 - $f(x) \to +\infty$：$e^{-f(x)} \to 0$ なので $p \to 1$
 - $f(x) \to -\infty$：$e^{-f(x)} \to +\infty$ なので $p \to 0$
-- どれも[$f(x)$ と $p$ の対応表](#peek-to-probability){.peek}どおり
 :::
 
 ::: {.callout-important title="重要ポイント"}
 - $p \geq 0.5$（$f(x) \geq 0$）なら Salmon と判定
 - $p < 0.5$ なら Sea bass と判定
-- $p$ は「**どれくらい自信があるか**」まで表す
 :::
 
 
