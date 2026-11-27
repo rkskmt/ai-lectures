@@ -149,31 +149,29 @@ $$\text{距離} = \frac{|Ax_1 + Bx_2 + C|}{\sqrt{A^2 + B^2}}$$
 #| echo: false
 #| fig-align: center
 #| classes: fig-medium
-# Example line 3*x1 + 4*x2 - 12 = 0, where sqrt(3^2 + 4^2) = 5
-A, B, C = 3, 4, -12
-ab_norm = np.hypot(A, B)
-xs = np.linspace(-0.5, 5.5, 50)
-line_x2 = -(A * xs + C) / B
-plt.figure(figsize=(6.0, 5.0))
-plt.fill_between(xs, line_x2, 4.5, color="#f5b7b1", alpha=0.4)
-plt.fill_between(xs, -0.5, line_x2, color="#aed6f1", alpha=0.4)
-plt.plot(xs, line_x2, "b--", lw=2.5)
-# Each point, its value, and the perpendicular to the line (its distance)
-for u1, u2, dy in [(4, 3, 0.35), (1, 1, -0.4)]:
-    value = A * u1 + B * u2 + C
-    foot = np.array([u1, u2]) - value / ab_norm**2 * np.array([A, B])
-    plt.plot([u1, foot[0]], [u2, foot[1]], color="#8e44ad", lw=2.5)
-    plt.scatter([u1], [u2], c="#2c3e50", s=55, zorder=5)
-    plt.text(u1, u2 + dy, f"値 {value:+d}　距離 {abs(value) / ab_norm:g}".replace("-", "−"),
-             fontsize=12, color="#8e44ad", ha="center", va="center")
-plt.annotate("値 = 0", (3.6, 0.3), xytext=(4.1, 1.1), fontsize=12, color="blue",
-             arrowprops={"arrowstyle": "->", "color": "blue"})
-plt.text(3.2, 4.0, "値 > 0 の側", fontsize=11, color="#c0392b", fontweight="bold")
-plt.text(-0.3, -0.2, "値 < 0 の側", fontsize=11, color="#2471a3", fontweight="bold")
-plt.xlim(-0.5, 5.5); plt.ylim(-0.5, 4.5)
+# Example f(x) = x1 + 2*x2 - 4: every point gets a value, and the points
+# whose value happens to be 0, (0, 2), (2, 1), (4, 0), lie on one line
+g1, g2 = np.meshgrid(np.arange(0, 6), np.arange(0, 4))
+f_values = g1 + 2 * g2 - 4
+xs = np.linspace(-0.6, 5.6, 50)
+plt.figure(figsize=(6.4, 4.4))
+plt.plot(xs, (4 - xs) / 2, color="black", lw=2, zorder=1)
+for u1, u2, v in zip(g1.ravel(), g2.ravel(), f_values.ravel()):
+    if v == 0:
+        style = {"color": "black", "fontweight": "bold",
+                 "bbox": {"boxstyle": "round", "fc": "#f9e79f", "ec": "black"}}
+    else:
+        style = {"color": "#c0392b" if v > 0 else "#2471a3",
+                 "bbox": {"boxstyle": "round", "fc": "white", "ec": "none"}}
+    plt.text(u1, u2, f"{v:+d}".replace("-", "−") if v else "0",
+             fontsize=13, ha="center", va="center", zorder=3, **style)
+plt.annotate("値が 0 の点の集合＝直線", (4.6, -0.3), xytext=(2.6, -0.75), fontsize=11,
+             va="center", arrowprops={"arrowstyle": "->", "color": "black"})
+plt.xlim(-0.6, 5.6); plt.ylim(-1.0, 3.6)
 plt.gca().set_aspect("equal")
+plt.xticks(range(0, 6)); plt.yticks(range(0, 4))
 plt.xlabel("$x_1$"); plt.ylabel("$x_2$")
-plt.title("例：$3x_1 + 4x_2 - 12 = 0$（$\\sqrt{3^2 + 4^2} = 5$）", fontsize=11)
+plt.title("例：各点での $f(x) = x_1 + 2x_2 - 4$ の値", fontsize=11)
 plt.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.show()
@@ -183,6 +181,62 @@ plt.show()
 - 直線は、代入した値が **0** になる点の集まり
 - 値の**符号**：直線のどちら側か
 - 値の**大きさ**：直線からの遠さ（距離に比例）
+:::
+
+
+## 回帰は $f$ を 0 に近づけ、分類は 0 から遠ざける
+
+```{python}
+#| echo: false
+#| fig-align: center
+# Left: the 15 fish of the regression deck and their least-squares line
+reg_lengths = np.array([55.2, 56.0, 51.8, 58.1, 56.8, 51.5, 56.6, 51.6, 61.0, 52.0,
+                        58.5, 50.5, 55.5, 48.7, 46.6])
+reg_weights = np.array([1884, 1978, 1483, 2181, 2028, 1476, 2094, 1563, 2474, 1414,
+                        2230, 1445, 1838, 1370, 1096], dtype=float)
+a_ls, b_ls = np.polyfit(reg_lengths, reg_weights, 1)
+
+fig, axes = plt.subplots(1, 2, figsize=(11, 4.2))
+ax = axes[0]
+gx = np.linspace(46, 62, 50)
+ax.plot(gx, a_ls * gx + b_ls, color="blue", lw=2)
+ax.vlines(reg_lengths, reg_weights, a_ls * reg_lengths + b_ls, color="#8e44ad", lw=2)
+ax.scatter(reg_lengths, reg_weights, c="#5dade2", edgecolors="gray", s=40, zorder=3)
+ax.set_title("回帰直線　$f(x, t) = ax + b - t$", fontsize=11)
+ax.set_xlabel("体長 $x$ (cm)"); ax.set_ylabel("重さ $t$ (g)")
+
+# Right: the slanted boundary from "このような直線を求めたい", x2 = 120 x1 + 1050
+ax = axes[1]
+bb = np.linspace(1.6, 10.4, 50)
+ax.plot(bb, 120 * bb + 1050, color="blue", lw=2)
+for br, wt, col, mk, name in [(salmon_brightness, salmon_weights, "black", "o", "Salmon"),
+                              (seabass_brightness, seabass_weights, "red", "s", "Sea bass")]:
+    ax.vlines(br, wt, 120 * br + 1050, color=col, lw=1, alpha=0.35)
+    ax.scatter(br, wt, c=col, marker=mk, s=30, alpha=0.7, zorder=3, label=name)
+ax.set_title("決定境界　$f(x) = x_2 - (120x_1 + 1050)$", fontsize=11)
+ax.set_xlabel("輝度 $x_1$"); ax.set_ylabel("重さ $x_2$ (g)")
+ax.set_ylim(1050, 2700)
+ax.legend(fontsize=9, loc="upper right")
+for ax in axes:
+    ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.caption-note .center}
+縦の線分：魚の点を代入した $f$ の値
+:::
+
+::: {.callout-note title="回帰直線"}
+- すべての魚で $f$ の値を **0 に近づけたい**（点が直線上に並ぶ）
+- [MSE（平均二乗誤差）](linear-regression.qmd#peek-mse){.peek}は、この値を2乗した平均
+:::
+
+::: {.callout-note title="決定境界"}
+- すべての魚で $f$ の値を **0 から遠ざけたい**（点が直線から離れる）
+   - 符号は Salmon と Sea bass で逆
+- $f$ の値の MSE は、分類の損失にならない
+   - 正しい側で 0 から離れるほど小さくなる損失が要る
 :::
 
 
