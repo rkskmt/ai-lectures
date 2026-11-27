@@ -245,8 +245,12 @@ plt.tight_layout()
 plt.show()
 ```
 
-- **シグモイド関数（[sigmoid function]{.en}）**：S字形の関数の総称
-   - 表の変換は、値が 0〜1 に収まるシグモイド関数で作れる
+::: {.callout-note}
+- 0〜1 に押し込める仕組み：$f(x)$ が 0 から離れるほど、$p$ の変化を小さくする
+   - $f(x)$ が 0 の近くでは、$p$ は大きく変わる
+   - 0 から遠くでは $p$ はほとんど変わらず、1 や 0 に近づくだけで届かない
+- **シグモイド関数（[sigmoid function]{.en}）**：この仕組みを持つS字形の関数の総称
+:::
 
 
 ## ロジスティック関数（[Logistic Function]{.en}） {#peek-logistic-function}
@@ -261,6 +265,7 @@ $$p=\sigma(f(x))=\frac{1}{1+e^{-f(x)}}$$
 - $p$：ロジスティック関数から得られる出力（Salmon である確率）
 
 ::: {.callout-note}
+- どんな $f(x)$ でも $e^{-f(x)} > 0$ なので、分母は 1 より大きく $0 < p < 1$
 - $f(x) = 0$：$e^{0} = 1$ なので $p = \dfrac{1}{2}$
 - $f(x) \to +\infty$：$e^{-f(x)} \to 0$ なので $p \to 1$
 - $f(x) \to -\infty$：$e^{-f(x)} \to +\infty$ なので $p \to 0$
