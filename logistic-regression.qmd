@@ -366,7 +366,7 @@ $$\ell(y,p)=-\left[y\log p+(1-y)\log(1-p)\right]$$
 - 全データの平均損失：$L=\dfrac{1}{N}\sum_i\ell(y_i,p_i)$
 
 
-## 損失を $f(x)$ で見ると、0 から遠ざける形になっている {#peek-loss-in-f}
+## $f(x)$ に対する損失：正しい側で 0 から離れるほど小さい {#peek-loss-in-f}
 
 - $p = \sigma(f(x))$ を二値交差エントロピーに代入する
    - $y=1$（Salmon）：$\ell = -\log \sigma(f(x))$
@@ -684,7 +684,7 @@ def accuracy(y_true, p):
 - 1データ分の勾配は、[`delta`、`d_w`、`d_b` の3行](#peek-gradient-code){.peek}で計算する
 
 
-## 1データずつ学習してみる {#peek-one-at-a-time}
+## 1データずつ学習する {#peek-one-at-a-time}
 
 - 1データ分の損失 $\ell$ の勾配で更新する
    - 全データの平均損失 $L$ は更新に使わない
@@ -724,7 +724,7 @@ Loss は1データごとに下がっていく
 :::
 
 
-## 境界が動く様子を見る
+## 学習中の $f(x)$ の挙動
 
 ```{python}
 #| echo: false
@@ -753,7 +753,7 @@ for ax, step in zip(axes.flat, [0, 1, 2, 3, 4, 10]):
         xr = np.linspace(-2.5, 2.5, 50)
         ax.plot(xr, -(a[0] * xr + bb) / a[1], "r--", lw=2)
     ax.set_xlim(-2.5, 2.5); ax.set_ylim(-2.5, 2.8)
-    ax.set_title("学習前（境界なし）" if step == 0 else f"{step}件を見た後", fontsize=10)
+    ax.set_title("学習前（境界なし）" if step == 0 else f"{step}件で更新した後", fontsize=10)
     ax.grid(True, alpha=0.3)
 fig.supxlabel("輝度（標準化）", fontsize=10)
 fig.supylabel("重さ（標準化）", fontsize=10)
@@ -762,18 +762,18 @@ plt.show()
 ```
 
 ::: {.caption-note .center}
-◯印：直前に見せたデータ点
+◯印：直前の更新に使ったデータ点
 :::
 
 ::: {.callout-note title="結果"}
-- **予測が正解からずれている分だけ、境界がその点を正しく分類する向きへ動く**
-- 人が決めた閾値（縦線）と違い、機械は**斜めの直線**を自由に調整していく
+- **予測が正解からずれている分だけ、$f(x) = 0$ の直線がその点を正しく分類する向きへ動く**
+- 人が決めた閾値（縦線）と違い、学習で決まる直線は**斜め**にもなる
 :::
 
 
-## 10件を見た後のパラメータを読む {#peek-logistic-params}
+## 10件で更新した後のパラメータ {#peek-logistic-params}
 
-- 10件を見た後の $w$、$b$ は、[学習ループ](#peek-one-at-a-time){.peek}の出力の最終行
+- 10件で更新した後の $w$、$b$ は、[学習ループ](#peek-one-at-a-time){.peek}の出力の最終行
 
 | パラメータ | 値 | 意味 |
 |---|---|---|
@@ -789,7 +789,7 @@ plt.show()
 :::
 
 
-## $z$ を高さとして見る
+## $z$ を高さにすると、傾いた板になる
 
 ```{python}
 #| echo: false
@@ -810,7 +810,7 @@ ax3.plot_surface(g1, g2, zg, cmap="RdBu_r", norm=norm, alpha=0.85, linewidth=0)
 ax3.plot_surface(g1, g2, np.zeros_like(zg), color="gray", alpha=0.25)
 ax3.contour(g1, g2, zg, levels=[0], colors="black", linewidths=2.5)
 ax3.set_xlabel("輝度"); ax3.set_ylabel("重さ"); ax3.set_zlabel("z")
-ax3.set_title("z を高さとして見る（灰色＝高さ 0）", fontsize=11)
+ax3.set_title("z を高さにした板（灰色＝高さ 0）", fontsize=11)
 
 # Right: the same plate seen from above; the black line is height 0
 ax2 = fig.add_subplot(1, 2, 2)
@@ -821,7 +821,7 @@ for cls, col in [(1, "salmon"), (0, "#5dade2")]:
     ax2.scatter(X_norm[m, 0], X_norm[m, 1], c=col, s=25, edgecolors="gray")
 fig.colorbar(cf, ax=ax2, label="z（高さ）")
 ax2.set_xlabel("輝度（標準化）"); ax2.set_ylabel("重さ（標準化）")
-ax2.set_title("上から見る：黒線＝高さ 0", fontsize=11)
+ax2.set_title("真上から：黒線＝高さ 0", fontsize=11)
 plt.tight_layout()
 plt.show()
 ```
@@ -854,15 +854,15 @@ plt.show()
 ::: {.tweak}
 | やりたいこと | コード |
 |--|--|
-| ゆっくり学ばせる | `lr = 0.05` |
-| 80件全部見せる | `for i in range(80):` |
+| 学習率を小さくする | `lr = 0.05` |
+| 80件全部で更新する | `for i in range(80):` |
 :::
 
 ::: {.callout-tip title="チェックポイント"}
 - `lr = 0.05`：正答率は元の `lr = 0.5` と並ぶのに、**Loss は大きく異なる**
    - パラメータが少ししか動かず、正しく分類できてはいるが**自信がない**（$p$ が 0.5 の近くにある）
    - 正答率に出ない差が Loss に出る
-- 80件全部見せると、正答率はどこまで上がる？
+- 80件全部で更新すると、正答率はどこまで上がる？
    - 途中で**下がる瞬間**が何度もある（間違えたデータ点に境界が引っ張られるため）
 :::
 
