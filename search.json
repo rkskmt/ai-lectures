@@ -6242,5 +6242,12 @@
     "title": "ロジスティック回帰",
     "section": "解答例：ロジスティック回帰を2ステップ学習する",
     "text": "解答例：ロジスティック回帰を2ステップ学習する\n\n\n1件目（\\(x = (2, 1)\\)、\\(y = 1\\)）2件目（\\(x = (-1, 1)\\)、\\(y = 0\\)）\n\n\n\\[\\begin{aligned}\nz &= 0 \\times 2 + 0 \\times 1 + 0 = 0 \\\\\np &= \\sigma(0) = 0.5, \\qquad p - y = 0.5 - 1 = -0.5\n\\end{aligned}\\]\n勾配: \\[\\begin{aligned}\n\\frac{\\partial \\ell}{\\partial w_1} &= (p-y)\\,x_1 = -0.5 \\times 2 = -1 \\\\\n\\frac{\\partial \\ell}{\\partial w_2} &= (p-y)\\,x_2 = -0.5 \\times 1 = -0.5 \\\\\n\\frac{\\partial \\ell}{\\partial b} &= p-y = -0.5\n\\end{aligned}\\]\n更新: \\[\\begin{aligned}\nw_1 &\\leftarrow 0 - 0.5 \\times (-1) = 0.5 \\\\\nw_2 &\\leftarrow 0 - 0.5 \\times (-0.5) = 0.25 \\\\\nb &\\leftarrow 0 - 0.5 \\times (-0.5) = 0.25\n\\end{aligned}\\]\n\nパラメータがすべて 0 なので \\(p = 0.5\\)（五分五分）\n正解 \\(y=1\\) との差 \\(p-y=-0.5\\) の分だけ、パラメータが動く\n\n\n\n\\[\\begin{aligned}\nz &= 0.5 \\times (-1) + 0.25 \\times 1 + 0.25 = 0 \\\\\np &= 0.5, \\qquad p - y = 0.5\n\\end{aligned}\\]\n\n2件目はちょうど境界の上（\\(z = 0\\)）にある\n\n勾配: \\[\\begin{aligned}\n\\frac{\\partial \\ell}{\\partial w_1} &= (p-y)\\,x_1 = 0.5 \\times (-1) = -0.5 \\\\\n\\frac{\\partial \\ell}{\\partial w_2} &= (p-y)\\,x_2 = 0.5 \\times 1 = 0.5 \\\\\n\\frac{\\partial \\ell}{\\partial b} &= p-y = 0.5\n\\end{aligned}\\]\n更新: \\[\\begin{aligned}\nw_1 &\\leftarrow 0.5 - 0.5 \\times (-0.5) = 0.75 \\\\\nw_2 &\\leftarrow 0.25 - 0.5 \\times 0.5 = 0 \\\\\nb &\\leftarrow 0.25 - 0.5 \\times 0.5 = 0\n\\end{aligned}\\]"
+  },
+  {
+    "objectID": "logistic-regression.html#演習ロジスティック回帰を2ステップ学習する",
+    "href": "logistic-regression.html#演習ロジスティック回帰を2ステップ学習する",
+    "title": "ロジスティック回帰",
+    "section": "演習：ロジスティック回帰を2ステップ学習する",
+    "text": "演習：ロジスティック回帰を2ステップ学習する\n\n次の2件のデータで、ロジスティック回帰のパラメータを手計算で2回更新せよ。\n\n特徴量（標準化済み）：（輝度, 重さ）\n1件目：\\(x^{(1)} = (2, 1)\\)、Salmon（\\(y=1\\)）\n2件目：\\(x^{(2)} = (-1, 1)\\)、Sea bass（\\(y=0\\)）\n初期値：\\(w = (0, 0)\\)、\\(b = 0\\)\n学習率：\\(\\alpha = 0.5\\)\n\n\n1件目の \\(z\\)、\\(p = \\sigma(z)\\)、勾配 \\(\\dfrac{\\partial \\ell}{\\partial w_1}\\)、\\(\\dfrac{\\partial \\ell}{\\partial w_2}\\)、\\(\\dfrac{\\partial \\ell}{\\partial b}\\) を計算\n更新式 \\(w_j \\leftarrow w_j - \\alpha\\dfrac{\\partial \\ell}{\\partial w_j}\\)、\\(b \\leftarrow b - \\alpha\\dfrac{\\partial \\ell}{\\partial b}\\) で更新\n続けて2件目でも、勾配を計算して更新\n\nヒント：\\(\\sigma(0) = 0.5\\)（この問題で使う \\(\\sigma\\) の値はこれだけ）"
   }
 ]
