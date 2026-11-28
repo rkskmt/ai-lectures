@@ -390,7 +390,7 @@ b = 0.0
 
 ## 準備：魚のデータを入力に使う
 
-- [ロジスティック回帰で勾配を追った魚](logistic-regression.qmd#peek-parameter-gradients){.peek}と同じ入力と正解を使う
+- 入力と正解は次の値とする
 
 $$
 x=(2,\,0.5),
@@ -477,10 +477,6 @@ p: 0.401312339887548
 - `sigmoid`：活性化関数
    - 数式のロジスティック関数 $\sigma$ に対応する、コードでの一般的な名前
 
-::: {.callout-note}
-[勾配の計算例の $p=0.4$](logistic-regression.qmd#peek-parameter-gradients){.peek}は、この `p` を丸めた値
-:::
-
 
 ## 採点：損失関数は二値交差エントロピー（[Binary Cross-Entropy]{.en}） {#peek-one-layer-loss}
 
@@ -502,10 +498,6 @@ $$
 
 - 損失関数はネットワークの図には入らない
    - Forwardの出力 $p$ と正解 $y$ を受け取って採点する関数
-
-::: {.callout-note}
-[$p=0.4$ と丸めて計算した $0.92$](logistic-regression.qmd#peek-loss-value){.peek}と同じ魚の、丸める前の損失
-:::
 
 
 ## 採点：`binary_cross_entropy` として実装する
@@ -533,7 +525,7 @@ loss: 0.9130152523999526
 ## 勾配：更新に使う3つの微分値
 
 - 損失関数の偏微分（[partial derivative]{.en}）の値から、$w_1,w_2,b$ をどちらへ動かせば損失が下がるかが分かる
-- 式は[連鎖律で導いた結果](logistic-regression.qmd#peek-parameter-gradients){.peek}をそのまま使う
+- 式は[連鎖律で導いた結果](logistic-regression.qmd#peek-gradient-code){.peek}をそのまま使う
 
 $$
 \frac{\partial\ell}{\partial z}=p-y,
@@ -581,10 +573,6 @@ DZ -> B
    - よって $d_{w_1}=d_z\times x_1\approx-1.1974$
 - $z=w_1x_1+w_2x_2+b$ で $b$ は1倍で足されていたので、$d_b=d_z$
 - $d_{w_1},d_{w_2},d_b$ は、$\partial\ell/\partial w_1,\ \partial\ell/\partial w_2,\ \partial\ell/\partial b$ の値
-
-::: {.callout-note}
-[$p=0.4$ に丸めて手計算した $-1.2,\ -0.3,\ -0.6$](logistic-regression.qmd#peek-parameter-gradients){.peek}の、丸める前の値
-:::
 
 
 ## 勾配：Backward
@@ -838,7 +826,7 @@ X -> H -> O -> P
 
 ここまでに作った4つの関数で、[1匹ずつ学習した魚のデータ](logistic-regression.qmd#peek-one-at-a-time){.peek}（80匹）を学習せよ。
 
-0. [魚データの定義](logistic-regression.qmd#peek-forward){.peek}をコピーし、`X_norm` と `y` を用意
+0. [魚データの定義](logistic-regression.qmd#peek-one-at-a-time){.peek}をコピーし、`X_norm` と `y` を用意
 1. ここまでに作った `forward`・`binary_cross_entropy`・`backward`・`update`（と部品の `linear`・`sigmoid`）を用意
 2. `w = np.array([0.0, 0.0])`、`b = 0.0`、`lr = 0.5` で初期化（[1匹ずつ学習したとき](logistic-regression.qmd#peek-one-at-a-time){.peek}と同じ値）
 3. 80匹を順に1匹ずつ学習（1匹ごとに `forward`、`backward`、`update` を実行）

@@ -102,9 +102,9 @@ plt.show()
 
 ## そもそも直線とは {#peek-line-distance}
 
-$$f(x) = ax_1 + bx_2 + c$$
+$$f(x) = w_1x_1 + w_2x_2 + b$$
 
-という関数に対して$f(x)=0$となる点の集合が直線である。
+という関数に対して $f(x)=0$ となる点の集合が直線である。
 
 
 ```{python}
@@ -139,7 +139,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-- 直線の式 $ax_1 + bx_2 + c = 0$：代入した値が **0** になる点の集まり
+- 直線の式 $w_1x_1 + w_2x_2 + b = 0$：代入した値が **0** になる点の集まり
 - 値の**符号**：直線のどちら側か
 - 値の**大きさ**：直線からの遠さ
 
@@ -205,18 +205,13 @@ plt.show()
 :::
 
 
-## $f(x)$ を確率に変える {#peek-to-probability}
+## $f(x)$ を確率っぽいものに変換 {#peek-to-probability}
 
-- $f(x)$ は $-\infty$ から $+\infty$ まで取る
-- そこで、この値域を 0〜1 に変換する関数を考える
-   - この 0〜1 の値を確率 $p$ として扱う
-      - $p$：Salmon である確率
-
-| データ点の位置 | $f(x)$ | $p$ |
-|---|---|---|
-| Salmon の側で直線から遠い | 大きい正の値 | 1 に近い |
-| 直線の上 | 0 | 0.5 |
-| Sea bass の側で直線から遠い | 大きい負の値 | 0 に近い |
+- $f(x)$ は $-\infty$ から $+\infty$ まで値域があるため扱いにくい
+- そこで、この出力を 0〜1 に押し込む変換をする関数を導入
+   - 0〜1 とした値を確率 $p$ として扱う
+      - 例えば、$p$ は Salmon と判定してよい蓋然性が高い確率（のようなもの）
+      - 逆に $1-p$ は Salmon 以外
 
 ```{python}
 #| echo: false
@@ -247,169 +242,106 @@ plt.tight_layout()
 plt.show()
 ```
 
-::: {.callout-note}
-- 0〜1 に押し込める仕組み：$f(x)$ が 0 から離れるほど、$p$ の変化を小さくする
-   - $f(x)$ が 0 の近くでは、$p$ は大きく変わる
-   - 0 から遠くでは $p$ はほとんど変わらず、1 や 0 に近づくだけで届かない
-:::
+| データ点の位置 | $f(x)$ | $p$ |
+|---|---|---|
+| Salmon の側で直線から遠い | 大きい正の値 | 1 に近い |
+| 直線の上 | 0 | 0.5 |
+| Sea bass の側で直線から遠い | 大きい負の値 | 0 に近い |
 
 
 ## ロジスティック関数（[Logistic Function]{.en}） {#peek-logistic-function}
 
-- ロジスティック回帰はシグモイド関数として[ロジスティック関数](#peek-logistic-name){.peek}を使う
+- $f(x)$ を確率っぽいものに変換できる関数に、シグモイド関数がある
+  - S字の形をしている関数という意味
+  - ロジスティック回帰では、シグモイド関数のうち[ロジスティック関数](#peek-logistic-name){.peek}を使う
 
 $$p=\sigma(f(x))=\frac{1}{1+e^{-f(x)}}$$
 
+::: {.caption-note .center}
 - $\sigma$：ロジスティック関数（sigmoid の s に当たるギリシャ文字）
 - $f(x)$：ロジスティック関数への入力（データ点 $x$ での値）
 - $p$：各クラスである確率（Salmon である確率）
+:::
 
-::: {.callout-note title="[$f(x)$ と $p$ の対応表](#peek-to-probability){.peek}どおり"}
+::: {.callout-note title="[$f(x)$ と $p$ の対応表](#peek-to-probability){.peek}と同じ"}
 - どんな $f(x)$ でも $e^{-f(x)} > 0$ なので、分母は 1 より大きく $0 < p < 1$
-- $f(x) = 0$：$e^{0} = 1$ なので $p = \dfrac{1}{2}$
-- $f(x) \to +\infty$：$e^{-f(x)} \to 0$ なので $p \to 1$
-- $f(x) \to -\infty$：$e^{-f(x)} \to +\infty$ なので $p \to 0$
+- $f(x) = 0$
+  - $e^{0} = 1$ なので $p = \dfrac{1}{2}$
+- $f(x) \to +\infty$
+  - $e^{-f(x)} \to 0$ なので $p \to 1$
+- $f(x) \to -\infty$
+  - $e^{-f(x)} \to +\infty$ なので $p \to 0$
 :::
 
-::: {.callout-important title="重要ポイント"}
-- $p \geq 0.5$（$f(x) \geq 0$）なら Salmon と判定
-- $p < 0.5$ なら Sea bass と判定
-:::
 
+## 例：$f(x) = 1$ の場合
 
-## $f(x) = 1$ を実際に確率へ変換する
-
-- $f(x) = 1$ をロジスティック関数に代入する
+$f(x) = 1$ をロジスティック関数に代入
 
 $$p = \sigma(1) = \frac{1}{1 + e^{-1}} \approx 0.731$$
 
-- $f(x)=1$ のデータ点は、Salmon である確率が $73.1\%$ と解釈できる
 
-
-## 正解クラスの確率 $q$ で、損失の条件を言い直す {#peek-q-condition}
-
-- $y$：正解ラベル（Salmon は 1、Sea bass は 0）
-- 2クラスしかないので、Salmon である確率が $p$ なら、Sea bass である確率は $1-p$
-- $q$：正解クラスに出した確率
-   - 正解が Salmon なら $q = p$
-   - 正解が Sea bass なら $q = 1-p$
-
-| データ点の位置 | $q$ | 損失 |
-|---|---|---|
-| 正しい側で直線から遠い | 1 に近い | **0 に近づける** |
-| 直線の上 | 0.5 | 中くらい |
-| 逆の側で直線から遠い | 0 に近い | **大きくする** |
-
-::: {.takeaway}
-$q$ が 1 に近いほど小さく、0 に近いほど大きい損失を作る
+::: {.takeaway title="今の気持ち"}
+$f(x)=1$ のデータ点は $p$ が 0.731 であるから、Salmon である確率を $73.1\%$ だと解釈してしまおう
 :::
 
 
-## 全データの $q$ の積を大きくする {#peek-q-product}
+## $p$ から Loss を作る準備 {#peek-q-condition}
 
-- 全データで、正解クラスの確率を同時に高めたい
-   - 各データの $q$ を掛けた積 $q_1 q_2 \cdots q_N$ を大きくする
-   - この積：全データの正解ラベルを、まとめて出す確率
-- log は増加関数なので、積を大きくすることと、積の log を大きくすることは同じ
-   - log をとると積が和になり、1データずつの損失に分けられる
-
-$$\log(q_1 q_2 \cdots q_N) = \log q_1 + \log q_2 + \cdots + \log q_N$$
-
-- 損失は小さいほど良いので、符号を反転してデータ数 $N$ で平均する
-
-$$L = \frac{1}{N}\sum_{i} \left(-\log q_i\right)$$
+- $p$ はそのまま Loss にできない（方向が逆）
+  - やりたい Loss 関数の挙動
+    - $p$ が高いなら Loss が低い
+    - $p$ が低いなら Loss が高い
+- おまけに正解ラベル以外（Sea bass）も $p$ としてしまうと訳が分からなくなる
+- そこで**「$q$：正解クラスに出した確率」**を導入する
+  - 2クラスの場合、片方の確率が $p$ なら逆は $1-p$
+    - 正解が Salmon なら $q = p$
+    - 正解が Sea bass（Salmon 以外）なら $q = 1-p$
 
 ::: {.takeaway}
-1データ分の損失（[loss]{.en}）：$\ell = -\log q$
+$q$ が 1 に近いほど小さく、0 に近いほど大きい損失を作りたい
 :::
 
 
-## −log の形 {#peek-neglog}
+## このような損失を $-\log q$ で作ってみよう {#peek-neglog}
+
+- $q$ をいい感じにする関数として例えば以下が考えられる
+   - $1-q$：外し方がひどくても（$q \to 0$）、損失は 1 で頭打ち
+   - $-\log q$：外し方がひどいと（$q \to 0$）損失青天井
+     - ※注 log は増加関数なのでマイナスをつけて良い感じに
 
 ```{python}
 #| echo: false
 #| fig-align: center
+#| classes: fig-small
+# Two candidate losses that both satisfy the condition; only -log q keeps
+# growing for a confident miss (q near 0)
 qq = np.linspace(0.005, 1.0, 400)
 plt.figure(figsize=(6.0, 3.2))
-plt.plot(qq, -np.log(qq), color="#e74c3c", lw=2.5)
-for qx, dx, dy, note in [(0.4, 0.05, 0.35, "q=0.4 → 損失 0.92"),
-                         (0.99, -0.32, 0.55, "q=0.99 → 損失 0.01")]:
-    lv = -np.log(qx)
-    plt.scatter([qx], [lv], s=60, color="#2c3e50", zorder=5)
-    plt.annotate(note, (qx, lv), xytext=(qx + dx, lv + dy), fontsize=10,
-                 arrowprops={"arrowstyle": "->", "color": "gray"})
+plt.plot(qq, -np.log(qq), color="#e74c3c", lw=2.5, label="$-\\log q$")
+plt.plot(qq, 1 - qq, color="#1c7ed6", lw=2.5, ls="--", label="$1-q$")
+plt.annotate("めっちゃ間違い", (0.03, 3.5), xytext=(0.18, 4.3), fontsize=10,
+             arrowprops={"arrowstyle": "->", "color": "gray"})
 plt.xlabel("正解クラスに出した確率 q")
-plt.ylabel("損失 −log q")
+plt.ylabel("Loss")
 plt.ylim(-0.2, 5.5)
+plt.legend(fontsize=10, loc="upper right")
 plt.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.show()
 ```
 
-::: {.callout-note title="結果"}
-- 正解クラスの確率が高いほど（$q \to 1$）、損失は 0 に近づく
-- 外れるほど、損失は**急カーブ**で跳ね上がる
-- $q \to 0$（自信満々の間違い）では、損失が無限大に向かう
-   - 間違いに大きな損失を与えられるので都合がよい
-- [$q$ で言い直した損失の条件](#peek-q-condition){.peek}どおりの形
-:::
-
-
-## $-\log q$ の一般形：交差エントロピー（[Cross Entropy]{.en}） {#peek-cross-entropy}
-
-- $-\log q$ を、クラスごとの式で書く
-- クラス $c$ ごとに、正解ラベル $y_c$ と予測確率 $p_c$ を用意する
-   - 正解クラスだけ $y_c=1$、それ以外は $y_c=0$
-
-$$
-\ell(\mathbf{y},\mathbf{p})
-=-\sum_c y_c\log p_c
-$$
-
-- $y_c=0$ の項は消えるので、正解クラスの項だけが残る
-- 正解クラスに出した確率を $q$ と置けば
-
-$$\ell=-\log q$$
-
 ::: {.takeaway}
-**交差エントロピー**：正解クラスに出した確率 $q$ を $-\log q$ で採点する損失関数（[loss function]{.en}）
+$\ell = -\log q$ を Loss 関数とする（ただし1データ分）
 :::
 
 
-## 2クラス版：二値交差エントロピー（[Binary Cross-Entropy]{.en}） {#peek-binary-cross-entropy}
+## 一旦、現状の損失を $f(x)$ から見るとどのような形になるかチェック {#peek-loss-in-f}
 
-- クラスの順を（Salmon、Sea bass）とする
-- Salmon の確率を $p$、正解ラベルを $y$ とすると
-
-$$\mathbf{y}=(y,\,1-y),\qquad \mathbf{p}=(p,\,1-p)$$
-
-- この2つを一般の交差エントロピーへ代入すると
-
-$$\ell(y,p)=-\left[y\log p+(1-y)\log(1-p)\right]$$
-
-- $y$ と $1-y$ は **0/1 のスイッチ**
-   - 正解側の項だけが残る
-
-::: {.takeaway}
-**二値交差エントロピー**：2クラス用の交差エントロピー
-:::
-
-
-## $p=0.4$ のデータ点を採点する {#peek-loss-value}
-
-| 正解 | 採点する確率 $q$ | $p=0.4$ のときの損失 $-\log q$ |
-|---|---:|---:|
-| $y=1$（Salmon） | $q=p$ | $-\log(0.4)\approx0.92$ |
-| $y=0$（Sea bass） | $q=1-p$ | $-\log(0.6)\approx0.51$ |
-
-- 全データの平均損失：$L=\dfrac{1}{N}\sum_i\ell(y_i,p_i)$
-
-
-## $f(x)$ に対する損失：正しい側で 0 から離れるほど小さい {#peek-loss-in-f}
-
-- $p = \sigma(f(x))$ を二値交差エントロピーに代入する
-   - $y=1$（Salmon）：$\ell = -\log \sigma(f(x))$
-   - $y=0$（Sea bass）：$\ell = -\log\bigl(1-\sigma(f(x))\bigr)$
+- 当初欲しかった損失は、$f(x)$ が正しい側で 0 から離れるほど小さくなる関数
+- $p = \sigma(f(x))$ を代入して、損失を $f(x)$ の関数として描く
+   - 正解が Salmon：$\ell = -\log \sigma(f(x))$
+   - 正解が Sea bass：$\ell = -\log\bigl(1-\sigma(f(x))\bigr)$
 
 ```{python}
 #| echo: false
@@ -418,8 +350,8 @@ $$\ell(y,p)=-\left[y\log p+(1-y)\log(1-p)\right]$$
 ff = np.linspace(-6, 6, 300)
 plt.figure(figsize=(6.5, 3.6))
 # -log(sigmoid(f)) = log(1 + e^-f), -log(1 - sigmoid(f)) = log(1 + e^f)
-plt.plot(ff, np.logaddexp(0, -ff), color="black", lw=2.5, label="正解が Salmon（$y=1$）")
-plt.plot(ff, np.logaddexp(0, ff), color="red", lw=2.5, ls="--", label="正解が Sea bass（$y=0$）")
+plt.plot(ff, np.logaddexp(0, -ff), color="black", lw=2.5, label="正解が Salmon")
+plt.plot(ff, np.logaddexp(0, ff), color="red", lw=2.5, ls="--", label="正解が Sea bass")
 plt.axvline(0, color="gray", ls=":", lw=1)
 plt.text(4.5, 1.0, "Salmon の側", ha="center", fontsize=11)
 plt.text(-4.5, 1.0, "Sea bass の側", ha="center", fontsize=11)
@@ -441,10 +373,55 @@ plt.show()
 :::
 
 
+## log は全データを一括で扱いやすい {#peek-q-product}
+
+- 全データで、正解クラスの確率を同時に高めたい
+   - 各データの $q$ を掛けた積 $q_1 q_2 \cdots q_N$ を大きくする
+   - この積：全データの正解ラベルを、まとめて出す確率
+- log は積が和になり、1データずつの損失に分けられる
+
+$$-\log(q_1 q_2 \cdots q_N) = -\log q_1 - \log q_2 - \cdots - \log q_N = \ell_1 + \ell_2 + \cdots + \ell_N$$
+
+- なのでデータ数で割って平均をとるといい感じになる
+
+$$L = \frac{1}{N}\sum_{i} \left(-\log q_i\right)$$
+
+::: {.takeaway}
+$L$ を Loss 関数とする
+:::
+
+
+## クロスエントロピー：正解ラベル $y$ も Loss 関数に入れ込みたい {#peek-binary-cross-entropy}
+
+- $q$ は、正解によって場合分けで決めている
+   - **正解が Salmon なら** $q = p$
+   - **正解が Sea bass なら** $q = 1-p$
+- このままでは、**○○なら**ごとに、別々に選ぶ必要がある
+  - つまり、クロネッカーのデルタのように条件判定により使う項をスイッチしたい
+- そこで、正解ラベル $y$（0/1）を利用
+  $$\ell(y,p)=-\left[y\log p+(1-y)\log(1-p)\right]$$
+  - $y=1$（Salmon）
+    - 右の項が消えて $\ell=-\log p$（$p=0.4$ なら $\ell\approx0.92$）
+  - $y=0$（Sea bass）
+    - 左の項が消えて $\ell=-\log(1-p)$
+
+::: {.takeaway}
+これが**（二値）交差エントロピー（[Binary Cross-Entropy]{.en}）**
+:::
+
+::: {.callout-note title="クロスエントロピーは3値以上でも使える優れもの"}
+[多クラスの交差エントロピー](#peek-cross-entropy){.peek}
+:::
+
+
 ## {background-color="white" .center .break-slide}
 
 ::: {.break-title}
-勾配降下法でパラメータを学習する
+勾配降下法で学習する
+:::
+
+::: {.break-subtitle}
+$f(x)$ はある。Loss も決まった。あとは学習
 :::
 
 
@@ -452,15 +429,8 @@ plt.show()
 
 $$z = w_1 x_1 + w_2 x_2 + b$$
 
-- [直線の $f(x) = ax_1 + bx_2 + c$](#peek-line-distance){.peek} と同じ形で、係数を学習で求める
-   - 係数の名前を、機械学習の書き方に変える
-
-| 直線の $f(x)$ | $a$ | $b$ | $c$ |
-|---|---|---|---|
-| $z$ | $w_1$ | $w_2$ | $b$ |
-
-- $w_1, w_2$：**重み（[weight]{.en}）**（どの特徴量をどれだけ重視するか）
-- $b$：**バイアス（[bias]{.en}）**
+- [直線の $f(x)$](#peek-line-distance){.peek} の係数 $w_1, w_2, b$ を、学習で求める
+- 機械学習では、$b$ を**バイアス（[bias]{.en}）**と呼ぶことが多い
 - 確率は $p = \sigma(z)$
 
 ::: {.takeaway}
@@ -468,7 +438,7 @@ $z$：データ点 $x$ での $f(x)$（$z = 0$ の点の集合が決定境界）
 :::
 
 
-## 回帰と同じく勾配降下法で学習する
+## 勾配降下法で学習
 
 ```{.d2 sketch="true" width="96%"}
 direction: right
@@ -481,29 +451,35 @@ A -> B -> C -> D -> E
 E -> A: "繰り返す"
 ```
 
-- [直線を求めたとき](linear-regression.qmd#peek-mse-grad){.peek}と同じ形の更新式を使う
+- 普通に勾配降下法を実行：[回帰直線のとき](linear-regression.qmd#peek-mse-grad){.peek}とまったく同じ
 
 $$w_j \leftarrow w_j-\alpha\frac{\partial L}{\partial w_j},
 \qquad b \leftarrow b-\alpha\frac{\partial L}{\partial b}$$
 
-- $\alpha$（アルファ）：学習率（[learning rate]{.en}）
-   - コードでは learning rate を略して `lr` と書く
-- $j$：どの特徴量の重みかを表す添字
-   - ここでは $j=1$（輝度）、$j=2$（重さ）
-- [損失 $L$](#peek-q-product){.peek} はできたので、残りは**勾配（[gradient]{.en}）**
+::: {.caption-note .center}
+- $\alpha$（アルファ）：学習率（[learning rate]{.en}、`lr`）
+- $j$：どの特徴量の係数かを表す添字
+   - 例：魚データにおいては $j=1$（輝度）、$j=2$（重さ）
+:::
+
+::: {.takeaway}
+これで[損失 $L$](#peek-q-product){.peek} はできたので、残りは**勾配（[gradient]{.en}）**
+:::
 
 
-## ロジスティック関数を微分する {#peek-chain-rule}
+## ロジスティック関数の微分 {#peek-chain-rule}
 
-- 勾配を求めるには、ロジスティック関数の微分（傾き）が要る
-- 合成関数（[composite function]{.en}）の微分は、**外側の微分 × 内側の微分**
+損失 $\ell$ は、$z$ から2段で計算している
 
+$$z \;\xrightarrow{\;\text{ロジスティック関数}\;}\; p \;\xrightarrow{\;\text{交差エントロピー}\;}\; \ell$$
+
+- 勾配のため、まず1段目のロジスティック関数を微分する
+- 準備：合成関数（[composite function]{.en}）の微分は**外側の微分 × 内側の微分**
 $$
 \frac{d}{dx}h(g(x))=h'(g(x))\,g'(x),
 \qquad
 \frac{dy}{dx}=\frac{dy}{du}\frac{du}{dx}
 $$
-
 - $p=(1+e^{-z})^{-1}$ を合成関数として微分する
    - 外側：$(\;)^{-1}$
    - 内側：$1+e^{-z}$（指数関数（[exponential function]{.en}）の[微分](#peek-exp-derivative){.peek}）
@@ -516,9 +492,9 @@ $$\begin{aligned}
 \end{aligned}$$
 
 
-## 実は、微分結果は $p$ だけで表せる
+## ここで朗報：微分せずとも $p$ だけでロジスティック関数の微分は計算可能
 
-- 微分した直後は、次の形になっている
+- ロジスティック関数の微分は以下の形
 
 $$
 \frac{dp}{dz}=\frac{e^{-z}}{(1+e^{-z})^2}
@@ -526,7 +502,7 @@ $$
 $$
 
 - 一方、ロジスティック関数の出力は $p=\dfrac{1}{1+e^{-z}}$
-- $p(1-p)$ を計算すると、微分した直後と同じ形になる
+- $p(1-p)$ を計算すると、
 
 $$p(1-p)
 =\frac{1}{1+e^{-z}}
@@ -534,20 +510,17 @@ $$p(1-p)
 =\frac{e^{-z}}{(1+e^{-z})^2}
 \tag{2}$$
 
-- (1)と(2)の右辺が同じなので、ロジスティック関数の微分は $p$ だけで書ける
+- (1)と(2)の右辺が同じなので、ロジスティック関数の微分は $p$ だけで計算可能
 
 $$\therefore \qquad \frac{dp}{dz}=p(1-p)$$
 
+
+## 交差エントロピーを $p$ で微分する {#peek-bce-derivative}
+
+
 ::: {.takeaway}
-$$
-\text{出力： }p=\sigma(z)
-\quad\Longrightarrow\quad
-\text{傾き： }\frac{dp}{dz}=p(1-p)
-$$
+$\dfrac{dp}{dz}$ はできたので、次は交差エントロピーの微分 $\dfrac{\partial\ell}{\partial p}$ を求める
 :::
-
-
-## 二値交差エントロピーを $p$ で微分する {#peek-bce-derivative}
 
 - **正解が $y=1$ のとき**：$\ell=-\log p$
 
@@ -557,32 +530,27 @@ $$\frac{\partial\ell}{\partial p}=-\frac{1}{p}$$
 
 $$\frac{\partial\ell}{\partial p}=\frac{1}{1-p}$$
 
-::: {.takeaway}
-ここで求めたのは、$p$ が変化したときに損失 $\ell$ がどれだけ変化するか
-:::
-
 
 ## 2つの微分を掛けると $p-y$ になる {#peek-logistic-p-minus-y}
 
 - $p$ は $z$ から計算されるので、連鎖律（[chain rule]{.en}）で2つの微分を掛ける
-
 $$
 \frac{\partial\ell}{\partial z}
 =\frac{\partial\ell}{\partial p}\frac{dp}{dz}
 $$
+  - $\dfrac{\partial\ell}{\partial p}$：ラベルにより2通りある（[交差エントロピーの微分](#peek-bce-derivative){.peek}）
+  - $\dfrac{dp}{dz}=p(1-p)$：ロジスティック関数だけで決まるので一意
 
-- ロジスティック関数の微分は、どちらの正解でも同じ
+ここで、ラベルごとに、2つの微分を掛けてみると…
 
-$$\frac{dp}{dz}=p(1-p)$$
-
-- **正解が $y=1$ のとき**：
+- **ラベルが $y=1$ のとき**：
 
 $$\frac{\partial \ell}{\partial z}
 =\underbrace{\left(-\frac{1}{p}\right)}_{\partial\ell/\partial p}
  \underbrace{p(1-p)}_{dp/dz}
 =-(1-p)=p-1=p-y \qquad (y=1)$$
 
-- **正解が $y=0$ のとき**：
+- **ラベルが $y=0$ のとき**：
 
 $$\frac{\partial \ell}{\partial z}
 =\underbrace{\frac{1}{1-p}}_{\partial\ell/\partial p}
@@ -590,46 +558,13 @@ $$\frac{\partial \ell}{\partial z}
 =p=p-0=p-y \qquad (y=0)$$
 
 ::: {.takeaway}
-どちらの正解でも
-$$\frac{\partial \ell}{\partial z}=p-y$$
+どのラベルでも、$z$ についての勾配は、単に $p$ と正解ラベル $y$ の差を計算するだけ
+$$\dfrac{\partial \ell}{\partial z}=p-y$$
 :::
 
 
-## 1データ分の入力からパラメータの勾配が決まる {#peek-parameter-gradients}
+## 1データ分の勾配のコード {#peek-gradient-code}
 
-- $z=w_1x_1+w_2x_2+b$ なので
-
-$$\frac{\partial z}{\partial w_j}=x_j, \qquad
-\frac{\partial z}{\partial b}=1$$
-
-- [いま求めた](#peek-logistic-p-minus-y){.peek} $\dfrac{\partial \ell}{\partial z}=p-y$ を使い、連鎖律で更新に必要な $w_j$ と $b$ の勾配を求める
-
-$$\frac{\partial \ell}{\partial w_j}
-=\frac{\partial \ell}{\partial z}\frac{\partial z}{\partial w_j}
-=(p-y)x_j, \qquad
-\frac{\partial \ell}{\partial b}=p-y$$
-
-- 先ほどの $p=0.4$、$y=1$（Salmon）の例なら、$p-y=0.4-1=-0.6$
-- あるデータ点の入力を $x=(2,\,0.5)$ とすると
-   - $\dfrac{\partial \ell}{\partial w_1}=-0.6\times2=-1.2$
-   - $\dfrac{\partial \ell}{\partial w_2}=-0.6\times0.5=-0.3$
-   - $|x_1|$ が $|x_2|$ の4倍なので、$w_1$ の勾配も4倍
-
-- 学習率 $\alpha$ を掛けて更新
-
-$$w_j \leftarrow w_j-\alpha(p-y)x_j, \qquad
-b \leftarrow b-\alpha(p-y)$$
-
-::: {.callout-important title="損失値そのものから勾配を求めたわけではない"}
-- 先ほど計算した $0.92$ は、現在の予測がどれくらい悪いかを表す目安
-   - この値から勾配を求めるわけではない
-- 更新に使うのは、**現在のパラメータ位置における損失関数の傾き（＝勾配）**
-:::
-
-
-## 1データ分の勾配をコードに置き換える {#peek-gradient-code}
-
-- 数式の各部分に、そのまま変数名を付ける
 
 ```python
 delta = p - y
@@ -640,15 +575,19 @@ d_b = delta
 | コード | 数式 | 意味 |
 |---|---|---|
 | `delta` | $p-y=\dfrac{\partial \ell}{\partial z}$ | 1データ分の損失の、$z$ に対する勾配 |
-| `d_w[j]` | $(p-y)x_j=\dfrac{\partial \ell}{\partial w_j}$ | 重み $w_j$ の勾配 |
+| `d_w[j]` | $(p-y)x_j=\dfrac{\partial \ell}{\partial w_j}$ | 係数 $w_j$ の勾配 |
 | `d_b` | $p-y=\dfrac{\partial \ell}{\partial b}$ | バイアス $b$ の勾配 |
 
-::: {.callout-note}
-[`backward`](nn-logistic.qmd#peek-one-layer-backward){.peek}：ニューラルネットワーク（[neural network]{.en}、NN）の実装で、**出力側から各パラメータの勾配を求める**関数
+::: {.caption-note .center}
+$z=w_1x_1+w_2x_2+b$ なので、$w_j$ には $x_j$、$b$ には 1 が掛かっていると解釈（後述）
 :::
 
 
-## 実装 {#peek-forward}
+## 実際に1データずつ逐次学習してみる {#peek-one-at-a-time}
+
+- [log で和にした](#peek-q-product){.peek}ので、$L$ の勾配は1データ分の勾配の平均
+   - だから、1データ分の勾配で少しずつ更新しても大丈夫
+     - $L$ で全データまとめて更新してもよいが、練習のため1データずつ進める
 
 ```{python}
 #| echo: true
@@ -656,28 +595,28 @@ d_b = delta
 #| code-summary: "データの定義（クリックして展開）"
 import numpy as np
 
-salmon_weights     = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,
-                               1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,
-                               2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,
-                               1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652])
-salmon_brightness  = np.array([3.5, 5.8, 4.9, 4.4, 2.6, 2.6, 2.2, 5.5, 4.4, 4.8, 2.1,
-                               5.9, 5.3, 2.8, 2.7, 2.7, 3.2, 4.1, 3.7, 3.2, 4.4, 2.6,
-                               3.2, 3.5, 3.8, 5.1, 2.8, 4.1, 4.4, 2.2, 4.4, 2.7, 2.3,
-                               5.8, 5.9, 5.2, 3.2, 2.4, 4.7, 3.8])
-seabass_weights    = np.array([1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,
-                               1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,
-                               1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,
-                               1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531])
-seabass_brightness = np.array([5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8,
-                               8.9, 9.7, 9.5, 8.0, 9.6, 5.4, 6.0, 5.2, 6.6, 6.9, 6.4,
-                               9.1, 6.8, 6.4, 7.7, 5.7, 9.0, 5.4, 9.9, 8.9, 6.0, 5.0,
-                               9.1, 8.5, 8.6, 8.9, 5.4, 6.8, 5.6])
-
-X = np.column_stack([
-    np.concatenate([salmon_brightness, seabass_brightness]),
-    np.concatenate([salmon_weights,    seabass_weights])
+# 1行 = 1匹の特徴量 [輝度, 重さ]。Salmon 40匹のあとに Sea bass 40匹
+X = np.array([
+    # Salmon
+    [3.5, 2149], [5.8, 1959], [4.9, 2194], [4.4, 2457], [2.6, 1930],
+    [2.6, 1930], [2.2, 2474], [5.5, 2230], [4.4, 1859], [4.8, 2163],
+    [2.1, 1861], [5.9, 1860], [5.3, 2073], [2.8, 1426], [2.7, 1483],
+    [2.7, 1831], [3.2, 1696], [4.1, 2094], [3.7, 1728], [3.2, 1576],
+    [4.4, 2028], [2.6, 1903], [3.2, 2057], [3.5, 2229], [3.8, 1884],
+    [5.1, 1884], [2.8, 2240], [4.1, 2081], [4.4, 1838], [2.2, 2037],
+    [4.4, 1839], [2.7, 1838], [2.3, 1978], [5.8, 1554], [5.9, 1591],
+    [5.2, 1820], [3.2, 1731], [2.4, 1992], [4.7, 1752], [3.8, 1652],
+    # Sea bass
+    [5.6, 1677], [7.5, 1327], [5.2, 1486], [9.5, 1440], [6.3, 1857],
+    [8.3, 1476], [6.6, 1749], [7.6, 2203], [7.7, 1979], [5.9, 1468],
+    [9.8, 1496], [8.9, 1737], [9.7, 1099], [9.5, 1341], [8.0, 1748],
+    [9.6, 1563], [5.4, 2181], [6.0, 1414], [5.2, 1286], [6.6, 1333],
+    [6.9, 1787], [6.4, 1445], [9.1, 1505], [6.8, 1204], [6.4, 1381],
+    [7.7, 1513], [5.7, 1259], [9.0, 1567], [5.4, 1370], [9.9, 1432],
+    [8.9, 1370], [6.0, 1864], [5.0, 1488], [9.1, 1278], [8.5, 1657],
+    [8.6, 1245], [8.9, 1533], [5.4, 1096], [6.8, 1223], [5.6, 1531],
 ])
-y = np.array([1]*40 + [0]*40)   # 1=Salmon, 0=Sea bass
+y = np.array([1]*40 + [0]*40)   # X と同じ魚の順。1=Salmon, 0=Sea bass
 
 # スケールを揃える
 X_norm = (X - X.mean(axis=0)) / X.std(axis=0)
@@ -695,72 +634,21 @@ y      = y[order]
 def sigmoid(z):
     return 1 / (1 + np.exp(-z))
 
-def forward(X, w, b):
-    """線形結合＋バイアス → シグモイド"""
-    return sigmoid(X @ w + b)
-
-def loss_fn(y_true, p):
-    """全データの二値交差エントロピーを平均する"""
-    eps = 1e-10
-    # log(0) は計算できないため、確率が厳密な 0 / 1 にならないようにする
-    p = np.clip(p, eps, 1 - eps)
-    return -np.mean(y_true * np.log(p) + (1 - y_true) * np.log(1 - p))
-
-def accuracy(y_true, p):
-    return np.mean((p >= 0.5) == y_true)
-```
-
-
-## 各関数の役割 {#peek-logistic-functions}
-
-| 関数 | 役割 |
-|---|---|
-| `sigmoid` | $z$ を確率 $p$ に変換する |
-| `forward` | 全データの入力 $X$ から確率を予測する |
-| `loss_fn` | 全データの二値交差エントロピー $L$ を計算する |
-| `accuracy` | $p\geq0.5$ を Salmon として正答率を計算する |
-
-- 1データ分の勾配は、[`delta`、`d_w`、`d_b` の3行](#peek-gradient-code){.peek}で計算する
-
-
-## 1データずつ学習する {#peek-one-at-a-time}
-
-- 1データ分の損失 $\ell$ の勾配で更新する
-   - 全データの平均損失 $L$ は更新に使わない
-
-
-
-```{python}
-#| echo: true
-w = np.array([0.0, 0.0])   # Weights start at zero
-b  = 0.0
-lr = 0.5                       # 学習率
+w = np.array([0.0, 0.0])   # 係数は 0 から始める
+b = 0.0
+lr = 0.5                   # 学習率
 
 for i in range(10):
     xi, yi = X_norm[i], y[i]
     # このデータの損失 ℓ の勾配で、パラメータを更新する
-    p_i   = sigmoid(xi @ w + b)   # Forward：1データだけ予測
+    p_i   = sigmoid(xi @ w + b)   # 1データだけ予測
     delta = p_i - yi
     d_w = delta * xi
     d_b = delta
     w = w - lr * d_w
-    b     = b  - lr * d_b
-
-    # 全データの Loss と正答率は、学習の様子を表示するためだけに計算する
-    p_all = forward(X_norm, w, b)
-    print(f"{i+1}件目 | Loss: {loss_fn(y, p_all):.4f} | 正答率: {accuracy(y, p_all):.1%} "
-          f"| w=[{w[0]:6.3f}, {w[1]:6.3f}] | b={b:6.3f}")
+    b = b - lr * d_b
+    print(f"{i+1}件目 | w=[{w[0]:6.3f}, {w[1]:6.3f}] | b={b:6.3f}")
 ```
-
-::: {.callout-note title="結果"}
-Loss は1データごとに下がっていく
-:::
-
-::: {.callout-note title="更新に使う値と、表示する値は別"}
-- **更新**：いま見ている1データの勾配 `delta`、`d_w`、`d_b` を使う
-- **表示**：更新後に全データの平均損失 $L$ と正答率を計算する
-   - 表示した Loss の数値を更新式へ代入するわけではない
-:::
 
 
 ## 学習中の $f(x)$ の挙動
@@ -810,85 +698,75 @@ plt.show()
 :::
 
 
-## 10件で更新した後のパラメータ {#peek-logistic-params}
+## 全データの Loss は行列で計算可能 {#peek-monitor-functions}
 
-- 10件で更新した後の $w$、$b$ は、[学習ループ](#peek-one-at-a-time){.peek}の出力の最終行
-
-| パラメータ | 値 | 意味 |
-|---|---|---|
-| $w_1$（輝度） | 負 | **暗い**ほど Salmon 寄り |
-| $w_2$（重さ） | 正 | **重い**ほど Salmon 寄り |
-| $b$（バイアス） | 負 | 決定境界の位置を調整 |
-
-- [散布図から分かった傾向](classification-2d-boundaries.qmd#peek-diagonal){.peek}を、学習したパラメータが数値で示している
-
-::: {.callout-note}
-- `sklearn` の `fit()` も「予測 → 損失 → パラメータを更新」という考え方は同じ
-   - ただし、この1データずつのループをそのまま実行するわけではなく、最適化方法や正則化などが加わる
-:::
-
-
-## $z$ を高さにすると、傾いた板になる
+- 各データはそれぞれ独立しているため、[`X @ w + b` の形](numpy-recipes.qmd#peek-np-matmul){.peek}で全データ分をまとめて計算できる
+  - $z$：特徴量行列 $X$ と係数 $w$ の積
+  $$\begin{pmatrix} z^{(1)} \\ \vdots \\ z^{(N)} \end{pmatrix}
+  =\begin{pmatrix} x^{(1)}_1 & x^{(1)}_2 \\ \vdots & \vdots \\ x^{(N)}_1 & x^{(N)}_2 \end{pmatrix}
+  \begin{pmatrix} w_1 \\ w_2 \end{pmatrix} + b$$
+  - 1行ごとが $w_1x_1+w_2x_2+b$
+  - $b$ は全行に同じ値を足すだけでよい
+- Loss：[log で積を和にした](#peek-q-product){.peek}ので、全データの $L$ は1データ分の損失 $\ell$ の平均
 
 ```{python}
-#| echo: false
-#| fig-align: center
-from matplotlib.colors import TwoSlopeNorm
+#| echo: true
+def predict(X, w, b):
+    """全データの z を計算し、ロジスティック関数で確率 p にする"""
+    return sigmoid(X @ w + b)
 
-# Height z over the (brightness, weight) plane, using w and b after 10 data points
-g1, g2 = np.meshgrid(np.linspace(-2.5, 2.5, 60), np.linspace(-2.5, 2.8, 60))
-zg = w[0] * g1 + w[1] * g2 + b
-zmax = np.abs(zg).max()
-norm = TwoSlopeNorm(vmin=-zmax, vcenter=0, vmax=zmax)
-
-fig = plt.figure(figsize=(11, 4))
-
-# Left: the tilted plate z, the water level z = 0 (gray), and where they meet (black)
-ax3 = fig.add_subplot(1, 2, 1, projection="3d")
-ax3.plot_surface(g1, g2, zg, cmap="RdBu_r", norm=norm, alpha=0.85, linewidth=0)
-ax3.plot_surface(g1, g2, np.zeros_like(zg), color="gray", alpha=0.25)
-ax3.contour(g1, g2, zg, levels=[0], colors="black", linewidths=2.5)
-ax3.set_xlabel("輝度"); ax3.set_ylabel("重さ"); ax3.set_zlabel("z")
-ax3.set_title("z を高さにした板（灰色＝高さ 0）", fontsize=11)
-
-# Right: the same plate seen from above; the black line is height 0
-ax2 = fig.add_subplot(1, 2, 2)
-cf = ax2.contourf(g1, g2, zg, levels=20, cmap="RdBu_r", norm=norm, alpha=0.6)
-ax2.contour(g1, g2, zg, levels=[0], colors="black", linewidths=2.5)
-for cls, col in [(1, "salmon"), (0, "#5dade2")]:
-    m = y == cls
-    ax2.scatter(X_norm[m, 0], X_norm[m, 1], c=col, s=25, edgecolors="gray")
-fig.colorbar(cf, ax=ax2, label="z（高さ）")
-ax2.set_xlabel("輝度（標準化）"); ax2.set_ylabel("重さ（標準化）")
-ax2.set_title("真上から：黒線＝高さ 0", fontsize=11)
-plt.tight_layout()
-plt.show()
+def binary_cross_entropy(y, p):
+    """1データ分の損失 ℓ を、データの数だけまとめて計算する"""
+    eps = 1e-10
+    # log(0) は計算できないため、確率が厳密な 0 / 1 にならないようにする
+    p = np.clip(p, eps, 1 - eps)
+    return -(y * np.log(p) + (1 - y) * np.log(1 - p))
 ```
 
-::: {.callout-note}
-- 各点 $(x_1, x_2)$ に高さ $z = w_1x_1 + w_2x_2 + b$ がある → 平面の上の**傾いた板**
-- **決定境界 ＝ 高さ 0 の線（水際）**
-   - 水面より上（$z>0$）：Salmon
-   - 水面より下（$z<0$）：Sea bass
+
+## 学習しながら Loss と正答率を表示する {#peek-monitor-loop}
+
+[1データずつ学習するループ](#peek-one-at-a-time){.peek}と同様に更新し、更新のたびに全データで測る
+
+- 正答率：$p \geq 0.5$ を Salmon と判定して数える
+
+```{python}
+#| echo: true
+def accuracy(y, p):
+    return np.mean((p >= 0.5) == y)
+
+w = np.array([0.0, 0.0])
+b = 0.0
+lr = 0.5
+
+for i in range(10):
+    xi, yi = X_norm[i], y[i]
+    p_i   = sigmoid(xi @ w + b)
+    delta = p_i - yi
+    d_w = delta * xi
+    d_b = delta
+    w = w - lr * d_w
+    b = b - lr * d_b
+
+    p_all = predict(X_norm, w, b)
+    L = np.mean(binary_cross_entropy(y, p_all))   # 全データの Loss：ℓ の平均
+    print(f"{i+1}件目 | Loss: {L:.4f} | 正答率: {accuracy(y, p_all):.1%}")
+```
+
+::: {.callout-note title="結果"}
+Loss は1データごとに下がっていく
 :::
 
-
-## 係数は板の「傾き」と「高さ」を決める
-
-| 係数 | 板にとっては | 境界にとっては |
-|---|---|---|
-| $w_1, w_2$ | **傾き**（どちら向きに上り坂か） | 境界の**向き** |
-| $b$ | 全体の**上げ下げ** | 境界の**平行移動** |
-
-- $w_1<0$：暗い方へ上り坂になる（[暗いほど Salmon 寄り](#peek-logistic-params){.peek}）
-- $b$ で板を上下させると、水際が平行に動く（[決定境界の位置の調整](#peek-logistic-params){.peek}）
-- [直線（$f(x) = 0$ の点の集合）](#peek-line-distance){.peek}は、この水際を表す
-- 学習で係数が変わると、板が傾き直して水際（決定境界）が動く
+::: {.callout-note title="更新に使う値と、表示する値は別"}
+- **更新**：いま見ている1データの勾配 `delta`、`d_w`、`d_b` を使う
+- **表示**：更新後に、全データの Loss $L$ と正答率を計算する
+   - 表示した Loss の数値を更新式へ代入するわけではない
+:::
 
 
 ## **Tweak** 学習率とデータの数を変える {.badge-practice}
 
-- [1データずつ学習するコード](#peek-one-at-a-time){.peek} を**書き換えて実行**
+- [全データで測りながら学習するコード](#peek-monitor-loop){.peek} を**書き換えて実行**
 
 ::: {.tweak}
 | やりたいこと | コード |
@@ -906,14 +784,7 @@ plt.show()
 :::
 
 
-## {background-color="white" .center .break-slide}
-
-::: {.break-title}
-ロジスティック回帰
-:::
-
-
-## ロジスティック回帰（[Logistic Regression]{.en}） {#peek-logistic-structure}
+## これがロジスティック回帰（[Logistic Regression]{.en}） {#peek-logistic-structure}
 
 ```{.d2 sketch="true" width="96%"}
 direction: right
@@ -931,14 +802,15 @@ Y -> L
    - $z$：[直線の係数をパラメータにした値](#peek-logistic-linear){.peek}
    - $p$：[ロジスティック関数で変換した確率](#peek-logistic-function){.peek}
    - $\ell$：[二値交差エントロピー](#peek-binary-cross-entropy){.peek}による採点
-   - 学習：[勾配 $(p-y)x_j$](#peek-parameter-gradients){.peek} で $w_1, w_2, b$ を更新
+   - 学習：[勾配 $(p-y)x_j$](#peek-gradient-code){.peek} で $w_1, w_2, b$ を更新
 
 $$p = \sigma(w_1 x_1 + w_2 x_2 + b)
 = \frac{1}{1 + e^{-(w_1 x_1 + w_2 x_2 + b)}}$$
 
 ::: {.callout-note title="「回帰」なのに分類？"}
-- 予測する値が 0/1 のラベルではなく、「Salmon である**確率**」という連続値だから
-- 確率を数値として回帰し、最後に閾値 0.5 で分類する
+- 統計では、$x$ によってラベル $y$ の平均（Salmon の割合）がどう変わるかを式で表すことを回帰と呼ぶ
+   - ロジスティック回帰は、その割合を $p=\sigma(w_1x_1+w_2x_2+b)$ で表す
+- 分類は、最後に $p \geq 0.5$ で判定するひと手間
 :::
 
 
@@ -956,7 +828,7 @@ $$p = \sigma(w_1 x_1 + w_2 x_2 + b)
 ## {background-color="white" .center .break-slide}
 
 ::: {.break-title}
-「線形」とは
+（おまけ）「線形」とは
 :::
 
 
@@ -978,7 +850,7 @@ $$z = w_1 x_1 + w_2 x_2 + b$$
 - 斉次性（[homogeneity]{.en}）：**先に**定数倍しても**後で**定数倍しても同じ
 - 加法性（[additivity]{.en}）：**先に**足しても**後で**足しても同じ
 
-$$\;\;\text{斉次性：} f(c\,u) = c\,f(u) \qquad \qquad $$ 
+$$\;\;\text{斉次性：} f(c\,u) = c\,f(u) \qquad \qquad $$
 $$\;\text{加法性：}f(u + v) = f(u) + f(v) $$
 
 
@@ -1022,7 +894,7 @@ $b$ の分だけズレるので加法性を満たさない
 
 ## $+b$ を入力の1つと読み替えると線形になる
 
-- $b$ を「**常に 1 が入っている入力** $x_0$ への重み $w_0$」と読み替える
+- $b$ を「**常に 1 が入っている入力** $x_0$ の係数 $w_0$」と読み替える
 
 $$z = w_0 \underbrace{x_0}_{=\,1} + w_1 x_1 + w_2 x_2$$
 
@@ -1043,7 +915,7 @@ $$z = w_0 \underbrace{x_0}_{=\,1} + w_1 x_1 + w_2 x_2$$
 - **行列のかけ算** として計算可能
   - さらに何回掛け算しても線形のまま
 - 微分した結果に $w$ が残らない：$\dfrac{\partial z}{\partial w_1} = x_1$、$\dfrac{\partial z}{\partial b} = 1$
-  - （非線形の例）重みの2乗：$z = w_1^2 x_1$ なら $\dfrac{\partial z}{\partial w_1} = 2w_1x_1$ で、$w_1$ 自身が残る
+  - （非線形の例）係数の2乗：$z = w_1^2 x_1$ なら $\dfrac{\partial z}{\partial w_1} = 2w_1x_1$ で、$w_1$ 自身が残る
 - 線形代数の道具が使える：最小二乗（[least squares]{.en}）なら正規方程式（[normal equation]{.en}）で**勾配降下法なしに解ける**
 - 凸（[convex]{.en}）な損失と組めば**ローカルミニマム（[local minimum]{.en}）がない**（ロジスティック回帰の交差エントロピーもこの例）
 
@@ -1056,7 +928,6 @@ $$z = w_0 \underbrace{x_0}_{=\,1} + w_1 x_1 + w_2 x_2$$
 |--------|--------|------|------------------------------|
 | 学習するとき | $x$（データ） | $w$ | 微分で $w$ が残らない・正規方程式・ローカルミニマムなし |
 | 予測するとき | $w$ | $x$ | 決定境界が直線・行列のかけ算・重ねても線形 |
-
 
 
 ::: {.takeaway}
@@ -1090,7 +961,7 @@ $$z = w_0 \underbrace{x_0}_{=\,1} + w_1 x_1 + w_2 x_2$$
 
 ## まとめ
 
-- 直線は、$f(x) = ax_1 + bx_2 + c$ が 0 になる点の集合
+- 直線は、$f(x) = w_1x_1 + w_2x_2 + b$ が 0 になる点の集合
    - 値の符号：直線のどちら側か
    - 値の大きさ：直線からの遠さ
 - 回帰と分類で、データ点での $f(x)$ に求めることが逆
@@ -1287,10 +1158,31 @@ plt.tight_layout()
 plt.show()
 ```
 
-- 指数が $-z$ なら、連鎖律で内側の微分 $-1$ が掛かる
+- 指数が $-z$ のときは、合成関数になっている
+   - 内側 $g$ で先に $-z$ を作り、外側 $h$ で $e$ の右肩に乗せる
+
+$$g(z) = -z, \qquad h(u) = e^{u} \qquad\Longrightarrow\qquad h(g(z)) = e^{g(z)} = e^{-z}$$
+
+- [連鎖律](#peek-chain-rule){.peek}で、内側の微分 $-1$ が掛かる
 
 $$\frac{d}{dz}e^{-z}=e^{-z}\frac{d(-z)}{dz}=-e^{-z}$$
 
 ::: {.takeaway}
 $e$ は、指数関数の**値と傾きが同じになるように選ばれた数**
+:::
+
+
+## 【参考】多クラスの交差エントロピー（[Cross Entropy]{.en}） {#peek-cross-entropy}
+
+- 3クラス以上の分類（手書き数字の 0〜9 など）で使う
+- クラス $c$ ごとに、正解ラベル $y_c$ と予測確率 $p_c$ を用意する
+   - 正解クラスだけ $y_c=1$、それ以外は $y_c=0$
+
+$$\ell(\mathbf{y},\mathbf{p})=-\sum_c y_c\log p_c$$
+
+- $y_c=0$ の項は消えるので、正解クラスの項 $-\log q$ だけが残る
+- 2クラスで $\mathbf{y}=(y,\,1-y)$、$\mathbf{p}=(p,\,1-p)$ とおくと、[二値交差エントロピー](#peek-binary-cross-entropy){.peek}になる
+
+::: {.takeaway}
+**交差エントロピー**：正解クラスに出した確率 $q$ を $-\log q$ で採点する損失関数（[loss function]{.en}）
 :::
