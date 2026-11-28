@@ -6214,5 +6214,33 @@
     "title": "ロジスティック回帰",
     "section": "（おまけ）「線形」が付く用語",
     "text": "（おまけ）「線形」が付く用語\n\n\\[z = w_1 x_1 + w_2 x_2 + b\\]\n\n上の式：線形結合（linear combination）\nロジスティック回帰：線形分類器（linear classifier）\n体長から重さを予測した直線：線形回帰（linear regression）\n\n\nこの「線形」とは何？直線のこと？"
+  },
+  {
+    "objectID": "logistic-regression.html#練習問題線形かどうかを判定する",
+    "href": "logistic-regression.html#練習問題線形かどうかを判定する",
+    "title": "ロジスティック回帰",
+    "section": "練習問題：線形かどうかを判定する",
+    "text": "練習問題：線形かどうかを判定する\n\n次の関数が線形性（斉次性・加法性）を満たすか、手計算とPythonコードの両方で判定せよ。\n\\[\\begin{aligned}\n&\\text{(a)}\\; f(x) = 5x & \\qquad &\\text{(b)}\\; f(x) = 3x + 2 \\\\\n&\\text{(c)}\\; f(x) = x^2 & \\qquad &\\text{(d)}\\; f(x_1, x_2) = 2x_1 - x_2\n\\end{aligned}\\]\n\n\\(f(0) = 0\\) かどうかを確認し、線形でない関数を除外\n残った関数で加法性 \\(f(u + v) = f(u) + f(v)\\) を確認（成り立たない場合は反例を1つ提示）\n「先に足してから入れる」と「入れてから足す」をコードで比較（1変数の関数は \\(u=1, v=2\\)、(d) は \\(u=(1,2), v=(3,1)\\)）"
+  },
+  {
+    "objectID": "logistic-regression.html#解答例線形かどうかを判定する",
+    "href": "logistic-regression.html#解答例線形かどうかを判定する",
+    "title": "ロジスティック回帰",
+    "section": "解答例：線形かどうかを判定する",
+    "text": "解答例：線形かどうかを判定する\n\n\nf(0) チェック加法性チェック\n\n\n\n\n\\(f(0) = 0\\)：通過\n\n\n\\(f(0) = 2 \\neq 0\\)：線形ではない\n\n\n\\(f(0) = 0\\)：通過（線形とはまだ言えない）\n\n\n\\(f(0, 0) = 0\\)：通過\n\n\n\n\n\n\n\\(f(1+2) = 15 = f(1) + f(2) = 5 + 10\\)：成立\n\n\n斉次性も \\(f(cx) = 5cx = c f(x)\\) で成立するので線形\n\n\n\\(f(1+2) = 9 \\neq f(1) + f(2) = 1 + 4 = 5\\)：非線形\n\n\n\\(f(0)=0\\) を満たしても線形とは限らない\n\n\n\\(f(u+v)=2(u_1+v_1)-(u_2+v_2)=f(u)+f(v)\\)：成立\n\n\n斉次性も \\(f(cu) = 2cu_1 - cu_2 = c f(u)\\) で成立するので線形\n\n\n\n\n\nコードで確認\n\n\n解答例を見る\ndef f_a(x):\n    return 5 * x\n\ndef f_b(x):\n    return 3 * x + 2\n\ndef f_c(x):\n    return x ** 2\n\ndef f_d(x1, x2):\n    return 2 * x1 - x2\n\n# u = 1, v = 2\nprint(\"(a) f(0) =\", f_a(0), \"| f(1+2) =\", f_a(1 + 2), \"| f(1)+f(2) =\", f_a(1) + f_a(2))\nprint(\"(b) f(0) =\", f_b(0), \"| f(1+2) =\", f_b(1 + 2), \"| f(1)+f(2) =\", f_b(1) + f_b(2))\nprint(\"(c) f(0) =\", f_c(0), \"| f(1+2) =\", f_c(1 + 2), \"| f(1)+f(2) =\", f_c(1) + f_c(2))\n# u = (1, 2), v = (3, 1)\nprint(\"(d) f(0,0) =\", f_d(0, 0), \"| f(1+3, 2+1) =\", f_d(1 + 3, 2 + 1),\n      \"| f(1,2)+f(3,1) =\", f_d(1, 2) + f_d(3, 1))\n\n\n(a) f(0) = 0 | f(1+2) = 15 | f(1)+f(2) = 15\n(b) f(0) = 2 | f(1+2) = 11 | f(1)+f(2) = 13\n(c) f(0) = 0 | f(1+2) = 9 | f(1)+f(2) = 5\n(d) f(0,0) = 0 | f(1+3, 2+1) = 5 | f(1,2)+f(3,1) = 5\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n(b)：\\(f(0) \\neq 0\\) なので線形ではない\n(c)：加法性が成り立たないので線形ではない\n(a)(d)：両辺が一致し、手計算と同じ結果"
+  },
+  {
+    "objectID": "logistic-regression.html#練習問題ロジスティック回帰を2ステップ学習する",
+    "href": "logistic-regression.html#練習問題ロジスティック回帰を2ステップ学習する",
+    "title": "ロジスティック回帰",
+    "section": "練習問題：ロジスティック回帰を2ステップ学習する",
+    "text": "練習問題：ロジスティック回帰を2ステップ学習する\n\n次の2件のデータで、ロジスティック回帰のパラメータを手計算で2回更新せよ。\n\n特徴量（標準化済み）：（輝度, 重さ）\n1件目：\\(x^{(1)} = (2, 1)\\)、Salmon（\\(y=1\\)）\n2件目：\\(x^{(2)} = (-1, 1)\\)、Sea bass（\\(y=0\\)）\n初期値：\\(w = (0, 0)\\)、\\(b = 0\\)\n学習率：\\(\\alpha = 0.5\\)\n\n\n1件目の \\(z\\)、\\(p = \\sigma(z)\\)、勾配 \\(\\dfrac{\\partial \\ell}{\\partial w_1}\\)、\\(\\dfrac{\\partial \\ell}{\\partial w_2}\\)、\\(\\dfrac{\\partial \\ell}{\\partial b}\\) を計算\n更新式 \\(w_j \\leftarrow w_j - \\alpha\\dfrac{\\partial \\ell}{\\partial w_j}\\)、\\(b \\leftarrow b - \\alpha\\dfrac{\\partial \\ell}{\\partial b}\\) で更新\n続けて2件目でも、勾配を計算して更新\n\nヒント：\\(\\sigma(0) = 0.5\\)（この問題で使う \\(\\sigma\\) の値はこれだけ）"
+  },
+  {
+    "objectID": "logistic-regression.html#解答例ロジスティック回帰を2ステップ学習する",
+    "href": "logistic-regression.html#解答例ロジスティック回帰を2ステップ学習する",
+    "title": "ロジスティック回帰",
+    "section": "解答例：ロジスティック回帰を2ステップ学習する",
+    "text": "解答例：ロジスティック回帰を2ステップ学習する\n\n\n1件目（\\(x = (2, 1)\\)、\\(y = 1\\)）2件目（\\(x = (-1, 1)\\)、\\(y = 0\\)）\n\n\n\\[\\begin{aligned}\nz &= 0 \\times 2 + 0 \\times 1 + 0 = 0 \\\\\np &= \\sigma(0) = 0.5, \\qquad p - y = 0.5 - 1 = -0.5\n\\end{aligned}\\]\n勾配: \\[\\begin{aligned}\n\\frac{\\partial \\ell}{\\partial w_1} &= (p-y)\\,x_1 = -0.5 \\times 2 = -1 \\\\\n\\frac{\\partial \\ell}{\\partial w_2} &= (p-y)\\,x_2 = -0.5 \\times 1 = -0.5 \\\\\n\\frac{\\partial \\ell}{\\partial b} &= p-y = -0.5\n\\end{aligned}\\]\n更新: \\[\\begin{aligned}\nw_1 &\\leftarrow 0 - 0.5 \\times (-1) = 0.5 \\\\\nw_2 &\\leftarrow 0 - 0.5 \\times (-0.5) = 0.25 \\\\\nb &\\leftarrow 0 - 0.5 \\times (-0.5) = 0.25\n\\end{aligned}\\]\n\nパラメータがすべて 0 なので \\(p = 0.5\\)（五分五分）\n正解 \\(y=1\\) との差 \\(p-y=-0.5\\) の分だけ、パラメータが動く\n\n\n\n\\[\\begin{aligned}\nz &= 0.5 \\times (-1) + 0.25 \\times 1 + 0.25 = 0 \\\\\np &= 0.5, \\qquad p - y = 0.5\n\\end{aligned}\\]\n\n2件目はちょうど境界の上（\\(z = 0\\)）にある\n\n勾配: \\[\\begin{aligned}\n\\frac{\\partial \\ell}{\\partial w_1} &= (p-y)\\,x_1 = 0.5 \\times (-1) = -0.5 \\\\\n\\frac{\\partial \\ell}{\\partial w_2} &= (p-y)\\,x_2 = 0.5 \\times 1 = 0.5 \\\\\n\\frac{\\partial \\ell}{\\partial b} &= p-y = 0.5\n\\end{aligned}\\]\n更新: \\[\\begin{aligned}\nw_1 &\\leftarrow 0.5 - 0.5 \\times (-0.5) = 0.75 \\\\\nw_2 &\\leftarrow 0.25 - 0.5 \\times 0.5 = 0 \\\\\nb &\\leftarrow 0.25 - 0.5 \\times 0.5 = 0\n\\end{aligned}\\]"
   }
 ]
