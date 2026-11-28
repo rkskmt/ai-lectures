@@ -1051,7 +1051,7 @@ print("(d) f(0,0) =", f_d(0, 0), "| f(1+3, 2+1) =", f_d(1 + 3, 2 + 1),
    - 「常に 1 の入力 $x_0$」と読み替えれば線形結合に収まる
 
 
-## 練習問題：ロジスティック回帰を2ステップ学習する
+## 演習：ロジスティック回帰を2ステップ学習する {.badge-practice}
 
 次の2件のデータで、ロジスティック回帰のパラメータを**手計算**で2回更新せよ。
 
@@ -1066,60 +1066,6 @@ print("(d) f(0,0) =", f_d(0, 0), "| f(1+3, 2+1) =", f_d(1 + 3, 2 + 1),
 3. 続けて2件目でも、勾配を計算して更新
 
 ヒント：$\sigma(0) = 0.5$（この問題で使う $\sigma$ の値はこれだけ）
-
-
-## 解答例：ロジスティック回帰を2ステップ学習する
-
-::: {.panel-tabset}
-
-### 1件目（$x = (2, 1)$、$y = 1$）
-
-$$\begin{aligned}
-z &= 0 \times 2 + 0 \times 1 + 0 = 0 \\
-p &= \sigma(0) = 0.5, \qquad p - y = 0.5 - 1 = -0.5
-\end{aligned}$$
-
-**勾配:**
-$$\begin{aligned}
-\frac{\partial \ell}{\partial w_1} &= (p-y)\,x_1 = -0.5 \times 2 = -1 \\
-\frac{\partial \ell}{\partial w_2} &= (p-y)\,x_2 = -0.5 \times 1 = -0.5 \\
-\frac{\partial \ell}{\partial b} &= p-y = -0.5
-\end{aligned}$$
-
-**更新:**
-$$\begin{aligned}
-w_1 &\leftarrow 0 - 0.5 \times (-1) = 0.5 \\
-w_2 &\leftarrow 0 - 0.5 \times (-0.5) = 0.25 \\
-b &\leftarrow 0 - 0.5 \times (-0.5) = 0.25
-\end{aligned}$$
-
-- パラメータがすべて 0 なので $p = 0.5$（五分五分）
-- 正解 $y=1$ との差 $p-y=-0.5$ の分だけ、パラメータが動く
-
-### 2件目（$x = (-1, 1)$、$y = 0$）
-
-$$\begin{aligned}
-z &= 0.5 \times (-1) + 0.25 \times 1 + 0.25 = 0 \\
-p &= 0.5, \qquad p - y = 0.5
-\end{aligned}$$
-
-- 2件目は**ちょうど境界の上**（$z = 0$）にある
-
-**勾配:**
-$$\begin{aligned}
-\frac{\partial \ell}{\partial w_1} &= (p-y)\,x_1 = 0.5 \times (-1) = -0.5 \\
-\frac{\partial \ell}{\partial w_2} &= (p-y)\,x_2 = 0.5 \times 1 = 0.5 \\
-\frac{\partial \ell}{\partial b} &= p-y = 0.5
-\end{aligned}$$
-
-**更新:**
-$$\begin{aligned}
-w_1 &\leftarrow 0.5 - 0.5 \times (-0.5) = 0.75 \\
-w_2 &\leftarrow 0.25 - 0.5 \times 0.5 = 0 \\
-b &\leftarrow 0.25 - 0.5 \times 0.5 = 0
-\end{aligned}$$
-
-:::
 
 
 ## 【参考】$e^x$ は微分しても $e^x$ {#peek-exp-derivative}
