@@ -431,6 +431,48 @@ table td:first-child {
 .reveal .takeaway.dark a {
   text-decoration: underline;
 }
+/* Takeaway title — `::: {.takeaway title="..."}`. takeaway.lua turns the
+   attribute into a first child .takeaway-title, drawn like a fieldset
+   legend: smaller, left-aligned text straddling the top border near the
+   left corner, its white fill masking the line behind it. It stays in flow
+   rather than positioned, so a title too long for one line wraps and pushes
+   the message down instead of running into it. The top margin lifts it by
+   the box's top padding (0.55em of the box, i.e. 0.55em / scale in its own
+   em), 1px to the middle of the 2px border and half a line; the bottom
+   margin gives all of that back but the line, so a one-line title adds no
+   height and the message stays put. Sideways it reaches through the box's
+   1em padding to 0.5em from the border on both ends. Wrapped lines fill the
+   width instead of the box's balanced wrapping: the fill spans the whole
+   width either way, and balanced lines would leave a white gap after them. */
+.reveal .takeaway > .takeaway-title {
+  --takeaway-title-scale: 0.8;
+  width: fit-content;
+  margin:
+    calc(-0.55em / var(--takeaway-title-scale) - 1px - 0.7em)
+    calc(-1em / var(--takeaway-title-scale) + 0.5em)
+    calc(0.55em / var(--takeaway-title-scale) + 1px - 0.7em);
+  padding: 0 0.4em;
+  background: #fff;
+  color: #131516;
+  /* A bold face of its own marks it as a label, not part of the message:
+     the textbook face on Windows, the rounded gothic on macOS, and the
+     theme's gothic, bold, elsewhere. */
+  font-family: "UD Digi Kyokasho NP-B", "UD Digi Kyokasho NP",
+    "UD デジタル 教科書体 NP-B", "UD デジタル 教科書体 NP",
+    "Hiragino Maru Gothic ProN", system-ui, -apple-system, "Hiragino Sans",
+    "Yu Gothic UI", "Segoe UI", "Meiryo", sans-serif;
+  font-weight: bold;
+  font-size: calc(var(--takeaway-title-scale) * 1em);
+  line-height: 1.4;
+  text-align: left;
+  text-wrap: wrap;
+}
+/* On the .dark fill the tag stays white with dark text, but its upper half
+   would melt into the white slide: an outline in the frame's black restores
+   its edge above the border and vanishes into the fill below it. */
+.reveal .takeaway.dark > .takeaway-title {
+  box-shadow: 0 0 0 2px #131516;
+}
 /* Mini slide — a slide drawn inside a slide (`::: {.mini-slide}`), for
    showing what a slide should look like: a sample of the slides students hand
    in, a before/after of a slide design, a page of a report. Ordinary markdown
@@ -1232,6 +1274,27 @@ a.lightbox[href]::after {
   padding: 0 0 0.24em;
   text-align: left;
 }
+/* Optional subtitle under the title: the same box as .break-title, indented
+   a little from its left edge, smaller and gray, in a Mincho face. */
+.break-slide .break-subtitle {
+  display: block;
+  width: 860px;
+  max-width: calc(100% - 310px);
+  margin-left: 190px !important;
+  margin-right: auto !important;
+  padding-top: 0.4em;
+  padding-left: 1.5em;
+  font-family: "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", "Noto Serif JP", serif;
+  font-size: 1.15em;
+  color: #444;
+  text-align: left;
+}
+/* The weight goes on the paragraph: the body-text rule at the top of this
+   file sets 400 on every `.reveal p`, overriding what it would inherit from
+   the div. */
+.break-slide .break-subtitle p {
+  font-weight: 300;
+}
 .slide-body ul {
   margin-top: 0 !important;
   margin-bottom: 0 !important;
@@ -1415,6 +1478,10 @@ a.lightbox[href]::after {
 .reveal .callout .callout-title p,
 .reveal .callout .callout-title strong,
 .reveal .callout .callout-title code { color: #fff !important; }   /* code in a header bar must be white too */
+/* A link keeps its teal, which sinks into the coloured bar: make it white
+   and mark it by an underline (a .peek link already has its dotted one). */
+.reveal .callout .callout-title a { color: #fff !important; }
+.reveal .callout .callout-title a:not(.peek) { text-decoration: underline; }
 .reveal .callout .callout-icon::before { filter: brightness(0) invert(1) !important; }
 
 .reveal .callout-note      .callout-title { background: #1c7ed6 !important; }

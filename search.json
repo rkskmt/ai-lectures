@@ -529,14 +529,14 @@
     "href": "nn-logistic.html#peek-one-fish-forward",
     "title": "ロジスティック回帰をNNとして実装する",
     "section": "予測：Forwardの2段階を関数にしてつなぐ",
-    "text": "予測：Forwardの2段階を関数にしてつなぐ\n\ndef linear(x, w, b):\n    return x @ w + b\n\ndef sigmoid(z):\n    return 1 / (1 + np.exp(-z))\n\ndef forward(x, w, b):\n    z = linear(x, w, b)\n    p = sigmoid(z)\n    return z, p\n\nz, p = forward(x, w, b)\nz: -0.4\np: 0.401312339887548\n\nlinear：接続の掛け算と足し算\n\nx @ w：\\(x_1w_1+x_2w_2\\) を計算する内積（inner product）\n\nsigmoid：活性化関数\n\n数式のロジスティック関数 \\(\\sigma\\) に対応する、コードでの一般的な名前\n\n\n\n\n\n\n\n\nノート\n\n\n勾配の計算例の \\(p=0.4\\)は、この p を丸めた値"
+    "text": "予測：Forwardの2段階を関数にしてつなぐ\n\ndef linear(x, w, b):\n    return x @ w + b\n\ndef sigmoid(z):\n    return 1 / (1 + np.exp(-z))\n\ndef forward(x, w, b):\n    z = linear(x, w, b)\n    p = sigmoid(z)\n    return z, p\n\nz, p = forward(x, w, b)\nz: -0.4\np: 0.401312339887548\n\nlinear：接続の掛け算と足し算\n\nx @ w：\\(x_1w_1+x_2w_2\\) を計算する内積（inner product）\n\nsigmoid：活性化関数\n\n数式のロジスティック関数 \\(\\sigma\\) に対応する、コードでの一般的な名前"
   },
   {
     "objectID": "nn-logistic.html#peek-one-layer-loss",
     "href": "nn-logistic.html#peek-one-layer-loss",
     "title": "ロジスティック回帰をNNとして実装する",
     "section": "採点：損失関数は二値交差エントロピー（Binary Cross-Entropy）",
-    "text": "採点：損失関数は二値交差エントロピー（Binary Cross-Entropy）\n\n\nロジスティック回帰の損失関数をそのまま使う\n\n\\[\n\\ell(y,p)\n=-\\left[y\\log p+(1-y)\\log(1-p)\\right]\n\\]\n\n\\(\\ell\\)：この魚の予測に対する損失（loss）\nこの魚は \\(y=1\\) なので、第1項だけが残る\n\n\\[\n\\ell(1,0.4013)\n=-\\log(0.4013)\n\\approx0.913\n\\]\n\n損失関数はネットワークの図には入らない\n\nForwardの出力 \\(p\\) と正解 \\(y\\) を受け取って採点する関数\n\n\n\n\n\n\n\n\nノート\n\n\n\\(p=0.4\\) と丸めて計算した \\(0.92\\)と同じ魚の、丸める前の損失"
+    "text": "採点：損失関数は二値交差エントロピー（Binary Cross-Entropy）\n\n\nロジスティック回帰の損失関数をそのまま使う\n\n\\[\n\\ell(y,p)\n=-\\left[y\\log p+(1-y)\\log(1-p)\\right]\n\\]\n\n\\(\\ell\\)：この魚の予測に対する損失（loss）\nこの魚は \\(y=1\\) なので、第1項だけが残る\n\n\\[\n\\ell(1,0.4013)\n=-\\log(0.4013)\n\\approx0.913\n\\]\n\n損失関数はネットワークの図には入らない\n\nForwardの出力 \\(p\\) と正解 \\(y\\) を受け取って採点する関数"
   },
   {
     "objectID": "nn-logistic.html#採点binary_cross_entropy-として実装する",
@@ -564,7 +564,7 @@
     "href": "nn-logistic.html#勾配接続ごとに届いた-d_z-へforwardの入力を掛ける",
     "title": "ロジスティック回帰をNNとして実装する",
     "section": "勾配：接続ごとに、届いた \\(d_z\\) へForwardの入力を掛ける",
-    "text": "勾配：接続ごとに、届いた \\(d_z\\) へForwardの入力を掛ける\n\n\n\n各接続は、届いた \\(d_z\\) に「Forwardで自分を通った入力」を掛けて、自分の重みの微分値を作る\n\\(w_1\\) の接続をForwardで通ったのは \\(x_1=2\\)\n\nよって \\(d_{w_1}=d_z\\times x_1\\approx-1.1974\\)\n\n\\(z=w_1x_1+w_2x_2+b\\) で \\(b\\) は1倍で足されていたので、\\(d_b=d_z\\)\n\\(d_{w_1},d_{w_2},d_b\\) は、\\(\\partial\\ell/\\partial w_1,\\ \\partial\\ell/\\partial w_2,\\ \\partial\\ell/\\partial b\\) の値\n\n\n\n\n\n\n\nノート\n\n\n\\(p=0.4\\) に丸めて手計算した \\(-1.2,\\ -0.3,\\ -0.6\\)の、丸める前の値"
+    "text": "勾配：接続ごとに、届いた \\(d_z\\) へForwardの入力を掛ける\n\n\n\n各接続は、届いた \\(d_z\\) に「Forwardで自分を通った入力」を掛けて、自分の重みの微分値を作る\n\\(w_1\\) の接続をForwardで通ったのは \\(x_1=2\\)\n\nよって \\(d_{w_1}=d_z\\times x_1\\approx-1.1974\\)\n\n\\(z=w_1x_1+w_2x_2+b\\) で \\(b\\) は1倍で足されていたので、\\(d_b=d_z\\)\n\\(d_{w_1},d_{w_2},d_b\\) は、\\(\\partial\\ell/\\partial w_1,\\ \\partial\\ell/\\partial w_2,\\ \\partial\\ell/\\partial b\\) の値"
   },
   {
     "objectID": "nn-logistic.html#勾配この逆向きの計算をbackwardと呼ぶ",
@@ -760,7 +760,7 @@
     "href": "logistic-regression.html#分類問題で出てきた閾値の縦線",
     "title": "ロジスティック回帰",
     "section": "分類問題で出てきた閾値の縦線",
-    "text": "分類問題で出てきた閾値の縦線\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n目で見て決めた閾値（threshold、輝度 5.5）で引いた縦線\n斜めの線ならもっと上手く分離できそう"
+    "text": "分類問題で出てきた閾値の縦線\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n人が決めた閾値（threshold、輝度 5.5）の縦線\n斜めの線ならもっと上手く分離できそう"
   },
   {
     "objectID": "logistic-regression.html#このような直線を求めたい",
@@ -781,21 +781,21 @@
     "href": "logistic-regression.html#section",
     "title": "ロジスティック回帰",
     "section": "",
-    "text": "モデルの構造"
+    "text": "分類の損失を作る"
   },
   {
     "objectID": "logistic-regression.html#peek-logistic-structure",
     "href": "logistic-regression.html#peek-logistic-structure",
     "title": "ロジスティック回帰",
-    "section": "ロジスティック回帰（Logistic Regression）",
-    "text": "ロジスティック回帰（Logistic Regression）\n\n\n\nロジスティック回帰：直線のパラメータを最適化して分類\n中身は2ステップ\n\nStep 1：直線を仮定\nStep 2：クラスに属する確率を計算\n\n\n\n\n\n\n\n\n\n「回帰」なのに分類？\n\n\n\n予測する値が 0/1 のラベルではなく、「Salmon である確率」という連続値だから\n確率を数値として回帰し、最後に閾値 0.5 で分類する"
+    "section": "これがロジスティック回帰（Logistic Regression）",
+    "text": "これがロジスティック回帰（Logistic Regression）\n\n\n\nロジスティック回帰：ここまでの部品をつないだ分類器\n\n\\(z\\)：直線の係数をパラメータにした値\n\\(p\\)：ロジスティック関数で変換した確率\n\\(\\ell\\)：二値交差エントロピーによる採点\n学習：勾配 \\((p-y)x_j\\) で \\(w_1, w_2, b\\) を更新\n\n\n\\[p = \\sigma(w_1 x_1 + w_2 x_2 + b)\n= \\frac{1}{1 + e^{-(w_1 x_1 + w_2 x_2 + b)}}\\]\n\n\n\n\n\n\n\n「回帰」なのに分類？\n\n\n\n統計では、\\(x\\) によってラベル \\(y\\) の平均（Salmon の割合）がどう変わるかを式で表すことを回帰と呼ぶ\n\nロジスティック回帰は、その割合を \\(p=\\sigma(w_1x_1+w_2x_2+b)\\) で表す\n\n分類は、最後に \\(p \\geq 0.5\\) で判定するひと手間"
   },
   {
     "objectID": "logistic-regression.html#peek-logistic-linear",
     "href": "logistic-regression.html#peek-logistic-linear",
     "title": "ロジスティック回帰",
-    "section": "Step 1：線形結合（Linear Combination）＋バイアスで直線を仮定",
-    "text": "Step 1：線形結合（Linear Combination）＋バイアスで直線を仮定\n\n\\[z = w_1 x_1 + w_2 x_2 + b\\]\n\n\\(x_1, x_2\\)：入力（輝度、重さ）\n\\(w_1, w_2\\)：重み（weight）（どの特徴量をどれだけ重視するか）\n\\(b\\)：バイアス（bias）（直線の切片）\n\n\n魚1匹の \\(x_1, x_2\\) を入力すると、\\(z\\) という1つの値にまとまる"
+    "section": "直線の係数を、学習するパラメータにする",
+    "text": "直線の係数を、学習するパラメータにする\n\n\\[z = w_1 x_1 + w_2 x_2 + b\\]\n\n直線の \\(f(x)\\) の係数 \\(w_1, w_2, b\\) を、学習で求める\n機械学習では、\\(b\\) をバイアス（bias）と呼ぶことが多い\n確率は \\(p = \\sigma(z)\\)\n\n\n\\(z\\)：データ点 \\(x\\) での \\(f(x)\\)（\\(z = 0\\) の点の集合が決定境界）"
   },
   {
     "objectID": "logistic-regression.html#見慣れた式",
@@ -808,8 +808,8 @@
     "objectID": "logistic-regression.html#peek-logistic-function",
     "href": "logistic-regression.html#peek-logistic-function",
     "title": "ロジスティック回帰",
-    "section": "Step 2：\\(z\\) を確率に変換するロジスティック関数（Logistic Function）",
-    "text": "Step 2：\\(z\\) を確率に変換するロジスティック関数（Logistic Function）\n\n\\[p=\\sigma(z)=\\frac{1}{1+e^{-z}}\\]\n\n\\(\\sigma\\)：ロジスティック関数\n\\(z\\)：ロジスティック関数への入力\n\\(p\\)：ロジスティック関数から得られる出力\n\n\\[p = \\sigma(w_1 x_1 + w_2 x_2 + b)\n= \\frac{1}{1 + e^{-(w_1 x_1 + w_2 x_2 + b)}}\\]\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nノート\n\n\n\n\\(z\\) の取りうる範囲である実数全体 \\((-\\infty, +\\infty)\\) を 0〜1 の範囲に押し込む\nS字形の関数なので、機械学習では単に sigmoid と呼ぶことも多い\n\n\n\n\n\n\n\n\n\n\n\n重要ポイント\n\n\n\n\\(p \\geq 0.5\\) なら Salmon、\\(p &lt; 0.5\\) なら Sea bass と判定する\n\\(z = 0\\)（＝決定境界の上）のとき、ちょうど \\(p = 0.5\\)\n判定だけなら \\(z\\) の符号で足りるが、\\(p\\) は「どれくらい自信があるか」まで表す\n\n学習ではこの \\(p\\) を使う"
+    "section": "ロジスティック関数（Logistic Function）",
+    "text": "ロジスティック関数（Logistic Function）\n\n\n\\(f(x)\\) を確率っぽいものに変換できる関数に、シグモイド関数がある\n\nS字の形をしている関数という意味\nロジスティック回帰では、シグモイド関数のうちロジスティック関数を使う\n\n\n\\[p=\\sigma(f(x))=\\frac{1}{1+e^{-f(x)}}\\]\n\n\n\\(\\sigma\\)：ロジスティック関数（sigmoid の s に当たるギリシャ文字）\n\\(f(x)\\)：ロジスティック関数への入力（データ点 \\(x\\) での値）\n\\(p\\)：各クラスである確率（Salmon である確率）\n\n\n\n\n\n\n\n\n\n\\(f(x)\\) と \\(p\\) の対応表と同じ\n\n\n\nどんな \\(f(x)\\) でも \\(e^{-f(x)} &gt; 0\\) なので、分母は 1 より大きく \\(0 &lt; p &lt; 1\\)\n\\(f(x) = 0\\)\n\n\\(e^{0} = 1\\) なので \\(p = \\dfrac{1}{2}\\)\n\n\\(f(x) \\to +\\infty\\)\n\n\\(e^{-f(x)} \\to 0\\) なので \\(p \\to 1\\)\n\n\\(f(x) \\to -\\infty\\)\n\n\\(e^{-f(x)} \\to +\\infty\\) なので \\(p \\to 0\\)"
   },
   {
     "objectID": "logistic-regression.html#z-1-を実際に確率へ変換する",
@@ -822,8 +822,8 @@
     "objectID": "logistic-regression.html#peek-chain-rule",
     "href": "logistic-regression.html#peek-chain-rule",
     "title": "ロジスティック回帰",
-    "section": "ロジスティック関数を微分する",
-    "text": "ロジスティック関数を微分する\n\n\nロジスティック関数の傾きを、先に求めておく\n\n勾配降下法で学習するには微分（傾き）が必要\n\n合成関数（composite function）の微分は、外側の微分 × 内側の微分\n\n\\[\n\\frac{d}{dx}f(g(x))=f'(g(x))\\,g'(x),\n\\qquad\n\\frac{dy}{dx}=\\frac{dy}{du}\\frac{du}{dx}\n\\]\n\n\\(p=(1+e^{-z})^{-1}\\) を合成関数として微分する\n\n外側：\\((\\;)^{-1}\\)\n内側：\\(1+e^{-z}\\)（指数関数（exponential function）の微分）\n\n\n\\[\\begin{aligned}\n\\frac{dp}{dz}\n&=\\underbrace{-(1+e^{-z})^{-2}}_{\\text{外側の微分}}\n  \\underbrace{(-e^{-z})}_{\\text{内側の微分}} \\\\\n&=\\frac{e^{-z}}{(1+e^{-z})^2}\n\\end{aligned}\\]"
+    "section": "ロジスティック関数の微分",
+    "text": "ロジスティック関数の微分\n\n損失 \\(\\ell\\) は、\\(z\\) から2段で計算している\n\\[z \\;\\xrightarrow{\\;\\text{ロジスティック関数}\\;}\\; p \\;\\xrightarrow{\\;\\text{交差エントロピー}\\;}\\; \\ell\\]\n\n勾配のため、まず1段目のロジスティック関数を微分する\n準備：合成関数（composite function）の微分は外側の微分 × 内側の微分 \\[\n\\frac{d}{dx}h(g(x))=h'(g(x))\\,g'(x),\n\\qquad\n\\frac{dy}{dx}=\\frac{dy}{du}\\frac{du}{dx}\n\\]\n\\(p=(1+e^{-z})^{-1}\\) を合成関数として微分する\n\n外側：\\((\\;)^{-1}\\)\n内側：\\(1+e^{-z}\\)（指数関数（exponential function）の微分）\n\n\n\\[\\begin{aligned}\n\\frac{dp}{dz}\n&=\\underbrace{-(1+e^{-z})^{-2}}_{\\text{外側の微分}}\n  \\underbrace{(-e^{-z})}_{\\text{内側の微分}} \\\\\n&=\\frac{e^{-z}}{(1+e^{-z})^2}\n\\end{aligned}\\]"
   },
   {
     "objectID": "logistic-regression.html#実は微分結果は-p-だけで表せる",
@@ -837,7 +837,7 @@
     "href": "logistic-regression.html#section-1",
     "title": "ロジスティック回帰",
     "section": "",
-    "text": "勾配降下法でパラメータを学習する"
+    "text": "勾配降下法で学習する\n\n\n\\(f(x)\\) はある。Loss も決まった。あとは学習"
   },
   {
     "objectID": "logistic-regression.html#ロジスティック回帰も勾配降下法で-fit-する",
@@ -857,85 +857,85 @@
     "objectID": "logistic-regression.html#peek-cross-entropy",
     "href": "logistic-regression.html#peek-cross-entropy",
     "title": "ロジスティック回帰",
-    "section": "予測を採点する損失関数：交差エントロピー（Cross Entropy）",
-    "text": "予測を採点する損失関数：交差エントロピー（Cross Entropy）\n\n\nクラス \\(c\\) ごとに、正解ラベル \\(y_c\\) と予測確率 \\(p_c\\) を用意する\n\n正解クラスだけ \\(y_c=1\\)、それ以外は \\(y_c=0\\)\n\n\n\\[\n\\ell(\\mathbf{y},\\mathbf{p})\n=-\\sum_c y_c\\log p_c\n\\]\n\n\\(y_c=0\\) の項は消えるので、正解クラスの項だけが残る\n正解クラスに出した確率を \\(q\\) と置けば\n\n\\[\\ell=-\\log q\\]\n\n交差エントロピー：正解クラスに出した確率 \\(q\\) を \\(-\\log q\\) で採点する損失関数（loss function）"
+    "section": "【参考】多クラスの交差エントロピー（Cross Entropy）",
+    "text": "【参考】多クラスの交差エントロピー（Cross Entropy）\n\n\n3クラス以上の分類（手書き数字の 0〜9 など）で使う\nクラス \\(c\\) ごとに、正解ラベル \\(y_c\\) と予測確率 \\(p_c\\) を用意する\n\n正解クラスだけ \\(y_c=1\\)、それ以外は \\(y_c=0\\)\n\n\n\\[\\ell(\\mathbf{y},\\mathbf{p})=-\\sum_c y_c\\log p_c\\]\n\n\\(y_c=0\\) の項は消えるので、正解クラスの項 \\(-\\log q\\) だけが残る\n2クラスで \\(\\mathbf{y}=(y,\\,1-y)\\)、\\(\\mathbf{p}=(p,\\,1-p)\\) とおくと、二値交差エントロピーになる\n\n\n交差エントロピー：正解クラスに出した確率 \\(q\\) を \\(-\\log q\\) で採点する損失関数（loss function）"
   },
   {
     "objectID": "logistic-regression.html#peek-binary-cross-entropy",
     "href": "logistic-regression.html#peek-binary-cross-entropy",
     "title": "ロジスティック回帰",
-    "section": "2クラス版：二値交差エントロピー（Binary Cross-Entropy）",
-    "text": "2クラス版：二値交差エントロピー（Binary Cross-Entropy）\n\n\nクラスの順を（Salmon、Sea bass）とする\nSalmon の確率を \\(p\\)、正解ラベルを \\(y\\) とすると\n\n\\[\\mathbf{y}=(y,\\,1-y),\\qquad \\mathbf{p}=(p,\\,1-p)\\]\n\nこの2つを一般の交差エントロピーへ代入すると\n\n\\[\\ell(y,p)=-\\left[y\\log p+(1-y)\\log(1-p)\\right]\\]\n\n\\(y\\) と \\(1-y\\) は 0/1 のスイッチ\n\n正解側の項だけが残る\n\n\n\n二値交差エントロピー：2クラス用の交差エントロピー"
+    "section": "クロスエントロピー：正解ラベル \\(y\\) も Loss 関数に入れ込みたい",
+    "text": "クロスエントロピー：正解ラベル \\(y\\) も Loss 関数に入れ込みたい\n\n\n\\(q\\) は、正解によって場合分けで決めている\n\n正解が Salmon なら \\(q = p\\)\n正解が Sea bass なら \\(q = 1-p\\)\n\nこのままでは、○○ならごとに、別々に選ぶ必要がある\n\nつまり、クロネッカーのデルタのように条件判定により使う項をスイッチしたい\n\nそこで、正解ラベル \\(y\\)（0/1）を利用 \\[\\ell(y,p)=-\\left[y\\log p+(1-y)\\log(1-p)\\right]\\]\n\n\\(y=1\\)（Salmon）\n\n右の項が消えて \\(\\ell=-\\log p\\)（\\(p=0.4\\) なら \\(\\ell\\approx0.92\\)）\n\n\\(y=0\\)（Sea bass）\n\n左の項が消えて \\(\\ell=-\\log(1-p)\\)\n\n\n\n\nこれが（二値）交差エントロピー（Binary Cross-Entropy）\n\n\n\n\n\n\n\n\nクロスエントロピーは3値以上でも使える優れもの\n\n\n多クラスの交差エントロピー"
   },
   {
     "objectID": "logistic-regression.html#peek-loss-value",
     "href": "logistic-regression.html#peek-loss-value",
     "title": "ロジスティック回帰",
-    "section": "\\(p=0.4\\) の魚を採点する",
-    "text": "\\(p=0.4\\) の魚を採点する\n\n\n\n\n正解\n採点する確率 \\(q\\)\n\\(p=0.4\\) のときの損失 \\(-\\log q\\)\n\n\n\n\n\\(y=1\\)（Salmon）\n\\(q=p\\)\n\\(-\\log(0.4)\\approx0.92\\)\n\n\n\\(y=0\\)（Sea bass）\n\\(q=1-p\\)\n\\(-\\log(0.6)\\approx0.51\\)\n\n\n\n\n全魚の平均損失：\\(L=\\dfrac{1}{N}\\sum_i\\ell(y_i,p_i)\\)"
+    "section": "\\(p=0.4\\) のデータ点を採点する",
+    "text": "\\(p=0.4\\) のデータ点を採点する\n\n\n\n\n正解\n採点する確率 \\(q\\)\n\\(p=0.4\\) のときの損失 \\(-\\log q\\)\n\n\n\n\n\\(y=1\\)（Salmon）\n\\(q=p\\)\n\\(-\\log(0.4)\\approx0.92\\)\n\n\n\\(y=0\\)（Sea bass）\n\\(q=1-p\\)\n\\(-\\log(0.6)\\approx0.51\\)\n\n\n\n\n全データの平均損失：\\(L=\\dfrac{1}{N}\\sum_i\\ell(y_i,p_i)\\)"
   },
   {
     "objectID": "logistic-regression.html#peek-neglog",
     "href": "logistic-regression.html#peek-neglog",
     "title": "ロジスティック回帰",
-    "section": "−log の形",
-    "text": "−log の形\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n正解クラスの確率が高いほど（\\(q \\to 1\\)）、損失は 0 に近づく\n外れるほど、損失は急カーブで跳ね上がる\n\\(q \\to 0\\)（自信満々の間違い）では、損失が無限大に向かう\n\n間違いに大きな損失を与えられるので都合がよい"
+    "section": "このような損失を \\(-\\log q\\) で作ってみよう",
+    "text": "このような損失を \\(-\\log q\\) で作ってみよう\n\n\n\\(q\\) をいい感じにする関数として例えば以下が考えられる\n\n\\(1-q\\)：外し方がひどくても（\\(q \\to 0\\)）、損失は 1 で頭打ち\n\\(-\\log q\\)：外し方がひどいと（\\(q \\to 0\\)）損失青天井\n\n※注 log は増加関数なのでマイナスをつけて良い感じに\n\n\n\n\n\n\n\n\n\n\n\n\n\n\\(\\ell = -\\log q\\) を Loss 関数とする（ただし1データ分）"
   },
   {
     "objectID": "logistic-regression.html#peek-bce-derivative",
     "href": "logistic-regression.html#peek-bce-derivative",
     "title": "ロジスティック回帰",
-    "section": "二値交差エントロピーを \\(p\\) で微分する",
-    "text": "二値交差エントロピーを \\(p\\) で微分する\n\n\n正解が \\(y=1\\) のとき：\\(\\ell=-\\log p\\)\n\n\\[\\frac{\\partial\\ell}{\\partial p}=-\\frac{1}{p}\\]\n\n正解が \\(y=0\\) のとき：\\(\\ell=-\\log(1-p)\\)\n\n\\[\\frac{\\partial\\ell}{\\partial p}=\\frac{1}{1-p}\\]\n\nここで求めたのは、\\(p\\) が変化したときに損失 \\(\\ell\\) がどれだけ変化するか"
+    "section": "交差エントロピーを \\(p\\) で微分する",
+    "text": "交差エントロピーを \\(p\\) で微分する\n\n\n\\(\\dfrac{dp}{dz}\\) はできたので、次は交差エントロピーの微分 \\(\\dfrac{\\partial\\ell}{\\partial p}\\) を求める\n\n\n正解が \\(y=1\\) のとき：\\(\\ell=-\\log p\\)\n\n\\[\\frac{\\partial\\ell}{\\partial p}=-\\frac{1}{p}\\]\n\n正解が \\(y=0\\) のとき：\\(\\ell=-\\log(1-p)\\)\n\n\\[\\frac{\\partial\\ell}{\\partial p}=\\frac{1}{1-p}\\]"
   },
   {
     "objectID": "logistic-regression.html#peek-logistic-p-minus-y",
     "href": "logistic-regression.html#peek-logistic-p-minus-y",
     "title": "ロジスティック回帰",
     "section": "2つの微分を掛けると \\(p-y\\) になる",
-    "text": "2つの微分を掛けると \\(p-y\\) になる\n\n\n\\(p\\) は \\(z\\) から計算されるので、連鎖律（chain rule）で2つの微分を掛ける\n\n\\[\n\\frac{\\partial\\ell}{\\partial z}\n=\\frac{\\partial\\ell}{\\partial p}\\frac{dp}{dz}\n\\]\n\nロジスティック関数の微分は、どちらの正解でも同じ\n\n\\[\\frac{\\partial p}{\\partial z}=p(1-p)\\]\n\n正解が \\(y=1\\) のとき：\n\n\\[\\frac{\\partial \\ell}{\\partial z}\n=\\underbrace{\\left(-\\frac{1}{p}\\right)}_{\\partial\\ell/\\partial p}\n\\underbrace{p(1-p)}_{dp/dz}\n=-(1-p)=p-1=p-y \\qquad (y=1)\\]\n\n正解が \\(y=0\\) のとき：\n\n\\[\\frac{\\partial \\ell}{\\partial z}\n=\\underbrace{\\frac{1}{1-p}}_{\\partial\\ell/\\partial p}\n\\underbrace{p(1-p)}_{dp/dz}\n=p=p-0=p-y \\qquad (y=0)\\]\n\nどちらの正解でも \\[\\frac{\\partial \\ell}{\\partial z}=p-y\\]"
+    "text": "2つの微分を掛けると \\(p-y\\) になる\n\n\n\\(p\\) は \\(z\\) から計算されるので、連鎖律（chain rule）で2つの微分を掛ける \\[\n\\frac{\\partial\\ell}{\\partial z}\n=\\frac{\\partial\\ell}{\\partial p}\\frac{dp}{dz}\n\\]\n\n\\(\\dfrac{\\partial\\ell}{\\partial p}\\)：ラベルにより2通りある（交差エントロピーの微分）\n\\(\\dfrac{dp}{dz}=p(1-p)\\)：ロジスティック関数だけで決まるので一意\n\n\nここで、ラベルごとに、2つの微分を掛けてみると…\n\nラベルが \\(y=1\\) のとき：\n\n\\[\\frac{\\partial \\ell}{\\partial z}\n=\\underbrace{\\left(-\\frac{1}{p}\\right)}_{\\partial\\ell/\\partial p}\n\\underbrace{p(1-p)}_{dp/dz}\n=-(1-p)=p-1=p-y \\qquad (y=1)\\]\n\nラベルが \\(y=0\\) のとき：\n\n\\[\\frac{\\partial \\ell}{\\partial z}\n=\\underbrace{\\frac{1}{1-p}}_{\\partial\\ell/\\partial p}\n\\underbrace{p(1-p)}_{dp/dz}\n=p=p-0=p-y \\qquad (y=0)\\]\n\nどのラベルでも、\\(z\\) についての勾配は、単に \\(p\\) と正解ラベル \\(y\\) の差を計算するだけ \\[\\dfrac{\\partial \\ell}{\\partial z}=p-y\\]"
   },
   {
     "objectID": "logistic-regression.html#peek-parameter-gradients",
     "href": "logistic-regression.html#peek-parameter-gradients",
     "title": "ロジスティック回帰",
-    "section": "1匹分の入力からパラメータの勾配が決まる",
-    "text": "1匹分の入力からパラメータの勾配が決まる\n\n\n\\(z=w_1x_1+w_2x_2+b\\) なので\n\n\\[\\frac{\\partial z}{\\partial w_j}=x_j, \\qquad\n\\frac{\\partial z}{\\partial b}=1\\]\n\nいま求めた \\(\\dfrac{\\partial \\ell}{\\partial z}=p-y\\) を使い、連鎖律で更新に必要な \\(w_j\\) と \\(b\\) の勾配を求める\n\n\\[\\frac{\\partial \\ell}{\\partial w_j}\n=\\frac{\\partial \\ell}{\\partial z}\\frac{\\partial z}{\\partial w_j}\n=(p-y)x_j, \\qquad\n\\frac{\\partial \\ell}{\\partial b}=p-y\\]\n\n先ほどの \\(p=0.4\\)、\\(y=1\\)（Salmon）の例なら、\\(p-y=0.4-1=-0.6\\)\nある魚の入力を \\(x=(2,\\,0.5)\\) とすると\n\n\\(\\dfrac{\\partial \\ell}{\\partial w_1}=-0.6\\times2=-1.2\\)\n\\(\\dfrac{\\partial \\ell}{\\partial w_2}=-0.6\\times0.5=-0.3\\)\n\\(|x_1|\\) が \\(|x_2|\\) の4倍なので、\\(w_1\\) の勾配も4倍\n\n学習率 \\(\\alpha\\) を掛けて更新\n\n\\[w_j \\leftarrow w_j-\\alpha(p-y)x_j, \\qquad\nb \\leftarrow b-\\alpha(p-y)\\]\n\n\n\n\n\n\n\n損失値そのものから勾配を求めたわけではない\n\n\n\n先ほど計算した \\(0.92\\) は、現在の予測がどれくらい悪いかを表す目安\n\nこの値から勾配を求めるわけではない\n\n更新に使うのは、現在のパラメータ位置における損失関数の傾き（＝勾配）"
+    "section": "実際の入力で具体的な勾配を求める",
+    "text": "実際の入力で具体的な勾配を求める\n\n勾配を、入力 \\(x\\) と正解ラベル \\(y\\) の式で書くと（\\(p-y\\) を使う）\n\\[\\frac{\\partial \\ell}{\\partial w_j}=(p-y)\\,x_j, \\qquad\n\\frac{\\partial \\ell}{\\partial b}=p-y\\]\n\n\\(z=w_1x_1+w_2x_2+b\\) なので、\\(w_j\\) には \\(x_j\\)、\\(b\\) には 1 が掛かっている\n\n例：\\(p=0.4\\)、\\(y=1\\)（Salmon）、入力 \\(x=(2,\\,0.5)\\) なら、\\(p-y=-0.6\\) なので\n\n\\(w_1\\) の勾配：\\(-0.6\\times2=-1.2\\)\n\\(w_2\\) の勾配：\\(-0.6\\times0.5=-0.3\\)\n\\(b\\) の勾配：\\(-0.6\\)\n\nこの勾配に学習率 \\(\\alpha\\) を掛けて引く\n\\[w_j \\leftarrow w_j-\\alpha(p-y)x_j, \\qquad\nb \\leftarrow b-\\alpha(p-y)\\]"
   },
   {
     "objectID": "logistic-regression.html#peek-gradient-code",
     "href": "logistic-regression.html#peek-gradient-code",
     "title": "ロジスティック回帰",
-    "section": "1匹分の勾配をコードに置き換える",
-    "text": "1匹分の勾配をコードに置き換える\n\n\n数式の各部分に、そのまま変数名を付ける\n\ndelta = p - y\nd_w = delta * x\nd_b = delta\n\n\n\n\n\n\n\n\nコード\n数式\n意味\n\n\n\n\ndelta\n\\(p-y=\\dfrac{\\partial \\ell}{\\partial z}\\)\n1匹分の損失の、\\(z\\) に対する勾配\n\n\nd_w[j]\n\\((p-y)x_j=\\dfrac{\\partial \\ell}{\\partial w_j}\\)\n重み \\(w_j\\) の勾配\n\n\nd_b\n\\(p-y=\\dfrac{\\partial \\ell}{\\partial b}\\)\nバイアス \\(b\\) の勾配\n\n\n\n\n\n\n\n\n\nノート\n\n\nbackward：ニューラルネットワーク（neural network、NN）の実装で、出力側から各パラメータの勾配を求める関数"
+    "section": "1データ分の勾配のコード",
+    "text": "1データ分の勾配のコード\n\ndelta = p - y\nd_w = delta * x\nd_b = delta\n\n\n\n\n\n\n\n\nコード\n数式\n意味\n\n\n\n\ndelta\n\\(p-y=\\dfrac{\\partial \\ell}{\\partial z}\\)\n1データ分の損失の、\\(z\\) に対する勾配\n\n\nd_w[j]\n\\((p-y)x_j=\\dfrac{\\partial \\ell}{\\partial w_j}\\)\n係数 \\(w_j\\) の勾配\n\n\nd_b\n\\(p-y=\\dfrac{\\partial \\ell}{\\partial b}\\)\nバイアス \\(b\\) の勾配\n\n\n\n\n\\(z=w_1x_1+w_2x_2+b\\) なので、\\(w_j\\) には \\(x_j\\)、\\(b\\) には 1 が掛かっていると解釈（後述）"
   },
   {
     "objectID": "logistic-regression.html#peek-forward",
     "href": "logistic-regression.html#peek-forward",
     "title": "ロジスティック回帰",
     "section": "実装",
-    "text": "実装\n\n\n\n魚データの定義（クリックして展開）\nimport numpy as np\n\nsalmon_weights     = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,\n                               1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,\n                               2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,\n                               1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652])\nsalmon_brightness  = np.array([3.5, 5.8, 4.9, 4.4, 2.6, 2.6, 2.2, 5.5, 4.4, 4.8, 2.1,\n                               5.9, 5.3, 2.8, 2.7, 2.7, 3.2, 4.1, 3.7, 3.2, 4.4, 2.6,\n                               3.2, 3.5, 3.8, 5.1, 2.8, 4.1, 4.4, 2.2, 4.4, 2.7, 2.3,\n                               5.8, 5.9, 5.2, 3.2, 2.4, 4.7, 3.8])\nseabass_weights    = np.array([1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,\n                               1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,\n                               1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,\n                               1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531])\nseabass_brightness = np.array([5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8,\n                               8.9, 9.7, 9.5, 8.0, 9.6, 5.4, 6.0, 5.2, 6.6, 6.9, 6.4,\n                               9.1, 6.8, 6.4, 7.7, 5.7, 9.0, 5.4, 9.9, 8.9, 6.0, 5.0,\n                               9.1, 8.5, 8.6, 8.9, 5.4, 6.8, 5.6])\n\nX = np.column_stack([\n    np.concatenate([salmon_brightness, seabass_brightness]),\n    np.concatenate([salmon_weights,    seabass_weights])\n])\ny = np.array([1]*40 + [0]*40)   # 1=Salmon, 0=Sea bass\n\n# スケールを揃える\nX_norm = (X - X.mean(axis=0)) / X.std(axis=0)\n\n# Salmon, Sea bass, Salmon, ... と交互に並べ替えておく\norder = np.empty(80, dtype=int)\norder[0::2] = np.arange(0, 40)\norder[1::2] = np.arange(40, 80)\nX_norm = X_norm[order]\ny      = y[order]\n\n\n\ndef sigmoid(z):\n    return 1 / (1 + np.exp(-z))\n\ndef forward(X, w, b):\n    \"\"\"線形結合＋バイアス → シグモイド\"\"\"\n    return sigmoid(X @ w + b)\n\ndef loss_fn(y_true, p):\n    \"\"\"全魚の二値交差エントロピーを平均する\"\"\"\n    eps = 1e-10\n    # log(0) は計算できないため、確率が厳密な 0 / 1 にならないようにする\n    p = np.clip(p, eps, 1 - eps)\n    return -np.mean(y_true * np.log(p) + (1 - y_true) * np.log(1 - p))\n\ndef accuracy(y_true, p):\n    return np.mean((p &gt;= 0.5) == y_true)"
+    "text": "実装\n\n\n\nデータの定義（クリックして展開）\nimport numpy as np\n\nsalmon_weights     = np.array([2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,\n                               1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,\n                               2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,\n                               1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652])\nsalmon_brightness  = np.array([3.5, 5.8, 4.9, 4.4, 2.6, 2.6, 2.2, 5.5, 4.4, 4.8, 2.1,\n                               5.9, 5.3, 2.8, 2.7, 2.7, 3.2, 4.1, 3.7, 3.2, 4.4, 2.6,\n                               3.2, 3.5, 3.8, 5.1, 2.8, 4.1, 4.4, 2.2, 4.4, 2.7, 2.3,\n                               5.8, 5.9, 5.2, 3.2, 2.4, 4.7, 3.8])\nseabass_weights    = np.array([1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,\n                               1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,\n                               1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,\n                               1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531])\nseabass_brightness = np.array([5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8,\n                               8.9, 9.7, 9.5, 8.0, 9.6, 5.4, 6.0, 5.2, 6.6, 6.9, 6.4,\n                               9.1, 6.8, 6.4, 7.7, 5.7, 9.0, 5.4, 9.9, 8.9, 6.0, 5.0,\n                               9.1, 8.5, 8.6, 8.9, 5.4, 6.8, 5.6])\n\nX = np.column_stack([\n    np.concatenate([salmon_brightness, seabass_brightness]),\n    np.concatenate([salmon_weights,    seabass_weights])\n])\ny = np.array([1]*40 + [0]*40)   # 1=Salmon, 0=Sea bass\n\n# スケールを揃える\nX_norm = (X - X.mean(axis=0)) / X.std(axis=0)\n\n# Salmon, Sea bass, Salmon, ... と交互に並べ替えておく\norder = np.empty(80, dtype=int)\norder[0::2] = np.arange(0, 40)\norder[1::2] = np.arange(40, 80)\nX_norm = X_norm[order]\ny      = y[order]\n\n\n\ndef sigmoid(z):\n    return 1 / (1 + np.exp(-z))"
   },
   {
     "objectID": "logistic-regression.html#peek-logistic-functions",
     "href": "logistic-regression.html#peek-logistic-functions",
     "title": "ロジスティック回帰",
     "section": "各関数の役割",
-    "text": "各関数の役割\n\n\n\n\n関数\n役割\n\n\n\n\nsigmoid\n\\(z\\) を確率 \\(p\\) に変換する\n\n\nforward\n全魚の入力 \\(X\\) から確率を予測する\n\n\nloss_fn\n全魚の二値交差エントロピー \\(L\\) を計算する\n\n\naccuracy\n\\(p\\geq0.5\\) を Salmon として正答率を計算する\n\n\n\n\n1匹分の勾配は、delta、d_w、d_b の3行で計算する"
+    "text": "各関数の役割\n\n\n\n\n\n\n\n\n関数\n役割\n\n\n\n\nsigmoid\n\\(z\\) を確率 \\(p\\) に変換する\n\n\npredict\n全データの入力 \\(X\\) から確率 \\(p\\) を予測する\n\n\nbinary_cross_entropy\n全データの二値交差エントロピー \\(L\\) を計算する\n\n\naccuracy\n\\(p\\geq0.5\\) を Salmon として正答率を計算する\n\n\n\n\n1データ分の勾配は、delta、d_w、d_b の3行で計算する"
   },
   {
     "objectID": "logistic-regression.html#peek-one-at-a-time",
     "href": "logistic-regression.html#peek-one-at-a-time",
     "title": "ロジスティック回帰",
-    "section": "1データずつ学習してみる",
-    "text": "1データずつ学習してみる\n\n\n1匹分の損失 \\(\\ell\\) の勾配で更新する\n\n全魚の平均損失 \\(L\\) は更新に使わない\n\n\n\nw = np.array([0.0, 0.0])   # Weights start at zero\nb  = 0.0\nlr = 0.5                       # 学習率\n\nfor i in range(10):\n    xi, yi = X_norm[i], y[i]\n    # この1匹の損失 ℓ の勾配で、パラメータを更新する\n    p_i   = sigmoid(xi @ w + b)   # Forward：1匹だけ予測\n    delta = p_i - yi\n    d_w = delta * xi\n    d_b = delta\n    w = w - lr * d_w\n    b     = b  - lr * d_b\n\n    # 全魚の Loss と正答率は、学習の様子を表示するためだけに計算する\n    p_all = forward(X_norm, w, b)\n    print(f\"{i+1}匹目 | Loss: {loss_fn(y, p_all):.4f} | 正答率: {accuracy(y, p_all):.1%} \"\n          f\"| w=[{w[0]:6.3f}, {w[1]:6.3f}] | b={b:6.3f}\")\n\n1匹目 | Loss: 0.5326 | 正答率: 85.0% | w=[-0.233,  0.335] | b= 0.250\n2匹目 | Loss: 0.5179 | 正答率: 90.0% | w=[-0.233,  0.371] | b=-0.026\n3匹目 | Loss: 0.4974 | 正答率: 85.0% | w=[-0.213,  0.537] | b= 0.196\n4匹目 | Loss: 0.4269 | 正答率: 88.8% | w=[-0.359,  0.748] | b= 0.023\n5匹目 | Loss: 0.4044 | 正答率: 85.0% | w=[-0.394,  0.914] | b= 0.135\n6匹目 | Loss: 0.3994 | 正答率: 87.5% | w=[-0.360,  1.054] | b=-0.059\n7匹目 | Loss: 0.3901 | 正答率: 87.5% | w=[-0.379,  1.137] | b=-0.023\n8匹目 | Loss: 0.3617 | 正答率: 87.5% | w=[-0.516,  1.206] | b=-0.102\n9匹目 | Loss: 0.3364 | 正答率: 88.8% | w=[-0.650,  1.272] | b=-0.002\n10匹目 | Loss: 0.3330 | 正答率: 90.0% | w=[-0.741,  1.146] | b=-0.294\n\n\n\n\n\n\n\n\n\n結果\n\n\nLoss は1匹ごとに下がっていく\n\n\n\n\n\n\n\n\n\n\n\n更新に使う値と、表示する値は別\n\n\n\n更新：いま見ている1匹の勾配 delta、d_w、d_b を使う\n表示：更新後に全魚の平均損失 \\(L\\) と正答率を計算する\n\n表示した Loss の数値を更新式へ代入するわけではない"
+    "section": "実際に1データずつ逐次学習してみる",
+    "text": "実際に1データずつ逐次学習してみる\n\n\nlog で和にしたので、\\(L\\) の勾配は1データ分の勾配の平均\n\nだから、1データ分の勾配で少しずつ更新しても大丈夫\n\n\\(L\\) で全データまとめて更新してもよいが、練習のため1データずつ進める\n\n\n\n\n\nデータの定義（クリックして展開）\nimport numpy as np\n\n# 1行 = 1匹の特徴量 [輝度, 重さ]。Salmon 40匹のあとに Sea bass 40匹\nX = np.array([\n    # Salmon\n    [3.5, 2149], [5.8, 1959], [4.9, 2194], [4.4, 2457], [2.6, 1930],\n    [2.6, 1930], [2.2, 2474], [5.5, 2230], [4.4, 1859], [4.8, 2163],\n    [2.1, 1861], [5.9, 1860], [5.3, 2073], [2.8, 1426], [2.7, 1483],\n    [2.7, 1831], [3.2, 1696], [4.1, 2094], [3.7, 1728], [3.2, 1576],\n    [4.4, 2028], [2.6, 1903], [3.2, 2057], [3.5, 2229], [3.8, 1884],\n    [5.1, 1884], [2.8, 2240], [4.1, 2081], [4.4, 1838], [2.2, 2037],\n    [4.4, 1839], [2.7, 1838], [2.3, 1978], [5.8, 1554], [5.9, 1591],\n    [5.2, 1820], [3.2, 1731], [2.4, 1992], [4.7, 1752], [3.8, 1652],\n    # Sea bass\n    [5.6, 1677], [7.5, 1327], [5.2, 1486], [9.5, 1440], [6.3, 1857],\n    [8.3, 1476], [6.6, 1749], [7.6, 2203], [7.7, 1979], [5.9, 1468],\n    [9.8, 1496], [8.9, 1737], [9.7, 1099], [9.5, 1341], [8.0, 1748],\n    [9.6, 1563], [5.4, 2181], [6.0, 1414], [5.2, 1286], [6.6, 1333],\n    [6.9, 1787], [6.4, 1445], [9.1, 1505], [6.8, 1204], [6.4, 1381],\n    [7.7, 1513], [5.7, 1259], [9.0, 1567], [5.4, 1370], [9.9, 1432],\n    [8.9, 1370], [6.0, 1864], [5.0, 1488], [9.1, 1278], [8.5, 1657],\n    [8.6, 1245], [8.9, 1533], [5.4, 1096], [6.8, 1223], [5.6, 1531],\n])\ny = np.array([1]*40 + [0]*40)   # X と同じ魚の順。1=Salmon, 0=Sea bass\n\n# スケールを揃える\nX_norm = (X - X.mean(axis=0)) / X.std(axis=0)\n\n# Salmon, Sea bass, Salmon, ... と交互に並べ替えておく\norder = np.empty(80, dtype=int)\norder[0::2] = np.arange(0, 40)\norder[1::2] = np.arange(40, 80)\nX_norm = X_norm[order]\ny      = y[order]\n\n\n\ndef sigmoid(z):\n    return 1 / (1 + np.exp(-z))\n\nw = np.array([0.0, 0.0])   # 係数は 0 から始める\nb = 0.0\nlr = 0.5                   # 学習率\n\nfor i in range(10):\n    xi, yi = X_norm[i], y[i]\n    # このデータの損失 ℓ の勾配で、パラメータを更新する\n    p_i   = sigmoid(xi @ w + b)   # 1データだけ予測\n    delta = p_i - yi\n    d_w = delta * xi\n    d_b = delta\n    w = w - lr * d_w\n    b = b - lr * d_b\n    print(f\"{i+1}件目 | w=[{w[0]:6.3f}, {w[1]:6.3f}] | b={b:6.3f}\")\n\n1件目 | w=[-0.233,  0.335] | b= 0.250\n2件目 | w=[-0.233,  0.371] | b=-0.026\n3件目 | w=[-0.213,  0.537] | b= 0.196\n4件目 | w=[-0.359,  0.748] | b= 0.023\n5件目 | w=[-0.394,  0.914] | b= 0.135\n6件目 | w=[-0.360,  1.054] | b=-0.059\n7件目 | w=[-0.379,  1.137] | b=-0.023\n8件目 | w=[-0.516,  1.206] | b=-0.102\n9件目 | w=[-0.650,  1.272] | b=-0.002\n10件目 | w=[-0.741,  1.146] | b=-0.294"
   },
   {
     "objectID": "logistic-regression.html#境界が動く様子を見る",
     "href": "logistic-regression.html#境界が動く様子を見る",
     "title": "ロジスティック回帰",
     "section": "境界が動く様子を見る",
-    "text": "境界が動く様子を見る\n\n\n\n\n\n\n\n\n\n\n\n◯印：直前に見せた魚\n\n\n\n\n\n\n\n\n結果\n\n\n\n予測が正解からずれている分だけ、境界がその魚を正しく分類する向きへ動く\n縦線しか引けなかった人間と違い、機械は斜めの直線を自由に調整していく"
+    "text": "境界が動く様子を見る\n\n\n\n\n\n\n\n\n\n\n\n◯印：直前に見せたデータ点\n\n\n\n\n\n\n\n\n結果\n\n\n\n予測が正解からずれている分だけ、境界がその点を正しく分類する向きへ動く\n人が決めた閾値（縦線）と違い、機械は斜めの直線を自由に調整していく"
   },
   {
     "objectID": "logistic-regression.html#匹を見た後のパラメータを読む",
@@ -956,14 +956,14 @@
     "href": "logistic-regression.html#peek-logistic-name",
     "title": "ロジスティック回帰",
     "section": "名前の由来：何が「ロジスティック」？",
-    "text": "名前の由来：何が「ロジスティック」？\n\n\nシグモイド（sigmoid）：「S字型の」という意味の総称\n\nS字カーブの関数はすべてシグモイド\n\n\\(\\dfrac{1}{1+e^{-z}}\\) の正式名はロジスティック関数（logistic function）\n\nシグモイドの代表例\n\n出自は機械学習ではなく、19世紀の人口の成長モデル\n\n最初は勢いよく増え、資源の上限に近づくと頭打ちになる成長曲線がS字\n\nロジスティック関数で確率を出す回帰だからロジスティック回帰\n\n\n\n\n\n培養瓶の中のキイロショウジョウバエ。個体数の増え方がロジスティック曲線に当てはまることが確かめられた例（写真：Masur, Wikimedia Commons, CC BY-SA 4.0）"
+    "text": "名前の由来：何が「ロジスティック」？\n\n\nロジスティック関数の出自は機械学習ではなく、19世紀の人口の成長モデル\n\n最初は勢いよく増え、資源の上限に近づくと頭打ちになる成長曲線がS字\n\nロジスティック関数で確率を出す回帰だからロジスティック回帰\n\n\n\n\n\n培養瓶の中のキイロショウジョウバエ。個体数の増え方がロジスティック曲線に当てはまることが確かめられた例（写真：Masur, Wikimedia Commons, CC BY-SA 4.0）"
   },
   {
     "objectID": "logistic-regression.html#section-2",
     "href": "logistic-regression.html#section-2",
     "title": "ロジスティック回帰",
     "section": "",
-    "text": "「線形」とは"
+    "text": "（おまけ）「線形」とは"
   },
   {
     "objectID": "logistic-regression.html#この式なんと呼ばれているか",
@@ -1012,14 +1012,14 @@
     "href": "logistic-regression.html#まとめ",
     "title": "ロジスティック回帰",
     "section": "まとめ",
-    "text": "まとめ\n\n\nロジスティック回帰：線形結合（＋バイアス）→ ロジスティック関数\n\n決定境界は \\(z = 0\\) の直線\n\n「線形」は直線の見た目ではなく、「定数倍と足し算だけ」という性質\n\n\\(f(0) \\neq 0\\) なら線形ではない\n\n\\(+b\\) があると厳密には線形ではない（アフィン）\n\n「常に 1 の入力 \\(x_0\\)」と読み替えれば線形結合に収まる\n\n学習：交差エントロピーを勾配降下法で最小化\n\n勾配は \\((p - y) x\\)（ロジスティック関数と交差エントロピーを組み合わせた結果）\n\n学習の中身は「予測 → 差を測る → 境界を少し動かす」の繰り返し\n「線形結合 → ロジスティック関数」は、すでに最小構成のニューラルネットワーク"
+    "text": "まとめ\n\n\n直線は、\\(f(x) = w_1x_1 + w_2x_2 + b\\) が 0 になる点の集合\n\n値の符号：直線のどちら側か\n値の大きさ：直線からの遠さ\n\n回帰と分類で、データ点での \\(f(x)\\) に求めることが逆\n\n回帰：0 に近づける（MSE）\n分類：正しい側で 0 から遠ざける\n\n分類の損失：二値交差エントロピー\n\n確率に変換：\\(p = \\sigma(f(x))\\)\n採点：正解クラスの確率 \\(q\\) に \\(-\\log q\\)\n\n学習：交差エントロピーを勾配降下法で最小化\n\n勾配は \\((p - y) x\\)（ロジスティック関数と交差エントロピーを組み合わせた結果）\n\n学習の中身は「予測 → 差を測る → 境界を少し動かす」の繰り返し\nロジスティック回帰：線形結合（＋バイアス）→ ロジスティック関数 → 交差エントロピー\n\n「線形結合 → ロジスティック関数」は、すでに最小構成のニューラルネットワーク\n\n「線形」は直線の見た目ではなく、「定数倍と足し算だけ」という性質\n\n\\(f(0) \\neq 0\\) なら線形ではない\n\n\\(+b\\) があると厳密には線形ではない（アフィン）\n\n「常に 1 の入力 \\(x_0\\)」と読み替えれば線形結合に収まる"
   },
   {
     "objectID": "logistic-regression.html#練習問題",
     "href": "logistic-regression.html#練習問題",
     "title": "ロジスティック回帰",
     "section": "練習問題",
-    "text": "練習問題\n\n以下の問題を手計算とPythonコードの両方で解け。\n問題1：線形かどうかを判定する\n次の関数が線形性（斉次性・加法性）を満たすか判定せよ。\n\\[\\text{(a)}\\; f(x) = 5x \\qquad \\text{(b)}\\; f(x) = 3x + 2 \\qquad \\text{(c)}\\; f(x) = x^2 \\qquad \\text{(d)}\\; f(x_1, x_2) = 2x_1 - x_2\\]\n\n\\(f(0) = 0\\) かどうかを確認し、線形でない関数を除外\n残った関数で加法性 \\(f(u + v) = f(u) + f(v)\\) を確認（成り立たない場合は反例を1つ提示）\n「先に足してから入れる」と「入れてから足す」をコードで比較（1変数の関数は \\(u=1, v=2\\)、(d) は \\(u=(1,2), v=(3,1)\\)）\n\n問題2：ロジスティック回帰を2ステップ学習する\n次の2匹のデータで、ロジスティック回帰のパラメータを2回更新せよ。\n\n特徴量（標準化済み）：（輝度, 重さ）\n1匹目：\\(x^{(1)} = (2, 1)\\)、Salmon（\\(y=1\\)）\n2匹目：\\(x^{(2)} = (-1, 1)\\)、Sea bass（\\(y=0\\)）\n初期値：\\(w = (0, 0)\\)、\\(b = 0\\)\n学習率：\\(\\alpha = 0.5\\)\n\n\n1匹目の \\(z\\)、\\(p = \\sigma(z)\\)、差 \\(\\delta = p - y\\) を計算\n更新式 \\(w \\leftarrow w - \\alpha\\,\\delta\\,x\\)、\\(b \\leftarrow b - \\alpha\\,\\delta\\) で更新\n続けて2匹目でも更新\n同じ計算をコードで実行し、手計算との一致を確認\n\nヒント：\\(\\sigma(0) = 0.5\\)（この問題で使う \\(\\sigma\\) の値はこれだけ）"
+    "text": "練習問題\n\n以下の問題を手計算とPythonコードの両方で解け。\n問題1：線形かどうかを判定する\n次の関数が線形性（斉次性・加法性）を満たすか判定せよ。\n\\[\\text{(a)}\\; f(x) = 5x \\qquad \\text{(b)}\\; f(x) = 3x + 2 \\qquad \\text{(c)}\\; f(x) = x^2 \\qquad \\text{(d)}\\; f(x_1, x_2) = 2x_1 - x_2\\]\n\n\\(f(0) = 0\\) かどうかを確認し、線形でない関数を除外\n残った関数で加法性 \\(f(u + v) = f(u) + f(v)\\) を確認（成り立たない場合は反例を1つ提示）\n「先に足してから入れる」と「入れてから足す」をコードで比較（1変数の関数は \\(u=1, v=2\\)、(d) は \\(u=(1,2), v=(3,1)\\)）\n\n問題2：ロジスティック回帰を2ステップ学習する\n次の2件のデータで、ロジスティック回帰のパラメータを2回更新せよ。\n\n特徴量（標準化済み）：（輝度, 重さ）\n1件目：\\(x^{(1)} = (2, 1)\\)、Salmon（\\(y=1\\)）\n2件目：\\(x^{(2)} = (-1, 1)\\)、Sea bass（\\(y=0\\)）\n初期値：\\(w = (0, 0)\\)、\\(b = 0\\)\n学習率：\\(\\alpha = 0.5\\)\n\n\n1件目の \\(z\\)、\\(p = \\sigma(z)\\)、差 \\(\\delta = p - y\\) を計算\n更新式 \\(w \\leftarrow w - \\alpha\\,\\delta\\,x\\)、\\(b \\leftarrow b - \\alpha\\,\\delta\\) で更新\n続けて2件目でも更新\n同じ計算をコードで実行し、手計算との一致を確認\n\nヒント：\\(\\sigma(0) = 0.5\\)（この問題で使う \\(\\sigma\\) の値はこれだけ）"
   },
   {
     "objectID": "logistic-regression.html#問題1の解答例",
@@ -1033,14 +1033,14 @@
     "href": "logistic-regression.html#問題2の解答例",
     "title": "ロジスティック回帰",
     "section": "問題2の解答例",
-    "text": "問題2の解答例\n\n\n1匹目（\\(x = (2, 1)\\)、\\(y = 1\\)）2匹目（\\(x = (-1, 1)\\)、\\(y = 0\\)）\n\n\n\\[z = 0 \\times 2 + 0 \\times 1 + 0 = 0, \\qquad p = \\sigma(0) = 0.5, \\qquad \\delta = 0.5 - 1 = -0.5\\]\n更新: \\[w \\leftarrow (0, 0) - 0.5 \\times (-0.5) \\times (2, 1) = (0.5,\\; 0.25)\\] \\[b \\leftarrow 0 + 0.25 = 0.25\\]\n\nパラメータがすべて 0 なので \\(p = 0.5\\)（五分五分）\n正解 \\(y=1\\) との差 \\(\\delta=-0.5\\) の分だけ、パラメータが動く\n\n\n\n\\[z = 0.5 \\times (-1) + 0.25 \\times 1 + 0.25 = 0, \\qquad p = 0.5, \\qquad \\delta = 0.5\\]\n\n2匹目はちょうど境界の上（\\(z = 0\\)）にある\n\n更新: \\[w \\leftarrow (0.5, 0.25) - 0.5 \\times 0.5 \\times (-1, 1) = (0.75,\\; 0)\\] \\[b \\leftarrow 0.25 - 0.25 = 0\\]\n\n\n\nコードで確認\n\n\n解答例を見る\nimport numpy as np\n\ndef sigmoid(z):\n    return 1 / (1 + np.exp(-z))\n\nw = np.array([0.0, 0.0])\nb  = 0.0\nlr = 0.5\n\nfishes = [(np.array([2.0, 1.0]), 1),    # Salmon\n          (np.array([-1.0, 1.0]), 0)]   # Sea bass\n\nfor i, (xi, yi) in enumerate(fishes, 1):\n    z     = xi @ w + b\n    p     = sigmoid(z)\n    delta = p - yi\n    w = w - lr * delta * xi\n    b     = b - lr * delta\n    print(f\"{i}匹目: z={z:.2f}, p={p:.2f}, δ={delta:+.2f} → w={w}, b={b:.2f}\")\n\n\n1匹目: z=0.00, p=0.50, δ=-0.50 → w=[0.5  0.25], b=0.25\n2匹目: z=0.00, p=0.50, δ=+0.50 → w=[0.75 0.  ], b=0.00\n\n\n\n\n\n\n\n\n\n結果\n\n\n手計算どおりに \\(w\\) と \\(b\\) が動く"
+    "text": "問題2の解答例\n\n\n1件目（\\(x = (2, 1)\\)、\\(y = 1\\)）2件目（\\(x = (-1, 1)\\)、\\(y = 0\\)）\n\n\n\\[z = 0 \\times 2 + 0 \\times 1 + 0 = 0, \\qquad p = \\sigma(0) = 0.5, \\qquad \\delta = 0.5 - 1 = -0.5\\]\n更新: \\[w \\leftarrow (0, 0) - 0.5 \\times (-0.5) \\times (2, 1) = (0.5,\\; 0.25)\\] \\[b \\leftarrow 0 + 0.25 = 0.25\\]\n\nパラメータがすべて 0 なので \\(p = 0.5\\)（五分五分）\n正解 \\(y=1\\) との差 \\(\\delta=-0.5\\) の分だけ、パラメータが動く\n\n\n\n\\[z = 0.5 \\times (-1) + 0.25 \\times 1 + 0.25 = 0, \\qquad p = 0.5, \\qquad \\delta = 0.5\\]\n\n2件目はちょうど境界の上（\\(z = 0\\)）にある\n\n更新: \\[w \\leftarrow (0.5, 0.25) - 0.5 \\times 0.5 \\times (-1, 1) = (0.75,\\; 0)\\] \\[b \\leftarrow 0.25 - 0.25 = 0\\]\n\n\n\nコードで確認\n\n\n解答例を見る\nimport numpy as np\n\ndef sigmoid(z):\n    return 1 / (1 + np.exp(-z))\n\nw = np.array([0.0, 0.0])\nb  = 0.0\nlr = 0.5\n\nsamples = [(np.array([2.0, 1.0]), 1),    # Salmon\n           (np.array([-1.0, 1.0]), 0)]   # Sea bass\n\nfor i, (xi, yi) in enumerate(samples, 1):\n    z     = xi @ w + b\n    p     = sigmoid(z)\n    delta = p - yi\n    w = w - lr * delta * xi\n    b     = b - lr * delta\n    print(f\"{i}件目: z={z:.2f}, p={p:.2f}, δ={delta:+.2f} → w={w}, b={b:.2f}\")\n\n\n1件目: z=0.00, p=0.50, δ=-0.50 → w=[0.5  0.25], b=0.25\n2件目: z=0.00, p=0.50, δ=+0.50 → w=[0.75 0.  ], b=0.00\n\n\n\n\n\n\n\n\n\n結果\n\n\n手計算どおりに \\(w\\) と \\(b\\) が動く"
   },
   {
     "objectID": "logistic-regression.html#peek-exp-derivative",
     "href": "logistic-regression.html#peek-exp-derivative",
     "title": "ロジスティック回帰",
     "section": "【参考】\\(e^x\\) は微分しても \\(e^x\\)",
-    "text": "【参考】\\(e^x\\) は微分しても \\(e^x\\)\n\n\n一般の指数関数（exponential function）\\(a^x\\) を微分すると\n\n\\[\\frac{d}{dx}a^x=(\\log a)a^x\\]\n\n\\(\\log a=1\\) になる特別な底が \\(e\\approx2.718\\)\n\n\\[\\frac{d}{dx}e^x=e^x\\]\n\n\n\n\n\n\n\n\n\n\n指数が \\(-z\\) なら、連鎖律で内側の微分 \\(-1\\) が掛かる\n\n\\[\\frac{d}{dz}e^{-z}=e^{-z}\\frac{d(-z)}{dz}=-e^{-z}\\]\n\n\\(e\\) は、指数関数の値と傾きが同じになるように選ばれた数"
+    "text": "【参考】\\(e^x\\) は微分しても \\(e^x\\)\n\n\n一般の指数関数（exponential function）\\(a^x\\) を微分すると\n\n\\[\\frac{d}{dx}a^x=(\\log a)a^x\\]\n\n\\(\\log a=1\\) になる特別な底が \\(e\\approx2.718\\)\n\n\\[\\frac{d}{dx}e^x=e^x\\]\n\n\n\n\n\n\n\n\n\n\n指数が \\(-z\\) のときは、合成関数になっている\n\n内側 \\(g\\) で先に \\(-z\\) を作り、外側 \\(h\\) で \\(e\\) の右肩に乗せる\n\n\n\\[g(z) = -z, \\qquad h(u) = e^{u} \\qquad\\Longrightarrow\\qquad h(g(z)) = e^{g(z)} = e^{-z}\\]\n\n連鎖律で、内側の微分 \\(-1\\) が掛かる\n\n\\[\\frac{d}{dz}e^{-z}=e^{-z}\\frac{d(-z)}{dz}=-e^{-z}\\]\n\n\\(e\\) は、指数関数の値と傾きが同じになるように選ばれた数"
   },
   {
     "objectID": "index.html#人工知能",
@@ -1572,7 +1572,7 @@
     "href": "classification-2d-boundaries.html#peek-handline",
     "title": "2次元の特徴量で分類",
     "section": "輝度だけで分類",
-    "text": "輝度だけで分類\n\n\nグラフ上で適当な閾値を設定して左右に分割\n\n\n# 目で見て決めた閾値。輝度がこれより小さければ Salmon\nlightness_threshold = 5.5\n\n\n\n（参考）描画コード\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\n\nplt.figure(figsize=(10, 7))\n\nplt.scatter(salmon_brightness, salmon_weights,\n           c=\"black\", marker=\"o\", s=100, alpha=0.7, label=\"Salmon\", edgecolors=\"black\")\nplt.scatter(seabass_brightness, seabass_weights,\n           c=\"red\", marker=\"s\", s=100, alpha=0.7, label=\"Sea bass\", edgecolors=\"darkred\")\n\nplt.axvline(x=lightness_threshold, color=\"blue\", linestyle=\"--\", linewidth=2.5, \n           label=f\"decision boundary (Lightness = {lightness_threshold})\")\n\nplt.xlabel(\"Lightness\", fontsize=14, fontweight=\"bold\")\nplt.ylabel(\"Weight (g)\", fontsize=14, fontweight=\"bold\")\nplt.title(\"Manual Decision Boundary\", fontsize=16, fontweight=\"bold\")\nplt.legend(fontsize=13, loc=\"upper left\")\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nチェックポイント\n\n\n\nどこに引けば一番うまく分けられそうか\n完璧には分けられないので、誤分類がどのくらい出るかを数える"
+    "text": "輝度だけで分類\n\n\nグラフ上で適当な閾値を設定して左右に分割\n\n\n# 散布図から決めた閾値。輝度がこれより小さければ Salmon\nlightness_threshold = 5.5\n\n\n\n（参考）描画コード\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\n\nplt.figure(figsize=(10, 7))\n\nplt.scatter(salmon_brightness, salmon_weights,\n           c=\"black\", marker=\"o\", s=100, alpha=0.7, label=\"Salmon\", edgecolors=\"black\")\nplt.scatter(seabass_brightness, seabass_weights,\n           c=\"red\", marker=\"s\", s=100, alpha=0.7, label=\"Sea bass\", edgecolors=\"darkred\")\n\nplt.axvline(x=lightness_threshold, color=\"blue\", linestyle=\"--\", linewidth=2.5, \n           label=f\"decision boundary (Lightness = {lightness_threshold})\")\n\nplt.xlabel(\"Lightness\", fontsize=14, fontweight=\"bold\")\nplt.ylabel(\"Weight (g)\", fontsize=14, fontweight=\"bold\")\nplt.title(\"Manual Decision Boundary\", fontsize=16, fontweight=\"bold\")\nplt.legend(fontsize=13, loc=\"upper left\")\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nチェックポイント\n\n\n\n閾値をいくつにすれば一番うまく分けられそうか\n完璧には分けられないので、誤分類がどのくらい出るかを数える"
   },
   {
     "objectID": "classification-2d-boundaries.html#この閾値の性能は",
@@ -1621,7 +1621,7 @@
     "href": "classification-2d-boundaries.html#tweak-閾値を変えてジニ不純度を比べる",
     "title": "2次元の特徴量で分類",
     "section": "Tweak 閾値を変えてジニ不純度を比べる",
-    "text": "Tweak 閾値を変えてジニ不純度を比べる\n\n\n\n土台のコード\nimport numpy as np\n\n# Salmon（40匹）の重さ (g)\nsalmon_weights = [2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,\n                  1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,\n                  2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,\n                  1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652]\n\n# Salmon（40匹）の輝度（暗め: 2.1-5.9）\nsalmon_brightness = [3.5, 5.8, 4.9, 4.4, 2.6, 2.6, 2.2, 5.5, 4.4, 4.8, 2.1,\n                     5.9, 5.3, 2.8, 2.7, 2.7, 3.2, 4.1, 3.7, 3.2, 4.4, 2.6,\n                     3.2, 3.5, 3.8, 5.1, 2.8, 4.1, 4.4, 2.2, 4.4, 2.7, 2.3,\n                     5.8, 5.9, 5.2, 3.2, 2.4, 4.7, 3.8]\n\n# Sea bass（40匹）の重さ (g)\nseabass_weights = [1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,\n                   1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,\n                   1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,\n                   1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531]\n\n# Sea bass（40匹）の輝度（明るめ: 5.0-9.9）\nseabass_brightness = [5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8,\n                       8.9, 9.7, 9.5, 8.0, 9.6, 5.4, 6.0, 5.2, 6.6, 6.9, 6.4,\n                       9.1, 6.8, 6.4, 7.7, 5.7, 9.0, 5.4, 9.9, 8.9, 6.0, 5.0,\n                       9.1, 8.5, 8.6, 8.9, 5.4, 6.8, 5.6]\n\n# numpy配列にキャスト\nsalmon_weights = np.array(salmon_weights)\nsalmon_brightness = np.array(salmon_brightness)\nseabass_weights = np.array(seabass_weights)\nseabass_brightness = np.array(seabass_brightness)\n\n# 目で見て決めた閾値。輝度がこれより小さければ Salmon\nlightness_threshold = 5.5\n\ndef gini(n_salmon, n_seabass):\n    \"\"\"ジニ不純度。n_salmon, n_seabass はその領域にいる匹数\"\"\"\n    n = n_salmon + n_seabass\n    if n == 0:\n        return 0\n    p_salmon = n_salmon / n\n    p_seabass = n_seabass / n\n    return 1 - (p_salmon**2 + p_seabass**2)\n\n# 縦線の左右それぞれに、Salmon と Sea bass が何匹いるか\nleft_salmon = np.sum(salmon_brightness &lt; lightness_threshold)\nleft_seabass = np.sum(seabass_brightness &lt; lightness_threshold)\nright_salmon = np.sum(salmon_brightness &gt;= lightness_threshold)\nright_seabass = np.sum(seabass_brightness &gt;= lightness_threshold)\n\ngini_left = gini(left_salmon, left_seabass)\ngini_right = gini(right_salmon, right_seabass)\n\n# 左右のジニ不純度を匹数で重み付けして平均\nn_left = left_salmon + left_seabass\nn_right = right_salmon + right_seabass\nweighted_gini = (n_left * gini_left + n_right * gini_right) / (n_left + n_right)\n\nprint(f\"threshold={lightness_threshold}\")\nprint(f\"  left : Salmon {left_salmon:&gt;2}, Sea bass {left_seabass:&gt;2}, Gini={gini_left:.3f}\")\nprint(f\"  right: Salmon {right_salmon:&gt;2}, Sea bass {right_seabass:&gt;2}, Gini={gini_right:.3f}\")\nprint(f\"  weighted Gini = {weighted_gini:.3f}\")\n\n\n\n「土台のコード」の lightness_threshold を書き換えて実行\n\n\n\n\n\n\n\n\n\nやりたいこと\nコード\n\n\n\n\n目で引いた線より良い線を探せ\nlightness_threshold = 5.5 → 5.0、4.8 など（weighted Gini が小さいほど良い）\n\n\n線を端に寄せたら？\nlightness_threshold = 5.5 → 2.0\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n5.0 にすると、weighted Gini は 5.5 のときより下がる（左側が Salmon だけの純粋な領域になる）\n2.0 では全部の魚が右側に入り、分割前と同じ 0.5\n\n切っていないのと同じ"
+    "text": "Tweak 閾値を変えてジニ不純度を比べる\n\n\n\n土台のコード\nimport numpy as np\n\n# Salmon（40匹）の重さ (g)\nsalmon_weights = [2149, 1959, 2194, 2457, 1930, 1930, 2474, 2230, 1859, 2163,\n                  1861, 1860, 2073, 1426, 1483, 1831, 1696, 2094, 1728, 1576,\n                  2028, 1903, 2057, 2229, 1884, 1884, 2240, 2081, 1838, 2037,\n                  1839, 1838, 1978, 1554, 1591, 1820, 1731, 1992, 1752, 1652]\n\n# Salmon（40匹）の輝度（暗め: 2.1-5.9）\nsalmon_brightness = [3.5, 5.8, 4.9, 4.4, 2.6, 2.6, 2.2, 5.5, 4.4, 4.8, 2.1,\n                     5.9, 5.3, 2.8, 2.7, 2.7, 3.2, 4.1, 3.7, 3.2, 4.4, 2.6,\n                     3.2, 3.5, 3.8, 5.1, 2.8, 4.1, 4.4, 2.2, 4.4, 2.7, 2.3,\n                     5.8, 5.9, 5.2, 3.2, 2.4, 4.7, 3.8]\n\n# Sea bass（40匹）の重さ (g)\nseabass_weights = [1677, 1327, 1486, 1440, 1857, 1476, 1749, 2203, 1979, 1468,\n                   1496, 1737, 1099, 1341, 1748, 1563, 2181, 1414, 1286, 1333,\n                   1787, 1445, 1505, 1204, 1381, 1513, 1259, 1567, 1370, 1432,\n                   1370, 1864, 1488, 1278, 1657, 1245, 1533, 1096, 1223, 1531]\n\n# Sea bass（40匹）の輝度（明るめ: 5.0-9.9）\nseabass_brightness = [5.6, 7.5, 5.2, 9.5, 6.3, 8.3, 6.6, 7.6, 7.7, 5.9, 9.8,\n                       8.9, 9.7, 9.5, 8.0, 9.6, 5.4, 6.0, 5.2, 6.6, 6.9, 6.4,\n                       9.1, 6.8, 6.4, 7.7, 5.7, 9.0, 5.4, 9.9, 8.9, 6.0, 5.0,\n                       9.1, 8.5, 8.6, 8.9, 5.4, 6.8, 5.6]\n\n# numpy配列にキャスト\nsalmon_weights = np.array(salmon_weights)\nsalmon_brightness = np.array(salmon_brightness)\nseabass_weights = np.array(seabass_weights)\nseabass_brightness = np.array(seabass_brightness)\n\n# 散布図から決めた閾値。輝度がこれより小さければ Salmon\nlightness_threshold = 5.5\n\ndef gini(n_salmon, n_seabass):\n    \"\"\"ジニ不純度。n_salmon, n_seabass はその領域にいる匹数\"\"\"\n    n = n_salmon + n_seabass\n    if n == 0:\n        return 0\n    p_salmon = n_salmon / n\n    p_seabass = n_seabass / n\n    return 1 - (p_salmon**2 + p_seabass**2)\n\n# 縦線の左右それぞれに、Salmon と Sea bass が何匹いるか\nleft_salmon = np.sum(salmon_brightness &lt; lightness_threshold)\nleft_seabass = np.sum(seabass_brightness &lt; lightness_threshold)\nright_salmon = np.sum(salmon_brightness &gt;= lightness_threshold)\nright_seabass = np.sum(seabass_brightness &gt;= lightness_threshold)\n\ngini_left = gini(left_salmon, left_seabass)\ngini_right = gini(right_salmon, right_seabass)\n\n# 左右のジニ不純度を匹数で重み付けして平均\nn_left = left_salmon + left_seabass\nn_right = right_salmon + right_seabass\nweighted_gini = (n_left * gini_left + n_right * gini_right) / (n_left + n_right)\n\nprint(f\"threshold={lightness_threshold}\")\nprint(f\"  left : Salmon {left_salmon:&gt;2}, Sea bass {left_seabass:&gt;2}, Gini={gini_left:.3f}\")\nprint(f\"  right: Salmon {right_salmon:&gt;2}, Sea bass {right_seabass:&gt;2}, Gini={gini_right:.3f}\")\nprint(f\"  weighted Gini = {weighted_gini:.3f}\")\n\n\n\n「土台のコード」の lightness_threshold を書き換えて実行\n\n\n\n\n\n\n\n\n\nやりたいこと\nコード\n\n\n\n\n5.5 より良い閾値を探せ\nlightness_threshold = 5.5 → 5.0、4.8 など（weighted Gini が小さいほど良い）\n\n\n線を端に寄せたら？\nlightness_threshold = 5.5 → 2.0\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n5.0 にすると、weighted Gini は 5.5 のときより下がる（左側が Salmon だけの純粋な領域になる）\n2.0 では全部の魚が右側に入り、分割前と同じ 0.5\n\n切っていないのと同じ"
   },
   {
     "objectID": "classification-2d-boundaries.html#最適化ジニ不純度が最小になる閾値を探索",
@@ -1782,7 +1782,7 @@
     "href": "classification-2d-boundaries.html#性能比較表",
     "title": "2次元の特徴量で分類",
     "section": "性能比較表",
-    "text": "性能比較表\n\n\n\n\nモデル\nAccuracy\nPrecision\nRecall\n\n\n\n\n人が引いた縦線（輝度 5.5）\n0.863\n0.854\n0.875\n\n\n決定木（深さ3）\n0.975\n0.952\n1.000\n\n\n\n\n普段は scikit-learn の決定木を使えばよい（自動で最適化でき、特徴量が3つ以上でもそのまま扱える）"
+    "text": "性能比較表\n\n\n\n\nモデル\nAccuracy\nPrecision\nRecall\n\n\n\n\n人が決めた閾値（輝度 5.5）\n0.863\n0.854\n0.875\n\n\n決定木（深さ3）\n0.975\n0.952\n1.000\n\n\n\n\n普段は scikit-learn の決定木を使えばよい（自動で最適化でき、特徴量が3つ以上でもそのまま扱える）"
   },
   {
     "objectID": "classification-2d-boundaries.html#peek-depth",
@@ -1810,7 +1810,7 @@
     "href": "classification-2d-boundaries.html#まとめ",
     "title": "2次元の特徴量で分類",
     "section": "まとめ",
-    "text": "まとめ\n\n\n\n\n\n\n\n\n重要ポイント\n\n\n\n2次元にすることで分類精度が向上\n\n重さ + 輝度の組み合わせで、より正確に分類\n\n決定境界は人が決めても、アルゴリズムで決めてもよい\n\n人：目で見て直線を引く\n決定木：ジニ不純度で自動最適化\n\n手法によって決定境界が異なる\n\n人が引いた直線: 縦線（閾値の2次元版）\n決定木: 階段状（軸に平行）\n\nトレードオフを理解する\n\nシンプル vs 複雑\n解釈しやすさ vs 性能\n深さ無制限で満点が出たが、採点に使ったのは学習と同じ80匹"
+    "text": "まとめ\n\n\n\n\n\n\n\n\n重要ポイント\n\n\n\n2次元にすることで分類精度が向上\n\n重さ + 輝度の組み合わせで、より正確に分類\n\n決定境界は人が決めても、アルゴリズムで決めてもよい\n\n人：散布図を見て閾値を決める\n決定木：ジニ不純度で自動最適化\n\n手法によって決定境界が異なる\n\n人が決めた閾値: 縦線\n決定木: 階段状（軸に平行）\n\nトレードオフを理解する\n\nシンプル vs 複雑\n解釈しやすさ vs 性能\n深さ無制限で満点が出たが、採点に使ったのは学習と同じ80匹"
   },
   {
     "objectID": "classification-2d-boundaries.html#次回",
@@ -2671,7 +2671,7 @@
     "href": "linear-regression.html#次数を上げてみる",
     "title": "線形回帰と正則化",
     "section": "次数を上げてみる",
-    "text": "次数を上げてみる\n\n\n\ncode\n# 先頭の10匹を訓練データ、残りの5匹をテストデータにする\nx_train, t_train = lengths[:10], weights[:10]\nx_test, t_test = lengths[10:], weights[10:]\n\n# 体長を標準化してから多項式を当てはめる（そのまま9乗すると計算が不安定になる）\nx_mean, x_std = x_train.mean(), x_train.std()\nz_train = (x_train - x_mean) / x_std\nz_test = (x_test - x_mean) / x_std\n\ngrid = np.linspace(lengths.min() - 0.5, lengths.max() + 0.5, 300)\nz_grid = (grid - x_mean) / x_std\n\nfig, axes = plt.subplots(1, 3, figsize=(12, 3.6))\nfor ax, deg in zip(axes, [1, 3, 9]):\n    coef = np.polyfit(z_train, t_train, deg)   # 訓練データに最も合う deg 次式の係数\n    ax.scatter(x_train, t_train, c=\"#2980b9\", s=45, label=\"訓練\")\n    ax.scatter(x_test, t_test, c=\"#e74c3c\", marker=\"s\", s=45, label=\"テスト\")\n    ax.plot(grid, np.polyval(coef, z_grid), \"k-\", lw=2)   # 求めた多項式に z_grid を代入\n    ax.set_ylim(800, 2900)\n    ax.set_title(f\"次数 {deg}\", fontsize=11)\n    ax.set_xlabel(\"体長 (cm)\")\naxes[0].set_ylabel(\"重さ (g)\"); axes[0].legend(fontsize=8)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n次数9は訓練の点をすべて通る\n代わりに点のあいだで大きく振れ、小さい魚の重さをマイナスと予測している"
+    "text": "次数を上げてみる\n\n\n\ncode\n# 曲線を当てはめるデータ：体長（cm）と重さ（g）、訓練10点・テスト6点\nx_train = np.array([24, 28, 30, 32, 34, 36, 42, 50, 52, 56], dtype=float)\nt_train = np.array([950, 1470, 1050, 2510, 1810, 2170, 2100, 2440, 2140, 2770], dtype=float)\nx_test = np.array([18, 26, 36, 44, 54, 62], dtype=float)\nt_test = np.array([870, 1540, 2320, 2300, 2530, 2900], dtype=float)\n\n# 体長を標準化してから多項式を当てはめる（そのまま9乗すると計算が不安定になる）\nx_mean, x_std = x_train.mean(), x_train.std()\nz_train = (x_train - x_mean) / x_std\nz_test = (x_test - x_mean) / x_std\n\ngrid = np.linspace(15, 65, 300)               # 曲線を描く体長\nz_grid = (grid - x_mean) / x_std\n\nfig, axes = plt.subplots(1, 3, figsize=(12, 3.6))\nfor ax, deg in zip(axes, [1, 3, 9]):\n    coef = np.polyfit(z_train, t_train, deg)   # 訓練データに最も合う deg 次式の係数\n    ax.scatter(x_train, t_train, c=\"#2980b9\", s=45, label=\"訓練\")\n    ax.scatter(x_test, t_test, c=\"#e74c3c\", marker=\"s\", s=45, label=\"テスト\")\n    ax.plot(grid, np.polyval(coef, z_grid), \"k-\", lw=2)   # 求めた多項式に z_grid を代入\n    ax.set_ylim(500, 3500)\n    ax.set_title(f\"次数 {deg}\", fontsize=11)\n    ax.set_xlabel(\"体長 (cm)\")\naxes[0].set_ylabel(\"重さ (g)\"); axes[0].legend(fontsize=8)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n次数9は訓練の点をすべて通る\n代わりに点のあいだで大きく振れ、重さをマイナスと予測するところもある"
   },
   {
     "objectID": "linear-regression.html#数字で見るまた会ったな過学習",
@@ -2692,7 +2692,7 @@
     "href": "linear-regression.html#peek-ridge-code",
     "title": "線形回帰と正則化",
     "section": "正則化の実装：勾配降下法にペナルティを足す",
-    "text": "正則化の実装：勾配降下法にペナルティを足す\n\n\n勾配降下法に、ペナルティの項を足す\nペナルティ \\(\\lambda \\sum w^2\\) の微分は \\(2\\lambda w\\)\n\n各係数の勾配に足せばよい\n\n\n\n# 特徴量 x, x², …, x⁹ を作る（列が x^1 〜 x^9 の配列）\nP_train = x_train.reshape(-1, 1) ** np.arange(1, 10)   # (10, 9)\nP_test  = x_test.reshape(-1, 1)  ** np.arange(1, 10)\nmu, sd  = P_train.mean(axis=0), P_train.std(axis=0)\nP_train = (P_train - mu) / sd                  # スケールを揃える（いつもの）\nP_test  = (P_test  - mu) / sd\nt_mean, t_std = t_train.mean(), t_train.std()\ntt = (t_train - t_mean) / t_std                # 重さも標準化\n\nlam  = 0.1        # ペナルティの強さ λ\nw, b = np.zeros(9), 0.0\nlr   = 0.01\nfor i in range(10_000):\n    pred   = P_train @ w + b\n    grad_w = np.array([2 * np.mean((pred - tt) * P_train[:, d]) for d in range(9)]) \\\n             + 2 * lam * w                     # ← MSEの勾配 ＋ ペナルティの勾配\n    grad_b = 2 * np.mean(pred - tt)\n    w -= lr * grad_w\n    b -= lr * grad_b\n\ntest_pred = (P_test @ w + b) * t_std + t_mean  # 元の単位（g）に戻す\ntrain_pred = (P_train @ w + b) * t_std + t_mean\ncoef_own = np.polyfit(z_train, train_pred, 9)  # 前のスライドと同じ多項式の係数に直す\nprint(\"係数の最大絶対値:\", f\"{np.abs(coef_own[:-1]).max():,.0f}\")\nprint(\"テストMSE:\", f\"{np.mean((test_pred - t_test) ** 2):,.0f}\")\n\n係数の最大絶対値: 320\nテストMSE: 3,427\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n係数の最大絶対値が桁違いに小さくなった\n\nペナルティが係数の増大を抑えた\n\n勾配降下法のループは正則化なしのコードと同じ形\n\n増えたのは + 2 * lam * w の項だけ"
+    "text": "正則化の実装：勾配降下法にペナルティを足す\n\n\n勾配降下法に、ペナルティの項を足す\nペナルティ \\(\\lambda \\sum w^2\\) の微分は \\(2\\lambda w\\)\n\n各係数の勾配に足せばよい\n\n\n\n# 特徴量 x, x², …, x⁹ を作る（列が x^1 〜 x^9 の配列）\nP_train = x_train.reshape(-1, 1) ** np.arange(1, 10)   # (10, 9)\nP_test  = x_test.reshape(-1, 1)  ** np.arange(1, 10)\nmu, sd  = P_train.mean(axis=0), P_train.std(axis=0)\nP_train = (P_train - mu) / sd                  # スケールを揃える（いつもの）\nP_test  = (P_test  - mu) / sd\nt_mean, t_std = t_train.mean(), t_train.std()\ntt = (t_train - t_mean) / t_std                # 重さも標準化\n\nlam  = 0.1        # ペナルティの強さ λ\nw, b = np.zeros(9), 0.0\nlr   = 0.01\nfor i in range(10_000):\n    pred   = P_train @ w + b\n    grad_w = np.array([2 * np.mean((pred - tt) * P_train[:, d]) for d in range(9)]) \\\n             + 2 * lam * w                     # ← MSEの勾配 ＋ ペナルティの勾配\n    grad_b = 2 * np.mean(pred - tt)\n    w -= lr * grad_w\n    b -= lr * grad_b\n\ntest_pred = (P_test @ w + b) * t_std + t_mean  # 元の単位（g）に戻す\ntrain_pred = (P_train @ w + b) * t_std + t_mean\ncoef_own = np.polyfit(z_train, train_pred, 9)  # 前のスライドと同じ多項式の係数に直す\nprint(\"係数の最大絶対値:\", f\"{np.abs(coef_own[:-1]).max():,.0f}\")\nprint(\"テストMSE:\", f\"{np.mean((test_pred - t_test) ** 2):,.0f}\")\n\n係数の最大絶対値: 447\nテストMSE: 59,383\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n係数の最大絶対値が桁違いに小さくなった\n\nペナルティが係数の増大を抑えた\n\n勾配降下法のループは正則化なしのコードと同じ形\n\n増えたのは + 2 * lam * w の項だけ"
   },
   {
     "objectID": "linear-regression.html#罰金ありなしを見比べる",
@@ -2776,7 +2776,7 @@
     "href": "linear-regression.html#まとめ",
     "title": "線形回帰と正則化",
     "section": "まとめ",
-    "text": "まとめ\n\n\n回帰：\\(t = f(x) + \\varepsilon\\) の \\(f\\) をデータから推定する手法\n\n損失は二乗誤差（MSE）（微分しやすさで選ぶ）\n\n勾配降下法で求めた傾きと切片は、最小二乗法の厳密解と一致\n多項式回帰：特徴量に \\(x^2, x^3, \\ldots\\) を足せば道具は線形回帰のまま\n過学習は回帰でも起きる：次数を上げると訓練誤差は下がり、テスト誤差は桁違いに増える\n正則化（regularization）：大きい係数にペナルティを与え、曲線の振れを抑える\n\nリッジ回帰（L2）：係数全体を小さくする\nラッソ回帰（L1）：一部の係数をちょうど 0 にする"
+    "text": "まとめ\n\n\n回帰：\\(t = f(x) + \\varepsilon\\) の \\(f\\) をデータから推定する手法\n\n損失は二乗誤差（MSE）（微分しやすさで選ぶ）\n\n勾配降下法で求めた傾きと切片は、最小二乗法の厳密解と一致\n多項式回帰：特徴量に \\(x^2, x^3, \\ldots\\) を足せば道具は線形回帰のまま\n過学習は回帰でも起きる：次数を上げると訓練誤差は下がり、テスト誤差は桁違いに増える\n正則化（regularization）：大きい係数にペナルティを与え、曲線の振れを抑える\n\nリッジ回帰：L2正則化（\\(\\lambda \\sum_j w_j^2\\)）\nラッソ回帰：L1正則化（\\(\\lambda \\sum_j |w_j|\\)）"
   },
   {
     "objectID": "linear-regression.html#問題1魚2匹だけの世界で-fit-する",
@@ -4988,7 +4988,7 @@
     "href": "logistic-regression.html#係数は板の傾きと高さを決める",
     "title": "ロジスティック回帰",
     "section": "係数は板の「傾き」と「高さ」を決める",
-    "text": "係数は板の「傾き」と「高さ」を決める\n\n\n\n\n係数\n板にとっては\n境界にとっては\n\n\n\n\n\\(w_1, w_2\\)\n傾き（どちら向きに上り坂か）\n境界の向き\n\n\n\\(b\\)\n全体の上げ下げ\n境界の平行移動\n\n\n\n\n\\(w_1&lt;0\\)：暗い方へ上り坂になる（暗いほど Salmon 寄り）\n\\(b\\) で板を上下させると、水際が平行に動く（決定境界の位置の調整）\n\\(z = 0\\) と置いた直線の式は、この水際を表す\n学習で係数が変わると、板が傾き直して水際（決定境界）が動く"
+    "text": "係数は板の「傾き」と「高さ」を決める\n\n\n\n\n係数\n板にとっては\n境界にとっては\n\n\n\n\n\\(w_1, w_2\\)\n傾き（どちら向きに上り坂か）\n境界の向き\n\n\n\\(b\\)\n全体の上げ下げ\n境界の平行移動\n\n\n\n\n\\(w_1&lt;0\\), \\(w_2&gt;0\\)：暗くて重いほうへ上り坂（散布図で見た傾向と一致）\n\\(b\\) で板を上下させると、水際が平行に動く\n直線（\\(f(x) = 0\\) の点の集合）は、この水際を表す\n学習で係数が変わると、板が傾き直して水際（決定境界）が動く"
   },
   {
     "objectID": "logistic-regression.html#例線形結合の式",
@@ -5030,14 +5030,14 @@
     "href": "logistic-regression.html#線形だと何かと都合がよい",
     "title": "ロジスティック回帰",
     "section": "線形だと何かと都合がよい",
-    "text": "線形だと何かと都合がよい\n\n\n行列のかけ算 として計算可能\n\nさらに何回掛け算しても線形のまま\n\n微分した結果に \\(w\\) が残らない：\\(\\dfrac{\\partial z}{\\partial w_1} = x_1\\)、\\(\\dfrac{\\partial z}{\\partial b} = 1\\)\n\n（非線形の例）重みの2乗：\\(z = w_1^2 x_1\\) なら \\(\\dfrac{\\partial z}{\\partial w_1} = 2w_1x_1\\) で、\\(w_1\\) 自身が残る\n\n線形代数の道具が使える：最小二乗（least squares）なら正規方程式（normal equation）で勾配降下法なしに解ける\n凸（convex）な損失と組めばローカルミニマム（local minimum）がない（ロジスティック回帰の交差エントロピーもこの例）"
+    "text": "線形だと何かと都合がよい\n\n\n行列のかけ算 として計算可能\n\nさらに何回掛け算しても線形のまま\n\n微分した結果に \\(w\\) が残らない：\\(\\dfrac{\\partial z}{\\partial w_1} = x_1\\)、\\(\\dfrac{\\partial z}{\\partial b} = 1\\)\n\n（非線形の例）係数の2乗：\\(z = w_1^2 x_1\\) なら \\(\\dfrac{\\partial z}{\\partial w_1} = 2w_1x_1\\) で、\\(w_1\\) 自身が残る\n\n線形代数の道具が使える：最小二乗（least squares）なら正規方程式（normal equation）で勾配降下法なしに解ける\n凸（convex）な損失と組めばローカルミニマム（local minimum）がない（ロジスティック回帰の交差エントロピーもこの例）"
   },
   {
     "objectID": "logistic-regression.html#どの変数に対する線形か",
     "href": "logistic-regression.html#どの変数に対する線形か",
     "title": "ロジスティック回帰",
     "section": "どの変数に対する「線形」か",
-    "text": "どの変数に対する「線形」か\n\n\nここでの変数はデータ \\(x\\) とパラメータ \\(w\\) の2種類\n\n\n\n\n\n\n\n\n\n\n見方\n固定\n動かす\n1次だと嬉しいこと\n\n\n\n\n学習するとき\n\\(x\\)（データ）\n\\(w\\)\n微分で \\(w\\) が残らない・正規方程式・ローカルミニマムなし\n\n\n予測するとき\n\\(w\\)\n\\(x\\)\n決定境界が直線・行列のかけ算・重ねても線形\n\n\n\n\n\\(z = w_1 x + w_2 x^2\\)：曲がった境界が引けて、学習は今までどおり楽\n\n\n\\(x\\) について曲線なので、境界を直線以外にできる\n\n例：\\(b\\) も入れて \\(z = w_1x + w_2x^2 + b\\) とし、\\(w_2 &lt; 0\\) にすると、\\(z &gt; 0\\) になるのは \\(x\\) が中くらいの範囲だけ\n「小さすぎず大きすぎないものだけ A」という、直線1本では分けられない分類が可能\n\n\\(w\\) について1次なので、学習の仕方に変化なし\n\n\\(x^2\\) を新しい入力の列としてデータ表に足す\n\n\\(x_0 = 1\\) の列を足すのと同じ\n\n損失はお椀型のままで、ローカルミニマムがない\n\nそのままロジスティック回帰で学習できる\n\n\n\n\n\\(z = w^2 x\\)：表現力は増えないのに、学習だけ難しくなる\n\n\n\\(x\\) について直線なので、表現力は \\(z = wx\\) と変わらない\n\nむしろ \\(w^2 \\geq 0\\) なので、傾きを負にできない分だけ狭い\n\n\\(w\\) について1次でないので、学習が厄介になる\n\n勾配が \\(2wx\\) なので、\\(w = 0\\) から始めると勾配が 0 で、まったく動けない\n\\(w = 1\\) と \\(w = -1\\) が同じモデルになるので、谷が2つできる\n\n\n\n\n\n\n\n\nノート\n\n\n\n統計の「線形モデル」：\\(w\\) について線形（多項式回帰も含む）\n「線形分類器」：\\(x\\) について線形"
+    "text": "どの変数に対する「線形」か\n\n\nここでの変数はデータ \\(x\\) とパラメータ \\(w\\) の2種類\n\n\n\n\n\n\n\n\n\n\n見方\n固定\n動かす\n1次だと嬉しいこと\n\n\n\n\n学習するとき\n\\(x\\)（データ）\n\\(w\\)\n微分で \\(w\\) が残らない・正規方程式・ローカルミニマムなし\n\n\n予測するとき\n\\(w\\)\n\\(x\\)\n決定境界が直線・行列のかけ算・重ねても線形\n\n\n\n\n\\(z = w_1 x + w_2 x^2\\)：曲がった境界を作れて、学習は今までどおり楽\n\n\n\\(x\\) について曲線なので、境界を直線以外にできる\n\n例：\\(b\\) も入れて \\(z = w_1x + w_2x^2 + b\\) とし、\\(w_2 &lt; 0\\) にすると、\\(z &gt; 0\\) になるのは \\(x\\) が中くらいの範囲だけ\n「小さすぎず大きすぎないものだけ A」という、直線1本では分けられない分類が可能\n\n\\(w\\) について1次なので、学習の仕方に変化なし\n\n\\(x^2\\) を新しい入力の列としてデータ表に足す\n\n\\(x_0 = 1\\) の列を足すのと同じ\n\n損失はお椀型のままで、ローカルミニマムがない\n\nそのままロジスティック回帰で学習できる\n\n\n\n\n\\(z = w^2 x\\)：表現力は増えないのに、学習だけ難しくなる\n\n\n\\(x\\) について直線なので、表現力は \\(z = wx\\) と変わらない\n\nむしろ \\(w^2 \\geq 0\\) なので、傾きを負にできない分だけ狭い\n\n\\(w\\) について1次でないので、学習が厄介になる\n\n勾配が \\(2wx\\) なので、\\(w = 0\\) から始めると勾配が 0 で、まったく動けない\n\\(w = 1\\) と \\(w = -1\\) が同じモデルになるので、谷が2つできる\n\n\n\n\n\n\n\n\nノート\n\n\n\n統計の「線形モデル」：\\(w\\) について線形（多項式回帰も含む）\n「線形分類器」：\\(x\\) について線形"
   },
   {
     "objectID": "optimization-gradient-descent.html#変数では軸ごとの傾きを並べた勾配ベクトルを使う",
@@ -5198,7 +5198,7 @@
     "href": "classification-2d-boundaries.html#少ない候補で最適解が見つかる",
     "title": "2次元の特徴量で分類",
     "section": "少ない候補で最適解が見つかる",
-    "text": "少ない候補で最適解が見つかる\n\n\n\n（参考）総当たりと描画のコード\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\n\n# 候補ごとの加重平均ジニ不純度を折れ線にする\nginis = [weighted_gini_at(t) for t in candidates]\nbest_i = int(np.argmin(ginis))\nplt.figure(figsize=(7, 4))\nplt.plot(candidates, ginis, \"o-\", color=\"#2980b9\", markersize=4)\nplt.scatter([candidates[best_i]], [ginis[best_i]], color=\"#e74c3c\", s=120,\n            zorder=3, label=f\"best: {candidates[best_i]:.2f}\")\nplt.xlabel(\"閾値（輝度）\")\nplt.ylabel(\"加重平均ジニ不純度\")\nplt.legend()\nplt.grid(True, alpha=0.4)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n最適な閾値は、目で引いた 5.5 より少し左\nこの縦線での誤分類は 8匹（正答率 90.0%）\n\n目で引いた 5.5 の縦線より誤分類が少ない"
+    "text": "少ない候補で最適解が見つかる\n\n\n\n（参考）総当たりと描画のコード\nimport matplotlib.pyplot as plt\nimport japanize_matplotlib\n\n# 候補ごとの加重平均ジニ不純度を折れ線にする\nginis = [weighted_gini_at(t) for t in candidates]\nbest_i = int(np.argmin(ginis))\nplt.figure(figsize=(7, 4))\nplt.plot(candidates, ginis, \"o-\", color=\"#2980b9\", markersize=4)\nplt.scatter([candidates[best_i]], [ginis[best_i]], color=\"#e74c3c\", s=120,\n            zorder=3, label=f\"best: {candidates[best_i]:.2f}\")\nplt.xlabel(\"閾値（輝度）\")\nplt.ylabel(\"加重平均ジニ不純度\")\nplt.legend()\nplt.grid(True, alpha=0.4)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n最適な閾値は、人が決めた 5.5 より少し左\nこの縦線での誤分類は 8匹（正答率 90.0%）\n\n5.5 の縦線より誤分類が少ない"
   },
   {
     "objectID": "classification-2d-boundaries.html#特徴量行列から値を取り出す",
@@ -5233,7 +5233,7 @@
     "href": "classification-evaluation.html#ここまでの道具",
     "title": "過学習と汎化",
     "section": "ここまでの道具",
-    "text": "ここまでの道具\n\n\n学習データでの満点は意味がない\n\n\n重さ + 輝度の 2特徴量 で Salmon / Sea bass を分類\n人が引いた直線と決定木で決定境界を定めた\n決定木は深くするほど、成績が上がった\n\n深さ無制限では80匹全部を正しく分類（Precision も Recall も 100%）\nただし採点は学習に使った同じデータ\n\n\n\n\n\n\n\n\n\n今回の主題\n\n\n決定木の深さはいくつにすればいいか"
+    "text": "ここまでの道具\n\n\n学習データでの満点は意味がない\n\n\n重さ + 輝度の 2特徴量 で Salmon / Sea bass を分類\n人が決めた閾値と決定木で決定境界を定めた\n決定木は深くするほど、成績が上がった\n\n深さ無制限では80匹全部を正しく分類（Precision も Recall も 100%）\nただし採点は学習に使った同じデータ\n\n\n\n\n\n\n\n\n\n今回の主題\n\n\n決定木の深さはいくつにすればいいか"
   },
   {
     "objectID": "clustering-kmeans.html#教師なし学習unsupervised-learning",
@@ -5282,14 +5282,14 @@
     "href": "logistic-regression.html#peek-logistic-line",
     "title": "ロジスティック回帰",
     "section": "\\(z = 0\\) と置くと直線の式になる",
-    "text": "\\(z = 0\\) と置くと直線の式になる\n\n\n\\(z = 0\\) と置くと\n\n\\[\\underbrace{w_1}_{A}\\, x_1 + \\underbrace{w_2}_{B}\\, x_2 + \\underbrace{\\;b\\;}_{C} = 0\\]\n\n直線の式 \\(Ax_1 + Bx_2 + C = 0\\) そのもの\n\nこの直線を決定境界とする\n\n\\(z\\) の符号：線の上か下か\n\\(z\\) の大きさ：線からの遠さ\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n最適化の対象\n\n\n\n\\(A, B, C\\)（ここでは \\(w_1, w_2, b\\)） をパラメータとして最適化する"
+    "text": "\\(z = 0\\) と置くと直線の式になる\n\n\n\\(z = 0\\) と置くと\n\n\\[\\underbrace{w_1}_{A}\\, x_1 + \\underbrace{w_2}_{B}\\, x_2 + \\underbrace{\\;b\\;}_{C} = 0\\]\n\n直線の式 \\(Ax_1 + Bx_2 + C = 0\\) そのもの\n\nこの直線を決定境界とする\n\n\\(z\\) は、直線の式の左辺に点を代入した値\n\n符号：線の上か下か\n大きさ：線からの遠さ\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n最適化の対象\n\n\n\n\\(A, B, C\\)（ここでは \\(w_1, w_2, b\\)） をパラメータとして最適化する"
   },
   {
     "objectID": "logistic-regression.html#peek-logistic-params",
     "href": "logistic-regression.html#peek-logistic-params",
     "title": "ロジスティック回帰",
-    "section": "10匹を見た後のパラメータを読む",
-    "text": "10匹を見た後のパラメータを読む\n\n\n10匹を見た後の \\(w\\)、\\(b\\) は、学習ループの出力の最終行\n\n\n\n\nパラメータ\n値\n意味\n\n\n\n\n\\(w_1\\)（輝度）\n負\n暗いほど Salmon 寄り\n\n\n\\(w_2\\)（重さ）\n正\n重いほど Salmon 寄り\n\n\n\\(b\\)（バイアス）\n負\n決定境界の位置を調整\n\n\n\n\n散布図を目で見て分かった傾向を、学習したパラメータが数値で示している\n\n\n\n\n\n\n\nノート\n\n\n\nsklearn の fit() も「予測 → 損失 → パラメータを更新」という考え方は同じ\n\nただし、この1匹ずつのループをそのまま実行するわけではなく、最適化方法や正則化などが加わる"
+    "section": "10件で更新した後のパラメータ",
+    "text": "10件で更新した後のパラメータ\n\n\n10件で更新した後の \\(w\\)、\\(b\\) は、学習ループの出力の最終行\n\n\n\n\nパラメータ\n値\n意味\n\n\n\n\n\\(w_1\\)（輝度）\n負\n暗いほど Salmon 寄り\n\n\n\\(w_2\\)（重さ）\n正\n重いほど Salmon 寄り\n\n\n\\(b\\)（バイアス）\n負\n決定境界の位置を調整\n\n\n\n\n散布図から分かった傾向を、学習したパラメータが数値で示している\n\n\n\n\n\n\n\nノート\n\n\n\nsklearn の fit() も「予測 → 損失 → パラメータを更新」という考え方は同じ\n\nただし、この1データずつのループをそのまま実行するわけではなく、最適化方法や正則化などが加わる"
   },
   {
     "objectID": "logistic-regression.html#tweak-学習率と魚の数を変える",
@@ -5317,7 +5317,7 @@
     "href": "logistic-regression.html#b-を入力の1つと読み替えると線形になる",
     "title": "ロジスティック回帰",
     "section": "\\(+b\\) を入力の1つと読み替えると線形になる",
-    "text": "\\(+b\\) を入力の1つと読み替えると線形になる\n\n\n\\(b\\) を「常に 1 が入っている入力 \\(x_0\\) への重み \\(w_0\\)」と読み替える\n\n\\[z = w_0 \\underbrace{x_0}_{=\\,1} + w_1 x_1 + w_2 x_2\\]\n\n入力を \\((1, x_1, x_2)\\) の3次元と見れば、\\(f(0,0,0) = 0\\)\n\nこれは線形結合\n\n統計学では、データ表に「全部 1 の列」を足すのが定番の手法（切片項、intercept）\n実装でも広く使われる\nアフィン変換（affine transformation）：\\(+b\\) の形（線形＋平行移動）\n\n\n\n\n\n\n\n\n重要ポイント\n\n\n\n世の中の説明の多くは \\(+b\\) 込みでも「線形」と書く\n\n\\(x_0 = 1\\) を補って読めば、その呼び方でも辻褄が合う"
+    "text": "\\(+b\\) を入力の1つと読み替えると線形になる\n\n\n\\(b\\) を「常に 1 が入っている入力 \\(x_0\\) の係数 \\(w_0\\)」と読み替える\n\n\\[z = w_0 \\underbrace{x_0}_{=\\,1} + w_1 x_1 + w_2 x_2\\]\n\n入力を \\((1, x_1, x_2)\\) の3次元と見れば、\\(f(0,0,0) = 0\\)\n\nこれは線形結合\n\n統計学では、データ表に「全部 1 の列」を足すのが定番の手法（切片項、intercept）\n実装でも広く使われる\nアフィン変換（affine transformation）：\\(+b\\) の形（線形＋平行移動）\n\n\n\n\n\n\n\n\n重要ポイント\n\n\n\n世の中の説明の多くは \\(+b\\) 込みでも「線形」と書く\n\n\\(x_0 = 1\\) を補って読めば、その呼び方でも辻褄が合う"
   },
   {
     "objectID": "mnist-project.html#チェックポイント",
@@ -5422,7 +5422,7 @@
     "href": "nn-logistic.html#準備魚のデータを入力に使う",
     "title": "ロジスティック回帰をNNとして実装する",
     "section": "準備：魚のデータを入力に使う",
-    "text": "準備：魚のデータを入力に使う\n\n\nロジスティック回帰で勾配を追った魚と同じ入力と正解を使う\n\n\\[\nx=(2,\\,0.5),\n\\qquad\ny=1\\;\\text{（Salmon）}\n\\]\nx = np.array([2.0, 0.5])\ny = 1.0\n\n\\(x_1=2\\)、\\(x_2=0.5\\)：この魚の2つの特徴量\n\\(y=1\\)：この魚の正解ラベル\n\n予測には使わず、採点で使う"
+    "text": "準備：魚のデータを入力に使う\n\n\n入力と正解は次の値とする\n\n\\[\nx=(2,\\,0.5),\n\\qquad\ny=1\\;\\text{（Salmon）}\n\\]\nx = np.array([2.0, 0.5])\ny = 1.0\n\n\\(x_1=2\\)、\\(x_2=0.5\\)：この魚の2つの特徴量\n\\(y=1\\)：この魚の正解ラベル\n\n予測には使わず、採点で使う"
   },
   {
     "objectID": "nn-logistic.html#勾配更新に使う3つの微分値",
@@ -5765,21 +5765,21 @@
     "href": "linear-regression.html#正則化大きい係数にペナルティを与える",
     "title": "線形回帰と正則化",
     "section": "正則化：大きい係数にペナルティを与える",
-    "text": "正則化：大きい係数にペナルティを与える\n\n\n曲線が大きく振れる原因は、巨大な係数\n\n\ncoef1 = np.polyfit(z_train, t_train, 1)\ncoef9 = np.polyfit(z_train, t_train, 9)\nprint(\"次数1の係数の最大絶対値:\", f\"{np.abs(coef1[:-1]).max():,.0f}\")   # [:-1] は切片を除く\nprint(\"次数9の係数の最大絶対値:\", f\"{np.abs(coef9[:-1]).max():,.0f}\")\n\n次数1の係数の最大絶対値: 336\n次数9の係数の最大絶対値: 36,757\n\n\n\nそこで、損失に「係数の大きさ」へのペナルティを課すことを考える\n\n\\[L = \\mathrm{MSE} + \\lambda \\sum_j w_j^2\\]\n\n正則化（regularization）：モデルの複雑さを抑えるペナルティを損失に足す手法\nMSE だけではなく、係数の大きさも loss に入れ込む\n\\(\\lambda\\)（ラムダ）：ペナルティの強さ\n\n\\(\\lambda = 0\\) なら今までどおりの MSE\n学習のしかたを決めるハイパーパラメータ"
+    "text": "正則化：大きい係数にペナルティを与える\n\n\n曲線が大きく振れる原因は、巨大な係数\n\n\ncoef1 = np.polyfit(z_train, t_train, 1)\ncoef9 = np.polyfit(z_train, t_train, 9)\nprint(\"次数1の係数の最大絶対値:\", f\"{np.abs(coef1[:-1]).max():,.0f}\")   # [:-1] は切片を除く\nprint(\"次数9の係数の最大絶対値:\", f\"{np.abs(coef9[:-1]).max():,.0f}\")\n\n次数1の係数の最大絶対値: 446\n次数9の係数の最大絶対値: 288,152\n\n\n\nそこで、損失に「係数の大きさ」へのペナルティを課すことを考える\n\n\\[L = \\mathrm{MSE} + \\lambda \\sum_j w_j^2\\]\n\n正則化（regularization）：モデルの複雑さを抑えるペナルティを損失に足す手法\nMSE だけではなく、係数の大きさも loss に入れ込む\n\\(\\lambda\\)（ラムダ）：ペナルティの強さ\n\n\\(\\lambda = 0\\) なら今までどおりの MSE\n学習のしかたを決めるハイパーパラメータ"
   },
   {
     "objectID": "linear-regression.html#ペナルティありなしを見比べる",
     "href": "linear-regression.html#ペナルティありなしを見比べる",
     "title": "線形回帰と正則化",
     "section": "ペナルティあり・なしを見比べる",
-    "text": "ペナルティあり・なしを見比べる\n\n\n\n描画コード\nP_grid    = ((grid.reshape(-1, 1) ** np.arange(1, 10)) - mu) / sd\nown_curve = (P_grid @ w + b) * t_std + t_mean\n\nfig, axes = plt.subplots(1, 2, figsize=(9.5, 3.6))\nfor ax, curve, name, mse in [\n        (axes[0], np.polyval(coef9, z_grid), \"次数9（正則化なし）\",\n         np.mean((np.polyval(coef9, z_test) - t_test) ** 2)),\n        (axes[1], own_curve, \"次数9 + 正則化（勾配降下法）\",\n         np.mean((test_pred - t_test) ** 2))]:\n    ax.scatter(x_train, t_train, c=\"#2980b9\", s=45)\n    ax.scatter(x_test, t_test, c=\"#e74c3c\", marker=\"s\", s=45)\n    ax.plot(grid, curve, \"k-\", lw=2)\n    ax.set_ylim(800, 2900)\n    ax.set_title(f\"{name}\\nテストMSE {mse:,.0f}\", fontsize=10)\n    ax.set_xlabel(\"体長 (cm)\")\naxes[0].set_ylabel(\"重さ (g)\")\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n同じ次数9なのに、ペナルティの項を足しただけで素直な曲線に戻った\nテストMSEは桁違いに改善（図のタイトル）"
+    "text": "ペナルティあり・なしを見比べる\n\n\n\n描画コード\nP_grid    = ((grid.reshape(-1, 1) ** np.arange(1, 10)) - mu) / sd\nown_curve = (P_grid @ w + b) * t_std + t_mean\n\nfig, axes = plt.subplots(1, 2, figsize=(9.5, 3.6))\nfor ax, curve, name, mse in [\n        (axes[0], np.polyval(coef9, z_grid), \"次数9（正則化なし）\",\n         np.mean((np.polyval(coef9, z_test) - t_test) ** 2)),\n        (axes[1], own_curve, \"次数9 + 正則化（勾配降下法）\",\n         np.mean((test_pred - t_test) ** 2))]:\n    ax.scatter(x_train, t_train, c=\"#2980b9\", s=45)\n    ax.scatter(x_test, t_test, c=\"#e74c3c\", marker=\"s\", s=45)\n    ax.plot(grid, curve, \"k-\", lw=2)\n    ax.set_ylim(500, 3500)\n    ax.set_title(f\"{name}\\nテストMSE {mse:,.0f}\", fontsize=10)\n    ax.set_xlabel(\"体長 (cm)\")\naxes[0].set_ylabel(\"重さ (g)\")\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n同じ次数9なのに、ペナルティの項を足しただけで素直な曲線に戻った\nテストMSEは桁違いに改善（図のタイトル）"
   },
   {
     "objectID": "linear-regression.html#tweak-ペナルティの強さで曲線が変わる",
     "href": "linear-regression.html#tweak-ペナルティの強さで曲線が変わる",
     "title": "線形回帰と正則化",
     "section": "Tweak ペナルティの強さで曲線が変わる",
-    "text": "Tweak ペナルティの強さで曲線が変わる\n\n\nさっきのコード の lam = 0.1 を書き換えて実行（比較の図まで続けて実行すると形の変化が見える）\n\n\n\n\n\nやりたいこと\nコード\n\n\n\n\nペナルティをゼロにする\nlam = 0.0\n\n\nペナルティを強烈にする\nlam = 10\n\n\n\n\n\n\n\n\n\n\n\nチェックポイント\n\n\n\n0.0：テストMSEは悪化する\n\nただし正則化なしの厳密解ほどは大きく外れない\n勾配降下法を1万回で打ち切ること自体が、係数の増大を抑える弱いブレーキになる\n\n10：曲線はほぼまっすぐ寝て、訓練MSEまで悪化する\n\nペナルティが強すぎて、訓練データに合わなくなる\n\nちょうど良い \\(\\lambda\\) は問題ごとに違う\n\n訓練MSEでは選べない（\\(\\lambda\\) を小さくするほど下がるので、必ず \\(\\lambda = 0\\) が選ばれる）\nテストMSEでも選ばない（テストデータを確認してからモデルを調整しない）\n訓練データの中の交差検証で選ぶ（検証用に別のデータを用意しなくてよい）"
+    "text": "Tweak ペナルティの強さで曲線が変わる\n\n\nさっきのコード の lam = 0.1 を書き換えて実行（比較の図まで続けて実行すると形の変化が見える）\n\n\n\n\n\nやりたいこと\nコード\n\n\n\n\nペナルティをゼロにする\nlam = 0.0\n\n\nペナルティを強烈にする\nlam = 10\n\n\n\n\n\n\n\n\n\n\n\nチェックポイント\n\n\n\n0.0：テストMSEは悪化する\n\nただし正則化なしの厳密解ほどは大きく外れない\n勾配降下法を1万回で打ち切ること自体が、係数の増大を抑える弱いブレーキになる\n\n10：曲線が寝て、訓練MSEまで悪化する\n\nペナルティが強すぎて、訓練データに合わなくなる\n\nちょうど良い \\(\\lambda\\) は問題ごとに違う\n\n訓練MSEでは選べない（\\(\\lambda\\) を小さくするほど下がるので、必ず \\(\\lambda = 0\\) が選ばれる）\nテストMSEでも選ばない（テストデータを確認してからモデルを調整しない）\n訓練データの中の交差検証で選ぶ（検証用に別のデータを用意しなくてよい）"
   },
   {
     "objectID": "optimization-gradient-descent.html#今までのパラメータ探索",
@@ -5828,7 +5828,7 @@
     "href": "classification-2d-boundaries.html#人が引いた直線-vs-決定木",
     "title": "2次元の特徴量で分類",
     "section": "人が引いた直線 vs 決定木",
-    "text": "人が引いた直線 vs 決定木\n\n\n\n\n\n\n\n\n\n\n人が引いた直線\n決定木\n\n\n\n\n境界の決め方\n目で見て引く（データを眺める過程が入る）\nジニ不純度で自動最適化\n\n\n説明のしやすさ\n単純で、理由を説明しやすい\nif-then ルールとして読める\n\n\n特徴量が3つ以上\n目で見えなくなる\nそのまま扱える\n\n\n弱点\n最適の保証がない自動化できない\n過学習（overfitting）しやすい境界は階段状のみ"
+    "text": "人が引いた直線 vs 決定木\n\n\n\n\n\n\n\n\n\n\n人が引いた直線\n決定木\n\n\n\n\n境界の決め方\n散布図を見て人が判断\nジニ不純度で自動最適化\n\n\n説明のしやすさ\n単純で、理由を説明しやすい\nif-then ルールとして読める\n\n\n特徴量が3つ以上\n目で見えなくなる\nそのまま扱える\n\n\n弱点\n最適の保証がない自動化できない\n過学習（overfitting）しやすい境界は階段状のみ"
   },
   {
     "objectID": "clustering-kmeans.html#問題1k-means-の1周を計算する",
@@ -5918,8 +5918,8 @@
     "objectID": "linear-regression.html#peek-coef-plane",
     "href": "linear-regression.html#peek-coef-plane",
     "title": "線形回帰と正則化",
-    "section": "係数の平面に誤差とペナルティを描く",
-    "text": "係数の平面に誤差とペナルティを描く\n\n\nアヤメ150本：萼片の長さと花弁の幅から、花弁の長さを予測（すべて標準化）\n横軸・縦軸は係数 \\(w_1\\)（萼片の長さ）・\\(w_2\\)（花弁の幅）\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nノート\n\n\n\n緑の楕円：MSE が同じ値になる \\((w_1, w_2)\\) を結んだ等高線\n\n中心（×）が正則化なしの解で、外側ほど MSE が大きい\n予測が \\(w\\) について線形なので MSE は \\(w\\) の2次式になり、等高線は楕円\n\n塗った範囲：ペナルティが一定値 \\(c\\) 以下になる \\((w_1, w_2)\\)\n\nL2ノルム（L2 norm）\\(\\|w\\|_2 = \\sqrt{w_1^2 + w_2^2}\\) が \\(c\\) 以下：円\nL1ノルム（L1 norm）\\(\\|w\\|_1 = |w_1| + |w_2|\\) が \\(c\\) 以下：ひし形\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n中心から楕円を広げ、範囲に最初に触れた点（○）が解\n\n\\(\\mathrm{MSE} + \\lambda \\times\\) ペナルティの解は、ある \\(c\\) の範囲の中で MSE が最小の点と同じ\n\\(\\lambda\\) を大きくするほど、\\(c\\) は小さくなる\n\n円（リッジ回帰）：角がないので、接点はふつう両方の係数が 0 でない点\nひし形（ラッソ回帰）：楕円は角で触れやすく、角では片方の係数がちょうど 0\n\n角はどれも、灰色の線（\\(w_1 = 0\\) か \\(w_2 = 0\\)）の上\n係数が 0 の特徴量は、予測に使われない：特徴量選択（feature selection）"
+    "section": "係数の空間と正則化の関係",
+    "text": "係数の空間と正則化の関係\n\n\\(w_1, w_2\\)（標準化済） をモデルとした場合、係数の組 \\((w_1, w_2)\\)は、平面上に表せる。\n\\[\\text{予測} = w_1 x + w_2 x^2 + b\\]\n正則化がない場合が一番MSEが低いが、破線のような形で汎化性能が低い。同じMSEとなる \\(w_1, w_2\\) の組を線でつなぐとMSEの等高線を描ける。L2は \\(w_1, w_2\\) の水色の円であり、\\(w_1, w_2\\) をその範囲内に収めたいのがL2正則化。\\(\\lambda\\) を大きくしていくと、円は小さくなる。"
   },
   {
     "objectID": "linear-regression.html#peek-coef-plane-answer",
@@ -5929,11 +5929,186 @@
     "text": "範囲の中で MSE が最小の点が解\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n答え\n\n\n\n楕円が範囲に最初に触れた点（○）が解\n\n\\(\\mathrm{MSE} + \\lambda \\times\\) ペナルティの解は、ある \\(c\\) の範囲の中で MSE が最小の点と同じ\n\\(\\lambda\\) を大きくするほど、\\(c\\) は小さくなる\n\n円（リッジ回帰）：角がないので、接点はふつう軸から外れ、両方の係数が残る\nひし形（ラッソ回帰）：角が軸の上にあるので角で触れやすく、そのとき片方の係数がちょうど 0\n\n係数が 0 の特徴量は、予測に使われない：特徴量選択（feature selection）\n相関の強い特徴量からは、1つだけが残りやすい（ここでは花弁の幅だけ）"
   },
   {
-    "objectID": "ai-introduction.html#練習問題elizaを机上で作る",
-    "href": "ai-introduction.html#練習問題elizaを机上で作る",
-    "title": "人工知能概論",
-    "section": "練習問題：ELIZAを机上で作る",
-    "text": "練習問題：ELIZAを机上で作る\n\n会話ごとにルールを増やすチャットボットを机上で演じよ。\n\n初期応答ルールの用意\n\n相手の文に「〜がつらい」があれば「なぜ◯◯がつらいと思うのですか？」、それ以外は「もう少し詳しく」と応答\n\n現在のルールで対応できない文が出たら、if文で書ける程度のルールを考えて追加\n大抵の患者に対して N ターンまで会話が続くルールの集合を作成\n\n\n量も内容も、このルール作りの負担が古典的AI最大の課題"
+    "objectID": "linear-regression.html#peek-l1-corner",
+    "href": "linear-regression.html#peek-l1-corner",
+    "title": "線形回帰と正則化",
+    "section": "ラッソ回帰で係数がちょうど 0 になる理由",
+    "text": "ラッソ回帰で係数がちょうど 0 になる理由\n\n\nアヤメ150本：萼片の長さと花弁の幅から、花弁の長さを予測（すべて標準化）\n横軸・縦軸は係数 \\(w_1\\)（萼片の長さ）・\\(w_2\\)（花弁の幅）\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nノート\n\n\n\n緑の楕円：MSE の等高線（中心の × が正則化なしの解）\n塗った範囲：ペナルティが一定値 \\(c\\) 以下になる \\((w_1, w_2)\\)\n\nL2ノルム \\(\\|w\\|_2 = \\sqrt{w_1^2 + w_2^2}\\) が \\(c\\) 以下：円\nL1ノルム（L1 norm）\\(\\|w\\|_1 = |w_1| + |w_2|\\) が \\(c\\) 以下：ひし形\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n範囲に最初に触れた点（○）が解\n円（リッジ回帰）：角がないので、接点はふつう両方の係数が 0 でない点\nひし形（ラッソ回帰）：楕円は角で触れやすく、角では片方の係数がちょうど 0\n\n角はどれも、灰色の線（\\(w_1 = 0\\) か \\(w_2 = 0\\)）の上\n係数が 0 の特徴量は、予測に使われない：特徴量選択（feature selection）"
+  },
+  {
+    "objectID": "linear-regression.html#peek-l1-plane",
+    "href": "linear-regression.html#peek-l1-plane",
+    "title": "線形回帰と正則化",
+    "section": "ラッソ回帰とリッジ回帰",
+    "text": "ラッソ回帰とリッジ回帰\n\n\nアヤメ150本：萼片の長さと花弁の幅から、花弁の長さを予測（すべて標準化）\n横軸・縦軸は係数 \\(w_1\\)（萼片の長さ）・\\(w_2\\)（花弁の幅）\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nノート\n\n\n\n緑の楕円：MSE の等高線（中心の × が正則化なしの解）\n塗った範囲：ペナルティが一定値 \\(c\\) 以下になる \\((w_1, w_2)\\)\n\nL2ノルム（L2 norm）\\(\\|w\\|_2 = \\sqrt{w_1^2 + w_2^2}\\) が \\(c\\) 以下：円\nL1ノルム（L1 norm）\\(\\|w\\|_1 = |w_1| + |w_2|\\) が \\(c\\) 以下：ひし形\n\n\n\n\n\n\nどちらも範囲に最初に触れた点（○）が解で、違うのは範囲の形だけ"
+  },
+  {
+    "objectID": "logistic-regression.html#peek-line-substitute",
+    "href": "logistic-regression.html#peek-line-substitute",
+    "title": "ロジスティック回帰",
+    "section": "点が線より上か下かを式で判定する",
+    "text": "点が線より上か下かを式で判定する\n\n\n直線の式を、右辺が 0 になるように移項する\n\n\\[\\text{重さ} - 120 \\times \\text{輝度} - 1050 = 0\\]\n\n左辺に魚の輝度と重さを代入する\n\n\n\n\n\n\n\n\n\n\n\n紫の数値：代入した値（線から縦に何 g 離れているか）\n\n\n\n\n\n\n\n\n結果\n\n\n\n線より上は正、線より下は負\n線から遠いほど、値の絶対値が大きい\n直線は、値が 0 になる点の集まり"
+  },
+  {
+    "objectID": "logistic-regression.html#peek-line-distance",
+    "href": "logistic-regression.html#peek-line-distance",
+    "title": "ロジスティック回帰",
+    "section": "そもそも直線とは",
+    "text": "そもそも直線とは\n\n\\[f(x) = w_1x_1 + w_2x_2 + b\\]\nという関数に対して \\(f(x)=0\\) となる点の集合が直線である。\n\n\n\n\n\n\n\n\n\n\n直線の式 \\(w_1x_1 + w_2x_2 + b = 0\\)：代入した値が 0 になる点の集まり\n値の符号：直線のどちら側か\n値の大きさ：直線からの遠さ"
+  },
+  {
+    "objectID": "logistic-regression.html#ここまで",
+    "href": "logistic-regression.html#ここまで",
+    "title": "ロジスティック回帰",
+    "section": "ここまで",
+    "text": "ここまで\n\n\n勾配降下法（gradient descent）：少しずつ進んで最小値を探す\n回帰：体長→重さの直線を勾配降下法でフィッティング\n\nこのケースでは解と一致\n\n分類（classification）：特徴量からクラスを予測\n\n決定木：軸に平行な閾値を組み合わせて分ける\nk-NN：近い \\(k\\) 個のデータの投票で決める\n\n\n\n\n\n\n\n\n\n今回の主題\n\n\n\n「斜めの直線で分けられそう」と言いながら、斜めの直線は求めていなかった\nデータから最適な斜めの決定境界（decision boundary）を求められるか？"
+  },
+  {
+    "objectID": "classification-2d-boundaries.html#人が決めた閾値-vs-決定木",
+    "href": "classification-2d-boundaries.html#人が決めた閾値-vs-決定木",
+    "title": "2次元の特徴量で分類",
+    "section": "人が決めた閾値 vs 決定木",
+    "text": "人が決めた閾値 vs 決定木\n\n\n\n\n\n\n\n\n\n\n人が決めた閾値\n決定木\n\n\n\n\n境界の決め方\n散布図を見て人が判断\nジニ不純度で自動最適化\n\n\n説明のしやすさ\n単純で、理由を説明しやすい\nif-then ルールとして読める\n\n\n特徴量が3つ以上\n目で見えなくなる\nそのまま扱える\n\n\n弱点\n最適の保証がない自動化できない\n過学習（overfitting）しやすい境界は階段状のみ"
+  },
+  {
+    "objectID": "logistic-regression.html#回帰は-f-を-0-に近づけ分類は-0-から遠ざける",
+    "href": "logistic-regression.html#回帰は-f-を-0-に近づけ分類は-0-から遠ざける",
+    "title": "ロジスティック回帰",
+    "section": "回帰は \\(f\\) を 0 に近づけ、分類は 0 から遠ざける",
+    "text": "回帰は \\(f\\) を 0 に近づけ、分類は 0 から遠ざける\n\n\n\n\n\n\n\n\n\n\n\n縦の線分：魚の点を代入した \\(f\\) の値\n\n\n\n\n\n\n\n\n回帰直線\n\n\n\nすべての魚で \\(f\\) の値を 0 に近づけたい（点が直線上に並ぶ）\nMSE（平均二乗誤差）は、この値を2乗した平均\n\n\n\n\n\n\n\n\n\n\n\n\n決定境界\n\n\n\nすべての魚で \\(f\\) の値を 0 から遠ざけたい（点が直線から離れる）\n\n符号は Salmon と Sea bass で逆\n\n\\(f\\) の値の MSE は、分類の損失にならない\n\n正しい側で 0 から離れるほど小さくなる損失が要る"
+  },
+  {
+    "objectID": "logistic-regression.html#peek-far-loss",
+    "href": "logistic-regression.html#peek-far-loss",
+    "title": "ロジスティック回帰",
+    "section": "回帰は \\(f(x)\\) を 0 に近づけ、分類は 0 から遠ざける",
+    "text": "回帰は \\(f(x)\\) を 0 に近づけ、分類は 0 から遠ざける\n\n\n\n\n\n\n\n\n\n\n\n縦の線分：データ点 \\(x\\) での \\(f(x)\\)\n\n\n\n\n\n回帰直線（regression line）\n決定境界\n\n\n\n\n役割\n縦軸の値を予測する（点の真ん中を通る）\n2クラスを分ける（点の間を通る）\n\n\nデータ点での \\(f(x)\\)\n0 に近づける\n0 から遠ざける（符号はクラスで逆）\n\n\n損失\nMSE（平均二乗誤差）：\\(f(x)\\) の2乗の平均\n？\n\n\n\n\n分類の損失：\\(f(x)\\) が正しい側で 0 から離れるほど小さくなる関数"
+  },
+  {
+    "objectID": "logistic-regression.html#f-1-を実際に確率へ変換する",
+    "href": "logistic-regression.html#f-1-を実際に確率へ変換する",
+    "title": "ロジスティック回帰",
+    "section": "\\(f = 1\\) を実際に確率へ変換する",
+    "text": "\\(f = 1\\) を実際に確率へ変換する\n\n\n\\(f = 1\\) をロジスティック関数に代入する\n\n\\[p = \\sigma(1) = \\frac{1}{1 + e^{-1}} \\approx 0.731\\]\n\n\\(f=1\\) のデータ点は、Salmon である確率が \\(73.1\\%\\) と解釈できる"
+  },
+  {
+    "objectID": "logistic-regression.html#peek-q-condition",
+    "href": "logistic-regression.html#peek-q-condition",
+    "title": "ロジスティック回帰",
+    "section": "\\(p\\) から Loss を作る準備",
+    "text": "\\(p\\) から Loss を作る準備\n\n\n\\(p\\) はそのまま Loss にできない（方向が逆）\n\nやりたい Loss 関数の挙動\n\n\\(p\\) が高いなら Loss が低い\n\\(p\\) が低いなら Loss が高い\n\n\nおまけに正解ラベル以外（Sea bass）も \\(p\\) としてしまうと訳が分からなくなる\nそこで「\\(q\\)：正解クラスに出した確率」を導入する\n\n2クラスの場合、片方の確率が \\(p\\) なら逆は \\(1-p\\)\n\n正解が Salmon なら \\(q = p\\)\n正解が Sea bass（Salmon 以外）なら \\(q = 1-p\\)\n\n\n\n\n\\(q\\) が 1 に近いほど小さく、0 に近いほど大きい損失を作りたい"
+  },
+  {
+    "objectID": "logistic-regression.html#peek-q-product",
+    "href": "logistic-regression.html#peek-q-product",
+    "title": "ロジスティック回帰",
+    "section": "log は全データを一括で扱いやすい",
+    "text": "log は全データを一括で扱いやすい\n\n\n全データで、正解クラスの確率を同時に高めたい\n\n各データの \\(q\\) を掛けた積 \\(q_1 q_2 \\cdots q_N\\) を大きくする\nこの積：全データの正解ラベルを、まとめて出す確率\n\nlog は積が和になり、1データずつの損失に分けられる\n\n\\[-\\log(q_1 q_2 \\cdots q_N) = -\\log q_1 - \\log q_2 - \\cdots - \\log q_N = \\ell_1 + \\ell_2 + \\cdots + \\ell_N\\]\n\nなのでデータ数で割って平均をとるといい感じになる\n\n\\[L = \\frac{1}{N}\\sum_{i} \\left(-\\log q_i\\right)\\]\n\n\\(L\\) を Loss 関数とする"
+  },
+  {
+    "objectID": "logistic-regression.html#peek-loss-in-f",
+    "href": "logistic-regression.html#peek-loss-in-f",
+    "title": "ロジスティック回帰",
+    "section": "一旦、現状の損失を \\(f(x)\\) から見るとどのような形になるかチェック",
+    "text": "一旦、現状の損失を \\(f(x)\\) から見るとどのような形になるかチェック\n\n\n当初欲しかった損失は、\\(f(x)\\) が正しい側で 0 から離れるほど小さくなる関数\n\\(p = \\sigma(f(x))\\) を代入して、損失を \\(f(x)\\) の関数として描く\n\n正解が Salmon：\\(\\ell = -\\log \\sigma(f(x))\\)\n正解が Sea bass：\\(\\ell = -\\log\\bigl(1-\\sigma(f(x))\\bigr)\\)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n結果\n\n\n\n正しい側で 0 から離れるほど、損失は 0 に近づく\n逆の側では、0 から離れるほど損失が大きくなる\n\n\n\n\n\n\n分類の損失に求めた条件を満たす損失ができた"
+  },
+  {
+    "objectID": "logistic-regression.html#回帰と同じく勾配降下法で学習する",
+    "href": "logistic-regression.html#回帰と同じく勾配降下法で学習する",
+    "title": "ロジスティック回帰",
+    "section": "回帰と同じく勾配降下法で学習する",
+    "text": "回帰と同じく勾配降下法で学習する\n\n\n\n回帰直線を求めたときと同じ形の更新式を使う\n\n\\[w_j \\leftarrow w_j-\\alpha\\frac{\\partial L}{\\partial w_j},\n\\qquad b \\leftarrow b-\\alpha\\frac{\\partial L}{\\partial b}\\]\n\n\\(\\alpha\\)（アルファ）：学習率（learning rate）\n\nコードでは learning rate を略して lr と書く\n\n\\(j\\)：どの特徴量の重みかを表す添字\n\nここでは \\(j=1\\)（輝度）、\\(j=2\\)（重さ）\n\n損失 \\(L\\) はできたので、残りは勾配（gradient）"
+  },
+  {
+    "objectID": "logistic-regression.html#section-3",
+    "href": "logistic-regression.html#section-3",
+    "title": "ロジスティック回帰",
+    "section": "",
+    "text": "「線形」とは"
+  },
+  {
+    "objectID": "logistic-regression.html#fx-1-を実際に確率へ変換する",
+    "href": "logistic-regression.html#fx-1-を実際に確率へ変換する",
+    "title": "ロジスティック回帰",
+    "section": "\\(f(x) = 1\\) を実際に確率へ変換する",
+    "text": "\\(f(x) = 1\\) を実際に確率へ変換する\n\n\n\\(f(x) = 1\\) をロジスティック関数に代入する\n\n\\[p = \\sigma(1) = \\frac{1}{1 + e^{-1}} \\approx 0.731\\]\n\n\\(f(x)=1\\) のデータ点は、Salmon である確率が \\(73.1\\%\\) と解釈できる"
+  },
+  {
+    "objectID": "logistic-regression.html#tweak-学習率とデータの数を変える",
+    "href": "logistic-regression.html#tweak-学習率とデータの数を変える",
+    "title": "ロジスティック回帰",
+    "section": "Tweak 学習率とデータの数を変える",
+    "text": "Tweak 学習率とデータの数を変える\n\n\n全データで測りながら学習するコード を書き換えて実行\n\n\n\n\n\nやりたいこと\nコード\n\n\n\n\n学習率を小さくする\nlr = 0.05\n\n\n80件全部で更新する\nfor i in range(80):\n\n\n\n\n\n\n\n\n\n\n\nチェックポイント\n\n\n\nlr = 0.05：正答率は元の lr = 0.5 と並ぶのに、Loss は大きく異なる\n\nパラメータが少ししか動かず、正しく分類できてはいるが自信がない（\\(p\\) が 0.5 の近くにある）\n正答率に出ない差が Loss に出る\n\n80件全部で更新すると、正答率はどこまで上がる？\n\n途中で下がる瞬間が何度もある（間違えたデータ点に境界が引っ張られるため）"
+  },
+  {
+    "objectID": "logistic-regression.html#学習中の-fx-の挙動",
+    "href": "logistic-regression.html#学習中の-fx-の挙動",
+    "title": "ロジスティック回帰",
+    "section": "学習中の \\(f(x)\\) の挙動",
+    "text": "学習中の \\(f(x)\\) の挙動\n\n\n\n\n\n\n\n\n\n\n\n◯印：直前の更新に使ったデータ点\n\n\n\n\n\n\n\n\n結果\n\n\n\n予測が正解からずれている分だけ、\\(f(x) = 0\\) の直線がその点を正しく分類する向きへ動く\n人が決めた閾値（縦線）と違い、学習で決まる直線は斜めにもなる"
+  },
+  {
+    "objectID": "logistic-regression.html#z-を高さにすると傾いた板になる",
+    "href": "logistic-regression.html#z-を高さにすると傾いた板になる",
+    "title": "ロジスティック回帰",
+    "section": "\\(z\\) を高さにすると、傾いた板になる",
+    "text": "\\(z\\) を高さにすると、傾いた板になる\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nノート\n\n\n\n各点 \\((x_1, x_2)\\) に高さ \\(z = w_1x_1 + w_2x_2 + b\\) がある → 平面の上の傾いた板\n決定境界 ＝ 高さ 0 の線（水際）\n\n水面より上（\\(z&gt;0\\)）：Salmon\n水面より下（\\(z&lt;0\\)）：Sea bass"
+  },
+  {
+    "objectID": "logistic-regression.html#peek-to-probability",
+    "href": "logistic-regression.html#peek-to-probability",
+    "title": "ロジスティック回帰",
+    "section": "\\(f(x)\\) を確率っぽいものに変換",
+    "text": "\\(f(x)\\) を確率っぽいものに変換\n\n\n\\(f(x)\\) は \\(-\\infty\\) から \\(+\\infty\\) まで値域があるため扱いにくい\nそこで、この出力を 0〜1 に押し込む変換をする関数を導入\n\n0〜1 とした値を確率 \\(p\\) として扱う\n\n例えば、\\(p\\) は Salmon と判定してよい蓋然性が高い確率（のようなもの）\n逆に \\(1-p\\) は Salmon 以外\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nデータ点の位置\n\\(f(x)\\)\n\\(p\\)\n\n\n\n\nSalmon の側で直線から遠い\n大きい正の値\n1 に近い\n\n\n直線の上\n0\n0.5\n\n\nSea bass の側で直線から遠い\n大きい負の値\n0 に近い"
+  },
+  {
+    "objectID": "logistic-regression.html#fx-1-の場合の計算",
+    "href": "logistic-regression.html#fx-1-の場合の計算",
+    "title": "ロジスティック回帰",
+    "section": "\\(f(x) = 1\\) の場合の計算",
+    "text": "\\(f(x) = 1\\) の場合の計算\n\n\n\\(f(x) = 1\\) をロジスティック関数に代入する\n\n\\[p = \\sigma(1) = \\frac{1}{1 + e^{-1}} \\approx 0.731\\]\n\n\\(f(x)=1\\) のデータ点は、Salmon である確率が \\(73.1\\%\\) と解釈できる"
+  },
+  {
+    "objectID": "logistic-regression.html#fx-1-の場合",
+    "href": "logistic-regression.html#fx-1-の場合",
+    "title": "ロジスティック回帰",
+    "section": "\\(f(x) = 1\\) の場合",
+    "text": "\\(f(x) = 1\\) の場合\n\n\\(f(x) = 1\\) をロジスティック関数に代入\n\\[p = \\sigma(1) = \\frac{1}{1 + e^{-1}} \\approx 0.731\\]\n\n\\(f(x)=1\\) のデータ点はpが0.731であるから、Salmon である確率を \\(73.1\\%\\) と解釈してしまおう"
+  },
+  {
+    "objectID": "logistic-regression.html#例fx-1-の場合",
+    "href": "logistic-regression.html#例fx-1-の場合",
+    "title": "ロジスティック回帰",
+    "section": "例：\\(f(x) = 1\\) の場合",
+    "text": "例：\\(f(x) = 1\\) の場合\n\n\\(f(x) = 1\\) をロジスティック関数に代入\n\\[p = \\sigma(1) = \\frac{1}{1 + e^{-1}} \\approx 0.731\\]\n\n\n今の気持ち\n\n\\(f(x)=1\\) のデータ点は \\(p\\) が 0.731 であるから、Salmon である確率を \\(73.1\\%\\) だと解釈してしまおう"
+  },
+  {
+    "objectID": "logistic-regression.html#peek-loss-choice",
+    "href": "logistic-regression.html#peek-loss-choice",
+    "title": "ロジスティック回帰",
+    "section": "損失：\\(-\\log q\\)",
+    "text": "損失：\\(-\\log q\\)\n\n\n条件を満たす関数は1つではない\n\n\\(1-q\\)：外し方がひどくても（\\(q \\to 0\\)）、損失は 1 で頭打ち\n\\(-\\log q\\)：外し方がひどいほど（\\(q \\to 0\\)）、損失は際限なく大きくなる\n\n\n\n\n\n\n\n\n\n\n\n\nひどい外れほど強く罰したいので、1データ分の損失（loss）は \\(\\ell = -\\log q\\)"
+  },
+  {
+    "objectID": "logistic-regression.html#このような損失を-log-q-peek-loss-choiceで作ってみよう",
+    "href": "logistic-regression.html#このような損失を-log-q-peek-loss-choiceで作ってみよう",
+    "title": "ロジスティック回帰",
+    "section": "このような損失を\\(-\\log q\\) {#peek-loss-choice}で作ってみよう",
+    "text": "このような損失を\\(-\\log q\\) {#peek-loss-choice}で作ってみよう\n\n\n条件を満たす関数は1つではない\n\n\\(1-q\\)：外し方がひどくても（\\(q \\to 0\\)）、損失は 1 で頭打ち\n\\(-\\log q\\)：外し方がひどいほど（\\(q \\to 0\\)）、損失は際限なく大きくなる\n\n\n\n\n\n\n\n\n\n\n\n\nひどい外れほど強く罰したいので、1データ分の損失（loss）は \\(\\ell = -\\log q\\)"
+  },
+  {
+    "objectID": "logistic-regression.html#このような損失を-log-qpeek-loss-choiceで作ってみよう",
+    "href": "logistic-regression.html#このような損失を-log-qpeek-loss-choiceで作ってみよう",
+    "title": "ロジスティック回帰",
+    "section": "このような損失を\\(-\\log q\\){#peek-loss-choice}で作ってみよう",
+    "text": "このような損失を\\(-\\log q\\){#peek-loss-choice}で作ってみよう\n\n\nqをいい感じにする関数として例えば以下が考えられる\n\n\\(1-q\\)：外し方がひどくても（\\(q \\to 0\\)）、損失は 1 で頭打ち\n\\(-\\log q\\)：外し方がひどいほど（\\(q \\to 0\\)）、損失は際限なく大きくなる\n\n\n\n\n\n\n\n\n\n\n\n\n\\(\\ell = -\\log q\\) をLoss関数とする"
+  },
+  {
+    "objectID": "logistic-regression.html#このような損失を-log-qで作ってみよう",
+    "href": "logistic-regression.html#このような損失を-log-qで作ってみよう",
+    "title": "ロジスティック回帰",
+    "section": "このような損失を\\(-\\log q\\)で作ってみよう",
+    "text": "このような損失を\\(-\\log q\\)で作ってみよう\n\n\nqをいい感じにする関数として例えば以下が考えられる\n\n\\(1-q\\)：外し方がひどくても（\\(q \\to 0\\)）、損失は 1 で頭打ち\n\\(-\\log q\\)：外し方がひどいと（\\(q \\to 0\\)）損失青天井\n\n\n\n\n\n\n\n\n\n\n\n\n\\(\\ell = -\\log q\\) をLoss関数とする"
   },
   {
     "objectID": "nn-logistic.html#練習問題1匹の魚でforwardとbackwardを実行する",
@@ -5948,5 +6123,96 @@
     "title": "ロジスティック回帰をNNとして実装する",
     "section": "練習問題の解答例",
     "text": "練習問題の解答例\n\n\n\n解答例を見る\nimport numpy as np\n\ndef linear(x, w, b):\n    return x @ w + b\n\ndef sigmoid(z):\n    return 1 / (1 + np.exp(-z))\n\ndef forward(x, w, b):\n    z = linear(x, w, b)\n    p = sigmoid(z)\n    return z, p\n\ndef binary_cross_entropy(y, p):\n    eps = 1e-10\n    p = np.clip(p, eps, 1 - eps)\n    return -(y * np.log(p) + (1 - y) * np.log(1 - p))\n\ndef backward(x, y, p):\n    d_z = p - y\n    d_w = d_z * x\n    d_b = d_z\n    return d_w, d_b\n\nx = np.array([2.0, 0.5])\ny = 1.0\nw = np.array([-0.2, 0.0])\nb = 0.0\n\nz, p = forward(x, w, b)\nloss = binary_cross_entropy(y, p)\nd_w, d_b = backward(x, y, p)\n\nprint(f\"z: {z}\")\nprint(f\"p: {p}\")\nprint(f\"loss: {loss}\")\nprint(\"d_w:\", d_w)\nprint(\"d_b:\", d_b)"
+  },
+  {
+    "objectID": "logistic-regression.html#勾配降下法で学習する",
+    "href": "logistic-regression.html#勾配降下法で学習する",
+    "title": "ロジスティック回帰",
+    "section": "勾配降下法で学習する",
+    "text": "勾配降下法で学習する\n\n\n\n回帰直線を求めたときと同じ形の更新式を使う\n\n\\[w_j \\leftarrow w_j-\\alpha\\frac{\\partial L}{\\partial w_j},\n\\qquad b \\leftarrow b-\\alpha\\frac{\\partial L}{\\partial b}\\]\n\n\\(\\alpha\\)（アルファ）：学習率（learning rate）\n\nコードでは learning rate を略して lr と書く\n\n\\(j\\)：どの特徴量の重みかを表す添字\n\nここでは \\(j=1\\)（輝度）、\\(j=2\\)（重さ）\n\n損失 \\(L\\) はできたので、残りは勾配（gradient）"
+  },
+  {
+    "objectID": "logistic-regression.html#勾配降下法で学習",
+    "href": "logistic-regression.html#勾配降下法で学習",
+    "title": "ロジスティック回帰",
+    "section": "勾配降下法で学習",
+    "text": "勾配降下法で学習\n\n\n\n普通に勾配降下法を実行：回帰直線のときとまったく同じ\n\n\\[w_j \\leftarrow w_j-\\alpha\\frac{\\partial L}{\\partial w_j},\n\\qquad b \\leftarrow b-\\alpha\\frac{\\partial L}{\\partial b}\\]\n\n\n\\(\\alpha\\)（アルファ）：学習率（learning rate、lr）\n\\(j\\)：どの特徴量の係数かを表す添字\n\n例：魚データにおいては \\(j=1\\)（輝度）、\\(j=2\\)（重さ）\n\n\n\n\nこれで損失 \\(L\\) はできたので、残りは勾配（gradient）"
+  },
+  {
+    "objectID": "logistic-regression.html#ここで朗報微分結果は-p-だけで表せる",
+    "href": "logistic-regression.html#ここで朗報微分結果は-p-だけで表せる",
+    "title": "ロジスティック回帰",
+    "section": "ここで朗報：微分結果は \\(p\\) だけで表せる",
+    "text": "ここで朗報：微分結果は \\(p\\) だけで表せる\n\n\n微分した直後は、次の形になっている\n\n\\[\n\\frac{dp}{dz}=\\frac{e^{-z}}{(1+e^{-z})^2}\n\\tag{1}\n\\]\n\n一方、ロジスティック関数の出力は \\(p=\\dfrac{1}{1+e^{-z}}\\)\n\\(p(1-p)\\) を計算すると、微分した直後と同じ形になる\n\n\\[p(1-p)\n=\\frac{1}{1+e^{-z}}\n\\left(1-\\frac{1}{1+e^{-z}}\\right)\n=\\frac{e^{-z}}{(1+e^{-z})^2}\n\\tag{2}\\]\n\n(1)と(2)の右辺が同じなので、ロジスティック関数の微分は \\(p\\) だけで書ける\n\n\\[\\therefore \\qquad \\frac{dp}{dz}=p(1-p)\\]\n\n\\[\n\\text{出力： }p=\\sigma(z)\n\\quad\\Longrightarrow\\quad\n\\text{傾き： }\\frac{dp}{dz}=p(1-p)\n\\]"
+  },
+  {
+    "objectID": "logistic-regression.html#ここで朗報微分は-p-だけで表せる",
+    "href": "logistic-regression.html#ここで朗報微分は-p-だけで表せる",
+    "title": "ロジスティック回帰",
+    "section": "ここで朗報：微分は \\(p\\) だけで表せる",
+    "text": "ここで朗報：微分は \\(p\\) だけで表せる\n\n\n微分した直後は、次の形になっている\n\n\\[\n\\frac{dp}{dz}=\\frac{e^{-z}}{(1+e^{-z})^2}\n\\tag{1}\n\\]\n\n一方、ロジスティック関数の出力は \\(p=\\dfrac{1}{1+e^{-z}}\\)\n\\(p(1-p)\\) を計算すると、微分した直後と同じ形になる\n\n\\[p(1-p)\n=\\frac{1}{1+e^{-z}}\n\\left(1-\\frac{1}{1+e^{-z}}\\right)\n=\\frac{e^{-z}}{(1+e^{-z})^2}\n\\tag{2}\\]\n\n(1)と(2)の右辺が同じなので、ロジスティック関数の微分は \\(p\\) だけで書ける\n\n\\[\\therefore \\qquad \\frac{dp}{dz}=p(1-p)\\]\n\n\\[\n\\text{出力： }p=\\sigma(z)\n\\quad\\Longrightarrow\\quad\n\\text{傾き： }\\frac{dp}{dz}=p(1-p)\n\\]"
+  },
+  {
+    "objectID": "logistic-regression.html#ここで朗報微分せずとも-p-だけで表せる",
+    "href": "logistic-regression.html#ここで朗報微分せずとも-p-だけで表せる",
+    "title": "ロジスティック回帰",
+    "section": "ここで朗報：微分せずとも \\(p\\) だけで表せる",
+    "text": "ここで朗報：微分せずとも \\(p\\) だけで表せる\n\n\n微分した直後は、次の形になっている\n\n\\[\n\\frac{dp}{dz}=\\frac{e^{-z}}{(1+e^{-z})^2}\n\\tag{1}\n\\]\n\n一方、ロジスティック関数の出力は \\(p=\\dfrac{1}{1+e^{-z}}\\)\n\\(p(1-p)\\) を計算すると、微分した直後と同じ形になる\n\n\\[p(1-p)\n=\\frac{1}{1+e^{-z}}\n\\left(1-\\frac{1}{1+e^{-z}}\\right)\n=\\frac{e^{-z}}{(1+e^{-z})^2}\n\\tag{2}\\]\n\n(1)と(2)の右辺が同じなので、ロジスティック関数の微分は \\(p\\) だけで書ける\n\n\\[\\therefore \\qquad \\frac{dp}{dz}=p(1-p)\\]\n\n\\[\n\\text{出力： }p=\\sigma(z)\n\\quad\\Longrightarrow\\quad\n\\text{傾き： }\\frac{dp}{dz}=p(1-p)\n\\]"
+  },
+  {
+    "objectID": "logistic-regression.html#ここで朗報微分せずとも-p-だけで表現可能",
+    "href": "logistic-regression.html#ここで朗報微分せずとも-p-だけで表現可能",
+    "title": "ロジスティック回帰",
+    "section": "ここで朗報：微分せずとも \\(p\\) だけで表現可能",
+    "text": "ここで朗報：微分せずとも \\(p\\) だけで表現可能\n\n\n微分した直後は、次の形になっている\n\n\\[\n\\frac{dp}{dz}=\\frac{e^{-z}}{(1+e^{-z})^2}\n\\tag{1}\n\\]\n\n一方、ロジスティック関数の出力は \\(p=\\dfrac{1}{1+e^{-z}}\\)\n\\(p(1-p)\\) を計算すると、微分した直後と同じ形になる\n\n\\[p(1-p)\n=\\frac{1}{1+e^{-z}}\n\\left(1-\\frac{1}{1+e^{-z}}\\right)\n=\\frac{e^{-z}}{(1+e^{-z})^2}\n\\tag{2}\\]\n\n(1)と(2)の右辺が同じなので、ロジスティック関数の微分は \\(p\\) だけで書ける\n\n\\[\\therefore \\qquad \\frac{dp}{dz}=p(1-p)\\]\n\n\\[\n\\text{出力： }p=\\sigma(z)\n\\quad\\Longrightarrow\\quad\n\\text{傾き： }\\frac{dp}{dz}=p(1-p)\n\\]"
+  },
+  {
+    "objectID": "logistic-regression.html#ここで朗報微分せずとも-p-だけで勾配にできる",
+    "href": "logistic-regression.html#ここで朗報微分せずとも-p-だけで勾配にできる",
+    "title": "ロジスティック回帰",
+    "section": "ここで朗報：微分せずとも \\(p\\) だけで勾配にできる",
+    "text": "ここで朗報：微分せずとも \\(p\\) だけで勾配にできる\n\n\nロジスティック関数の微分は以下の形\n\n\\[\n\\frac{dp}{dz}=\\frac{e^{-z}}{(1+e^{-z})^2}\n\\tag{1}\n\\]\n\n一方、ロジスティック関数の出力は \\(p=\\dfrac{1}{1+e^{-z}}\\)\n\\(p(1-p)\\) を計算すると、\n\n\\[p(1-p)\n=\\frac{1}{1+e^{-z}}\n\\left(1-\\frac{1}{1+e^{-z}}\\right)\n=\\frac{e^{-z}}{(1+e^{-z})^2}\n\\tag{2}\\]\n\n(1)と(2)の右辺が同じなので、ロジスティック関数の微分は \\(p\\) だけで書ける\n\n\\[\\therefore \\qquad \\frac{dp}{dz}=p(1-p)\\]\n\n\\[\n\\text{出力： }p=\\sigma(z)\n\\quad\\Longrightarrow\\quad\n\\text{傾き： }\\frac{dp}{dz}=p(1-p)\n\\]"
+  },
+  {
+    "objectID": "logistic-regression.html#ここで朗報微分せずとも-p-だけで勾配が計算可能",
+    "href": "logistic-regression.html#ここで朗報微分せずとも-p-だけで勾配が計算可能",
+    "title": "ロジスティック回帰",
+    "section": "ここで朗報：微分せずとも \\(p\\) だけで勾配が計算可能",
+    "text": "ここで朗報：微分せずとも \\(p\\) だけで勾配が計算可能\n\n\nロジスティック関数の微分は以下の形\n\n\\[\n\\frac{dp}{dz}=\\frac{e^{-z}}{(1+e^{-z})^2}\n\\tag{1}\n\\]\n\n一方、ロジスティック関数の出力は \\(p=\\dfrac{1}{1+e^{-z}}\\)\n\\(p(1-p)\\) を計算すると、\n\n\\[p(1-p)\n=\\frac{1}{1+e^{-z}}\n\\left(1-\\frac{1}{1+e^{-z}}\\right)\n=\\frac{e^{-z}}{(1+e^{-z})^2}\n\\tag{2}\\]\n\n(1)と(2)の右辺が同じなので、ロジスティック関数の微分＝勾配は \\(p\\) だけで計算可能\n\n\\[\\therefore \\qquad \\frac{dp}{dz}=p(1-p)\\]\n\n\\[\n\\text{出力： }p=\\sigma(z)\n\\quad\\Longrightarrow\\quad\n\\text{傾き： }\\frac{dp}{dz}=p(1-p)\n\\]"
+  },
+  {
+    "objectID": "logistic-regression.html#ここで朗報微分せずとも-p-だけでロジスティック関数の微分は計算可能",
+    "href": "logistic-regression.html#ここで朗報微分せずとも-p-だけでロジスティック関数の微分は計算可能",
+    "title": "ロジスティック回帰",
+    "section": "ここで朗報：微分せずとも \\(p\\) だけでロジスティック関数の微分は計算可能",
+    "text": "ここで朗報：微分せずとも \\(p\\) だけでロジスティック関数の微分は計算可能\n\n\nロジスティック関数の微分は以下の形\n\n\\[\n\\frac{dp}{dz}=\\frac{e^{-z}}{(1+e^{-z})^2}\n\\tag{1}\n\\]\n\n一方、ロジスティック関数の出力は \\(p=\\dfrac{1}{1+e^{-z}}\\)\n\\(p(1-p)\\) を計算すると、\n\n\\[p(1-p)\n=\\frac{1}{1+e^{-z}}\n\\left(1-\\frac{1}{1+e^{-z}}\\right)\n=\\frac{e^{-z}}{(1+e^{-z})^2}\n\\tag{2}\\]\n\n(1)と(2)の右辺が同じなので、ロジスティック関数の微分は \\(p\\) だけで計算可能\n\n\\[\\therefore \\qquad \\frac{dp}{dz}=p(1-p)\\]"
+  },
+  {
+    "objectID": "logistic-regression.html#peek-monitor-functions",
+    "href": "logistic-regression.html#peek-monitor-functions",
+    "title": "ロジスティック回帰",
+    "section": "全データの Loss は行列で計算可能",
+    "text": "全データの Loss は行列で計算可能\n\n\n各データはそれぞれ独立しているため、X @ w + b の形で全データ分をまとめて計算できる\n\n\\(z\\)：特徴量行列 \\(X\\) と係数 \\(w\\) の積 \\[\\begin{pmatrix} z^{(1)} \\\\ \\vdots \\\\ z^{(N)} \\end{pmatrix}\n=\\begin{pmatrix} x^{(1)}_1 & x^{(1)}_2 \\\\ \\vdots & \\vdots \\\\ x^{(N)}_1 & x^{(N)}_2 \\end{pmatrix}\n\\begin{pmatrix} w_1 \\\\ w_2 \\end{pmatrix} + b\\]\n1行ごとが \\(w_1x_1+w_2x_2+b\\)\n\\(b\\) は全行に同じ値を足すだけでよい\n\nLoss：log で積を和にしたので、全データの \\(L\\) は1データ分の損失 \\(\\ell\\) の平均\n\n\ndef predict(X, w, b):\n    \"\"\"全データの z を計算し、ロジスティック関数で確率 p にする\"\"\"\n    return sigmoid(X @ w + b)\n\ndef binary_cross_entropy(y, p):\n    \"\"\"1データ分の損失 ℓ を、データの数だけまとめて計算する\"\"\"\n    eps = 1e-10\n    # log(0) は計算できないため、確率が厳密な 0 / 1 にならないようにする\n    p = np.clip(p, eps, 1 - eps)\n    return -(y * np.log(p) + (1 - y) * np.log(1 - p))"
+  },
+  {
+    "objectID": "logistic-regression.html#peek-monitor-loop",
+    "href": "logistic-regression.html#peek-monitor-loop",
+    "title": "ロジスティック回帰",
+    "section": "学習しながら Loss と正答率を表示する",
+    "text": "学習しながら Loss と正答率を表示する\n\n1データずつ学習するループと同様に更新し、更新のたびに全データで測る\n\n正答率：\\(p \\geq 0.5\\) を Salmon と判定して数える\n\n\ndef accuracy(y, p):\n    return np.mean((p &gt;= 0.5) == y)\n\nw = np.array([0.0, 0.0])\nb = 0.0\nlr = 0.5\n\nfor i in range(10):\n    xi, yi = X_norm[i], y[i]\n    p_i   = sigmoid(xi @ w + b)\n    delta = p_i - yi\n    d_w = delta * xi\n    d_b = delta\n    w = w - lr * d_w\n    b = b - lr * d_b\n\n    p_all = predict(X_norm, w, b)\n    L = np.mean(binary_cross_entropy(y, p_all))   # 全データの Loss：ℓ の平均\n    print(f\"{i+1}件目 | Loss: {L:.4f} | 正答率: {accuracy(y, p_all):.1%}\")\n\n1件目 | Loss: 0.5326 | 正答率: 85.0%\n2件目 | Loss: 0.5179 | 正答率: 90.0%\n3件目 | Loss: 0.4974 | 正答率: 85.0%\n4件目 | Loss: 0.4269 | 正答率: 88.8%\n5件目 | Loss: 0.4044 | 正答率: 85.0%\n6件目 | Loss: 0.3994 | 正答率: 87.5%\n7件目 | Loss: 0.3901 | 正答率: 87.5%\n8件目 | Loss: 0.3617 | 正答率: 87.5%\n9件目 | Loss: 0.3364 | 正答率: 88.8%\n10件目 | Loss: 0.3330 | 正答率: 90.0%\n\n\n\n\n\n\n\n\n\n結果\n\n\nLoss は1データごとに下がっていく\n\n\n\n\n\n\n\n\n\n\n\n更新に使う値と、表示する値は別\n\n\n\n更新：いま見ている1データの勾配 delta、d_w、d_b を使う\n表示：更新後に、全データの Loss \\(L\\) と正答率を計算する\n\n表示した Loss の数値を更新式へ代入するわけではない"
+  },
+  {
+    "objectID": "logistic-regression.html#z-を含めた3次元空間では決定境界は板",
+    "href": "logistic-regression.html#z-を含めた3次元空間では決定境界は板",
+    "title": "ロジスティック回帰",
+    "section": "\\(z\\) を含めた3次元空間では決定境界は板",
+    "text": "\\(z\\) を含めた3次元空間では決定境界は板\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nノート\n\n\n\n各点 \\((x_1, x_2)\\) に高さ \\(z = w_1x_1 + w_2x_2 + b\\) がある → 平面の上の傾いた板\n決定境界 ＝ 高さ 0 の線（水際）\n\n水面より上（\\(z&gt;0\\)）：Salmon\n水面より下（\\(z&lt;0\\)）：Sea bass"
+  },
+  {
+    "objectID": "logistic-regression.html#おまけ線形が付く用語",
+    "href": "logistic-regression.html#おまけ線形が付く用語",
+    "title": "ロジスティック回帰",
+    "section": "（おまけ）「線形」が付く用語",
+    "text": "（おまけ）「線形」が付く用語\n\n\\[z = w_1 x_1 + w_2 x_2 + b\\]\n\n上の式：線形結合（linear combination）\nロジスティック回帰：線形分類器（linear classifier）\n体長から重さを予測した直線：線形回帰（linear regression）\n\n\nこの「線形」とは何？直線のこと？"
   }
 ]

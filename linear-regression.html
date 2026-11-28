@@ -258,7 +258,7 @@
   <script src="badge-ui.js" defer=""></script>
   <script src="toc-ui.js" defer=""></script>
   <script src="network-ui.js" defer=""></script>
-  <meta name="qmd-web-source" content="4ccef8470ad6fead025c8d5951acf3b33af33042">
+  <meta name="qmd-web-source" content="eac24f67f82a854d883e875c35df18dfe5a2d9bb">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -366,7 +366,7 @@ rkskmt
 <li>魚の<strong>体長</strong>（cm）を、新しい特徴量として使う</li>
 <li>体長を測るだけで重さが分かれば、<strong>秤に乗せる手間が省ける</strong></li>
 </ul>
-<div id="5122f73c" class="cell" data-execution_count="1">
+<div id="0bf1c2d6" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>魚データの定義（クリックして展開）</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -383,7 +383,7 @@ rkskmt
 <span id="cb1-12"><a aria-label="12"></a>                    <span class="dv">2230</span>, <span class="dv">1445</span>, <span class="dv">1838</span>, <span class="dv">1370</span>, <span class="dv">1096</span>], dtype<span class="op">=</span><span class="bu">float</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="16d6e9f9" class="cell" data-execution_count="2">
+<div id="5ab55f60" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -515,7 +515,7 @@ rkskmt
 <li>学習率を1つで済ませるため</li>
 </ul></li>
 </ul>
-<div id="d68bc99c" class="cell" data-execution_count="3">
+<div id="48428fef" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a>x <span class="op">=</span> (lengths <span class="op">-</span> lengths.mean()) <span class="op">/</span> lengths.std()   <span class="co"># 標準化した体長</span></span>
 <span id="cb2-2"><a aria-label="2"></a>t <span class="op">=</span> (weights <span class="op">-</span> weights.mean()) <span class="op">/</span> weights.std()   <span class="co"># 標準化した重さ</span></span>
 <span id="cb2-3"><a aria-label="3"></a></span>
@@ -558,7 +558,7 @@ rkskmt
 <section id="直線が合っていく様子" class="slide level2">
 <h2>直線が合っていく様子</h2>
 <div class="slide-body">
-<div id="83355e36" class="cell" data-execution_count="4">
+<div id="b02023a7" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -635,7 +635,7 @@ rkskmt
 <li>係数は次数の高い順に返る（<code>d = 1</code> なら <span class="math inline">\(a, b\)</span> の順）</li>
 </ul></li>
 </ul>
-<div id="35fde5f8" class="cell" data-execution_count="5">
+<div id="1b291b9f" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a aria-label="1"></a>a_exact, b_exact <span class="op">=</span> np.polyfit(x, t, <span class="dv">1</span>)</span>
 <span id="cb4-2"><a aria-label="2"></a><span class="bu">print</span>(<span class="ss">f"gradient descent: a=</span><span class="sc">{</span>a<span class="sc">:.4f}</span><span class="ss">, b=</span><span class="sc">{</span>b<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
 <span id="cb4-3"><a aria-label="3"></a><span class="bu">print</span>(<span class="ss">f"np.polyfit      : a=</span><span class="sc">{</span>a_exact<span class="sc">:.4f}</span><span class="ss">, b=</span><span class="sc">{</span>b_exact<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
@@ -764,33 +764,35 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <section id="次数を上げてみる" class="slide level2">
 <h2>次数を上げてみる</h2>
 <div class="slide-body">
-<div id="7db0c8f1" class="cell" data-execution_count="6">
+<div id="49901135" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a aria-label="1"></a><span class="co"># 先頭の10匹を訓練データ、残りの5匹をテストデータにする</span></span>
-<span id="cb6-2"><a aria-label="2"></a>x_train, t_train <span class="op">=</span> lengths[:<span class="dv">10</span>], weights[:<span class="dv">10</span>]</span>
-<span id="cb6-3"><a aria-label="3"></a>x_test, t_test <span class="op">=</span> lengths[<span class="dv">10</span>:], weights[<span class="dv">10</span>:]</span>
-<span id="cb6-4"><a aria-label="4"></a></span>
-<span id="cb6-5"><a aria-label="5"></a><span class="co"># 体長を標準化してから多項式を当てはめる（そのまま9乗すると計算が不安定になる）</span></span>
-<span id="cb6-6"><a aria-label="6"></a>x_mean, x_std <span class="op">=</span> x_train.mean(), x_train.std()</span>
-<span id="cb6-7"><a aria-label="7"></a>z_train <span class="op">=</span> (x_train <span class="op">-</span> x_mean) <span class="op">/</span> x_std</span>
-<span id="cb6-8"><a aria-label="8"></a>z_test <span class="op">=</span> (x_test <span class="op">-</span> x_mean) <span class="op">/</span> x_std</span>
-<span id="cb6-9"><a aria-label="9"></a></span>
-<span id="cb6-10"><a aria-label="10"></a>grid <span class="op">=</span> np.linspace(lengths.<span class="bu">min</span>() <span class="op">-</span> <span class="fl">0.5</span>, lengths.<span class="bu">max</span>() <span class="op">+</span> <span class="fl">0.5</span>, <span class="dv">300</span>)</span>
-<span id="cb6-11"><a aria-label="11"></a>z_grid <span class="op">=</span> (grid <span class="op">-</span> x_mean) <span class="op">/</span> x_std</span>
-<span id="cb6-12"><a aria-label="12"></a></span>
-<span id="cb6-13"><a aria-label="13"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="fl">3.6</span>))</span>
-<span id="cb6-14"><a aria-label="14"></a><span class="cf">for</span> ax, deg <span class="kw">in</span> <span class="bu">zip</span>(axes, [<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">9</span>]):</span>
-<span id="cb6-15"><a aria-label="15"></a>    coef <span class="op">=</span> np.polyfit(z_train, t_train, deg)   <span class="co"># 訓練データに最も合う deg 次式の係数</span></span>
-<span id="cb6-16"><a aria-label="16"></a>    ax.scatter(x_train, t_train, c<span class="op">=</span><span class="st">"#2980b9"</span>, s<span class="op">=</span><span class="dv">45</span>, label<span class="op">=</span><span class="st">"訓練"</span>)</span>
-<span id="cb6-17"><a aria-label="17"></a>    ax.scatter(x_test, t_test, c<span class="op">=</span><span class="st">"#e74c3c"</span>, marker<span class="op">=</span><span class="st">"s"</span>, s<span class="op">=</span><span class="dv">45</span>, label<span class="op">=</span><span class="st">"テスト"</span>)</span>
-<span id="cb6-18"><a aria-label="18"></a>    ax.plot(grid, np.polyval(coef, z_grid), <span class="st">"k-"</span>, lw<span class="op">=</span><span class="dv">2</span>)   <span class="co"># 求めた多項式に z_grid を代入</span></span>
-<span id="cb6-19"><a aria-label="19"></a>    ax.set_ylim(<span class="dv">800</span>, <span class="dv">2900</span>)</span>
-<span id="cb6-20"><a aria-label="20"></a>    ax.set_title(<span class="ss">f"次数 </span><span class="sc">{</span>deg<span class="sc">}</span><span class="ss">"</span>, fontsize<span class="op">=</span><span class="dv">11</span>)</span>
-<span id="cb6-21"><a aria-label="21"></a>    ax.set_xlabel(<span class="st">"体長 (cm)"</span>)</span>
-<span id="cb6-22"><a aria-label="22"></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">"重さ (g)"</span>)<span class="op">;</span> axes[<span class="dv">0</span>].legend(fontsize<span class="op">=</span><span class="dv">8</span>)</span>
-<span id="cb6-23"><a aria-label="23"></a>plt.tight_layout()</span>
-<span id="cb6-24"><a aria-label="24"></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a aria-label="1"></a><span class="co"># 曲線を当てはめるデータ：体長（cm）と重さ（g）、訓練10点・テスト6点</span></span>
+<span id="cb6-2"><a aria-label="2"></a>x_train <span class="op">=</span> np.array([<span class="dv">24</span>, <span class="dv">28</span>, <span class="dv">30</span>, <span class="dv">32</span>, <span class="dv">34</span>, <span class="dv">36</span>, <span class="dv">42</span>, <span class="dv">50</span>, <span class="dv">52</span>, <span class="dv">56</span>], dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb6-3"><a aria-label="3"></a>t_train <span class="op">=</span> np.array([<span class="dv">950</span>, <span class="dv">1470</span>, <span class="dv">1050</span>, <span class="dv">2510</span>, <span class="dv">1810</span>, <span class="dv">2170</span>, <span class="dv">2100</span>, <span class="dv">2440</span>, <span class="dv">2140</span>, <span class="dv">2770</span>], dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb6-4"><a aria-label="4"></a>x_test <span class="op">=</span> np.array([<span class="dv">18</span>, <span class="dv">26</span>, <span class="dv">36</span>, <span class="dv">44</span>, <span class="dv">54</span>, <span class="dv">62</span>], dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb6-5"><a aria-label="5"></a>t_test <span class="op">=</span> np.array([<span class="dv">870</span>, <span class="dv">1540</span>, <span class="dv">2320</span>, <span class="dv">2300</span>, <span class="dv">2530</span>, <span class="dv">2900</span>], dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb6-6"><a aria-label="6"></a></span>
+<span id="cb6-7"><a aria-label="7"></a><span class="co"># 体長を標準化してから多項式を当てはめる（そのまま9乗すると計算が不安定になる）</span></span>
+<span id="cb6-8"><a aria-label="8"></a>x_mean, x_std <span class="op">=</span> x_train.mean(), x_train.std()</span>
+<span id="cb6-9"><a aria-label="9"></a>z_train <span class="op">=</span> (x_train <span class="op">-</span> x_mean) <span class="op">/</span> x_std</span>
+<span id="cb6-10"><a aria-label="10"></a>z_test <span class="op">=</span> (x_test <span class="op">-</span> x_mean) <span class="op">/</span> x_std</span>
+<span id="cb6-11"><a aria-label="11"></a></span>
+<span id="cb6-12"><a aria-label="12"></a>grid <span class="op">=</span> np.linspace(<span class="dv">15</span>, <span class="dv">65</span>, <span class="dv">300</span>)               <span class="co"># 曲線を描く体長</span></span>
+<span id="cb6-13"><a aria-label="13"></a>z_grid <span class="op">=</span> (grid <span class="op">-</span> x_mean) <span class="op">/</span> x_std</span>
+<span id="cb6-14"><a aria-label="14"></a></span>
+<span id="cb6-15"><a aria-label="15"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="fl">3.6</span>))</span>
+<span id="cb6-16"><a aria-label="16"></a><span class="cf">for</span> ax, deg <span class="kw">in</span> <span class="bu">zip</span>(axes, [<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">9</span>]):</span>
+<span id="cb6-17"><a aria-label="17"></a>    coef <span class="op">=</span> np.polyfit(z_train, t_train, deg)   <span class="co"># 訓練データに最も合う deg 次式の係数</span></span>
+<span id="cb6-18"><a aria-label="18"></a>    ax.scatter(x_train, t_train, c<span class="op">=</span><span class="st">"#2980b9"</span>, s<span class="op">=</span><span class="dv">45</span>, label<span class="op">=</span><span class="st">"訓練"</span>)</span>
+<span id="cb6-19"><a aria-label="19"></a>    ax.scatter(x_test, t_test, c<span class="op">=</span><span class="st">"#e74c3c"</span>, marker<span class="op">=</span><span class="st">"s"</span>, s<span class="op">=</span><span class="dv">45</span>, label<span class="op">=</span><span class="st">"テスト"</span>)</span>
+<span id="cb6-20"><a aria-label="20"></a>    ax.plot(grid, np.polyval(coef, z_grid), <span class="st">"k-"</span>, lw<span class="op">=</span><span class="dv">2</span>)   <span class="co"># 求めた多項式に z_grid を代入</span></span>
+<span id="cb6-21"><a aria-label="21"></a>    ax.set_ylim(<span class="dv">500</span>, <span class="dv">3500</span>)</span>
+<span id="cb6-22"><a aria-label="22"></a>    ax.set_title(<span class="ss">f"次数 </span><span class="sc">{</span>deg<span class="sc">}</span><span class="ss">"</span>, fontsize<span class="op">=</span><span class="dv">11</span>)</span>
+<span id="cb6-23"><a aria-label="23"></a>    ax.set_xlabel(<span class="st">"体長 (cm)"</span>)</span>
+<span id="cb6-24"><a aria-label="24"></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">"重さ (g)"</span>)<span class="op">;</span> axes[<span class="dv">0</span>].legend(fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb6-25"><a aria-label="25"></a>plt.tight_layout()</span>
+<span id="cb6-26"><a aria-label="26"></a>plt.show()</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
@@ -812,7 +814,7 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <div class="callout-content">
 <ul>
 <li>次数9は訓練の点を<strong>すべて通る</strong></li>
-<li>代わりに点のあいだで大きく振れ、小さい魚の重さを<strong>マイナス</strong>と予測している</li>
+<li>代わりに点のあいだで大きく振れ、重さを<strong>マイナス</strong>と予測するところもある</li>
 </ul>
 </div>
 </div>
@@ -823,7 +825,7 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <section id="テストデータで過学習を確認" class="slide level2">
 <h2>テストデータで過学習を確認</h2>
 <div class="slide-body">
-<div id="3ef2b714" class="cell" data-execution_count="7">
+<div id="6a370a4d" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a aria-label="1"></a>degrees <span class="op">=</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">9</span>)</span>
 <span id="cb7-2"><a aria-label="2"></a>train_mse, test_mse <span class="op">=</span> [], []</span>
 <span id="cb7-3"><a aria-label="3"></a><span class="cf">for</span> deg <span class="kw">in</span> degrees:</span>
@@ -879,14 +881,14 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <ul>
 <li>曲線が大きく振れる原因は、<strong>巨大な係数</strong></li>
 </ul>
-<div id="25310959" class="cell" data-execution_count="8">
+<div id="e4929c2e" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a aria-label="1"></a>coef1 <span class="op">=</span> np.polyfit(z_train, t_train, <span class="dv">1</span>)</span>
 <span id="cb8-2"><a aria-label="2"></a>coef9 <span class="op">=</span> np.polyfit(z_train, t_train, <span class="dv">9</span>)</span>
 <span id="cb8-3"><a aria-label="3"></a><span class="bu">print</span>(<span class="st">"次数1の係数の最大絶対値:"</span>, <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">abs</span>(coef1[:<span class="op">-</span><span class="dv">1</span>])<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss">"</span>)   <span class="co"># [:-1] は切片を除く</span></span>
 <span id="cb8-4"><a aria-label="4"></a><span class="bu">print</span>(<span class="st">"次数9の係数の最大絶対値:"</span>, <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">abs</span>(coef9[:<span class="op">-</span><span class="dv">1</span>])<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>次数1の係数の最大絶対値: 336
-次数9の係数の最大絶対値: 36,757</code></pre>
+<pre><code>次数1の係数の最大絶対値: 446
+次数9の係数の最大絶対値: 288,152</code></pre>
 </div>
 </div>
 <ul>
@@ -914,7 +916,7 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <li>各係数の勾配に足せばよい</li>
 </ul></li>
 </ul>
-<div id="dbddc981" class="cell" data-execution_count="9">
+<div id="ddc448d6" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a aria-label="1"></a><span class="co"># 特徴量 x, x², …, x⁹ を作る（列が x^1 〜 x^9 の配列）</span></span>
 <span id="cb10-2"><a aria-label="2"></a>P_train <span class="op">=</span> x_train.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>) <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)   <span class="co"># (10, 9)</span></span>
 <span id="cb10-3"><a aria-label="3"></a>P_test  <span class="op">=</span> x_test.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)  <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)</span>
@@ -941,8 +943,8 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <span id="cb10-24"><a aria-label="24"></a><span class="bu">print</span>(<span class="st">"係数の最大絶対値:"</span>, <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">abs</span>(coef_own[:<span class="op">-</span><span class="dv">1</span>])<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss">"</span>)</span>
 <span id="cb10-25"><a aria-label="25"></a><span class="bu">print</span>(<span class="st">"テストMSE:"</span>, <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span>mean((test_pred <span class="op">-</span> t_test) <span class="op">**</span> <span class="dv">2</span>)<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>係数の最大絶対値: 320
-テストMSE: 3,427</code></pre>
+<pre><code>係数の最大絶対値: 447
+テストMSE: 59,383</code></pre>
 </div>
 </div>
 <div title="結果">
@@ -974,7 +976,7 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <section id="ペナルティありなしを見比べる" class="slide level2">
 <h2>ペナルティあり・なしを見比べる</h2>
 <div class="slide-body">
-<div id="28b76614" class="cell" data-execution_count="10">
+<div id="07885f0e" class="cell" data-execution_count="10">
 <details class="code-fold">
 <summary>描画コード</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a aria-label="1"></a>P_grid    <span class="op">=</span> ((grid.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>) <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">10</span>)) <span class="op">-</span> mu) <span class="op">/</span> sd</span>
@@ -989,7 +991,7 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <span id="cb12-10"><a aria-label="10"></a>    ax.scatter(x_train, t_train, c<span class="op">=</span><span class="st">"#2980b9"</span>, s<span class="op">=</span><span class="dv">45</span>)</span>
 <span id="cb12-11"><a aria-label="11"></a>    ax.scatter(x_test, t_test, c<span class="op">=</span><span class="st">"#e74c3c"</span>, marker<span class="op">=</span><span class="st">"s"</span>, s<span class="op">=</span><span class="dv">45</span>)</span>
 <span id="cb12-12"><a aria-label="12"></a>    ax.plot(grid, curve, <span class="st">"k-"</span>, lw<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb12-13"><a aria-label="13"></a>    ax.set_ylim(<span class="dv">800</span>, <span class="dv">2900</span>)</span>
+<span id="cb12-13"><a aria-label="13"></a>    ax.set_ylim(<span class="dv">500</span>, <span class="dv">3500</span>)</span>
 <span id="cb12-14"><a aria-label="14"></a>    ax.set_title(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">}</span><span class="ch">\n</span><span class="ss">テストMSE </span><span class="sc">{</span>mse<span class="sc">:,.0f}</span><span class="ss">"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
 <span id="cb12-15"><a aria-label="15"></a>    ax.set_xlabel(<span class="st">"体長 (cm)"</span>)</span>
 <span id="cb12-16"><a aria-label="16"></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">"重さ (g)"</span>)</span>
@@ -1041,6 +1043,23 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <p><span class="math display">\[w \leftarrow w - \alpha \left( \text{MSEの勾配} + 2\lambda w \right) = (1 - 2\alpha\lambda)\, w - \alpha \times \text{MSEの勾配}\]</span></p>
 </div>
 </section>
+<section id="peek-coef-plane" class="slide level2">
+<h2>係数の空間と正則化の関係</h2>
+<div class="slide-body">
+<p><span class="math inline">\(w_1, w_2\)</span>（標準化済） をモデルとした場合、係数の組 <span class="math inline">\((w_1, w_2)\)</span>は、平面上に表せる。</p>
+<p><span class="math display">\[\text{予測} = w_1 x + w_2 x^2 + b\]</span></p>
+<p>正則化がない場合が一番MSEが低いが、破線のような形で汎化性能が低い。同じMSEとなる <span class="math inline">\(w_1, w_2\)</span> の組を線でつなぐとMSEの等高線を描ける。L2は <span class="math inline">\(w_1, w_2\)</span> の水色の円であり、<span class="math inline">\(w_1, w_2\)</span> をその範囲内に収めたいのがL2正則化。<span class="math inline">\(\lambda\)</span> を大きくしていくと、円は小さくなる。</p>
+<div id="f53abc1e" class="cell" data-execution_count="11">
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="linear-regression_files/figure-revealjs/cell-12-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img data-src="linear-regression_files/figure-revealjs/cell-12-output-1.png" class="quarto-figure quarto-figure-center" width="959" height="428"></a></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</section>
 <section id="peek-regularization-broad" class="slide level2">
 <h2>深さの制限も、広い意味での正則化</h2>
 <div class="slide-body">
@@ -1048,11 +1067,11 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <div class="takeaway">
 <p>つまり、<a href="./classification-evaluation.html#peek-depth-curve" class="peek">決定木の深さの制限</a>も正則化</p>
 </div>
-<div id="57994400" class="cell" data-execution_count="11">
+<div id="c83dd17d" class="cell" data-execution_count="12">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="linear-regression_files/figure-revealjs/cell-12-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img data-src="linear-regression_files/figure-revealjs/cell-12-output-1.png" class="quarto-figure quarto-figure-center" width="957" height="492"></a></p>
+<p><a href="linear-regression_files/figure-revealjs/cell-13-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img data-src="linear-regression_files/figure-revealjs/cell-13-output-1.png" class="quarto-figure quarto-figure-center" width="957" height="492"></a></p>
 </figure>
 </div>
 </div>
@@ -1101,7 +1120,7 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <li>ただし正則化なしの厳密解ほどは大きく外れない</li>
 <li>勾配降下法を1万回で打ち切ること自体が、係数の増大を抑える弱いブレーキになる</li>
 </ul></li>
-<li><code>10</code>：曲線はほぼ<strong>まっすぐ寝て</strong>、訓練MSEまで悪化する
+<li><code>10</code>：曲線が<strong>寝て</strong>、訓練MSEまで悪化する
 <ul>
 <li>ペナルティが強すぎて、訓練データに合わなくなる</li>
 </ul></li>
@@ -1138,18 +1157,18 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 </ul>
 </div>
 </section>
-<section id="peek-coef-plane" class="slide level2">
-<h2>係数の平面に誤差とペナルティを描く</h2>
+<section id="peek-l1-plane" class="slide level2">
+<h2>ラッソ回帰とリッジ回帰</h2>
 <div class="slide-body">
 <ul>
 <li>アヤメ150本：萼片の長さと花弁の幅から、花弁の長さを予測（すべて標準化）</li>
 <li>横軸・縦軸は係数 <span class="math inline">\(w_1\)</span>（萼片の長さ）・<span class="math inline">\(w_2\)</span>（花弁の幅）</li>
 </ul>
-<div id="b6dc4bbe" class="cell" data-execution_count="12">
+<div id="8fb1c7e3" class="cell" data-execution_count="13">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="linear-regression_files/figure-revealjs/cell-13-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img data-src="linear-regression_files/figure-revealjs/cell-13-output-1.png" class="quarto-figure quarto-figure-center" width="932" height="464"></a></p>
+<p><a href="linear-regression_files/figure-revealjs/cell-14-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img data-src="linear-regression_files/figure-revealjs/cell-14-output-1.png" class="quarto-figure quarto-figure-center" width="932" height="464"></a></p>
 </figure>
 </div>
 </div>
@@ -1164,11 +1183,7 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 </div>
 <div class="callout-content">
 <ul>
-<li>緑の楕円：MSE が同じ値になる <span class="math inline">\((w_1, w_2)\)</span> を結んだ<strong>等高線</strong>
-<ul>
-<li>中心（×）が正則化なしの解で、外側ほど MSE が大きい</li>
-<li>予測が <span class="math inline">\(w\)</span> について<a href="#/peek-quadratic-linear" class="peek">線形</a>なので MSE は <span class="math inline">\(w\)</span> の2次式になり、等高線は楕円</li>
-</ul></li>
+<li>緑の楕円：<a href="#/peek-coef-plane" class="peek">MSE の等高線</a>（中心の × が正則化なしの解）</li>
 <li>塗った範囲：ペナルティが一定値 <span class="math inline">\(c\)</span> 以下になる <span class="math inline">\((w_1, w_2)\)</span>
 <ul>
 <li><strong>L2ノルム</strong>（<span class="en">L2 norm</span>）<span class="math inline">\(\|w\|_2 = \sqrt{w_1^2 + w_2^2}\)</span> が <span class="math inline">\(c\)</span> 以下：円</li>
@@ -1178,71 +1193,8 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 </div>
 </div>
 </div>
-<div title="結果">
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>結果</strong></p>
-</div>
-<div class="callout-content">
-<ul>
-<li>中心から楕円を広げ、範囲に最初に触れた点（○）が解
-<ul>
-<li><span class="math inline">\(\mathrm{MSE} + \lambda \times\)</span> ペナルティの解は、ある <span class="math inline">\(c\)</span> の範囲の中で MSE が最小の点と同じ</li>
-<li><span class="math inline">\(\lambda\)</span> を大きくするほど、<span class="math inline">\(c\)</span> は小さくなる</li>
-</ul></li>
-<li>円（リッジ回帰）：角がないので、接点はふつう両方の係数が 0 でない点</li>
-<li>ひし形（ラッソ回帰）：楕円は角で触れやすく、角では片方の係数が<strong>ちょうど 0</strong>
-<ul>
-<li>角はどれも、灰色の線（<span class="math inline">\(w_1 = 0\)</span> か <span class="math inline">\(w_2 = 0\)</span>）の上</li>
-<li>係数が 0 の特徴量は、予測に使われない：<strong>特徴量選択</strong>（<span class="en">feature selection</span>）</li>
-</ul></li>
-</ul>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="リッジ回帰とラッソ回帰の違い" class="slide level2">
-<h2>リッジ回帰とラッソ回帰の違い</h2>
-<div class="slide-body">
-<table class="caption-top">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th></th>
-<th>リッジ回帰</th>
-<th>ラッソ回帰</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>ペナルティ</td>
-<td>L2：<span class="math inline">\(\lambda \sum_j w_j^2\)</span></td>
-<td>L1：<span class="math inline">\(\lambda \sum_j \lvert w_j \rvert\)</span></td>
-</tr>
-<tr class="even">
-<td>係数</td>
-<td>全体を小さくする</td>
-<td>一部をちょうど 0 にする</td>
-</tr>
-<tr class="odd">
-<td>使いどころ</td>
-<td>予測を安定させたい</td>
-<td>使う特徴量を絞りたい（測る項目を減らす）</td>
-</tr>
-</tbody>
-</table>
 <div class="takeaway">
-<p>どちらが良いかはデータごとに違うので、<a href="./classification-evaluation.html#peek-cv" class="peek">交差検証</a>で選ぶ</p>
+<p>どちらも範囲に最初に触れた点（○）が解で、違うのは範囲の形だけ</p>
 </div>
 </div>
 </section>
@@ -1259,8 +1211,8 @@ np.polyfit      : a=0.9854, b=0.0000</code></pre>
 <li><strong>過学習は回帰でも起きる</strong>：次数を上げると訓練誤差は下がり、テスト誤差は桁違いに増える</li>
 <li><strong>正則化（<span class="en">regularization</span>）</strong>：大きい係数にペナルティを与え、曲線の振れを抑える
 <ul>
-<li><strong>リッジ回帰</strong>（L2）：係数全体を小さくする</li>
-<li><strong>ラッソ回帰</strong>（L1）：一部の係数をちょうど 0 にする</li>
+<li><strong>リッジ回帰</strong>：L2正則化（<span class="math inline">\(\lambda \sum_j w_j^2\)</span>）</li>
+<li><strong>ラッソ回帰</strong>：L1正則化（<span class="math inline">\(\lambda \sum_j |w_j|\)</span>）</li>
 </ul></li>
 </ul>
 </div>
@@ -1305,7 +1257,7 @@ a = 0.2 + 0.16 = 0.36\]</span></p>
 </div>
 </div>
 <h3 id="コードで確認">コードで確認</h3>
-<div id="b7b8f811" class="cell" data-execution_count="13">
+<div id="92b26ff4" class="cell" data-execution_count="14">
 <details class="code-fold">
 <summary>解答例を見る</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
